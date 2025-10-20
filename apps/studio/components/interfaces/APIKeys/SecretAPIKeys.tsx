@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { ReactNode, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -8,11 +8,11 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Card, CardContent, EyeOffIcon, Skeleton, cn } from 'ui'
+import { Card, EyeOffIcon } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -75,106 +75,59 @@ export const SecretAPIKeys = () => {
 
   const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
-  const RowLoading = () => (
-    <TableRow>
-      <TableCell>
-        <Skeleton className="max-w-12 h-4 rounded-full" />
-      </TableCell>
-      <TableCell>
-        <Skeleton className="max-w-60 h-4 rounded-full" />
-      </TableCell>
-      <TableCell>
-        <Skeleton className="max-w-60 h-4 rounded-full" />
-      </TableCell>
-      <TableCell>
-        <Skeleton className="w-2 h-4 rounded-full" />
-      </TableCell>
-    </TableRow>
-  )
-
-  const TableContainer = ({ children, className }: { children: ReactNode; className?: string }) => (
+  return (
     <div className="pb-30">
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
         actions={<CreateSecretAPIKeyDialog />}
       />
-      <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100', className)}>
-        <CardContent className="p-0">
-          <Table className="p-5 table-auto">
-            <TableHeader>
-              <TableRow className={cn('bg-200', empty && 'hidden')}>
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                  Name
-                </TableHead>
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0">
-                  API Key
-                </TableHead>
 
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 hidden lg:table-cell">
-                  Last Seen
-                </TableHead>
-                <TableHead className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2" />
+      {isLoadingApiKeys || isLoadingPermissions ? (
+        <GenericSkeletonLoader />
+      ) : !canReadAPIKeys ? (
+        <Card>
+          <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+            <EyeOffIcon />
+            <p className="text-sm text-foreground">
+              You do not have permission to read API Secret Keys
+            </p>
+            <p className="text-foreground-light">
+              Contact your organization owner/admin to request access.
+            </p>
+          </div>
+        </Card>
+      ) : isErrorApiKeys ? (
+        <AlertError error={error} subject="Failed to load secret API keys" />
+      ) : empty ? (
+        <Card>
+          <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+            <p className="text-sm text-foreground">No secret API keys found</p>
+            <p className="text-sm text-foreground-light">
+              Your project is not accessible via secret keys—there are no active secret keys
+              created.
+            </p>
+          </div>
+        </Card>
+      ) : (
+        <Card className="bg-surface-100">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-200">
+                <TableHead>Name</TableHead>
+                <TableHead>API Key</TableHead>
+                <TableHead className="hidden lg:table-cell">Last Seen</TableHead>
+                <TableHead />
               </TableRow>
             </TableHeader>
-            <TableBody className="">{children}</TableBody>
+            <TableBody>
+              {secretApiKeys.map((apiKey) => (
+                <APIKeyRow key={apiKey.id} apiKey={apiKey} lastSeen={lastSeen[apiKey.hash]} />
+              ))}
+            </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </Card>
+      )}
     </div>
-  )
-
-  if (isLoadingApiKeys || isLoadingPermissions) {
-    return (
-      <TableContainer>
-        <RowLoading />
-        <RowLoading />
-      </TableContainer>
-    )
-  }
-
-  if (!canReadAPIKeys) {
-    return (
-      <TableContainer>
-        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-          <EyeOffIcon />
-          <p className="text-sm text-foreground">
-            You do not have permission to read API Secret Keys
-          </p>
-          <p className="text-foreground-light">
-            Contact your organization owner/admin to request access.
-          </p>
-        </div>
-      </TableContainer>
-    )
-  }
-
-  if (isErrorApiKeys) {
-    return (
-      <TableContainer className="border-0">
-        <AlertError error={error} subject="Failed to load secret API keys" />
-      </TableContainer>
-    )
-  }
-
-  if (empty) {
-    return (
-      <TableContainer>
-        <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-          <p className="text-sm text-foreground">No secret API keys found</p>
-          <p className="text-sm text-foreground-light">
-            Your project is not accessible via secret keys—there are no active secret keys created.
-          </p>
-        </div>
-      </TableContainer>
-    )
-  }
-
-  return (
-    <TableContainer>
-      {secretApiKeys.map((apiKey) => (
-        <APIKeyRow key={apiKey.id} apiKey={apiKey} lastSeen={lastSeen[apiKey.hash]} />
-      ))}
-    </TableContainer>
   )
 }

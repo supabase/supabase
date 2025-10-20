@@ -34,6 +34,7 @@
   "dashboard_auth:sign_in_with_sso": true,
   "dashboard_auth:sign_in_with_email": true,
   "dashboard_auth:show_testimonial": true,
+  "dashboard_auth:show_tos": true,
 
   "database:replication": true,
   "database:roles": true,
@@ -78,6 +79,7 @@
 
   "organization:show_sso_settings": true,
   "organization:show_security_settings": true,
+  "organization:show_legal_documents": true,
 
   "profile:show_email": true,
   "profile:show_information": true,

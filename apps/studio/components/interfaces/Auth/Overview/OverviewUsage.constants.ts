@@ -15,6 +15,7 @@ export const getDateRanges = () => {
 }
 
 export const AUTH_COMBINED_QUERY = () => `
+-- auth-overview
   with base as (
     select
       json_value(event_message, "$.auth_event.action") as action,

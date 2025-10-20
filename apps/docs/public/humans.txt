@@ -10,6 +10,7 @@ Aleksi Immonen
 Alexander Korotkov
 Amy Q
 Andrew Valleteau
+Andrey A
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
@@ -26,6 +27,7 @@ Cameron Blackwood
 Cemal Kılıç
 Chandana Anumula
 Charis Lam
+Chase Cresgy
 Chase Granberry
 Chris Caruso
 Chris Chandler
@@ -50,6 +52,7 @@ Dustin Keib
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
+Eliot Whalan
 Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
@@ -60,6 +63,7 @@ Francesco Sansalvadore
 Greg Kress
 Greg P
 Greg Richardson
+Gregor Vand
 Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari

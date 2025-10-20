@@ -48,7 +48,7 @@
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@types/node": "catalog:",
-    "eslint": "^8.57.0",
+    "eslint": "^9.0.0",
     "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",

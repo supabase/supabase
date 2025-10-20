@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ExternalLink, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -15,9 +14,9 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -53,9 +52,10 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
 
 export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { setProjectStatus } = useSetProjectStatus()
+
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const enableProBenefitWording = usePHFlag('proBenefitWording')
 
@@ -89,7 +89,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const { mutate: restoreProject, isLoading: isRestoring } = useProjectRestoreMutation({
     onSuccess: (_, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
       toast.success('Restoring project')
     },
   })
