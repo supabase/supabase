@@ -258,6 +258,9 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                               rowLink={rowLink}
                               external={isPR}
                               rowActions={
+                                // We always want to show the action button to close a merge request
+                                // when user has requested review from dashboard. It doesn't matter
+                                // whether the branch is linked to a GitHub PR.
                                 branch.review_requested_at && (
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
