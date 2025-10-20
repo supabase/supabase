@@ -108,20 +108,13 @@ export const UsersV2 = () => {
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
 
-  // [Joshen] Opting to only store filter column into local storage for now, which will initialize
+  // [Joshen] Opting to store filter column, into local storage for now, which will initialize
   // the page when landing on auth users page only if no query params for filter column provided
-  const [localStorageFilter, setLocalStorageFilter] = useLocalStorageQuery<
-    'id' | 'email' | 'phone' | 'freeform'
-  >(LOCAL_STORAGE_KEYS.AUTH_USERS_FILTER(projectRef ?? ''), 'id')
-
-  const [columns, setColumns] = useState<Column<any>[]>([])
-  const [search, setSearch] = useState('')
-  const [selectedUser, setSelectedUser] = useState<string>()
-  const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
-  const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [isDeletingUsers, setIsDeletingUsers] = useState(false)
-  const [showFreeformWarning, setShowFreeformWarning] = useState(false)
+  const [localStorageFilter, setLocalStorageFilter, { isSuccess: isLocalStorageFilterLoaded }] =
+    useLocalStorageQuery<'id' | 'email' | 'phone' | 'freeform'>(
+      LOCAL_STORAGE_KEYS.AUTH_USERS_FILTER(projectRef ?? ''),
+      'id'
+    )
 
   const [
     columnConfiguration,
@@ -131,6 +124,15 @@ export const UsersV2 = () => {
     LOCAL_STORAGE_KEYS.AUTH_USERS_COLUMNS_CONFIGURATION(projectRef ?? ''),
     null as ColumnConfiguration[] | null
   )
+
+  const [columns, setColumns] = useState<Column<any>[]>([])
+  const [search, setSearch] = useState('')
+  const [selectedUser, setSelectedUser] = useState<string>()
+  const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [isDeletingUsers, setIsDeletingUsers] = useState(false)
+  const [showFreeformWarning, setShowFreeformWarning] = useState(false)
 
   const {
     data,
