@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
+import { Box, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -110,7 +110,7 @@ export const CreateVectorBucketDialog = () => {
         <ButtonTooltip
           block
           size="tiny"
-          type="default"
+          type="primary"
           className="w-fit"
           icon={<Plus size={14} />}
           disabled={!canCreateBuckets}
@@ -124,20 +124,20 @@ export const CreateVectorBucketDialog = () => {
             },
           }}
         >
-          Create vector bucket
+          Create bucket
         </ButtonTooltip>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create a vector bucket</DialogTitle>
+          <DialogTitle>Create vector bucket</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-2">
+            <DialogSection>
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -147,6 +147,7 @@ export const CreateVectorBucketDialog = () => {
                     name="name"
                     label="Bucket name"
                     labelOptional="Cannot be changed after creation"
+                    description="Must be between 3–63 characters. Valid characters are a-z, 0-9, hyphens (-), and periods (.). A target schema will be created that matches this name."
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
@@ -162,6 +163,29 @@ export const CreateVectorBucketDialog = () => {
                   </FormItemLayout>
                 )}
               />
+            </DialogSection>
+            <DialogSectionSeparator />
+            <DialogSection>
+              <span className="text-sm text-foreground leading-normal">Required integrations</span>
+              <div className="flex flex-row space-y-3">
+                <div className="flex items-start gap-3 p-4">
+                  <div className="flex-shrink-0 mt-1">
+                    <Box />
+                  </div>
+                </div>
+                <p className="text-sm text-foreground-light">
+                  S3 Vectors Wrapper will be installed on your behalf. This integration is required
+                  for querying analytics data.{' '}
+                  <a
+                    href="https://supabase.com/docs/guides/storage/vector"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:no-underline"
+                  >
+                    Learn more
+                  </a>
+                </p>
+              </div>
             </DialogSection>
           </form>
         </Form_Shadcn_>
