@@ -159,6 +159,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  const isHomeNew = useFlag('homeNew')
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },
@@ -210,7 +211,7 @@ const Wizard: NextPageWithLayout = () => {
           organization: res.organization_slug,
         },
       })
-      router.push(`/project/${res.ref}/building`)
+      router.push(isHomeNew ? `/project/${res.ref}` : `/project/${res.ref}/building`)
     },
   })
 
