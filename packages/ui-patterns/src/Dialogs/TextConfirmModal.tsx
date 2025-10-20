@@ -34,6 +34,7 @@ export interface TextConfirmModalProps {
   confirmLabel?: string
   confirmPlaceholder: string
   confirmString: string
+  className?: string
   text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
@@ -67,6 +68,7 @@ const TextConfirmModal = forwardRef<
       confirmLabel = 'Submit',
       confirmPlaceholder,
       confirmString,
+      className,
       alert,
       input,
       label,
@@ -135,7 +137,9 @@ const TextConfirmModal = forwardRef<
           )}
           {children && (
             <>
-              <DialogSection padding={'small'}>{children}</DialogSection>
+              <DialogSection padding="small" className={className}>
+                {children}
+              </DialogSection>
               <DialogSectionSeparator />
             </>
           )}

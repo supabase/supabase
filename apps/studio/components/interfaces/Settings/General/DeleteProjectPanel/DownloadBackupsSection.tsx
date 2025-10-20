@@ -40,7 +40,7 @@ export const DownloadBackupsSection = () => {
   )
 
   return (
-    <Accordion_Shadcn_ collapsible type="single" className="border-t mt-5">
+    <Accordion_Shadcn_ collapsible type="single">
       <AccordionItem_Shadcn_ value="backups" className="border-b-0 px-5">
         <AccordionTrigger_Shadcn_ className="pb-2">
           <p className="text-sm">Download a backup of your database before deleting</p>

@@ -101,7 +101,7 @@ export const DeleteProjectModal = ({
     <TextConfirmModal
       visible={visible}
       loading={isSubmitting}
-      size={isFree ? 'small' : 'xlarge'}
+      size={isFree ? 'medium' : 'xlarge'}
       title={`Confirm deletion of ${project?.name}`}
       variant="destructive"
       alert={{
@@ -122,7 +122,7 @@ export const DeleteProjectModal = ({
       onCancel={() => {
         if (!isSubmitting) onClose()
       }}
-      className="md:px-0 pb-2"
+      className="md:px-0 pt-0 pb-2"
     >
       {/* 
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
@@ -130,7 +130,7 @@ export const DeleteProjectModal = ({
           but leaving that for the future.
         */}
       {!isFree && (
-        <div className="px-5">
+        <div className="px-5 pb-5 border-b">
           <div className="space-y-1">
             <h4 className="text-sm">
               Help us improve by sharing why you're deleting your project.
