@@ -126,7 +126,8 @@ comment on function ${QUEUES_SCHEMA}.delete(queue_name text, message_id bigint) 
 create or replace function ${QUEUES_SCHEMA}.read(
     queue_name text,
     sleep_seconds integer,
-    n integer
+    n integer,
+    condition JSONB DEFAULT '{}'::jsonb
 )
   returns setof pgmq.message_record
   language plpgsql
@@ -138,7 +139,8 @@ begin
     from pgmq.read(
         queue_name := queue_name,
         vt := sleep_seconds,
-        qty := n
+        qty := n,
+        condition := condition
     );
 end;
 $$;
@@ -162,7 +164,7 @@ grant execute on function ${QUEUES_SCHEMA}.delete(text, bigint) to postgres, ser
 grant execute on function pgmq.delete(text, bigint) to postgres, service_role, anon, authenticated;
 
 grant execute on function ${QUEUES_SCHEMA}.read(text, integer, integer) to postgres, service_role, anon, authenticated;
-grant execute on function pgmq.read(text, integer, integer) to postgres, service_role, anon, authenticated;
+grant execute on function pgmq.read(text, integer, integer, jsonb) to postgres, service_role, anon, authenticated;
 
 -- For the service role, we want full access
 -- Grant permissions on existing tables
