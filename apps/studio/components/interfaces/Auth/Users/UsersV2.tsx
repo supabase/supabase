@@ -21,7 +21,7 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
-import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
   Button,
   cn,
@@ -97,16 +97,22 @@ export const UsersV2 = () => {
     parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
   )
   const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
+  const [sortByValue, setSortByValue] = useQueryState('id:asc', { defaultValue: 'id:asc' })
+  const [sortColumn, sortOrder] = sortByValue.split(':')
+  const [selectedColumns, setSelectedColumns] = useQueryState(
+    'columns',
+    parseAsArrayOf(parseAsString, ',').withDefault([])
+  )
+  const [selectedProviders, setSelectedProviders] = useQueryState(
+    'providers',
+    parseAsArrayOf(parseAsString, ',').withDefault([])
+  )
 
   // [Joshen] Opting to only store filter column into local storage for now, which will initialize
   // the page when landing on auth users page only if no query params for filter column provided
   const [localStorageFilter, setLocalStorageFilter] = useLocalStorageQuery<
     'id' | 'email' | 'phone' | 'freeform'
   >(LOCAL_STORAGE_KEYS.AUTH_USERS_FILTER(projectRef ?? ''), 'id')
-
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([])
-  const [selectedProviders, setSelectedProviders] = useState<string[]>([])
-  const [sortByValue, setSortByValue] = useState<string>('id:asc')
 
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
@@ -125,8 +131,6 @@ export const UsersV2 = () => {
     LOCAL_STORAGE_KEYS.AUTH_USERS_COLUMNS_CONFIGURATION(projectRef ?? ''),
     null as ColumnConfiguration[] | null
   )
-
-  const [sortColumn, sortOrder] = sortByValue.split(':')
 
   const {
     data,
@@ -310,7 +314,7 @@ export const UsersV2 = () => {
     <>
       <div className="h-full flex flex-col">
         <FormHeader className="py-4 px-6 !mb-0" title="Users" />
-        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-t">
+        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
               <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
