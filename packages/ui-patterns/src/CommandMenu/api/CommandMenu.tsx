@@ -6,11 +6,13 @@ import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo 
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { useBreakpoint } from 'common'
+import type { CommandMenuOpenedEvent } from 'common/telemetry-constants'
 import useDragToClose from 'common/hooks/useDragToClose'
 import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
+import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 import {
   useCommandMenuSize,
   useCommandMenuOpen,
@@ -26,6 +28,7 @@ function Breadcrumb({ className }: { className?: string }) {
 
   return (
     <button
+      type="button"
       className={cn(
         'p-2 bg-overlay flex items-center gap-2 text-xs text-foreground-muted',
         className
@@ -108,6 +111,7 @@ function useTouchGestures({ toggleOpen }: { toggleOpen: () => void }) {
 function CommandMenuTrigger({ children }: PropsWithChildren) {
   const open = useCommandMenuOpen()
   const setOpen = useSetCommandMenuOpen()
+  const telemetryContext = useCommandMenuTelemetryContext()
 
   const childFromProps = Children.only(children) as ReactElement<
     {
@@ -120,6 +124,20 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
   const handleOpen = () => {
     setOpen(!open)
     childFromProps.props.onOpen?.(!open)
+
+    // Send telemetry when opening via click
+    if (!open && telemetryContext?.onTelemetry) {
+      const event = {
+        action: 'command_menu_opened' as const,
+        properties: {
+          trigger: 'search_input' as const,
+          app: telemetryContext.app,
+        },
+        groups: {} as CommandMenuOpenedEvent['groups'],
+      }
+
+      telemetryContext.onTelemetry(event)
+    }
   }
 
   const childWithClickHandler = cloneElement(childFromProps, {

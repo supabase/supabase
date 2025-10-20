@@ -1950,6 +1950,28 @@ export interface AuthUsersSearchSubmittedEvent {
 }
 
 /**
+ * User opened the command menu.
+ *
+ * @group Events
+ * @source ui-patterns
+ * @page any
+ */
+export interface CommandMenuOpenedEvent {
+  action: 'command_menu_opened'
+  properties: {
+    /**
+     * The trigger that opened the command menu
+     */
+    trigger: 'keyboard_shortcut' | 'search_input'
+    /**
+     * The trigger that opened the command menu
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2063,3 +2085,4 @@ export type TelemetryEvent =
   | TableDataAddedEvent
   | TableRLSEnabledEvent
   | AuthUsersSearchSubmittedEvent
+  | CommandMenuOpenedEvent

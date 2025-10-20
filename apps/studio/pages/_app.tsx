@@ -57,7 +57,7 @@ import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
