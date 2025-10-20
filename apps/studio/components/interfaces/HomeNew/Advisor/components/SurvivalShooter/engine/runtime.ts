@@ -1,5 +1,6 @@
 import {
   type Enemy,
+  type ExperienceDrop,
   type GameConfig,
   type GameState,
   GameStatus,
@@ -14,12 +15,26 @@ import {
 import type { GameItem } from '../items/base'
 import { getItemById } from '../items'
 import { aggregateEventHandlers } from '../weapons/base'
-import { GameEventBus, type SpawnProjectileOptions } from '../events'
+import {
+  GameEventBus,
+  type SpawnProjectileOptions,
+  type ProjectileRenderFunction,
+  type ProjectileBehaviorFunction,
+} from '../events'
 import { getAllWeapons, getWeaponByType } from '../weapons'
 import { defaultPlayer } from '../player/default'
 
+interface ProjectileUpdateContext {
+  deltaTime: number
+  currentTime: number
+  runtime: GameRuntime
+}
+
+type ProjectileBehavior = ProjectileBehaviorFunction
+
 type RuntimeProjectile = Projectile & {
   behavior: ProjectileBehavior
+  render: ProjectileRenderFunction
 }
 
 type RuntimeEnemy = Enemy & {
@@ -30,14 +45,6 @@ type RuntimeGameState = GameState & {
   enemies: RuntimeEnemy[]
   projectiles: RuntimeProjectile[]
 }
-
-interface ProjectileUpdateContext {
-  deltaTime: number
-  currentTime: number
-  runtime: GameRuntime
-}
-
-type ProjectileBehavior = (projectile: RuntimeProjectile, ctx: ProjectileUpdateContext) => boolean
 
 interface EnemyUpdateContext {
   deltaTime: number
@@ -53,13 +60,13 @@ interface ItemBuckets {
   unlockedWeapons: Set<WeaponType>
 }
 
-
 export class GameRuntime {
   readonly events = new GameEventBus()
   state: RuntimeGameState
 
   private enemyIdCounter = 0
   private projectileIdCounter = 0
+  private experienceDropIdCounter = 0
   private readonly baseStats: PlayerStats
   config: GameConfig // made public for behavior functions
   private itemSubscriptions: Array<() => void> = []
@@ -75,6 +82,7 @@ export class GameRuntime {
   initialize(selectedCards: SelectedCard[], maxSelectableItems: number): RuntimeGameState {
     this.enemyIdCounter = 0
     this.projectileIdCounter = 0
+    this.experienceDropIdCounter = 0
     this.selectedCards = selectedCards
     this.events.clear()
     this.teardownItemHandlers()
@@ -121,6 +129,7 @@ export class GameRuntime {
     this.handleWeapons(currentTime)
     this.updateProjectiles(deltaTime, currentTime)
     this.updateEnemies(deltaTime, currentTime)
+    this.collectExperienceDrops()
     this.spawnEnemiesIfNeeded(currentTime)
     this.updateWaveFromScore(this.state.score)
 
@@ -130,19 +139,85 @@ export class GameRuntime {
     }
   }
 
+  private collectExperienceDrops() {
+    const player = this.state.player
+    const playerRadius = this.getPlayerRadius()
+    const pickupRadius = playerRadius + 10 // pickup range
+
+    for (let i = this.state.experienceDrops.length - 1; i >= 0; i--) {
+      const drop = this.state.experienceDrops[i]
+      const dx = drop.position.x - player.position.x
+      const dy = drop.position.y - player.position.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+
+      if (distance < pickupRadius) {
+        // Collect the experience
+        const oldLevel = this.state.currentLevel
+        this.state.experience += drop.value
+        this.state.currentLevel = this.calculateLevel(this.state.experience)
+
+        // Check if level up occurred
+        if (this.state.currentLevel > oldLevel) {
+          this.handleLevelUp()
+        }
+
+        // Remove the drop
+        this.state.experienceDrops.splice(i, 1)
+      }
+    }
+  }
+
+  private calculateLevel(experience: number): number {
+    // Exponential level progression: level = floor(sqrt(experience / 5)) + 1
+    // Level 1: 0 exp, Level 2: 5 exp, Level 3: 20 exp, Level 4: 45 exp, Level 5: 80 exp, etc.
+    return Math.floor(Math.sqrt(experience / 5)) + 1
+  }
+
+  getExperienceForLevel(level: number): number {
+    // Inverse of calculateLevel: experience needed for a specific level
+    return (level - 1) * (level - 1) * 5
+  }
+
+  getExperienceForNextLevel(): number {
+    return this.getExperienceForLevel(this.state.currentLevel + 1)
+  }
+
+  private handleLevelUp() {
+    // Pause the game
+    this.state.status = GameStatus.PAUSED
+    // The UI will detect this and show the item selection screen
+  }
+
   spawnProjectile(projectile: SpawnProjectileOptions, currentTime: number) {
     const id = projectile.id ?? this.nextProjectileId()
     const createdAt = projectile.createdAt ?? currentTime
 
-    // Get behavior from weapon definition
-    const weaponDefinition = getWeaponByType(projectile.weaponType)
-    const behavior = weaponDefinition.createProjectileBehavior()
+    // Use provided behavior/renderer if available, otherwise get from weapon definition
+    let behavior: ProjectileBehavior
+    let render: ProjectileRenderFunction
+
+    if (projectile.behavior && projectile.render) {
+      // Item provided custom behavior and renderer (e.g., explosions)
+      behavior = projectile.behavior
+      render = projectile.render
+    } else if (projectile.isPulse) {
+      // Legacy pulse projectiles (ring weapon)
+      const weaponDefinition = getWeaponByType(projectile.weaponType)
+      behavior = weaponDefinition.createProjectileBehavior()
+      render = weaponDefinition.createProjectileRenderer()
+    } else {
+      // Standard weapon projectiles
+      const weaponDefinition = getWeaponByType(projectile.weaponType)
+      behavior = weaponDefinition.createProjectileBehavior()
+      render = weaponDefinition.createProjectileRenderer()
+    }
 
     const runtimeProjectile: RuntimeProjectile = {
       ...projectile,
       id,
       createdAt,
       behavior,
+      render,
     }
 
     this.state.projectiles.push(runtimeProjectile)
@@ -221,6 +296,7 @@ export class GameRuntime {
       player,
       enemies: [],
       projectiles: [],
+      experienceDrops: [],
       wave: {
         waveNumber: 1,
         enemiesRemaining: 0,
@@ -229,6 +305,8 @@ export class GameRuntime {
       },
       score: 0,
       enemiesKilled: 0,
+      experience: 0,
+      currentLevel: 1,
       selectedCards,
       mousePosition: null,
       maxSelectableItems,
@@ -304,24 +382,27 @@ export class GameRuntime {
         unlocked.add(item.unlocksWeapon)
       }
 
-      if (item.requiresWeaponSelection) {
-        if (!card.assignedWeaponType) return
+      // Items with weapon modifiers go to perWeapon bucket for stat calculations
+      if (item.requiresWeaponSelection && card.assignedWeaponType) {
         const bucket = perWeapon.get(card.assignedWeaponType)
         if (bucket) {
           bucket.push(item)
         }
-        return
+        // Don't return - also add to global for event handlers
       }
 
+      // All items go to global bucket for event handler registration
       global.push(item)
     })
 
     return { global, perWeapon, unlockedWeapons: unlocked }
   }
 
-  private registerItemHandlers({ global, perWeapon }: ItemBuckets) {
+  private registerItemHandlers({ global }: ItemBuckets) {
     this.teardownItemHandlers()
 
+    // Register all item event handlers globally
+    // Items check applicableWeaponTypes themselves in their handlers
     if (global.length > 0) {
       const handlers = aggregateEventHandlers(global)
       if (handlers.onDamage) {
@@ -343,22 +424,6 @@ export class GameRuntime {
         this.itemSubscriptions.push(this.events.onPlayerDamaged(handlers.onPlayerDamaged))
       }
     }
-
-    perWeapon.forEach((items, weaponType) => {
-      if (items.length === 0) return
-      const weaponDefinition = getWeaponByType(weaponType)
-      const handlers = weaponDefinition.getEventHandlers(items)
-
-      if (handlers.onDamage) {
-        this.itemSubscriptions.push(this.events.onDamage(handlers.onDamage, weaponType))
-      }
-      if (handlers.onEnemyDeath) {
-        this.itemSubscriptions.push(this.events.onEnemyDeath(handlers.onEnemyDeath, weaponType))
-      }
-      if (handlers.onShoot) {
-        this.itemSubscriptions.push(this.events.onShoot(handlers.onShoot, weaponType))
-      }
-    })
   }
 
   private updatePlayerStats(selectedCards: SelectedCard[]) {
@@ -598,7 +663,19 @@ export class GameRuntime {
     if (index >= 0) {
       this.state.enemies.splice(index, 1)
       this.state.enemiesKilled++
+
+      // Spawn experience drop at enemy position
+      this.spawnExperienceDrop(enemy.position, 1)
     }
+  }
+
+  private spawnExperienceDrop(position: Vector2, value: number) {
+    const drop: ExperienceDrop = {
+      id: `exp_${this.experienceDropIdCounter++}`,
+      position: { ...position },
+      value,
+    }
+    this.state.experienceDrops.push(drop)
   }
 
   private updateWaveFromScore(score: number) {
@@ -618,87 +695,6 @@ export class GameRuntime {
 
   private nextProjectileId(): string {
     return `projectile_${this.projectileIdCounter++}`
-  }
-}
-
-const createProjectileBehavior = (): ProjectileBehavior => {
-  return (projectile, { deltaTime, runtime, currentTime }) => {
-    projectile.position.x += projectile.velocity.x * deltaTime
-    projectile.position.y += projectile.velocity.y * deltaTime
-
-    const { config } = runtime
-
-    if (
-      projectile.position.x > config.canvasWidth + 20 ||
-      projectile.position.x < -20 ||
-      projectile.position.y > config.canvasHeight + 20 ||
-      projectile.position.y < -20
-    ) {
-      return false
-    }
-
-    const enemies = runtime.state.enemies
-
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      const enemy = enemies[i]
-      const dx = projectile.position.x - enemy.position.x
-      const dy = projectile.position.y - enemy.position.y
-      const distance = Math.sqrt(dx * dx + dy * dy)
-      const isColliding = distance < projectile.radius + runtime.config.enemySize / 2
-
-      if (!isColliding) continue
-
-      const removeProjectile = runtime.handleProjectileHit(
-        enemy,
-        projectile,
-        currentTime,
-        true
-      )
-
-      if (removeProjectile) {
-        return false
-      }
-    }
-
-    return true
-  }
-}
-
-const createPulseBehavior = (): ProjectileBehavior => {
-  return (projectile, { currentTime, runtime }) => {
-    const startTime = projectile.createdAt ?? currentTime
-    const ageSeconds = (currentTime - startTime) / 1000
-    const initialRadius = projectile.initialRadius ?? runtime.config.playerRadius
-
-    projectile.radius = initialRadius + ageSeconds * RING_EXPANSION_SPEED
-
-    const maxDimension = Math.max(runtime.config.canvasWidth, runtime.config.canvasHeight)
-    const maxAge = projectile.maxAge ?? DEFAULT_RING_MAX_AGE
-
-    if (ageSeconds > maxAge || projectile.radius > maxDimension) {
-      return false
-    }
-
-    const playerPosition = runtime.state.player.position
-    const enemies = runtime.state.enemies
-    const ringThickness = 20
-
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      const enemy = enemies[i]
-      const dx = enemy.position.x - playerPosition.x
-      const dy = enemy.position.y - playerPosition.y
-      const distanceFromCenter = Math.sqrt(dx * dx + dy * dy)
-
-      const isColliding =
-        Math.abs(distanceFromCenter - projectile.radius) <
-        ringThickness + runtime.config.enemySize / 2
-
-      if (!isColliding) continue
-
-      runtime.handleProjectileHit(enemy, projectile, currentTime, false)
-    }
-
-    return true
   }
 }
 

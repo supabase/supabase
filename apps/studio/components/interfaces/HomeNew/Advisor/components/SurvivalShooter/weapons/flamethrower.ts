@@ -1,4 +1,10 @@
-import type { GameWeapon, ShootContext, ShootResult, ProjectileBehavior } from './base'
+import type {
+  GameWeapon,
+  ShootContext,
+  ShootResult,
+  ProjectileBehavior,
+  ProjectileRenderFunction,
+} from './base'
 import { applyModifiers, aggregateModifiers, aggregateEventHandlers } from './base'
 import type { GameItem } from '../items/base'
 import type { Projectile } from '../types'
@@ -132,6 +138,24 @@ export const flamethrowerWeapon = defineWeapon({
 
       // Flamethrower never expires, only one exists per weapon
       return true
+    }
+  },
+
+  createProjectileRenderer: (): ProjectileRenderFunction => {
+    return (projectile, { ctx }) => {
+      ctx.strokeStyle = '#fb923c' // orange
+      ctx.lineWidth = 3
+      ctx.globalAlpha = 0.8
+      ctx.beginPath()
+
+      const lineLength = projectile.radius
+      const endX = projectile.position.x + Math.cos(projectile.angle) * lineLength
+      const endY = projectile.position.y + Math.sin(projectile.angle) * lineLength
+
+      ctx.moveTo(projectile.position.x, projectile.position.y)
+      ctx.lineTo(endX, endY)
+      ctx.stroke()
+      ctx.globalAlpha = 1
     }
   },
 

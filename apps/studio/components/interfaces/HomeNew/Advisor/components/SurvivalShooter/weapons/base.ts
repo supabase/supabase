@@ -32,6 +32,18 @@ export interface ProjectileUpdateContext {
 
 export type ProjectileBehavior = (projectile: Projectile, ctx: ProjectileUpdateContext) => boolean
 
+// Projectile render context
+export interface ProjectileRenderContext {
+  ctx: CanvasRenderingContext2D
+  playerPosition: Vector2
+  isDark: boolean
+}
+
+export type ProjectileRenderFunction = (
+  projectile: Projectile,
+  renderCtx: ProjectileRenderContext
+) => void
+
 // Base weapon stats
 export interface BaseWeaponStats {
   damage: number
@@ -88,8 +100,11 @@ export interface GameWeapon {
     projectileAngles: number[]
   ) => ShootResult | null
 
-  // Create projectile behavior (movement, collision, rendering)
+  // Create projectile behavior (movement, collision)
   createProjectileBehavior: () => ProjectileBehavior
+
+  // Create projectile renderer
+  createProjectileRenderer: () => ProjectileRenderFunction
 
   // Get event handlers from applied items
   getEventHandlers: (appliedItems: GameItem[]) => EventHandlers

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useTheme } from 'next-themes'
 import type { GameState, GameConfig } from './types'
-import { WeaponType } from './types'
 
 interface SurvivalCanvasProps {
   gameStateRef: React.MutableRefObject<GameState | null>
@@ -34,7 +33,7 @@ export const SurvivalCanvas = ({ gameStateRef, config, onMouseMove, onResize }: 
 
     const gameState = gameStateRef.current
     if (gameState) {
-      const { player, enemies, projectiles } = gameState
+      const { player, enemies, projectiles, experienceDrops } = gameState
 
       // Draw player (circle) - scale size with HP
       const baseRadius = 8
@@ -73,6 +72,19 @@ export const SurvivalCanvas = ({ gameStateRef, config, onMouseMove, onResize }: 
       ctx.fillStyle = hpPercentage > 0.5 ? '#22c55e' : hpPercentage > 0.25 ? '#eab308' : '#ef4444'
       ctx.fillRect(hpBarX, hpBarY, hpBarWidth * hpPercentage, hpBarHeight)
 
+      // Draw experience drops (blue diamonds)
+      experienceDrops.forEach((drop) => {
+        const size = 6
+        ctx.fillStyle = isDark ? '#3b82f6' : '#2563eb' // blue
+        ctx.beginPath()
+        // Draw diamond shape (rotated square)
+        ctx.save()
+        ctx.translate(drop.position.x, drop.position.y)
+        ctx.rotate(Math.PI / 4) // 45 degrees
+        ctx.fillRect(-size / 2, -size / 2, size, size)
+        ctx.restore()
+      })
+
       // Draw enemies (squares)
       enemies.forEach((enemy) => {
         const size = config.enemySize
@@ -102,65 +114,15 @@ export const SurvivalCanvas = ({ gameStateRef, config, onMouseMove, onResize }: 
         )
       })
 
-      // Draw projectiles with weapon-specific colors
-      projectiles.forEach((projectile) => {
-        if (projectile.weaponType === WeaponType.RING) {
-          // Draw ring as expanding ring
-          ctx.strokeStyle = '#a78bfa' // purple
-          ctx.lineWidth = 3
-          ctx.globalAlpha = 0.6
-          ctx.beginPath()
-          ctx.arc(player.position.x, player.position.y, projectile.radius, 0, Math.PI * 2)
-          ctx.stroke()
-          ctx.globalAlpha = 1
-        } else if (projectile.weaponType === WeaponType.SHOTGUN) {
-          // Draw shotgun as an arc segment
-          ctx.strokeStyle = '#f97316' // orange
-          ctx.lineWidth = 4
-          ctx.globalAlpha = 0.7
-          ctx.beginPath()
-
-          // Arc angle is 60 degrees (PI/3), centered on projectile.angle
-          const arcAngle = Math.PI / 3
-          const startAngle = projectile.angle - arcAngle / 2
-          const endAngle = projectile.angle + arcAngle / 2
-
-          ctx.arc(
-            projectile.position.x,
-            projectile.position.y,
-            projectile.radius,
-            startAngle,
-            endAngle
-          )
-          ctx.stroke()
-          ctx.globalAlpha = 1
-        } else if (projectile.weaponType === WeaponType.FLAMETHROWER) {
-          // Draw flamethrower as a rotating line
-          ctx.strokeStyle = '#fb923c' // orange
-          ctx.lineWidth = 3
-          ctx.globalAlpha = 0.8
-          ctx.beginPath()
-
-          const lineLength = projectile.radius
-          const endX = projectile.position.x + Math.cos(projectile.angle) * lineLength
-          const endY = projectile.position.y + Math.sin(projectile.angle) * lineLength
-
-          ctx.moveTo(projectile.position.x, projectile.position.y)
-          ctx.lineTo(endX, endY)
-          ctx.stroke()
-          ctx.globalAlpha = 1
-        } else {
-          // Draw normal projectiles (yellow)
-          ctx.fillStyle = '#fbbf24' // yellow
-          ctx.beginPath()
-          ctx.arc(
-            projectile.position.x,
-            projectile.position.y,
-            projectile.radius,
-            0,
-            Math.PI * 2
-          )
-          ctx.fill()
+      // Draw projectiles using their own render functions
+      projectiles.forEach((projectile: any) => {
+        // Call the projectile's render function if it exists
+        if (projectile.render) {
+          projectile.render(projectile, {
+            ctx,
+            playerPosition: player.position,
+            isDark,
+          })
         }
       })
     }

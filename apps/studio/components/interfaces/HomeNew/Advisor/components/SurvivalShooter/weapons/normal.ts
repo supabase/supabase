@@ -1,4 +1,10 @@
-import type { GameWeapon, ShootContext, ShootResult, ProjectileBehavior } from './base'
+import type {
+  GameWeapon,
+  ShootContext,
+  ShootResult,
+  ProjectileBehavior,
+  ProjectileRenderFunction,
+} from './base'
 import { applyModifiers, aggregateModifiers, aggregateEventHandlers } from './base'
 import type { Vector2, Projectile } from '../types'
 import type { GameItem } from '../items/base'
@@ -146,6 +152,15 @@ export const normalWeapon = defineWeapon({
       }
 
       return true
+    }
+  },
+
+  createProjectileRenderer: (): ProjectileRenderFunction => {
+    return (projectile, { ctx }) => {
+      ctx.fillStyle = '#fbbf24' // yellow
+      ctx.beginPath()
+      ctx.arc(projectile.position.x, projectile.position.y, projectile.radius, 0, Math.PI * 2)
+      ctx.fill()
     }
   },
 

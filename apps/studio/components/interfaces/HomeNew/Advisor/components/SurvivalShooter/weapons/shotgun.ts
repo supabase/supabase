@@ -1,4 +1,10 @@
-import type { GameWeapon, ShootContext, ShootResult, ProjectileBehavior } from './base'
+import type {
+  GameWeapon,
+  ShootContext,
+  ShootResult,
+  ProjectileBehavior,
+  ProjectileRenderFunction,
+} from './base'
 import { applyModifiers, aggregateModifiers, aggregateEventHandlers } from './base'
 import type { Vector2, Projectile } from '../types'
 import type { GameItem } from '../items/base'
@@ -146,6 +152,24 @@ export const shotgunWeapon = defineWeapon({
       }
 
       return true
+    }
+  },
+
+  createProjectileRenderer: (): ProjectileRenderFunction => {
+    return (projectile, { ctx }) => {
+      ctx.strokeStyle = '#f97316' // orange
+      ctx.lineWidth = 4
+      ctx.globalAlpha = 0.7
+      ctx.beginPath()
+
+      // Arc angle is 60 degrees (PI/3), centered on projectile.angle
+      const arcAngle = SHOTGUN_ARC_ANGLE
+      const startAngle = projectile.angle - arcAngle / 2
+      const endAngle = projectile.angle + arcAngle / 2
+
+      ctx.arc(projectile.position.x, projectile.position.y, projectile.radius, startAngle, endAngle)
+      ctx.stroke()
+      ctx.globalAlpha = 1
     }
   },
 

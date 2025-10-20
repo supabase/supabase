@@ -1,4 +1,10 @@
-import type { GameWeapon, ShootContext, ShootResult, ProjectileBehavior } from './base'
+import type {
+  GameWeapon,
+  ShootContext,
+  ShootResult,
+  ProjectileBehavior,
+  ProjectileRenderFunction,
+} from './base'
 import { applyModifiers, aggregateModifiers, aggregateEventHandlers } from './base'
 import type { GameItem } from '../items/base'
 import type { Projectile } from '../types'
@@ -107,6 +113,18 @@ export const ringWeapon = defineWeapon({
       }
 
       return true
+    }
+  },
+
+  createProjectileRenderer: (): ProjectileRenderFunction => {
+    return (projectile, { ctx, playerPosition }) => {
+      ctx.strokeStyle = '#a78bfa' // purple
+      ctx.lineWidth = 3
+      ctx.globalAlpha = 0.6
+      ctx.beginPath()
+      ctx.arc(playerPosition.x, playerPosition.y, projectile.radius, 0, Math.PI * 2)
+      ctx.stroke()
+      ctx.globalAlpha = 1
     }
   },
 

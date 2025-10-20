@@ -32,6 +32,8 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
   const [hasStarted, setHasStarted] = useState(false)
   const [currentScore, setCurrentScore] = useState(0)
   const [enemiesKilled, setEnemiesKilled] = useState(0)
+  const [experience, setExperience] = useState(0)
+  const [currentLevel, setCurrentLevel] = useState(1)
   const [gameStatus, setGameStatus] = useState<GameStatus>('card_selection' as GameStatus)
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
   const [weaponSelectionPrompt, setWeaponSelectionPrompt] = useState<{
@@ -39,8 +41,11 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
     options: WeaponType[]
   } | null>(null)
   const [isSelectionActive, setIsSelectionActive] = useState(false)
+  const [levelUpPending, setLevelUpPending] = useState(false)
+  const [pendingLevelUpRewards, setPendingLevelUpRewards] = useState(0)
   const wasPlayingBeforeSelectionRef = useRef(false)
   const keyboardInputRef = useRef<KeyboardInput | null>(null)
+  const lastProcessedLevelRef = useRef(1)
 
   const { gameStateRef, config, startGame, pauseGame, resumeGame, updateMousePosition, updateInputVector } =
     useGameLoop(selectedCards, canvasSize, maxCards)
@@ -64,8 +69,31 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
   }
 
   const addItemSelection = (item: GameItem, assignedWeaponType?: WeaponType) => {
-    setSelectedCards((prev) => [...prev, { item, assignedWeaponType }])
+    // Store only minimal item metadata in card (not the full item with functions)
+    setSelectedCards((prev) => [
+      ...prev,
+      {
+        item: {
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          requiresWeaponSelection: item.requiresWeaponSelection,
+          applicableWeaponTypes: item.applicableWeaponTypes,
+          unlocksWeapon: item.unlocksWeapon,
+          stackable: item.stackable,
+        },
+        assignedWeaponType,
+      },
+    ])
     setCurrentOptions([])
+
+    // If this was a level-up reward, decrement pending rewards
+    if (levelUpPending && pendingLevelUpRewards > 0) {
+      setPendingLevelUpRewards((prev) => prev - 1)
+      if (pendingLevelUpRewards <= 1) {
+        setLevelUpPending(false)
+      }
+    }
   }
 
   // Initialize keyboard input
@@ -102,6 +130,16 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
         setGameStatus(gameStateRef.current.status)
         setCurrentScore(gameStateRef.current.score)
         setEnemiesKilled(gameStateRef.current.enemiesKilled)
+        setExperience(gameStateRef.current.experience)
+        setCurrentLevel(gameStateRef.current.currentLevel)
+
+        // Detect level ups
+        if (gameStateRef.current.currentLevel > lastProcessedLevelRef.current) {
+          const levelDifference = gameStateRef.current.currentLevel - lastProcessedLevelRef.current
+          lastProcessedLevelRef.current = gameStateRef.current.currentLevel
+          setLevelUpPending(true)
+          setPendingLevelUpRewards((prev) => prev + levelDifference)
+        }
       }
     }, 100)
 
@@ -109,13 +147,18 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
   }, [hasStarted, gameStateRef])
 
   useEffect(() => {
-    if (remainingSelections > 0) {
+    const totalSelections = remainingSelections + pendingLevelUpRewards
+
+    if (totalSelections > 0 || levelUpPending) {
       if (!isSelectionActive) {
         setIsSelectionActive(true)
         setCurrentOptions([])
         const status = gameStateRef.current?.status
         if (status === 'playing') {
           pauseGame()
+          wasPlayingBeforeSelectionRef.current = true
+        } else if (levelUpPending) {
+          // Level up paused the game, we should resume after selection
           wasPlayingBeforeSelectionRef.current = true
         } else {
           wasPlayingBeforeSelectionRef.current = false
@@ -139,6 +182,8 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
     }
   }, [
     remainingSelections,
+    pendingLevelUpRewards,
+    levelUpPending,
     isSelectionActive,
     pauseGame,
     resumeGame,
@@ -174,13 +219,14 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
 
     if (weaponSelectionPrompt) return
 
-    if (remainingSelections <= 0) {
+    const totalSelections = remainingSelections + pendingLevelUpRewards
+    if (totalSelections <= 0) {
       setCurrentOptions([])
       return
     }
 
     if (currentOptions.length === 0) {
-      const optionCount = Math.min(3, remainingSelections)
+      const optionCount = 3 // Always show 3 options to choose from
       const selectedNonStackableIds = new Set(
         selectedCards
           .filter((choice) => choice.item.stackable === false)
@@ -211,11 +257,19 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
 
       setCurrentOptions(options)
     }
-  }, [isSelectionActive, weaponSelectionPrompt, remainingSelections, currentOptions.length, selectedCards])
+  }, [
+    isSelectionActive,
+    weaponSelectionPrompt,
+    remainingSelections,
+    pendingLevelUpRewards,
+    currentOptions.length,
+    selectedCards,
+  ])
 
   const handleItemSelect = (item: GameItem) => {
     if (!isSelectionActive || weaponSelectionPrompt) return
-    if (remainingSelections <= 0) return
+    const totalSelections = remainingSelections + pendingLevelUpRewards
+    if (totalSelections <= 0) return
 
     // Check if item is already selected and not stackable
     const stackable = item.stackable !== false // defaults to true if undefined
@@ -250,6 +304,11 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
     setGameStatus('card_selection' as GameStatus)
     setWeaponSelectionPrompt(null)
     setEnemiesKilled(0)
+    setExperience(0)
+    setCurrentLevel(1)
+    setLevelUpPending(false)
+    setPendingLevelUpRewards(0)
+    lastProcessedLevelRef.current = 1
     wasPlayingBeforeSelectionRef.current = false
   }
 
@@ -259,93 +318,92 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  const getExperienceForLevel = (level: number): number => {
+    return (level - 1) * (level - 1) * 5
+  }
+
+  const getExperienceProgress = () => {
+    const currentLevelExp = getExperienceForLevel(currentLevel)
+    const nextLevelExp = getExperienceForLevel(currentLevel + 1)
+    const expInCurrentLevel = experience - currentLevelExp
+    const expNeededForLevel = nextLevelExp - currentLevelExp
+    return {
+      current: expInCurrentLevel,
+      needed: expNeededForLevel,
+      percentage: expNeededForLevel > 0 ? (expInCurrentLevel / expNeededForLevel) * 100 : 0,
+    }
+  }
+
   const renderSelectionOverlay = isSelectionActive ? (
-    <div className="absolute inset-0 bg-surface-100/95 backdrop-blur-md z-20 flex items-center justify-center p-6">
+    <div className="absolute inset-0 bg-surface-100/95 backdrop-blur-md z-20 flex">
       <Button
         onClick={onExit}
         type="default"
         size="tiny"
-        className="absolute top-4 right-4"
+        className="absolute top-4 right-4 z-10"
         icon={<X strokeWidth={1} size={16} />}
       />
-      <div className="bg-surface-100 border border-overlay rounded-lg shadow-xl w-full max-w-lg p-6 flex flex-col gap-4">
-        {!weaponSelectionPrompt ? (
-          <>
-            <div className="text-center space-y-1">
-              <h2 className="text-lg font-medium">Select an item</h2>
-              <p className="text-sm text-foreground-light">
-                {remainingSelections} selection{remainingSelections !== 1 ? 's' : ''} remaining
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3 justify-center">
-              {currentOptions.map((item) => {
-                const weaponOptions = getWeaponOptions(item)
-                const stackable = item.stackable !== false
-                const alreadySelected =
-                  !stackable && selectedCards.some((choice) => choice.item.id === item.id)
-                const isDisabled =
-                  alreadySelected || (item.requiresWeaponSelection && weaponOptions.length === 0)
+      {!weaponSelectionPrompt ? (
+        <>
+          {currentOptions.map((item) => {
+            const weaponOptions = getWeaponOptions(item)
+            const stackable = item.stackable !== false
+            const alreadySelected =
+              !stackable && selectedCards.some((choice) => choice.item.id === item.id)
+            const isDisabled =
+              alreadySelected || (item.requiresWeaponSelection && weaponOptions.length === 0)
 
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => handleItemSelect(item)}
-                    disabled={isDisabled}
-                    className={`w-44 px-4 py-3 rounded-lg border-2 transition-all text-left ${
-                      isDisabled
-                        ? 'border-overlay opacity-40 cursor-not-allowed'
-                        : 'border-overlay hover:border-brand hover:bg-brand/10'
-                    }`}
-                  >
-                    <div className="text-sm font-medium">{item.name}</div>
-                    <div className="text-xs text-foreground-light mt-1">{item.description}</div>
-                    {alreadySelected && (
-                      <div className="text-xs text-foreground-muted mt-2">Already unlocked</div>
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleItemSelect(item)}
+                disabled={isDisabled}
+                className={`flex-1 flex flex-col items-center justify-center border-r border-overlay last:border-r-0 transition-all ${
+                  isDisabled
+                    ? 'opacity-40 cursor-not-allowed'
+                    : 'hover:bg-brand/10 cursor-pointer'
+                }`}
+              >
+                <div className="text-center px-8">
+                  <div className="text-2xl font-medium mb-3">{item.name}</div>
+                  <div className="text-base text-foreground-light">{item.description}</div>
+                  {alreadySelected && (
+                    <div className="text-sm text-foreground-muted mt-4">Already unlocked</div>
+                  )}
+                  {!alreadySelected &&
+                    item.requiresWeaponSelection &&
+                    weaponOptions.length === 0 && (
+                      <div className="text-sm text-foreground-muted mt-4">
+                        Unlock a compatible weapon to use this item
+                      </div>
                     )}
-                    {!alreadySelected &&
-                      item.requiresWeaponSelection &&
-                      weaponOptions.length === 0 && (
-                        <div className="text-xs text-foreground-muted mt-2">
-                          Unlock a compatible weapon to use this item
-                        </div>
-                      )}
-                  </button>
-                )
-              })}
+                </div>
+              </button>
+            )
+          })}
+          {currentOptions.length === 0 && (
+            <div className="flex-1 flex items-center justify-center text-foreground-muted">
+              Generating items...
             </div>
-            {currentOptions.length === 0 && (
-              <div className="text-center text-sm text-foreground-muted">
-                Generating more items...
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <div className="text-center space-y-1">
-              <h3 className="text-lg font-medium">Choose a weapon</h3>
-              <p className="text-sm text-foreground-light">
-                {weaponSelectionPrompt.item.name} can be applied to multiple weapons
-              </p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {weaponSelectionPrompt.options.map((option) => (
-                <Button key={option} onClick={() => handleWeaponSelection(option)} size="tiny">
-                  {weaponTypeLabels[option]}
-                </Button>
-              ))}
-            </div>
-            <Button
-              onClick={() => setWeaponSelectionPrompt(null)}
-              type="text"
-              size="tiny"
-              className="self-center"
+          )}
+        </>
+      ) : (
+        <>
+          {weaponSelectionPrompt.options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => handleWeaponSelection(option)}
+              className="flex-1 flex flex-col items-center justify-center border-r border-overlay last:border-r-0 hover:bg-brand/10 transition-all cursor-pointer"
             >
-              Back to items
-            </Button>
-          </>
-        )}
-      </div>
+              <div className="text-center px-8">
+                <div className="text-2xl font-medium">{weaponTypeLabels[option]}</div>
+              </div>
+            </button>
+          ))}
+        </>
+      )}
     </div>
   ) : null
 
@@ -395,7 +453,7 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
       />
 
       {/* HUD - Top left corner */}
-      <div className="absolute top-4 left-4 z-10 flex items-center gap-3 font-mono text-sm text-foreground">
+      <div className="absolute top-4 left-4 z-10 flex items-center gap-4 font-mono text-sm text-foreground">
         {/* HP */}
         <div className="flex items-center gap-1.5">
           <Heart strokeWidth={1.5} size={16} className="text-red-500" />
@@ -409,6 +467,20 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
         <div className="flex items-center gap-1.5">
           <Zap strokeWidth={1.5} size={16} className="text-yellow-500" />
           <span>{enemiesKilled}</span>
+        </div>
+
+        {/* Experience Bar */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs">Lv.{currentLevel}</span>
+          <div className="w-32 h-2 bg-overlay rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-500 transition-all duration-300"
+              style={{ width: `${getExperienceProgress().percentage}%` }}
+            />
+          </div>
+          <span className="text-xs text-foreground-light">
+            {getExperienceProgress().current}/{getExperienceProgress().needed}
+          </span>
         </div>
       </div>
 

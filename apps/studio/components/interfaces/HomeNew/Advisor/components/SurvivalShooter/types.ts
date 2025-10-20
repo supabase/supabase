@@ -110,14 +110,23 @@ export interface Wave {
   lastSpawnTime: number
 }
 
+export interface ExperienceDrop {
+  id: string
+  position: Vector2
+  value: number // experience points
+}
+
 export interface GameState {
   status: GameStatus
   player: Player
   enemies: Enemy[]
   projectiles: Projectile[]
+  experienceDrops: ExperienceDrop[]
   wave: Wave
   score: number // survival time in seconds
   enemiesKilled: number // total enemies killed
+  experience: number // total experience gained
+  currentLevel: number // calculated from experience
   selectedCards: SelectedCard[]
   mousePosition: Vector2 | null
   maxSelectableItems: number

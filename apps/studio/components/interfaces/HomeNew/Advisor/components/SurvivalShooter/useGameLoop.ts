@@ -48,7 +48,8 @@ export const useGameLoop = (
   )
 
   const itemLimit = Math.max(0, Math.floor(maxSelectableItems || 0))
-  const cardsForGame = useMemo(() => selectedCards.slice(0, itemLimit), [selectedCards, itemLimit])
+  // Don't slice selectedCards - level-up items should also be applied
+  const cardsForGame = useMemo(() => selectedCards, [selectedCards])
 
   const ensureRuntime = useCallback(() => {
     if (!runtimeRef.current) {

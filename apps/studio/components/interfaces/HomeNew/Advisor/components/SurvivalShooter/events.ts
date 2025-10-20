@@ -1,8 +1,23 @@
-import type { WeaponType, Projectile, Player, Enemy } from './types'
+import type { WeaponType, Projectile, Player, Enemy, Vector2 } from './types'
 
 const GLOBAL_SCOPE = 'global'
 
 type HandlerScope = WeaponType | typeof GLOBAL_SCOPE
+
+// Projectile behavior and rendering types (used by items that spawn custom projectiles)
+export type ProjectileRenderFunction = (
+  projectile: Projectile,
+  renderCtx: { ctx: CanvasRenderingContext2D; playerPosition: Vector2; isDark: boolean }
+) => void
+
+export type ProjectileBehaviorFunction = (
+  projectile: any, // RuntimeProjectile, but we can't import it here to avoid circular deps
+  ctx: {
+    deltaTime: number
+    currentTime: number
+    runtime: any // GameRuntime
+  }
+) => boolean
 
 // Event contexts - rich state passed to event handlers
 export interface OnDamageContext {
@@ -16,6 +31,8 @@ export interface OnDamageContext {
 
 export type SpawnProjectileOptions = Omit<Projectile, 'id'> & {
   id?: string
+  render?: ProjectileRenderFunction
+  behavior?: ProjectileBehaviorFunction
 }
 
 export interface OnEnemyDeathContext {
