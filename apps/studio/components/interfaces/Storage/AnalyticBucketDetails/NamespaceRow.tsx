@@ -8,9 +8,9 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { FDW } from 'data/fdw/fdws-query'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { Button, cn, TableCell, TableRow } from 'ui'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 type NamespaceRowProps = {
   bucketName: string
@@ -64,6 +64,8 @@ export const NamespaceRow = ({
       (t) => !tables.find((table) => table.table.split('.')[1] === t)
     )
   }, [tablesData, tables])
+
+  console.log({ missingTables })
 
   let scanTooltip = useMemo(() => {
     if (isImportingForeignSchema) return 'Scanning for new tables...'

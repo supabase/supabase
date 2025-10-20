@@ -1,5 +1,5 @@
 import { snakeCase, uniq } from 'lodash'
-import { Plus } from 'lucide-react'
+import { ChevronRight, Plus, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
@@ -38,12 +38,17 @@ import {
   Button,
   Card,
   CardContent,
+  CardHeader,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -189,109 +194,161 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
 
           {state === 'added' && wrapperInstance && (
             <>
-              {isStorageV2 ? (
-                <ScaffoldSection isFullWidth>
-                  <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
-                    <div>
-                      <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
-                      <ScaffoldSectionDescription>
-                        Analytics tables connected to this bucket.
-                      </ScaffoldSectionDescription>
-                    </div>
-                    <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
-                      New table
-                    </Button>
-                  </ScaffoldHeader>
+              {/* New */}
+              <ScaffoldSection isFullWidth>
+                <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
+                  <div>
+                    <ScaffoldSectionTitle>Namespaces</ScaffoldSectionTitle>
+                    <ScaffoldSectionDescription>
+                      Namespaces and tables connected to this bucket.
+                    </ScaffoldSectionDescription>
+                  </div>
+                  <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
+                    Add namespace
+                  </Button>
+                </ScaffoldHeader>
 
+                <Card>
+                  <CardHeader className="flex flex-row justify-between items-center px-4 py-3">
+                    <div className="flex flex-row border-alternative rounded-full text-sm bg-surface-300 text-foreground-light leading-none">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="border rounded-full pl-3 pr-2 py-1.5 bg-surface-75 flex flex-row items-center gap-1">
+                              paddleboards
+                              <ChevronRight size={12} className="text-foreground-muted" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Namespace</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="border border-muted/0 rounded-full pl-2 pr-3 py-1.5 leading-none">
+                              analytics_paddleboards
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Database schema</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    {/* <div className=""> */}
+                    <Button
+                      type="default"
+                      size="tiny"
+                      icon={<RefreshCw size={14} />}
+                      onClick={() => {}}
+                    >
+                      Sync tables
+                    </Button>
+                    {/* <Button
+                        type="default"
+                        size="tiny"
+                        icon={<Plus size={14} />}
+                        onClick={() => {}}
+                      >
+                        Table Editor
+                      </Button> */}
+                    {/* </div> */}
+                  </CardHeader>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-foreground-muted">Table</TableHead>
+                        <TableHead className="text-foreground-muted">Status</TableHead>
+                        {/* <TableHead className="text-foreground-muted">Updated at</TableHead> */}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell colSpan={4}>
+                          <p className="text-sm text-foreground">No tables yet</p>
+                          <p className="text-sm text-foreground-lighter">
+                            Publish an analytics table and then sync.{' '}
+                            <InlineLink
+                              href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
+                            >
+                              Learn more
+                            </InlineLink>
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>hello_world</TableCell>
+                        <TableCell>Connected</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>unsynced table</TableCell>
+                        <TableCell>Sync to connect</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </Card>
+              </ScaffoldSection>
+
+              {/* Old */}
+
+              <ScaffoldSection isFullWidth>
+                {isLoadingNamespaces || isFDWsLoading ? (
+                  <GenericSkeletonLoader />
+                ) : namespaces.length === 0 ? (
                   <Card>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-foreground-muted">Name</TableHead>
+                          <TableHead className="text-foreground-muted">Namespace</TableHead>
                           <TableHead className="text-foreground-muted">Schema</TableHead>
-                          <TableHead className="text-foreground-muted">Created at</TableHead>
+                          <TableHead className="text-foreground-muted">Tables</TableHead>
+                          <TableHead />
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         <TableRow>
                           <TableCell colSpan={4}>
-                            <p className="text-sm text-foreground">No tables yet</p>
+                            <p className="text-sm text-foreground">No namespaces in this bucket</p>
                             <p className="text-sm text-foreground-lighter">
-                              Create an analytics table to get started
+                              Create a namespace and add some data
                             </p>
                           </TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>
                   </Card>
-                </ScaffoldSection>
-              ) : (
-                <ScaffoldSection isFullWidth>
-                  <ScaffoldHeader>
-                    <ScaffoldSectionTitle>Namespaces</ScaffoldSectionTitle>
-                    <ScaffoldSectionDescription>
-                      Connected namespaces and tables.
-                    </ScaffoldSectionDescription>
-                  </ScaffoldHeader>
-
-                  {isLoadingNamespaces || isFDWsLoading ? (
-                    <GenericSkeletonLoader />
-                  ) : namespaces.length === 0 ? (
-                    <Card>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-foreground-muted">Namespace</TableHead>
-                            <TableHead className="text-foreground-muted">Schema</TableHead>
-                            <TableHead className="text-foreground-muted">Tables</TableHead>
-                            <TableHead />
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell colSpan={4}>
-                              <p className="text-sm text-foreground">
-                                No namespaces in this bucket
-                              </p>
-                              <p className="text-sm text-foreground-lighter">
-                                Create a namespace and add some data
-                              </p>
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </Card>
-                  ) : (
-                    <Card>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Namespace</TableHead>
-                            <TableHead>Schema</TableHead>
-                            <TableHead>Tables</TableHead>
-                            <TableHead />
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {namespaces.map(({ namespace, schema, tables }) => (
-                            <NamespaceRow
-                              key={namespace}
-                              bucketName={bucket.id}
-                              namespace={namespace}
-                              schema={schema}
-                              tables={tables as any}
-                              token={token!}
-                              wrapperInstance={wrapperInstance}
-                              wrapperValues={wrapperValues}
-                              wrapperMeta={wrapperMeta}
-                            />
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </Card>
-                  )}
-                </ScaffoldSection>
-              )}
+                ) : (
+                  <Card>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Namespace</TableHead>
+                          <TableHead>Schema</TableHead>
+                          <TableHead>Tables</TableHead>
+                          <TableHead />
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {namespaces.map(({ namespace, schema, tables }) => (
+                          <NamespaceRow
+                            key={namespace}
+                            bucketName={bucket.id}
+                            namespace={namespace}
+                            schema={schema}
+                            tables={tables as any}
+                            token={token!}
+                            wrapperInstance={wrapperInstance}
+                            wrapperValues={wrapperValues}
+                            wrapperMeta={wrapperMeta}
+                          />
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                )}
+              </ScaffoldSection>
 
               <ScaffoldSection isFullWidth>
                 <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
