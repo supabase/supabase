@@ -43,8 +43,8 @@ export const generateAuthMenu = (
               ...(authenticationEmails
                 ? [
                     {
-                      name: 'Emails',
-                      key: 'emails',
+                      name: 'Email',
+                      key: 'email',
                       pages: ['templates', 'smtp'],
                       url: `/project/${ref}/auth/templates`,
                       items: [],
