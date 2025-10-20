@@ -3,7 +3,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams, useFlag } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
@@ -318,11 +318,13 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
+  const isHomeNewFlag = useFlag('homeNew')
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
+  const isHomePage = router.pathname === '/project/[ref]'
 
   const requiresDbConnection: boolean =
     (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
@@ -383,7 +385,12 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoreFailedState />
   }
 
-  if (requiresDbConnection && isProjectBuilding && !isBranchesPage) {
+  if (
+    requiresDbConnection &&
+    isProjectBuilding &&
+    !isBranchesPage &&
+    !(isHomeNewFlag && isHomePage) // [jordi] We won't be showing the building state with the new home page
+  ) {
     return <BuildingState />
   }
 
