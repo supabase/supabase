@@ -1,6 +1,7 @@
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SqlEditor } from 'icons'
-import { KeyboardShortcut } from 'ui'
+import { SIDEBAR_KEYS, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { cn, KeyboardShortcut } from 'ui'
 
 export const InlineEditorButton = ({
   onClick,
@@ -9,12 +10,18 @@ export const InlineEditorButton = ({
   onClick: () => void
   showShortcut?: boolean
 }) => {
+  const sidebarSnap = useSidebarManagerSnapshot()
+  const isOpen = sidebarSnap.panels[SIDEBAR_KEYS.EDITOR_PANEL]?.open
+
   return (
     <ButtonTooltip
-      type="text"
+      type="outline"
       size="tiny"
       id="editor-trigger"
-      className="rounded-none w-[32px] h-[30px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground"
+      className={cn(
+        "rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground",
+        isOpen && "bg-foreground text-background hover:text-background"
+      )}
       onClick={onClick}
       tooltip={{
         content: {

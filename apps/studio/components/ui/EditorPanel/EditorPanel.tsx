@@ -1,7 +1,7 @@
-import { Book, Save, X } from 'lucide-react'
+import { Book, Maximize2, X } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
@@ -12,7 +12,6 @@ import {
 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -46,7 +45,6 @@ import { Admonition } from 'ui-patterns'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { InlineLink } from '../InlineLink'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 
 type Template = {
@@ -104,13 +102,12 @@ export const EditorPanel = ({
   const onChange = editorStateSnap.onChange || propOnChange
 
   const { ref } = useParams()
+  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
@@ -206,7 +203,7 @@ export const EditorPanel = ({
           <h2 className="text-sm font-medium">SQL Editor</h2>
           {label && <p className="text-xs text-foreground-light">{label}</p>}
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center">
           {templates.length > 0 && (
             <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
               <PopoverTrigger_Shadcn_ asChild>
@@ -269,44 +266,29 @@ export const EditorPanel = ({
           <ButtonTooltip
             type="text"
             className="w-7 h-7 p-0"
-            loading={isSaving}
-            icon={<Save strokeWidth={1.5} />}
+            icon={<Maximize2 strokeWidth={1.5} />}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'Save as snippet',
+                text: 'Expand to SQL editor',
               },
             }}
-            onClick={async () => {
+            onClick={() => {
               if (!ref) return console.error('Project ref is required')
               if (!project) return console.error('Project is required')
               if (!profile) return console.error('Profile is required')
 
-              try {
-                setIsSaving(true)
-                const { title: name } = await generateSqlTitle({
-                  sql: currentValue,
-                })
-                const snippet = createSqlSnippetSkeletonV2({
-                  id: uuidv4(),
-                  name,
-                  sql: currentValue,
-                  owner_id: profile.id,
-                  project_id: project.id,
-                })
-                snapV2.addSnippet({ projectRef: ref, snippet })
-                snapV2.addNeedsSaving(snippet.id)
-                toast.success(
-                  <div>
-                    Saved snippet! View it{' '}
-                    <InlineLink href={`/project/${ref}/sql/${snippet.id}`}>here</InlineLink>
-                  </div>
-                )
-              } catch (error: any) {
-                toast.error(`Failed to create new query: ${error.message}`)
-              } finally {
-                setIsSaving(false)
-              }
+              const snippet = createSqlSnippetSkeletonV2({
+                id: uuidv4(),
+                name: 'New query',
+                sql: currentValue,
+                owner_id: profile.id,
+                project_id: project.id,
+              })
+              snapV2.addSnippet({ projectRef: ref, snippet })
+              snapV2.addNeedsSaving(snippet.id)
+              router.push(`/project/${ref}/sql/${snippet.id}`)
+              sidebarManagerState.closeSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
             }}
           />
 

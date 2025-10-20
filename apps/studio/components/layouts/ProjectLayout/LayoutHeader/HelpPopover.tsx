@@ -37,13 +37,13 @@ export const HelpPopover = () => {
       <PopoverTrigger_Shadcn_ asChild>
         <ButtonTooltip
           id="help-popover-button"
-          type="text"
-          className="rounded-none w-[32px] h-[30px] group"
+          type="outline"
+          className="rounded-full w-[32px] h-[32px] group"
           icon={
             <HelpCircle
-              size={18}
+              size={16}
               strokeWidth={1.5}
-              className="!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground"
+              className="text-foreground-light group-hover:text-foreground"
             />
           }
           tooltip={{ content: { side: 'bottom', text: 'Help' } }}

@@ -225,7 +225,7 @@ const LayoutHeader = ({
               <>
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="overflow-hidden flex items-center gap-2">
                   <HelpPopover />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
