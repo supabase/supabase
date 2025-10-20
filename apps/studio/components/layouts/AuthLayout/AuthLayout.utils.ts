@@ -35,7 +35,7 @@ export const generateAuthMenu = (
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
       ],
     },
-    ...(authenticationShowSecurityNotifications
+    ...(authenticationEmails && authenticationShowSecurityNotifications && IS_PLATFORM
       ? [
           {
             title: 'Notifications',
