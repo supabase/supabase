@@ -1,4 +1,4 @@
-import { ChevronDown, GlobeIcon, InfoIcon } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 
@@ -8,8 +8,6 @@ import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { InlineLink } from 'components/ui/InlineLink'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -18,7 +16,6 @@ import { IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
-  Badge,
   CodeBlock,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -45,6 +42,7 @@ import {
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
+import { usePoolerConfiguration } from './usePoolerConfiguration'
 
 const StepLabel = ({
   number,
@@ -137,19 +135,13 @@ export const DatabaseConnectionString = () => {
   }, [state.selectedDatabaseId, querySource, projectRef])
 
   const {
-    data: pgbouncerConfig,
-    error: pgbouncerError,
-    isLoading: isLoadingPgbouncerConfig,
-    isError: isErrorPgbouncerConfig,
-    isSuccess: isSuccessPgBouncerConfig,
-  } = usePgbouncerConfigQuery({ projectRef })
-  const {
-    data: supavisorConfig,
-    error: supavisorConfigError,
-    isLoading: isLoadingSupavisorConfig,
-    isError: isErrorSupavisorConfig,
-    isSuccess: isSuccessSupavisorConfig,
-  } = useSupavisorConfigurationQuery({ projectRef })
+    sharedPoolerConfiguration,
+    poolingConfiguration,
+    error: poolerError,
+    isLoading: isLoadingPoolerConfig,
+    isError: isErrorPoolerConfig,
+    isSuccess: isSuccessPoolerConfig,
+  } = usePoolerConfiguration({ projectRef })
 
   const {
     data: databases,
@@ -159,30 +151,10 @@ export const DatabaseConnectionString = () => {
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
 
-  const poolerError = sharedPoolerPreferred ? pgbouncerError : supavisorConfigError
-  const isLoadingPoolerConfig = !IS_PLATFORM
-    ? false
-    : sharedPoolerPreferred
-      ? isLoadingPgbouncerConfig
-      : isLoadingSupavisorConfig
-  const isErrorPoolerConfig = !IS_PLATFORM
-    ? undefined
-    : sharedPoolerPreferred
-      ? isErrorPgbouncerConfig
-      : isErrorSupavisorConfig
-  const isSuccessPoolerConfig = !IS_PLATFORM
-    ? true
-    : sharedPoolerPreferred
-      ? isSuccessPgBouncerConfig
-      : isSuccessSupavisorConfig
-
   const error = poolerError || readReplicasError
   const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
   const isError = isErrorPoolerConfig || isErrorReadReplicas
   const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
-
-  const sharedPoolerConfig = supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
-  const poolingConfiguration = sharedPoolerPreferred ? sharedPoolerConfig : pgbouncerConfig
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
@@ -215,11 +187,13 @@ export const DatabaseConnectionString = () => {
   const supavisorConnectionStrings = getConnectionStrings({
     connectionInfo,
     poolingInfo: {
-      connectionString: sharedPoolerConfig?.connection_string ?? '',
-      db_host: isReplicaSelected ? connectionInfo.db_host : sharedPoolerConfig?.db_host ?? '',
-      db_name: sharedPoolerConfig?.db_name ?? '',
-      db_port: sharedPoolerConfig?.db_port ?? 0,
-      db_user: sharedPoolerConfig?.db_user ?? '',
+      connectionString: sharedPoolerConfiguration?.connection_string ?? '',
+      db_host: isReplicaSelected
+        ? connectionInfo.db_host
+        : sharedPoolerConfiguration?.db_host ?? '',
+      db_name: sharedPoolerConfiguration?.db_name ?? '',
+      db_port: sharedPoolerConfiguration?.db_port ?? 0,
+      db_user: sharedPoolerConfiguration?.db_user ?? '',
     },
     metadata: { projectRef },
   })
@@ -494,13 +468,19 @@ export const DatabaseConnectionString = () => {
                       links: undefined,
                     }}
                     parameters={[
-                      { ...CONNECTION_PARAMETERS.host, value: sharedPoolerConfig?.db_host ?? '' },
+                      {
+                        ...CONNECTION_PARAMETERS.host,
+                        value: sharedPoolerConfiguration?.db_host ?? '',
+                      },
                       { ...CONNECTION_PARAMETERS.port, value: '5432' },
                       {
                         ...CONNECTION_PARAMETERS.database,
-                        value: sharedPoolerConfig?.db_name ?? '',
+                        value: sharedPoolerConfiguration?.db_name ?? '',
                       },
-                      { ...CONNECTION_PARAMETERS.user, value: sharedPoolerConfig?.db_user ?? '' },
+                      {
+                        ...CONNECTION_PARAMETERS.user,
+                        value: sharedPoolerConfiguration?.db_user ?? '',
+                      },
                       { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
                     ]}
                     onCopyCallback={() => handleCopy(selectedTab, 'session_pooler')}
