@@ -27,6 +27,7 @@ const IntegrationSettings = () => {
   const isBranch = project?.parent_project_ref !== undefined
 
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
+  const showAWSPrivateLink = useIsFeatureEnabled('integrations:aws_private_link')
 
   return (
     <>
@@ -52,9 +53,13 @@ const IntegrationSettings = () => {
         <>
           <ScaffoldDivider />
           <VercelSection isProjectScoped={true} />
+          <SidePanelVercelProjectLinker />
+        </>
+      )}
+      {showAWSPrivateLink && (
+        <>
           <ScaffoldDivider />
           <AWSPrivateLinkSection />
-          <SidePanelVercelProjectLinker />
         </>
       )}
     </>

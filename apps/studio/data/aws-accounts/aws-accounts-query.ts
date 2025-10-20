@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
 import { awsAccountKeys } from './keys'
 
 export type AWSAccountsVariables = {
@@ -8,27 +9,24 @@ export type AWSAccountsVariables = {
 }
 
 export interface AWSAccount {
-  id: string
-  awsAccountId: string
-  description: string
-  status: 'connected' | 'pending'
+  aws_account_id: string
+  account_name?: string
+  status: 'CREATING' | 'READY' | 'ASSOCIATION_REQUEST_EXPIRED' | 'ASSOCIATION_ACCEPTED' | 'CREATION_FAILED' | 'DELETING'
+  shared_at: string | null
 }
 
 export async function getAWSAccounts({ projectRef }: AWSAccountsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')
 
-  // Mocked data
-  const data: AWSAccount[] = [
-    {
-      id: '1',
-      awsAccountId: '123456789012',
-      description: 'Production Account',
-      status: 'connected',
+  const { data, error } = await get('/platform/projects/{ref}/privatelink/associations', {
+    params: {
+      path: { ref: projectRef },
     },
-    { id: '2', awsAccountId: '210987654321', description: 'Staging Account', status: 'pending' },
-  ]
+    signal,
+  })
 
-  return data
+  if (error) handleError(error)
+  return data.private_link_associations as AWSAccount[]
 }
 
 export type AWSAccountsData = Awaited<ReturnType<typeof getAWSAccounts>>

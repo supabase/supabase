@@ -11,12 +11,12 @@ import AWSPrivateLinkForm from './AWSPrivateLinkForm'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
 import { useAWSAccountDeleteMutation } from 'data/aws-accounts/aws-account-delete-mutation'
 
 const AWSPrivateLinkSection = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
   const { mutate: deleteAccount } = useAWSAccountDeleteMutation()
 
@@ -41,7 +41,7 @@ const AWSPrivateLinkSection = () => {
 
   const onConfirmDelete = () => {
     if (selectedAccount && project) {
-      deleteAccount({ projectRef: project.ref, id: selectedAccount.id })
+      deleteAccount({ projectRef: project.ref, awsAccountId: selectedAccount.aws_account_id })
     }
     setShowDeleteModal(false)
     setSelectedAccount(null)
@@ -74,7 +74,7 @@ const AWSPrivateLinkSection = () => {
                 <ResourceList>
                   {accounts?.map((account) => (
                     <AWSPrivateLinkAccountItem
-                      key={account.id}
+                      key={account.aws_account_id}
                       {...account}
                       onClick={() => onEditAccount(account)}
                       onDelete={() => onDeleteAccount(account)}
@@ -103,7 +103,7 @@ const AWSPrivateLinkSection = () => {
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to delete the AWS account connection for{' '}
-          {selectedAccount?.awsAccountId}?
+          {selectedAccount?.aws_account_id}?
         </p>
       </ConfirmationModal>
     </>

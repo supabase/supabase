@@ -1,18 +1,25 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
 import { awsAccountKeys } from './keys'
 
 export type AWSAccountDeleteVariables = {
   projectRef: string
-  id: string
+  awsAccountId: string
 }
 
-export async function deleteAWSAccount({ id }: AWSAccountDeleteVariables) {
-  // Mocked response
-  const data = {
-    id,
-  }
+export async function deleteAWSAccount({ projectRef, awsAccountId }: AWSAccountDeleteVariables) {
+  const { data, error } = await del('/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}', {
+    params: {
+      path: { 
+        ref: projectRef,
+        aws_account_id: awsAccountId,
+      },
+    },
+  })
+
+  if (error) handleError(error)
   return data
 }
 

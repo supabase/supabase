@@ -1,26 +1,31 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+import { post, handleError } from 'data/fetchers'
 import { awsAccountKeys } from './keys'
 
 export type AWSAccountCreateVariables = {
   projectRef: string
   awsAccountId: string
-  description: string
+  accountName?: string
 }
 
 export async function createAWSAccount({
   projectRef,
   awsAccountId,
-  description,
+  accountName,
 }: AWSAccountCreateVariables) {
-  // Mocked response
-  const data = {
-    id: Math.random().toString(),
-    awsAccountId,
-    description,
-    status: 'pending' as const,
-  }
+  const { data, error } = await post('/platform/projects/{ref}/privatelink/associations/aws-account', {
+    params: {
+      path: { ref: projectRef },
+    },
+    body: {
+      aws_account_id: awsAccountId,
+      account_name: accountName,
+    },
+  })
+
+  if (error) handleError(error)
   return data
 }
 
