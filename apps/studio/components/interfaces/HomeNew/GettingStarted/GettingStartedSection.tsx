@@ -63,6 +63,7 @@ export function GettingStartedSection({ value, onChange }: GettingStartedSection
     let using: string | undefined
     let withKey: string | undefined
     if (parent.children && parent.children.length > 0) {
+      // prefer App Router for Nextjs by default
       if (parent.key === 'nextjs') {
         const appChild = parent.children.find((c) => c.key === 'app') || parent.children[0]
         using = appChild?.key
