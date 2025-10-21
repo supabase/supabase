@@ -8,7 +8,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
@@ -66,9 +66,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const hasProjectScopedRoles = (allRoles?.project_scoped_roles ?? []).length > 0
 
   // [Joshen] We only need this data if the org has project scoped roles
-  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
-  const projects = data?.projects ?? []
-
+  const { data } = useProjectsInfiniteQuery({}, { enabled: hasProjectScopedRoles })
+  const projects = data?.pages.flatMap((page) => page.projects) ?? []
+  console.log(projects, 'projects') // empty []
   const { data: permissions } = usePermissionsQuery()
 
   // [Joshen] We use the org scoped roles as the source for available roles
