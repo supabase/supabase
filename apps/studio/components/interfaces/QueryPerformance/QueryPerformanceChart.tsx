@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import type { ChartDataPoint } from './WithMonitor/WithMonitor.utils'
+import { calculatePercentilesFromHistogram } from './WithMonitor/WithMonitor.utils'
 
 interface QueryPerformanceChartProps {
   dateRange?: {
@@ -61,12 +62,35 @@ export const QueryPerformanceChart = ({
 
     switch (selectedMetric) {
       case 'query_latency': {
-        const avgP95 = chartData.reduce((sum, d) => sum + d.p95_time, 0) / chartData.length
+        let trueP95: number
+
+        if (parsedLogs && parsedLogs.length > 0) {
+          const combinedHistogram = [0, 0, 0, 0, 0, 0]
+
+          parsedLogs.forEach((log) => {
+            if (log.resp_calls && Array.isArray(log.resp_calls)) {
+              log.resp_calls.forEach((count: number, index: number) => {
+                if (index < combinedHistogram.length) {
+                  combinedHistogram[index] += count
+                }
+              })
+            }
+          })
+
+          const percentiles = calculatePercentilesFromHistogram(combinedHistogram)
+          trueP95 = percentiles.p95
+        } else {
+          const totalCalls = chartData.reduce((sum, d) => sum + d.calls, 0)
+          trueP95 =
+            totalCalls > 0
+              ? chartData.reduce((sum, d) => sum + d.p95_time * d.calls, 0) / totalCalls
+              : 0
+        }
 
         return [
           {
             label: 'Average p95',
-            value: avgP95 >= 100 ? `${(avgP95 / 1000).toFixed(2)}s` : `${Math.round(avgP95)}ms`,
+            value: trueP95 >= 100 ? `${(trueP95 / 1000).toFixed(2)}s` : `${Math.round(trueP95)}ms`,
           },
         ]
       }
@@ -106,7 +130,7 @@ export const QueryPerformanceChart = ({
       default:
         return []
     }
-  }, [chartData, selectedMetric])
+  }, [chartData, selectedMetric, parsedLogs])
 
   const transformedChartData = useMemo(() => {
     if (selectedMetric !== 'query_latency') return chartData
