@@ -1,5 +1,4 @@
-import { merge } from 'lodash'
-import { constructHeaders } from 'data/fetchers'
+import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,6 +13,8 @@ type PartialTable = Partial<AIGeneratedSchema['tables'][number]> & {
 type PartialSchema = Partial<AIGeneratedSchema> & {
   tables?: PartialTable[]
 }
+
+const MAX_BUFFER_SIZE = 50 * 1024 // 50KB limit for streaming responses
 
 const isNotNull = <T>(value: T | null | undefined): value is T => value != null
 
@@ -64,7 +65,7 @@ const convertAISchemaToTableSuggestions = (schema: AIGeneratedSchema): TableSugg
       unique: column.isUnique ?? undefined,
       default: column.defaultValue ?? undefined,
       description: getColumnDescription(column),
-      isPrimary: isPrimaryColumn(column) || undefined,
+      isPrimary: column.isPrimary || isIdColumn(column.name) || undefined,
     })),
     rationale: table.description,
     source: TableSource.AI,
@@ -102,7 +103,7 @@ const convertPartialSchemaToTableSuggestions = (schema: PartialSchema): TableSug
             unique: column.isUnique ?? undefined,
             default: column.defaultValue ?? undefined,
             description: getColumnDescription({ ...column, name: columnName }),
-            isPrimary: isPrimaryColumn({ ...column, name: columnName }) || undefined,
+            isPrimary: column.isPrimary || isIdColumn(columnName) || undefined,
           }
         })
         .filter(isNotNull)
@@ -119,30 +120,6 @@ const convertPartialSchemaToTableSuggestions = (schema: PartialSchema): TableSug
       }
     })
     .filter(isNotNull)
-}
-
-const parseSseEvent = (raw: string) => {
-  const trimmed = raw.trim()
-  if (!trimmed) return null
-
-  const lines = trimmed.split(/\r?\n/)
-  let event = 'message'
-  const dataParts: string[] = []
-
-  for (const line of lines) {
-    if (line.startsWith('event:')) {
-      event = line.slice(6).trim()
-    } else if (line.startsWith('data:')) {
-      dataParts.push(line.slice(5).trim())
-    }
-  }
-
-  if (dataParts.length === 0) return null
-
-  return {
-    event,
-    data: dataParts.join('\n'),
-  }
 }
 
 const safeJsonParse = <T>(input: string): T | null => {
@@ -177,7 +154,12 @@ export const useAITableGeneration = () => {
 
     if (prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
       const message = `Your description is too long. Try shortening it to under ${LIMITS.MAX_PROMPT_LENGTH} characters.`
-      toast.error(message)
+      if (isMountedRef.current) {
+        setError(message)
+      }
+      toast.error('Description too long', {
+        description: message,
+      })
       return []
     }
 
@@ -193,9 +175,8 @@ export const useAITableGeneration = () => {
     try {
       const headers = await constructHeaders()
       headers.set('Content-Type', 'application/json')
-      headers.set('Accept', 'text/event-stream')
 
-      const response = await fetch(`${BASE_PATH}/api/ai/table-quickstart/generate-schemas`, {
+      const response = await fetchHandler(`${BASE_PATH}/api/ai/table-quickstart/generate-schemas`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ prompt }),
@@ -204,11 +185,11 @@ export const useAITableGeneration = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({
-          error: 'Something went wrong while generating your table schema. Please try again.',
+          error: 'Unable to generate table schema. Try again with a different description.',
         }))
         const errorMessage =
           errorData?.error ||
-          'Something went wrong while generating your table schema. Please try again.'
+          'Unable to generate table schema. Try again with a different description.'
         if (isMountedRef.current) {
           setError(errorMessage)
         }
@@ -218,116 +199,60 @@ export const useAITableGeneration = () => {
         return []
       }
 
-      const contentType = response.headers.get('content-type') ?? ''
-
-      if (contentType.includes('text/event-stream') && response.body) {
-        const reader = response.body.getReader()
-        const decoder = new TextDecoder()
-        let buffer = ''
-        let latestPartial: Record<string, any> = {}
-        let finalTables: TableSuggestion[] = []
-
-        const handleEvent = (rawEvent: string) => {
-          const event = parseSseEvent(rawEvent)
-          if (!event) return
-
-          if (event.event === 'partial') {
-            const partial = safeJsonParse<Record<string, any>>(event.data)
-            if (!partial) return
-
-            latestPartial = merge({}, latestPartial, partial)
-            const partialSuggestions = convertPartialSchemaToTableSuggestions(
-              latestPartial as PartialSchema
-            )
-
-            if (isMountedRef.current) {
-              setTables(partialSuggestions)
-            }
-            return
-          }
-
-          if (event.event === 'complete') {
-            const schemaPayload = safeJsonParse<AIGeneratedSchema>(event.data)
-            if (!schemaPayload) return
-
-            finalTables = convertAISchemaToTableSuggestions(schemaPayload)
-            latestPartial = schemaPayload as unknown as Record<string, any>
-
-            if (isMountedRef.current) {
-              setTables(finalTables)
-              setError(null)
-            }
-            return
-          }
-
-          if (event.event === 'error') {
-            const errorPayload = safeJsonParse<{ message?: string }>(event.data)
-            throw new Error(
-              errorPayload?.message ??
-                'Something went wrong while streaming the response. Please try again.'
-            )
-          }
-        }
-
-        const flushBuffer = () => {
-          let boundary = buffer.indexOf('\n\n')
-          while (boundary !== -1) {
-            const rawEvent = buffer.slice(0, boundary)
-            buffer = buffer.slice(boundary + 2)
-            handleEvent(rawEvent)
-            boundary = buffer.indexOf('\n\n')
-          }
-        }
-
-        try {
-          while (true) {
-            const { done, value } = await reader.read()
-            if (done) break
-
-            buffer += decoder.decode(value, { stream: true })
-            flushBuffer()
-          }
-
-          buffer += decoder.decode()
-          flushBuffer()
-
-          const trailingEvent = parseSseEvent(buffer)
-          if (trailingEvent) {
-            handleEvent(buffer)
-            buffer = ''
-          }
-        } finally {
-          reader.releaseLock()
-        }
-
-        if (finalTables.length === 0) {
-          finalTables = convertPartialSchemaToTableSuggestions(latestPartial as PartialSchema)
-        }
-
-        if (isMountedRef.current) {
-          setError(null)
-          setTables(finalTables)
-        }
-
-        return finalTables
+      if (!response.body) {
+        throw new Error('Response body is null')
       }
 
-      const data: AIGeneratedSchema = await response.json()
-      const tablesFromJson = convertAISchemaToTableSuggestions(data)
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let jsonBuffer = ''
+      let latestPartialSchema: PartialSchema = {}
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          jsonBuffer += decoder.decode(value, { stream: true })
+
+          if (jsonBuffer.length > MAX_BUFFER_SIZE) {
+            throw new Error('Response too large')
+          }
+
+          const partialJson = safeJsonParse<PartialSchema>(jsonBuffer)
+          if (partialJson) {
+            Object.assign(latestPartialSchema, partialJson)
+            const partialSuggestions = convertPartialSchemaToTableSuggestions(latestPartialSchema)
+
+            if (isMountedRef.current && partialSuggestions.length > 0) {
+              setTables(partialSuggestions)
+            }
+          }
+        }
+      } finally {
+        reader.releaseLock()
+      }
+
+      jsonBuffer += decoder.decode()
+
+      const finalSchema = safeJsonParse<AIGeneratedSchema>(jsonBuffer)
+      const finalTables = finalSchema
+        ? convertAISchemaToTableSuggestions(finalSchema)
+        : convertPartialSchemaToTableSuggestions(latestPartialSchema)
 
       if (isMountedRef.current) {
         setError(null)
-        setTables(tablesFromJson)
+        setTables(finalTables)
       }
 
-      return tablesFromJson
+      return finalTables
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         return []
       }
 
       const message =
-        error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+        error instanceof Error ? error.message : 'Unable to generate tables. Please try again.'
 
       if (isMountedRef.current) {
         setError(message)

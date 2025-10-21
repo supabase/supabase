@@ -20,7 +20,6 @@ export const QuickstartTemplatesWidget = ({
   disabled,
 }: QuickstartTemplatesWidgetProps) => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const [selectedTemplate, setSelectedTemplate] = useState<TableSuggestion | null>(null)
 
   useEffect(() => {
     if (activeCategory === null && CATEGORIES.length > 0) {
@@ -32,7 +31,6 @@ export const QuickstartTemplatesWidget = ({
     (template: TableSuggestion) => {
       const tableField = convertTableSuggestionToTableField(template)
       onSelectTemplate(tableField)
-      setSelectedTemplate(template)
       toast.success(`Applied ${template.tableName} template. You can customize the fields below.`, {
         duration: SUCCESS_MESSAGE_DURATION_MS,
       })
@@ -85,12 +83,9 @@ export const QuickstartTemplatesWidget = ({
                 onClick={() => handleSelectTemplate(template)}
                 disabled={disabled}
                 aria-label={`Select ${template.tableName} template with ${template.fields.length} fields`}
-                aria-pressed={selectedTemplate?.tableName === template.tableName}
                 className={cn(
                   'text-left p-3 rounded-md border transition-all w-full',
-                  selectedTemplate?.tableName === template.tableName
-                    ? 'border-foreground bg-surface-200'
-                    : 'border-default hover:border-foreground-muted hover:bg-surface-100',
+                  'border-default hover:border-foreground-muted hover:bg-surface-100',
                   'disabled:opacity-50 disabled:cursor-not-allowed'
                 )}
               >

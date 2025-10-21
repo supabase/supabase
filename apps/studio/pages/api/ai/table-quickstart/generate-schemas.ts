@@ -8,8 +8,6 @@ import apiWrapper from 'lib/api/apiWrapper'
 
 export const maxDuration = 30
 
-const MAX_RETRIES = 2
-
 const ColumnSchema = z.object({
   name: z.string().describe('The column name in snake_case'),
   type: z.string().describe('PostgreSQL data type (e.g., bigint, text, timestamp with time zone)'),
@@ -34,8 +32,6 @@ const ResponseSchema = z.object({
   summary: z.string().optional().describe('Brief summary of the generated schema'),
 })
 
-type SchemaStreamResult = ReturnType<typeof streamObject<typeof ResponseSchema>>
-
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
@@ -52,28 +48,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { model, providerOptions } = await getModel({
-    provider: 'bedrock',
-    model: 'openai.gpt-oss-120b-1:0',
+  const modelName = 'gpt-5-mini'
+  const modelResult = await getModel({
+    provider: 'openai',
+    model: modelName,
     routingKey: 'table-quickstart',
     isLimited: false,
   })
 
-  if (!model) {
-    return res
-      .status(500)
-      .json({ error: 'The AI service is temporarily unavailable. Please try again in a moment.' })
+  if (modelResult.error || !modelResult.model) {
+    return res.status(500).json({
+      error:
+        modelResult.error?.message || 'AI service temporarily unavailable. Try again in a moment.',
+    })
   }
+
+  const { model, providerOptions } = modelResult
 
   const { prompt } = req.body
 
   if (!prompt) {
-    return res.status(400).json({ error: 'Please provide a description of your app.' })
+    return res.status(400).json({ error: 'Please provide a description of your app' })
   }
 
   if (typeof prompt !== 'string' || prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
     return res.status(400).json({
-      error: `Your description is too long. Please keep it under ${LIMITS.MAX_PROMPT_LENGTH} characters.`,
+      error: `Description too long. Keep it under ${LIMITS.MAX_PROMPT_LENGTH} characters.`,
     })
   }
 
@@ -82,49 +82,43 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
 
-    const systemPrompt = `You are a Supabase PostgreSQL schema designer. Generate exactly 2-3 core tables based on the user's description.
+    const systemPrompt = `Generate exactly 3 core database tables.
 
-      Rules:
-      - Use "id uuid" as primary key with type: 'uuid'
-      - ALWAYS mark the "id" field with isPrimary: true
-      - Set defaultValue: 'gen_random_uuid()' for UUID primary keys
-      - Use 'text' for string data, 'timestamptz' for timestamps
-      - Use snake_case naming consistently
-      - Add created_at, updated_at timestamps with type: 'timestamptz' and defaultValue: 'now()'
-      - Do NOT generate foreign key constraints or relationships
-      - Keep descriptions brief (one sentence)
-      - Focus on the most essential tables only
+      Schema rules:
+      - Primary key: id (uuid) with isPrimary: true, defaultValue: 'gen_random_uuid()'
+      - Timestamps: created_at, updated_at (timestamptz) with defaultValue: 'now()'
+      - Use text for strings, timestamptz for dates, bigint for integers
+      - snake_case naming
 
-      Be concise and practical.`
+      Output rules (minimize tokens):
+      - ALWAYS include: name, type, isNullable
+      - Include isPrimary/isUnique/defaultValue ONLY when true/set
+      - Omit summary field`
 
-    const userPrompt = `Generate a database schema for: ${prompt}
+    const userPrompt = `Application: ${prompt}`
 
-      Create a practical, production-ready schema with related tables that would be needed for this application.`
+    const result = streamObject({
+      model,
+      abortSignal: abortController.signal,
+      schema: ResponseSchema,
+      mode: 'json',
+      ...(providerOptions && { providerOptions }),
+      system: systemPrompt,
+      prompt: userPrompt,
+    })
 
-    const generateStream = () =>
-      streamObject({
-        model,
-        abortSignal: abortController.signal,
-        schema: ResponseSchema,
-        mode: 'json',
-        ...(providerOptions && { providerOptions }),
-        system: systemPrompt,
-        prompt: userPrompt,
-      })
-
-    await streamSchemaResponse(res, generateStream)
+    result.pipeTextStreamToResponse(res)
   } catch (error) {
     if (error instanceof Error) {
       if (error.message.includes('context_length') || error.message.includes('too long')) {
         return res.status(400).json({
-          error:
-            'Your description is too long. Try using fewer words to describe your application.',
+          error: 'Description too complex. Try using fewer words.',
         })
       }
     }
 
     return res.status(500).json({
-      error: 'Unable to generate table schema. Please try again or use a different description.',
+      error: 'Unable to generate schema. Try a different description.',
     })
   }
 }
@@ -133,100 +127,3 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
 
 export default wrapper
-
-const streamSchemaResponse = async (
-  res: NextApiResponse,
-  generateStream: () => SchemaStreamResult
-) => {
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache, no-transform',
-    Connection: 'keep-alive',
-  })
-
-  const writeEvent = (event: string, data: unknown) => {
-    res.write(`event: ${event}\n`)
-    res.write(`data: ${JSON.stringify(data)}\n\n`)
-  }
-
-  let lastPartial: unknown = null
-
-  const tryStream = async (): Promise<boolean> => {
-    const result = generateStream()
-    lastPartial = null
-    let chunkCount = 0
-
-    try {
-      for await (const partial of result.partialObjectStream) {
-        if (!partial) continue
-        chunkCount++
-        lastPartial = partial
-        writeEvent('partial', partial)
-      }
-
-      if (chunkCount === 0) {
-        return false
-      }
-
-      const hasTablesProp = (obj: unknown): obj is { tables: unknown[] } => {
-        if (typeof obj !== 'object' || obj === null || !('tables' in obj)) {
-          return false
-        }
-        return Array.isArray((obj as any).tables)
-      }
-
-      let finalObject: unknown = null
-      try {
-        finalObject = await result.object
-      } catch {
-        finalObject = null
-      }
-
-      if (hasTablesProp(finalObject) && finalObject.tables.length > LIMITS.MAX_TABLES) {
-        finalObject.tables = finalObject.tables.slice(0, LIMITS.MAX_TABLES)
-      }
-
-      const parseResult = finalObject ? ResponseSchema.safeParse(finalObject) : null
-      const objectToSend = parseResult?.success
-        ? parseResult.data
-        : hasTablesProp(finalObject)
-          ? finalObject
-          : hasTablesProp(lastPartial)
-            ? lastPartial
-            : null
-
-      if (objectToSend) {
-        writeEvent('complete', objectToSend)
-        return true
-      }
-
-      return false
-    } catch {
-      return false
-    }
-  }
-
-  try {
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-      const success = await tryStream()
-      if (success) {
-        return
-      }
-
-      if (attempt === MAX_RETRIES) {
-        throw new Error(
-          'The AI had trouble understanding your request. Try describing your app differently.'
-        )
-      }
-    }
-  } catch (error) {
-    writeEvent('error', {
-      message:
-        error instanceof Error
-          ? error.message
-          : 'Something went wrong. Please try again or refresh the page.',
-    })
-  } finally {
-    res.end()
-  }
-}

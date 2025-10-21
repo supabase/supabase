@@ -36,10 +36,6 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
 
-/**
- * Projects created within this threshold are considered "new" and eligible for quickstart widgets.
- * This aligns with the onboarding window where users are most likely to benefit from templates.
- */
 const NEW_PROJECT_THRESHOLD_DAYS = 7
 const TABLE_QUICKSTART_FLAG = 'tableQuickstart'
 
@@ -78,16 +74,14 @@ export function NewTab() {
     TABLE_QUICKSTART_FLAG
   )
 
-  const isRecentProject = useMemo(() => {
+  const isNewProject = useMemo(() => {
     if (!project?.inserted_at) return false
     return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
   }, [project?.inserted_at])
 
-  // Determine which quickstart variant to show (if any)
-  // Only show for recent projects with a valid non-control variant
-  const showQuickstartVariant =
+  const activeQuickstartVariant =
     editor !== 'sql' &&
-    isRecentProject &&
+    isNewProject &&
     tableQuickstartVariant &&
     tableQuickstartVariant !== QuickstartVariant.CONTROL
       ? tableQuickstartVariant
@@ -160,10 +154,10 @@ export function NewTab() {
             <ActionCard key={`action-card-${i}`} {...item} />
           ))}
         </div>
-        {showQuickstartVariant === QuickstartVariant.AI && (
+        {activeQuickstartVariant === QuickstartVariant.AI && (
           <QuickstartAIWidget onSelectTable={(tableData) => snap.onAddTable(tableData)} />
         )}
-        {showQuickstartVariant === QuickstartVariant.TEMPLATES && (
+        {activeQuickstartVariant === QuickstartVariant.TEMPLATES && (
           <QuickstartTemplatesWidget onSelectTemplate={(tableData) => snap.onAddTable(tableData)} />
         )}
         <RecentItems />
