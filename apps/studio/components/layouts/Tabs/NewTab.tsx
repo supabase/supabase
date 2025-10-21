@@ -1,17 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
 import { partition } from 'lodash'
 import { Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { QuickstartAIWidget } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/QuickstartAIWidget'
+import { QuickstartTemplatesWidget } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/QuickstartTemplatesWidget'
+import { QuickstartVariant } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableQuickstart/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -29,6 +35,13 @@ import {
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
+
+/**
+ * Projects created within this threshold are considered "new" and eligible for quickstart widgets.
+ * This aligns with the onboarding window where users are most likely to benefit from templates.
+ */
+const NEW_PROJECT_THRESHOLD_DAYS = 7
+const TABLE_QUICKSTART_FLAG = 'tableQuickstart'
 
 export function NewTab() {
   const router = useRouter()
@@ -55,6 +68,31 @@ export function NewTab() {
     }
   )
 
+  /**
+   * Returns:
+   * - `QuickstartVariant`: user variation (if bucketed into AI, Templates, or future variants)
+   * - `false`: user not yet bucketed or not targeted for experiment
+   * - `undefined`: PostHog still loading
+   */
+  const tableQuickstartVariant = usePHFlag<QuickstartVariant | false | undefined>(
+    TABLE_QUICKSTART_FLAG
+  )
+
+  const isRecentProject = useMemo(() => {
+    if (!project?.inserted_at) return false
+    return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
+  }, [project?.inserted_at])
+
+  // Determine which quickstart variant to show (if any)
+  // Only show for recent projects with a valid non-control variant
+  const showQuickstartVariant =
+    editor !== 'sql' &&
+    isRecentProject &&
+    tableQuickstartVariant &&
+    tableQuickstartVariant !== QuickstartVariant.CONTROL
+      ? tableQuickstartVariant
+      : null
+
   const tableEditorActions = [
     {
       icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
@@ -62,7 +100,7 @@ export function NewTab() {
       description: 'Design and create a new database table',
       bgColor: 'bg-blue-500',
       isBeta: false,
-      onClick: snap.onAddTable,
+      onClick: () => snap.onAddTable(),
     },
   ]
 
@@ -122,6 +160,12 @@ export function NewTab() {
             <ActionCard key={`action-card-${i}`} {...item} />
           ))}
         </div>
+        {showQuickstartVariant === QuickstartVariant.AI && (
+          <QuickstartAIWidget onSelectTable={(tableData) => snap.onAddTable(tableData)} />
+        )}
+        {showQuickstartVariant === QuickstartVariant.TEMPLATES && (
+          <QuickstartTemplatesWidget onSelectTemplate={(tableData) => snap.onAddTable(tableData)} />
+        )}
         <RecentItems />
       </div>
       {editor === 'sql' && (
