@@ -90,11 +90,9 @@ export const RegionSelector = ({
 
   const allSelectableRegions = [...smartRegions, ...regionOptions]
   const selectedRegion =
-    field.value !== undefined
-      ? allSelectableRegions.find((region) => {
-          return !!region.name && region.name === field.value
-        })
-      : undefined
+allSelectableRegions.find((region) => {
+    return !!region.name && region.name === field.value
+  })
 
   if (isErrorAvailableRegions) {
     return <AlertError subject="Error loading available regions" error={errorAvailableRegions} />
