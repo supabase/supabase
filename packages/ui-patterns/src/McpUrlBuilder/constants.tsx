@@ -51,7 +51,7 @@ export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
 ]
 
 export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group) =>
-  ['docs', 'database', 'development'].includes(group.id)
+  ['docs', 'database', 'development', 'debugging'].includes(group.id)
 )
 
 export const MCP_CLIENTS: McpClient[] = [

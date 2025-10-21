@@ -109,7 +109,7 @@ export const getPaginatedUsersSQL = ({
   const sortOn = sort ?? 'created_at'
   const sortOrder = order ?? 'desc'
 
-  let actualQuery = `${conditions.length > 0 ? ` where ${combinedConditions}` : ''}
+  let whereStatement = `${conditions.length > 0 ? ` where ${combinedConditions}` : ''}
     order by
       "${sortOn}" ${sortOrder} nulls last
     limit
@@ -119,22 +119,21 @@ export const getPaginatedUsersSQL = ({
   `
 
   // DON'T TOUCH THESE QUERIES. ONE CHARACTER OFF AND DISASTER.
-  let firstOperator = startAt ? '>' : '>='
+  const firstOperator = startAt ? '>' : '>='
 
   if (column === 'email') {
     const range = stringRange(keywords ?? '')
 
-    actualQuery = `where lower(email) ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and lower(email) < '${range[1]}'` : ''} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid order by instance_id, lower(email) asc limit ${limit}`
+    whereStatement = `where lower(email) ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and lower(email) < '${range[1]}'` : ''} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid order by instance_id, lower(email) asc limit ${limit}`
   } else if (column === 'phone') {
     const range = stringRange(keywords ?? '')
-
-    actualQuery = `where phone ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and phone < '${range[1]}'` : ''} order by phone asc limit ${limit}`
+    whereStatement = `where phone ${firstOperator} '${startAt ? startAt : range[0]}' ${range[1] ? `and phone < '${range[1]}'` : ''} order by phone asc limit ${limit}`
   } else if (column === 'id') {
     const isMatchingUUIDValue = prefixToUUID(keywords ?? '', false) === keywords
     if (isMatchingUUIDValue) {
-      actualQuery = `where id = '${keywords}' order by id asc limit ${limit}`
+      whereStatement = `where id = '${keywords}' order by id asc limit ${limit}`
     } else {
-      actualQuery = `where id ${firstOperator} '${startAt ? startAt : prefixToUUID(keywords ?? '', false)}' and id < '${prefixToUUID(keywords ?? '', true)}' order by id asc limit ${limit}`
+      whereStatement = `where id ${firstOperator} '${startAt ? startAt : prefixToUUID(keywords ?? '', false)}' and id < '${prefixToUUID(keywords ?? '', true)}' order by id asc limit ${limit}`
     }
   }
 
@@ -156,7 +155,7 @@ export const getPaginatedUsersSQL = ({
       auth.users.updated_at
     from
       auth.users
-    ${actualQuery}`
+    ${whereStatement}`
 
   let usersQuery = `
 with

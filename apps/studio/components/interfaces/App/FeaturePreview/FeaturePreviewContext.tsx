@@ -115,6 +115,11 @@ export const useIsNewStorageUIEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]
 }
 
+export const useIsSecurityNotificationsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]
+}
+
 export const useFeaturePreviewModal = () => {
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
 
@@ -122,6 +127,7 @@ export const useFeaturePreviewModal = () => {
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
   const isNewStorageUIAvailable = useFlag('storageAnalyticsVector')
+  const isSecurityNotificationsAvailable = useFlag('securityNotifications')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
@@ -138,11 +144,19 @@ export const useFeaturePreviewModal = () => {
           return isUnifiedLogsPreviewAvailable
         case 'new-storage-ui':
           return isNewStorageUIAvailable
+        case 'security-notifications':
+          return isSecurityNotificationsAvailable
         default:
           return true
       }
     },
-    [gitlessBranchingEnabled, advisorRulesEnabled, isUnifiedLogsPreviewAvailable]
+    [
+      gitlessBranchingEnabled,
+      advisorRulesEnabled,
+      isUnifiedLogsPreviewAvailable,
+      isNewStorageUIAvailable,
+      isSecurityNotificationsAvailable,
+    ]
   )
 
   const selectedFeatureKey = (
