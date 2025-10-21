@@ -5,6 +5,7 @@ import { useField } from '@payloadcms/ui'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-markdown'
 import './styles.css'
+import { exportTraceState } from 'next/dist/trace'
 
 type MarkdownEditorProps = {
   path: string
@@ -42,20 +43,13 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ path, label, req
 
   return (
     <div className="markdown-editor-field">
-      <div className="field-label">
-        {label && (
-          <label>
-            {label}
-            {required && <span className="required">*</span>}
-          </label>
-        )}
-      </div>
       <div className="markdown-editor-container">
-        <pre className="markdown-editor-highlight" aria-hidden="true">
+        <pre className="markdown-editor-highlight" aria-hidden="true" suppressHydrationWarning>
           <code ref={highlightRef} className="language-markdown">
             {value || ''}
           </code>
         </pre>
+
         <textarea
           ref={textareaRef}
           className="markdown-editor-textarea"
@@ -67,5 +61,14 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ path, label, req
         />
       </div>
     </div>
+  )
+}
+
+export const Label = ({ label, required }: { label: string; required?: boolean }) => {
+  return (
+    <label>
+      {label}
+      {required && <span className="required">*</span>}
+    </label>
   )
 }

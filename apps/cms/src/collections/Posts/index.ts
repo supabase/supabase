@@ -85,11 +85,12 @@ export const Posts: CollectionConfig = {
                   'Write your content in Markdown format. Supports headings, lists, links, images, code blocks, and more.',
                 components: {
                   Field: '@/fields/MarkdownEditor/Component#MarkdownEditor',
+                  Label: '@/fields/MarkdownEditor/Component#Label',
                 },
               },
             },
           ],
-          label: 'Content',
+          label: 'Content (Markdown)',
         },
         {
           fields: [

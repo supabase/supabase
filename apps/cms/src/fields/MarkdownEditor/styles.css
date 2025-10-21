@@ -188,3 +188,78 @@
   color: var(--color-success-800);
   font-size: 0.85em;
 }
+
+/* MDX Component Syntax - Different shades of green */
+.markdown-editor-highlight .token.tag {
+  color: var(--color-success-900);
+}
+
+.markdown-editor-highlight .token.tag.punctuation {
+  color: var(--color-success-700);
+}
+
+.markdown-editor-highlight .token.tag.tag {
+  color: var(--color-success-500);
+}
+
+.markdown-editor-highlight .token.tag.attr-name {
+  color: var(--color-success-600);
+}
+
+.markdown-editor-highlight .token.tag.attr-value {
+  color: var(--color-success-500);
+}
+
+.markdown-editor-highlight .token.tag.attr-value .punctuation {
+  color: var(--color-success-400);
+}
+
+.markdown-editor-highlight .token.tag.script,
+.markdown-editor-highlight .token.tag.script-punctuation {
+  color: var(--color-success-800);
+}
+
+/* MDX JSX expressions {} */
+.markdown-editor-highlight .token.expression,
+.markdown-editor-highlight .token.expression.punctuation {
+  color: var(--color-success-700);
+  background: var(--color-success-50);
+}
+
+/* MDX imports and exports */
+.markdown-editor-highlight .token.imports,
+.markdown-editor-highlight .token.exports {
+  color: var(--color-success-900);
+}
+
+.markdown-editor-highlight .token.module,
+.markdown-editor-highlight .token.from {
+  color: var(--color-success-700);
+}
+
+/* JSX/MDX component names */
+.markdown-editor-highlight .token.class-name,
+.markdown-editor-highlight .token.component {
+  color: var(--color-success-800);
+}
+
+/* MDX spread attributes {...props} */
+.markdown-editor-highlight .token.spread,
+.markdown-editor-highlight .token.operator {
+  color: var(--color-success-600);
+}
+
+/* JSX/MDX self-closing tags */
+.markdown-editor-highlight .token.tag.self-closing {
+  color: var(--color-success-800);
+}
+
+/* MDX interpolation and template literals */
+.markdown-editor-highlight .token.template-string,
+.markdown-editor-highlight .token.interpolation {
+  color: var(--color-success-600);
+}
+
+.markdown-editor-highlight .token.interpolation-punctuation {
+  color: var(--color-success-500);
+}
