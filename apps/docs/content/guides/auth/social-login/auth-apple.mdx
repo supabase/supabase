@@ -22,9 +22,7 @@ In some cases you're able to use the OAuth flow within web-based native apps suc
 
 When developing with Expo, you can test Sign in with Apple via the Expo Go app, in all other cases you will need to obtain an [Apple Developer](https://developer.apple.com) account to enable the capability.
 
-<Admonition type="caution">
-
-**Important: Secret Key Rotation Required**
+<Admonition type="caution" label="Secret Key Rotation Required">
 
 If you're using the OAuth flow (web, Flutter web, Kotlin non-iOS platforms), Apple requires you to generate a new secret key every 6 months using the signing key (`.p8` file). This is a critical maintenance task that will cause authentication failures if missed.
 
@@ -33,17 +31,13 @@ If you're using the OAuth flow (web, Flutter web, Kotlin non-iOS platforms), App
 - If you lose the `.p8` file or it's compromised, immediately revoke it in the Apple Developer Console and create a new one
 - Consider automating this process if possible to prevent service disruptions
 
-**Note**: This requirement only applies if you're configuring OAuth settings (Services ID, signing key, etc.). Native-only implementations don't require secret key rotation.
+This requirement only applies if you're configuring OAuth settings (Services ID, signing key, etc.). Native-only implementations don't require secret key rotation.
 
 </Admonition>
 
-<Admonition type="caution">
-
-**Important: Apple Does Not Provide Full Name in Identity Token**
+<Admonition type="caution" label="Apple Does Not Provide Full Name in Identity Token">
 
 Apple's identity token does not include the user's full name in its claims. This means the Supabase Auth server cannot automatically populate the user's name metadata when users sign in with Apple.
-
-**Critical Apple Behavior:**
 
 - Apple only provides the user's full name during the **first sign-in attempt** (when the user initially authorizes your app)
 - All subsequent sign-ins return `null` for the full name fields
@@ -66,7 +60,7 @@ if (credential.fullName) {
 }
 ```
 
-**Note**: If a user revokes your app's access and then re-authorizes it, Apple will provide the full name again as if it were a first sign-in.
+If a user revokes your app's access and then re-authorizes it, Apple will provide the full name again as if it were a first sign-in.
 
 The platform-specific examples below demonstrate how to implement this pattern for each SDK.
 
@@ -103,9 +97,7 @@ The platform-specific examples below demonstrate how to implement this pattern f
 
     This call takes the user to Apple's consent screen. Once the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
-    <Admonition type="note">
-
-    **Full Name Not Available in OAuth Flow**
+    <Admonition type="note" label="Full Name Not Available in OAuth Flow">
 
     When using the OAuth flow, the user's full name is not accessible from Apple's response. Apple only provides the full name through native authentication methods (Sign in with Apple JS, or native iOS/macOS SDKs) during the first sign-in.
 
@@ -379,9 +371,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     }
     ```
 
-    <Admonition type="note">
-
-    **Android Implementation Notes**
+    <Admonition type="note" label="Android Implementation Notes">
 
     - Sign in with Apple is not natively available on Android devices
     - The OAuth flow opens a browser window for authentication
