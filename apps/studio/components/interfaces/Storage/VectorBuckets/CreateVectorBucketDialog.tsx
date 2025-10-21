@@ -153,7 +153,7 @@ export const CreateVectorBucketDialog = () => {
                     name="name"
                     label="Bucket name"
                     labelOptional="Cannot be changed after creation"
-                    description="Must be between 3–63 characters. Valid characters are a-z, 0-9, hyphens (-), and periods (.)."
+                    description="A target schema will be created that matches this name."
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
