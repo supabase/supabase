@@ -2,6 +2,7 @@ import { BucketAdd } from 'icons'
 import { CreateBucketModal } from './CreateBucketModal'
 import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
 import { BUCKET_TYPES } from './Storage.constants'
+import { CreateVectorBucketDialog } from './VectorBuckets/CreateVectorBucketDialog'
 
 interface EmptyBucketStateProps {
   bucketType: keyof typeof BUCKET_TYPES
@@ -20,27 +21,18 @@ export const EmptyBucketState = ({ bucketType }: EmptyBucketStateProps) => {
         <p className="text-foreground-light text-sm">{config.valueProp}</p>
       </div>
 
-      {bucketType === 'files' ? (
+      {bucketType === 'files' && (
         <CreateBucketModal buttonSize="tiny" buttonType="primary" buttonClassName="w-fit" />
-      ) : (
+      )}
+      {bucketType === 'analytics' && (
         <CreateSpecializedBucketModal
           bucketType={bucketType}
           buttonSize="tiny"
           buttonType="primary"
           buttonClassName="w-fit"
-          disabled={bucketType === 'vectors'}
-          tooltip={
-            bucketType === 'vectors'
-              ? {
-                  content: {
-                    side: 'bottom',
-                    text: 'Vector buckets are not supported yet',
-                  },
-                }
-              : undefined
-          }
         />
       )}
+      {bucketType === 'vectors' && <CreateVectorBucketDialog />}
     </aside>
   )
 }
