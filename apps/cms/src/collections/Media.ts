@@ -1,9 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 
 import { isAnyone } from '../access/isAnyone.ts'
 import { isAuthenticated } from '../access/isAuthenticated.ts'
@@ -23,12 +18,12 @@ export const Media: CollectionConfig = {
     },
     {
       name: 'caption',
-      type: 'richText',
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
+      type: 'text',
+      admin: {
+        components: {
+          Field: '@/fields/MarkdownEditor/Component#MarkdownEditor',
         },
-      }),
+      },
     },
   ],
   upload: {

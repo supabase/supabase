@@ -220,6 +220,10 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
+    devDependencies:
+      '@types/prismjs':
+        specifier: ^1.26.5
+        version: 1.26.5
 
   apps/design-system:
     dependencies:
@@ -9596,8 +9600,8 @@ packages:
   '@types/phoenix@1.6.6':
     resolution: {integrity: sha512-PIzZZlEppgrpoT2QgbnDU+MMzuR6BbCjllj0bM70lWoejMeNJAxCchxnv7J3XFkI8MpygtRpzXrIlmWUBclP5A==}
 
-  '@types/prismjs@1.26.3':
-    resolution: {integrity: sha512-A0D0aTXvjlqJ5ZILMz3rNfDBOx9hHxLZYv2by47Sm/pqW35zzjusrZTryatjN/Rf8Us2gZrJD+KeHbUSTux1Cw==}
+  '@types/prismjs@1.26.5':
+    resolution: {integrity: sha512-AUZTa7hQ2KY5L7AmtSiqxlhWxb4ina0yd8hNbl4TWuqnv/pFP0nDMb3YrfSBf4hJVGLh2YEIBfKaBW/9UEl6IQ==}
 
   '@types/prop-types@15.7.8':
     resolution: {integrity: sha512-kMpQpfZKSCBqltAJwskgePRaYRFukDkm1oItcAbC3gNELR20XIBcN9VRgg4+m8DKsTfkWeA4m4Imp4DDuWy7FQ==}
@@ -29858,7 +29862,7 @@ snapshots:
 
   '@types/phoenix@1.6.6': {}
 
-  '@types/prismjs@1.26.3': {}
+  '@types/prismjs@1.26.5': {}
 
   '@types/prop-types@15.7.8': {}
 
@@ -38691,7 +38695,7 @@ snapshots:
 
   prism-react-renderer@2.3.1(react@18.3.1):
     dependencies:
-      '@types/prismjs': 1.26.3
+      '@types/prismjs': 1.26.5
       clsx: 2.1.1
       react: 18.3.1
 

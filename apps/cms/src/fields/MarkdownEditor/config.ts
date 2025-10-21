@@ -1,6 +1,6 @@
-import type { Field } from 'payload'
+import type { Field, TextareaField } from 'payload'
 
-export const markdownField = (overrides?: Partial<Field>): Field[] => {
+export const markdownField = (overrides?: Partial<TextareaField>): Field[] => {
   return [
     {
       name: 'content',
@@ -12,6 +12,6 @@ export const markdownField = (overrides?: Partial<Field>): Field[] => {
         },
       },
       ...overrides,
-    },
+    } as TextareaField,
   ]
 }

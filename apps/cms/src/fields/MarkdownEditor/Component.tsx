@@ -41,7 +41,12 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ path, label, req
 
     // Use Prism.highlight for direct string-to-HTML conversion (faster than highlightElement)
     try {
-      return Prism.highlight(value, Prism.languages.markdown, 'markdown')
+      const grammar = Prism.languages.markdown
+      if (!grammar) {
+        console.warn('Markdown grammar not loaded')
+        return value
+      }
+      return Prism.highlight(value, grammar, 'markdown')
     } catch (error) {
       console.error('Syntax highlighting error:', error)
       return value
