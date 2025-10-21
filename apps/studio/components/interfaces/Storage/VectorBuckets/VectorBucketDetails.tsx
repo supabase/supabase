@@ -20,15 +20,19 @@ import {
   TableRow,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateVectorIndexSheet } from './CreateVectorIndexSheet'
-import { EmptyVectorBucketsState } from './EmptyVectorBucketState'
 
 export const VectorBucketDetails = () => {
   const { ref: projectRef } = useParams()
   const { data } = useVectorBucketsQuery({ projectRef })
 
+  console.log({ data })
+
   const bucketsList = data?.vectorBuckets ?? []
   const [filterString, setFilterString] = useState('')
+
+  console.log({ bucketsList })
 
   return (
     <div className="flex flex-col gap-y-6">
@@ -125,7 +129,7 @@ export const VectorBucketDetails = () => {
           </Table>
         </Card>
       ) : (
-        <EmptyVectorBucketsState />
+        <EmptyBucketState bucketType="vectors" />
       )}
     </div>
   )
