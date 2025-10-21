@@ -44,6 +44,7 @@ If you're using the OAuth flow (web, Flutter web, Kotlin non-iOS platforms), App
 Apple's identity token does not include the user's full name in its claims. This means the Supabase Auth server cannot automatically populate the user's name metadata when users sign in with Apple.
 
 **Critical Apple Behavior:**
+
 - Apple only provides the user's full name during the **first sign-in attempt** (when the user initially authorizes your app)
 - All subsequent sign-ins return `null` for the full name fields
 - The full name must be captured from Apple's native authentication response and manually saved using the `updateUser` method
@@ -60,7 +61,7 @@ if (credential.fullName) {
       full_name: `${credential.fullName.givenName} ${credential.fullName.familyName}`,
       given_name: credential.fullName.givenName,
       family_name: credential.fullName.familyName,
-    }
+    },
   })
 }
 ```
