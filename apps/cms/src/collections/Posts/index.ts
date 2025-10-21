@@ -1,22 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
-import {
-  BlocksFeature,
-  FixedToolbarFeature,
-  HeadingFeature,
-  HorizontalRuleFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
-
 import { isAnyone } from '../../access/isAnyone.ts'
 import { isAuthenticated } from '../../access/isAuthenticated.ts'
 
-import { Banner } from '../../blocks/Banner/config.ts'
-import { Code } from '../../blocks/Code/config.ts'
-import { MediaBlock } from '../../blocks/MediaBlock/config.ts'
-import { Quote } from '../../blocks/Quote/config.ts'
-import { YouTube } from '../../blocks/YouTube/config.ts'
 import { populateAuthors } from './hooks/populateAuthors.ts'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost.ts'
 
@@ -91,21 +77,16 @@ export const Posts: CollectionConfig = {
           fields: [
             {
               name: 'content',
-              type: 'richText',
-              editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                  return [
-                    ...rootFeatures,
-                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [Banner, Code, MediaBlock, Quote, YouTube] }),
-                    FixedToolbarFeature(),
-                    InlineToolbarFeature(),
-                    HorizontalRuleFeature(),
-                  ]
-                },
-              }),
-              label: false,
+              type: 'textarea',
+              label: 'Content (Markdown)',
               required: true,
+              admin: {
+                description:
+                  'Write your content in Markdown format. Supports headings, lists, links, images, code blocks, and more.',
+                components: {
+                  Field: '@/fields/MarkdownEditor/Component#MarkdownEditor',
+                },
+              },
             },
           ],
           label: 'Content',

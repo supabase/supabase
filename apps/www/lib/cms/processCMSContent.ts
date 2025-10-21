@@ -19,42 +19,66 @@ export interface ProcessedCMSContent {
 }
 
 /**
- * Process PayloadCMS rich text content for use in the www blog
- * This function handles both basic content and custom blocks
+ * Process PayloadCMS content for use in the www blog
+ * This function handles:
+ * 1. Raw markdown strings (new textarea field)
+ * 2. Lexical rich text JSON (legacy format)
+ * 3. Custom blocks converted to existing www syntax
  */
 export async function processCMSContent(
-  richTextContent: any,
+  content: any,
   tocDepth: number = 3
 ): Promise<ProcessedCMSContent> {
   try {
-    // Convert rich text to markdown with blocks converted to existing www syntax
-    const { markdown, blocks } = convertRichTextToMarkdownWithBlocks(richTextContent)
+    // Check if content is already a markdown string
+    if (typeof content === 'string') {
+      // Direct markdown string - no conversion needed
+      const toc = await generateTocFromMarkdown(content, tocDepth)
+      const mdxContent = await mdxSerialize(content, { tocDepth })
 
-    // Generate TOC from the converted markdown
-    const toc = await generateTocFromMarkdown(markdown, tocDepth)
-
-    // Serialize the markdown for MDX (blocks are now converted to existing components)
-    const mdxContent = await mdxSerialize(markdown, { tocDepth })
-
-    return {
-      content: mdxContent,
-      blocks,
-      toc,
-      plainMarkdown: markdown,
+      return {
+        content: mdxContent,
+        blocks: [],
+        toc,
+        plainMarkdown: content,
+      }
     }
+
+    // Handle Lexical JSON format (legacy)
+    if (content?.root?.children) {
+      // Convert rich text to markdown with blocks converted to existing www syntax
+      const { markdown, blocks } = convertRichTextToMarkdownWithBlocks(content)
+
+      // Generate TOC from the converted markdown
+      const toc = await generateTocFromMarkdown(markdown, tocDepth)
+
+      // Serialize the markdown for MDX (blocks are now converted to existing components)
+      const mdxContent = await mdxSerialize(markdown, { tocDepth })
+
+      return {
+        content: mdxContent,
+        blocks,
+        toc,
+        plainMarkdown: markdown,
+      }
+    }
+
+    // Fallback for unexpected format
+    throw new Error('Content format not recognized')
   } catch (error) {
     console.error('Error processing CMS content:', error)
 
-    // Fallback to basic conversion
-    const plainMarkdown = convertRichTextToMarkdown(richTextContent)
-    const toc = await generateTocFromMarkdown(plainMarkdown, tocDepth)
-    const mdxContent = await mdxSerialize(plainMarkdown, { tocDepth })
+    // Last resort fallback
+    const fallbackMarkdown =
+      typeof content === 'string' ? content : convertRichTextToMarkdown(content)
+    const toc = await generateTocFromMarkdown(fallbackMarkdown, tocDepth)
+    const mdxContent = await mdxSerialize(fallbackMarkdown, { tocDepth })
 
     return {
       content: mdxContent,
       blocks: [],
       toc,
-      plainMarkdown,
+      plainMarkdown: fallbackMarkdown,
     }
   }
 }

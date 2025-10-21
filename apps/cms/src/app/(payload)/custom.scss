@@ -1,0 +1,46 @@
+/* Override Payload CMS success colors with Supabase brand green */
+:root {
+  /* Light theme - Supabase brand green scale */
+  --color-success-50: hsla(153, 80%, 99%, 1);
+  --color-success-100: hsla(148, 88%, 97%, 1);
+  --color-success-150: hsla(148, 76%, 95%, 1);
+  --color-success-200: hsla(148, 68%, 92%, 1);
+  --color-success-250: hsla(148, 59%, 88%, 1);
+  --color-success-300: hsla(149, 43%, 82%, 1);
+  --color-success-350: hsla(149, 43%, 75%, 1);
+  --color-success-400: hsla(149, 43%, 69%, 1);
+  --color-success-450: hsla(154, 55%, 57%, 1);
+  --color-success-500: hsla(154, 55%, 45%, 1);
+  --color-success-550: hsla(153, 60%, 53%, 1);
+  --color-success-600: hsla(153, 50%, 50%, 1);
+  --color-success-650: hsla(153, 50%, 42%, 1);
+  --color-success-700: hsla(153, 50%, 34%, 1);
+  --color-success-750: hsla(153, 45%, 23%, 1);
+  --color-success-800: hsla(153, 40%, 18%, 1);
+  --color-success-850: hsla(153, 40%, 15%, 1);
+  --color-success-900: hsla(153, 40%, 12%, 1);
+  --color-success-950: hsla(153, 40%, 8%, 1);
+}
+
+/* Dark theme - Supabase brand green dark scale */
+[data-theme='dark'] {
+  --color-success-50: hsla(153, 75%, 6%, 1);
+  --color-success-100: hsla(153, 73%, 7%, 1);
+  --color-success-150: hsla(154, 69%, 8%, 1);
+  --color-success-200: hsla(154, 69%, 9%, 1);
+  --color-success-250: hsla(154, 67%, 10%, 1);
+  --color-success-300: hsla(154, 67%, 11%, 1);
+  --color-success-350: hsla(154, 66%, 12%, 1);
+  --color-success-400: hsla(154, 66%, 13%, 1);
+  --color-success-450: hsla(154, 64%, 15%, 1);
+  --color-success-500: hsla(154, 64%, 17%, 1);
+  --color-success-550: hsla(154, 62%, 19%, 1);
+  --color-success-600: hsla(154, 62%, 22%, 1);
+  --color-success-650: hsla(153, 60%, 25%, 1);
+  --color-success-700: hsla(153, 60%, 28%, 1);
+  --color-success-750: hsla(153, 60%, 40%, 1);
+  --color-success-800: hsla(153, 60%, 53%, 1);
+  --color-success-850: hsla(153, 60%, 62%, 1);
+  --color-success-900: hsla(153, 60%, 70%, 1);
+  --color-success-950: hsla(153, 60%, 95%, 1);
+}

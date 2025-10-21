@@ -1,0 +1,190 @@
+.markdown-editor-field {
+  margin-bottom: 1rem;
+}
+
+.field-label label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--theme-elevation-900);
+}
+
+.field-label .required {
+  color: var(--color-error-500);
+  margin-left: 0.25rem;
+}
+
+.markdown-editor-container {
+  position: relative;
+  width: 100%;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  background: var(--theme-input-bg);
+  overflow: hidden;
+  transition: border-color 150ms ease;
+}
+
+.markdown-editor-container:focus-within {
+  border-color: var(--theme-elevation-400);
+}
+
+.markdown-editor-highlight,
+.markdown-editor-textarea {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'courier-new', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 1rem;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  tab-size: 2;
+}
+
+.markdown-editor-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  background: transparent !important;
+}
+
+.markdown-editor-highlight code {
+  display: block;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  padding: 0;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background: transparent !important;
+  color: var(--theme-elevation-800);
+}
+
+.markdown-editor-textarea {
+  position: relative;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: transparent;
+  z-index: 1;
+  caret-color: var(--theme-elevation-800);
+  -webkit-text-fill-color: transparent;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.markdown-editor-textarea::placeholder {
+  color: var(--theme-elevation-400);
+  opacity: 1;
+}
+
+.markdown-editor-textarea::selection {
+  background: var(--theme-elevation-150);
+  color: var(--theme-elevation-1000);
+}
+
+/* Custom Prism theme - elevation based with green highlights */
+.markdown-editor-highlight .token.title,
+.markdown-editor-highlight .token.heading {
+  color: var(--color-success-800);
+  font-weight: 600;
+}
+
+.markdown-editor-highlight .token.heading.punctuation {
+  color: var(--color-success-800);
+}
+
+.markdown-editor-highlight .token.bold {
+  color: var(--theme-elevation-800);
+  font-weight: bold;
+}
+
+.markdown-editor-highlight .token.italic {
+  color: var(--theme-elevation-800);
+  font-style: italic;
+}
+
+.markdown-editor-highlight .token.url,
+.markdown-editor-highlight .token.link {
+  color: var(--color-success-800);
+  text-decoration: underline;
+}
+
+.markdown-editor-highlight .token.url-reference,
+.markdown-editor-highlight .token.link-text {
+  color: var(--color-success-800);
+}
+
+.markdown-editor-highlight .token.list.punctuation {
+  color: var(--color-success-800);
+  font-weight: 600;
+}
+
+.markdown-editor-highlight .token.code,
+.markdown-editor-highlight .token.code-snippet {
+  color: var(--color-success-800);
+  background: var(--color-success-50);
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+}
+
+.markdown-editor-highlight .token.code-fence,
+.markdown-editor-highlight .token.code-block {
+  color: var(--color-success-800);
+}
+
+.markdown-editor-highlight .token.blockquote {
+  color: var(--theme-elevation-600);
+  font-style: italic;
+}
+
+.markdown-editor-highlight .token.blockquote.punctuation {
+  color: var(--theme-elevation-400);
+}
+
+.markdown-editor-highlight .token.hr,
+.markdown-editor-highlight .token.hr.punctuation {
+  color: var(--theme-elevation-300);
+}
+
+.markdown-editor-highlight .token.table-header,
+.markdown-editor-highlight .token.table-cell {
+  color: var(--theme-elevation-800);
+}
+
+.markdown-editor-highlight .token.table-delimiter,
+.markdown-editor-highlight .token.table.punctuation {
+  color: var(--theme-elevation-500);
+}
+
+.markdown-editor-highlight .token.strike,
+.markdown-editor-highlight .token.strikethrough {
+  color: var(--theme-elevation-500);
+  text-decoration: line-through;
+}
+
+.markdown-editor-highlight .token.task-list-item,
+.markdown-editor-highlight .token.checkbox {
+  color: var(--color-success-800);
+}
+
+.markdown-editor-highlight .token.punctuation {
+  color: var(--theme-elevation-500);
+}
+
+.markdown-editor-highlight .token.attr-name,
+.markdown-editor-highlight .token.keyword {
+  color: var(--color-success-800);
+}
+
+.markdown-editor-highlight .token.code-language {
+  color: var(--color-success-800);
+  font-size: 0.85em;
+}
