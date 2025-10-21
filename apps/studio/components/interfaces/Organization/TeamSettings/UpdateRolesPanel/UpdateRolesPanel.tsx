@@ -68,7 +68,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   // [Joshen] We only need this data if the org has project scoped roles
   const { data } = useProjectsInfiniteQuery({}, { enabled: hasProjectScopedRoles })
   const projects = data?.pages.flatMap((page) => page.projects) ?? []
-  console.log(projects, 'projects') // empty []
   const { data: permissions } = usePermissionsQuery()
 
   // [Joshen] We use the org scoped roles as the source for available roles
