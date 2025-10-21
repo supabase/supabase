@@ -128,7 +128,7 @@ export const HomeV2 = () => {
                     return (
                       <div key={id} className={cn(isComingUp && 'opacity-60 pointer-events-none')}>
                         <SortableSection id={id}>
-                          <AdvisorSection />
+                          <AdvisorSection showEmptyState={isComingUp} />
                         </SortableSection>
                       </div>
                     )
