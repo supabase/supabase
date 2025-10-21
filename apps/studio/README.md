@@ -40,9 +40,15 @@ Project settings are managed outside of the Dashboard. If you use docker compose
 # You'll need to be on Node v20
 # in /studio
 
-pnpmn install # install dependencies
-mise studio  # Supabase internal use: if you are working on the platform version of the Studio
+## For external contributors
+pnpm install # install dependencies
 pnpm run dev # start dev server
+
+## For internal contributors
+## First clone the private supabase/infrastructure repo and follow instructions for setting up mise
+mise studio  # Run from supabase/infrastructure alongside `mise infra`
+
+## For all
 pnpm run test # run tests
 pnpm run test -- --watch # run tests in watch mode
 ```
