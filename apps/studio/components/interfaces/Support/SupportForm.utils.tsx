@@ -3,19 +3,19 @@ import {
   createLoader,
   createParser,
   createSerializer,
-  type inferParserType,
   parseAsString,
-  parseAsStringLiteral,
+  type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
 // End of third-party imports
 
 import {
+  DocsSearchResultType as PageType,
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
-  DocsSearchResultType as PageType,
 } from 'common'
 import { getProjectDetail } from 'data/projects/project-detail-query'
+import dayjs from 'dayjs'
 import { DOCS_URL } from 'lib/constants'
 import type { Organization } from 'types'
 import { CATEGORY_OPTIONS } from './Support.constants'
@@ -23,18 +23,25 @@ import { CATEGORY_OPTIONS } from './Support.constants'
 export const NO_PROJECT_MARKER = 'no-project'
 export const NO_ORG_MARKER = 'no-org'
 
-export const formatMessage = (
-  message: string,
-  attachments: string[],
+export const formatMessage = ({
+  message,
+  attachments = [],
+  error,
+  commit,
+}: {
+  message: string
+  attachments?: string[]
   error: string | null | undefined
-) => {
-  const errorString = error != null ? `\nError: ${error}` : ''
-  if (attachments.length > 0) {
-    const attachmentsImg = attachments.map((url) => `\n${url}`)
-    return `${message}\n${attachmentsImg.join('')}${errorString}`
-  } else {
-    return `${message}${errorString}`
-  }
+  commit: { commitSha: string; commitTime: string } | undefined
+}) => {
+  const errorString = error != null ? `\n\nError: ${error}` : ''
+  const attachmentsString =
+    attachments.length > 0 ? `\n\nAttachments:\n${attachments.join('\n')}` : ''
+  const commitString =
+    commit != undefined
+      ? `\n\n---\nSupabase Studio version: SHA ${commit.commitSha} deployed at ${commit.commitTime === 'unknown' ? 'unknown time' : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
+      : ''
+  return `${message}${errorString}${attachmentsString}${commitString}`
 }
 
 export function getPageIcon(page: Page) {
@@ -138,7 +145,7 @@ export function createSupportFormUrl(initialParams: SupportFormUrlKeys) {
  * - URL param (if any)
  * - Fallback
  */
-export async function selectInitalOrgAndProject({
+export async function selectInitialOrgAndProject({
   projectRef,
   orgSlug,
   orgs,

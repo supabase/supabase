@@ -588,6 +588,50 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "data-input-demo": {
+      name: "data-input-demo",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-demo")),
+      source: "",
+      files: ["registry/default/example/data-input-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-input-with-copy": {
+      name: "data-input-with-copy",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-copy")),
+      source: "",
+      files: ["registry/default/example/data-input-with-copy.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-input-with-copy-secret": {
+      name: "data-input-with-copy-secret",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-copy-secret")),
+      source: "",
+      files: ["registry/default/example/data-input-with-copy-secret.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-input-with-reveal-copy": {
+      name: "data-input-with-reveal-copy",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy")),
+      source: "",
+      files: ["registry/default/example/data-input-with-reveal-copy.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "date-picker-demo": {
       name: "date-picker-demo",
       type: "components:example",

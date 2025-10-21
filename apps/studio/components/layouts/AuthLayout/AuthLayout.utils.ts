@@ -12,6 +12,7 @@ export const generateAuthMenu = (
     authenticationAttackProtection: boolean
     authenticationAdvanced: boolean
     authenticationShowOverview: boolean
+    authenticationShowSecurityNotifications: boolean
   }
 ): ProductMenuGroup[] => {
   const {
@@ -22,6 +23,7 @@ export const generateAuthMenu = (
     authenticationAttackProtection,
     authenticationAdvanced,
     authenticationShowOverview,
+    authenticationShowSecurityNotifications,
   } = flags ?? {}
 
   const enableOAuth21 = useFlag('EnableOAuth21')
@@ -46,6 +48,26 @@ export const generateAuthMenu = (
           : []),
       ],
     },
+    ...(authenticationEmails && authenticationShowSecurityNotifications && IS_PLATFORM
+      ? [
+          {
+            title: 'Notifications',
+            items: [
+              ...(authenticationEmails
+                ? [
+                    {
+                      name: 'Email',
+                      key: 'email',
+                      pages: ['templates', 'smtp'],
+                      url: `/project/${ref}/auth/templates`,
+                      items: [],
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
+      : []),
     {
       title: 'Configuration',
       items: [
@@ -94,7 +116,7 @@ export const generateAuthMenu = (
                     },
                   ]
                 : []),
-              ...(authenticationEmails
+              ...(authenticationEmails && !authenticationShowSecurityNotifications
                 ? [
                     {
                       name: 'Emails',

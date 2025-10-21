@@ -22,6 +22,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/test',
   '/edge-functions/body',
   '/platform/auth/oauth-clients',
+  '/generate-attachment-url',
 ]
 
 export function middleware(request: NextRequest) {

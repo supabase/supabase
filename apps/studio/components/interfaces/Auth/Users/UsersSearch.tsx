@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { SetStateAction } from 'react'
 
 import {
@@ -11,6 +11,9 @@ import {
   SelectSeparator_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -19,7 +22,7 @@ interface UsersSearchProps {
   searchInvalid: boolean
   specificFilterColumn: 'id' | 'email' | 'phone' | 'freeform'
   setSearch: (value: SetStateAction<string>) => void
-  setFilterKeywords: (value: SetStateAction<string>) => void
+  setFilterKeywords: (value: string) => void
   setSpecificFilterColumn: (value: 'id' | 'email' | 'phone' | 'freeform') => void
 }
 
@@ -33,8 +36,8 @@ export const UsersSearch = ({
 }: UsersSearchProps) => {
   return (
     <div className="flex items-center">
-      <div className="text-xs h-[26px] flex items-center px-2 border border-strong rounded-l-md bg-surface-300">
-        Search
+      <div className="text-xs h-[26px] flex items-center px-1.5 border border-strong rounded-l-md bg-surface-300">
+        <Search size={14} />
       </div>
 
       <Select_Shadcn_
@@ -62,9 +65,17 @@ export const UsersSearch = ({
               Phone number
             </SelectItem_Shadcn_>
             <SelectSeparator_Shadcn_ />
-            <SelectItem_Shadcn_ value="freeform" className="text-xs">
-              All columns
-            </SelectItem_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
+                <SelectItem_Shadcn_ value="freeform" className="text-xs">
+                  Unified search
+                </SelectItem_Shadcn_>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="w-64 text-center">
+                Search by all columns at once, including mid-string search. May impact database
+                performance if you have many users.
+              </TooltipContent>
+            </Tooltip>
           </SelectGroup_Shadcn_>
         </SelectContent_Shadcn_>
       </Select_Shadcn_>
@@ -72,7 +83,7 @@ export const UsersSearch = ({
       <Input
         size="tiny"
         className={cn(
-          'w-64 bg-transparent rounded-l-none -ml-[1px]',
+          'w-[245px] bg-transparent rounded-l-none -ml-[1px]',
           searchInvalid ? 'text-red-900 dark:border-red-900' : '',
           search.length > 1 && 'pr-6'
         )}

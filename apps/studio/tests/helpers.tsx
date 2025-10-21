@@ -63,6 +63,7 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     opt_in_tags: [],
     restriction_status: null,
     restriction_data: null,
+    organization_missing_address: false,
   }
 
   return Object.assign(base, details)
