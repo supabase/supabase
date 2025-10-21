@@ -66,6 +66,7 @@ import {
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { useDiffEditorLifecycle } from './useDiffEditorLifecycle'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -100,7 +101,7 @@ export const SQLEditor = () => {
     setIsAcceptDiffLoading,
     isDiffOpen,
     defaultSqlDiff,
-    closeDiff,
+    closeDiff: closeDiffState,
   } = useSqlEditorDiff()
   const { promptState, setPromptState, promptInput, setPromptInput, resetPrompt } =
     useSqlEditorPrompt()
@@ -133,6 +134,19 @@ export const SQLEditor = () => {
   const isLoading = urlId === 'new' ? false : snippetIsLoading
 
   useAddDefinitions(id, monacoRef.current)
+
+  const handleDiffCleared = useCallback(() => {
+    setIsDiffEditorMounted(false)
+    setShowWidget(false)
+  }, [])
+
+  const { closeDiff } = useDiffEditorLifecycle({
+    editorRef,
+    diffEditorRef,
+    isDiffOpen,
+    closeDiffState,
+    onDiffCleared: handleDiffCleared,
+  })
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
     {
@@ -440,7 +454,7 @@ export const SQLEditor = () => {
       setIsAcceptDiffLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceSqlDiff, selectedDiffType, handleNewQuery, generateSqlTitle, router, id, snapV2])
+  }, [sourceSqlDiff, selectedDiffType, handleNewQuery, generateSqlTitle, router, id, snapV2, closeDiff])
 
   const discardAiHandler = useCallback(() => {
     sendEvent({
@@ -643,13 +657,13 @@ export const SQLEditor = () => {
   // We want to check if the diff editor is mounted and if it is, we want to show the widget
   // We also want to cleanup the widget when the diff editor is closed
   useEffect(() => {
-    if (!isDiffOpen) {
-      setIsDiffEditorMounted(false)
-      setShowWidget(false)
-    } else if (diffEditorRef.current && isDiffEditorMounted) {
-      setShowWidget(true)
-      return () => setShowWidget(false)
+    if (!isDiffOpen || !isDiffEditorMounted || !diffEditorRef.current) {
+      return
     }
+
+    setShowWidget(true)
+
+    return () => setShowWidget(false)
   }, [isDiffOpen, isDiffEditorMounted])
 
   return (

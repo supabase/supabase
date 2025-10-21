@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { constructHeaders } from 'data/fetchers'
 import { detectOS } from 'lib/helpers'
+import { useDiffEditorLifecycle } from 'components/interfaces/SQLEditor/useDiffEditorLifecycle'
 import ResizableAIWidget from './ResizableAIWidget'
 
 interface AIEditorProps {
@@ -126,12 +127,29 @@ const AIEditor = ({
     [aiEndpoint, aiMetadata]
   )
 
-  const handleReset = useCallback(() => {
-    setIsDiffMode(false)
+  const handleDiffCleared = useCallback(() => {
+    setIsDiffEditorMounted(false)
     setPromptState((prev) => ({ ...prev, isOpen: false }))
     setPromptInput('')
-    editorRef.current?.focus()
   }, [])
+
+  const { closeDiff } = useDiffEditorLifecycle({
+    editorRef,
+    diffEditorRef,
+    isDiffOpen: isDiffMode,
+    closeDiffState: () => setIsDiffMode(false),
+    onDiffCleared: handleDiffCleared,
+  })
+
+  const handleReset = useCallback(() => {
+    if (isDiffMode) {
+      closeDiff()
+    } else {
+      setPromptState((prev) => ({ ...prev, isOpen: false }))
+      setPromptInput('')
+    }
+    editorRef.current?.focus()
+  }, [isDiffMode, closeDiff])
 
   const handleAcceptDiff = useCallback(() => {
     if (diffValue.modified) {
