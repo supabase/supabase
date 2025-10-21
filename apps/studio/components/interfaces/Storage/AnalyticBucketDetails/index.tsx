@@ -1,5 +1,5 @@
 import { snakeCase, uniq } from 'lodash'
-import { ChevronRight, Plus, RefreshCw } from 'lucide-react'
+import { Plus, SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
@@ -34,22 +34,7 @@ import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-cr
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteBucketModal } from '../DeleteBucketModal'
@@ -57,6 +42,7 @@ import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { NamespaceRow } from './NamespaceRow'
+import { NamespaceRowAlt } from './NamespaceRowAlt'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
@@ -194,159 +180,65 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
 
           {state === 'added' && wrapperInstance && (
             <>
-              {/* New */}
               <ScaffoldSection isFullWidth>
-                <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
+                <ScaffoldHeader className="pt-0 flex flex-row justify-between items-end gap-x-8">
                   <div>
                     <ScaffoldSectionTitle>Namespaces</ScaffoldSectionTitle>
                     <ScaffoldSectionDescription>
                       Namespaces and tables connected to this bucket.
                     </ScaffoldSectionDescription>
                   </div>
-                  <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
-                    Add namespace
-                  </Button>
+                  {namespaces.length > 0 && (
+                    <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
+                      Add namespace
+                    </Button>
+                  )}
                 </ScaffoldHeader>
 
-                <Card>
-                  <CardHeader className="flex flex-row justify-between items-center px-4 py-3">
-                    <div className="flex flex-row border-alternative rounded-full text-sm bg-surface-300 text-foreground-light leading-none">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="border rounded-full pl-3 pr-2 py-1.5 bg-surface-75 flex flex-row items-center gap-1">
-                              paddleboards
-                              <ChevronRight size={12} className="text-foreground-muted" />
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Namespace</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="border border-muted/0 rounded-full pl-2 pr-3 py-1.5 leading-none">
-                              analytics_paddleboards
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Database schema</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    {/* <div className=""> */}
-                    <Button
-                      type="default"
-                      size="tiny"
-                      icon={<RefreshCw size={14} />}
-                      onClick={() => {}}
-                    >
-                      Sync tables
-                    </Button>
-                    {/* <Button
-                        type="default"
-                        size="tiny"
-                        icon={<Plus size={14} />}
-                        onClick={() => {}}
-                      >
-                        Table Editor
-                      </Button> */}
-                    {/* </div> */}
-                  </CardHeader>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-foreground-muted">Table</TableHead>
-                        <TableHead className="text-foreground-muted">Status</TableHead>
-                        {/* <TableHead className="text-foreground-muted">Updated at</TableHead> */}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <p className="text-sm text-foreground">No tables yet</p>
-                          <p className="text-sm text-foreground-lighter">
-                            Publish an analytics table and then sync.{' '}
-                            <InlineLink
-                              href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
-                            >
-                              Learn more
-                            </InlineLink>
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>hello_world</TableCell>
-                        <TableCell>Connected</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>unsynced table</TableCell>
-                        <TableCell>Sync to connect</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </Card>
-              </ScaffoldSection>
-
-              {/* Old */}
-
-              <ScaffoldSection isFullWidth>
                 {isLoadingNamespaces || isFDWsLoading ? (
                   <GenericSkeletonLoader />
                 ) : namespaces.length === 0 ? (
-                  <Card>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-foreground-muted">Namespace</TableHead>
-                          <TableHead className="text-foreground-muted">Schema</TableHead>
-                          <TableHead className="text-foreground-muted">Tables</TableHead>
-                          <TableHead />
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell colSpan={4}>
-                            <p className="text-sm text-foreground">No namespaces in this bucket</p>
-                            <p className="text-sm text-foreground-lighter">
-                              Create a namespace and add some data
-                            </p>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </Card>
+                  <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
+                    <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
+                    <div className="flex flex-col items-center text-center">
+                      <h3>Add a namespace</h3>
+                      <p className="text-foreground-light text-sm">
+                        Then populate it with data using the below connection details.
+                      </p>
+                    </div>
+                    <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
+                      Add namespace
+                    </Button>
+                  </aside>
                 ) : (
-                  <Card>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Namespace</TableHead>
-                          <TableHead>Schema</TableHead>
-                          <TableHead>Tables</TableHead>
-                          <TableHead />
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {namespaces.map(({ namespace, schema, tables }) => (
-                          <NamespaceRow
-                            key={namespace}
-                            bucketName={bucket.id}
-                            namespace={namespace}
-                            schema={schema}
-                            tables={tables as any}
-                            token={token!}
-                            wrapperInstance={wrapperInstance}
-                            wrapperValues={wrapperValues}
-                            wrapperMeta={wrapperMeta}
-                          />
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </Card>
+                  <div className="flex flex-col gap-y-10">
+                    {namespaces.map(({ namespace, schema, tables }) => (
+                      <>
+                        <NamespaceRowAlt
+                          key={namespace}
+                          bucketName={bucket.id}
+                          namespace={namespace}
+                          schema={schema}
+                          tables={tables as any}
+                          token={token!}
+                          wrapperInstance={wrapperInstance}
+                          wrapperValues={wrapperValues}
+                          wrapperMeta={wrapperMeta}
+                        />
+                        <NamespaceRow
+                          key={namespace}
+                          bucketName={bucket.id}
+                          namespace={namespace}
+                          schema={schema}
+                          tables={tables as any}
+                          token={token!}
+                          wrapperInstance={wrapperInstance}
+                          wrapperValues={wrapperValues}
+                          wrapperMeta={wrapperMeta}
+                        />
+                      </>
+                    ))}
+                  </div>
                 )}
               </ScaffoldSection>
 

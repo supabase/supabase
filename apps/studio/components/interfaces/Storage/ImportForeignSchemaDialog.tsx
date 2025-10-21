@@ -12,7 +12,7 @@ import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-s
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { getFDWs } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal } from 'ui'
+import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
 import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
@@ -158,20 +158,25 @@ export const ImportForeignSchemaDialog = ({
       hideFooter
       visible={visible}
       size="medium"
-      header={<span>Connect namespace "{namespace}"</span>}
+      header={<span>Create new schema</span>}
       onCancel={() => onClose()}
     >
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-4">
+            <p className="text-sm">
+              Namespace “<strong>{namespace}</strong>” must be linked to a new database schema
+              before its tables can be queried.
+            </p>
+            <Separator />
             <FormField_Shadcn_
               control={form.control}
               name="targetSchema"
               render={({ field }) => (
                 <FormItemLayout
                   layout="vertical"
-                  label="Specify a new schema for where the Iceberg data will be accessible"
-                  description="A new schema will be created. For security purposes, the wrapper tables from the foreign schema cannot be created within an existing schema."
+                  label="Target schema"
+                  description="The new database schema where your analytics data will be accessible."
                 >
                   <Input_Shadcn_ {...field} placeholder="Enter schema name" />
                 </FormItemLayout>
@@ -184,7 +189,7 @@ export const ImportForeignSchemaDialog = ({
               Cancel
             </Button>
             <Button type="primary" htmlType="submit" loading={loading}>
-              Save
+              Create
             </Button>
           </Modal.Content>
         </form>
