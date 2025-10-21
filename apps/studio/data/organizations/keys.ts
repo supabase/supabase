@@ -1,3 +1,5 @@
+import type { DesiredInstanceSizeForAvailableRegions } from './organization-available-regions-query'
+
 export const organizationKeys = {
   list: () => ['organizations'] as const,
   detail: (slug?: string) => ['organizations', slug] as const,
@@ -20,6 +22,9 @@ export const organizationKeys = {
     ['organizations', slug, 'validate-token', token] as const,
   projectClaim: (slug: string, token: string) =>
     ['organizations', slug, 'project-claim', token] as const,
-  availableRegions: (slug: string | undefined, cloudProvider: string) =>
-    ['organizations', slug, 'available-regions', cloudProvider] as const,
+  availableRegions: (
+    slug: string | undefined,
+    cloudProvider: string,
+    size?: DesiredInstanceSizeForAvailableRegions
+  ) => ['organizations', slug, 'available-regions', cloudProvider, size] as const,
 }
