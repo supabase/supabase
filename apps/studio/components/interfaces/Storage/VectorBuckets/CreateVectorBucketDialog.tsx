@@ -124,7 +124,7 @@ export const CreateVectorBucketDialog = () => {
             },
           }}
         >
-          Create bucket
+          New bucket
         </ButtonTooltip>
       </DialogTrigger>
 

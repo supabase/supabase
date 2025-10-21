@@ -31,7 +31,7 @@ export const VectorsBuckets = () => {
     <div className="flex flex-col">
       {bucketsList.length > 0 && (
         <div className="flex flex-row justify-between mt-16 mb-6">
-          <span className="text-lg">Vectors</span>
+          <span className="text-lg">Buckets</span>
           <CreateVectorBucketDialog />
         </div>
       )}
@@ -42,7 +42,7 @@ export const VectorsBuckets = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Created</TableHead>
+                <TableHead>Created at</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
@@ -75,7 +75,7 @@ export const VectorsBuckets = () => {
                             href={`/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`}
                             onClick={(e) => e.stopPropagation()}
                           >
-                            View
+                            View contents
                           </Link>
                         </Button>
                         <DropdownMenu>
