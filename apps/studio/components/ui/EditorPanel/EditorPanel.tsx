@@ -91,7 +91,6 @@ export const EditorPanel = ({
   // Prefer state values over props for new state-based usage
   const onClose = propOnClose ?? (() => {})
   const initialValue = editorStateSnap.initialValue || propInitialValue || ''
-  const label = editorStateSnap.label || propLabel || ''
   const saveLabel = editorStateSnap.saveLabel || propSaveLabel || 'Save'
   const saveValue = editorStateSnap.saveValue || propSaveValue || ''
   const onSave = editorStateSnap.onSave || propOnSave
@@ -202,7 +201,7 @@ export const EditorPanel = ({
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 px-4 py-3">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 px-4 h-[46px]">
         <div className="flex-1 flex items-center gap-x-2">
           <SQLSnippetSelector
             currentSnippetName={currentSnippet?.name || 'SQL Editor'}

@@ -230,10 +230,7 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => sidebarManagerState.openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <InlineEditorButton showShortcut={inlineEditorHotkeyEnabled} />
                         <AdvisorButton />
                         <AssistantButton />
                       </>
@@ -249,10 +246,7 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => sidebarManagerState.openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <InlineEditorButton showShortcut={inlineEditorHotkeyEnabled} />
                         <AdvisorButton />
                         <AssistantButton />
                       </>

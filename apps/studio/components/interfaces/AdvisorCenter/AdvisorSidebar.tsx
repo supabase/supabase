@@ -149,7 +149,7 @@ export const AdvisorSidebar = () => {
     if (!lintData) return []
 
     return lintData
-      .map((lint) => {
+      .map((lint): AdvisorCenterItem | null => {
         const categories = lint.categories || []
         const tab =
           categories.includes('SECURITY') && !categories.includes('PERFORMANCE')
@@ -218,6 +218,15 @@ export const AdvisorSidebar = () => {
     })
   }, [combinedItems, advisorSnap.severityFilters, advisorSnap.activeTab])
 
+  const itemsFilteredByTabOnly = useMemo<AdvisorCenterItem[]>(() => {
+    return combinedItems.filter((item) => {
+      if (advisorSnap.activeTab === 'all') return true
+      return item.tab === advisorSnap.activeTab
+    })
+  }, [combinedItems, advisorSnap.activeTab])
+
+  const hiddenItemsCount = itemsFilteredByTabOnly.length - filteredItems.length
+
   useEffect(() => {
     if (!advisorSnap.open) return
 
@@ -236,7 +245,6 @@ export const AdvisorSidebar = () => {
 
   const isLoading = isLintsLoading || notificationsQuery.isLoading
   const isNotificationsFetching = notificationsQuery.isFetching && !notificationsQuery.isLoading
-  const isRefetching = isLintsRefetching || isNotificationsFetching
 
   const handleTabChange = (tab: string) => {
     advisorCenterState.setActiveTab(tab as AdvisorCenterTab)
@@ -303,19 +311,23 @@ export const AdvisorSidebar = () => {
       ) : (
         <>
           <div className="border-b">
-            <div className="flex items-center justify-between gap-3 px-4">
-              <Tabs_Shadcn_ value={advisorSnap.activeTab} onValueChange={handleTabChange}>
-                <TabsList_Shadcn_ className="border-b-0 gap-4">
-                  <TabsTrigger_Shadcn_ value="all" className="py-3 text-xs">
+            <div className="flex items-center justify-between gap-3 px-4 h-[46px]">
+              <Tabs_Shadcn_
+                value={advisorSnap.activeTab}
+                onValueChange={handleTabChange}
+                className="h-full"
+              >
+                <TabsList_Shadcn_ className="border-b-0 gap-4 h-full">
+                  <TabsTrigger_Shadcn_ value="all" className="h-full text-xs">
                     All
                   </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="security" className="py-3 text-xs">
+                  <TabsTrigger_Shadcn_ value="security" className="h-full text-xs">
                     Security
                   </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="performance" className="py-3 text-xs">
+                  <TabsTrigger_Shadcn_ value="performance" className="h-full text-xs">
                     Performance
                   </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="messages" className="py-3 text-xs">
+                  <TabsTrigger_Shadcn_ value="messages" className="h-full text-xs">
                     Messages
                   </TabsTrigger_Shadcn_>
                 </TabsList_Shadcn_>
@@ -324,7 +336,7 @@ export const AdvisorSidebar = () => {
                 <FilterPopover
                   name="Severity"
                   options={severityOptions}
-                  activeOptions={advisorSnap.severityFilters}
+                  activeOptions={[...advisorSnap.severityFilters]}
                   valueKey="value"
                   labelKey="label"
                   onSaveFilters={(values) =>
@@ -349,38 +361,51 @@ export const AdvisorSidebar = () => {
                 No advisor items match your selection.
               </p>
             ) : (
-              <div className="flex flex-col">
-                {filteredItems.map((item) => {
-                  const SeverityIcon = tabIconMap[item.tab]
-                  const severityClass = severityColorClasses[item.severity]
-                  return (
-                    <div className="border-b">
-                      <Button
-                        key={item.id}
-                        type="text"
-                        className="justify-start w-full block rounded-none h-auto py-3 px-4 text-foreground-light hover:text-foreground"
-                        onClick={() => advisorCenterState.selectItem(item.id)}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2 overflow-hidden">
-                            <SeverityIcon
+              <>
+                <div className="flex flex-col">
+                  {filteredItems.map((item) => {
+                    const SeverityIcon = tabIconMap[item.tab]
+                    const severityClass = severityColorClasses[item.severity]
+                    return (
+                      <div className="border-b">
+                        <Button
+                          key={item.id}
+                          type="text"
+                          className="justify-start w-full block rounded-none h-auto py-3 px-4 text-foreground-light hover:text-foreground"
+                          onClick={() => advisorCenterState.selectItem(item.id)}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 overflow-hidden">
+                              <SeverityIcon
+                                size={16}
+                                strokeWidth={1.5}
+                                className={cn('flex-shrink-0', severityClass)}
+                              />
+                              <span className="truncate">{item.title}</span>
+                            </div>
+                            <ChevronRight
                               size={16}
                               strokeWidth={1.5}
-                              className={cn('flex-shrink-0', severityClass)}
+                              className="flex-shrink-0 text-foreground-lighter"
                             />
-                            <span className="truncate">{item.title}</span>
                           </div>
-                          <ChevronRight
-                            size={16}
-                            strokeWidth={1.5}
-                            className="flex-shrink-0 text-foreground-lighter"
-                          />
-                        </div>
-                      </Button>
-                    </div>
-                  )
-                })}
-              </div>
+                        </Button>
+                      </div>
+                    )
+                  })}
+                </div>
+                {advisorSnap.severityFilters.length > 0 && hiddenItemsCount > 0 && (
+                  <div className="px-4 py-3">
+                    <Button
+                      type="text"
+                      className="w-full"
+                      onClick={() => advisorCenterState.clearSeverityFilters()}
+                    >
+                      Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? 's' : ''}
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </>

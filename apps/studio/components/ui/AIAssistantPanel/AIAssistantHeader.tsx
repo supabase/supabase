@@ -31,22 +31,6 @@ export const AIAssistantHeader = ({
     <div className="z-30 sticky top-0">
       <div className="border-b border-b-muted flex items-center bg gap-x-4 px-3 h-[46px]">
         <div className="text-sm flex-1 flex items-center">
-          <AiIconAnimation size={20} allowHoverEffect={false} />
-          <span className="text-border-stronger dark:text-border-strong ml-3">
-            <svg
-              viewBox="0 0 24 24"
-              width="16"
-              height="16"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-              shapeRendering="geometricPrecision"
-            >
-              <path d="M16 3.549L7.12 20.600" />
-            </svg>
-          </span>
           <AIAssistantChatSelector disabled={isChatLoading} />
         </div>
         <div className="flex items-center gap-x-4">

@@ -8,7 +8,7 @@ export type AdvisorSeverity = 'critical' | 'warning' | 'info'
 const initialState = {
   open: false,
   activeTab: 'all' as AdvisorCenterTab,
-  severityFilters: [] as AdvisorSeverity[],
+  severityFilters: ['critical'] as AdvisorSeverity[],
   selectedItemId: undefined as string | undefined,
 }
 
