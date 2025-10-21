@@ -1,6 +1,6 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import dayjs from 'dayjs'
-import { Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
+import { Edit, MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -32,8 +32,9 @@ import {
 import { CreateOAuthAppModal } from './CreateOAuthAppModal'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
 import { RegenerateClientSecretDialog } from './RegenerateClientSecretDialog'
+import { UpdateOAuthAppSidePanel } from './UpdateOAuthAppSidePanel'
 
-export const OAUTH_APP_SCOPES_OPTIONS = [
+export const OAUTH_APP_SCOPE_OPTIONS = [
   { name: 'email', value: 'email' },
   { name: 'profile', value: 'profile' },
   { name: 'openid', value: 'openid' },
@@ -51,6 +52,7 @@ const OAuthAppsList = () => {
 
   // State for OAuth apps
   const [showCreatePanel, setShowCreatePanel] = useState(false)
+  const [showUpdatePanel, setShowUpdatePanel] = useState(false)
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
@@ -70,6 +72,11 @@ const OAuthAppsList = () => {
   )
 
   const oAuthApps = data?.clients || []
+
+  const handleEditClick = (app: OAuthClient) => {
+    setSelectedApp(app)
+    setShowUpdatePanel(true)
+  }
 
   const handleDeleteClick = (app: OAuthClient) => {
     setSelectedApp(app)
@@ -133,7 +140,7 @@ const OAuthAppsList = () => {
             />
             <FilterPopover
               name="Scope"
-              options={OAUTH_APP_SCOPES_OPTIONS}
+              options={OAUTH_APP_SCOPE_OPTIONS}
               labelKey="name"
               valueKey="value"
               iconKey="icon"
@@ -190,8 +197,14 @@ const OAuthAppsList = () => {
                 {oAuthApps.length > 0 &&
                   oAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
-                      <TableCell className="max-w-64 truncate">{app.client_name}</TableCell>
-                      <TableCell className="w-40">{app.client_id}</TableCell>
+                      <TableCell className="max-w-64 truncate">
+                        <button type="button" onClick={() => handleEditClick(app)}>
+                          {app.client_name}
+                        </button>
+                      </TableCell>
+                      <TableCell className="w-64 max-w-64 truncate" title={app.client_id}>
+                        {app.client_id}
+                      </TableCell>
                       <TableCell className="w-40">
                         <Badge>{app.registration_type}</Badge>
                       </TableCell>
@@ -211,7 +224,16 @@ const OAuthAppsList = () => {
                             <DropdownMenuTrigger asChild>
                               <Button type="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent side="bottom" align="end" className="w-32">
+                            <DropdownMenuContent side="bottom" align="end" className="w-52">
+                              <DropdownMenuItem
+                                className="space-x-2"
+                                onClick={() => {
+                                  handleEditClick(app)
+                                }}
+                              >
+                                <Edit size={14} />
+                                <p>Edit</p>
+                              </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => {
@@ -219,7 +241,7 @@ const OAuthAppsList = () => {
                                   setShowRegenerateDialog(true)
                                 }}
                               >
-                                <Edit size={14} />
+                                <RotateCw size={14} />
                                 <p>Regenerate client secret</p>
                               </DropdownMenuItem>
                               <DropdownMenuItem
@@ -242,6 +264,13 @@ const OAuthAppsList = () => {
       </div>
 
       <CreateOAuthAppModal visible={showCreatePanel} onClose={() => setShowCreatePanel(false)} />
+
+      <UpdateOAuthAppSidePanel
+        visible={showUpdatePanel}
+        onClose={() => setShowUpdatePanel(false)}
+        selectedApp={selectedApp}
+        onDeleteClick={handleDeleteClick}
+      />
 
       <RegenerateClientSecretDialog
         visible={showRegenerateDialog}

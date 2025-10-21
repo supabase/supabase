@@ -38,7 +38,7 @@ import {
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
+import { OAUTH_APP_SCOPE_OPTIONS } from './OAuthAppsList'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -77,7 +77,7 @@ interface OAuthServerSettings {
 const OAuthServerSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
   const [isSaving, setIsSaving] = useState(false)
   const [oAuthAppsCount, setOAuthAppsCount] = useState(0)
   const [showDynamicAppsConfirmation, setShowDynamicAppsConfirmation] = useState(false)
@@ -403,9 +403,9 @@ const OAuthServerSettingsForm = () => {
 
                     <Card>
                       <CardHeader>
-                        <CardTitle>Scopes</CardTitle>
+                        <CardTitle>Scope</CardTitle>
                         <CardDescription>
-                          OAuth scopes that can be requested by OAuth applications.
+                          OAuth scope that can be requested by OAuth applications.
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="p-0">
@@ -426,7 +426,7 @@ const OAuthServerSettingsForm = () => {
                                   </Badge>
                                 </TableCell>
                                 <TableCell>
-                                  {OAUTH_APP_SCOPES_OPTIONS.find((opt) => opt.value === scope)
+                                  {OAUTH_APP_SCOPE_OPTIONS.find((opt) => opt.value === scope)
                                     ?.name || 'Custom scope'}
                                 </TableCell>
                                 <TableCell>

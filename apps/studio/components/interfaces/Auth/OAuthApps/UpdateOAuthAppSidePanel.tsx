@@ -28,7 +28,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
-import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
+import { OAUTH_APP_SCOPE_OPTIONS } from './OAuthAppsList'
 
 interface UpdateOAuthAppSidePanelProps {
   visible: boolean
@@ -41,18 +41,16 @@ const FormSchema = z.object({
   name: z
     .string()
     .min(1, 'Please provide a name for your OAuth app')
-    .max(100, 'Name must be less than 100 characters')
-    .default(''),
+    .max(100, 'Name must be less than 100 characters'),
   type: z.enum(['manual', 'dynamic']).default('manual'),
-  scope: z.string().min(1, 'Please select a scope').default('openid'),
+  scope: z.string().min(1, 'Please select a scope'),
   redirect_uris: z
     .object({
       value: z.string().refine((val) => val === '' || z.string().url().safeParse(val).success, {
         message: 'Please provide a valid URL',
       }),
     })
-    .array()
-    .default([{ value: '' }]),
+    .array(),
   is_public: z.boolean().default(false),
 })
 
@@ -84,7 +82,7 @@ export const UpdateOAuthAppSidePanel = ({
       const values = {
         name: selectedApp.client_name,
         type: selectedApp.registration_type,
-        scopes: selectedApp.scope,
+        scope: selectedApp.scope,
         redirect_uris: selectedApp.redirect_uris?.length
           ? selectedApp.redirect_uris.map((uri: string) => ({ value: uri }))
           : [{ value: '' }],
@@ -280,13 +278,13 @@ export const UpdateOAuthAppSidePanel = ({
                 name="scope"
                 render={({ field }) => (
                   <FormItemLayout
-                    label="Scopes"
+                    label="Scope"
                     layout="vertical"
                     description={
                       <>
                         Select the permissions your app will request from users.{' '}
                         <Link
-                          href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#scopes"
+                          href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#scope"
                           target="_blank"
                           rel="noreferrer"
                           className="text-foreground-light underline hover:text-foreground transition"
@@ -302,7 +300,7 @@ export const UpdateOAuthAppSidePanel = ({
                           <SelectValue_Shadcn_ placeholder="Select scope..." />
                         </SelectTrigger_Shadcn_>
                         <SelectContent_Shadcn_>
-                          {OAUTH_APP_SCOPES_OPTIONS.map((scope) => (
+                          {OAUTH_APP_SCOPE_OPTIONS.map((scope) => (
                             <SelectItem_Shadcn_ key={scope.value} value={scope.value}>
                               {scope.name}
                             </SelectItem_Shadcn_>

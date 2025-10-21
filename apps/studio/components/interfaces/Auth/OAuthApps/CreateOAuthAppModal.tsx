@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type CreateOAuthClientParams } from '@supabase/supabase-js'
+import type { CreateOAuthClientParams } from '@supabase/supabase-js'
 import { Plus, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
@@ -16,7 +16,6 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
-  FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   SelectContent_Shadcn_,
@@ -36,7 +35,7 @@ import {
   cn,
 } from 'ui'
 import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
-import { OAUTH_APP_SCOPES_OPTIONS } from './OAuthAppsList'
+import { OAUTH_APP_SCOPE_OPTIONS } from './OAuthAppsList'
 
 interface CreateOAuthAppModalProps {
   visible: boolean
@@ -51,21 +50,18 @@ const FormSchema = z.object({
     .default(''),
   type: z.enum(['manual', 'dynamic']).default('manual'),
   scope: z.string().min(1, 'Please select a scope').default('profile'),
-  redirect_uris: z
-    .object({
-      value: z.string().refine((val) => val === '' || z.string().url().safeParse(val).success, {
-        message: 'Please provide a valid URL',
-      }),
+  redirect_uris: z.array(
+    z.object({
+      value: z.string(),
     })
-    .array()
-    .default([{ value: '' }]),
+  ),
   is_public: z.boolean().default(false),
 })
 
 const initialValues = {
   name: '',
   type: 'manual' as const,
-  scopes: ['email', 'profile'],
+  scope: 'email',
   redirect_uris: [{ value: '' }],
   is_public: false,
 }
@@ -80,9 +76,13 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
     clientId: string
     clientSecret: string
   } | null>(null)
+  const [redirectUriErrors, setRedirectUriErrors] = useState<string[]>([])
+  const [fieldErrors, setFieldErrors] = useState<{ [key: number]: string }>({})
 
   useEffect(() => {
     form.reset(initialValues)
+    setRedirectUriErrors([])
+    setFieldErrors({})
   }, [visible])
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -99,47 +99,89 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
     control: form.control,
   })
 
-  const generateClientSecret = () => {
-    // Generate a secure random client secret (32 characters)
-    const array = new Uint8Array(32)
-    crypto.getRandomValues(array)
-    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
-  }
-
   const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
-  const { mutateAsync: createOAuthApp, isLoading } = useOAuthServerAppCreateMutation()
+  const { mutateAsync: createOAuthApp, isLoading } = useOAuthServerAppCreateMutation({
+    onSuccess: (data) => {
+      if (data) {
+        toast.success(`Successfully created OAuth app "${data.client_name}"`)
+        setGeneratedCredentials({
+          clientId: data.client_id ?? '',
+          clientSecret: data.client_secret ?? '',
+        })
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
+  const validateRedirectUris = (uris: { value: string }[]) => {
+    const errors: string[] = []
+    const fieldErrorMap: { [key: number]: string } = {}
+
+    if (uris.length === 0) {
+      errors.push('At least one redirect URI is required')
+      return { errors, fieldErrors: fieldErrorMap }
+    }
+
+    const validUris = uris.filter((uri) => uri.value.trim() !== '')
+    if (validUris.length === 0) {
+      errors.push('At least one redirect URI must be provided')
+      return { errors, fieldErrors: fieldErrorMap }
+    }
+
+    // Validate each URI and track field-level errors
+    uris.forEach((uri, index) => {
+      if (uri.value.trim() !== '') {
+        try {
+          new URL(uri.value.trim())
+        } catch {
+          fieldErrorMap[index] = 'Please provide a valid URL'
+        }
+      }
+    })
+
+    return { errors, fieldErrors: fieldErrorMap }
+  }
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    try {
-      // Generate a unique ID and client_id
-      const id = Date.now().toString()
-      const client_id = `oauth_${id}`
-      const client_secret = generateClientSecret()
+    // Validate redirect URIs
+    const { errors: uriErrors, fieldErrors: newFieldErrors } = validateRedirectUris(
+      data.redirect_uris
+    )
+    setRedirectUriErrors(uriErrors)
+    setFieldErrors(newFieldErrors)
 
+    if (uriErrors.length > 0 || Object.keys(newFieldErrors).length > 0) {
+      return
+    }
+
+    // Filter out empty redirect URIs
+    const validRedirectUris = data.redirect_uris
+      .map((uri) => uri.value.trim())
+      .filter((uri) => uri !== '')
+
+    try {
       const payload: CreateOAuthClientParams = {
         client_name: data.name,
         client_uri: '',
         scope: data.scope,
-        redirect_uris: data.redirect_uris
-          .filter((uri) => uri.value.trim())
-          .map((uri) => uri.value.trim()),
+        redirect_uris: validRedirectUris,
       }
 
       await createOAuthApp({
         projectRef,
         supabaseClient: supabaseClientData?.supabaseClient,
+        temporaryApiKey: supabaseClientData?.temporaryApiKey,
         ...payload,
       })
-
-      toast.success(`Successfully created OAuth app "${data.name}"`)
 
       // Close the create modal first, then show credentials
       closeModal()
 
       // Show credentials modal after a brief delay
       setTimeout(() => {
-        setGeneratedCredentials({ clientId: client_id, clientSecret: client_secret })
         setShowCredentialsModal(true)
       }, 100)
     } catch (error) {
@@ -149,6 +191,8 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
 
   const closeModal = () => {
     form.reset(initialValues)
+    setRedirectUriErrors([])
+    setFieldErrors({})
     onClose()
   }
 
@@ -200,6 +244,7 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
                 <FormField_Shadcn_
                   control={form.control}
                   name="scope"
+                  rules={{ required: true }}
                   render={({ field }) => (
                     <FormItemLayout
                       label="Scope"
@@ -208,7 +253,7 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
                         <>
                           Select the permissions your app will request from users.{' '}
                           <Link
-                            href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#scopes"
+                            href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#scope"
                             target="_blank"
                             rel="noreferrer"
                             className="text-foreground-light underline hover:text-foreground transition"
@@ -225,7 +270,7 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
                             <SelectValue_Shadcn_ placeholder="Select scope..." />
                           </SelectTrigger_Shadcn_>
                           <SelectContent_Shadcn_>
-                            {OAUTH_APP_SCOPES_OPTIONS.map((scope) => (
+                            {OAUTH_APP_SCOPE_OPTIONS.map((scope) => (
                               <SelectItem_Shadcn_ key={scope.value} value={scope.value}>
                                 {scope.name}
                               </SelectItem_Shadcn_>
@@ -248,10 +293,10 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
                       className="px-5"
                     >
                       <div className="space-y-2">
-                        {redirectUriFields.map((field, index) => (
+                        {redirectUriFields.map((fieldItem, index) => (
                           <FormField_Shadcn_
                             control={form.control}
-                            key={field.id}
+                            key={fieldItem.id}
                             name={`redirect_uris.${index}.value`}
                             render={({ field: inputField }) => (
                               <FormItem_Shadcn_>
@@ -261,6 +306,19 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
                                       {...inputField}
                                       placeholder="https://example.com/callback"
                                       className="flex-1"
+                                      onChange={(e) => {
+                                        inputField.onChange(e)
+                                        if (redirectUriErrors.length > 0) {
+                                          setRedirectUriErrors([])
+                                        }
+                                        if (fieldErrors[index]) {
+                                          setFieldErrors((prev) => {
+                                            const newErrors = { ...prev }
+                                            delete newErrors[index]
+                                            return newErrors
+                                          })
+                                        }
+                                      }}
                                     />
                                     {redirectUriFields.length > 1 && (
                                       <Button
@@ -273,7 +331,11 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
                                     )}
                                   </div>
                                 </FormControl_Shadcn_>
-                                <FormMessage_Shadcn_ />
+                                {fieldErrors[index] && (
+                                  <div className="text-sm text-destructive mt-1">
+                                    {fieldErrors[index]}
+                                  </div>
+                                )}
                               </FormItem_Shadcn_>
                             )}
                           />
@@ -287,6 +349,13 @@ export const CreateOAuthAppModal = ({ visible, onClose }: CreateOAuthAppModalPro
                       >
                         Add redirect URI
                       </Button>
+                      {redirectUriErrors.length > 0 && (
+                        <div className="text-sm text-destructive mt-2">
+                          {redirectUriErrors.map((error) => (
+                            <div key={`redirect-uri-error-${error}`}>{error}</div>
+                          ))}
+                        </div>
+                      )}
                     </FormItemLayout>
                   )}
                 />
