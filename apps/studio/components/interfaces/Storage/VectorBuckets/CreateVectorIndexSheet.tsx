@@ -158,7 +158,7 @@ export const CreateVectorIndexSheet = () => {
             },
           }}
         >
-          Create index
+          Create table
         </ButtonTooltip>
       </SheetTrigger>
 
