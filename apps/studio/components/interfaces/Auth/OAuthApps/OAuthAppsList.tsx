@@ -86,30 +86,29 @@ const OAuthAppsList = () => {
     return <AlertError error={error} subject="Failed to retrieve OAuth Server apps" />
   }
 
-  if (!isOAuthServerEnabled) {
-    return (
-      <div className="space-y-4">
-        <Card>
-          <CardContent className="py-12 text-center">
-            <div className="flex flex-col items-center gap-y-4">
-              <h3 className="text-lg">OAuth Server is disabled</h3>
-              <p className="text-foreground-light -mt-2">
-                Enable the OAuth Server to make your project act as an identity provider for
-                third-party applications.
-              </p>
-              <Button asChild>
-                <Link href={`/project/${projectRef}/auth/oauth-server`}>Go to Settings</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
   return (
     <>
       <div className="space-y-4">
+        {!isOAuthServerEnabled && (
+          <div className="space-y-4">
+            <Card>
+              <CardContent className="flex flex-col md:flex-row gap-4 justify-between md:items-center">
+                <div className="flex flex-col gap-2-4">
+                  <h3 className="">OAuth Server is disabled</h3>
+                  <p className="text-foreground-light text-sm">
+                    Enable the OAuth Server to make your project act as an identity provider for
+                    third-party applications.
+                  </p>
+                </div>
+                <Button asChild>
+                  <Link href={`/project/${projectRef}/auth/oauth-server`}>
+                    Go to OAuth Server Settings
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
             <Input
