@@ -1,3 +1,5 @@
+import { cn } from '../../lib/utils'
+
 const getIsMac = () => {
   if (typeof navigator === 'undefined') return false
 
@@ -20,7 +22,11 @@ export const KeyboardShortcut = ({ keys }: { keys: string[] }) => {
     <div className="text-xs text-foreground-light flex items-center gap-[3px]">
       {keysWithMetaAndShift.map((key) => (
         <span
-          className="px-1.5 py-0.5 rounded-sm border-b-2 flex items-center justify-center border border-foreground-lightest cursor-default"
+          className={cn(
+            ['⌘', 'Shift', 'Ctrl'].includes(key) ? 'px-1.5 py-0.5' : 'w-[23px] h-[23px]',
+            'border border-b-2 border-foreground-lightest',
+            'rounded-sm flex items-center justify-center cursor-default'
+          )}
           key={key}
         >
           {key}
