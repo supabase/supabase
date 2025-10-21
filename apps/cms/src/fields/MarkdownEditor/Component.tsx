@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useField } from '@payloadcms/ui'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-jsx'
+import 'prismjs/components/prism-tsx'
 import './styles.css'
-import { exportTraceState } from 'next/dist/trace'
 
 type MarkdownEditorProps = {
   path: string
@@ -15,7 +16,7 @@ type MarkdownEditorProps = {
 
 export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ path, label, required }) => {
   const { value, setValue } = useField<string>({ path })
-  const highlightRef = useRef<HTMLPreElement>(null)
+  const highlightRef = useRef<HTMLElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleChange = useCallback(
@@ -34,20 +35,31 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ path, label, req
     }
   }, [value])
 
-  // Highlight using Prism
-  useEffect(() => {
-    if (highlightRef.current) {
-      Prism.highlightElement(highlightRef.current)
+  // Memoized highlighted HTML - only re-compute when value changes
+  const highlightedCode = useMemo(() => {
+    if (!value) return ''
+
+    // Use Prism.highlight for direct string-to-HTML conversion (faster than highlightElement)
+    try {
+      return Prism.highlight(value, Prism.languages.markdown, 'markdown')
+    } catch (error) {
+      console.error('Syntax highlighting error:', error)
+      return value
     }
   }, [value])
+
+  // Apply highlighted HTML to DOM only when it changes
+  useEffect(() => {
+    if (highlightRef.current && highlightedCode) {
+      highlightRef.current.innerHTML = highlightedCode
+    }
+  }, [highlightedCode])
 
   return (
     <div className="markdown-editor-field">
       <div className="markdown-editor-container">
         <pre className="markdown-editor-highlight" aria-hidden="true" suppressHydrationWarning>
-          <code ref={highlightRef} className="language-markdown">
-            {value || ''}
-          </code>
+          <code ref={highlightRef} className="language-markdown" />
         </pre>
 
         <textarea
