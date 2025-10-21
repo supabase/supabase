@@ -35,7 +35,9 @@ export interface Tab {
     schema?: string
     name?: string
     tableId?: number
-    sqlId?: string
+    sqlId?: string // Deprecated: keeping for backward compatibility
+    sql?: string // NEW: SQL content stored in tab
+    snippetId?: string // NEW: Reference to persisted snippet (optional)
     scrollTop?: number
   }
   isPreview?: boolean
@@ -204,7 +206,10 @@ function createTabsState(projectRef: string) {
       store.previewTabId = tab.id
       store.activeTab = tab.id
     },
-    updateTab: (id: string, updates: { label?: string; scrollTop?: number }) => {
+    updateTab: (
+      id: string,
+      updates: { label?: string; scrollTop?: number; sql?: string; snippetId?: string }
+    ) => {
       if (!!store.tabsMap[id]) {
         if ('label' in updates) {
           store.tabsMap[id].label = updates.label
@@ -212,6 +217,28 @@ function createTabsState(projectRef: string) {
         if ('scrollTop' in updates && store.tabsMap[id].metadata) {
           store.tabsMap[id].metadata.scrollTop = updates.scrollTop
         }
+        if ('sql' in updates && store.tabsMap[id].metadata) {
+          store.tabsMap[id].metadata!.sql = updates.sql
+        }
+        if ('snippetId' in updates && store.tabsMap[id].metadata) {
+          store.tabsMap[id].metadata!.snippetId = updates.snippetId
+        }
+      }
+    },
+    updateTabSql: (id: string, sql: string) => {
+      if (!!store.tabsMap[id]) {
+        if (!store.tabsMap[id].metadata) {
+          store.tabsMap[id].metadata = {}
+        }
+        store.tabsMap[id].metadata!.sql = sql
+      }
+    },
+    updateTabSnippetId: (id: string, snippetId: string) => {
+      if (!!store.tabsMap[id]) {
+        if (!store.tabsMap[id].metadata) {
+          store.tabsMap[id].metadata = {}
+        }
+        store.tabsMap[id].metadata!.snippetId = snippetId
       }
     },
     // Function to remove a tab from the store
@@ -279,7 +306,10 @@ function createTabsState(projectRef: string) {
       switch (tab.type) {
         case 'sql':
           const schema = (router.query.schema as string) || 'public'
-          router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
+          // Extract the SQL ID from the tab ID (format: sql-{id})
+          // For snippet-linked tabs, prefer snippetId, otherwise extract from tab.id
+          const sqlId = tab.metadata?.snippetId || tab.id.replace('sql-', '')
+          router.push(`/project/${router.query.ref}/sql/${sqlId}?schema=${schema}`)
           break
         case 'r':
         case 'v':

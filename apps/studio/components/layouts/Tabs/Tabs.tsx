@@ -26,6 +26,7 @@ import {
 } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
+import { SaveButton } from './SaveButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 
@@ -232,7 +233,12 @@ export const EditorTabs = () => {
               </motion.button>
             )}
           </AnimatePresence>
-          <div className="grow h-full border-b pr-6" />
+          <div className="grow h-full border-b" />
+          {editor === 'sql' && (
+            <div className="flex items-center border-b pr-4">
+              <SaveButton />
+            </div>
+          )}
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
 

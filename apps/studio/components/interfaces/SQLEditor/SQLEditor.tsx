@@ -127,10 +127,19 @@ export const SQLEditor = () => {
 
   const limit = snapV2.limit
   const results = snapV2.results[id]?.[0]
+
+  // Check if tab exists with this ID
+  const tabId = `sql-${id}`
+  const tabExists = tabs.tabsMap[tabId] !== undefined
+
+  // Only show loading if:
+  // 1. Not creating a new tab (/new)
+  // 2. No tab exists yet with this ID
+  // 3. AND no snippet is loaded yet
   const snippetIsLoading = !(
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
-  const isLoading = urlId === 'new' ? false : snippetIsLoading
+  const isLoading = urlId === 'new' ? false : !tabExists && snippetIsLoading
 
   useAddDefinitions(id, monacoRef.current)
 
@@ -364,13 +373,12 @@ export const SQLEditor = () => {
   )
 
   const onMount = (editor: IStandaloneCodeEditor) => {
-    const tabId = createTabId('sql', { id })
-    const tabData = tabs.tabsMap[tabId]
+    const activeTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : null
 
     // [Joshen] Tiny timeout to give a bit of time for the content to load before scrolling
     setTimeout(() => {
-      if (tabData?.metadata?.scrollTop) {
-        editor.setScrollTop(tabData.metadata.scrollTop)
+      if (activeTab?.metadata?.scrollTop) {
+        editor.setScrollTop(activeTab.metadata.scrollTop)
       }
     }, 20)
     editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
@@ -561,9 +569,8 @@ export const SQLEditor = () => {
       setPromptState((prev) => ({ ...prev, isOpen: false }))
     }
     return () => {
-      if (ref) {
-        const tabId = createTabId('sql', { id })
-        tabs.updateTab(tabId, { scrollTop: scrollTopRef.current })
+      if (ref && tabs.activeTab) {
+        tabs.updateTab(tabs.activeTab, { scrollTop: scrollTopRef.current })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -680,7 +687,7 @@ export const SQLEditor = () => {
             <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
-                  <Loader2 className="animate-spin text-brand" />
+                  {/* <Loader2 className="animate-spin text-brand" /> */}
                 </div>
               ) : (
                 <>
