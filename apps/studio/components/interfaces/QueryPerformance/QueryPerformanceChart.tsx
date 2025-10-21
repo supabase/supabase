@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import type { ChartDataPoint } from './WithMonitor/WithMonitor.utils'
+import { calculatePercentilesFromHistogram } from './WithMonitor/WithMonitor.utils'
 
 interface QueryPerformanceChartProps {
   dateRange?: {
@@ -70,10 +71,7 @@ export const QueryPerformanceChart = ({
         return [
           {
             label: 'Average p95',
-            value:
-              weightedP95 >= 100
-                ? `${(weightedP95 / 1000).toFixed(2)}s`
-                : `${Math.round(weightedP95)}ms`,
+            value: `${Math.round(weightedP95)}ms`,
           },
         ]
       }
