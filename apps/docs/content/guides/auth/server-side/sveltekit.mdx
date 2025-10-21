@@ -71,29 +71,45 @@ Set up server-side hooks in `src/hooks.server.ts`. The hooks:
 <$CodeTabs>
 
 ```ts name=src/hooks.server.ts
-
 import { createServerClient } from '@supabase/ssr'
 import { type Handle, redirect } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public'
 
 const supabase: Handle = async ({ event, resolve }) => {
-  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
-    cookies: {
-      getAll: () => event.cookies.getAll(),
-      setAll: (cookiesToSet) => {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          event.cookies.set(name, value, { ...options, path: '/' })
-        })
+  //  Create a Supabase server client for handling requests on the server
+  event.locals.supabase = createServerClient(
+    PUBLIC_SUPABASE_URL, // Your Supabase project URL
+    PUBLIC_SUPABASE_PUBLISHABLE_KEY, // Your project's public (anon) key
+    {
+      cookies: {
+        // Read all cookies from the incoming request
+        // This lets Supabase identify the user's current session
+        getAll: () => event.cookies.getAll(),
+
+        // Write (or update) cookies in the outgoing response
+        // Supabase uses this to manage session tokens automatically
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            // Use the correct SvelteKit API to set cookies
+            // Spreads existing cookie options and ensures they apply site-wide
+            event.cookies.set(name, value, { ...options, path: '/' })
+          })
+        },
       },
-    },
-  })
+    }
+  )
 
   event.locals.safeGetSession = async () => {
-    const { data: { session } } = await event.locals.supabase.auth.getSession()
+    const {
+      data: { session },
+    } = await event.locals.supabase.auth.getSession()
     if (!session) return { session: null, user: null }
 
-    const { data: { user }, error } = await event.locals.supabase.auth.getUser()
+    const {
+      data: { user },
+      error,
+    } = await event.locals.supabase.auth.getUser()
     if (error) return { session: null, user: null }
 
     return { session, user }
@@ -376,7 +392,7 @@ export const actions: Actions = {
       console.error(error)
       return redirect(303, '/auth/error')
     } else {
-      return redirect(303, data.url) 
+      return redirect(303, data.url)
     }
   },
   login: async ({ request, locals: { supabase } }) => {
