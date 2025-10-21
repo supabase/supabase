@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.51.0
+  version: 2.53.6
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1772,6 +1772,10 @@ commands:
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+      - id: skip-pooler
+        name: --skip-pooler
+        description: Use direct connection instead of pooler.
+        default_value: 'false'
   - id: supabase-inspect
     title: supabase inspect
     summary: Tools to inspect your Supabase project
@@ -3114,7 +3118,7 @@ commands:
         default_value: '[]'
       - id: use-copy
         name: --use-copy
-        description: Uses copy statements in place of inserts.
+        description: Use copy statements in place of inserts.
         default_value: 'false'
   - id: supabase-db-diff
     title: supabase db diff
@@ -3391,6 +3395,10 @@ commands:
         name: --name <string>
         description: Rename the preview branch.
         default_value: ''
+      - id: notify-url
+        name: --notify-url <string>
+        description: URL to notify when branch is active healthy.
+        default_value: ''
       - id: persistent
         name: --persistent
         description: Switch between ephemeral and persistent branch.
@@ -3491,6 +3499,10 @@ commands:
     usage: supabase branches create [name] [flags]
     subcommands: []
     flags:
+      - id: notify-url
+        name: --notify-url <string>
+        description: URL to notify when branch is active healthy.
+        default_value: ''
       - id: persistent
         name: --persistent
         description: Whether to create a persistent branch.
