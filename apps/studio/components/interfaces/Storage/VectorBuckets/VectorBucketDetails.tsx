@@ -20,7 +20,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
   Table,
   TableBody,
   TableCell,
@@ -28,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { BUCKET_TYPES } from '../Storage.constants'
 import { CreateVectorIndexSheet } from './CreateVectorIndexSheet'
@@ -48,6 +48,8 @@ const MOCK_VECTOR_INDEXES = [
   },
 ]
 
+const MOCK_VECTOR_INDEXES_EMPTY = []
+
 interface VectorBucketDetailsProps {
   bucket: { vectorBucketName: string; creationTime: string }
 }
@@ -62,9 +64,17 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
   })
 
   // Mock data for development - replace with real data when backend is ready
-  const indexesList = MOCK_VECTOR_INDEXES // data?.vectorBuckets ?? []
+  const allIndexes = MOCK_VECTOR_INDEXES // data?.vectorBuckets ?? []
+  // const allIndexes = data?.vectorBuckets ?? []
   const config = BUCKET_TYPES['vectors']
   const [filterString, setFilterString] = useState('')
+
+  // Filter indexes based on search string
+  const indexesList = allIndexes.filter((index) =>
+    filterString.length === 0
+      ? true
+      : index.indexName.toLowerCase().includes(filterString.toLowerCase())
+  )
 
   console.log({ data, bucket, indexesList })
 
@@ -88,11 +98,11 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                 Vector indexes connected to this bucket.
               </ScaffoldSectionDescription>
             </ScaffoldHeader>
-            {indexesList.length > 0 && (
+            {allIndexes.length > 0 && (
               <div className="flex flex-row justify-between">
                 <Input
                   size="tiny"
-                  placeholder="Search for a table"
+                  placeholder="Search for an index"
                   value={filterString}
                   onChange={(e) => setFilterString(e.target.value)}
                   icon={<Search size={12} />}
@@ -102,17 +112,35 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
               </div>
             )}
 
-            {indexesList.length > 0 && (
+            {allIndexes.length > 0 && (
               <Card>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Created at</TableHead>
+                      <TableHead
+                        className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
+                      >
+                        Name
+                      </TableHead>
+                      <TableHead
+                        className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
+                      >
+                        Created at
+                      </TableHead>
                       <TableHead />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    {indexesList.length === 0 && filterString.length > 0 && (
+                      <TableRow>
+                        <TableCell colSpan={3}>
+                          <p className="text-sm text-foreground">No results found</p>
+                          <p className="text-sm text-foreground-light">
+                            Your search for "{filterString}" did not return any results
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {indexesList.map((index, idx: number) => {
                       const id = `index-${idx}`
                       const name = index.indexName
