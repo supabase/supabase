@@ -203,17 +203,16 @@ export const NamespaceRowAlt = ({
               size="tiny"
               icon={<Plus size={14} />}
               onClick={() => setImportForeignSchemaShown(true)}
-              loading={isImportingForeignSchema}
             >
               Create schema
             </Button>
           )}
-          {true && (
+          {missingTables.length > 0 && (
             <Button
               type="default"
               size="tiny"
               icon={<RefreshCw size={14} />}
-              onClick={() => rescanNamespace()}
+              onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
               loading={isImportingForeignSchema || isLoadingNamespaceTables}
             >
               Sync tables
@@ -244,7 +243,7 @@ export const NamespaceRowAlt = ({
               <TableCell colSpan={3}>
                 <p className="text-sm text-foreground">No tables yet</p>
                 <p className="text-sm text-foreground-lighter">
-                  Publish an analytics table and then sync.{' '}
+                  Publish and sync your first analytics table.{' '}
                   <InlineLink
                     href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
                   >
@@ -272,9 +271,11 @@ export const NamespaceRowAlt = ({
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}
       />
-      <CardFooter className="px-4 py-4 text-sm text-foreground-muted border-t border-border">
-        {scanTooltip ? <p>{scanTooltip}</p> : <ShimmeringLoader className="py-0 w-20" />}
-      </CardFooter>
+      {tables.length > 0 && (
+        <CardFooter className="px-4 py-4 text-sm text-foreground-muted border-t border-border">
+          {scanTooltip ? <p>{scanTooltip}</p> : <ShimmeringLoader className="py-0 w-20" />}
+        </CardFooter>
+      )}
     </Card>
   )
 }
