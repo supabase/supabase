@@ -1116,6 +1116,9 @@ You can configure replay with the following options:
     def on_broadcast(payload):
         if payload.get('meta', {}).get('replayed'):
             print(f"Replayed message: {payload['meta']['id']}")
+
+    await channel.on_broadcast('position', on_broadcast)
+    await channel.subscribe()
     ```
 
   </TabPanel>
