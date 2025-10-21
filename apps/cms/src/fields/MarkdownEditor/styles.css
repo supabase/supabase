@@ -90,7 +90,6 @@
   color: var(--theme-elevation-1000);
 }
 
-/* Custom Prism theme - elevation based with green highlights */
 .markdown-editor-highlight .token.title,
 .markdown-editor-highlight .token.heading {
   color: var(--color-success-800);
@@ -130,9 +129,16 @@
 .markdown-editor-highlight .token.code,
 .markdown-editor-highlight .token.code-snippet {
   color: var(--color-success-800);
-  background: var(--color-success-50);
+  background: var(--color-success-100);
   padding: 0.125rem 0.25rem;
   border-radius: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .markdown-editor-highlight .token.code,
+  .markdown-editor-highlight .token.code-snippet {
+    background: var(--color-success-50);
+  }
 }
 
 .markdown-editor-highlight .token.code-fence,
@@ -200,6 +206,12 @@
 
 .markdown-editor-highlight .token.tag.tag {
   color: var(--color-success-500);
+}
+
+@media (prefers-color-scheme: dark) {
+  .markdown-editor-highlight .token.tag.tag {
+    color: var(--color-success-700);
+  }
 }
 
 .markdown-editor-highlight .token.tag.attr-name {
