@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2025.10.09-sha-433e578
+    image: supabase/studio:2025.10.20-sha-5005fc6
     restart: unless-stopped
     healthcheck:
       test:
@@ -190,7 +190,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.53.2
+    image: supabase/realtime:v2.56.0
     restart: unless-stopped
     depends_on:
       db:
@@ -300,7 +300,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.91.7
+    image: supabase/postgres-meta:v0.93.0
     restart: unless-stopped
     depends_on:
       db:
@@ -319,7 +319,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.69.12
+    image: supabase/edge-runtime:v1.69.14
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
@@ -343,7 +343,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.23.0
+    image: supabase/logflare:1.22.6
     restart: unless-stopped
     ports:
       - 4000:4000
