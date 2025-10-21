@@ -1,10 +1,18 @@
 import { constructHeaders, fetchHandler } from 'data/fetchers'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH } from 'lib/constants'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { LIMITS } from './constants'
 import type { AIGeneratedSchema, PostgresType, TableSuggestion } from './types'
 import { TableSource } from './types'
+
+// [Sean] TODO: Consider migrating to AI SDK's experimental_useObject() hook once it's stable
+// for client-side streaming. Currently using server-side streamObject() with manual fetch handling.
+// https://ai-sdk.dev/cookbook/next/stream-object#client
+
+const AI_TABLES_STORAGE_KEY = 'table-quickstart-ai-results'
+const MAX_BUFFER_SIZE = 50 * 1024 // 50KB limit for streaming responses
 
 type PartialColumn = Partial<AIGeneratedSchema['tables'][number]['columns'][number]>
 type PartialTable = Partial<AIGeneratedSchema['tables'][number]> & {
@@ -13,8 +21,6 @@ type PartialTable = Partial<AIGeneratedSchema['tables'][number]> & {
 type PartialSchema = Partial<AIGeneratedSchema> & {
   tables?: PartialTable[]
 }
-
-const MAX_BUFFER_SIZE = 50 * 1024 // 50KB limit for streaming responses
 
 const isNotNull = <T>(value: T | null | undefined): value is T => value != null
 
@@ -133,7 +139,7 @@ const safeJsonParse = <T>(input: string): T | null => {
 export const useAITableGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [tables, setTables] = useState<TableSuggestion[]>([])
+  const [tables, setTables] = useLocalStorage<TableSuggestion[]>(AI_TABLES_STORAGE_KEY, [])
   const abortControllerRef = useRef<AbortController | null>(null)
   const isMountedRef = useRef(true)
 
@@ -154,9 +160,7 @@ export const useAITableGeneration = () => {
 
     if (prompt.length > LIMITS.MAX_PROMPT_LENGTH) {
       const message = `Your description is too long. Try shortening it to under ${LIMITS.MAX_PROMPT_LENGTH} characters.`
-      if (isMountedRef.current) {
-        setError(message)
-      }
+      setError(message)
       toast.error('Description too long', {
         description: message,
       })
@@ -166,11 +170,9 @@ export const useAITableGeneration = () => {
     const abortController = new AbortController()
     abortControllerRef.current = abortController
 
-    if (isMountedRef.current) {
-      setIsGenerating(true)
-      setError(null)
-      setTables([])
-    }
+    setIsGenerating(true)
+    setError(null)
+    setTables([])
 
     try {
       const headers = await constructHeaders()
@@ -277,11 +279,9 @@ export const useAITableGeneration = () => {
       abortControllerRef.current = null
     }
 
-    if (isMountedRef.current) {
-      setIsGenerating(false)
-      setError(null)
-      setTables([])
-    }
+    setIsGenerating(false)
+    setError(null)
+    setTables([])
   }, [])
 
   return {

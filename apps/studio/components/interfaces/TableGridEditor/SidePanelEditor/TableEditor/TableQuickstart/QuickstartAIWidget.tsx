@@ -113,7 +113,7 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
 
         {tables.length === 0 && (
           <div>
-            <div className="text-xs text-foreground-light mb-2">Quick ideas:</div>
+            <h4 className="text-xs text-foreground-light mb-2">Quick ideas:</h4>
             <div className="flex flex-wrap gap-2">
               {AI_QUICK_IDEAS.map((idea) => (
                 <button
