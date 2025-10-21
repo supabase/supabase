@@ -62,16 +62,38 @@ export const QueryPerformanceChart = ({
 
     switch (selectedMetric) {
       case 'query_latency': {
-        const totalCalls = chartData.reduce((sum, d) => sum + d.calls, 0)
-        const weightedP95 =
-          totalCalls > 0
-            ? chartData.reduce((sum, d) => sum + d.p95_time * d.calls, 0) / totalCalls
-            : 0
+        let trueP95: number = 0
+
+        if (parsedLogs && parsedLogs.length > 0) {
+          const bucketCount = parsedLogs[0]?.resp_calls?.length || 50
+          const combinedHistogram = new Array(bucketCount).fill(0)
+
+          parsedLogs.forEach((log) => {
+            if (log.resp_calls && Array.isArray(log.resp_calls)) {
+              log.resp_calls.forEach((count: number, index: number) => {
+                if (index < combinedHistogram.length) {
+                  combinedHistogram[index] += count
+                }
+              })
+            }
+          })
+
+          // [kemal]: this might need a revisit
+          const percentiles = calculatePercentilesFromHistogram(combinedHistogram)
+          trueP95 = percentiles.p95
+        } else {
+          // [kemal]: fallback to weighted average
+          const totalCalls = chartData.reduce((sum, d) => sum + d.calls, 0)
+          trueP95 =
+            totalCalls > 0
+              ? chartData.reduce((sum, d) => sum + d.p95_time * d.calls, 0) / totalCalls
+              : 0
+        }
 
         return [
           {
             label: 'Average p95',
-            value: `${Math.round(weightedP95)}ms`,
+            value: `${Math.round(trueP95)}ms`,
           },
         ]
       }
