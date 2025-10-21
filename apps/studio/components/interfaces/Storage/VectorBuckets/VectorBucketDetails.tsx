@@ -23,7 +23,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { CreateVectorIndexSheet } from './CreateVectorIndexSheet'
 import { EmptyVectorBucketsState } from './EmptyVectorBucketState'
 
-export const BucketDetails = () => {
+export const VectorBucketDetails = () => {
   const { ref: projectRef } = useParams()
   const { data } = useVectorBucketsQuery({ projectRef })
 
