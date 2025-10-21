@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { debounce } from 'lodash'
-import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
@@ -121,7 +120,7 @@ const FormSchema = z.object({
   dbPass: z
     .string({ required_error: 'Please enter a database password.' })
     .min(1, 'Password is required.'),
-  instanceSize: z.string(),
+  instanceSize: z.string().optional(),
   dataApi: z.boolean(),
   useApiSchema: z.boolean(),
   postgresVersionSelection: z.string(),
@@ -133,16 +132,28 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
+  const defaultProvider = useDefaultProvider()
+
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
+  const canChooseInstanceSize = !isFreePlan
+
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
+  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+
+  const smartRegionEnabled = useFlag('enableSmartRegion')
+  const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
+  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
 
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
-
   const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+
+  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -153,32 +164,68 @@ const Wizard: NextPageWithLayout = () => {
     }
   }
 
+  const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
+  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
+  const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
+  const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
+    useState(false)
+
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const smartRegionEnabled = useFlag('enableSmartRegion')
-  const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
-  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
+    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+      refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['dbPass'],
+        message: passwordStrengthWarning || 'Password not secure enough',
+      })
+    }
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    mode: 'onChange',
+    defaultValues: {
+      organization: slug,
+      projectName: projectName || '',
+      postgresVersion: '',
+      cloudProvider: PROVIDERS[defaultProvider].id,
+      dbPass: '',
+      dbPassStrength: 0,
+      dbRegion: undefined,
+      instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
+      dataApi: true,
+      useApiSchema: false,
+      postgresVersionSelection: '',
+      useOrioleDb: false,
+    },
+  })
+  const { instanceSize: watchedInstanceSize, cloudProvider, dbRegion, organization } = form.watch()
+
+  // [Charis] Since the form is updated in a useEffect, there is an edge case
+  // when switching from free to paid, where canChooseInstanceSize is true for
+  // an in-between render, but watchedInstanceSize is still undefined from the
+  // form state carried over from the free plan. To avoid this, we set a
+  // default instance size in this case.
+  const instanceSize = canChooseInstanceSize ? watchedInstanceSize ?? sizes[0] : undefined
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }
   )
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+  const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
+
+  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
+  const orgNotFound = isOrganizationsSuccess && (organizations?.length ?? 0) > 0 && isInvalidSlug
+  const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
 
   const { data: approvedOAuthApps } = useAuthorizedAppsQuery(
     { slug },
     { enabled: !isFreePlan && slug !== '_' }
   )
-
   const hasOAuthApps = approvedOAuthApps && approvedOAuthApps.length > 0
-
-  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
-  const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
-
-  const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
-    useState(false)
-
-  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
 
   const isNotOnTeamOrEnterprisePlan = useMemo(
     () => !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
@@ -188,7 +235,6 @@ const Wizard: NextPageWithLayout = () => {
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
     enabled: isNotOnTeamOrEnterprisePlan,
   })
-
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === currentOrg?.id
   )
@@ -219,13 +265,8 @@ const Wizard: NextPageWithLayout = () => {
     () => orgProjectsFromApi?.pages.flatMap((page) => page.projects),
     [orgProjectsFromApi?.pages]
   )
-
-  const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
-
   const organizationProjects =
     allProjects?.filter((project) => project.status !== PROJECT_STATUS.INACTIVE) ?? []
-
-  const defaultProvider = useDefaultProvider()
 
   const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
@@ -246,6 +287,7 @@ const Wizard: NextPageWithLayout = () => {
       {
         slug: slug,
         cloudProvider: PROVIDERS[defaultProvider].id,
+        desiredInstanceSize: instanceSize as DesiredInstanceSize,
       },
       {
         enabled: smartRegionEnabled,
@@ -255,7 +297,6 @@ const Wizard: NextPageWithLayout = () => {
         refetchOnReconnect: false,
       }
     )
-
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
@@ -267,68 +308,9 @@ const Wizard: NextPageWithLayout = () => {
         ? availableRegionsData?.recommendations.smartGroup.name
         : _defaultRegion
 
-  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
-
-  const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
-  const orgNotFound = isOrganizationsSuccess && (organizations?.length ?? 0) > 0 && isInvalidSlug
-  const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
-
-  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
-
-  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-
-  const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
-
-  const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
-
   const canCreateProject =
     isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel && !hasOutstandingInvoices
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value) => checkPasswordStrength(value), 300)
-  ).current
-
-  async function checkPasswordStrength(value: any) {
-    const { message, warning, strength } = await passwordStrength(value)
-
-    form.setValue('dbPassStrength', strength)
-    form.trigger('dbPassStrength')
-    form.trigger('dbPass')
-
-    setPasswordStrengthWarning(warning)
-    setPasswordStrengthMessage(message)
-  }
-
-  FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
-    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-      refinementContext.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['dbPass'],
-        message: passwordStrengthWarning || 'Password not secure enough',
-      })
-    }
-  })
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    mode: 'onChange',
-    defaultValues: {
-      organization: slug,
-      projectName: projectName || '',
-      postgresVersion: '',
-      cloudProvider: PROVIDERS[defaultProvider].id,
-      dbPass: '',
-      dbPassStrength: 0,
-      dbRegion: defaultRegion || undefined,
-      instanceSize: sizes[0],
-      dataApi: true,
-      useApiSchema: false,
-      postgresVersionSelection: '',
-      useOrioleDb: false,
-    },
-  })
-
-  const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
   const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
@@ -358,6 +340,20 @@ const Wizard: NextPageWithLayout = () => {
   const additionalMonthlySpend = isFreePlan
     ? 0
     : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+
+  async function checkPasswordStrength(value: any) {
+    const { message, warning, strength } = await passwordStrength(value)
+
+    form.setValue('dbPassStrength', strength)
+    form.trigger('dbPassStrength')
+    form.trigger('dbPass')
+
+    setPasswordStrengthWarning(warning)
+    setPasswordStrengthMessage(message)
+  }
+  const delayedCheckPasswordStrength = useRef(
+    debounce((value) => checkPasswordStrength(value), 300)
+  ).current
 
   // [Refactor] DB Password could be a common component used in multiple pages with repeated logic
   function generatePassword() {
@@ -478,6 +474,16 @@ const Wizard: NextPageWithLayout = () => {
       form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
     }
   }, [regionError])
+
+  useEffect(() => {
+    if (watchedInstanceSize !== instanceSize) {
+      form.setValue('instanceSize', instanceSize, {
+        shouldDirty: false,
+        shouldValidate: false,
+        shouldTouch: false,
+      })
+    }
+  }, [instanceSize, watchedInstanceSize, form])
 
   return (
     <Form_Shadcn_ {...form}>
@@ -747,7 +753,7 @@ const Wizard: NextPageWithLayout = () => {
                       </Panel.Content>
                     )}
 
-                    {currentOrg?.plan && currentOrg?.plan.id !== 'free' && (
+                    {canChooseInstanceSize && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}
@@ -906,8 +912,8 @@ const Wizard: NextPageWithLayout = () => {
                         render={({ field }) => (
                           <RegionSelector
                             field={field}
-                            form={form}
                             cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                            instanceSize={instanceSize as DesiredInstanceSize}
                           />
                         )}
                       />
