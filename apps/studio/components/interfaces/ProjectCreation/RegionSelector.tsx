@@ -89,8 +89,7 @@ export const RegionSelector = ({
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const allSelectableRegions = [...smartRegions, ...regionOptions]
-  const selectedRegion =
-allSelectableRegions.find((region) => {
+  const selectedRegion = allSelectableRegions.find((region) => {
     return !!region.name && region.name === field.value
   })
 
