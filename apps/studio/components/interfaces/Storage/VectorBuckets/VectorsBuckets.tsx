@@ -43,7 +43,6 @@ export const VectorsBuckets = () => {
       {!isLoadingBuckets && bucketsList.length === 0 ? (
         <EmptyBucketState bucketType="vectors" />
       ) : (
-        // <EmptyVectorBucketsState />
         // Override the default first:pt-12 to match other storage types
         <ScaffoldSection isFullWidth className="gap-y-4 first:pt-8">
           <ScaffoldHeader className="py-0">
