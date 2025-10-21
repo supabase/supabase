@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { debounce } from 'lodash'
-import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
@@ -11,10 +10,8 @@ import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import {
-  FreeProjectLimitWarning,
-  NotOrganizationOwnerWarning,
-} from 'components/interfaces/Organization/NewProject'
+import { NotOrganizationOwnerWarning } from 'components/interfaces/Organization/NewProject'
+import { FreeProjectLimitWarning } from 'components/interfaces/Organization/NewProject/FreeProjectLimitWarning'
 import { OrgNotFound } from 'components/interfaces/Organization/OrgNotFound'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import {
@@ -966,10 +963,7 @@ const Wizard: NextPageWithLayout = () => {
                   isAdmin &&
                   slug && (
                     <Panel.Content>
-                      <FreeProjectLimitWarning
-                        membersExceededLimit={membersExceededLimit || []}
-                        orgSlug={slug}
-                      />
+                      <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
                     </Panel.Content>
                   )
                 ) : isManagedByVercel ? (
