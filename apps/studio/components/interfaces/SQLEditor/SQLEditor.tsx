@@ -454,7 +454,16 @@ export const SQLEditor = () => {
       setIsAcceptDiffLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceSqlDiff, selectedDiffType, handleNewQuery, generateSqlTitle, router, id, snapV2, closeDiff])
+  }, [
+    sourceSqlDiff,
+    selectedDiffType,
+    handleNewQuery,
+    generateSqlTitle,
+    router,
+    id,
+    snapV2,
+    closeDiff,
+  ])
 
   const discardAiHandler = useCallback(() => {
     sendEvent({
