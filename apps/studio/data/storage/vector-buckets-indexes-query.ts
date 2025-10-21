@@ -21,7 +21,15 @@ export async function getVectorBucketsIndexes(
   })
 
   if (error) handleError(error)
-  return data as unknown as { vectorBuckets: { vectorBucketName: string; creationTime: string }[] }
+  return data as {
+    indexes: {
+      indexName: string
+      creationTime?: string
+      dimension?: number
+      distanceMetric?: string
+    }[]
+    nextToken?: string
+  }
 }
 
 export type VectorBucketsIndexesData = Awaited<ReturnType<typeof getVectorBucketsIndexes>>
