@@ -70,18 +70,16 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
 
   // Mock data for development - replace with real data when backend is ready
   // const allIndexes = MOCK_VECTOR_INDEXES
-  const allIndexes = data?.vectorBuckets ?? []
+  const allIndexes = data?.indexes ?? []
   const config = BUCKET_TYPES['vectors']
   const [filterString, setFilterString] = useState('')
 
   // Filter indexes based on search string
-  const indexesList = allIndexes.filter((index) =>
+  const filteredList = allIndexes.filter((index) =>
     filterString.length === 0
       ? true
       : index.indexName.toLowerCase().includes(filterString.toLowerCase())
   )
-
-  console.log({ data, bucket, indexesList })
 
   return (
     <>
@@ -103,7 +101,6 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                 Vector tables stored in this bucket.
               </ScaffoldSectionDescription>
             </ScaffoldHeader>
-
             <div className="flex flex-row justify-between">
               <Input
                 size="tiny"
@@ -121,17 +118,17 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                 <TableHeader>
                   <TableRow>
                     <TableHead
-                      className={indexesList.length === 0 ? 'text-foreground-muted' : undefined}
+                      className={filteredList.length === 0 ? 'text-foreground-muted' : undefined}
                     >
                       Name
                     </TableHead>
                     <TableHead
-                      className={indexesList.length === 0 ? 'text-foreground-muted' : undefined}
+                      className={filteredList.length === 0 ? 'text-foreground-muted' : undefined}
                     >
                       Dimension
                     </TableHead>
                     <TableHead
-                      className={indexesList.length === 0 ? 'text-foreground-muted' : undefined}
+                      className={filteredList.length === 0 ? 'text-foreground-muted' : undefined}
                     >
                       Distance metric
                     </TableHead>
@@ -139,7 +136,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {indexesList.length === 0 ? (
+                  {filteredList.length === 0 ? (
                     <TableRow className="[&>td]:hover:bg-inherit">
                       <TableCell colSpan={3}>
                         {filterString.length > 0 ? (
@@ -160,11 +157,11 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    indexesList.map((index, idx: number) => {
+                    filteredList.map((index, idx: number) => {
                       const id = `index-${idx}`
                       const name = index.indexName
                       // the creation time is in seconds, convert it to milliseconds
-                      const created = +index.creationTime * 1000
+                      // const created = +index.creationTime * 1000
 
                       return (
                         <TableRow key={id}>

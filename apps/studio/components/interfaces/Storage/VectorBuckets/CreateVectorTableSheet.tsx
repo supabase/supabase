@@ -1,14 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ExternalLink, Lock, Plus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useVectorBucketIndexCreateMutation } from 'data/storage/vector-bucket-create-index-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Form_Shadcn_,
@@ -29,8 +31,9 @@ import {
   SheetTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import z from 'zod'
-import { inverseValidBucketNameRegex, validBucketNameRegex } from '../CreateBucketModal.utils'
+import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
+
+const BUCKET_INDEX_NAME_REGEX = /^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$/
 
 const DISTANCE_METRICS = [
   {
@@ -82,7 +85,7 @@ const FormSchema = z
       .default([]),
   })
   .superRefine((data, ctx) => {
-    if (!validBucketNameRegex.test(data.name)) {
+    if (!BUCKET_INDEX_NAME_REGEX.test(data.name)) {
       const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
       ctx.addIssue({
         path: ['name'],
@@ -104,14 +107,15 @@ interface CreateVectorTableSheetProps {
 
 export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
   const { ref } = useParams()
-  const { mutate: createVectorBucket, isLoading: isCreating } = useVectorBucketCreateMutation()
+  const { mutateAsync: createVectorBucketTable, isLoading: isCreating } =
+    useVectorBucketIndexCreateMutation({ onError: () => {} })
   const [visible, setVisible] = useState(false)
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const form = useForm<CreateVectorTableForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
-      targetSchema: '',
+      targetSchema: bucketName,
       dimension: undefined,
       distanceMetric: 'cosine',
       metadataKeys: [],
@@ -127,10 +131,22 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     if (!ref) return console.error('Project ref is required')
 
     try {
-      await createVectorBucket({
+      await createVectorBucketTable({
         projectRef: ref,
-        bucketName: values.name,
+        bucketName: values.targetSchema,
+        indexName: 'documents-openai',
+        dataType: 'float32',
+        dimension: 1536,
+        distanceMetric: 'cosine',
+        metadataKeys: ['raw_text'],
       })
+
+      //   indexName: values.name,
+      //   dataType: 'float32',
+      //   dimension: values.dimension!,
+      //   distanceMetric: values.distanceMetric,
+      //   metadataKeys: values.metadataKeys.map((key) => key.value),
+      // })
 
       toast.success(`Successfully created vector table ${values.name}`)
       form.reset()
@@ -178,7 +194,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         </ButtonTooltip>
       </SheetTrigger>
 
-      <SheetContent size="default" className="flex flex-col gap-0 p-0">
+      <SheetContent size="lg" className="flex flex-col gap-0 p-0">
         <SheetHeader>
           <SheetTitle>Create vector table</SheetTitle>
         </SheetHeader>
