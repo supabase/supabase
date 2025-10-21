@@ -32,7 +32,10 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({
+    projectRef,
+    enabled: !showEmptyState,
+  })
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: organization } = useSelectedOrganizationQuery()
