@@ -115,17 +115,23 @@ const logIndexedDB = (message: string, ...args: any[]) => {
   })()
 }
 
+let captureException: ((e: any) => any) | null = null
+
+export function setCaptureException(fn: typeof captureException) {
+  captureException = fn
+}
+
 async function debuggableNavigatorLock<R>(
   name: string,
   acquireTimeout: number,
   fn: () => Promise<R>
 ): Promise<R> {
-  let stack: any = null
+  let stackException: any
 
-  if ('captureStackTrace' in Error) {
-    const result: any = {}
-    Error.captureStackTrace(result)
-    stack = result.stack
+  try {
+    throw new Error('Lock is being held for over 2s here')
+  } catch (e: any) {
+    stackException = e
   }
 
   const debugTimeout = setTimeout(() => {
@@ -140,7 +146,7 @@ async function debuggableNavigatorLock<R>(
       console.error(
         `Waited for over 2s to acquire an Auth client lock`,
         await navigator.locks.query(),
-        stack
+        stackException
       )
     })()
   }, 2000)
@@ -151,7 +157,11 @@ async function debuggableNavigatorLock<R>(
 
       const bc = new BroadcastChannel('who-is-holding-the-lock')
       bc.addEventListener('message', () => {
-        console.error('I am holding the lock', stack)
+        console.error('Lock is held here', stackException)
+
+        if (captureException) {
+          captureException(stackException)
+        }
       })
 
       try {
