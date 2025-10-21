@@ -10,6 +10,7 @@ Supabase is a robust and open-source platform. Supabase provides all the backend
 This guide demonstrates how to migrate your Postgres database to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
 
 This guide provides three methods for migrating your PostgreSQL database to Supabase:
+
 1. **Google Colab** - Guided notebook with copy-paste workflow
 2. **Manual Dump/Restore** - CLI approach, works for all versions
 3. **Logical Replication** - Minimal downtime, requires PostgreSQL 10+
@@ -38,17 +39,20 @@ This method works for all PostgreSQL versions using CLI tools.
 ### Prerequisites
 
 #### Source PostgreSQL Requirements
+
 - Connection string with rights to run `pg_dump`
 - No special settings required for dump/restore
 - Network access from migration VM
 
 #### Migration Environment
+
 - Cloud VM running Ubuntu in the same region as source or target database
 - PostgreSQL client tools matching your source database version
 - tmux for session persistence
 - Sufficient disk space (usually ~50% of source database size is enough, but varies case by case)
 
 ### Pre-Migration Checklist
+
 ```sql
 -- Check database size
 SELECT pg_size_pretty(pg_database_size(current_database())) AS size;
@@ -64,6 +68,7 @@ SELECT count(*) FROM pg_stat_activity;
 ```
 
 #### Check Available Extensions in Supabase
+
 ```sql
 -- Connect to your Supabase database and check available extensions
 SELECT name, comment FROM pg_available_extensions ORDER BY name;
@@ -77,7 +82,11 @@ CREATE EXTENSION IF NOT EXISTS extension_name;
 
 ### Step 1: Set Up Migration VM
 
-**Important**: For optimal performance, run the migration from a cloud VM, not your local machine. The VM should be in the same region as either your source or target database to optimize network performance. See the Resource Requirements table in Step 2 for VM sizing recommendations.
+<Admonition type="tip">
+
+For optimal performance, run the migration from a cloud VM, not your local machine. The VM should be in the same region as either your source or target database to optimize network performance. See the Resource Requirements table in Step 2 for VM sizing recommendations.
+
+</Admonition>
 
 #### Set Up Ubuntu VM
 
@@ -222,7 +231,11 @@ If restore fails with extension errors, check that errors are only extension-rel
 psql "$SUPABASE_DB_URL" -c "VACUUM VERBOSE ANALYZE;"
 ```
 
-**Note**: For PostgreSQL 18+, pg_dump includes statistics with `--with-statistics`, but you should still run VACUUM for optimal performance.
+<Admonition type="note">
+
+For PostgreSQL 18+, pg_dump includes statistics with `--with-statistics`, but you should still run VACUUM for optimal performance.
+
+</Admonition>
 
 #### Verify Migration
 
@@ -277,22 +290,26 @@ This method allows migration with minimal downtime using PostgreSQL's logical re
 ### Source PostgreSQL Prerequisites
 
 #### Access & Privileges
+
 - Connection string with rights to CREATE PUBLICATION and read tables
 - Superuser or replication privileges recommended
 
 #### Required Settings for Logical Replication
+
 - `wal_level = logical`
 - `max_wal_senders ≥ 1` 
 - `max_replication_slots ≥ 1`
 - Sufficient `max_connections` (current + 1 for subscription)
 
 #### Replica Identity
+
 Every table receiving UPDATE/DELETE must have a replica identity (typically a PRIMARY KEY). For tables without one:
 ```sql
 ALTER TABLE schema.table_name REPLICA IDENTITY FULL;
 ```
 
 #### Non-Replicated Items
+
 - **DDL changes** (schema modifications)
 - **Sequences** (need manual sync)
 - **Large Objects (LOBs)** (use dump/restore or store in regular bytea columns)
@@ -304,6 +321,7 @@ Plan a schema freeze, sequence sync before cutover, and handle LOBs separately.
 Edit PostgreSQL configuration files:
 
 #### postgresql.conf
+
 ```bash
 # Set Supabase connection (Session Pooler on port 5432 or direct connection)
 export SUPABASE_DB_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
@@ -328,6 +346,7 @@ listen_addresses = '*'  # Or specific IP addresses
 ```
 
 #### pg_hba.conf
+
 ```bash
 # Allow replication connections from Supabase
 # Replace <supabase_ip_range> with actual Supabase IP range
