@@ -56,12 +56,11 @@ const createSidebarManagerState = () => {
     },
 
     openSidebar(id: SidebarKey) {
-      if (!state.panels[id]) {
-        state.registerSidebar(id)
-      }
-
       const panel = state.panels[id]
-      if (!panel) return
+      if (!panel) {
+        console.warn(`Sidebar "${id}" is not registered. Register it before opening.`)
+        return
+      }
 
       if (panel.open) {
         state.activeSidebar = id

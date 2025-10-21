@@ -3,7 +3,6 @@ import { ShieldAlert } from 'lucide-react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { useAdvisorCenterStateSnapshot } from 'state/advisor-center-state'
 import {
   SIDEBAR_KEYS,
   sidebarManagerState,
@@ -13,21 +12,16 @@ import { cn } from 'ui'
 
 export const AdvisorButton = () => {
   const { ref: projectRef } = useParams()
-  const advisorSnap = useAdvisorCenterStateSnapshot()
   const sidebarSnap = useSidebarManagerSnapshot()
   const { data: lints } = useProjectLintsQuery({ projectRef })
 
   const hasCriticalIssues = Array.isArray(lints) && lints.some((lint) => lint.level === 'ERROR')
 
-  const handleClick = () => {
-    if (advisorSnap.open) {
-      sidebarManagerState.closeSidebar(SIDEBAR_KEYS.ADVISOR_CENTER)
-    } else {
-      sidebarManagerState.openSidebar(SIDEBAR_KEYS.ADVISOR_CENTER)
-    }
-  }
-
   const isOpen = sidebarSnap.panels[SIDEBAR_KEYS.ADVISOR_CENTER]?.open
+
+  const handleClick = () => {
+    sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.ADVISOR_CENTER)
+  }
 
   return (
     <div className="relative">

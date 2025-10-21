@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
@@ -91,7 +91,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ref
   ) => {
     const router = useRouter()
-    const [isClient, setIsClient] = useState(false)
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
@@ -135,10 +134,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const ignorePausedState =
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
-
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
 
     return (
       <>
@@ -238,7 +233,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                     )}
                   </main>
                 </ResizablePanel>
-                <LayoutSidebar isClient={isClient} />
+                <LayoutSidebar />
               </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>

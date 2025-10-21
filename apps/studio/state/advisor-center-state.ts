@@ -6,7 +6,6 @@ export type AdvisorCenterTab = 'all' | 'security' | 'performance' | 'messages'
 export type AdvisorSeverity = 'critical' | 'warning' | 'info'
 
 const initialState = {
-  open: false,
   activeTab: 'all' as AdvisorCenterTab,
   severityFilters: ['critical'] as AdvisorSeverity[],
   selectedItemId: undefined as string | undefined,
@@ -41,16 +40,6 @@ export const advisorCenterState = proxy({
   reset() {
     sidebarManagerState.closeSidebar(SIDEBAR_KEYS.ADVISOR_CENTER)
     Object.assign(advisorCenterState, initialState)
-  },
-})
-
-sidebarManagerState.registerSidebar(SIDEBAR_KEYS.ADVISOR_CENTER, {
-  onOpen: () => {
-    advisorCenterState.open = true
-  },
-  onClose: () => {
-    advisorCenterState.open = false
-    advisorCenterState.selectedItemId = undefined
   },
 })
 

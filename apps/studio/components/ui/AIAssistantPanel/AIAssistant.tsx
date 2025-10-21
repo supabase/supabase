@@ -432,12 +432,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
   }, [snap.initialInput])
 
+  const isSidebarOpen = sidebarManagerState.isSidebarOpen(SIDEBAR_KEYS.AI_ASSISTANT)
+
   useEffect(() => {
-    if (snap.open && isInSQLEditor && !!snippetContent) {
+    if (isSidebarOpen && isInSQLEditor && !!snippetContent) {
       snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snap.open, isInSQLEditor, snippetContent])
+  }, [isSidebarOpen, isInSQLEditor, snippetContent])
 
   return (
     <ErrorBoundary

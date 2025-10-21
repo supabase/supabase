@@ -79,14 +79,6 @@ export const editorPanelState = proxy({
   },
 })
 
-// Register to reset state when sidebar closes (but don't control sidebar open/close)
-sidebarManagerState.registerSidebar(SIDEBAR_KEYS.EDITOR_PANEL, {
-  onClose: () => {
-    // Auto-reset state when sidebar closes
-    editorPanelState.reset()
-  },
-})
-
 export const getEditorPanelStateSnapshot = () => snapshot(editorPanelState)
 
 export const useEditorPanelStateSnapshot = (

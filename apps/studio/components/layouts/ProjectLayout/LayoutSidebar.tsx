@@ -1,24 +1,55 @@
-import { Fragment, ReactNode } from 'react'
+import { useRouter } from 'next/router'
+import { Fragment, ReactNode, useEffect } from 'react'
 
 import { AdvisorSidebar } from 'components/interfaces/AdvisorCenter/AdvisorSidebar'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import EditorPanel from 'components/ui/EditorPanel/EditorPanel'
+import { advisorCenterState } from 'state/advisor-center-state'
+import { editorPanelState } from 'state/editor-panel-state'
 import {
   SIDEBAR_KEYS,
   SidebarKey,
+  sidebarManagerState,
   useSidebarManagerSnapshot,
 } from 'state/sidebar-manager-state'
 import { ResizableHandle, ResizablePanel, cn } from 'ui'
 
-type LayoutSidebarProps = {
-  isClient: boolean
-}
+// Register all sidebars at module level (runs once when module loads)
+sidebarManagerState.registerSidebar(SIDEBAR_KEYS.AI_ASSISTANT, {})
 
-export const LayoutSidebar = ({ isClient }: LayoutSidebarProps) => {
+sidebarManagerState.registerSidebar(SIDEBAR_KEYS.ADVISOR_CENTER, {
+  onClose: () => {
+    advisorCenterState.selectedItemId = undefined
+  },
+})
+
+sidebarManagerState.registerSidebar(SIDEBAR_KEYS.EDITOR_PANEL, {
+  onClose: () => {
+    editorPanelState.reset()
+  },
+})
+
+export const LayoutSidebar = () => {
+  const router = useRouter()
   const sidebarSnap = useSidebarManagerSnapshot()
-  const activeSidebar = isClient ? sidebarSnap.activeSidebar : undefined
+  const activeSidebar = sidebarSnap.activeSidebar
 
-  if (!isClient || !activeSidebar) return null
+  // Handle URL params for deep linking
+  useEffect(() => {
+    if (!router.isReady) return
+
+    const sidebarParamRaw = router.query.sidebar
+    const validSidebarKeys = Object.values(SIDEBAR_KEYS) as string[]
+    const sidebarParam = typeof sidebarParamRaw === 'string' ? sidebarParamRaw : null
+
+    if (!sidebarParam || !validSidebarKeys.includes(sidebarParam)) return
+
+    if (sidebarSnap.activeSidebar !== sidebarParam) {
+      sidebarManagerState.openSidebar(sidebarParam as SidebarKey)
+    }
+  }, [router.isReady, router.query.sidebar, sidebarSnap.activeSidebar])
+
+  if (!activeSidebar) return null
 
   let sidebarContent: ReactNode = null
 

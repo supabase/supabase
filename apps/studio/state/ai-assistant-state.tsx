@@ -1,13 +1,12 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { SIDEBAR_KEYS, sidebarManagerState } from './sidebar-manager-state'
 
 type SuggestionsType = {
   title: string
@@ -29,7 +28,6 @@ type ChatSession = {
 }
 
 type AiAssistantData = {
-  open: boolean
   initialInput: string
   sqlSnippets?: SqlSnippet[]
   suggestions?: SuggestionsType
@@ -42,14 +40,12 @@ type AiAssistantData = {
 // Data structure stored in IndexedDB
 type StoredAiAssistantState = {
   projectRef: string
-  open: boolean
   activeChatId?: string
   chats: Record<string, ChatSession>
   model?: AssistantModel
 }
 
 const INITIAL_AI_ASSISTANT: AiAssistantData = {
-  open: false,
   initialInput: '',
   sqlSnippets: undefined,
   suggestions: undefined,
@@ -168,7 +164,6 @@ async function tryMigrateFromLocalStorage(
     if (parsedFromLocalStorage && typeof parsedFromLocalStorage.chats === 'object') {
       migratedState = {
         projectRef: projectRef,
-        open: parsedFromLocalStorage.open ?? false,
         activeChatId: parsedFromLocalStorage.activeChatId,
         chats: parsedFromLocalStorage.chats,
         model: parsedFromLocalStorage.model ?? INITIAL_AI_ASSISTANT.model,
@@ -200,20 +195,6 @@ async function tryMigrateFromLocalStorage(
 
 // Helper function to ensure an active chat exists or initialize a new one
 function ensureActiveChatOrInitialize(state: AiAssistantState) {
-  // Check URL param again to override loaded 'open' state if present
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-    if (aiAssistantPanelOpenParam !== null) {
-      const shouldOpen = aiAssistantPanelOpenParam === 'true'
-      if (shouldOpen) {
-        sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-      } else {
-        sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-      }
-    }
-  }
-
   // Ensure an active chat exists after loading/migration
   if (!state.activeChatId || !state.chats[state.activeChatId]) {
     const chatIds = Object.keys(state.chats)
@@ -234,20 +215,10 @@ export const createAiAssistantState = (): AiAssistantState => {
   // Initialize with defaults, loading happens asynchronously in the provider
   const initialState = { ...INITIAL_AI_ASSISTANT }
 
-  // Check URL params for initial 'open' state, overriding any loaded state later if present
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-    if (aiAssistantPanelOpenParam !== null) {
-      initialState.open = aiAssistantPanelOpenParam === 'true'
-    }
-  }
-
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
 
     resetAiAssistantPanel: () => {
-      sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       Object.assign(state, INITIAL_AI_ASSISTANT)
     },
 
@@ -262,14 +233,9 @@ export const createAiAssistantState = (): AiAssistantState => {
 
     newChat: (
       options?: { name?: string } & Partial<
-        Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
+        Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
       >
     ) => {
-      if (options?.open === true) {
-        sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-      } else if (options?.open === false) {
-        sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-      }
       const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
@@ -401,33 +367,11 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.activeChatId = persistedState.activeChatId
       state.model = persistedState.model ?? INITIAL_AI_ASSISTANT.model
 
-      // Check URL param again to override loaded 'open' state if present
-      if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search)
-        const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-        if (aiAssistantPanelOpenParam !== null) {
-          const shouldOpen = aiAssistantPanelOpenParam === 'true'
-          if (shouldOpen) {
-            sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-          } else {
-            sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-          }
-        } else if (persistedState.open) {
-          sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-        } else {
-          sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-        }
-      } else if (persistedState.open) {
-        sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-      } else {
-        sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-      }
-
       // Ensure an active chat exists after loading
       if (!state.activeChat) {
         const chatIds = Object.keys(state.chats)
         if (chatIds.length > 0) {
-          // Maybe select the most recently updated? For now, first.
+          // Select the most recently updated chat
           state.activeChatId = chatIds.sort(
             (a, b) =>
               (state.chats[b].updatedAt?.getTime() || 0) -
@@ -454,7 +398,7 @@ export type AiAssistantState = AiAssistantData & {
   setModel: (model: AssistantModel) => void
   newChat: (
     options?: { name?: string } & Partial<
-      Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
+      Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
     >
   ) => string
   selectChat: (id: string) => void
@@ -477,42 +421,28 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
   const { data: project } = useSelectedProjectQuery()
   // Initialize state. createAiAssistantState now just sets defaults.
   const [state] = useState(() => createAiAssistantState())
-
-  useEffect(() => {
-    const shouldRestoreOpen = state.open
-
-    sidebarManagerState.registerSidebar(SIDEBAR_KEYS.AI_ASSISTANT, {
-      onOpen: () => {
-        state.open = true
-      },
-      onClose: () => {
-        state.open = false
-      },
-    })
-
-    if (shouldRestoreOpen) {
-      sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-    } else {
-      sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-    }
-
-    return () => {
-      sidebarManagerState.unregisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-    }
-  }, [state])
+  const previousProjectRef = useRef<string | undefined>(project?.ref)
 
   // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {
     let isMounted = true
 
-    async function loadAndInitializeState() {
-      if (!project?.ref || typeof window === 'undefined') {
-        if (project?.ref === undefined) {
-          state.resetAiAssistantPanel()
-        }
-        return // Don't load if no projectRef or not in browser
-      }
+    if (typeof window === 'undefined') {
+      return
+    }
 
+    if (!project?.ref) {
+      // Only reset if we previously had a project ref (e.g., navigating away)
+      if (previousProjectRef.current) {
+        state.resetAiAssistantPanel()
+      }
+      previousProjectRef.current = project?.ref
+      return
+    }
+
+    previousProjectRef.current = project.ref
+
+    async function loadAndInitializeState() {
       let loadedState: StoredAiAssistantState | null = null
 
       // 1. Try loading from IndexedDB
@@ -552,7 +482,6 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
           projectRef: project?.ref,
-          open: snap.open,
           activeChatId: snap.activeChatId,
           model: snap.model,
           chats: snap.chats

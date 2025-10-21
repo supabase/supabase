@@ -94,7 +94,7 @@ export const AdvisorSidebar = () => {
   const advisorSnap = useAdvisorCenterStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
 
-  const isSidebarOpen = Boolean(advisorSnap.open)
+  const isSidebarOpen = sidebarManagerState.isSidebarOpen(SIDEBAR_KEYS.ADVISOR_CENTER)
 
   const {
     data: lintData,
@@ -228,7 +228,7 @@ export const AdvisorSidebar = () => {
   const hiddenItemsCount = itemsFilteredByTabOnly.length - filteredItems.length
 
   useEffect(() => {
-    if (!advisorSnap.open) return
+    if (!isSidebarOpen) return
 
     if (advisorSnap.selectedItemId) {
       const selectedExists = filteredItems.some((item) => item.id === advisorSnap.selectedItemId)
@@ -238,7 +238,7 @@ export const AdvisorSidebar = () => {
     } else if (filteredItems.length === 0) {
       advisorCenterState.selectItem(undefined)
     }
-  }, [advisorSnap.open, filteredItems, advisorSnap.selectedItemId])
+  }, [isSidebarOpen, filteredItems, advisorSnap.selectedItemId])
 
   const selectedItem = filteredItems.find((item) => item.id === advisorSnap.selectedItemId)
   const isDetailView = !!selectedItem
