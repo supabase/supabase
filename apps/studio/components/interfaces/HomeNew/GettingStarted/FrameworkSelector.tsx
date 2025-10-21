@@ -45,7 +45,7 @@ export const FrameworkSelector = ({
           <Button
             size="tiny"
             type="default"
-            className="gap-0 rounded-l-none"
+            className="gap-0"
             iconRight={<ChevronDown strokeWidth={1.5} />}
           >
             <div className="flex items-center gap-2">
