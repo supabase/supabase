@@ -36,6 +36,7 @@ allow_list = [
     "[Cc]onsecutiveness",
     "[Cc]ooldowns?",
     "[Cc]oroutines?",
+    "ComposeAuth",
     "[Cc]ron",
     "[Cc]rypto",
     "[Cc]ryptography",

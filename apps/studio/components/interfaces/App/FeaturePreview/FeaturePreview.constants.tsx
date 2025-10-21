@@ -2,6 +2,13 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
   {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS,
+    name: 'Security notification templates',
+    discussionsUrl: undefined,
+    isNew: true,
+    isPlatformOnly: true,
+  },
+  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI,
     name: 'New Storage interface',
     discussionsUrl: undefined,

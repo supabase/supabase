@@ -22,6 +22,7 @@ import { useHotKey } from 'hooks/ui/useHotKey'
 import { prepareMessagesForAPI } from 'lib/ai/message-utils'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
+import type { AssistantModel } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
@@ -58,6 +59,19 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
+
+  const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
+
+  const selectedModel = useMemo<AssistantModel>(() => {
+    const defaultModel: AssistantModel = isPaidPlan ? 'gpt-5' : 'gpt-5-mini'
+    const model = snap.model ?? defaultModel
+
+    if (!isPaidPlan && model === 'gpt-5') {
+      return 'gpt-5-mini'
+    }
+
+    return model
+  }, [isPaidPlan, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -201,6 +215,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             table: currentTable?.name,
             chatName: currentChat,
             orgSlug: selectedOrganizationRef.current?.slug,
+            model: selectedModel,
           },
           headers: { Authorization: authorizationHeader ?? '' },
         }
@@ -640,6 +655,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               snap.setSqlSnippets(newSnippets)
             }}
             includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
+            selectedModel={selectedModel}
+            onSelectModel={(model) => snap.setModel(model)}
           />
         </div>
       </div>

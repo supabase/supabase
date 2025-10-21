@@ -238,6 +238,11 @@
                   },
                   "request_review": {
                     "type": "boolean"
+                  },
+                  "notify_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "HTTP endpoint to receive branch status updates."
                   }
                 }
               }
@@ -308,6 +313,10 @@
                     },
                     "with_data": {
                       "type": "boolean"
+                    },
+                    "notify_url": {
+                      "type": "string",
+                      "format": "uri"
                     }
                   },
                   "required": [
@@ -821,7 +830,8 @@
                   },
                   "region": {
                     "type": "string",
-                    "description": "Region you want your server to reside in",
+                    "description": "Region you want your server to reside in. Use region_selection instead.",
+                    "deprecated": true,
                     "enum": [
                       "us-east-1",
                       "us-east-2",
@@ -842,6 +852,66 @@
                       "ap-south-1",
                       "sa-east-1"
                     ]
+                  },
+                  "region_selection": {
+                    "discriminator": {
+                      "propertyName": "type"
+                    },
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["specific"]
+                          },
+                          "code": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                            "enum": [
+                              "us-east-1",
+                              "us-east-2",
+                              "us-west-1",
+                              "us-west-2",
+                              "ap-east-1",
+                              "ap-southeast-1",
+                              "ap-northeast-1",
+                              "ap-northeast-2",
+                              "ap-southeast-2",
+                              "eu-west-1",
+                              "eu-west-2",
+                              "eu-west-3",
+                              "eu-north-1",
+                              "eu-central-1",
+                              "eu-central-2",
+                              "ca-central-1",
+                              "ap-south-1",
+                              "sa-east-1"
+                            ]
+                          }
+                        },
+                        "required": ["type", "code"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["smartGroup"]
+                          },
+                          "code": {
+                            "type": "string",
+                            "enum": ["americas", "emea", "apac"],
+                            "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                            "example": "apac"
+                          }
+                        },
+                        "required": ["type", "code"]
+                      }
+                    ],
+                    "description": "Region selection. Only one of region or region_selection can be specified.",
+                    "example": "{ type: 'smartGroup', code: 'americas' }"
                   },
                   "kps_enabled": {
                     "type": "boolean",
@@ -878,9 +948,21 @@
                     "format": "uri",
                     "description": "Template URL used to create the project from the CLI.",
                     "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
+                  },
+                  "release_channel": {
+                    "type": "string",
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+                    "description": "Release channel. If not provided, GA will be used.",
+                    "deprecated": true
+                  },
+                  "postgres_engine": {
+                    "type": "string",
+                    "enum": ["15", "17", "17-oriole"],
+                    "description": "Postgres engine version. If not provided, the latest version will be used.",
+                    "deprecated": true
                   }
                 },
-                "required": ["db_pass", "name", "organization_id", "region"],
+                "required": ["db_pass", "name", "organization_id"],
                 "additionalProperties": false,
                 "hideDefinitions": ["release_channel", "postgres_engine"]
               }
@@ -950,6 +1032,158 @@
           }
         ],
         "summary": "Create a project",
+        "tags": ["Projects"]
+      }
+    },
+    "/v1/projects/available-regions": {
+      "get": {
+        "operationId": "v1-get-available-regions",
+        "parameters": [
+          {
+            "name": "organization_slug",
+            "required": true,
+            "in": "query",
+            "description": "Slug of your organization",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "continent",
+            "required": false,
+            "in": "query",
+            "description": "Continent code to determine regional recommendations: NA (North America), SA (South America), EU (Europe), AF (Africa), AS (Asia), OC (Oceania), AN (Antarctica)",
+            "schema": {
+              "example": "NA",
+              "type": "string",
+              "enum": ["NA", "SA", "EU", "AF", "AS", "OC", "AN"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recommendations": {
+                      "type": "object",
+                      "properties": {
+                        "smartGroup": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "code": {
+                              "type": "string",
+                              "enum": ["americas", "emea", "apac"]
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": ["smartGroup"]
+                            }
+                          },
+                          "required": ["name", "code", "type"]
+                        },
+                        "specific": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "code": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": ["specific"]
+                              },
+                              "provider": {
+                                "type": "string",
+                                "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": ["capacity", "other"]
+                              }
+                            },
+                            "required": ["name", "code", "type", "provider"]
+                          }
+                        }
+                      },
+                      "required": ["smartGroup", "specific"]
+                    },
+                    "all": {
+                      "type": "object",
+                      "properties": {
+                        "smartGroup": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "code": {
+                                "type": "string",
+                                "enum": ["americas", "emea", "apac"]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": ["smartGroup"]
+                              }
+                            },
+                            "required": ["name", "code", "type"]
+                          }
+                        },
+                        "specific": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "code": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": ["specific"]
+                              },
+                              "provider": {
+                                "type": "string",
+                                "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": ["capacity", "other"]
+                              }
+                            },
+                            "required": ["name", "code", "type", "provider"]
+                          }
+                        }
+                      },
+                      "required": ["smartGroup", "specific"]
+                    }
+                  },
+                  "required": ["recommendations", "all"]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Gets the list of available regions that can be used for a new project",
         "tags": ["Projects"]
       }
     },
@@ -1133,8 +1367,8 @@
             "in": "query",
             "description": "Resource indicator for MCP (Model Context Protocol) clients",
             "schema": {
-              "type": "string",
-              "enum": ["https://api.supabase.com/mcp", "https://mcp.supabase.com/mcp"]
+              "format": "uri",
+              "type": "string"
             }
           }
         ],
@@ -1188,8 +1422,11 @@
                   },
                   "resource": {
                     "type": "string",
-                    "enum": ["https://api.supabase.com/mcp", "https://mcp.supabase.com/mcp"],
+                    "format": "uri",
                     "description": "Resource indicator for MCP (Model Context Protocol) clients"
+                  },
+                  "scope": {
+                    "type": "string"
                   }
                 },
                 "additionalProperties": false
@@ -1365,8 +1602,7 @@
           }
         ],
         "summary": "Authorize user through oauth and claim a project",
-        "tags": ["OAuth"],
-        "x-internal": true
+        "tags": ["OAuth"]
       }
     },
     "/v1/snippets": {
@@ -3030,6 +3266,10 @@
                       },
                       "with_data": {
                         "type": "boolean"
+                      },
+                      "notify_url": {
+                        "type": "string",
+                        "format": "uri"
                       }
                     },
                     "required": [
@@ -3153,6 +3393,11 @@
                   },
                   "with_data": {
                     "type": "boolean"
+                  },
+                  "notify_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "HTTP endpoint to receive branch status updates."
                   }
                 },
                 "required": ["branch_name"]
@@ -3224,6 +3469,10 @@
                     },
                     "with_data": {
                       "type": "boolean"
+                    },
+                    "notify_url": {
+                      "type": "string",
+                      "format": "uri"
                     }
                   },
                   "required": [
@@ -3396,6 +3645,10 @@
                     },
                     "with_data": {
                       "type": "boolean"
+                    },
+                    "notify_url": {
+                      "type": "string",
+                      "format": "uri"
                     }
                   },
                   "required": [
@@ -8693,6 +8946,18 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "hook_after_user_created_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "hook_after_user_created_uri": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "hook_after_user_created_secrets": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "jwt_exp": {
                       "type": "integer",
                       "nullable": true
@@ -8740,6 +9005,34 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "mailer_subjects_password_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_email_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_phone_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_mfa_factor_enrolled_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_mfa_factor_unenrolled_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_identity_linked_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_identity_unlinked_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "mailer_templates_confirmation_content": {
                       "type": "string",
                       "nullable": true
@@ -8762,6 +9055,62 @@
                     },
                     "mailer_templates_recovery_content": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_password_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_email_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_phone_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_mfa_factor_enrolled_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_mfa_factor_unenrolled_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_identity_linked_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_identity_unlinked_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_notifications_password_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_email_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_phone_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_mfa_factor_enrolled_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_mfa_factor_unenrolled_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_identity_linked_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_identity_unlinked_enabled": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "mfa_max_enrolled_factors": {
@@ -9158,6 +9507,9 @@
                     "hook_before_user_created_enabled",
                     "hook_before_user_created_uri",
                     "hook_before_user_created_secrets",
+                    "hook_after_user_created_enabled",
+                    "hook_after_user_created_uri",
+                    "hook_after_user_created_secrets",
                     "jwt_exp",
                     "mailer_allow_unverified_email_sign_ins",
                     "mailer_autoconfirm",
@@ -9170,12 +9522,33 @@
                     "mailer_subjects_magic_link",
                     "mailer_subjects_reauthentication",
                     "mailer_subjects_recovery",
+                    "mailer_subjects_password_changed_notification",
+                    "mailer_subjects_email_changed_notification",
+                    "mailer_subjects_phone_changed_notification",
+                    "mailer_subjects_mfa_factor_enrolled_notification",
+                    "mailer_subjects_mfa_factor_unenrolled_notification",
+                    "mailer_subjects_identity_linked_notification",
+                    "mailer_subjects_identity_unlinked_notification",
                     "mailer_templates_confirmation_content",
                     "mailer_templates_email_change_content",
                     "mailer_templates_invite_content",
                     "mailer_templates_magic_link_content",
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
+                    "mailer_templates_password_changed_notification_content",
+                    "mailer_templates_email_changed_notification_content",
+                    "mailer_templates_phone_changed_notification_content",
+                    "mailer_templates_mfa_factor_enrolled_notification_content",
+                    "mailer_templates_mfa_factor_unenrolled_notification_content",
+                    "mailer_templates_identity_linked_notification_content",
+                    "mailer_templates_identity_unlinked_notification_content",
+                    "mailer_notifications_password_changed_enabled",
+                    "mailer_notifications_email_changed_enabled",
+                    "mailer_notifications_phone_changed_enabled",
+                    "mailer_notifications_mfa_factor_enrolled_enabled",
+                    "mailer_notifications_mfa_factor_unenrolled_enabled",
+                    "mailer_notifications_identity_linked_enabled",
+                    "mailer_notifications_identity_unlinked_enabled",
                     "mfa_max_enrolled_factors",
                     "mfa_totp_enroll_enabled",
                     "mfa_totp_verify_enabled",
@@ -9371,6 +9744,34 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "mailer_subjects_password_changed_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_email_changed_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_phone_changed_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_mfa_factor_enrolled_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_mfa_factor_unenrolled_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_identity_linked_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_identity_unlinked_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
                   "mailer_templates_invite_content": {
                     "type": "string",
                     "nullable": true
@@ -9393,6 +9794,62 @@
                   },
                   "mailer_templates_reauthentication_content": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_password_changed_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_email_changed_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_phone_changed_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_mfa_factor_enrolled_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_mfa_factor_unenrolled_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_identity_linked_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_identity_unlinked_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_notifications_password_changed_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_email_changed_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_phone_changed_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_mfa_factor_enrolled_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_mfa_factor_unenrolled_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_identity_linked_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_identity_unlinked_enabled": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "mfa_max_enrolled_factors": {
@@ -9718,6 +10175,18 @@
                     "nullable": true
                   },
                   "hook_before_user_created_secrets": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "hook_after_user_created_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "hook_after_user_created_uri": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "hook_after_user_created_secrets": {
                     "type": "string",
                     "nullable": true
                   },
@@ -10590,6 +11059,18 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "hook_after_user_created_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "hook_after_user_created_uri": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "hook_after_user_created_secrets": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "jwt_exp": {
                       "type": "integer",
                       "nullable": true
@@ -10637,6 +11118,34 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "mailer_subjects_password_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_email_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_phone_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_mfa_factor_enrolled_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_mfa_factor_unenrolled_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_identity_linked_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_identity_unlinked_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "mailer_templates_confirmation_content": {
                       "type": "string",
                       "nullable": true
@@ -10659,6 +11168,62 @@
                     },
                     "mailer_templates_recovery_content": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_password_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_email_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_phone_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_mfa_factor_enrolled_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_mfa_factor_unenrolled_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_identity_linked_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_identity_unlinked_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_notifications_password_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_email_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_phone_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_mfa_factor_enrolled_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_mfa_factor_unenrolled_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_identity_linked_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_identity_unlinked_enabled": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "mfa_max_enrolled_factors": {
@@ -11055,6 +11620,9 @@
                     "hook_before_user_created_enabled",
                     "hook_before_user_created_uri",
                     "hook_before_user_created_secrets",
+                    "hook_after_user_created_enabled",
+                    "hook_after_user_created_uri",
+                    "hook_after_user_created_secrets",
                     "jwt_exp",
                     "mailer_allow_unverified_email_sign_ins",
                     "mailer_autoconfirm",
@@ -11067,12 +11635,33 @@
                     "mailer_subjects_magic_link",
                     "mailer_subjects_reauthentication",
                     "mailer_subjects_recovery",
+                    "mailer_subjects_password_changed_notification",
+                    "mailer_subjects_email_changed_notification",
+                    "mailer_subjects_phone_changed_notification",
+                    "mailer_subjects_mfa_factor_enrolled_notification",
+                    "mailer_subjects_mfa_factor_unenrolled_notification",
+                    "mailer_subjects_identity_linked_notification",
+                    "mailer_subjects_identity_unlinked_notification",
                     "mailer_templates_confirmation_content",
                     "mailer_templates_email_change_content",
                     "mailer_templates_invite_content",
                     "mailer_templates_magic_link_content",
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
+                    "mailer_templates_password_changed_notification_content",
+                    "mailer_templates_email_changed_notification_content",
+                    "mailer_templates_phone_changed_notification_content",
+                    "mailer_templates_mfa_factor_enrolled_notification_content",
+                    "mailer_templates_mfa_factor_unenrolled_notification_content",
+                    "mailer_templates_identity_linked_notification_content",
+                    "mailer_templates_identity_unlinked_notification_content",
+                    "mailer_notifications_password_changed_enabled",
+                    "mailer_notifications_email_changed_enabled",
+                    "mailer_notifications_phone_changed_enabled",
+                    "mailer_notifications_mfa_factor_enrolled_enabled",
+                    "mailer_notifications_mfa_factor_unenrolled_enabled",
+                    "mailer_notifications_identity_linked_enabled",
+                    "mailer_notifications_identity_unlinked_enabled",
                     "mfa_max_enrolled_factors",
                     "mfa_totp_enroll_enabled",
                     "mfa_totp_verify_enabled",
@@ -16969,14 +17558,6 @@
                             "required": ["name", "limit"]
                           }
                         },
-                        "target_organization_eligible": {
-                          "type": "boolean",
-                          "nullable": true
-                        },
-                        "target_organization_has_free_project_slots": {
-                          "type": "boolean",
-                          "nullable": true
-                        },
                         "source_subscription_plan": {
                           "type": "string",
                           "enum": ["free", "pro", "team", "enterprise"]
@@ -16993,8 +17574,6 @@
                         "errors",
                         "info",
                         "members_exceeding_free_project_limit",
-                        "target_organization_eligible",
-                        "target_organization_has_free_project_slots",
                         "source_subscription_plan",
                         "target_subscription_plan"
                       ]
@@ -17183,6 +17762,11 @@
           },
           "request_review": {
             "type": "boolean"
+          },
+          "notify_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTP endpoint to receive branch status updates."
           }
         }
       },
@@ -17245,6 +17829,10 @@
           },
           "with_data": {
             "type": "boolean"
+          },
+          "notify_url": {
+            "type": "string",
+            "format": "uri"
           }
         },
         "required": [
@@ -17385,7 +17973,8 @@
           },
           "region": {
             "type": "string",
-            "description": "Region you want your server to reside in",
+            "description": "Region you want your server to reside in. Use region_selection instead.",
+            "deprecated": true,
             "enum": [
               "us-east-1",
               "us-east-2",
@@ -17406,6 +17995,66 @@
               "ap-south-1",
               "sa-east-1"
             ]
+          },
+          "region_selection": {
+            "discriminator": {
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["specific"]
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                    "enum": [
+                      "us-east-1",
+                      "us-east-2",
+                      "us-west-1",
+                      "us-west-2",
+                      "ap-east-1",
+                      "ap-southeast-1",
+                      "ap-northeast-1",
+                      "ap-northeast-2",
+                      "ap-southeast-2",
+                      "eu-west-1",
+                      "eu-west-2",
+                      "eu-west-3",
+                      "eu-north-1",
+                      "eu-central-1",
+                      "eu-central-2",
+                      "ca-central-1",
+                      "ap-south-1",
+                      "sa-east-1"
+                    ]
+                  }
+                },
+                "required": ["type", "code"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["smartGroup"]
+                  },
+                  "code": {
+                    "type": "string",
+                    "enum": ["americas", "emea", "apac"],
+                    "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                    "example": "apac"
+                  }
+                },
+                "required": ["type", "code"]
+              }
+            ],
+            "description": "Region selection. Only one of region or region_selection can be specified.",
+            "example": "{ type: 'smartGroup', code: 'americas' }"
           },
           "kps_enabled": {
             "type": "boolean",
@@ -17442,9 +18091,21 @@
             "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
+          },
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+            "description": "Release channel. If not provided, GA will be used.",
+            "deprecated": true
+          },
+          "postgres_engine": {
+            "type": "string",
+            "enum": ["15", "17", "17-oriole"],
+            "description": "Postgres engine version. If not provided, the latest version will be used.",
+            "deprecated": true
           }
         },
-        "required": ["db_pass", "name", "organization_id", "region"],
+        "required": ["db_pass", "name", "organization_id"],
         "additionalProperties": false,
         "hideDefinitions": ["release_channel", "postgres_engine"]
       },
@@ -17496,6 +18157,115 @@
         },
         "required": ["id", "organization_id", "name", "region", "created_at", "status"]
       },
+      "RegionsInfo": {
+        "type": "object",
+        "properties": {
+          "recommendations": {
+            "type": "object",
+            "properties": {
+              "smartGroup": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string",
+                    "enum": ["americas", "emea", "apac"]
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["smartGroup"]
+                  }
+                },
+                "required": ["name", "code", "type"]
+              },
+              "specific": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["specific"]
+                    },
+                    "provider": {
+                      "type": "string",
+                      "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["capacity", "other"]
+                    }
+                  },
+                  "required": ["name", "code", "type", "provider"]
+                }
+              }
+            },
+            "required": ["smartGroup", "specific"]
+          },
+          "all": {
+            "type": "object",
+            "properties": {
+              "smartGroup": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["americas", "emea", "apac"]
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["smartGroup"]
+                    }
+                  },
+                  "required": ["name", "code", "type"]
+                }
+              },
+              "specific": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["specific"]
+                    },
+                    "provider": {
+                      "type": "string",
+                      "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["capacity", "other"]
+                    }
+                  },
+                  "required": ["name", "code", "type", "provider"]
+                }
+              }
+            },
+            "required": ["smartGroup", "specific"]
+          }
+        },
+        "required": ["recommendations", "all"]
+      },
       "OrganizationResponseV1": {
         "type": "object",
         "properties": {
@@ -17546,8 +18316,11 @@
           },
           "resource": {
             "type": "string",
-            "enum": ["https://api.supabase.com/mcp", "https://mcp.supabase.com/mcp"],
+            "format": "uri",
             "description": "Resource indicator for MCP (Model Context Protocol) clients"
+          },
+          "scope": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -18128,6 +18901,11 @@
           },
           "with_data": {
             "type": "boolean"
+          },
+          "notify_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTP endpoint to receive branch status updates."
           }
         },
         "required": ["branch_name"]
@@ -20159,6 +20937,18 @@
             "type": "string",
             "nullable": true
           },
+          "hook_after_user_created_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "hook_after_user_created_uri": {
+            "type": "string",
+            "nullable": true
+          },
+          "hook_after_user_created_secrets": {
+            "type": "string",
+            "nullable": true
+          },
           "jwt_exp": {
             "type": "integer",
             "nullable": true
@@ -20206,6 +20996,34 @@
             "type": "string",
             "nullable": true
           },
+          "mailer_subjects_password_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_email_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_phone_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_enrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_unenrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_linked_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_unlinked_notification": {
+            "type": "string",
+            "nullable": true
+          },
           "mailer_templates_confirmation_content": {
             "type": "string",
             "nullable": true
@@ -20228,6 +21046,62 @@
           },
           "mailer_templates_recovery_content": {
             "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_password_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_email_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_phone_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_enrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_unenrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_linked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_unlinked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_notifications_password_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_email_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_phone_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_enrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_unenrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_linked_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_unlinked_enabled": {
+            "type": "boolean",
             "nullable": true
           },
           "mfa_max_enrolled_factors": {
@@ -20624,6 +21498,9 @@
           "hook_before_user_created_enabled",
           "hook_before_user_created_uri",
           "hook_before_user_created_secrets",
+          "hook_after_user_created_enabled",
+          "hook_after_user_created_uri",
+          "hook_after_user_created_secrets",
           "jwt_exp",
           "mailer_allow_unverified_email_sign_ins",
           "mailer_autoconfirm",
@@ -20636,12 +21513,33 @@
           "mailer_subjects_magic_link",
           "mailer_subjects_reauthentication",
           "mailer_subjects_recovery",
+          "mailer_subjects_password_changed_notification",
+          "mailer_subjects_email_changed_notification",
+          "mailer_subjects_phone_changed_notification",
+          "mailer_subjects_mfa_factor_enrolled_notification",
+          "mailer_subjects_mfa_factor_unenrolled_notification",
+          "mailer_subjects_identity_linked_notification",
+          "mailer_subjects_identity_unlinked_notification",
           "mailer_templates_confirmation_content",
           "mailer_templates_email_change_content",
           "mailer_templates_invite_content",
           "mailer_templates_magic_link_content",
           "mailer_templates_reauthentication_content",
           "mailer_templates_recovery_content",
+          "mailer_templates_password_changed_notification_content",
+          "mailer_templates_email_changed_notification_content",
+          "mailer_templates_phone_changed_notification_content",
+          "mailer_templates_mfa_factor_enrolled_notification_content",
+          "mailer_templates_mfa_factor_unenrolled_notification_content",
+          "mailer_templates_identity_linked_notification_content",
+          "mailer_templates_identity_unlinked_notification_content",
+          "mailer_notifications_password_changed_enabled",
+          "mailer_notifications_email_changed_enabled",
+          "mailer_notifications_phone_changed_enabled",
+          "mailer_notifications_mfa_factor_enrolled_enabled",
+          "mailer_notifications_mfa_factor_unenrolled_enabled",
+          "mailer_notifications_identity_linked_enabled",
+          "mailer_notifications_identity_unlinked_enabled",
           "mfa_max_enrolled_factors",
           "mfa_totp_enroll_enabled",
           "mfa_totp_verify_enabled",
@@ -20793,6 +21691,34 @@
             "type": "string",
             "nullable": true
           },
+          "mailer_subjects_password_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_email_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_phone_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_enrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_unenrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_linked_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_unlinked_notification": {
+            "type": "string",
+            "nullable": true
+          },
           "mailer_templates_invite_content": {
             "type": "string",
             "nullable": true
@@ -20815,6 +21741,62 @@
           },
           "mailer_templates_reauthentication_content": {
             "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_password_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_email_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_phone_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_enrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_unenrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_linked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_unlinked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_notifications_password_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_email_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_phone_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_enrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_unenrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_linked_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_unlinked_enabled": {
+            "type": "boolean",
             "nullable": true
           },
           "mfa_max_enrolled_factors": {
@@ -21140,6 +22122,18 @@
             "nullable": true
           },
           "hook_before_user_created_secrets": {
+            "type": "string",
+            "nullable": true
+          },
+          "hook_after_user_created_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "hook_after_user_created_uri": {
+            "type": "string",
+            "nullable": true
+          },
+          "hook_after_user_created_secrets": {
             "type": "string",
             "nullable": true
           },
@@ -23868,14 +24862,6 @@
                   "required": ["name", "limit"]
                 }
               },
-              "target_organization_eligible": {
-                "type": "boolean",
-                "nullable": true
-              },
-              "target_organization_has_free_project_slots": {
-                "type": "boolean",
-                "nullable": true
-              },
               "source_subscription_plan": {
                 "type": "string",
                 "enum": ["free", "pro", "team", "enterprise"]
@@ -23892,8 +24878,6 @@
               "errors",
               "info",
               "members_exceeding_free_project_limit",
-              "target_organization_eligible",
-              "target_organization_has_free_project_slots",
               "source_subscription_plan",
               "target_subscription_plan"
             ]

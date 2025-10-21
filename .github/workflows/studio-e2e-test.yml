@@ -42,25 +42,25 @@ jobs:
       VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - name: Verify Vercel bypass secret exists
         run: |
           if [ -z "${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}" ]; then
             echo "Required secret VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO is not set" >&2
             exit 1
           fi
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         name: Install pnpm
         with:
           run_install: false
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm i
+        run: pnpm install --frozen-lockfile
 
       # Deploy a preview to Vercel (CLI mode) and capture the URL
       - name: Install Vercel CLI
@@ -94,7 +94,7 @@ jobs:
           VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}
         run: pnpm e2e
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: playwright-artifacts
@@ -106,7 +106,7 @@ jobs:
       - name: Prepare summary (outputs)
         if: always()
         id: summarize
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const fs = require('fs')
@@ -144,7 +144,7 @@ jobs:
 
       - name: Comment summary on PR
         if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const owner = context.repo.owner

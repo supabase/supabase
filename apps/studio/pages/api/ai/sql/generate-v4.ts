@@ -62,6 +62,7 @@ const requestBodySchema = z.object({
   table: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
+  model: z.enum(['gpt-5', 'gpt-5-mini']).optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -79,7 +80,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
+  const {
+    messages: rawMessages,
+    projectRef,
+    connectionString,
+    orgSlug,
+    chatName,
+    model: requestedModel,
+  } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let isLimited = false
@@ -139,7 +147,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     providerOptions,
   } = await getModel({
     provider: 'openai',
-    model: 'gpt-5',
+    model: requestedModel ?? 'gpt-5',
     routingKey: projectRef,
     isLimited,
   })
