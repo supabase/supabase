@@ -129,7 +129,7 @@ async function debuggableNavigatorLock<R>(
   let stackException: any
 
   try {
-    throw new Error('Lock is being held for over 2s here')
+    throw new Error('Lock is being held for over 10s here')
   } catch (e: any) {
     stackException = e
   }
@@ -144,12 +144,12 @@ async function debuggableNavigatorLock<R>(
       }
 
       console.error(
-        `Waited for over 2s to acquire an Auth client lock`,
+        `Waited for over 10s to acquire an Auth client lock`,
         await navigator.locks.query(),
         stackException
       )
     })()
-  }, 2000)
+  }, 10000)
 
   try {
     return await navigatorLock(name, acquireTimeout, async () => {
