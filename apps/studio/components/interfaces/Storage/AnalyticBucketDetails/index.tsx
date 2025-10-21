@@ -42,7 +42,6 @@ import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { NamespaceRow } from './NamespaceRow'
-import { NamespaceRowAlt } from './NamespaceRowAlt'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
@@ -214,17 +213,6 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
                   <div className="flex flex-col gap-y-10">
                     {namespaces.map(({ namespace, schema, tables }) => (
                       <>
-                        <NamespaceRowAlt
-                          key={namespace}
-                          bucketName={bucket.id}
-                          namespace={namespace}
-                          schema={schema}
-                          tables={tables as any}
-                          token={token!}
-                          wrapperInstance={wrapperInstance}
-                          wrapperValues={wrapperValues}
-                          wrapperMeta={wrapperMeta}
-                        />
                         <NamespaceRow
                           key={namespace}
                           bucketName={bucket.id}

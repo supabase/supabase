@@ -1,9 +1,10 @@
-import { ChevronRight, Code, Eye, MoreVertical, RefreshCw, Trash2 } from 'lucide-react'
+import { Code, Eye, MoreVertical, RefreshCw, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { FDW } from 'data/fdw/fdws-query'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
@@ -11,7 +12,10 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
+  CardDescription,
+  CardFooter,
   CardHeader,
+  CardTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -22,10 +26,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
 } from 'ui'
 
 type NamespaceRowProps = {
@@ -50,6 +50,9 @@ const TableRowComponent = ({
   schema?: string
 }) => {
   const { data: project } = useSelectedProjectQuery()
+
+  // console.log({ schema })
+  // console.log({ project })
 
   console.log({ tableName, isConnected })
 
@@ -82,9 +85,7 @@ const TableRowComponent = ({
               }`}
             />
           </div>
-          <span className={`${isConnected ? 'text-foreground-light' : 'text-foreground-lighter'}`}>
-            {isConnected ? 'Connected' : 'Not connected'}
-          </span>
+          <span className="text-foreground-light">{isConnected ? 'Synced' : 'Needs syncing'}</span>
         </div>
       </TableCell>
       <TableCell className="text-right">
@@ -137,6 +138,8 @@ export const NamespaceRow = ({
     { enabled: !!token }
   )
 
+  console.log({ tablesData, isLoadingNamespaceTables, token, enabled: !!token })
+
   const { mutateAsync: importForeignSchema, isLoading: isImportingForeignSchema } =
     useFDWImportForeignSchemaMutation()
 
@@ -161,7 +164,8 @@ export const NamespaceRow = ({
   let scanTooltip = useMemo(() => {
     if (isImportingForeignSchema) return 'Scanning for new tables...'
     if (isLoadingNamespaceTables) return 'Loading tables...'
-    if (missingTables.length > 0) return `Found ${missingTables.length} new tables`
+    if (missingTables.length > 0)
+      return `${missingTables.length} new table${missingTables.length > 1 ? 's' : ''} found`
     if (tables.length === 0) return 'No tables found'
     return 'All tables are up to date'
   }, [isImportingForeignSchema, isLoadingNamespaceTables, missingTables.length, tables.length])
@@ -181,41 +185,17 @@ export const NamespaceRow = ({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row justify-between items-center px-4 py-4 space-y-0">
-        <div
-          className={`flex flex-row rounded-full text-sm text-foreground-light leading-none border ${schema ? 'bg-surface-300 border-alternative' : 'bg-warning-300 border-warning-400'}`}
-        >
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="outline outline-1 outline-border-alternative rounded-full pl-3 pr-2 py-1.5 bg-surface-75 flex flex-row items-center gap-1">
-                  {namespace}
-                  <ChevronRight size={12} className="text-foreground-muted" />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Namespace</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span
-                  className={`rounded-full pl-2 pr-3 py-1.5 leading-none
-                    ${schema ? '' : 'text-warning-600'}
-                  `}
-                >
-                  {schema || 'no schema'}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{schema ? 'Database schema' : 'Sync to create a schema'}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+      <CardHeader className="flex flex-row justify-between items-center px-4 py-5 space-y-0">
+        <div className="flex flex-col gap-y-1">
+          <CardTitle className="text-md font-normal font-sans normal-case leading-none">
+            {namespace}
+          </CardTitle>
+          {schema && (
+            <CardDescription className="text-foreground-lighter">
+              Target schema “{schema}”
+            </CardDescription>
+          )}
         </div>
-
         <div className="flex flex-row gap-x-2">
           {missingTables.length > 0 && (
             <Button
@@ -225,7 +205,7 @@ export const NamespaceRow = ({
               onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
               loading={isImportingForeignSchema || isLoadingNamespaceTables}
             >
-              Sync tables
+              Sync
             </Button>
           )}
           {tables.length > 0 && (
@@ -241,19 +221,17 @@ export const NamespaceRow = ({
             <TableHead className={allTables.length === 0 ? 'text-foreground-muted' : undefined}>
               Table
             </TableHead>
-            <TableHead className={allTables.length === 0 ? 'text-foreground-muted' : undefined}>
-              Status
-            </TableHead>
+            <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>Status</TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
           {allTables.length === 0 ? (
-            <TableRow>
+            <TableRow className="[&>td]:hover:bg-inherit">
               <TableCell colSpan={3}>
                 <p className="text-sm text-foreground">No tables yet</p>
                 <p className="text-sm text-foreground-lighter">
-                  Publish an analytics table and then sync.{' '}
+                  Publish an analytics table to this namespace.
                 </p>
               </TableCell>
             </TableRow>
@@ -276,6 +254,11 @@ export const NamespaceRow = ({
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}
       />
+      {tables.length > 0 && (
+        <CardFooter className="px-4 py-4 text-sm text-foreground-muted border-t border-border">
+          {scanTooltip ? <p>{scanTooltip}</p> : <ShimmeringLoader className="py-0 w-20" />}
+        </CardFooter>
+      )}
     </Card>
   )
 }
