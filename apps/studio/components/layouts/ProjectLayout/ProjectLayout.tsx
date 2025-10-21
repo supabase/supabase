@@ -357,7 +357,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
-  }, [ref, state])
+  }, [ref])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
