@@ -41,7 +41,7 @@ export const QuickstartTemplatesWidget = ({
   const displayedTemplates = activeCategory ? tableTemplates[activeCategory] || [] : []
 
   return (
-    <div className="rounded-lg border border-default bg-surface-75 p-6 transition-all hover:border-foreground-muted">
+    <div className="rounded-lg border border-default bg-surface-100 p-6 transition-all hover:border-foreground-muted">
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
           <Layers size={16} className="text-foreground" />
@@ -85,7 +85,7 @@ export const QuickstartTemplatesWidget = ({
                 aria-label={`Select ${template.tableName} template with ${template.fields.length} fields`}
                 className={cn(
                   'text-left p-3 rounded-md border transition-all w-full',
-                  'border-default hover:border-foreground-muted hover:bg-surface-100',
+                  'border-default hover:border-foreground-muted hover:bg-surface-200',
                   'disabled:opacity-50 disabled:cursor-not-allowed'
                 )}
               >

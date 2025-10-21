@@ -63,7 +63,7 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
   )
 
   return (
-    <div className="rounded-lg border border-default bg-surface-75 p-6 transition-all hover:border-foreground-muted">
+    <div className="rounded-lg border border-default bg-surface-100 p-6 transition-all hover:border-foreground-muted">
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
           <AiIconAnimation size={16} loading={false} />
@@ -123,7 +123,7 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
                   aria-label={`Generate table for ${idea}`}
                   className={cn(
                     'flex items-center gap-1.5 px-2 py-1 rounded-md text-xs border border-default',
-                    'hover:border-foreground-muted hover:bg-surface-100',
+                    'hover:border-foreground-muted hover:bg-surface-200',
                     'disabled:opacity-50 disabled:cursor-not-allowed',
                     'transition-all'
                   )}
@@ -164,7 +164,7 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
                 aria-label={`Select ${template.tableName} template with ${template.fields.length} fields`}
                 className={cn(
                   'text-left p-3 rounded-md border transition-all w-full',
-                  'border-default hover:border-foreground-muted hover:bg-surface-100',
+                  'border-default hover:border-foreground-muted hover:bg-surface-200',
                   'disabled:opacity-50 disabled:cursor-not-allowed'
                 )}
               >
