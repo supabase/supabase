@@ -64,7 +64,8 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
-  const { data } = useProjectsQuery()
+  // only fetch projects when the panel is visible
+  const { data } = useProjectsQuery({ enabled: visible })
   const projects = data?.projects ?? []
   const { data: permissions } = usePermissionsQuery()
 
