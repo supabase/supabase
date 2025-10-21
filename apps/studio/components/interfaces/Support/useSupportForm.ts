@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useRef, useState, type Dispatch } from 'react'
-import { useForm, useWatch, type DefaultValues, type UseFormReturn } from 'react-hook-form'
+import { type Dispatch, useEffect, useRef, useState } from 'react'
+import { type DefaultValues, type UseFormReturn, useForm, useWatch } from 'react-hook-form'
 // End of third-party imports
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -10,8 +10,8 @@ import {
   loadSupportFormInitialParams,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
-  selectInitalOrgAndProject,
   type SupportFormUrlKeys,
+  selectInitalOrgAndProject,
 } from './SupportForm.utils'
 
 const supportFormDefaultValues: DefaultValues<SupportFormValues> = {
@@ -84,10 +84,7 @@ export function useSupportForm(dispatch: Dispatch<SupportFormActions>): UseSuppo
       urlParamsRef.current.orgSlug && urlParamsRef.current.orgSlug !== NO_ORG_MARKER
         ? urlParamsRef.current.orgSlug
         : null
-    const projectRefFromUrl =
-      urlParamsRef.current.projectRef && urlParamsRef.current.projectRef !== NO_PROJECT_MARKER
-        ? urlParamsRef.current.projectRef
-        : null
+    const projectRefFromUrl = urlParamsRef.current.projectRef ?? null
 
     selectInitalOrgAndProject({
       projectRef: projectRefFromUrl,

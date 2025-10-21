@@ -3,16 +3,16 @@ import {
   createLoader,
   createParser,
   createSerializer,
-  parseAsString,
   type inferParserType,
+  parseAsString,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
 // End of third-party imports
 
 import {
-  DocsSearchResultType as PageType,
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
+  DocsSearchResultType as PageType,
 } from 'common'
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { DOCS_URL } from 'lib/constants'
@@ -118,8 +118,8 @@ const parseAsCategoryOption = createParser({
 })
 
 const supportFormUrlState = {
-  projectRef: parseAsString.withDefault(NO_PROJECT_MARKER),
-  orgSlug: parseAsString.withDefault(NO_ORG_MARKER),
+  projectRef: parseAsString.withDefault(''),
+  orgSlug: parseAsString.withDefault(''),
   category: parseAsCategoryOption,
   subject: parseAsString.withDefault(''),
   message: parseAsString.withDefault(''),

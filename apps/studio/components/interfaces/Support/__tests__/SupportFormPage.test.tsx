@@ -497,6 +497,20 @@ describe('SupportFormPage', () => {
     })
   })
 
+  test('loading a URL with explicit no project ref falls back to first organization and no project', async () => {
+    Object.defineProperty(window, 'location', {
+      value: createMockLocation(`?projectRef=${NO_PROJECT_MARKER}`),
+      writable: true,
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(() => {
+      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
+    })
+  })
+
   test('loading a URL with an invalid project slug falls back to first organization and project', async () => {
     mswServer.use(
       http.get(`${API_URL}/platform/projects/:ref`, () =>
