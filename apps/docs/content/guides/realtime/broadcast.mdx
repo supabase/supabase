@@ -1048,29 +1048,27 @@ You can configure replay with the following options:
     </Admonition>
     ```swift
     // Configure broadcast with replay
-    let config = RealtimeJoinConfig(
-      isPrivate: true,
-      broadcast: BroadcastJoinConfig(
-        acknowledgeBroadcasts: true,
-        receiveOwnBroadcasts: true,
-        replay: ReplayOption(
-          since: 1697472000000, // Unix timestamp in milliseconds
-
-          limit: 25
-        )
+    let channel = supabase.realtimeV2.channel("my-channel") {
+      $0.isPrivate = true
+      $0.broadcast.acknowledgeBroadcasts = true
+      $0.broadcast.receiveOwnBroadcasts = true
+      $0.broadcast.replay = ReplayOption(
+        since: 1697472000000, // Unix timestamp in milliseconds
+        limit: 25
       )
-    )
+    }
 
-    let channel = supabase.realtimeV2.channel("my-channel", config: config)
+    var subscriptions = Set<RealtimeSubscription>()
 
     // Broadcast callback receives meta field
-    channel.onBroadcast { message in
-      if let meta = message.payload["meta"] as? [String: Any],
-         let replayed = meta["replayed"] as? Bool,
+    channel.onBroadcast(event: "position") { message in
+      if let meta = message["payload"]?.objectValue?["meta"]?.objectValue,
+         let replayed = meta["replayed"]?.boolValue,
          replayed {
-        print("Replayed message: \(meta["id"] ?? "")")
+        print("Replayed message: \(meta["id"]?.stringValue ?? "")")
       }
     }
+    .store(in: &subscriptions)
 
     await channel.subscribe()
     ```
