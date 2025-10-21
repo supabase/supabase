@@ -6,7 +6,7 @@ export const FEATURE_PREVIEWS = [
     name: 'Security notification templates',
     discussionsUrl: undefined,
     isNew: true,
-    isPlatformOnly: false,
+    isPlatformOnly: true,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI,
