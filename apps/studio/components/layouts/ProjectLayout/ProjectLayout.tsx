@@ -345,9 +345,13 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
-  // [jordi] handle redirect to home for building state
+  // handle redirect to home for building state
   const shouldRedirectToHomeForBuilding =
     isHomeNewFlag && requiresDbConnection && isProjectBuilding && !isBranchesPage && !isHomePage
+
+  // We won't be showing the building state with the new home page
+  const shouldShowBuildingState =
+    requiresDbConnection && isProjectBuilding && !isBranchesPage && !(isHomeNewFlag && isHomePage)
 
   useEffect(() => {
     if (shouldRedirectToHomeForBuilding && ref) {
@@ -399,12 +403,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <Loading />
   }
 
-  if (
-    requiresDbConnection &&
-    isProjectBuilding &&
-    !isBranchesPage &&
-    !(isHomeNewFlag && isHomePage) // [jordi] We won't be showing the building state with the new home page
-  ) {
+  if (shouldShowBuildingState) {
     return <BuildingState />
   }
 
