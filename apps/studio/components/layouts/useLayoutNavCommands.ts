@@ -11,6 +11,7 @@ import { useReportsGotoCommands } from './ReportsLayout/Reports.Commands'
 import { useSqlEditorGotoCommands } from './SQLEditorLayout/SqlEditor.Commands'
 import { useStorageGotoCommands } from '../interfaces/Storage/Storage.Commands'
 import { useTableEditorGotoCommands } from './TableEditorLayout/TableEditor.Commands'
+import { useRealtimeGotoCommands } from './RealtimeLayout/Realtime.Commands'
 
 export function useLayoutNavCommands() {
   const isLoggedIn = useIsLoggedIn()
@@ -27,4 +28,5 @@ export function useLayoutNavCommands() {
   useApiDocsGotoCommands({ enabled: isLoggedIn })
   useProjectSettingsGotoCommands({ enabled: isLoggedIn })
   useIntegrationsGotoCommands({ enabled: isLoggedIn })
+  useRealtimeGotoCommands({ enabled: isLoggedIn })
 }
