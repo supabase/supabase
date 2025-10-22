@@ -55,16 +55,16 @@ This method works for all PostgreSQL versions using CLI tools.
 
 ```sql
 -- Check database size
-SELECT pg_size_pretty(pg_database_size(current_database())) AS size;
+select pg_size_pretty(pg_database_size(current_database())) as size;
 
 -- Check PostgreSQL version
-SELECT version();
+select version();
 
 -- List installed extensions
-SELECT * FROM pg_extension ORDER BY extname;
+select * from pg_extension order by extname;
 
 -- Check active connections
-SELECT count(*) FROM pg_stat_activity;
+select count(*) from pg_stat_activity;
 ```
 
 #### Check Available Extensions in Supabase
@@ -114,6 +114,7 @@ tmux a -t migration || tmux new -s migration
    - Connection format: `postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres`
 
 **Important Notes**:
+
 - **Users/roles are not migrated** - You'll need to recreate roles and privileges after import ([Supabase Roles Guide](https://supabase.com/blog/postgres-roles-and-privileges))
 - **Row Level Security (RLS) status on tables is not migrated** - You'll need to enable RLS for tables after migration.
 
@@ -171,6 +172,7 @@ pg_dump \
 ```
 
 **Notes about dump flags**:
+
 - `--no-owner --no-privileges`: Applied at dump time to prevent Supabase user management conflicts. While these could be used in pg_restore instead, applying them during dump keeps the dump file cleaner and more portable.
 - `--no-subscriptions`: Logical replication subscriptions won't work in the target
 - The dump captures all data and schema but excludes ownership/privileges that would conflict with Supabase's managed environment
@@ -184,11 +186,11 @@ Run `pg_dump --help` for a full list of options.
 #### Recommended Parallelization (-j values)
 
 | Database Size | Testing (no maintenance window) | Production (with maintenance window) | Limiting Factor |
-|--------------|--------------------------------|-------------------------------------|-----------------|
-| < 10 GB | 2 | 4 | Source CPU |
-| 10-100 GB | 2-4 | 8 | Source CPU |
-| 100-500 GB | 4 | 16 | Disk IOPS |
-| 500 GB - 1 TB | 4-8 | 16-32 | Disk IOPS + CPU |
+| ------------- | ------------------------------- | ------------------------------------ | --------------- |
+| < 10 GB       | 2                               | 4                                    | Source CPU      |
+| 10-100 GB     | 2-4                             | 8                                    | Source CPU      |
+| 100-500 GB    | 4                               | 16                                   | Disk IOPS       |
+| 500 GB - 1 TB | 4-8                             | 16-32                                | Disk IOPS + CPU |
 
 **Note**: For testing without a maintenance window, use lower -j values to avoid impacting production performance.
 
@@ -202,7 +204,7 @@ export SUPABASE_DB_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].po
 
 # Determine restore parallelization based on your Supabase compute size:
 # Free tier: 2 cores → use -j 2
-# Small compute: 2 cores → use -j 2  
+# Small compute: 2 cores → use -j 2
 # Medium compute: 4 cores → use -j 4
 # Large compute: 8 cores → use -j 8
 # XL compute: 16 cores → use -j 16
@@ -241,10 +243,10 @@ For PostgreSQL 18+, pg_dump includes statistics with `--with-statistics`, but yo
 
 ```sql
 -- Check row counts
-SELECT schemaname, tablename, n_live_tup 
-FROM pg_stat_user_tables 
-ORDER BY n_live_tup DESC LIMIT 20;
-
+select schemaname, tablename, n_live_tup
+from pg_stat_user_tables
+order by n_live_tup desc
+limit 20;
 -- Verify data with application-specific queries
 ```
 
@@ -257,13 +259,13 @@ ALTER DATABASE your_database_name SET default_transaction_read_only = false;
 ### Migration Time Estimates
 
 | Database Size | Dump Time | Restore Time | Total Time |
-|--------------|-----------|--------------|------------|
-| 10 GB | ~5 min | ~10 min | ~15 min |
-| 100 GB | ~30 min | ~45 min | ~1.5 hours |
-| 500 GB | ~2 hours | ~3 hours | ~5 hours |
-| 1 TB | ~4 hours | ~6 hours | ~10 hours |
+| ------------- | --------- | ------------ | ---------- |
+| 10 GB         | ~5 min    | ~10 min      | ~15 min    |
+| 100 GB        | ~30 min   | ~45 min      | ~1.5 hours |
+| 500 GB        | ~2 hours  | ~3 hours     | ~5 hours   |
+| 1 TB          | ~4 hours  | ~6 hours     | ~10 hours  |
 
-*Times vary based on hardware, network, and parallelization settings*
+_Times vary based on hardware, network, and parallelization settings_
 
 ### Important Notes
 
@@ -297,13 +299,14 @@ This method allows migration with minimal downtime using PostgreSQL's logical re
 #### Required Settings for Logical Replication
 
 - `wal_level = logical`
-- `max_wal_senders ≥ 1` 
+- `max_wal_senders ≥ 1`
 - `max_replication_slots ≥ 1`
 - Sufficient `max_connections` (current + 1 for subscription)
 
 #### Replica Identity
 
 Every table receiving UPDATE/DELETE must have a replica identity (typically a PRIMARY KEY). For tables without one:
+
 ```sql
 ALTER TABLE schema.table_name REPLICA IDENTITY FULL;
 ```
@@ -359,6 +362,7 @@ hostssl all            all     <supabase_ip_range>    md5
 ```
 
 Restart PostgreSQL:
+
 ```bash
 sudo systemctl restart postgresql
 sudo systemctl status postgresql
@@ -386,8 +390,8 @@ SELECT n.nspname, c.relname
 FROM pg_class c
 JOIN pg_namespace n ON n.oid = c.relnamespace
 LEFT JOIN pg_constraint pk ON pk.conrelid = c.oid AND pk.contype = 'p'
-WHERE c.relkind = 'r' 
-  AND pk.oid IS NULL 
+WHERE c.relkind = 'r'
+  AND pk.oid IS NULL
   AND n.nspname NOT IN ('pg_catalog','information_schema');
 
 -- For tables without a primary key, set REPLICA IDENTITY FULL
@@ -427,9 +431,9 @@ pg_restore \
 CREATE PUBLICATION supabase_migration FOR ALL TABLES;
 
 -- Or for specific tables only (doesn't require superuser)
-CREATE PUBLICATION supabase_migration FOR TABLE 
-  schema1.table1, 
-  schema1.table2, 
+CREATE PUBLICATION supabase_migration FOR TABLE
+  schema1.table1,
+  schema1.table2,
   public.table3;
 
 -- Verify publication was created
@@ -442,13 +446,13 @@ Connect to your Supabase database:
 
 ```sql
 -- Create subscription with SSL (recommended)
-CREATE SUBSCRIPTION supabase_subscription 
-CONNECTION 'host=<source_host> port=<source_port> user=<source_user> password=<source_password> dbname=<source_database> sslmode=require' 
+CREATE SUBSCRIPTION supabase_subscription
+CONNECTION 'host=<source_host> port=<source_port> user=<source_user> password=<source_password> dbname=<source_database> sslmode=require'
 PUBLICATION supabase_migration;
 
 -- Or without SSL (if source doesn't support it)
-CREATE SUBSCRIPTION supabase_subscription 
-CONNECTION 'host=<source_host> port=<source_port> user=<source_user> password=<source_password> dbname=<source_database> sslmode=disable' 
+CREATE SUBSCRIPTION supabase_subscription
+CONNECTION 'host=<source_host> port=<source_port> user=<source_user> password=<source_password> dbname=<source_database> sslmode=disable'
 PUBLICATION supabase_migration;
 ```
 
@@ -456,22 +460,23 @@ PUBLICATION supabase_migration;
 
 ```sql
 -- On Supabase (subscriber) - check subscription status
-SELECT * FROM pg_subscription_rel;
+select * from pg_subscription_rel;
+
 -- srsubstate = 'r' means ready (synchronized)
 -- srsubstate = 'i' means initializing
 -- srsubstate = 'd' means data is being copied
 
 -- Overall subscription status
-SELECT * FROM pg_stat_subscription;
+select * from pg_stat_subscription;
 
 -- On source database - check replication status
-SELECT * FROM pg_stat_replication;
+select * from pg_stat_replication;
 
 -- Check replication lag
-SELECT 
+select
   slot_name,
-  pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)) AS lag_size
-FROM pg_replication_slots;
+  pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)) as lag_size
+from pg_replication_slots;
 ```
 
 Wait until all tables show `srsubstate = 'r'` (ready) status.
@@ -501,15 +506,17 @@ psql "$SUPABASE_DB_URL" -f sequences.sql
 ### Step 9: Switch to Supabase
 
 1. Ensure replication lag is zero:
+
 ```sql
 -- On Supabase
-SELECT * FROM pg_stat_subscription;
+select * from pg_stat_subscription;
 -- Check that latest_end_lsn is current
 ```
 
 2. Stop writes to the source database (if not already read-only)
 
 3. Drop subscription on Supabase:
+
 ```sql
 DROP SUBSCRIPTION supabase_subscription;
 ```
@@ -521,6 +528,7 @@ DROP SUBSCRIPTION supabase_subscription;
 ### Step 10: Cleanup
 
 On source database (after successful migration):
+
 ```sql
 -- Remove publication
 DROP PUBLICATION supabase_migration;
@@ -535,14 +543,14 @@ DROP REPLICATION SLOT slot_name;  -- if any remain
 
 ### Troubleshooting Logical Replication
 
-| Issue | Solution |
-|-------|----------|
-| "could not connect to the publisher" | Check network connectivity, firewall rules, pg_hba.conf |
-| "role does not exist" | Ensure replication user exists on source with REPLICATION privilege |
-| "publication does not exist" | Verify publication name and that it was created successfully |
-| Replication lag growing | Check network bandwidth, source database load, add more WAL senders |
-| Tables stuck in 'i' state | Check for locks on source tables, verify table structure matches |
-| "out of replication slots" | Increase max_replication_slots in postgresql.conf |
+| Issue                                | Solution                                                            |
+| ------------------------------------ | ------------------------------------------------------------------- |
+| "could not connect to the publisher" | Check network connectivity, firewall rules, pg_hba.conf             |
+| "role does not exist"                | Ensure replication user exists on source with REPLICATION privilege |
+| "publication does not exist"         | Verify publication name and that it was created successfully        |
+| Replication lag growing              | Check network bandwidth, source database load, add more WAL senders |
+| Tables stuck in 'i' state            | Check for locks on source tables, verify table structure matches    |
+| "out of replication slots"           | Increase max_replication_slots in postgresql.conf                   |
 
 ### Important Limitations
 
@@ -557,12 +565,14 @@ For detailed restrictions, see [PostgreSQL Logical Replication Restrictions](htt
 ### When to Use Which Method
 
 **Use Dump/Restore when:**
+
 - Downtime window is acceptable
 - Source is PostgreSQL < 10
 - Simpler process preferred
 - Cannot configure logical replication on the source
 
 **Use Logical Replication when:**
+
 - Minimal downtime required
 - PostgreSQL 10+ on both sides
 - Can modify source configuration
