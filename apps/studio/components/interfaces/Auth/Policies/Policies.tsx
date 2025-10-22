@@ -1,7 +1,7 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEmpty } from 'lodash'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -11,15 +11,11 @@ import {
 } from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { ResponseError } from 'types'
 import { Button, Card, CardContent } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-
-const EMPTY_POLICIES: PostgresPolicy[] = []
 
 interface PoliciesProps {
   search?: string
@@ -27,10 +23,6 @@ interface PoliciesProps {
   tables: PolicyTableRowProps['table'][]
   hasTables: boolean
   isLocked: boolean
-  policies: PostgresPolicy[]
-  isLoadingPolicies: boolean
-  isPoliciesError: boolean
-  policiesError?: ResponseError | Error
   visibleTableIds: Set<number>
   onSelectCreatePolicy: (table: string) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
@@ -43,10 +35,6 @@ export const Policies = ({
   tables,
   hasTables,
   isLocked,
-  policies,
-  isLoadingPolicies,
-  isPoliciesError,
-  policiesError,
   visibleTableIds,
   onSelectCreatePolicy,
   onSelectEditPolicy: onSelectEditPolicyAI,
@@ -54,7 +42,6 @@ export const Policies = ({
 }: PoliciesProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
 
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
     id: number
@@ -132,33 +119,6 @@ export const Policies = ({
     })
   }
 
-  const exposedSchemas = useMemo(() => {
-    if (!postgrestConfig?.db_schema) return []
-    return postgrestConfig.db_schema
-      .split(',')
-      .map((schema) => schema.trim())
-      .filter((schema) => schema.length > 0)
-  }, [postgrestConfig?.db_schema])
-
-  const policiesByTable = useMemo(() => {
-    const map = new Map<string, PostgresPolicy[]>()
-    policies.forEach((policy) => {
-      const key = `${policy.schema}.${policy.table}`
-      const existing = map.get(key)
-      if (existing) {
-        existing.push(policy)
-      } else {
-        map.set(key, [policy])
-      }
-    })
-
-    map.forEach((policyList) => {
-      policyList.sort((a, b) => a.name.localeCompare(b.name))
-    })
-
-    return map
-  }, [policies])
-
   const handleCreatePolicy = useCallback(
     (tableData: PolicyTableRowProps['table']) => {
       onSelectCreatePolicy(tableData.name)
@@ -201,13 +161,6 @@ export const Policies = ({
                     onSelectCreatePolicy={handleCreatePolicy}
                     onSelectEditPolicy={onSelectEditPolicy}
                     onSelectDeletePolicy={onSelectDeletePolicy}
-                    policies={
-                      policiesByTable.get(`${table.schema}.${table.name}`) ?? EMPTY_POLICIES
-                    }
-                    isLoadingPolicies={isLoadingPolicies}
-                    isPoliciesError={isPoliciesError}
-                    policiesError={policiesError}
-                    exposedSchemas={exposedSchemas}
                   />
                 </section>
               )

@@ -2,15 +2,18 @@ import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useMemo, useState } from 'react'
 
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
+import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const RealtimePolicies = () => {
   const { data: project } = useSelectedProjectQuery()
+  const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
 
   const [showPolicyEditor, setShowPolicyEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
@@ -44,6 +47,13 @@ export const RealtimePolicies = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const exposedSchemas = useMemo(() => {
+    if (!postgrestConfig?.db_schema) return []
+    return postgrestConfig.db_schema
+      .split(',')
+      .map((schema) => schema.trim())
+      .filter((schema) => schema.length > 0)
+  }, [postgrestConfig?.db_schema])
 
   return (
     <>
@@ -52,25 +62,29 @@ export const RealtimePolicies = () => {
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess && (
-        <Policies
-          schema="realtime"
-          tables={filteredTables}
-          hasTables
-          isLocked={false}
+        <PoliciesDataProvider
           policies={policies ?? []}
-          isLoadingPolicies={isLoadingPolicies}
+          isPoliciesLoading={isLoadingPolicies}
           isPoliciesError={isPoliciesError}
-          policiesError={policiesError}
-          visibleTableIds={visibleTableIds}
-          onSelectCreatePolicy={(_tableName) => {
-            setSelectedPolicyToEdit(undefined)
-            setShowPolicyEditor(true)
-          }}
-          onSelectEditPolicy={(policy) => {
-            setSelectedPolicyToEdit(policy)
-            setShowPolicyEditor(true)
-          }}
-        />
+          policiesError={policiesError ?? undefined}
+          exposedSchemas={exposedSchemas}
+        >
+          <Policies
+            schema="realtime"
+            tables={filteredTables}
+            hasTables
+            isLocked={false}
+            visibleTableIds={visibleTableIds}
+            onSelectCreatePolicy={(_tableName) => {
+              setSelectedPolicyToEdit(undefined)
+              setShowPolicyEditor(true)
+            }}
+            onSelectEditPolicy={(policy) => {
+              setSelectedPolicyToEdit(policy)
+              setShowPolicyEditor(true)
+            }}
+          />
+        </PoliciesDataProvider>
       )}
 
       <PolicyEditorPanel

@@ -7,7 +7,6 @@ import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { ResponseError } from 'types'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -23,15 +22,10 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
+import type { PolicyTable } from './PolicyTableRow.types'
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
-
-export type PolicyTable = {
-  id: number
-  schema: string
-  name: string
-  rls_enabled: boolean
-}
 
 export interface PolicyTableRowProps {
   table: PolicyTable
@@ -40,11 +34,6 @@ export interface PolicyTableRowProps {
   onSelectCreatePolicy: (table: PolicyTable) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
-  policies: PostgresPolicy[]
-  isLoadingPolicies: boolean
-  isPoliciesError: boolean
-  policiesError?: ResponseError | Error
-  exposedSchemas: string[]
 }
 
 const PolicyTableRowComponent = ({
@@ -54,14 +43,16 @@ const PolicyTableRowComponent = ({
   onSelectCreatePolicy = noop,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
-  policies,
-  isLoadingPolicies,
-  isPoliciesError,
-  policiesError,
-  exposedSchemas,
 }: PolicyTableRowProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { getPoliciesForTable, isPoliciesLoading, isPoliciesError, policiesError, exposedSchemas } =
+    usePoliciesData()
+
+  const policies = useMemo(
+    () => getPoliciesForTable(table.schema, table.name),
+    [getPoliciesForTable, table.schema, table.name]
+  )
 
   // [Joshen] Changes here are so that warnings are more accurate and granular instead of purely relying if RLS is disabled or enabled
   // The following scenarios are technically okay if the table has RLS disabled, in which it won't be publicly readable / writable
@@ -73,7 +64,7 @@ const PolicyTableRowComponent = ({
   // Eventually if the security lints are able to cover those, we can look to using them as the source of truth instead then
   const isRLSEnabled = table.rls_enabled
   const isTableExposedThroughAPI = useMemo(
-    () => exposedSchemas.includes(table.schema),
+    () => exposedSchemas.has(table.schema),
     [exposedSchemas, table.schema]
   )
 
@@ -91,7 +82,7 @@ const PolicyTableRowComponent = ({
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
 
-  const showPolicies = !isLoadingPolicies && !isPoliciesError
+  const showPolicies = !isPoliciesLoading && !isPoliciesError
 
   return (
     <Card className={cn(isPubliclyReadableWritable && 'border-warning-500')}>
@@ -135,7 +126,7 @@ const PolicyTableRowComponent = ({
         </Alert_Shadcn_>
       )}
 
-      {isLoadingPolicies && (
+      {isPoliciesLoading && (
         <CardContent>
           <ShimmeringLoader />
         </CardContent>

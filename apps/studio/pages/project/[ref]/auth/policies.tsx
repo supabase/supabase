@@ -5,6 +5,7 @@ import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
+import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
@@ -19,6 +20,7 @@ import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -51,18 +53,18 @@ const getTableFilterState = (
   }
 
   const filter = searchString.toLowerCase()
-  const matchingPolicyTables = new Set(
+  const matchingPolicyKeys = new Set(
     policies
       // @ts-ignore Type instantiation is excessively deep and possibly infinite
       .filter((policy: PostgresPolicy) => policy.name.toLowerCase().includes(filter))
-      .map((policy) => policy.table)
+      .map((policy) => `${policy.schema}.${policy.table}`)
   )
 
   sortedTables.forEach((table) => {
     const matches =
       table.name.toLowerCase().includes(filter) ||
       table.id.toString() === filter ||
-      matchingPolicyTables.has(table.name)
+      matchingPolicyKeys.has(`${table.schema}.${table.name}`)
 
     if (matches) {
       visibleTableIds.add(table.id)
@@ -83,6 +85,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   )
   const deferredSearchString = useDeferredValue(searchString)
   const { data: project } = useSelectedProjectQuery()
+  const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const [selectedTable, setSelectedTable] = useState<string>()
@@ -120,6 +123,13 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     () => getTableFilterState(tables ?? [], policies ?? [], searchString),
     [tables, policies, searchString]
   )
+  const exposedSchemas = useMemo(() => {
+    if (!postgrestConfig?.db_schema) return []
+    return postgrestConfig.db_schema
+      .split(',')
+      .map((schema) => schema.trim())
+      .filter((schema) => schema.length > 0)
+  }, [postgrestConfig?.db_schema])
   const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'policies'
@@ -191,21 +201,25 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
         {isSuccess && (
-          <Policies
-            search={deferredSearchString}
-            schema={schema}
-            tables={tablesWithVisibility}
-            hasTables={(tables ?? []).length > 0}
-            isLocked={isSchemaLocked}
+          <PoliciesDataProvider
             policies={policies ?? []}
-            isLoadingPolicies={isLoadingPolicies}
+            isPoliciesLoading={isLoadingPolicies}
             isPoliciesError={isPoliciesError}
-            policiesError={policiesError}
-            visibleTableIds={visibleTableIds}
-            onSelectCreatePolicy={handleSelectCreatePolicy}
-            onSelectEditPolicy={handleSelectEditPolicy}
-            onResetSearch={handleResetSearch}
-          />
+            policiesError={policiesError ?? undefined}
+            exposedSchemas={exposedSchemas}
+          >
+            <Policies
+              search={deferredSearchString}
+              schema={schema}
+              tables={tablesWithVisibility}
+              hasTables={(tables ?? []).length > 0}
+              isLocked={isSchemaLocked}
+              visibleTableIds={visibleTableIds}
+              onSelectCreatePolicy={handleSelectCreatePolicy}
+              onSelectEditPolicy={handleSelectEditPolicy}
+              onResetSearch={handleResetSearch}
+            />
+          </PoliciesDataProvider>
         )}
 
         <PolicyEditorPanel
