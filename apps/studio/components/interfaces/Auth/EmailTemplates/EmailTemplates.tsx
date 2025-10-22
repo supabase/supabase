@@ -7,7 +7,7 @@ import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import TemplateEditor from './TemplateEditor'
 
-const EmailTemplates = () => {
+export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -25,7 +25,11 @@ const EmailTemplates = () => {
   return (
     <div className="w-full">
       {isError && (
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        <AlertError
+          className="mt-12"
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration"
+        />
       )}
       {isLoading && (
         <div className="w-[854px] mt-12">
@@ -68,5 +72,3 @@ const EmailTemplates = () => {
     </div>
   )
 }
-
-export default EmailTemplates

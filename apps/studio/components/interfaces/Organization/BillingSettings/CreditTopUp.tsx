@@ -12,10 +12,12 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationCreditTopUpMutation } from 'data/organizations/organization-credit-top-up-mutation'
 import { subscriptionKeys } from 'data/subscriptions/keys'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import {
   Alert_Shadcn_,
@@ -36,10 +38,8 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import type { PaymentMethodElementRef } from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
-import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import type { PaymentMethodElementRef } from './PaymentMethods/NewPaymentMethodElement'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -63,11 +63,10 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
   }>(null)
 
-  const canTopUpCredits = useCheckPermissions(
+  const { can: canTopUpCredits, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
-  const isPermissionsLoaded = usePermissionsLoaded()
 
   const {
     mutateAsync: topUpCredits,
@@ -238,8 +237,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
             <DialogDescription className="space-y-2">
               <p className="prose text-sm">
                 On successful payment, an invoice will be issued and you'll be granted credits.
-                Credits will be applied to outstanding and future invoices and are not refundable.
-                The topped up credits do not expire.
+                Credits will be applied to future invoices only and are not refundable. The topped
+                up credits do not expire.
               </p>
               <p className="prose text-sm">
                 For larger discounted credit packages, please{' '}

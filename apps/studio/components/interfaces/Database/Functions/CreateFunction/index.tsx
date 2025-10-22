@@ -401,7 +401,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               disabled={isCreating || isUpdating}
               loading={isCreating || isUpdating}
             >
-              Confirm
+              {isEditing ? 'Save' : 'Create'} function
             </Button>
           </SheetFooter>
         </div>

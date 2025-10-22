@@ -31,7 +31,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
+import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Admonition } from 'ui-patterns/admonition'
@@ -47,7 +47,7 @@ const NON_DEDICATED_IO_RESOURCES = [
   'ci_2xlarge',
 ]
 
-const InfrastructureActivity = () => {
+export const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -59,13 +59,14 @@ const InfrastructureActivity = () => {
   })
   const isFreePlan = organization?.plan?.id === 'free'
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
 
-  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
+  const { setShowNewReplicaPanel } = useShowNewReplicaPanel()
 
   const { computeInstance } = getAddons(selectedAddons)
   const hasDedicatedIOResources =
@@ -202,7 +203,7 @@ const InfrastructureActivity = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer id="infrastructure-activity">
         <div className="mx-auto flex flex-col gap-10 pt-6">
           <div>
             <p className="text-xl">Infrastructure Activity</p>
@@ -404,7 +405,7 @@ const InfrastructureActivity = () => {
                       >
                         <DocsButton
                           abbrev={false}
-                          href="https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops"
+                          href={`${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`}
                         />
                       </Admonition>
                     </>
@@ -447,5 +448,3 @@ const InfrastructureActivity = () => {
     </>
   )
 }
-
-export default InfrastructureActivity

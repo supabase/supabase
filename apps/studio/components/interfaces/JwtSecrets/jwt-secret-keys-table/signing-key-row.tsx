@@ -39,7 +39,7 @@ interface SigningKeyRowProps {
   isLoading?: boolean
 }
 
-const MotionTableRow = motion(TableRow)
+const MotionTableRow = motion.create(TableRow)
 
 export const SigningKeyRow = ({
   signingKey,

@@ -3,11 +3,9 @@ import { MoreVertical, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { toast } from 'sonner'
 import {
   Button,
@@ -23,15 +21,14 @@ interface ReviewRowProps {
 
 export const ReviewRow = ({ branch }: ReviewRowProps) => {
   const router = useRouter()
-  const { data: project } = useSelectedProjectQuery()
-  const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
+  const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onSuccess: () => {
       toast.success('Branch marked as not ready for review')
       queryClient.invalidateQueries({
-        queryKey: branchKeys.list(project?.parent_project_ref || projectRef),
+        queryKey: branchKeys.list(projectRef),
       })
     },
     onError: (error) => {
@@ -40,16 +37,15 @@ export const ReviewRow = ({ branch }: ReviewRowProps) => {
   })
 
   const handleRowClick = () => {
-    router.push(`/project/${branch.project_ref}/merge`)
+    router.push(`/project/${branchRef}/merge`)
   }
 
   const handleNotReadyForReview = (e?: Event) => {
     e?.preventDefault()
     e?.stopPropagation()
-    if (!projectRef) return
 
     updateBranch({
-      id: branch.id,
+      branchRef,
       projectRef,
       requestReview: false,
     })

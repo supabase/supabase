@@ -1,7 +1,6 @@
 import { TeamSettings } from 'components/interfaces/Organization/TeamSettings/TeamSettings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -16,9 +15,7 @@ const OrgTeamSettings: NextPageWithLayout = () => {
 
 OrgTeamSettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
-    </OrganizationLayout>
+    <OrganizationLayout>{page}</OrganizationLayout>
   </DefaultLayout>
 )
 

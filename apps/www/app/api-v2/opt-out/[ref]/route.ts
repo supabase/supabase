@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@supabase/supabase-js'
+import { NextRequest, NextResponse } from 'next/server'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_EMAIL_ABUSE_URL as string
 const supabaseServiceKey = process.env.EMAIL_ABUSE_SERVICE_KEY as string
@@ -78,7 +79,9 @@ export async function POST(req: NextRequest, props: { params: Promise<{ ref: str
       .from('manual_reports')
       .insert([{ project_ref: ref, reason, email }])
 
-    if (supabaseError) throw new Error(`Supabase error: ${supabaseError.message}`)
+    if (supabaseError) {
+      throw new Error(`Supabase error: ${supabaseError.message}`)
+    }
 
     const response = await fetch(process.env.EMAIL_REPORT_SLACK_WEBHOOK as string, {
       method: 'POST',
@@ -93,6 +96,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ ref: str
       { status: 200 }
     )
   } catch (error) {
+    Sentry.captureException(error)
     const errorMessage = (error as Error).message
     return NextResponse.json(
       { error: `Failure: Could not send post to Slack. Error: ${errorMessage}` },

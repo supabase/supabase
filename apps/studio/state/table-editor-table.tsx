@@ -61,8 +61,8 @@ export const createTableEditorTableState = ({
       const gridColumns = getInitialGridColumns(
         getGridColumns(supaTable, {
           tableId: table.id,
-          editable,
-          onAddColumn: editable ? onAddColumn : undefined,
+          editable: state.editable,
+          onAddColumn: state.editable ? onAddColumn : undefined,
           onExpandJSONEditor,
           onExpandTextEditor,
         }),

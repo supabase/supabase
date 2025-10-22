@@ -16,7 +16,7 @@ import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-conn
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { GitHubConnection } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
@@ -47,6 +47,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
+    <title>GitHub icon</title>
     <path
       fill="#ffffff"
       fillRule="evenodd"
@@ -70,28 +71,44 @@ const GitHubIntegrationConnectionForm = ({
   const [isConfirmingBranchChange, setIsConfirmingBranchChange] = useState(false)
   const [isConfirmingRepoChange, setIsConfirmingRepoChange] = useState(false)
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
-  const isParentProject = !Boolean(selectedProject?.parent_project_ref)
+  const isParentProject = !selectedProject?.parent_project_ref
 
-  const canUpdateGitHubConnection = useCheckPermissions(
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )
-  const canCreateGitHubConnection = useCheckPermissions(
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
 
-  const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
+  const { data: gitHubAuthorization, refetch: refetchGitHubAuthorization } =
     useGitHubAuthorizationQuery()
 
-  const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
-    any[]
-  >({
+  const {
+    data: githubReposData,
+    isLoading: isLoadingGitHubRepos,
+    refetch: refetchGitHubRepositories,
+  } = useGitHubRepositoriesQuery({
     enabled: Boolean(gitHubAuthorization),
   })
 
-  const { mutate: updateBranch } = useBranchUpdateMutation()
+  const refetchGitHubAuthorizationAndRepositories = () => {
+    setTimeout(() => {
+      refetchGitHubAuthorization()
+      refetchGitHubRepositories()
+    }, 2000) // 2 second to delay to let github authorization and repositories to be updated
+  }
+
+  const { mutate: updateBranch } = useBranchUpdateMutation({
+    onSuccess: () => {
+      toast.success('Production branch settings successfully updated')
+    },
+  })
   const { mutate: createBranch } = useBranchCreateMutation({
+    onSuccess: () => {
+      toast.success('Production branch settings successfully updated')
+    },
     onError: (error) => {
       console.error('Failed to enable branching:', error)
     },
@@ -106,7 +123,11 @@ const GitHubIntegrationConnectionForm = ({
     useCheckGithubBranchValidity({ onError: () => {} })
 
   const { mutate: createConnection, isLoading: isCreatingConnection } =
-    useGitHubConnectionCreateMutation()
+    useGitHubConnectionCreateMutation({
+      onSuccess: () => {
+        toast.success('GitHub integration successfully updated')
+      },
+    })
 
   const { mutateAsync: deleteConnection, isLoading: isDeletingConnection } =
     useGitHubConnectionDeleteMutation({
@@ -120,7 +141,7 @@ const GitHubIntegrationConnectionForm = ({
 
   const githubRepos = useMemo(
     () =>
-      githubReposData?.map((repo: any) => ({
+      githubReposData?.map((repo) => ({
         id: repo.id.toString(),
         name: repo.name,
         installation_id: repo.installation_id,
@@ -151,7 +172,7 @@ const GitHubIntegrationConnectionForm = ({
               repositoryId: Number(repositoryId),
               branchName: val.branchName,
             })
-          } catch (error) {
+          } catch {
             const selectedRepo = githubRepos.find((repo) => repo.id === repositoryId)
             const repoName =
               selectedRepo?.name || connection?.repository.name || 'selected repository'
@@ -232,7 +253,7 @@ const GitHubIntegrationConnectionForm = ({
       },
     })
 
-    if (!prodBranch?.id) {
+    if (!prodBranch) {
       createBranch({
         projectRef: selectedProject.ref,
         branchName: 'main',
@@ -241,12 +262,11 @@ const GitHubIntegrationConnectionForm = ({
       })
     } else {
       updateBranch({
-        id: prodBranch.id,
+        branchRef: prodBranch.project_ref,
         projectRef: selectedProject.ref,
         gitBranch: data.branchName,
       })
     }
-    toast.success('GitHub integration successfully updated')
   }
 
   const handleUpdateConnection = async (
@@ -282,15 +302,15 @@ const GitHubIntegrationConnectionForm = ({
       },
     })
 
-    if (prodBranch?.id) {
+    if (prodBranch) {
       updateBranch({
-        id: prodBranch.id,
+        branchRef: prodBranch.project_ref,
         projectRef: selectedProject.ref,
         gitBranch: data.enableProductionSync ? data.branchName : '',
+        branchName: data.branchName || 'main',
       })
     }
 
-    toast.success('GitHub integration successfully updated')
     setIsConfirmingBranchChange(false)
   }
 
@@ -328,11 +348,11 @@ const GitHubIntegrationConnectionForm = ({
     const data = githubSettingsForm.getValues()
     const selectedRepo = githubRepos.find((repo) => repo.id === data.repositoryId)
 
-    if (!selectedRepo || !connection) return
+    if (!selectedRepo || !connection || !selectedOrganization?.id) return
 
     try {
       await deleteConnection({
-        organizationId: selectedOrganization!.id,
+        organizationId: selectedOrganization.id,
         connectionId: connection.id,
       })
 
@@ -344,15 +364,6 @@ const GitHubIntegrationConnectionForm = ({
       toast.error('Failed to change repository')
     }
   }
-
-  useEffect(() => {
-    if (selectedRepository) {
-      githubSettingsForm.setValue(
-        'branchName',
-        githubRepos.find((repo) => repo.id === selectedRepository.id)?.default_branch || 'main'
-      )
-    }
-  }, [selectedRepository])
 
   useEffect(() => {
     if (connection) {
@@ -390,7 +401,10 @@ const GitHubIntegrationConnectionForm = ({
           </p>
           <Button
             onClick={() => {
-              openInstallGitHubIntegrationWindow('authorize')
+              openInstallGitHubIntegrationWindow(
+                'authorize',
+                refetchGitHubAuthorizationAndRepositories
+              )
             }}
           >
             Authorize GitHub
@@ -464,6 +478,10 @@ const GitHubIntegrationConnectionForm = ({
                                   onSelect={() => {
                                     field.onChange(repo.id)
                                     setRepoComboboxOpen(false)
+                                    githubSettingsForm.setValue(
+                                      'branchName',
+                                      repo.default_branch || 'main'
+                                    )
                                   }}
                                 >
                                   <div className="bg-black shadow rounded p-1 w-5 h-5 flex justify-center items-center">
@@ -478,7 +496,12 @@ const GitHubIntegrationConnectionForm = ({
                             <CommandGroup_Shadcn_>
                               <CommandItem_Shadcn_
                                 className="flex gap-2 items-center cursor-pointer"
-                                onSelect={() => openInstallGitHubIntegrationWindow('install')}
+                                onSelect={() =>
+                                  openInstallGitHubIntegrationWindow(
+                                    'install',
+                                    refetchGitHubAuthorizationAndRepositories
+                                  )
+                                }
                               >
                                 <PlusIcon size={16} />
                                 Add GitHub Repositories

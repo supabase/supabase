@@ -23,15 +23,16 @@ import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
 import {
-  UpdateTableBody,
-  updateTable as updateTableMutation,
-} from 'data/tables/table-update-mutation'
-import { getTables } from 'data/tables/tables-query'
-import {
   getTable,
   RetrievedTableColumn,
   RetrieveTableResult,
 } from 'data/tables/table-retrieve-query'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from 'data/tables/table-update-mutation'
+import { getTables } from 'data/tables/tables-query'
+import { sendEvent } from 'data/telemetry/send-event-mutation'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -41,6 +42,7 @@ import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { executeWithRetry } from 'data/table-rows/table-rows-query'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -460,6 +462,7 @@ export const createTable = async ({
   foreignKeyRelations,
   isRLSEnabled,
   importContent,
+  organizationSlug,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -473,6 +476,7 @@ export const createTable = async ({
   foreignKeyRelations: ForeignKey[]
   isRLSEnabled: boolean
   importContent?: ImportContent
+  organizationSlug?: string
 }) => {
   const queryClient = getQueryClient()
 
@@ -482,6 +486,26 @@ export const createTable = async ({
     connectionString: connectionString,
     payload: payload,
   })
+
+  // Track table creation event
+  try {
+    await sendEvent({
+      event: {
+        action: 'table_created',
+        properties: {
+          method: 'table_editor',
+          schema_name: payload.schema,
+          table_name: payload.name,
+        },
+        groups: {
+          project: projectRef,
+          ...(organizationSlug && { organization: organizationSlug }),
+        },
+      },
+    })
+  } catch (error) {
+    console.error('Failed to track table creation event:', error)
+  }
 
   const table = await queryClient.fetchQuery({
     queryKey: tableKeys.retrieve(projectRef, payload.name, payload.schema),
@@ -507,6 +531,26 @@ export const createTable = async ({
         schema: table.schema,
         payload: { rls_enabled: isRLSEnabled },
       })
+
+      // Track RLS enablement event
+      try {
+        await sendEvent({
+          event: {
+            action: 'table_rls_enabled',
+            properties: {
+              method: 'table_editor',
+              schema_name: table.schema,
+              table_name: table.name,
+            },
+            groups: {
+              project: projectRef,
+              ...(organizationSlug && { organization: organizationSlug }),
+            },
+          },
+        })
+      } catch (error) {
+        console.error('Failed to track RLS enablement event:', error)
+      }
     }
 
     // Then insert the columns - we don't do Promise.all as we want to keep the integrity
@@ -661,6 +705,7 @@ export const updateTable = async ({
   foreignKeyRelations,
   existingForeignKeyRelations,
   primaryKey,
+  organizationSlug,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -671,6 +716,7 @@ export const updateTable = async ({
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
+  organizationSlug?: string
 }) => {
   const queryClient = getQueryClient()
 
@@ -701,6 +747,28 @@ export const updateTable = async ({
     schema: table.schema,
     payload,
   })
+
+  // Track RLS enablement if it's being turned on
+  if (payload.rls_enabled === true) {
+    try {
+      await sendEvent({
+        event: {
+          action: 'table_rls_enabled',
+          properties: {
+            method: 'table_editor',
+            schema_name: table.schema,
+            table_name: payload.name ?? table.name,
+          },
+          groups: {
+            project: projectRef,
+            ...(organizationSlug && { organization: organizationSlug }),
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Failed to track RLS enablement event:', error)
+    }
+  }
 
   const updatedTable = await queryClient.fetchQuery({
     queryKey: tableKeys.retrieve(
@@ -821,6 +889,47 @@ export const updateTable = async ({
   }
 }
 
+/**
+ * Used in insertRowsViaSpreadsheet + insertTableRows
+ */
+export const formatRowsForInsert = ({
+  rows,
+  headers,
+  columns = [],
+}: {
+  rows: any[]
+  headers: string[]
+  columns?: RetrieveTableResult['columns']
+}) => {
+  return rows.map((row: any) => {
+    const formattedRow: any = {}
+    headers.forEach((header) => {
+      const column = columns?.find((c) => c.name === header)
+      const originalValue = row[header]
+
+      if ((column?.format ?? '').includes('json')) {
+        formattedRow[header] = tryParseJson(originalValue)
+      } else if ((column?.data_type ?? '') === 'ARRAY') {
+        if (
+          typeof originalValue === 'string' &&
+          originalValue.startsWith('{') &&
+          originalValue.endsWith('}')
+        ) {
+          const formattedPostgresArraytoJsonArray = `[${originalValue.slice(1, originalValue.length - 1)}]`
+          formattedRow[header] = tryParseJson(formattedPostgresArraytoJsonArray)
+        } else {
+          formattedRow[header] = tryParseJson(originalValue)
+        }
+      } else if (originalValue === '') {
+        formattedRow[header] = column?.is_nullable ? null : ''
+      } else {
+        formattedRow[header] = originalValue
+      }
+    })
+    return formattedRow
+  })
+}
+
 export const insertRowsViaSpreadsheet = async (
   projectRef: string,
   connectionString: string | undefined | null,
@@ -843,25 +952,17 @@ export const insertRowsViaSpreadsheet = async (
       chunk: async (results: any, parser: any) => {
         parser.pause()
 
-        const formattedData = results.data.map((row: any) => {
-          const formattedRow: any = {}
-          selectedHeaders.forEach((header) => {
-            const column = table.columns?.find((c) => c.name === header)
-            if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
-              formattedRow[header] = tryParseJson(row[header])
-            } else if (row[header] === '') {
-              // if the cell is empty string, convert it to NULL
-              formattedRow[header] = column?.is_nullable ? null : ''
-            } else {
-              formattedRow[header] = row[header]
-            }
-          })
-          return formattedRow
+        const formattedData = formatRowsForInsert({
+          rows: results.data,
+          headers: selectedHeaders,
+          columns: table.columns,
         })
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
         try {
-          await executeSql({ projectRef, connectionString, sql: insertQuery })
+          await executeWithRetry(() =>
+            executeSql({ projectRef, connectionString, sql: insertQuery })
+          )
         } catch (error) {
           console.warn(error)
           insertError = error
@@ -894,19 +995,10 @@ export const insertTableRows = async (
   let insertError = undefined
   let insertProgress = 0
 
-  const formattedRows = rows.map((row: any) => {
-    const formattedRow: any = {}
-    selectedHeaders.forEach((header) => {
-      const column = table.columns?.find((c) => c.name === header)
-      if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
-        formattedRow[header] = tryParseJson(row[header])
-      } else if (row[header] === '') {
-        formattedRow[header] = column?.is_nullable ? null : ''
-      } else {
-        formattedRow[header] = row[header]
-      }
-    })
-    return formattedRow
+  const formattedRows = formatRowsForInsert({
+    rows,
+    headers: selectedHeaders,
+    columns: table.columns,
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)

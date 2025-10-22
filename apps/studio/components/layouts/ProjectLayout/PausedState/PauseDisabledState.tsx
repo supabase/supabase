@@ -10,7 +10,7 @@ import { useStorageArchiveCreateMutation } from 'data/storage/storage-archive-cr
 import { useStorageArchiveQuery } from 'data/storage/storage-archive-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Database, Storage } from 'icons'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -164,7 +164,7 @@ export const PauseDisabledState = () => {
           <a
             target="_blank"
             rel="noreferrer"
-            href="https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore"
+            href={`${DOCS_URL}/guides/platform/migrating-within-supabase/dashboard-restore`}
           >
             Restore backup to a new Supabase project guide
           </a>
@@ -173,7 +173,7 @@ export const PauseDisabledState = () => {
           <a
             target="_blank"
             rel="noreferrer"
-            href="https://supabase.com/docs/guides/local-development/restoring-downloaded-backup"
+            href={`${DOCS_URL}/guides/local-development/restoring-downloaded-backup`}
           >
             Restore backup on your local machine guide
           </a>

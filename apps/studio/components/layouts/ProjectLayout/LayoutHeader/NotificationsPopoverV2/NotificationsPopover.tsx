@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
@@ -10,7 +11,6 @@ import { useNotificationsV2Query } from 'data/notifications/notifications-v2-que
 import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
 import {
   Button,
@@ -24,7 +24,6 @@ import {
 } from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -40,7 +39,6 @@ export const NotificationsPopoverV2 = () => {
   // so opting to simplify and implement it here for now
   const rowHeights = useRef<{ [key: number]: number }>({})
 
-  const { data: projects } = useProjectsQuery({ enabled: open })
   const { data: organizations } = useOrganizationsQuery({ enabled: open })
   const {
     data,
@@ -208,7 +206,6 @@ export const NotificationsPopoverV2 = () => {
                         rowHeights.current = { ...rowHeights.current, [idx]: height }
                       }
                     },
-                    getProject: (ref: string) => projects?.find((project) => project.ref === ref)!,
                     getOrganizationById: (id: number) =>
                       organizations?.find((org) => org.id === id)!,
                     getOrganizationBySlug: (slug: string) =>

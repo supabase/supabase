@@ -1,25 +1,21 @@
-import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import SectionContent from '../SectionContent'
-import { CategoryAttribute } from '../Usage.constants'
-import { useOrgProjectsQuery } from 'data/projects/org-projects'
-import { PROJECT_STATUS } from 'lib/constants'
-import {
-  Button,
-  Alert_Shadcn_,
-  CriticalIcon,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
-} from 'ui'
-import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+
 import Panel from 'components/ui/Panel'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { formatBytes } from 'lib/helpers'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  CriticalIcon,
+} from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { SectionContent } from '../SectionContent'
+import { CategoryAttribute } from '../Usage.constants'
 
 export interface DatabaseSizeUsageProps {
   slug: string

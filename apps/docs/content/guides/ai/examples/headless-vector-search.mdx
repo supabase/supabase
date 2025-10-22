@@ -33,7 +33,7 @@ There are 3 steps to build similarity search inside your documentation:
 
 ### Prepare your database
 
-To prepare, create a [new Supabase project](https://database.new) and store the database and API credentials, which you can find in the project [settings](https://supabase.com/dashboard/project/_/settings).
+To prepare, create a [new Supabase project](https://database.new) and store the database and API credentials, which you can find in the project [settings](/dashboard/project/_/settings).
 
 Now we can use the [Headless Vector Search](https://github.com/supabase/headless-vector-search#set-up) instructions to set up the database:
 
@@ -42,7 +42,7 @@ Now we can use the [Headless Vector Search](https://github.com/supabase/headless
 3. Apply the database migrations: `supabase db push`
 4. Set your OpenAI key as a secret: `supabase secrets set OPENAI_API_KEY=sk-xxx`
 5. Deploy the Edge Functions: `supabase functions deploy --no-verify-jwt`
-6. Expose `docs` schema via API in Supabase Dashboard [settings](https://supabase.com/dashboard/project/_/settings/api) > `API Settings` > `Exposed schemas`
+6. Expose `docs` schema via API in Supabase Dashboard [settings](/dashboard/project/_/settings/api) > `API Settings` > `Exposed schemas`
 
 ### Ingest your documentation
 
@@ -112,6 +112,6 @@ const onSubmit = (e: Event) => {
 
 ## Resources
 
-- Read about how we built [ChatGPT for the Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs).
+- Read about how we built [ChatGPT for the Supabase Docs](/blog/chatgpt-supabase-docs).
 - Read the pgvector Docs for [Embeddings and vector similarity](/docs/guides/database/extensions/pgvector)
 - See how to build something like this from scratch [using Next.js](/docs/guides/ai/examples/nextjs-vector-search).

@@ -14,19 +14,24 @@ import {
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
-import { ProjectInfo } from 'data/projects/projects-query'
+import { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS, STRIPE_PUBLIC_KEY } from 'lib/constants'
+import {
+  DOCS_URL,
+  PRICING_TIER_PRODUCT_IDS,
+  PROJECT_STATUS,
+  STRIPE_PUBLIC_KEY,
+} from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import type { PaymentMethodElementRef } from '../PaymentMethods/NewPaymentMethodElement'
+import type { PaymentMethodElementRef } from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import PaymentMethodSelection from './PaymentMethodSelection'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -59,7 +64,7 @@ interface Props {
   subscriptionPreview: OrganizationBillingSubscriptionPreviewResponse | undefined
   subscription: any
   currentPlanMeta: any
-  projects: ProjectInfo[]
+  projects: OrgProject[]
 }
 
 export const SubscriptionPlanUpdateDialog = ({
@@ -187,11 +192,11 @@ export const SubscriptionPlanUpdateDialog = ({
     })
   }
 
-  const features = subscriptionPlanMeta?.features?.[0]?.features || []
+  const features = subscriptionPlanMeta?.features || []
   const topFeatures = features
 
   // Get current plan features for downgrade comparison
-  const currentPlanFeatures = currentPlanMeta?.features?.[0]?.features || []
+  const currentPlanFeatures = currentPlanMeta?.features || []
 
   // Features that will be lost when downgrading
   const featuresToLose =
@@ -351,9 +356,7 @@ export const SubscriptionPlanUpdateDialog = ({
                               Credits; additional projects start at <span translate="no">$10</span>
                               /month regardless of usage.{' '}
                               <Link
-                                href={
-                                  'https://supabase.com/docs/guides/platform/manage-your-usage/compute'
-                                }
+                                href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                                 target="_blank"
                               >
                                 Learn more
@@ -589,7 +592,7 @@ export const SubscriptionPlanUpdateDialog = ({
                         /month regardless of usage.{' '}
                       </div>
                       <Link
-                        href={'https://supabase.com/docs/guides/platform/manage-your-usage/compute'}
+                        href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                         target="_blank"
                         className="underline"
                       >

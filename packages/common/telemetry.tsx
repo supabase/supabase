@@ -54,6 +54,12 @@ export function handlePageTelemetry(
   // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
     const pageData = getSharedTelemetryData(pathname)
+
+    // Align frontend and backend session IDs for correlation
+    if (pageData.session_id) {
+      document.cookie = `session_id=${pageData.session_id}; path=/; SameSite=Lax`
+    }
+
     posthogClient.capturePageView({
       $current_url: pageData.page_url,
       $pathname: pageData.pathname,
@@ -63,6 +69,7 @@ export function handlePageTelemetry(
         ...(ref ? { project: ref } : {}),
       },
       page_title: pageData.page_title,
+      ...(pageData.session_id && { $session_id: pageData.session_id }),
       ...pageData.ph,
       ...Object.fromEntries(
         Object.entries(featureFlags || {}).map(([k, v]) => [`$feature/${k}`, v])
@@ -70,26 +77,7 @@ export function handlePageTelemetry(
     })
   }
 
-  // Send to backend
-  // TODO: Remove this once migration to client-side page telemetry is complete
-  return post(
-    `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
-    telemetryDataOverride !== undefined
-      ? { feature_flags: featureFlags, ...telemetryDataOverride }
-      : {
-          ...getSharedTelemetryData(pathname),
-          ...(slug || ref
-            ? {
-                groups: {
-                  ...(slug ? { organization: slug } : {}),
-                  ...(ref ? { project: ref } : {}),
-                },
-              }
-            : {}),
-          feature_flags: featureFlags,
-        },
-    { headers: { Version: '2' } }
-  )
+  return Promise.resolve()
 }
 
 export function handlePageLeaveTelemetry(
@@ -108,25 +96,11 @@ export function handlePageLeaveTelemetry(
       $current_url: pageData.page_url,
       $pathname: pageData.pathname,
       page_title: pageData.page_title,
+      ...(pageData.session_id && { $session_id: pageData.session_id }),
     })
   }
 
-  // Send to backend
-  // TODO: Remove this once migration to client-side page telemetry is complete
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page-leave`, {
-    pathname,
-    page_url: isBrowser ? window.location.href : '',
-    page_title: isBrowser ? document?.title : '',
-    feature_flags: featureFlags,
-    ...(slug || ref
-      ? {
-          groups: {
-            ...(slug ? { organization: slug } : {}),
-            ...(ref ? { project: ref } : {}),
-          },
-        }
-      : {}),
-  })
+  return Promise.resolve()
 }
 
 export const PageTelemetry = ({

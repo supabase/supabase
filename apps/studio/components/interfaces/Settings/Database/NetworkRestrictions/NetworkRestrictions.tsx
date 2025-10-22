@@ -10,8 +10,9 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -66,7 +67,7 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   </ButtonTooltip>
 )
 
-const NetworkRestrictions = () => {
+export const NetworkRestrictions = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isAddingAddress, setIsAddingAddress] = useState<undefined | 'IPv4' | 'IPv6'>()
@@ -75,11 +76,15 @@ const NetworkRestrictions = () => {
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
 
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
-  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
@@ -105,7 +110,7 @@ const NetworkRestrictions = () => {
             description="Allow specific IP ranges to have access to your database."
           />
           <div className="flex items-center gap-x-2">
-            <DocsButton href="https://supabase.com/docs/guides/platform/network-restrictions" />
+            <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
             {!canUpdateNetworkRestrictions ? (
               <ButtonTooltip
                 disabled
@@ -295,5 +300,3 @@ const NetworkRestrictions = () => {
     </>
   )
 }
-
-export default NetworkRestrictions

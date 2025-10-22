@@ -6,19 +6,27 @@ import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Input } from 'ui'
+import {
+  AiIconAnimation,
+  Card,
+  Input,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
@@ -51,7 +59,7 @@ const FunctionsList = ({
     router.push(url)
   }
 
-  const { can: canCreateFunctions } = useAsyncCheckProjectPermissions(
+  const { can: canCreateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
@@ -107,10 +115,11 @@ const FunctionsList = ({
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={(schema) => {
-                  const url = new URL(document.URL)
-                  url.searchParams.delete('search')
-                  router.push(url)
-                  setSelectedSchema(schema)
+                  setFilterString('')
+                  // Wait for the filter to be cleared from the URL
+                  setTimeout(() => {
+                    setSelectedSchema(schema)
+                  }, 50)
                 }}
               />
               <Input
@@ -168,34 +177,34 @@ const FunctionsList = ({
           </div>
 
           {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
-
-          <Table
-            className="table-fixed overflow-x-auto"
-            head={
-              <>
-                <Table.th key="name">Name</Table.th>
-                <Table.th key="arguments" className="table-cell">
-                  Arguments
-                </Table.th>
-                <Table.th key="return_type" className="table-cell">
-                  Return type
-                </Table.th>
-                <Table.th key="security" className="table-cell w-[100px]">
-                  Security
-                </Table.th>
-                <Table.th key="buttons" className="w-1/6"></Table.th>
-              </>
-            }
-            body={
-              <FunctionList
-                schema={selectedSchema}
-                filterString={filterString}
-                isLocked={isSchemaLocked}
-                editFunction={editFunction}
-                deleteFunction={deleteFunction}
-              />
-            }
-          />
+          <Card>
+            <Table className="table-fixed overflow-x-auto">
+              <TableHeader>
+                <TableRow>
+                  <TableHead key="name">Name</TableHead>
+                  <TableHead key="arguments" className="table-cell">
+                    Arguments
+                  </TableHead>
+                  <TableHead key="return_type" className="table-cell">
+                    Return type
+                  </TableHead>
+                  <TableHead key="security" className="table-cell w-[100px]">
+                    Security
+                  </TableHead>
+                  <TableHead key="buttons" className="w-1/6"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <FunctionList
+                  schema={selectedSchema}
+                  filterString={filterString}
+                  isLocked={isSchemaLocked}
+                  editFunction={editFunction}
+                  deleteFunction={deleteFunction}
+                />
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       )}
     </>

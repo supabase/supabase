@@ -9,11 +9,14 @@ import { boolean, object, string } from 'yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -40,8 +43,10 @@ const schema = object({
   SITE_URL: string().required('Must have a Site URL'),
 })
 
-const BasicAuthSettingsForm = () => {
+export const BasicAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
+  const showManualLinking = useIsFeatureEnabled('authentication:show_manual_linking')
+
   const {
     data: authConfig,
     error: authConfigError,
@@ -51,11 +56,11 @@ const BasicAuthSettingsForm = () => {
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -113,11 +118,10 @@ const BasicAuthSettingsForm = () => {
       <ScaffoldSectionTitle className="mb-4">User Signups</ScaffoldSectionTitle>
 
       {isError && (
-        <Alert_Shadcn_ variant="destructive">
-          <WarningIcon />
-          <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+        <AlertError
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration for hooks"
+        />
       )}
 
       {isPermissionsLoaded && !canReadConfig && (
@@ -169,38 +173,40 @@ const BasicAuthSettingsForm = () => {
                   )}
                 />
               </CardContent>
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="SECURITY_MANUAL_LINKING_ENABLED"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Allow manual linking"
-                      description={
-                        <>
-                          Enable{' '}
-                          <InlineLink
-                            className="text-foreground-light hover:text-foreground"
-                            href="https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta"
-                          >
-                            manual linking APIs
-                          </InlineLink>{' '}
-                          for your project
-                        </>
-                      }
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+              {showManualLinking && (
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="SECURITY_MANUAL_LINKING_ENABLED"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Allow manual linking"
+                        description={
+                          <>
+                            Enable{' '}
+                            <InlineLink
+                              className="text-foreground-light hover:text-foreground"
+                              href={`${DOCS_URL}/guides/auth/auth-identity-linking#manual-linking-beta`}
+                            >
+                              manual linking APIs
+                            </InlineLink>{' '}
+                            for your project
+                          </>
+                        }
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+              )}
               <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
@@ -214,7 +220,7 @@ const BasicAuthSettingsForm = () => {
                           Enable{' '}
                           <InlineLink
                             className="text-foreground-light hover:text-foreground"
-                            href="https://supabase.com/docs/guides/auth/auth-anonymous"
+                            href={`${DOCS_URL}/guides/auth/auth-anonymous`}
                           >
                             anonymous sign-ins
                           </InlineLink>{' '}
@@ -258,7 +264,7 @@ const BasicAuthSettingsForm = () => {
                           to ensure that access to your data is restricted where required.
                         </p>
                         <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                          <Link href="https://supabase.com/docs/guides/auth/auth-anonymous#access-control">
+                          <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
                             View access control docs
                           </Link>
                         </Button>
@@ -328,5 +334,3 @@ const BasicAuthSettingsForm = () => {
     </ScaffoldSection>
   )
 }
-
-export default BasicAuthSettingsForm
