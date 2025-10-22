@@ -216,7 +216,7 @@ export const EditorTabs = () => {
           <AnimatePresence initial={false}>
             {!hasNewTab && (
               <motion.button
-                className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
+                className="flex items-center justify-center w-10 h-10 bg hover:bg-surface-100 shrink-0 border-b sticky right-0"
                 onClick={() =>
                   router.push(
                     `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
@@ -235,12 +235,12 @@ export const EditorTabs = () => {
             )}
           </AnimatePresence>
           <div className="grow h-full border-b" />
-          {editor === 'sql' && (
-            <div className="flex items-center border-b pr-4">
-              <SaveButton />
-            </div>
-          )}
         </TabsList_Shadcn_>
+        {editor === 'sql' && (
+          <div className="flex items-center border-b pr-4 shrink-0">
+            <SaveButton />
+          </div>
+        )}
       </Tabs_Shadcn_>
 
       <DragOverlay dropAnimation={null}>

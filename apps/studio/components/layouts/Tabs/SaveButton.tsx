@@ -11,13 +11,13 @@ import { useProfile } from 'lib/profile'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
+import { useTabsStateSnapshot } from 'state/tabs'
 import uuidv4 from 'lib/uuid'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 
 export const SaveButton = () => {
   const router = useRouter()
-  const { ref, id } = useParams()
+  const { ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
@@ -48,13 +48,7 @@ export const SaveButton = () => {
   // Show save button if:
   // 1. SQL is different from snippet SQL (for existing snippets)
   // 2. OR no snippet exists and SQL is not empty (for new tabs)
-  const showSaveButton = snippetId
-    ? tabSql !== snippetSql
-    : tabSql.trim().length > 0
-
-  if (!showSaveButton) {
-    return null
-  }
+  const showSaveButton = snippetId ? tabSql !== snippetSql : tabSql.trim().length > 0
 
   const handleSave = async () => {
     if (!ref || !profile || !project) return
@@ -116,7 +110,7 @@ export const SaveButton = () => {
       icon={<Save size={14} />}
       loading={isSaving}
       onClick={handleSave}
-      className="ml-2"
+      className={cn('opacity-0', showSaveButton && 'opacity-100')}
     >
       Save
     </Button>
