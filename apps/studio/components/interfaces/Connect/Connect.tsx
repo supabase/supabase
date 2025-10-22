@@ -268,9 +268,8 @@ export const Connect = () => {
 
   useEffect(() => {
     if (!showConnect) return
-
     const noConnectTabInUrl = typeof router.query.connectTab === 'undefined'
-    const hasQuery = Boolean(queryFramework || queryUsing || queryWith)
+    const hasQuery = queryFramework || queryUsing || queryWith
     const inferred = inferConnectTabFromParentKey(queryFramework)
 
     if (noConnectTabInUrl && hasQuery && inferred) {
