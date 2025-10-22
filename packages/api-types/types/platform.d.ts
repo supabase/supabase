@@ -4274,7 +4274,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/storage/{ref}/vector-buckets/{id}/indexes/vector-buckets/{id}/indexes/{indexName}': {
+  '/platform/storage/{ref}/vector-buckets/{id}/indexes/{indexName}': {
     parameters: {
       query?: never
       header?: never
@@ -4284,8 +4284,8 @@ export interface paths {
     get?: never
     put?: never
     post?: never
-    /** Deletes bucket */
-    delete: operations['StorageVectorBucketIdIndexesController_deleteBucket']
+    /** Deletes bucket index */
+    delete: operations['StorageVectorBucketIdIndexesController_deleteBucketIndex']
     options?: never
     head?: never
     patch?: never
@@ -9319,7 +9319,17 @@ export interface components {
     }
     StorageVectorBucketListIndexesResponse: {
       indexes: {
+        creationTime?: number
+        /** @enum {string} */
+        dataType: 'float32'
+        dimension: number
+        /** @enum {string} */
+        distanceMetric: 'cosine' | 'euclidean' | 'dotproduct'
         indexName: string
+        metadataConfiguration?: {
+          nonFilterableMetadataKeys?: string[]
+        }
+        vectorBucketName: string
       }[]
       nextToken?: string
     }
@@ -27220,11 +27230,18 @@ export interface operations {
       }
     }
   }
-  StorageVectorBucketIdIndexesController_deleteBucket: {
+  StorageVectorBucketIdIndexesController_deleteBucketIndex: {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        /** @description Vector storage bucket name */
+        id: string
+        /** @description Vector storage bucket index name */
+        indexName: string
+        /** @description Project ref */
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -27256,7 +27273,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to delete bucket */
+      /** @description Failed to delete bucket index */
       500: {
         headers: {
           [name: string]: unknown

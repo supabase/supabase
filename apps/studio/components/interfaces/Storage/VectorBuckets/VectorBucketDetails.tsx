@@ -1,3 +1,9 @@
+import { Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import {
@@ -8,10 +14,9 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
+import { useVectorBucketIndexDeleteMutation } from 'data/storage/vector-bucket-index-delete-mutation'
 import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
-import { Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
 import {
   Button,
   Card,
@@ -31,36 +36,13 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { BUCKET_TYPES } from '../Storage.constants'
 import { CreateVectorTableSheet } from './CreateVectorTableSheet'
 
-// Mock data for development - remove when backend is ready
-const MOCK_VECTOR_INDEXES = [
-  {
-    indexName: 'documents_index',
-    creationTime: '1704067200', // Jan 1, 2024
-    dimension: 1536,
-    distanceMetric: 'cosine',
-  },
-  {
-    indexName: 'embeddings_index',
-    creationTime: '1704153600', // Jan 2, 2024
-    dimension: 1536,
-    distanceMetric: 'cosine',
-  },
-  {
-    indexName: 'search_index',
-    creationTime: '1704240000', // Jan 3, 2024
-    dimension: 1536,
-    distanceMetric: 'cosine',
-  },
-]
-
-const MOCK_VECTOR_INDEXES_EMPTY = []
-
 interface VectorBucketDetailsProps {
   bucket: { vectorBucketName: string; creationTime: string }
 }
 
 export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
   const { ref: projectRef } = useParams()
+  const router = useRouter()
 
   // Use the correct query for bucket contents
   const { data, isLoading, error } = useVectorBucketsIndexesQuery({
@@ -68,8 +50,19 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
     vectorBucketName: bucket.vectorBucketName,
   })
 
-  // Mock data for development - replace with real data when backend is ready
-  // const allIndexes = MOCK_VECTOR_INDEXES
+  const { mutate: deleteIndex } = useVectorBucketIndexDeleteMutation({
+    onSuccess: (data, vars) => {
+      toast.success(`Table "${data.name}" deleted successfully`)
+    },
+  })
+
+  const { mutate: deleteBucket } = useVectorBucketDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Bucket "${bucket.vectorBucketName}" deleted successfully`)
+      router.push(`/project/${projectRef}/storage/vectors`)
+    },
+  })
+
   const allIndexes = data?.indexes ?? []
   const config = BUCKET_TYPES['vectors']
   const [filterString, setFilterString] = useState('')
@@ -85,12 +78,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
     <>
       <PageLayout
         title={bucket.vectorBucketName}
-        breadcrumbs={[
-          {
-            label: 'Vectors',
-            href: `/project/${projectRef}/storage/vectors`,
-          },
-        ]}
+        breadcrumbs={[{ label: 'Vectors', href: `/project/${projectRef}/storage/vectors` }]}
         secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
       >
         <ScaffoldContainer bottomPadding>
@@ -200,6 +188,11 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                                     className="flex items-center space-x-2"
                                     onClick={(e) => {
                                       e.stopPropagation()
+                                      deleteIndex({
+                                        projectRef: projectRef!,
+                                        bucketName: bucket.vectorBucketName,
+                                        indexName: index.indexName,
+                                      })
                                     }}
                                   >
                                     <Trash2 size={12} />
@@ -231,7 +224,15 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                     you want to keep your data.
                   </p>
                 </div>
-                <Button type="danger" onClick={() => {}}>
+                <Button
+                  type="danger"
+                  onClick={() => {
+                    deleteBucket({
+                      projectRef: projectRef!,
+                      bucketName: bucket.vectorBucketName,
+                    })
+                  }}
+                >
                   Delete bucket
                 </Button>
               </CardContent>
