@@ -1440,7 +1440,7 @@ describe('SupportFormPage', () => {
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.subject).toBe('Cannot access settings')
-    expect(payload.message).toBe(
+    expect(payload.message).toMatch(
       'Settings page shows 500 error - updated description' + supportVersionInfo
     )
     expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
@@ -1642,6 +1642,11 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
     })
+
+    const dashboardLogToggle = await getDashboardLogsToggle(screen)
+    expect(dashboardLogToggle).toBeChecked()
+    await userEvent.click(dashboardLogToggle!)
+    expect(dashboardLogToggle).not.toBeChecked()
 
     await userEvent.type(getSummaryField(screen), 'Cannot access my account')
     await userEvent.type(getMessageField(screen), 'I need help accessing my Supabase account')
