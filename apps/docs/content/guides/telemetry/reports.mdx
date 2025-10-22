@@ -4,6 +4,8 @@ title: 'Reports'
 description: 'Built-in observability for your Supabase project'
 ---
 
+{/* last LW we added that same report to every report page (pre-filtered) so, API Gateway report filtered by Auth will show the same data as going to Auth Report in the API Gateway section */}
+
 Supabase Reports provide comprehensive observability for your project through dedicated monitoring dashboards that visualize key metrics across your database, auth, storage, realtime, and API systems. Each report offers self-debugging tools to gain actionable insights for optimizing performance and troubleshooting issues.
 
 <Admonition type="note">
@@ -14,7 +16,7 @@ Reports are only available for projects hosted on the Supabase Cloud platform an
 
 ## Using reports
 
-Reports can be filtered by time range to focus your analysis on specific periods. Available time ranges are gated by your organization's plan, with higher-tier plans providing access to longer historical periods.
+You can filter reports by time range to focus your analysis on specific periods. Your organization's plans gate available time ranges, with higher-tier plans providing access to longer historical periods.
 
 | Time Range      | Free | Pro | Team | Enterprise |
 | --------------- | ---- | --- | ---- | ---------- |
@@ -31,27 +33,63 @@ Reports can be filtered by time range to focus your analysis on specific periods
 
 <$Show if="billing:all">
 
+## API gateway
+
+The API Gateway report analyzes traffic patterns and performance characteristics of requests flowing through your Supabase project's API layer.
+
+| Chart           | Description                               | Key Insights                                                           |
+| --------------- | ----------------------------------------- | ---------------------------------------------------------------------- |
+| Total Requests  | Overall API request volume                | Traffic patterns and growth trends, including top routes               |
+| Response Errors | Error rates with 4XX and 5XX status codes | API reliability and user experience issues, including top routes       |
+| Response Speed  | Average API response times                | Performance bottlenecks and optimization targets, including top routes |
+| Network Traffic | Request and response egress usage         | Data transfer patterns and cost implications                           |
+
+## Auth
+
+The Auth reports focus on user authentication patterns and behaviors within your Supabase project.
+
+| Chart                    | Description                                   | Key Insights                                    |
+| ------------------------ | --------------------------------------------- | ----------------------------------------------- |
+| Active Users             | Count of unique users performing auth actions | User engagement and retention patterns          |
+| Sign In Attempts by Type | Breakdown of authentication methods used      | Password vs OAuth vs magic link preferences     |
+| Sign Ups                 | Total new user registrations                  | Growth trends and onboarding funnel performance |
+| API Gateway Auth Errors  | Error rates grouped by status code            | Authentication friction and security issues     |
+| Password Reset Requests  | Volume of password recovery attempts          | User experience pain points                     |
+
+### Auth API Gateway
+
+The Auth API Gateway reports focus on API requests related to authentication and user management.
+
+| Chart           | Description                                   | Key Insights                                                                 |
+| --------------- | --------------------------------------------- | ---------------------------------------------------------------------------- |
+| Total Requests  | Count of unique users performing auth actions | User engagement and retention patterns, including top routes                 |
+| Response Errors | Error rates with 4XX and 5XX status codes     | API reliability and user experience issues, including top routes             |
+| Response speed  | Average response time for auth requests       | Performance bottlenecks and optimization opportunities, including top routes |
+| Network Traffic | Ingress and egress usage                      | Data transfer costs and CDN effectiveness                                    |
+
 ## Database
 
 The Database report provides the most comprehensive view into your Postgres instance's health and performance characteristics. These charts help you identify performance bottlenecks, resource constraints, and optimization opportunities at a glance.
 
 The following charts are available for Free and Pro plans:
 
-| Chart                        | Available Plans | Description                                  | Key Insights                                  |
-| ---------------------------- | --------------- | -------------------------------------------- | --------------------------------------------- |
-| Memory usage                 | Free, Pro       | RAM usage percentage by the database         | Memory pressure and resource utilization      |
-| CPU usage                    | Free, Pro       | Average CPU usage percentage                 | CPU-intensive query identification            |
-| Disk IOPS                    | Free, Pro       | Read/write operations per second with limits | IO bottleneck detection and workload analysis |
-| Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                    |
-| Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                  |
-| Dedicated Pooler connections | All             | Client connections to PgBouncer              | Dedicated pooler connection monitoring        |
-
-</$Show>
+| Chart                        | Available Plans | Description                                  | Key Insights                                                   |
+| ---------------------------- | --------------- | -------------------------------------------- | -------------------------------------------------------------- |
+| Memory usage                 | Free, Pro       | RAM usage percentage by the database         | Memory pressure and resource utilization                       |
+| CPU usage                    | Free, Pro       | Average CPU usage percentage                 | CPU-intensive query identification                             |
+| Disk IOPS                    | Free, Pro       | Read/write operations per second with limits | IO bottleneck detection and workload analysis                  |
+| Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                                     |
+| Dedicated Pooler connections | All             | Client connections to PgBouncer              | Dedicated pooler connection monitoring                         |
+| Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                                   |
+| Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                                   |
+| Disk usage                   | Free, Pro       | Disk space consumption breakdown             | Storage capacity planning                                      |
+| Database size                | Free, Pro       | Total database size and growth trends        | Space consumption monitoring, including list of largest tables |
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Advanced Telemetry
 
+{/* TODO: This is confusing and feels contradictory */}
 The following charts provide a more advanced and detailed view of your database performance and are available only for Teams and Enterprise plans.
 
 ### Memory usage
@@ -84,8 +122,8 @@ Actions you can take:
 | Action                                                                      | Description                                    |
 | --------------------------------------------------------------------------- | ---------------------------------------------- |
 | [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size) | Increase available memory resources            |
-| Optimize queries                                                            | Reduce memory consumption of expensive queries |
-| Tune Postgres configuration                                                 | Improve memory management settings             |
+| [Optimize queries](/docs/content/guides/database/query-optimization)        | Reduce memory consumption of expensive queries |
+| [Tune Postgres configuration](https://pgtune.leopard.in.ua)                 | Improve memory management settings             |
 | Implement application caching                                               | Add query result caching to reduce memory load |
 
 ### CPU usage
@@ -117,12 +155,12 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                         | Description                                                                 |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Optimize CPU-intensive queries                                 | Target queries causing high User CPU usage                                  |
-| Address IO bottlenecks                                         | Resolve disk/network issues when IOWait is high                             |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase available CPU capacity                                             |
-| Implement proper indexing                                      | Use [query optimization](/docs/guides/database/postgres/indexes) techniques |
+| Action                                                                             | Description                                     |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------- |
+| [Optimize CPU-intensive queries](/docs/content/guides/database/query-optimization) | Target queries causing high User CPU usage      |
+| Address IO bottlenecks                                                             | Resolve disk/network issues when IOWait is high |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk)                     | Increase available CPU capacity                 |
+| [Implement proper indexing](/docs/guides/database/postgres/indexes)                | Use query optimization techniques               |
 
 ### Disk input/output operations per second (IOPS)
 
@@ -149,8 +187,8 @@ Actions you can take:
 
 | Action                                                         | Description                                               |
 | -------------------------------------------------------------- | --------------------------------------------------------- |
-| Optimize indexing                                              | Reduce high read IOPS through better query indexing       |
-| Consider read replicas                                         | Distribute read-heavy workloads across multiple instances |
+| [Optimize indexing](/docs/guides/database/postgres/indexes)    | Reduce high read IOPS through better query indexing       |
+| Consider [read replicas](/docs/guides/platform/read-replicas)  | Distribute read-heavy workloads across multiple instances |
 | Batch write operations                                         | Reduce write IOPS by grouping database writes             |
 | [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase IOPS limits with larger compute instances        |
 
@@ -177,46 +215,12 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                         | Description                                        |
-| -------------------------------------------------------------- | -------------------------------------------------- |
-| Optimize disk-intensive queries                                | Reduce queries that perform excessive reads/writes |
-| Add strategic indexes                                          | Reduce sequential scans with appropriate indexing  |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase IOPS limits with larger compute instances |
-| Review database design                                         | Optimize schema and query patterns for efficiency  |
-
-### Disk size
-
-<Image
-  alt="Disk Size chart"
-  zoomable
-  src={{
-    dark: '/docs/img/database/reports/disk-size-chart-dark.png',
-    light: '/docs/img/database/reports/disk-size-chart-light.png',
-  }}
-/>
-
-| Component    | Description                                               |
-| ------------ | --------------------------------------------------------- |
-| **Database** | Space used by your actual database data (tables, indexes) |
-| **WAL**      | Space used by Write-Ahead Logging                         |
-| **System**   | Reserved space for system operations                      |
-
-How it helps debug issues:
-
-| Issue                         | Description                                 |
-| ----------------------------- | ------------------------------------------- |
-| Space consumption monitoring  | Track disk usage trends over time           |
-| Growth pattern identification | Identify rapid growth requiring attention   |
-| Capacity planning             | Plan upgrades before hitting storage limits |
-
-Actions you can take:
-
-| Action                                                                           | Description                                                          |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Run [VACUUM](https://www.postgresql.org/docs/current/sql-vacuum.html) operations | Reclaim dead tuple space and optimize storage                        |
-| Analyze large tables                                                             | Use CLI commands like `table-sizes` to identify optimization targets |
-| Implement data archival                                                          | Archive historical data to reduce active storage needs               |
-| [Upgrade disk size](/docs/guides/platform/database-size)                         | Increase storage capacity when approaching limits                    |
+| Action                                                                               | Description                                        |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| [Optimize disk-intensive queries](/docs/content/guides/database/query-optimization)  | Reduce queries that perform excessive reads/writes |
+| [Add strategic indexes](http://localhost:3001/docs/guides/database/postgres/indexes) | Reduce sequential scans with appropriate indexing  |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk)                       | Increase IOPS limits with larger compute instances |
+| Review database design                                                               | Optimize schema and query patterns for efficiency  |
 
 ### Database connections
 
@@ -254,29 +258,71 @@ Actions you can take:
 | Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
 | Review application code                                                                    | Ensure proper connection handling and cleanup                   |
 
-## Auth
+#### Dedicated Pooler connections
 
-The Auth report focuses on user authentication patterns and behaviors within your Supabase project.
+#### Shared Pooler connections
 
-| Chart                    | Description                                   | Key Insights                                    |
-| ------------------------ | --------------------------------------------- | ----------------------------------------------- |
-| Active Users             | Count of unique users performing auth actions | User engagement and retention patterns          |
-| Sign In Attempts by Type | Breakdown of authentication methods used      | Password vs OAuth vs magic link preferences     |
-| Sign Ups                 | Total new user registrations                  | Growth trends and onboarding funnel performance |
-| Auth Errors              | Error rates grouped by status code            | Authentication friction and security issues     |
-| Password Reset Requests  | Volume of password recovery attempts          | User experience pain points                     |
+### Disk Usage
 
-## Storage
+### Database size
 
-The Storage report provides visibility into how your Supabase Storage is being utilized, including request patterns, performance characteristics, and caching effectiveness.
+<Image
+  alt="Disk Size chart"
+  zoomable
+  src={{
+    dark: '/docs/img/database/reports/disk-size-chart-dark.png',
+    light: '/docs/img/database/reports/disk-size-chart-light.png',
+  }}
+/>
 
-| Chart           | Description                                | Key Insights                                           |
-| --------------- | ------------------------------------------ | ------------------------------------------------------ |
-| Total Requests  | Overall request volume to Storage          | Traffic patterns and usage trends                      |
-| Response Speed  | Average response time for storage requests | Performance bottlenecks and optimization opportunities |
-| Network Traffic | Ingress and egress usage                   | Data transfer costs and CDN effectiveness              |
-| Request Caching | Cache hit rates and miss patterns          | CDN performance and cost optimization                  |
-| Top Routes      | Most frequently accessed storage paths     | Popular content and usage patterns                     |
+| Component    | Description                                               |
+| ------------ | --------------------------------------------------------- |
+| **Database** | Space used by your actual database data (tables, indexes) |
+| **WAL**      | Space used by Write-Ahead Logging                         |
+| **System**   | Reserved space for system operations                      |
+
+How it helps debug issues:
+
+| Issue                         | Description                                 |
+| ----------------------------- | ------------------------------------------- |
+| Space consumption monitoring  | Track disk usage trends over time           |
+| Growth pattern identification | Identify rapid growth requiring attention   |
+| Capacity planning             | Plan upgrades before hitting storage limits |
+
+Actions you can take:
+
+| Action                                                                           | Description                                                          |
+| -------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Run [VACUUM](https://www.postgresql.org/docs/current/sql-vacuum.html) operations | Reclaim dead tuple space and optimize storage                        |
+| Analyze large tables                                                             | Use CLI commands like `table-sizes` to identify optimization targets |
+| Implement data archival                                                          | Archive historical data to reduce active storage needs               |
+| [Upgrade disk size](/docs/guides/platform/database-size)                         | Increase storage capacity when approaching limits                    |
+
+## Edge Functions
+
+The Edge Functions report provides insights into serverless function performance, execution patterns, and regional distribution across Supabase's global edge network.
+
+| Chart                                | Description                               | Key Insights                                   |
+| ------------------------------------ | ----------------------------------------- | ---------------------------------------------- |
+| Total Edge Function Invocations      | Function response codes and error rates   | Function reliability and error patterns        |
+| Edge Function Execution Status Codes | Function response codes and error rates   | Function reliability and error patterns        |
+| Edge Function Execution Time         | Average function duration and performance | Performance optimization opportunities         |
+| Edge Function Invocations by Region  | Geographic distribution of function calls | Global usage patterns and latency optimization |
+
+## Query Performance
+
+Links to the [Query Performance Advisory page](/docs/guides/platform/performance#examine-query-performance) in the dashboard, which provides a detailed analysis of slow database queries
+
+## PostgREST
+
+The PostgREST report provides insights into RESTful API performance, request patterns, and response characteristics.
+
+| Chart           | Description                                  | Key Insights                                                                 |
+| --------------- | -------------------------------------------- | ---------------------------------------------------------------------------- |
+| Total Requests  | HTTP requests to PostgREST endpoints         | API usage alongside WebSocket activity                                       |
+| Response Errors | Error rates with 4XX and 5XX status codes    | API reliability and user experience issues, including top routes             |
+| Response Speed  | Average response time for PostgREST requests | Performance bottlenecks and optimization opportunities, including top routes |
+| Network Traffic | Ingress and egress usage                     | Data transfer costs and CDN effectiveness                                    |
 
 ## Realtime
 
@@ -287,27 +333,26 @@ The Realtime report tracks WebSocket connections, channel activity, and real-tim
 | Realtime Connections  | Active WebSocket connections over time                        | Concurrent user activity and connection stability |
 | Channel Events        | Breakdown of broadcast, Postgres changes, and presence events | Real-time feature usage patterns                  |
 | Rate of Channel Joins | Frequency of new channel subscriptions                        | User engagement with real-time features           |
-| Total Requests        | HTTP requests to Realtime endpoints                           | API usage alongside WebSocket activity            |
-| Response Speed        | Performance of Realtime API endpoints                         | Infrastructure optimization opportunities         |
 
-## Edge Functions
+### Realtime API Gateway
 
-The Edge Functions report provides insights into serverless function performance, execution patterns, and regional distribution across Supabase's global edge network.
+The Realtime API Gateway reports focus on API requests related to Realtime functionality.
 
-| Chart                  | Description                               | Key Insights                                   |
-| ---------------------- | ----------------------------------------- | ---------------------------------------------- |
-| Execution Status Codes | Function response codes and error rates   | Function reliability and error patterns        |
-| Execution Time         | Average function duration and performance | Performance optimization opportunities         |
-| Invocations by Region  | Geographic distribution of function calls | Global usage patterns and latency optimization |
+| Chart           | Description                           | Key Insights                                                    |
+| --------------- | ------------------------------------- | --------------------------------------------------------------- |
+| Total Requests  | HTTP requests to Realtime endpoints   | API usage alongside WebSocket activity, including top routes    |
+| Response Errors | HTTP requests to Realtime endpoints   | API usage alongside WebSocket activity, including top routes    |
+| Response Speed  | Performance of Realtime API endpoints | Infrastructure optimization opportunities, including top routes |
 
-## API gateway
+## Storage
 
-The API Gateway report analyzes traffic patterns and performance characteristics of requests flowing through your Supabase project's API layer.
+The Storage report provides visibility into how your Supabase Storage is being utilized, including request patterns, performance characteristics, and caching effectiveness.
 
-| Chart           | Description                               | Key Insights                                     |
-| --------------- | ----------------------------------------- | ------------------------------------------------ |
-| Total Requests  | Overall API request volume                | Traffic patterns and growth trends               |
-| Response Errors | Error rates with 4XX and 5XX status codes | API reliability and user experience issues       |
-| Response Speed  | Average API response times                | Performance bottlenecks and optimization targets |
-| Network Traffic | Request and response egress usage         | Data transfer patterns and cost implications     |
-| Top Routes      | Most frequently accessed API endpoints    | Usage patterns and optimization priorities       |
+| Chart           | Description                                | Key Insights                                                                 |
+| --------------- | ------------------------------------------ | ---------------------------------------------------------------------------- |
+| Total Requests  | Overall request volume to Storage          | Traffic patterns and usage trends, including top routes                      |
+| Response Speed  | Average response time for storage requests | Performance bottlenecks and optimization opportunities, including top routes |
+| Network Traffic | Ingress and egress usage                   | Data transfer costs and CDN effectiveness                                    |
+| Request Caching | Cache hit rates and miss patterns          | CDN performance and cost optimization, including top routes                  |
+
+</$Show>
