@@ -1036,6 +1036,10 @@ export const database: NavMenuConstant = {
           name: 'Managing connections',
           url: '/guides/database/connection-management' as `/${string}`,
         },
+        {
+          name: 'Managing event triggers',
+          url: '/guides/database/postgres/event-triggers',
+        },
       ],
     },
     {
