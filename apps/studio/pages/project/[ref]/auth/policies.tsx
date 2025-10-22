@@ -1,7 +1,7 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { useDeferredValue, useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
@@ -22,9 +22,9 @@ import { useDatabasePoliciesQuery } from 'data/database-policies/database-polici
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { parseAsString, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -64,11 +64,15 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
-  const [params, setParams] = useUrlState<{
-    schema?: string
-    search?: string
-  }>()
-  const { schema = 'public', search: searchString = '' } = params
+  const [schema, setSchema] = useQueryState(
+    'schema',
+    parseAsString.withDefault('public').withOptions({ history: 'replace' })
+  )
+  const [searchString, setSearchString] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
+  )
+  const deferredSearchString = useDeferredValue(searchString)
   const { data: project } = useSelectedProjectQuery()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
@@ -120,7 +124,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             value={searchString || ''}
             onChange={(e) => {
               const str = e.target.value
-              setParams({ ...params, search: str === '' ? undefined : str })
+              setSearchString(str)
             }}
             icon={<Search size={14} />}
           />
@@ -130,8 +134,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             align="end"
             showError={false}
             selectedSchemaName={schema}
-            onSelectSchema={(schema) => {
-              setParams({ ...params, search: undefined, schema })
+            onSelectSchema={(schemaName) => {
+              setSchema(schemaName)
+              setSearchString('')
             }}
           />
         </div>
@@ -142,7 +147,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
         {isSuccess && (
           <Policies
-            search={searchString}
+            search={deferredSearchString}
             schema={schema}
             tables={filteredTables}
             hasTables={tables.length > 0}
@@ -165,7 +170,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 setShowPolicyAiEditor(true)
               }
             }}
-            onResetSearch={() => setParams({ ...params, search: undefined })}
+            onResetSearch={() => setSearchString('')}
           />
         )}
 
