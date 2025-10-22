@@ -180,9 +180,14 @@ const PreviewBranchActions = ({
 
   const { data } = useBranchQuery({ projectRef, branchRef })
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
+  const isPersistentBranch = branch.persistent
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
+  const [
+    showPersistentBranchDeleteConfirmationModal,
+    setShowPersistentBranchDeleteConfirmationModal,
+  ] = useState(false)
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
   const { mutate: resetBranch, isLoading: isResetting } = useBranchResetMutation({
@@ -308,12 +313,20 @@ const PreviewBranchActions = ({
             className="gap-x-2"
             disabled={!canDeleteBranches}
             onSelect={(e) => {
-              e.stopPropagation()
-              onSelectDeleteBranch()
+              if (isPersistentBranch) {
+                setShowPersistentBranchDeleteConfirmationModal(true)
+              } else {
+                e.stopPropagation()
+                onSelectDeleteBranch()
+              }
             }}
             onClick={(e) => {
-              e.stopPropagation()
-              onSelectDeleteBranch()
+              if (isPersistentBranch) {
+                setShowPersistentBranchDeleteConfirmationModal(true)
+              } else {
+                e.stopPropagation()
+                onSelectDeleteBranch()
+              }
             }}
             tooltip={{
               content: {
@@ -373,6 +386,20 @@ const PreviewBranchActions = ({
         </p>
       </ConfirmationModal>
 
+      <ConfirmationModal
+        variant="warning"
+        visible={showPersistentBranchDeleteConfirmationModal}
+        confirmLabel={'Switch to preview'}
+        title="Branch must be switched to preview before deletion"
+        loading={isUpdatingBranch}
+        onCancel={() => setShowPersistentBranchDeleteConfirmationModal(false)}
+        onConfirm={onTogglePersistent}
+      >
+        <p className="text-sm text-foreground-light">
+          You must switch the branch "{branch.name}" to preview before deleting it.
+        </p>
+      </ConfirmationModal>
+
       <EditBranchModal
         branch={branch}
         visible={showEditBranchModal}
@@ -401,6 +428,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
           {repo ? (
             <Link passHref href={`/project/${projectRef}/settings/integrations`}>
               <DropdownMenuItem asChild className="gap-x-2">
+                {/** biome-ignore lint/a11y/useValidAnchor: href is passed above in the Link component */}
                 <a>Change production branch</a>
               </DropdownMenuItem>
             </Link>
