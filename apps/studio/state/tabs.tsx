@@ -57,6 +57,7 @@ export interface RecentItem {
     name?: string
     tableId?: number
     sqlId?: string
+    snippetId?: string
   }
 }
 
