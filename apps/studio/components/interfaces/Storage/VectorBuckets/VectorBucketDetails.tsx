@@ -95,110 +95,117 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
             <ScaffoldHeader className="pt-0 pb-3">
               <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
               <ScaffoldSectionDescription>
-                Vector indexes connected to this bucket.
+                Vector indexes stored in this bucket.
               </ScaffoldSectionDescription>
             </ScaffoldHeader>
-            {allIndexes.length > 0 && (
-              <div className="flex flex-row justify-between">
-                <Input
-                  size="tiny"
-                  placeholder="Search for an index"
-                  value={filterString}
-                  onChange={(e) => setFilterString(e.target.value)}
-                  icon={<Search size={12} />}
-                  className="w-48"
-                />
-                <CreateVectorIndexSheet />
-              </div>
-            )}
 
-            {allIndexes.length > 0 && (
-              <Card>
-                <Table>
-                  <TableHeader>
+            <div className="flex flex-row justify-between">
+              <Input
+                size="tiny"
+                placeholder="Search for a table"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+                icon={<Search size={12} />}
+                className="w-48"
+              />
+              <CreateVectorIndexSheet />
+            </div>
+
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead
+                      className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
+                    >
+                      Name
+                    </TableHead>
+                    <TableHead
+                      className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
+                    >
+                      Created at
+                    </TableHead>
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {indexesList.length === 0 && filterString.length > 0 && (
                     <TableRow>
-                      <TableHead
-                        className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
-                      >
-                        Name
-                      </TableHead>
-                      <TableHead
-                        className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
-                      >
-                        Created at
-                      </TableHead>
-                      <TableHead />
+                      <TableCell colSpan={3}>
+                        <p className="text-sm text-foreground">No results found</p>
+                        <p className="text-sm text-foreground-light">
+                          Your search for "{filterString}" did not return any results
+                        </p>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {indexesList.length === 0 && filterString.length > 0 && (
-                      <TableRow>
-                        <TableCell colSpan={3}>
-                          <p className="text-sm text-foreground">No results found</p>
-                          <p className="text-sm text-foreground-light">
-                            Your search for "{filterString}" did not return any results
+                  )}
+                  {indexesList.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={3}>
+                        <p className="text-sm text-foreground">No tables yet</p>
+                        <p className="text-sm text-foreground-light">
+                          Publish your first table to get started
+                        </p>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {indexesList.map((index, idx: number) => {
+                    const id = `index-${idx}`
+                    const name = index.indexName
+                    // the creation time is in seconds, convert it to milliseconds
+                    const created = +index.creationTime * 1000
+
+                    return (
+                      <TableRow key={id}>
+                        <TableCell>{name}</TableCell>
+                        <TableCell>
+                          <p className="text-foreground-light">
+                            <TimestampInfo utcTimestamp={created} className="text-sm" />
                           </p>
                         </TableCell>
-                      </TableRow>
-                    )}
-                    {indexesList.map((index, idx: number) => {
-                      const id = `index-${idx}`
-                      const name = index.indexName
-                      // the creation time is in seconds, convert it to milliseconds
-                      const created = +index.creationTime * 1000
-
-                      return (
-                        <TableRow key={id}>
-                          <TableCell>{name}</TableCell>
-                          <TableCell>
-                            <p className="text-foreground-light">
-                              <TimestampInfo utcTimestamp={created} className="text-sm" />
-                            </p>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-row justify-end gap-2">
-                              <Button
-                                asChild
-                                icon={<Eye size={14} className="text-foreground-lighter" />}
-                                type="default"
+                        <TableCell>
+                          <div className="flex flex-row justify-end gap-2">
+                            <Button
+                              asChild
+                              icon={<Eye size={14} className="text-foreground-lighter" />}
+                              type="default"
+                            >
+                              {/* TODO: Proper URL for table editor */}
+                              <Link
+                                href={`/project/${projectRef}/editor/${encodeURIComponent(name)}`}
                               >
-                                {/* TODO: Proper URL for table editor */}
-                                <Link
-                                  href={`/project/${projectRef}/editor/${encodeURIComponent(name)}`}
+                                Table Editor
+                              </Link>
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  type="default"
+                                  className="px-1"
+                                  icon={<MoreVertical />}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent side="bottom" align="end" className="w-40">
+                                <DropdownMenuItem
+                                  className="flex items-center space-x-2"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                  }}
                                 >
-                                  Table Editor
-                                </Link>
-                              </Button>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    type="default"
-                                    className="px-1"
-                                    icon={<MoreVertical />}
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent side="bottom" align="end" className="w-40">
-                                  <DropdownMenuItem
-                                    className="flex items-center space-x-2"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                    }}
-                                  >
-                                    <Trash2 size={12} />
-                                    <p>Delete table</p>
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </Card>
-            )}
+                                  <Trash2 size={12} />
+                                  <p>Delete table</p>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </Card>
           </ScaffoldSection>
 
           <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
