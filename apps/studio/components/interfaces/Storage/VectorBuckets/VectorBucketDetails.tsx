@@ -28,23 +28,28 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { BUCKET_TYPES } from '../Storage.constants'
-import { CreateVectorIndexSheet } from './CreateVectorIndexSheet'
+import { CreateVectorTableSheet } from './CreateVectorTableSheet'
 
 // Mock data for development - remove when backend is ready
 const MOCK_VECTOR_INDEXES = [
   {
     indexName: 'documents_index',
     creationTime: '1704067200', // Jan 1, 2024
+    dimension: 1536,
+    distanceMetric: 'cosine',
   },
   {
     indexName: 'embeddings_index',
     creationTime: '1704153600', // Jan 2, 2024
+    dimension: 1536,
+    distanceMetric: 'cosine',
   },
   {
     indexName: 'search_index',
     creationTime: '1704240000', // Jan 3, 2024
+    dimension: 1536,
+    distanceMetric: 'cosine',
   },
 ]
 
@@ -95,53 +100,67 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
             <ScaffoldHeader className="pt-0 pb-3">
               <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
               <ScaffoldSectionDescription>
-                Vector indexes connected to this bucket.
+                Vector tables stored in this bucket.
               </ScaffoldSectionDescription>
             </ScaffoldHeader>
-            {allIndexes.length > 0 && (
-              <div className="flex flex-row justify-between">
-                <Input
-                  size="tiny"
-                  placeholder="Search for an index"
-                  value={filterString}
-                  onChange={(e) => setFilterString(e.target.value)}
-                  icon={<Search size={12} />}
-                  className="w-48"
-                />
-                <CreateVectorIndexSheet />
-              </div>
-            )}
 
-            {allIndexes.length > 0 && (
-              <Card>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead
-                        className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
-                      >
-                        Name
-                      </TableHead>
-                      <TableHead
-                        className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
-                      >
-                        Created at
-                      </TableHead>
-                      <TableHead />
+            <div className="flex flex-row justify-between">
+              <Input
+                size="tiny"
+                placeholder="Search for a table"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+                icon={<Search size={12} />}
+                className="w-48"
+              />
+              <CreateVectorTableSheet bucketName={bucket.vectorBucketName} />
+            </div>
+
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead
+                      className={indexesList.length === 0 ? 'text-foreground-muted' : undefined}
+                    >
+                      Name
+                    </TableHead>
+                    <TableHead
+                      className={indexesList.length === 0 ? 'text-foreground-muted' : undefined}
+                    >
+                      Dimension
+                    </TableHead>
+                    <TableHead
+                      className={indexesList.length === 0 ? 'text-foreground-muted' : undefined}
+                    >
+                      Distance metric
+                    </TableHead>
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {indexesList.length === 0 ? (
+                    <TableRow className="[&>td]:hover:bg-inherit">
+                      <TableCell colSpan={3}>
+                        {filterString.length > 0 ? (
+                          <>
+                            <p className="text-sm text-foreground">No results found</p>
+                            <p className="text-sm text-foreground-light">
+                              Your search for "{filterString}" did not return any results
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-sm text-foreground">No tables yet</p>
+                            <p className="text-sm text-foreground-light">
+                              Create your first table to get started
+                            </p>
+                          </>
+                        )}
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {indexesList.length === 0 && filterString.length > 0 && (
-                      <TableRow>
-                        <TableCell colSpan={3}>
-                          <p className="text-sm text-foreground">No results found</p>
-                          <p className="text-sm text-foreground-light">
-                            Your search for "{filterString}" did not return any results
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    {indexesList.map((index, idx: number) => {
+                  ) : (
+                    indexesList.map((index, idx: number) => {
                       const id = `index-${idx}`
                       const name = index.indexName
                       // the creation time is in seconds, convert it to milliseconds
@@ -151,9 +170,10 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                         <TableRow key={id}>
                           <TableCell>{name}</TableCell>
                           <TableCell>
-                            <p className="text-foreground-light">
-                              <TimestampInfo utcTimestamp={created} className="text-sm" />
-                            </p>
+                            <p className="text-foreground-lighter">{index.dimension}</p>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-foreground-lighter">{index.distanceMetric}</p>
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-row justify-end gap-2">
@@ -194,11 +214,11 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                           </TableCell>
                         </TableRow>
                       )
-                    })}
-                  </TableBody>
-                </Table>
-              </Card>
-            )}
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
           </ScaffoldSection>
 
           <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
