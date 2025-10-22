@@ -4669,16 +4669,7 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
-        | 'webhook'
-        | 'datadog'
-        | 'elastic'
-        | 'loki'
-        | 'sentry'
-        | 's3'
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
     }
     CreateCliLoginSessionBody: {
       public_key: string
@@ -6749,16 +6740,7 @@ export interface components {
       name: string
       token: string
       /** @enum {string} */
-      type:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
-        | 'webhook'
-        | 'datadog'
-        | 'elastic'
-        | 'loki'
-        | 'sentry'
-        | 's3'
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
       user_id: number
     }
     LFEndpoint: {
