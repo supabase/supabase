@@ -269,7 +269,7 @@ export const ProjectUsageSection = () => {
           <div className="flex items-start gap-2 heading-section text-foreground-light">
             <span className="text-foreground">{successRate.toFixed(1)}%</span>
             <span>Success Rate</span>
-            <span className={cn('text-sm', nonSuccessClass)}>{nonSuccessRate.toFixed(1)}%</span>
+            <span className={cn('text-sm', nonSuccessClass)}>{formatDelta(nonSuccessRate)}</span>
           </div>
         </div>
         <DropdownMenu>
