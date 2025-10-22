@@ -29,7 +29,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { BUCKET_TYPES } from '../Storage.constants'
-import { CreateVectorIndexSheet } from './CreateVectorIndexSheet'
+import { CreateVectorTableSheet } from './CreateVectorTableSheet'
 
 // Mock data for development - remove when backend is ready
 const MOCK_VECTOR_INDEXES = [
@@ -113,7 +113,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                 icon={<Search size={12} />}
                 className="w-48"
               />
-              <CreateVectorIndexSheet bucketName={bucket.vectorBucketName} />
+              <CreateVectorTableSheet bucketName={bucket.vectorBucketName} />
             </div>
 
             <Card>

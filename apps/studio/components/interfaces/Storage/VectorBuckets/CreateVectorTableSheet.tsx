@@ -98,11 +98,11 @@ const formId = 'create-vector-table-form'
 
 export type CreateVectorTableForm = z.infer<typeof FormSchema>
 
-interface CreateVectorIndexSheetProps {
+interface CreateVectorTableSheetProps {
   bucketName: string
 }
 
-export const CreateVectorIndexSheet = ({ bucketName }: CreateVectorIndexSheetProps) => {
+export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
   const { ref } = useParams()
   const { mutate: createVectorBucket, isLoading: isCreating } = useVectorBucketCreateMutation()
   const [visible, setVisible] = useState(false)
