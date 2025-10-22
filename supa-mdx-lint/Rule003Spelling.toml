@@ -280,6 +280,7 @@ allow_list = [
     "TextLocal",
     "TimescaleDB",
     "Transformers.js",
+    "tsquery",
     "[Tt]unneled",
     "Twilio",
     "Undici",

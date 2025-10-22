@@ -3,19 +3,10 @@ id: 'full-text-search'
 title: 'Full Text Search'
 description: 'How to use full text search in PostgreSQL.'
 subtitle: 'How to use full text search in PostgreSQL.'
-tocVideo: 'b-mgca_2Oe4'
+tocVideo: 'GRwIa-ce7RA'
 ---
 
 Postgres has built-in functions to handle `Full Text Search` queries. This is like a "search engine" within Postgres.
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/b-mgca_2Oe4"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
 
 ## Preparation
 
@@ -99,6 +90,13 @@ Converts a query string into tokens to match. `to_tsquery()` stands for "to text
 
 This conversion step is important because we will want to "fuzzy match" on keywords.
 For example if a user searches for `eggs`, and a column has the value `egg`, we probably still want to return a match.
+
+Postgres provides several functions to create tsquery objects:
+
+- **`to_tsquery()`** - Requires manual specification of operators (`&`, `|`, `!`)
+- **`plainto_tsquery()`** - Converts plain text to an AND query: `plainto_tsquery('english', 'fat rats')` → `'fat' & 'rat'`
+- **`phraseto_tsquery()`** - Creates phrase queries: `phraseto_tsquery('english', 'fat rats')` → `'fat' <-> 'rat'`
+- **`websearch_to_tsquery()`** - Supports web search syntax with quotes, "or", and negation
 
 ### Match: `@@` [#match]
 
@@ -751,9 +749,84 @@ When you want the search term to include a phrase or multiple words, you can con
 select * from search_books_by_title_prefix('Little+Puppy');
 ```
 
+## Web search syntax with `websearch_to_tsquery()` [#websearch-to-tsquery]
+
+The `websearch_to_tsquery()` function provides an intuitive search syntax similar to popular web search engines, making it ideal for user-facing search interfaces.
+
+### Basic usage
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select *
+from books
+where to_tsvector(description) @@ websearch_to_tsquery('english', 'green eggs');
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase
+  .from('books')
+  .select()
+  .textSearch('description', 'green eggs', { type: 'websearch' })
+```
+
+</TabPanel>
+</Tabs>
+
+### Quoted phrases
+
+Use quotes to search for exact phrases:
+
+```sql
+select * from books
+where to_tsvector(description || ' ' || title) @@ websearch_to_tsquery('english', '"Green Eggs"');
+-- Matches documents containing "Green" immediately followed by "Eggs"
+```
+
+### OR searches
+
+Use "or" (case-insensitive) to search for multiple terms:
+
+```sql
+select * from books
+where to_tsvector(description) @@ websearch_to_tsquery('english', 'puppy or rabbit');
+-- Matches documents containing either "puppy" OR "rabbit"
+```
+
+### Negation
+
+Use a dash (-) to exclude terms:
+
+```sql
+select * from books
+where to_tsvector(description) @@ websearch_to_tsquery('english', 'animal -rabbit');
+-- Matches documents containing "animal" but NOT "rabbit"
+```
+
+### Complex queries
+
+Combine multiple operators for sophisticated searches:
+
+```sql
+select * from books
+where to_tsvector(description || ' ' || title) @@
+  websearch_to_tsquery('english', '"Harry Potter" or "Dr. Seuss" -vegetables');
+-- Matches books by "Harry Potter" or "Dr. Seuss" but excludes those mentioning vegetables
+```
+
 ## Creating indexes
 
-Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents preemptively so that they
+Now that you have Full Text Search working, create an `index`. This allows Postgres to "build" the documents preemptively so that they
 don't need to be created at the time we execute the query. This will make our queries much faster.
 
 ### Searchable columns
@@ -1140,6 +1213,323 @@ data = client.from_('books').select().text_search('description', "'big' & !'litt
 
 </TabPanel>
 </$Show>
+</Tabs>
+
+## Ranking search results [#ranking]
+
+Postgres provides ranking functions to sort search results by relevance, helping you present the most relevant matches first. Since ranking functions need to be computed server-side, use RPC functions and generated columns.
+
+### Creating a search function with ranking [#search-function-ranking]
+
+First, create a Postgres function that handles search and ranking:
+
+```sql
+create or replace function search_books(search_query text)
+returns table(id int, title text, description text, rank real) as $$
+begin
+  return query
+  select
+    books.id,
+    books.title,
+    books.description,
+    ts_rank(to_tsvector('english', books.description), to_tsquery(search_query)) as rank
+  from books
+  where to_tsvector('english', books.description) @@ to_tsquery(search_query)
+  order by rank desc;
+end;
+$$ language plpgsql;
+```
+
+Now you can call this function from your client:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.rpc('search_books', { search_query: 'big' })
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+final result = await client
+  .rpc('search_books', params: { 'search_query': 'big' });
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+data = client.rpc('search_books', { 'search_query': 'big' }).execute()
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select * from search_books('big');
+```
+
+</TabPanel>
+</Tabs>
+
+### Ranking with weighted columns [#weighted-ranking]
+
+Postgres allows you to assign different importance levels to different parts of your documents using weight labels. This is especially useful when you want matches in certain fields (like titles) to rank higher than matches in other fields (like descriptions).
+
+#### Understanding weight labels
+
+Postgres uses four weight labels: **A**, **B**, **C**, and **D**, where:
+
+- **A** = Highest importance (weight 1.0)
+- **B** = High importance (weight 0.4)
+- **C** = Medium importance (weight 0.2)
+- **D** = Low importance (weight 0.1)
+
+#### Creating weighted search columns
+
+First, create a weighted tsvector column that gives titles higher priority than descriptions:
+
+```sql
+-- Add a weighted fts column
+alter table books
+add column fts_weighted tsvector
+generated always as (
+  setweight(to_tsvector('english', title), 'A') ||
+  setweight(to_tsvector('english', description), 'B')
+) stored;
+
+-- Create index for the weighted column
+create index books_fts_weighted on books using gin (fts_weighted);
+```
+
+Now create a search function that uses this weighted column:
+
+```sql
+create or replace function search_books_weighted(search_query text)
+returns table(id int, title text, description text, rank real) as $$
+begin
+  return query
+  select
+    books.id,
+    books.title,
+    books.description,
+    ts_rank(books.fts_weighted, to_tsquery(search_query)) as rank
+  from books
+  where books.fts_weighted @@ to_tsquery(search_query)
+  order by rank desc;
+end;
+$$ language plpgsql;
+```
+
+#### Custom weight arrays
+
+You can also specify custom weights by providing a weight array to `ts_rank()`:
+
+```sql
+create or replace function search_books_custom_weights(search_query text)
+returns table(id int, title text, description text, rank real) as $$
+begin
+  return query
+  select
+    books.id,
+    books.title,
+    books.description,
+    ts_rank(
+      '{0.0, 0.2, 0.5, 1.0}'::real[], -- Custom weights {D, C, B, A}
+      books.fts_weighted,
+      to_tsquery(search_query)
+    ) as rank
+  from books
+  where books.fts_weighted @@ to_tsquery(search_query)
+  order by rank desc;
+end;
+$$ language plpgsql;
+```
+
+This example uses custom weights where:
+
+- A-labeled terms (titles) have maximum weight (1.0)
+- B-labeled terms (descriptions) have medium weight (0.5)
+- C-labeled terms have low weight (0.2)
+- D-labeled terms are ignored (0.0)
+
+#### Using the weighted search
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+// Search with standard weighted ranking
+const { data, error } = await supabase.rpc('search_books_weighted', { search_query: 'Harry' })
+
+// Search with custom weights
+const { data: customData, error: customError } = await supabase.rpc('search_books_custom_weights', {
+  search_query: 'Harry',
+})
+```
+
+</TabPanel>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+# Search with standard weighted ranking
+data = client.rpc('search_books_weighted', { 'search_query': 'Harry' }).execute()
+
+# Search with custom weights
+custom_data = client.rpc('search_books_custom_weights', { 'search_query': 'Harry' }).execute()
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="sql" label="SQL">
+
+```sql
+-- Standard weighted search
+select * from search_books_weighted('Harry');
+
+-- Custom weighted search
+select * from search_books_custom_weights('Harry');
+```
+
+</TabPanel>
+</Tabs>
+
+#### Practical example with results
+
+Say you search for "Harry". With weighted columns:
+
+1. **"Harry Potter and the Goblet of Fire"** (title match) gets weight A = 1.0
+2. **Books mentioning "Harry" in description** get weight B = 0.4
+
+This ensures that books with "Harry" in the title ranks significantly higher than books that only mention "Harry" in the description, providing more relevant search results for users.
+
+### Using ranking with indexes [#ranking-with-indexes]
+
+When using the `fts` column you created earlier, ranking becomes more efficient. Create a function that uses the indexed column:
+
+```sql
+create or replace function search_books_fts(search_query text)
+returns table(id int, title text, description text, rank real) as $$
+begin
+  return query
+  select
+    books.id,
+    books.title,
+    books.description,
+    ts_rank(books.fts, to_tsquery(search_query)) as rank
+  from books
+  where books.fts @@ to_tsquery(search_query)
+  order by rank desc;
+end;
+$$ language plpgsql;
+```
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.rpc('search_books_fts', { search_query: 'little & big' })
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+final result = await client
+  .rpc('search_books_fts', params: { 'search_query': 'little & big' });
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+data = client.rpc('search_books_fts', { 'search_query': 'little & big' }).execute()
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select * from search_books_fts('little & big');
+```
+
+</TabPanel>
+</Tabs>
+
+### Using web search syntax with ranking [#websearch-ranking]
+
+You can also create a function that combines `websearch_to_tsquery()` with ranking for user-friendly search:
+
+```sql
+create or replace function websearch_books(search_text text)
+returns table(id int, title text, description text, rank real) as $$
+begin
+  return query
+  select
+    books.id,
+    books.title,
+    books.description,
+    ts_rank(books.fts, websearch_to_tsquery('english', search_text)) as rank
+  from books
+  where books.fts @@ websearch_to_tsquery('english', search_text)
+  order by rank desc;
+end;
+$$ language plpgsql;
+```
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+// Support natural search syntax
+const { data, error } = await supabase.rpc('websearch_books', {
+  search_text: '"little puppy" or train -vegetables',
+})
+```
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select * from websearch_books('"little puppy" or train -vegetables');
+```
+
+</TabPanel>
 </Tabs>
 
 ## Resources
