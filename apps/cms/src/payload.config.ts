@@ -106,6 +106,8 @@ export default buildConfig({
   },
   // Reduce payload init overhead
   telemetry: false,
+  // @ts-expect-error had to rollback sharp verion to 0.32.6
+  // check https://github.com/payloadcms/payload/issues/14142
   sharp,
   plugins,
 })

@@ -57,7 +57,7 @@
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
-    "sharp": "~0.34.0",
+    "sharp": "0.32.6",
     "tailwind-merge": "^1.13.2",
     "tsx": "^4.19.3",
     "typescript": "catalog:"
