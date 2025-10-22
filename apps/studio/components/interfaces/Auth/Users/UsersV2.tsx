@@ -14,6 +14,7 @@ import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
+import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -53,6 +54,9 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+
+// [Joshen] Arbitary threshold value for what's considered to be a lot of users
+const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
@@ -117,6 +121,15 @@ export const UsersV2 = () => {
     )
 
   const [
+    localStorageSortByValue,
+    setLocalStorageSortByValue,
+    { isSuccess: isLocalStorageSortByValueLoaded },
+  ] = useLocalStorageQuery<string>(
+    LOCAL_STORAGE_KEYS.AUTH_USERS_SORT_BY_VALUE(projectRef ?? ''),
+    'id'
+  )
+
+  const [
     columnConfiguration,
     setColumnConfiguration,
     { isSuccess: isSuccessStorage, isError: isErrorStorage, error: errorStorage },
@@ -133,6 +146,23 @@ export const UsersV2 = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
   const [showFreeformWarning, setShowFreeformWarning] = useState(false)
+
+  const { data: countData, isSuccess: isCountLoaded } = useUsersCountQuery(
+    {
+      projectRef,
+      connectionString: project?.connectionString,
+      // [Joshen] Do not change the following, these are to match the count query in UsersFooter
+      // on initial load with no search configuration so that we only fire 1 count request at the
+      // beginning. The count value is for all users - should disregard any search configuration
+      keywords: '',
+      filter: undefined,
+      providers: [],
+      forceExactCount: false,
+    },
+    { keepPreviousData: true }
+  )
+  const totalUsers = countData?.count ?? 0
+  const isCountWithinThresholdForSortBy = totalUsers <= SORT_BY_VALUE_COUNT_THRESHOLD
 
   const {
     data,
@@ -303,14 +333,31 @@ export const UsersV2 = () => {
 
   // [Joshen] Load URL state for filter column only once, if no filter column found in URL params
   useEffect(() => {
-    if (specificFilterColumn === 'id' && localStorageFilter !== 'id') {
+    if (
+      isLocalStorageFilterLoaded &&
+      specificFilterColumn === 'id' &&
+      localStorageFilter !== 'id'
+    ) {
       setSpecificFilterColumn(localStorageFilter)
     }
-  }, [])
+  }, [isLocalStorageFilterLoaded])
+
+  // [Joshen] Only load sort by value if count is within threshold
+  useEffect(() => {
+    if (isLocalStorageSortByValueLoaded && isCountLoaded && isCountWithinThresholdForSortBy) {
+      setSortByValue(localStorageSortByValue)
+    }
+  }, [isLocalStorageSortByValueLoaded, isCountLoaded])
 
   useEffect(() => {
     setLocalStorageFilter(specificFilterColumn)
   }, [specificFilterColumn])
+
+  useEffect(() => {
+    if (isCountWithinThresholdForSortBy) {
+      setLocalStorageSortByValue(sortByValue)
+    }
+  }, [sortByValue])
 
   return (
     <>
@@ -353,7 +400,11 @@ export const UsersV2 = () => {
                   }}
                   setSpecificFilterColumn={(value) => {
                     if (value === 'freeform') {
-                      setShowFreeformWarning(true)
+                      if (isCountWithinThresholdForSortBy) {
+                        setSpecificFilterColumn(value)
+                      } else {
+                        setShowFreeformWarning(true)
+                      }
                     } else {
                       setSpecificFilterColumn(value)
                     }
