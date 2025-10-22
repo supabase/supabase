@@ -1978,13 +1978,36 @@ export interface CommandMenuOpenedEvent {
  * @source ui-patterns
  * @page any
  */
-export interface CommandInputTypedEvent {
+export interface CommandMenuInputTypedEvent {
   action: 'command_input_typed'
   properties: {
     /**
      * Search term typed into the command menu input
      */
     value: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: TelemetryGroups
+}
+/**
+ * User selected a command from the command menu.
+ *
+ * @group Events
+ * @source ui-patterns
+ * @page any
+ */
+export interface CommandMenuCommandSelectedEvent {
+  action: 'command_menu_command_selected'
+  properties: {
+    /**
+     * The selected command
+     */
+    command_name: string
+    command_value?: string
+    command_type: 'action' | 'route'
     /**
      * In which app the command input was typed
      */
@@ -2108,4 +2131,5 @@ export type TelemetryEvent =
   | TableRLSEnabledEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
-  | CommandInputTypedEvent
+  | CommandMenuInputTypedEvent
+  | CommandMenuCommandSelectedEvent
