@@ -279,6 +279,7 @@ allow_list = [
     "Remapper",
     "TextLocal",
     "TimescaleDB",
+    "tmux",
     "Transformers.js",
     "[Tt]unneled",
     "Twilio",

@@ -9,13 +9,13 @@ Supabase is a robust and open-source platform. Supabase provides all the backend
 
 This guide demonstrates how to migrate your Postgres database to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
 
-This guide provides three methods for migrating your PostgreSQL database to Supabase:
+This guide provides three methods for migrating your Postgres database to Supabase:
 
 1. **Google Colab** - Guided notebook with copy-paste workflow
 2. **Manual Dump/Restore** - CLI approach, works for all versions
-3. **Logical Replication** - Minimal downtime, requires PostgreSQL 10+
+3. **Logical Replication** - Minimal downtime, requires Postgres 10+
 
-## Connection Modes
+## Connection modes
 
 Supabase provides the following connection modes:
 
@@ -25,7 +25,7 @@ Supabase provides the following connection modes:
 
 Use Supavisor session mode for the database migration tasks (pg_dump/restore and logical replication).
 
-## Method 1: Google Colab (Easiest)
+## Method 1: Google Colab (easiest)
 
 Supabase provides a Google Colab migration notebook for a guided migration experience:
 [Supabase Migration Colab Notebook](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb)
@@ -34,30 +34,30 @@ This is ideal if you prefer a step-by-step, copy-paste workflow with minimal set
 
 ## Method 2: Manual Dump/Restore
 
-This method works for all PostgreSQL versions using CLI tools.
+This method works for all Postgres versions using CLI tools.
 
 ### Prerequisites
 
-#### Source PostgreSQL Requirements
+#### Source Postgres requirements
 
 - Connection string with rights to run `pg_dump`
 - No special settings required for dump/restore
 - Network access from migration VM
 
-#### Migration Environment
+#### Migration environment
 
 - Cloud VM running Ubuntu in the same region as source or target database
-- PostgreSQL client tools matching your source database version
+- Postgres client tools matching your source database version
 - tmux for session persistence
 - Sufficient disk space (usually ~50% of source database size is enough, but varies case by case)
 
-### Pre-Migration Checklist
+### Pre-Migration checklist
 
 ```sql
 -- Check database size
 select pg_size_pretty(pg_database_size(current_database())) as size;
 
--- Check PostgreSQL version
+-- Check Postgres version
 select version();
 
 -- List installed extensions
@@ -67,7 +67,7 @@ select * from pg_extension order by extname;
 select count(*) from pg_stat_activity;
 ```
 
-#### Check Available Extensions in Supabase
+#### Check available extensions in Supabase
 
 ```sql
 -- Connect to your Supabase database and check available extensions
@@ -80,7 +80,7 @@ SELECT extname FROM pg_extension ORDER BY extname;
 CREATE EXTENSION IF NOT EXISTS extension_name;
 ```
 
-### Step 1: Set Up Migration VM
+### Step 1: Set up migration VM
 
 <Admonition type="tip">
 
@@ -88,22 +88,22 @@ For optimal performance, run the migration from a cloud VM, not your local machi
 
 </Admonition>
 
-#### Set Up Ubuntu VM
+#### Set up Ubuntu VM
 
 ```bash
-# Install PostgreSQL client and tools
+# Install Postgres client and tools
 sudo apt update
 sudo apt install software-properties-common
-sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo sh -c 'echo "deb http://apt.Postgres.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.Postgres.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt update
-sudo apt install postgresql-client-17 tmux htop iotop moreutils
+sudo apt install Postgres-client-17 tmux htop iotop moreutils
 
 # Start or attach to tmux session
 tmux a -t migration || tmux new -s migration
 ```
 
-### Step 2: Prepare Supabase Project
+### Step 2: Prepare Supabase project
 
 1. Create a Supabase project at [supabase.com/dashboard](https://supabase.com/dashboard)
 2. Note your database password
@@ -111,7 +111,7 @@ tmux a -t migration || tmux new -s migration
 4. Get your connection string:
    - Go to **Project → Settings → Database → Connection Pooling**
    - Select **Session pooler** (port 5432) and copy the connection string
-   - Connection format: `postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres`
+   - Connection format: `Postgres://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres`
 
 **Important Notes**:
 
@@ -129,9 +129,9 @@ tmux a -t migration || tmux new -s migration
 
 Also, you can temporarily increase compute size and/or disk IOPS and throughput via Settings → Compute and Disk if you want faster database restore (you can use larger -j for pg_restore if you do so).
 
-### Step 3: Create Database Dump
+### Step 3: Create database dump
 
-#### Set Source Database to Read-Only Mode (For Production Migration)
+#### Set source database to read only mode for production migration
 
 If doing a maintenance window migration, prevent data changes:
 
@@ -142,7 +142,7 @@ ALTER DATABASE your_database_name SET default_transaction_read_only = true;
 
 For testing without a maintenance window, skip this step but use lower -j values.
 
-#### Dump the Database
+#### Dump the database
 
 ```bash
 # Determine number of parallel jobs based on:
@@ -183,7 +183,7 @@ pg_dump \
 
 Run `pg_dump --help` for a full list of options.
 
-#### Recommended Parallelization (-j values)
+#### Recommended parallelization (-j values)
 
 | Database Size | Testing (no maintenance window) | Production (with maintenance window) | Limiting Factor |
 | ------------- | ------------------------------- | ------------------------------------ | --------------- |
@@ -196,11 +196,11 @@ Run `pg_dump --help` for a full list of options.
 
 ### Step 4: Restore to Supabase
 
-#### Set Connection and Restore
+#### Set connection and restore
 
 ```bash
 # Set Supabase connection (Session Pooler on port 5432 or direct connection)
-export SUPABASE_DB_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+export SUPABASE_DB_URL="Postgres://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
 
 # Determine restore parallelization based on your Supabase compute size:
 # Free tier: 2 cores → use -j 2
@@ -225,9 +225,9 @@ pg_restore \
 
 If restore fails with extension errors, check that errors are only extension-related.
 
-### Step 5: Post-Migration Tasks
+### Step 5: Post-Migration tasks
 
-#### Update Statistics (Important)
+#### Update statistics (important)
 
 ```bash
 psql "$SUPABASE_DB_URL" -c "VACUUM VERBOSE ANALYZE;"
@@ -235,11 +235,11 @@ psql "$SUPABASE_DB_URL" -c "VACUUM VERBOSE ANALYZE;"
 
 <Admonition type="note">
 
-For PostgreSQL 18+, pg_dump includes statistics with `--with-statistics`, but you should still run VACUUM for optimal performance.
+For Postgres 18+, pg_dump includes statistics with `--with-statistics`, but you should still run VACUUM for optimal performance.
 
 </Admonition>
 
-#### Verify Migration
+#### Verify migration
 
 ```sql
 -- Check row counts
@@ -250,13 +250,13 @@ limit 20;
 -- Verify data with application-specific queries
 ```
 
-#### Re-enable Writes on Source (if keeping it)
+#### Re-enable writes on source (if keeping it)
 
 ```sql
 ALTER DATABASE your_database_name SET default_transaction_read_only = false;
 ```
 
-### Migration Time Estimates
+### Migration time estimates
 
 | Database Size | Dump Time | Restore Time | Total Time |
 | ------------- | --------- | ------------ | ---------- |
@@ -267,7 +267,7 @@ ALTER DATABASE your_database_name SET default_transaction_read_only = false;
 
 _Times vary based on hardware, network, and parallelization settings_
 
-### Important Notes
+### Important notes
 
 1. **Region proximity matters**: VM should be in the same region as the source or target for best performance
 2. **Downgrade migrations**: While technically possible in some cases, highly not recommended
@@ -278,32 +278,32 @@ _Times vary based on hardware, network, and parallelization settings_
 
 ---
 
-## Method 3: Logical Replication
+## Method 3: Logical replication
 
-This method allows migration with minimal downtime using PostgreSQL's logical replication feature. Requires PostgreSQL 10+ on both source and target.
+This method allows migration with minimal downtime using Postgres's logical replication feature. Requires Postgres 10+ on both source and target.
 
-### When to Use Logical Replication
+### When to use logical replication
 
 - You need minimal downtime (minutes instead of hours)
-- Source database is PostgreSQL 10 or higher
+- Source database is Postgres 10 or higher
 - You can configure logical replication on the source
 - Database has high write activity that can't be paused for long
 
-### Source PostgreSQL Prerequisites
+### Source Postgres prerequisites
 
-#### Access & Privileges
+#### Access & privileges
 
 - Connection string with rights to CREATE PUBLICATION and read tables
 - Superuser or replication privileges recommended
 
-#### Required Settings for Logical Replication
+#### Required settings for logical replication
 
 - `wal_level = logical`
 - `max_wal_senders ≥ 1`
 - `max_replication_slots ≥ 1`
 - Sufficient `max_connections` (current + 1 for subscription)
 
-#### Replica Identity
+#### Replica identity
 
 Every table receiving UPDATE/DELETE must have a replica identity (typically a PRIMARY KEY). For tables without one:
 
@@ -311,7 +311,7 @@ Every table receiving UPDATE/DELETE must have a replica identity (typically a PR
 ALTER TABLE schema.table_name REPLICA IDENTITY FULL;
 ```
 
-#### Non-Replicated Items
+#### Non-Replicated items
 
 - **DDL changes** (schema modifications)
 - **Sequences** (need manual sync)
@@ -319,15 +319,15 @@ ALTER TABLE schema.table_name REPLICA IDENTITY FULL;
 
 Plan a schema freeze, sequence sync before cutover, and handle LOBs separately.
 
-### Step 1: Configure Source Database
+### Step 1: Configure source database
 
-Edit PostgreSQL configuration files:
+Edit Postgres configuration files:
 
-#### postgresql.conf
+#### Postgres.conf
 
 ```bash
 # Set Supabase connection (Session Pooler on port 5432 or direct connection)
-export SUPABASE_DB_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+export SUPABASE_DB_URL="Postgres://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
 
 # Set WAL level to logical
 wal_level = logical
@@ -361,14 +361,14 @@ hostssl replication     all     <supabase_ip_range>    md5
 hostssl all            all     <supabase_ip_range>    md5
 ```
 
-Restart PostgreSQL:
+Restart Postgres:
 
 ```bash
-sudo systemctl restart postgresql
-sudo systemctl status postgresql
+sudo systemctl restart Postgres
+sudo systemctl status Postgres
 ```
 
-### Step 2: Verify Configuration
+### Step 2: Verify configuration
 
 ```sql
 -- Should return 'logical'
@@ -382,7 +382,7 @@ SHOW max_wal_senders;
 SELECT count(*) FROM pg_stat_activity;
 ```
 
-### Step 3: Check and Set Replica Identity
+### Step 3: Check and set replica identity
 
 ```sql
 -- Find tables without primary keys
@@ -398,7 +398,7 @@ WHERE c.relkind = 'r'
 ALTER TABLE my_schema.my_table REPLICA IDENTITY FULL;
 ```
 
-### Step 4: Export and Restore Schema Only
+### Step 4: Export and restore schema only
 
 ```bash
 # Export schema from source
@@ -424,7 +424,7 @@ pg_restore \
   ./schema_dump
 ```
 
-### Step 5: Create Publication on Source
+### Step 5: Create publication on source
 
 ```sql
 -- Create publication for all tables
@@ -440,7 +440,7 @@ CREATE PUBLICATION supabase_migration FOR TABLE
 SELECT * FROM pg_publication;
 ```
 
-### Step 6: Create Subscription on Supabase
+### Step 6: Create subscription on Supabase
 
 Connect to your Supabase database:
 
@@ -456,7 +456,7 @@ CONNECTION 'host=<source_host> port=<source_port> user=<source_user> password=<s
 PUBLICATION supabase_migration;
 ```
 
-### Step 7: Monitor Replication Status
+### Step 7: Monitor replication status
 
 ```sql
 -- On Supabase (subscriber) - check subscription status
@@ -481,7 +481,7 @@ from pg_replication_slots;
 
 Wait until all tables show `srsubstate = 'r'` (ready) status.
 
-### Step 8: Synchronize Sequences
+### Step 8: Synchronize sequences
 
 After initial data sync is complete, but BEFORE switching to Supabase:
 
@@ -541,7 +541,7 @@ DROP REPLICATION SLOT slot_name;  -- if any remain
 -- Do NOT re-enable writes to avoid a split-brain scenario!
 ```
 
-### Troubleshooting Logical Replication
+### Troubleshooting logical replication
 
 | Issue                                | Solution                                                            |
 | ------------------------------------ | ------------------------------------------------------------------- |
@@ -550,9 +550,9 @@ DROP REPLICATION SLOT slot_name;  -- if any remain
 | "publication does not exist"         | Verify publication name and that it was created successfully        |
 | Replication lag growing              | Check network bandwidth, source database load, add more WAL senders |
 | Tables stuck in 'i' state            | Check for locks on source tables, verify table structure matches    |
-| "out of replication slots"           | Increase max_replication_slots in postgresql.conf                   |
+| "out of replication slots"           | Increase max_replication_slots in Postgres.conf                   |
 
-### Important Limitations
+### Important limitations
 
 - **DDL changes**: Schema modifications are not replicated - freeze schema during migration
 - **Sequences**: Need manual synchronization before cutover
@@ -560,28 +560,28 @@ DROP REPLICATION SLOT slot_name;  -- if any remain
 - **Custom types**: May need special handling
 - **Users and roles**: Must be recreated manually on Supabase
 
-For detailed restrictions, see [PostgreSQL Logical Replication Restrictions](https://www.postgresql.org/docs/current/logical-replication-restrictions.html)
+For detailed restrictions, see [Postgres Logical Replication Restrictions](https://www.Postgres.org/docs/current/logical-replication-restrictions.html)
 
-### When to Use Which Method
+### When to use which method
 
 **Use Dump/Restore when:**
 
 - Downtime window is acceptable
-- Source is PostgreSQL < 10
+- Source is Postgres < 10
 - Simpler process preferred
 - Cannot configure logical replication on the source
 
 **Use Logical Replication when:**
 
 - Minimal downtime required
-- PostgreSQL 10+ on both sides
+- Postgres 10+ on both sides
 - Can modify source configuration
 - Have replication privileges
 
-## Getting Help
+## Getting help
 
 - For databases > 150 GB: [Contact Supabase support](https://supabase.com/dashboard/support/new) before starting
 - [Supabase Dashboard Support](https://supabase.com/dashboard/support/new)
 - [Supabase Discord](https://discord.supabase.com)
-- [PostgreSQL Roles and Privileges Guide](https://supabase.com/blog/postgres-roles-and-privileges)
+- [Postgres Roles and Privileges Guide](https://supabase.com/blog/postgres-roles-and-privileges)
 - [Row Level Security Guide](https://supabase.com/docs/guides/database/postgres/row-level-security)
