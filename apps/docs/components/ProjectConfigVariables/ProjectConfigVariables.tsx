@@ -6,11 +6,10 @@ import type {
   Project,
   Variable,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
-import type { ProjectKeys, ProjectSettings } from '~/lib/fetch/projectApi'
 
 import { Check, Copy } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { withErrorBoundary } from 'react-error-boundary'
 import { proxy, useSnapshot } from 'valtio'
@@ -31,11 +30,13 @@ import {
   toOrgProjectValue,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
 import { useCopy } from '~/hooks/useCopy'
+import { useDebounce } from '~/hooks/useDebounce'
 import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
 import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
-import { useProjectSettingsQuery, useProjectKeysQuery } from '~/lib/fetch/projectApi'
-import { isProjectPaused, useProjectsQuery } from '~/lib/fetch/projects'
+import { useProjectKeysQuery, useProjectSettingsQuery } from '~/lib/fetch/projectApi'
+import { isProjectPaused } from '~/lib/fetch/projects'
+import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 
@@ -90,6 +91,9 @@ function OrgProjectSelector() {
   const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
 
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
+
   const { selectedOrg, selectedProject, setSelectedOrgProject } = useSnapshot(projectsStore)
 
   const {
@@ -97,11 +101,21 @@ function OrgProjectSelector() {
     isPending: organizationsIsPending,
     isError: organizationsIsError,
   } = useOrganizationsQuery({ enabled: isLoggedIn })
+
   const {
-    data: projects,
+    data: projectsData,
     isPending: projectsIsPending,
     isError: projectsIsError,
-  } = useProjectsQuery({ enabled: isLoggedIn })
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useProjectsInfiniteQuery(
+    { search: search.length === 0 ? search : debouncedSearch },
+    { enabled: isLoggedIn }
+  )
+  const projects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const anyIsPending = organizationsIsPending || projectsIsPending
   const anyIsError = organizationsIsError || projectsIsError
@@ -181,6 +195,12 @@ function OrgProjectSelector() {
           setSelectedOrgProject(org, project)
         }
       }}
+      search={search}
+      isFetching={isFetching}
+      isFetchingNextPage={isFetchingNextPage}
+      hasNextPage={hasNextPage}
+      fetchNextPage={fetchNextPage}
+      setSearch={setSearch}
     />
   )
 }

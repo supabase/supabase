@@ -1,11 +1,10 @@
 import { noop } from 'lodash-es'
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button_Shadcn_ as Button,
   cn,
   Command_Shadcn_ as Command,
-  CommandEmpty_Shadcn_ as CommandEmpty,
   CommandGroup_Shadcn_ as CommandGroup,
   CommandInput_Shadcn_ as CommandInput,
   CommandItem_Shadcn_ as CommandItem,
@@ -15,6 +14,9 @@ import {
   PopoverTrigger_Shadcn_ as PopoverTrigger,
   ScrollArea,
 } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
+import { fromOrgProjectValue } from './ProjectConfigVariables.utils'
 
 export interface ComboBoxOption {
   id: string
@@ -30,6 +32,12 @@ export function ComboBox<Opt extends ComboBoxOption>({
   selectedOption,
   onSelectOption = noop,
   className,
+  search = '',
+  hasNextPage = false,
+  isFetching = false,
+  isFetchingNextPage = false,
+  fetchNextPage,
+  setSearch = () => {},
 }: {
   isLoading: boolean
   disabled?: boolean
@@ -38,15 +46,45 @@ export function ComboBox<Opt extends ComboBoxOption>({
   selectedOption?: string
   onSelectOption?: (newValue: string) => void
   className?: string
+  search?: string
+  hasNextPage?: boolean
+  isFetching?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: () => void
+  setSearch?: (value: string) => void
 }) {
   const [open, setOpen] = useState(false)
 
-  const selectedOptionDisplayName = options.find(
-    (option) => option.value === selectedOption
-  )?.displayName
+  const scrollRootRef = useRef<HTMLDivElement | null>(null)
+  const [sentinelRef, entry] = useIntersectionObserver({
+    root: scrollRootRef.current,
+    threshold: 0,
+    rootMargin: '0px',
+  })
+
+  const [_, __, displayName] = fromOrgProjectValue(selectedOption ?? '')
+
+  useEffect(() => {
+    if (
+      !isLoading &&
+      !isFetching &&
+      !isFetchingNextPage &&
+      hasNextPage &&
+      entry?.isIntersecting &&
+      !!fetchNextPage
+    ) {
+      fetchNextPage()
+    }
+  }, [isLoading, isFetching, isFetchingNextPage, hasNextPage, entry?.isIntersecting, fetchNextPage])
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(value) => {
+        setOpen(value)
+        if (!value) setSearch('')
+      }}
+    >
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -62,41 +100,72 @@ export function ComboBox<Opt extends ComboBoxOption>({
             className
           )}
         >
-          {isLoading
-            ? 'Loading...'
-            : options.length === 0
-              ? `No ${name} found`
-              : selectedOptionDisplayName ?? `Select a ${name}...`}
+          {displayName ??
+            (isLoading && options.length > 0
+              ? 'Loading...'
+              : options.length === 0
+                ? `No ${name} found`
+                : `Select a ${name}...`)}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0" side="bottom">
-        <Command>
-          <CommandInput placeholder={`Search ${name}...`} className="border-none ring-0" />
+      <PopoverContent className="p-0" side="bottom" align="start">
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder={`Search ${name}...`}
+            className="border-none ring-0"
+            showResetIcon
+            value={search}
+            onValueChange={setSearch}
+            handleReset={() => setSearch('')}
+          />
           <CommandList>
-            <CommandEmpty>No {name} found.</CommandEmpty>
             <CommandGroup>
-              <ScrollArea className={options.length > 10 ? 'h-[280px]' : ''}>
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.id}
-                    value={option.value}
-                    onSelect={(selectedValue: string) => {
-                      setOpen(false)
-                      onSelectOption(selectedValue)
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        selectedOption === option.value ? 'opacity-100' : 'opacity-0'
-                      )}
-                    />
-                    {option.displayName}
-                  </CommandItem>
-                ))}
-              </ScrollArea>
+              {isLoading ? (
+                <>
+                  <div className="px-2 py-1">
+                    <ShimmeringLoader className="py-2" />
+                  </div>
+                  <div className="px-2 py-1 w-4/5">
+                    <ShimmeringLoader className="py-2" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {search.length > 0 && options.length === 0 && (
+                    <p className="text-xs text-center text-foreground-lighter py-3">
+                      No {name}s found based on your search
+                    </p>
+                  )}
+                  <ScrollArea className={options.length > 7 ? 'h-[210px]' : ''}>
+                    {options.map((option) => (
+                      <CommandItem
+                        key={option.id}
+                        value={option.value}
+                        onSelect={(selectedValue: string) => {
+                          setOpen(false)
+                          onSelectOption(selectedValue)
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Check
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            selectedOption === option.value ? 'opacity-100' : 'opacity-0'
+                          )}
+                        />
+                        {option.displayName}
+                      </CommandItem>
+                    ))}
+                    <div ref={sentinelRef} className="h-1 -mt-1" />
+                    {hasNextPage && (
+                      <div className="px-2 py-1">
+                        <ShimmeringLoader className="py-2" />
+                      </div>
+                    )}
+                  </ScrollArea>
+                </>
+              )}
             </CommandGroup>
           </CommandList>
         </Command>
