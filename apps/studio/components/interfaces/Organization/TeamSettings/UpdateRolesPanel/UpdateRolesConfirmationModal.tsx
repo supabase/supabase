@@ -14,6 +14,7 @@ import {
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
@@ -39,12 +40,12 @@ export const UpdateRolesConfirmationModal = ({
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const { data: organization } = useSelectedOrganizationQuery()
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: allRoles } = useOrganizationRolesV2Query({ slug: organization?.slug })
-  const hasProjectScopedRoles = (allRoles?.project_scoped_roles ?? []).length > 0
 
   // [Joshen] We only need this data if the org has project scoped roles
-  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
+  const { data } = useProjectsQuery({ enabled: isOptedIntoProjectLevelPermissions && visible })
   const projects = data?.projects ?? []
 
   // [Joshen] Separate saving state instead of using RQ due to several successive steps

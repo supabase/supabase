@@ -18,6 +18,7 @@ import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { LastSignInWrapper } from './LastSignInWrapper'
+import { Eye, EyeOff } from 'lucide-react'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -30,6 +31,8 @@ export const SignInForm = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [_, setLastSignIn] = useLastSignIn()
+
+  const [passwordHidden, setPasswordHidden] = useState(true)
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -146,14 +149,26 @@ export const SignInForm = () => {
             render={({ field }) => (
               <FormItemLayout name="password" label="Password">
                 <FormControl_Shadcn_>
-                  <Input_Shadcn_
-                    id="password"
-                    type="password"
-                    autoComplete="current-password"
-                    {...field}
-                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                    disabled={isSubmitting}
-                  />
+                  <div className="relative">
+                    <Input_Shadcn_
+                      id="password"
+                      type={passwordHidden ? 'password' : 'text'}
+                      autoComplete="current-password"
+                      {...field}
+                      placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                      disabled={isSubmitting}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="default"
+                      title={passwordHidden ? `Show password` : `Hide password`}
+                      aria-label={passwordHidden ? `Show password` : `Hide password`}
+                      className="absolute right-1 top-1 px-1.5"
+                      icon={passwordHidden ? <Eye /> : <EyeOff />}
+                      disabled={isSubmitting}
+                      onClick={() => setPasswordHidden((prev) => !prev)}
+                    />
+                  </div>
                 </FormControl_Shadcn_>
               </FormItemLayout>
             )}

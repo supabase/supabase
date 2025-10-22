@@ -46,10 +46,12 @@ const CommandShortcut = ({
   })
 
   useEffect(() => {
-    const handleKeydown = (evt: KeyboardEvent) => {
-      if (openKey === '') return
+    if (openKey === '') return
 
-      if (evt.key === openKey && evt.metaKey) {
+    const handleKeydown = (evt: KeyboardEvent) => {
+      const usesPrimaryModifier = evt.metaKey || evt.ctrlKey
+      const otherModifiersActive = evt.altKey || evt.shiftKey
+      if (evt.key === openKey && usesPrimaryModifier && !otherModifiersActive) {
         evt.preventDefault()
         toggleOpen()
         sendTelemetry('keyboard_shortcut')
@@ -59,7 +61,7 @@ const CommandShortcut = ({
     document.addEventListener('keydown', handleKeydown)
 
     return () => document.removeEventListener('keydown', handleKeydown)
-  }, [toggleOpen, sendTelemetry])
+  }, [openKey, sendTelemetry, toggleOpen])
 
   return null
 }

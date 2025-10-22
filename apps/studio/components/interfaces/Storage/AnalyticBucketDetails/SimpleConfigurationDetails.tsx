@@ -1,8 +1,14 @@
-import Link from '@ui/components/Typography/Link'
-import { ScaffoldSectionDescription, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import {
+  ScaffoldHeader,
+  ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Card } from 'ui'
 import { getCatalogURI, getConnectionURL } from '../StorageSettings/StorageSettings.utils'
 import { DESCRIPTIONS } from './constants'
@@ -11,9 +17,9 @@ import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 
 const wrapperMeta = {
   options: [
-    { name: 'vault_token', label: 'Vault Token', secureEntry: false },
-    { name: 'warehouse', label: 'Warehouse', secureEntry: false },
-    { name: 's3.endpoint', label: 'S3 Endpoint', secureEntry: false },
+    { name: 'vault_token', label: 'Vault token', secureEntry: false },
+    { name: 'warehouse', label: 'Warehouse name', secureEntry: false },
+    { name: 's3.endpoint', label: 'S3 endpoint', secureEntry: false },
     { name: 'catalog_uri', label: 'Catalog URI', secureEntry: false },
   ],
 }
@@ -37,24 +43,23 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
   }
 
   return (
-    <div>
-      <div className="flex flex-row justify-between items-center">
+    <ScaffoldSection isFullWidth>
+      <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
         <div>
-          <ScaffoldSectionTitle>Configuration Details</ScaffoldSectionTitle>
-          <ScaffoldSectionDescription className="mb-4">
-            You can use the following configuration details to connect to the bucket from your code.
+          <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
+          <ScaffoldSectionDescription>
+            Connect to this bucket from an Iceberg client.{' '}
+            <InlineLink
+              href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
+            >
+              Learn more
+            </InlineLink>
           </ScaffoldSectionDescription>
         </div>
         <CopyEnvButton serverOptions={wrapperMeta.options} values={values} />
-      </div>
-      <Card className="flex flex-col gap-6 p-6 pb-0">
-        <p className="text-sm text-foreground-light mb-4">
-          To get AWS credentials, you can create them using the{' '}
-          <Link href={`/project/${project?.ref}/storage/settings`}>
-            <a className="underline ">S3 Access Keys</a>
-          </Link>{' '}
-          feature.
-        </p>
+      </ScaffoldHeader>
+
+      <Card>
         {wrapperMeta.options.map((option) => {
           return (
             <DecryptedReadOnlyInput
@@ -67,6 +72,6 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
           )
         })}
       </Card>
-    </div>
+    </ScaffoldSection>
   )
 }

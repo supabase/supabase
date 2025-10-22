@@ -1,8 +1,9 @@
 import { CheckCircle, Download, Loader } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
@@ -110,11 +111,15 @@ const RestoringState = () => {
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
               <Button asChild type="default">
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Ongoing%20restoration%20for%20project`}
+                <SupportLink
+                  queryParams={{
+                    category: SupportCategories.DATABASE_UNRESPONSIVE,
+                    projectRef: project?.ref,
+                    subject: 'Ongoing restoration for project',
+                  }}
                 >
                   Contact support
-                </Link>
+                </SupportLink>
               </Button>
               <ButtonTooltip
                 type="default"
