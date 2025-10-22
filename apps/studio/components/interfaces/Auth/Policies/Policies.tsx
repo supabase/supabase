@@ -6,8 +6,8 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
-    PolicyTableRow,
-    PolicyTableRowProps,
+  PolicyTableRow,
+  PolicyTableRowProps,
 } from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
