@@ -55,7 +55,6 @@ import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
 
-// [Joshen] Arbitary threshold value for what's considered to be a lot of users
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 
 export const UsersV2 = () => {
