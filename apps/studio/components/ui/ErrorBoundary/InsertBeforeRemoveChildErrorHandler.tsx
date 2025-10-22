@@ -6,19 +6,21 @@ import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { detectBrowser } from 'lib/helpers'
 import { Button } from 'ui'
 
+interface InsertBeforeRemoveChildErrorHandlerProps {
+  message: string
+  sentryIssueId: string
+  urlMessage: string
+  isRemoveChildError: boolean
+  isInsertBeforeError?: boolean
+}
+
 export const InsertBeforeRemoveChildErrorHandler = ({
   message,
   sentryIssueId,
   urlMessage,
   isRemoveChildError,
   isInsertBeforeError,
-}: {
-  message: string
-  sentryIssueId: string
-  urlMessage: string
-  isRemoveChildError: boolean
-  isInsertBeforeError?: boolean
-}) => {
+}: InsertBeforeRemoveChildErrorHandlerProps) => {
   const router = useRouter()
   const browser = detectBrowser()
 
