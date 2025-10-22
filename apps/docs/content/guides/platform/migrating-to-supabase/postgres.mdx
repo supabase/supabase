@@ -32,7 +32,7 @@ Supabase provides a Google Colab migration notebook for a guided migration exper
 
 This is ideal if you prefer a step-by-step, copy-paste workflow with minimal setup.
 
-## Method 2: Manual Dump/Restore
+## Method 2: Manual dump/restore
 
 This method works for all Postgres versions using CLI tools.
 
@@ -115,7 +115,7 @@ tmux a -t migration || tmux new -s migration
 
 **Important Notes**:
 
-- **Users/roles are not migrated** - You'll need to recreate roles and privileges after import ([Supabase Roles Guide](https://supabase.com/blog/postgres-roles-and-privileges))
+- **Users/roles are not migrated** - You'll need to recreate roles and privileges after import ([Supabase Roles Guide](/blog/postgres-roles-and-privileges))
 - **Row Level Security (RLS) status on tables is not migrated** - You'll need to enable RLS for tables after migration.
 
 **Resource Requirements**:
@@ -348,6 +348,8 @@ ssl = on
 listen_addresses = '*'  # Or specific IP addresses
 ```
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 #### pg_hba.conf
 
 ```bash
@@ -549,7 +551,7 @@ DROP REPLICATION SLOT slot_name;  -- if any remain
 | "role does not exist"                | Ensure replication user exists on source with REPLICATION privilege |
 | "publication does not exist"         | Verify publication name and that it was created successfully        |
 | Replication lag growing              | Check network bandwidth, source database load, add more WAL senders |
-| Tables stuck in 'i' state            | Check for locks on source tables, verify table structure matches    |
+| Tables stuck in `i` state            | Check for locks on source tables, verify table structure matches    |
 | "out of replication slots"           | Increase max_replication_slots in Postgres.conf                   |
 
 ### Important limitations
