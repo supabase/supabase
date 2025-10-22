@@ -31,7 +31,6 @@ ignoredBuiltDependencies:
   - msw
   - node-pty
   - protobufjs
-  - sharp
 
 minimumReleaseAge: 10080
 
