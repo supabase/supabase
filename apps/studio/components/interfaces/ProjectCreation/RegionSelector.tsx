@@ -72,7 +72,7 @@ export const RegionSelector = ({
   )
 
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
-  const regionsArray = Object.entries(availableRegions).map(([key, value]) => {
+  const regionsArray = Object.entries(availableRegions).map(([_key, value]) => {
     return {
       code: value.code,
       name: value.displayName,
@@ -87,6 +87,11 @@ export const RegionSelector = ({
   const showNonProdFields =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+  const allSelectableRegions = [...smartRegions, ...regionOptions]
+  const selectedRegion = allSelectableRegions.find((region) => {
+    return !!region.name && region.name === field.value
+  })
 
   if (isErrorAvailableRegions) {
     return <AlertError subject="Error loading available regions" error={errorAvailableRegions} />
@@ -118,7 +123,20 @@ export const RegionSelector = ({
             placeholder={
               isLoading ? 'Loading available regions...' : 'Select a region for your project..'
             }
-          />
+          >
+            {field.value !== undefined && (
+              <div className="flex items-center gap-x-3">
+                {selectedRegion?.code && (
+                  <img
+                    alt="region icon"
+                    className="w-5 rounded-sm"
+                    src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
+                  />
+                )}
+                <span className="text-foreground">{selectedRegion?.name ?? field.value}</span>
+              </div>
+            )}
+          </SelectValue_Shadcn_>
         </SelectTrigger_Shadcn_>
         <SelectContent_Shadcn_>
           {smartRegionEnabled && (
