@@ -93,10 +93,10 @@ export const OverviewMonitoring = () => {
   })
 
   const responseErrors: ResponseErrorRow[] = Array.isArray(respErrData?.result)
-    ? (respErrData.result as unknown[]).filter(isResponseErrorRow)
+    ? (respErrData?.result as unknown[]).filter(isResponseErrorRow)
     : []
   const errorCodes: AuthErrorCodeRow[] = Array.isArray(codeErrData?.result)
-    ? (codeErrData.result as unknown[]).filter(isAuthErrorCodeRow)
+    ? (codeErrData?.result as unknown[]).filter(isAuthErrorCodeRow)
     : []
 
   return (
@@ -105,7 +105,7 @@ export const OverviewMonitoring = () => {
         <ScaffoldSectionTitle>Monitoring</ScaffoldSectionTitle>
       </div>
       <ScaffoldSectionContent className="gap-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <StatCard
             title="Auth API Success Rate"
             current={Math.max(0, 100 - metrics.current.apiErrorRate)}
@@ -132,8 +132,8 @@ export const OverviewMonitoring = () => {
 
         <div className="grid grid-cols-2 gap-4">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-foreground-lighter">Auth API Errors</CardTitle>
+            <CardHeader className="border-b-0 pb-0">
+              <CardTitle className="text-foreground-light">Auth API Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<ResponseErrorRow>
@@ -179,8 +179,8 @@ export const OverviewMonitoring = () => {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-foreground-lighter">Auth Server Errors</CardTitle>
+            <CardHeader className="border-b-0 pb-0">
+              <CardTitle className="text-foreground-light">Auth Server Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<AuthErrorCodeRow>

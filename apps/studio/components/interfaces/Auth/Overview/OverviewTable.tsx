@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Loader2 } from 'lucide-react'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 
 export type OverviewTableColumn<T> = {
   key: keyof T | string
@@ -17,20 +18,24 @@ export interface OverviewTable<T> {
 }
 
 export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: OverviewTable<T>) {
+  const hasData = !isLoading && data.length > 0
+
   return (
     <Table>
-      <TableHeader>
-        <TableRow>
-          {columns.map((col) => (
-            <TableHead key={String(col.key)} className={col.className}>
-              {col.header}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
+      {hasData && (
+        <TableHeader>
+          <TableRow>
+            {columns.map((col) => (
+              <TableHead key={String(col.key)} className={cn(col.className, 'bg-surface-100')}>
+                {col.header}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+      )}
       <TableBody className="text-foreground">
         {isLoading ? (
-          <TableRow>
+          <TableRow className="[&>td]:hover:bg-transparent">
             <TableCell colSpan={columns.length} className="text-center text-foreground-light">
               <div className="flex items-center justify-center gap-2 py-4">
                 <Loader2 className="size-4 animate-spin" />
@@ -39,9 +44,15 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
             </TableCell>
           </TableRow>
         ) : data.length === 0 ? (
-          <TableRow>
+          <TableRow className="[&>td]:hover:bg-transparent">
             <TableCell colSpan={columns.length} className="text-center text-foreground-light">
-              {emptyMessage || 'No data available'}
+              <div className="p-2 pt-0">
+                <NoDataPlaceholder
+                  size="normal"
+                  message={emptyMessage || 'No data available'}
+                  isFullHeight
+                />
+              </div>
             </TableCell>
           </TableRow>
         ) : (
