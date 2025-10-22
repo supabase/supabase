@@ -188,7 +188,7 @@ function CommandMenuTriggerInput({
           <Search size={18} strokeWidth={2} />
           <p className="flex text-sm pr-2">{placeholder}</p>
         </div>
-        <div className="hidden md:flex items-center space-x-1">
+        <div className="command-shortcut hidden md:flex items-center space-x-1">
           <div
             aria-hidden="true"
             className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"

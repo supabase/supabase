@@ -216,7 +216,20 @@ const LayoutHeader = ({
           </div>
           <div className="flex items-center gap-x-2">
             {customHeaderComponents && customHeaderComponents}
-            <CommandMenuTriggerInput placeholder="Run a command..." className="hidden md:flex" />
+            <CommandMenuTriggerInput
+              placeholder="Find..."
+              className="
+                hidden md:flex
+                border-transparent lg:border-default
+                bg-transparent lg:bg-surface-100/75
+                md:min-w-0 xl:!min-w-44
+                [&_p]:hidden [&_p]:lg:flex
+                [&>div:first-child]:text-foreground-lighter
+                [&>div:first-child]:lg:text-foreground-muted
+                [&_.command-shortcut]:hidden
+                [&_.command-shortcut]:lg:flex
+              "
+            />
             {IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />
