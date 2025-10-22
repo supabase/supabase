@@ -268,8 +268,9 @@ export const Connect = () => {
 
   useEffect(() => {
     if (!showConnect) return
-    const hasConnectTabInUrl = typeof router.query.connectTab !== 'undefined'
-    if (!hasConnectTabInUrl && (queryFramework || queryUsing || queryWith)) {
+    const noConnectTabInUrl = typeof router.query.connectTab === 'undefined'
+    const hasQuery = queryFramework || queryUsing || queryWith
+    if (noConnectTabInUrl && hasQuery) {
       const inferred = inferConnectTabFromParentKey(queryFramework)
       if (inferred) {
         setTab(inferred)
