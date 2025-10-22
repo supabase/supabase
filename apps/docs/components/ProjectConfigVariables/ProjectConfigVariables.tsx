@@ -32,7 +32,7 @@ import { useCopy } from '~/hooks/useCopy'
 import { useDebounce } from '~/hooks/useDebounce'
 import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
-import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
+import { useSupavisorConfigQuery, type SupavisorConfigData } from '~/lib/fetch/pooler'
 import { useProjectKeysQuery, useProjectSettingsQuery } from '~/lib/fetch/projectApi'
 import {
   isProjectPaused,
@@ -183,6 +183,11 @@ function OrgProjectSelector() {
         stateSummary === 'loggedIn.dataSuccess.hasNoData'
       }
       options={formattedData}
+      selectedDisplayName={
+        selectedOrg && selectedProject
+          ? toDisplayNameOrgProject(selectedOrg, selectedProject)
+          : undefined
+      }
       selectedOption={
         selectedOrg && selectedProject ? toOrgProjectValue(selectedOrg, selectedProject) : undefined
       }
@@ -203,6 +208,7 @@ function OrgProjectSelector() {
       hasNextPage={hasNextPage}
       fetchNextPage={fetchNextPage}
       setSearch={setSearch}
+      useCommandSearch={false}
     />
   )
 }
@@ -212,6 +218,7 @@ function BranchSelector() {
   const isLoggedIn = useIsLoggedIn()
 
   const { selectedProject, selectedBranch, setSelectedBranch } = useSnapshot(projectsStore)
+  const [branchSearch, setBranchSearch] = useState('')
 
   const projectPaused = isProjectPaused(selectedProject)
   const hasBranches = selectedProject?.is_branch_enabled ?? false
@@ -275,7 +282,10 @@ function BranchSelector() {
         stateSummary === 'loggedIn.branches.dataSuccess.noData'
       }
       options={formattedData}
+      selectedDisplayName={selectedBranch?.name}
       selectedOption={selectedBranch ? toBranchValue(selectedBranch) : undefined}
+      search={branchSearch}
+      setSearch={setBranchSearch}
       onSelectOption={(option) => {
         const [branchId] = fromBranchValue(option)
         if (branchId) {

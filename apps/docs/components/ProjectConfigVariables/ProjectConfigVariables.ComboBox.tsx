@@ -16,7 +16,6 @@ import {
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
-import { fromOrgProjectValue } from './ProjectConfigVariables.utils'
 
 export interface ComboBoxOption {
   id: string
@@ -30,6 +29,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
   name,
   options,
   selectedOption,
+  selectedDisplayName,
   onSelectOption = noop,
   className,
   search = '',
@@ -38,12 +38,14 @@ export function ComboBox<Opt extends ComboBoxOption>({
   isFetchingNextPage = false,
   fetchNextPage,
   setSearch = () => {},
+  useCommandSearch = true,
 }: {
   isLoading: boolean
   disabled?: boolean
   name: string
   options: Opt[]
   selectedOption?: string
+  selectedDisplayName?: string
   onSelectOption?: (newValue: string) => void
   className?: string
   search?: string
@@ -52,6 +54,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
   isFetchingNextPage?: boolean
   fetchNextPage?: () => void
   setSearch?: (value: string) => void
+  useCommandSearch?: boolean
 }) {
   const [open, setOpen] = useState(false)
 
@@ -62,18 +65,9 @@ export function ComboBox<Opt extends ComboBoxOption>({
     rootMargin: '0px',
   })
 
-  const [_, __, displayName] = fromOrgProjectValue(selectedOption ?? '')
-
   useEffect(() => {
-    if (
-      !isLoading &&
-      !isFetching &&
-      !isFetchingNextPage &&
-      hasNextPage &&
-      entry?.isIntersecting &&
-      !!fetchNextPage
-    ) {
-      fetchNextPage()
+    if (!isLoading && !isFetching && !isFetchingNextPage && hasNextPage && entry?.isIntersecting) {
+      fetchNextPage?.()
     }
   }, [isLoading, isFetching, isFetchingNextPage, hasNextPage, entry?.isIntersecting, fetchNextPage])
 
@@ -100,7 +94,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
             className
           )}
         >
-          {displayName ??
+          {selectedDisplayName ??
             (isLoading && options.length > 0
               ? 'Loading...'
               : options.length === 0
@@ -110,7 +104,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0" side="bottom" align="start">
-        <Command shouldFilter={false}>
+        <Command shouldFilter={useCommandSearch}>
           <CommandInput
             placeholder={`Search ${name}...`}
             className="border-none ring-0"
