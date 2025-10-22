@@ -12,7 +12,7 @@ import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachm
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { DialogSectionSeparator, Form_Shadcn_, Separator } from 'ui'
+import { DialogSectionSeparator, Form_Shadcn_ } from 'ui'
 import {
   AffectedServicesSelector,
   CATEGORIES_WITHOUT_AFFECTED_SERVICES,
@@ -210,19 +210,21 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         <DialogSectionSeparator />
 
-        <div className="px-6 flex flex-col gap-y-8">
-          {DASHBOARD_LOG_CATEGORIES.includes(category) && (
-            <>
-              <DashboardLogsToggle form={form} />
-              <Separator />
-            </>
-          )}
-          {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
-            <>
-              <SupportAccessToggle form={form} />
-              <Separator />
-            </>
-          )}
+        {DASHBOARD_LOG_CATEGORIES.includes(category) && (
+          <>
+            <DashboardLogsToggle form={form} />
+            <DialogSectionSeparator />
+          </>
+        )}
+
+        {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+          <>
+            <SupportAccessToggle form={form} />
+            <DialogSectionSeparator />
+          </>
+        )}
+
+        <div className="px-6 pt-2">
           <SubmitButton
             isSubmitting={state.type === 'submitting'}
             userEmail={respondToEmail}

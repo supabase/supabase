@@ -30,6 +30,7 @@ export function DashboardLogsToggle({ form }: DashboardLogsToggleProps) {
       control={form.control}
       render={({ field }) => (
         <FormItemLayout
+          hideMessage
           name="attachDashboardLogs"
           className="px-6"
           layout="flex"
@@ -41,23 +42,20 @@ export function DashboardLogsToggle({ form }: DashboardLogsToggleProps) {
           description={
             <div className="flex flex-col gap-y-2">
               <span className="text-foreground-light">
-                A sanitized log of recent dashboard actions will be shared with the support team to
-                help reproduce the issue.
+                Share sanitized logs of recent dashboard actions to help reproduce the issue.
               </span>
               <Collapsible_Shadcn_ open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-                <CollapsibleTrigger_Shadcn_ className="group flex items-center gap-x-1 text-sm text-foreground-muted hover:text-foreground transition">
+                <CollapsibleTrigger_Shadcn_ className="group flex items-center gap-x-1 text-sm text-foreground-lighter hover:text-foreground transition">
                   <ChevronRight
-                    strokeWidth={2}
                     size={14}
                     className="transition-transform group-data-[state=open]:rotate-90"
                   />
-                  <span>{isPreviewOpen ? 'Hide log preview' : 'Preview log'}</span>
+                  <span>Preview log</span>
                 </CollapsibleTrigger_Shadcn_>
                 <CollapsibleContent_Shadcn_ className="mt-2">
                   <pre className="bg-background-surface-200 border border-strong rounded-lg p-3 max-h-60 overflow-y-auto overflow-x-auto text-xs text-foreground-light whitespace-pre-wrap">
                     {sanitizedLogJson}
                   </pre>
-                  )
                 </CollapsibleContent_Shadcn_>
               </Collapsible_Shadcn_>
             </div>
