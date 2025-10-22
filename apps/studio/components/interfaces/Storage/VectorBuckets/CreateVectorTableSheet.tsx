@@ -183,8 +183,6 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           <SheetTitle>Create vector table</SheetTitle>
         </SheetHeader>
 
-        {/* <Separator /> */}
-
         <Form_Shadcn_ {...form}>
           <form
             id={formId}

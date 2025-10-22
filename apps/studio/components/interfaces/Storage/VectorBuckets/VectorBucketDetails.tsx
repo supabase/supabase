@@ -69,8 +69,8 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
   })
 
   // Mock data for development - replace with real data when backend is ready
-  const allIndexes = MOCK_VECTOR_INDEXES
-  // const allIndexes = data?.vectorBuckets ?? []
+  // const allIndexes = MOCK_VECTOR_INDEXES
+  const allIndexes = data?.vectorBuckets ?? []
   const config = BUCKET_TYPES['vectors']
   const [filterString, setFilterString] = useState('')
 
