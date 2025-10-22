@@ -42,7 +42,6 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
             <TableCell colSpan={columns.length} className="text-center text-foreground-light">
               <div className="flex items-center justify-center gap-2 py-4">
                 <Loader2 className="size-4 animate-spin" />
-                <span>Loading…</span>
               </div>
             </TableCell>
           </TableRow>
