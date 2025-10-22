@@ -1,9 +1,10 @@
-import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
+import { ControllerRenderProps } from 'react-hook-form'
 
 import { useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
+import type { DesiredInstanceSize } from 'data/projects/new-project.constants'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -27,7 +28,7 @@ import { getAvailableRegions } from './ProjectCreation.utils'
 interface RegionSelectorProps {
   cloudProvider: CloudProvider
   field: ControllerRenderProps<any, 'dbRegion'>
-  form: UseFormReturn<any>
+  instanceSize?: DesiredInstanceSize
   layout?: 'vertical' | 'horizontal'
 }
 
@@ -38,6 +39,7 @@ interface RegionSelectorProps {
 export const RegionSelector = ({
   cloudProvider,
   field,
+  instanceSize,
   layout = 'horizontal',
 }: RegionSelectorProps) => {
   const { slug } = useParams()
@@ -54,7 +56,10 @@ export const RegionSelector = ({
     isLoading: isLoadingAvailableRegions,
     isError: isErrorAvailableRegions,
     error: errorAvailableRegions,
-  } = useOrganizationAvailableRegionsQuery({ slug, cloudProvider }, { enabled: smartRegionEnabled })
+  } = useOrganizationAvailableRegionsQuery(
+    { slug, cloudProvider, desiredInstanceSize: instanceSize },
+    { enabled: smartRegionEnabled, staleTime: 1000 * 60 * 5 } // 5 minutes
+  )
 
   const smartRegions = availableRegionsData?.all.smartGroup ?? []
   const allRegions = availableRegionsData?.all.specific ?? []
@@ -67,7 +72,7 @@ export const RegionSelector = ({
   )
 
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
-  const regionsArray = Object.entries(availableRegions).map(([key, value]) => {
+  const regionsArray = Object.entries(availableRegions).map(([_key, value]) => {
     return {
       code: value.code,
       name: value.displayName,
@@ -82,6 +87,11 @@ export const RegionSelector = ({
   const showNonProdFields =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+  const allSelectableRegions = [...smartRegions, ...regionOptions]
+  const selectedRegion = allSelectableRegions.find((region) => {
+    return !!region.name && region.name === field.value
+  })
 
   if (isErrorAvailableRegions) {
     return <AlertError subject="Error loading available regions" error={errorAvailableRegions} />
@@ -113,7 +123,20 @@ export const RegionSelector = ({
             placeholder={
               isLoading ? 'Loading available regions...' : 'Select a region for your project..'
             }
-          />
+          >
+            {field.value !== undefined && (
+              <div className="flex items-center gap-x-3">
+                {selectedRegion?.code && (
+                  <img
+                    alt="region icon"
+                    className="w-5 rounded-sm"
+                    src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
+                  />
+                )}
+                <span className="text-foreground">{selectedRegion?.name ?? field.value}</span>
+              </div>
+            )}
+          </SelectValue_Shadcn_>
         </SelectTrigger_Shadcn_>
         <SelectContent_Shadcn_>
           {smartRegionEnabled && (
