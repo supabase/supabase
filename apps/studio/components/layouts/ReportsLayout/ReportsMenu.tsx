@@ -113,7 +113,7 @@ const ReportsMenu = () => {
         </div>
       ) : (
         <div className="my-6 space-y-8">
-          <div className="mx-3">
+          <div className="mx-2">
             <Menu.Group
               title={
                 <span className="flex w-full items-center justify-between relative h-6">
