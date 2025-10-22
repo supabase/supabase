@@ -17,4 +17,3 @@ WHERE n.nspname = '${schema}'
   )
 ;
 `.trim()
-
