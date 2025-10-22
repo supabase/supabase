@@ -117,6 +117,7 @@ function createTabsState(projectRef: string) {
   const { openTabs, activeTab, tabsMap, previewTabId } = getSavedTabs(projectRef)
 
   const store = proxy({
+    isReady: typeof window !== 'undefined' && Boolean(projectRef),
     // RECENT ITEMS
     recentItems,
 

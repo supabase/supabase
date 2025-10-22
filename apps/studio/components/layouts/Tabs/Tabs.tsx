@@ -49,7 +49,8 @@ export const EditorTabs = () => {
     .map((id) => tabs.tabsMap[id])
     .filter((tab) => tab !== undefined) as Tab[]
 
-  const hasNewTab = router.asPath.includes('/new')
+  // We no longer have an empty new tab for SQL editor, only table editor
+  const hasNewTab = router.asPath.includes('/new') && editor === 'table'
 
   // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
   const editorTabs = !!editor
