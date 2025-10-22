@@ -203,6 +203,7 @@ The following code samples are for App Router. For help with Pages Router, see t
 
 </Accordion>
 
+<div className="mt-12">
 <$CodeTabs>
 <$CodeSample
 path="/auth/nextjs/utils/supabase/client.ts"
@@ -215,6 +216,7 @@ meta="name=utils/supabase/server.ts"
 language="typescript"
 />
 </$CodeTabs>
+</div>
 
 ### Hook up middleware
 
@@ -234,6 +236,7 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 
 </Admonition>
 
+<div className="mt-12">
 <$CodeTabs>
 <$CodeSample
 path="/auth/nextjs/middleware.ts"
@@ -246,6 +249,7 @@ meta="name=utils/supabase/middleware.ts"
 language="typescript"
 />
 </$CodeTabs>
+</div>
 
 ### Create a login page
 
@@ -261,6 +265,7 @@ See the Next.js docs to learn more about [opting out of data caching](https://ne
 
 </Admonition>
 
+<div className="mt-12">
 <$CodeTabs>
 <$CodeSample
 path="/auth/nextjs/app/login/page.tsx"
@@ -278,6 +283,7 @@ meta="name=app/error/page.tsx"
 language="typescript"
 />
 </$CodeTabs>
+</div>
 
 ### Change the Auth confirmation path
 
@@ -293,6 +299,7 @@ Create a Route Handler for `auth/confirm`. When a user clicks their confirmation
 
 Since this is a Router Handler, use the Supabase client from `@/utils/supabase/server.ts`.
 
+<div className="mt-12">
 <$CodeTabs>
 <$CodeSample
 path="/auth/nextjs/app/auth/confirm/route.ts"
@@ -300,6 +307,7 @@ meta="name=app/auth/confirm/route.ts"
 language="typescript"
 />
 </$CodeTabs>
+</div>
 
 ### Access user info from server component
 
