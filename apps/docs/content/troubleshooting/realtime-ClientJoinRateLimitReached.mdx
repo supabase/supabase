@@ -1,0 +1,43 @@
+---
+title = "Realtime: ClientJoinRateLimitReached"
+date_created = "2025-07-07T22:39:54+00:00"
+topics = [ "realtime" ]
+keywords = [ "ratelimits", "Realtime", "channels" ]
+---
+
+The error `ClientJoinRateLimitReached` means that your clients (app users) are joining channels faster than your plan allows.
+
+Refer to [Realtime Quotas](https://supabase.com/docs/guides/realtime/quotas):
+
+| Plan                   | Joins/sec |
+|------------------------|-----------|
+| Free                   | 100       |
+| Pro                    | 500       |
+| Pro (no [spend cap](https://supabase.com/docs/guides/platform/cost-control#configure-the-spend-cap))     | 2,500     |
+| Team                   | 2,500     |
+| Enterprise             | 2,500+    |
+
+
+### Example:
+On the Free plan (100 joins/sec), if 101 clients join your channels simultaneously, the 101st gets ClientJoinRateLimitReached. The remaining client will be able to retry after 1 second.
+
+### How to fix it
+
+Upgrade your plan to allow more joins per second or pace the rate that individual users can join channels.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
