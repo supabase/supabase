@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { AiIconAnimation, Button, Input_Shadcn_ as Input, cn } from 'ui'
-import { Columns3 } from 'lucide-react'
+import {
+  AiIconAnimation,
+  Button,
+  Input_Shadcn_ as Input,
+  cn,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { Columns3, Table2 } from 'lucide-react'
 import type { TableField } from '../TableEditor.types'
 import { AI_QUICK_IDEAS } from './constants'
 import type { TableSuggestion } from './types'
@@ -16,20 +24,30 @@ interface QuickstartAIWidgetProps {
 const SUCCESS_MESSAGE_DURATION_MS = 3000
 
 export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidgetProps) => {
-  const [aiPrompt, setAiPrompt] = useState('')
+  const [lastGeneratedPrompt, setLastGeneratedPrompt] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const {
     generateTables,
     isGenerating,
     error: apiError,
-    tables,
-    clearTables,
+    prompt,
+    tables: storedTables,
+    setPrompt: setAiPrompt,
   } = useAITableGeneration()
+
+  const aiPrompt = prompt ?? ''
+  const tables = storedTables ?? []
 
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (aiPrompt && tables.length > 0) {
+      setLastGeneratedPrompt(aiPrompt)
     }
   }, [])
 
@@ -50,6 +68,7 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
       if (!promptToUse.trim() || isGenerating) return
 
       await generateTables(promptToUse)
+      setLastGeneratedPrompt(promptToUse)
     },
     [aiPrompt, generateTables, isGenerating]
   )
@@ -59,7 +78,7 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
       setAiPrompt(idea)
       handleGenerateTables(idea)
     },
-    [handleGenerateTables]
+    [handleGenerateTables, setAiPrompt]
   )
 
   return (
@@ -101,7 +120,11 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
             icon={<AiIconAnimation loading={isGenerating} />}
             className="absolute right-1 top-1/2 -translate-y-1/2 !space-x-1"
           >
-            {isGenerating ? 'Generating...' : 'Generate'}
+            {isGenerating
+              ? 'Generating...'
+              : aiPrompt === lastGeneratedPrompt && tables.length > 0
+                ? 'Regenerate'
+                : 'Generate'}
           </Button>
         </div>
 
@@ -138,24 +161,6 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
 
         {tables.length > 0 && (
           <div className="grid gap-2">
-            <div className="flex items-center justify-between mt-1 mb-1">
-              <span className="text-xs text-foreground-light">
-                Generated {tables.length} table{tables.length !== 1 ? 's' : ''}
-              </span>
-              <Button
-                type="text"
-                size="tiny"
-                onClick={() => {
-                  clearTables()
-                  setAiPrompt('')
-                  if (inputRef.current) inputRef.current.focus()
-                }}
-                disabled={isGenerating}
-                aria-label="Clear results and generate new tables"
-              >
-                Generate new
-              </Button>
-            </div>
             {tables.map((template) => (
               <button
                 key={`ai:${template.tableName}`}
@@ -163,22 +168,36 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
                 disabled={disabled}
                 aria-label={`Select ${template.tableName} template with ${template.fields.length} fields`}
                 className={cn(
-                  'text-left p-3 rounded-md border transition-all w-full',
-                  'border-default hover:border-foreground-muted hover:bg-surface-200',
+                  'text-left p-3 rounded-md border transition-colors w-full bg-surface-100',
+                  'border-light hover:border-default hover:bg-surface-200 cursor-pointer',
                   'disabled:opacity-50 disabled:cursor-not-allowed'
                 )}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="text-sm font-medium font-mono">{template.tableName}</div>
+                <div className="flex items-start gap-3">
+                  <div className="rounded-full bg-alternative border w-8 h-8 flex items-center justify-center flex-shrink-0">
+                    <Table2 size={16} className="text-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-foreground mb-0">
+                      {template.tableName}
+                    </div>
                     {template.rationale && (
-                      <div className="text-sm text-foreground-light mt-1">{template.rationale}</div>
+                      <div className="text-xs text-foreground-light mt-0.5">
+                        {template.rationale}
+                      </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-foreground-muted ml-3">
-                    <Columns3 size={14} aria-hidden="true" />
-                    <span>{template.fields.length}</span>
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-sm text-foreground-muted ml-3">
+                        <Columns3 size={14} aria-hidden="true" />
+                        <span>{template.fields.length}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {template.fields.length} {template.fields.length === 1 ? 'column' : 'columns'}
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </button>
             ))}

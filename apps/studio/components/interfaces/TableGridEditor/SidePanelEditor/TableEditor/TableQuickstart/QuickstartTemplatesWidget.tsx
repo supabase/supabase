@@ -1,7 +1,7 @@
-import { Columns3, Layers } from 'lucide-react'
+import { Columns3, Layers, Table2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { cn } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { TableField } from '../TableEditor.types'
 import { tableTemplates } from './templates'
 import type { TableSuggestion } from './types'
@@ -45,7 +45,7 @@ export const QuickstartTemplatesWidget = ({
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
           <Layers size={16} className="text-foreground" />
-          <h3 className="text-base font-medium">Start with a table template</h3>
+          <h3 className="text-base font-medium">Table quickstarts</h3>
         </div>
         <p className="text-sm text-foreground-lighter">
           Select a pre-built schema to get started quickly.
@@ -84,22 +84,36 @@ export const QuickstartTemplatesWidget = ({
                 disabled={disabled}
                 aria-label={`Select ${template.tableName} template with ${template.fields.length} fields`}
                 className={cn(
-                  'text-left p-3 rounded-md border transition-all w-full',
-                  'border-default hover:border-foreground-muted hover:bg-surface-200',
+                  'text-left p-3 rounded-md border transition-colors w-full bg-surface-100',
+                  'border-light hover:border-default hover:bg-surface-200 cursor-pointer',
                   'disabled:opacity-50 disabled:cursor-not-allowed'
                 )}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="text-sm font-medium font-mono">{template.tableName}</div>
+                <div className="flex items-start gap-3">
+                  <div className="rounded-full bg-alternative border w-8 h-8 flex items-center justify-center flex-shrink-0">
+                    <Table2 size={16} className="text-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-foreground mb-0">
+                      {template.tableName}
+                    </div>
                     {template.rationale && (
-                      <div className="text-sm text-foreground-light mt-1">{template.rationale}</div>
+                      <div className="text-xs text-foreground-light mt-0.5">
+                        {template.rationale}
+                      </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-foreground-muted ml-3">
-                    <Columns3 size={14} aria-hidden="true" />
-                    <span>{template.fields.length}</span>
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-sm text-foreground-muted ml-3">
+                        <Columns3 size={14} aria-hidden="true" />
+                        <span>{template.fields.length}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {template.fields.length} {template.fields.length === 1 ? 'column' : 'columns'}
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </button>
             ))}

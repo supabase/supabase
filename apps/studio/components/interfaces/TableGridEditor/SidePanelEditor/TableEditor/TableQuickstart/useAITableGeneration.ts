@@ -7,10 +7,6 @@ import { LIMITS } from './constants'
 import type { AIGeneratedSchema, PostgresType, TableSuggestion } from './types'
 import { TableSource } from './types'
 
-// [Sean] TODO: Consider migrating to AI SDK's experimental_useObject() hook once it's stable
-// for client-side streaming. Currently using server-side streamObject() with manual fetch handling.
-// https://ai-sdk.dev/cookbook/next/stream-object#client
-
 const AI_TABLES_STORAGE_KEY = 'table-quickstart-ai-results'
 const MAX_BUFFER_SIZE = 50 * 1024 // 50KB limit for streaming responses
 
@@ -20,6 +16,11 @@ type PartialTable = Partial<AIGeneratedSchema['tables'][number]> & {
 }
 type PartialSchema = Partial<AIGeneratedSchema> & {
   tables?: PartialTable[]
+}
+
+interface AITableGenerationState {
+  prompt: string
+  tables: TableSuggestion[]
 }
 
 const isNotNull = <T>(value: T | null | undefined): value is T => value != null
@@ -139,7 +140,10 @@ const safeJsonParse = <T>(input: string): T | null => {
 export const useAITableGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [tables, setTables] = useLocalStorage<TableSuggestion[]>(AI_TABLES_STORAGE_KEY, [])
+  const [state, setState] = useLocalStorage<AITableGenerationState>(AI_TABLES_STORAGE_KEY, {
+    prompt: '',
+    tables: [],
+  })
   const abortControllerRef = useRef<AbortController | null>(null)
   const isMountedRef = useRef(true)
 
@@ -172,7 +176,7 @@ export const useAITableGeneration = () => {
 
     setIsGenerating(true)
     setError(null)
-    setTables([])
+    setState({ prompt, tables: [] })
 
     try {
       const headers = await constructHeaders()
@@ -227,7 +231,7 @@ export const useAITableGeneration = () => {
             const partialSuggestions = convertPartialSchemaToTableSuggestions(latestPartialSchema)
 
             if (isMountedRef.current && partialSuggestions.length > 0) {
-              setTables(partialSuggestions)
+              setState({ prompt, tables: partialSuggestions })
             }
           }
         }
@@ -244,7 +248,7 @@ export const useAITableGeneration = () => {
 
       if (isMountedRef.current) {
         setError(null)
-        setTables(finalTables)
+        setState({ prompt, tables: finalTables })
       }
 
       return finalTables
@@ -281,14 +285,23 @@ export const useAITableGeneration = () => {
 
     setIsGenerating(false)
     setError(null)
-    setTables([])
+    setState({ prompt: '', tables: [] })
   }, [])
+
+  const setPrompt = useCallback(
+    (prompt: string) => {
+      setState((prev) => ({ ...prev, prompt }))
+    },
+    [setState]
+  )
 
   return {
     generateTables,
     isGenerating,
     error,
-    tables,
+    prompt: state.prompt,
+    tables: state.tables,
+    setPrompt,
     clearTables,
   }
 }
