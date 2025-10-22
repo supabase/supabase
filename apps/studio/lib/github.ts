@@ -2,7 +2,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { makeRandomString } from './helpers'
 
 const GITHUB_INTEGRATION_APP_NAME =
-  process.env.NIMBUS_PROD_PROJECTS_URL !== undefined
+  process.env.NEXT_PUBLIC_IS_NIMBUS !== undefined
     ? 'supabase-snap'
     : process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? `supabase`
@@ -11,7 +11,7 @@ const GITHUB_INTEGRATION_APP_NAME =
         : `supabase-local-testing`
 
 const GITHUB_INTEGRATION_CLIENT_ID =
-  process.env.NIMBUS_PROD_PROJECTS_URL !== undefined
+  process.env.NEXT_PUBLIC_IS_NIMBUS !== undefined
     ? 'Iv23li2pAiqDGgaSrP8q'
     : process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? `Iv1.b91a6d8eaa272168`
