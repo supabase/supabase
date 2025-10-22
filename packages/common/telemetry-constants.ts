@@ -1964,7 +1964,29 @@ export interface CommandMenuOpenedEvent {
      */
     trigger: 'keyboard_shortcut' | 'search_input'
     /**
-     * The trigger that opened the command menu
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User typed a search term in the command menu input.
+ *
+ * @group Events
+ * @source ui-patterns
+ * @page any
+ */
+export interface CommandInputTypedEvent {
+  action: 'command_input_typed'
+  properties: {
+    /**
+     * Search term typed into the command menu input
+     */
+    value: string
+    /**
+     * In which app the command input was typed
      */
     app: 'studio' | 'docs' | 'www'
   }
@@ -2086,3 +2108,4 @@ export type TelemetryEvent =
   | TableRLSEnabledEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
+  | CommandInputTypedEvent

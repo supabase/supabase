@@ -1,11 +1,13 @@
 'use client'
 
-import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import type React from 'react'
 
 import { useBreakpoint } from 'common'
 import { CommandInput_Shadcn_, cn } from 'ui'
 
 import { useQuery, useSetQuery } from './hooks/queryHooks'
+import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 
 function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) {
   const isBelowSm = useBreakpoint('sm')
@@ -50,7 +52,73 @@ const CommandInput = forwardRef<
   const [inputValue, setInputValue] = useState(query)
   useEffect(() => {
     setInputValue(query)
+    previousValueRef.current = query
   }, [query])
+
+  // Get telemetry context
+  const telemetryContext = useCommandMenuTelemetryContext()
+
+  // Debounced telemetry tracking
+  const debounceTimeoutRef = useRef<NodeJS.Timeout>()
+  const previousValueRef = useRef<string>(inputValue)
+
+  const logTelemetryEvent = useCallback(
+    (value: string) => {
+      if (telemetryContext?.onTelemetry) {
+        // Create a CommandInputTypedEvent
+        const event = {
+          action: 'command_input_typed' as const,
+          properties: {
+            value: value,
+            app: telemetryContext.app,
+          },
+          groups: {} as Record<string, string>, // Groups will be populated by the telemetry system
+        }
+        // Cast to unknown first, then to the expected type to bypass type checking
+        // This is a workaround for the type mismatch between CommandInputTypedEvent and CommandMenuOpenedEvent
+        telemetryContext.onTelemetry(
+          event as unknown as Parameters<typeof telemetryContext.onTelemetry>[0]
+        )
+      }
+    },
+    [telemetryContext]
+  )
+
+  const debouncedLogTelemetry = useCallback(
+    (value: string) => {
+      // Only trigger telemetry if the user is adding characters (not removing with backspace)
+      const isAddingCharacters = value.length > previousValueRef.current.length
+
+      if (!isAddingCharacters) {
+        previousValueRef.current = value
+        return
+      }
+
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+
+      debounceTimeoutRef.current = setTimeout(() => {
+        logTelemetryEvent(value)
+        previousValueRef.current = value
+      }, 500)
+    },
+    [logTelemetryEvent]
+  )
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleValueChange = (value: string) => {
+    setInputValue(value)
+    debouncedLogTelemetry(value)
+  }
 
   // To handle CJK input
   const [imeComposing, setImeComposing] = useState(false)
@@ -67,7 +135,7 @@ const CommandInput = forwardRef<
       autoFocus={false}
       ref={inputRef}
       value={inputValue}
-      onValueChange={setInputValue}
+      onValueChange={handleValueChange}
       placeholder="Run a command or search..."
       onCompositionStart={() => setImeComposing(true)}
       onCompositionEnd={() => setImeComposing(false)}

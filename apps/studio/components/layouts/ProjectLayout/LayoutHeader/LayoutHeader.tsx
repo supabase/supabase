@@ -217,7 +217,7 @@ const LayoutHeader = ({
           <div className="flex items-center gap-x-2">
             {customHeaderComponents && customHeaderComponents}
             <CommandMenuTriggerInput
-              placeholder="Find..."
+              placeholder="Search..."
               className="
                 hidden md:flex
                 border-transparent lg:border-default
@@ -233,7 +233,6 @@ const LayoutHeader = ({
             {IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />
-
                 <div className="overflow-hidden flex items-center rounded-full border">
                   <HelpPopover />
                   <NotificationsPopoverV2 />
