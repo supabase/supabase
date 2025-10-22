@@ -1,8 +1,9 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { detectBrowser } from 'lib/helpers'
 import { Blocks, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
+
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { detectBrowser } from 'lib/helpers'
 import { Button } from 'ui'
 
 export const InsertBeforeRemoveChildErrorHandler = ({
