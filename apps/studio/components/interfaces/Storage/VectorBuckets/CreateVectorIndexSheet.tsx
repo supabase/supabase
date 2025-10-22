@@ -1,29 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, Lock, Plus, Trash2, X } from 'lucide-react'
-import { useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { ExternalLink, Lock, Plus, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  RadioGroup_Shadcn_,
-  RadioGroupItem_Shadcn_,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Separator,
   Sheet,
-  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -32,7 +29,22 @@ import {
   SheetTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from '../CreateBucketModal.utils'
+
+const DISTANCE_METRICS = [
+  {
+    value: 'cosine',
+    label: 'Cosine',
+    description: 'Measures similarity between two vectors, based on directions, not magnitude.',
+  },
+  {
+    value: 'euclidean',
+    label: 'Euclidean',
+    description:
+      'Measures straight-line distance between two vectors, using both directions and magnitudes.',
+  },
+] as const
 
 const FormSchema = z
   .object({
@@ -166,25 +178,12 @@ export const CreateVectorIndexSheet = ({ bucketName }: CreateVectorIndexSheetPro
         </ButtonTooltip>
       </SheetTrigger>
 
-      <SheetContent size="default" showClose={false} className="flex flex-col gap-0">
-        <SheetHeader className="py-3 flex flex-row justify-between items-center border-b-0">
-          <div className="flex flex-row gap-3 items-center">
-            <SheetClose
-              className={cn(
-                'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                'disabled:pointer-events-none data-[state=open]:bg-secondary',
-                'transition'
-              )}
-            >
-              <X className="h-3 w-3" />
-              <span className="sr-only">Close</span>
-            </SheetClose>
-            <SheetTitle className="truncate">Create vector index</SheetTitle>
-          </div>
+      <SheetContent size="default" className="flex flex-col gap-0 p-0">
+        <SheetHeader>
+          <SheetTitle>Create vector table</SheetTitle>
         </SheetHeader>
 
-        <Separator />
+        {/* <Separator /> */}
 
         <Form_Shadcn_ {...form}>
           <form
@@ -192,7 +191,7 @@ export const CreateVectorIndexSheet = ({ bucketName }: CreateVectorIndexSheetPro
             onSubmit={form.handleSubmit(onSubmit)}
             className="overflow-auto flex-grow px-0"
           >
-            <SheetSection className="space-y-4">
+            <SheetSection className="flex flex-col gap-y-4">
               <FormField_Shadcn_
                 key="name"
                 name="name"
@@ -227,7 +226,7 @@ export const CreateVectorIndexSheet = ({ bucketName }: CreateVectorIndexSheetPro
                   <FormItemLayout
                     name="targetSchema"
                     label="Target schema"
-                    description="The bucket name will be used as the target schema for this table."
+                    description="The bucket name will be used as the target schema."
                     layout="horizontal"
                   >
                     <FormControl_Shadcn_>
@@ -240,7 +239,7 @@ export const CreateVectorIndexSheet = ({ bucketName }: CreateVectorIndexSheetPro
                           className="pr-10"
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <Lock className="h-4 w-4 text-foreground-lighter" />
+                          <Lock size={14} className="text-foreground-muted" />
                         </div>
                       </div>
                     </FormControl_Shadcn_>
@@ -249,7 +248,7 @@ export const CreateVectorIndexSheet = ({ bucketName }: CreateVectorIndexSheetPro
               />
             </SheetSection>
             <Separator />
-            <SheetSection className="space-y-4">
+            <SheetSection className="flex flex-col gap-y-4">
               <FormField_Shadcn_
                 key="dimension"
                 name="dimension"
@@ -283,97 +282,93 @@ export const CreateVectorIndexSheet = ({ bucketName }: CreateVectorIndexSheetPro
                 name="distanceMetric"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout name="distanceMetric" label="Distance metric" layout="horizontal">
+                  <FormItemLayout
+                    name="distanceMetric"
+                    label="Distance metric"
+                    layout="horizontal"
+                    className="gap-1"
+                  >
                     <FormControl_Shadcn_>
-                      <RadioGroup_Shadcn_
+                      <RadioGroupStacked
+                        id="distance_metric"
+                        name="distance_metric"
                         value={field.value}
+                        disabled={field.disabled}
                         onValueChange={field.onChange}
-                        className="space-y-3"
                       >
-                        <div className="flex items-start space-x-3">
-                          <RadioGroupItem_Shadcn_
-                            value="cosine"
-                            id="distance-cosine"
-                            className="mt-0.5"
-                          />
-                          <label htmlFor="distance-cosine" className="cursor-pointer flex flex-col">
-                            <span className="text-sm font-medium text-foreground">Cosine</span>
-                            <span className="text-sm text-foreground-light">
-                              Measures similarity between two vectors, based on directions, not
-                              magnitude.
-                            </span>
-                          </label>
-                        </div>
-                        <div className="flex items-start space-x-3">
-                          <RadioGroupItem_Shadcn_
-                            value="euclidean"
-                            id="distance-euclidean"
-                            className="mt-0.5"
-                          />
-                          <label
-                            htmlFor="distance-euclidean"
-                            className="cursor-pointer flex flex-col"
+                        {DISTANCE_METRICS.map((metric) => (
+                          <RadioGroupStackedItem
+                            key={metric.value}
+                            id={metric.value}
+                            value={metric.value}
+                            label=""
+                            showIndicator={false}
                           >
-                            <span className="text-sm font-medium text-foreground">Euclidean</span>
-                            <span className="text-sm text-foreground-light">
-                              Measures straight-line distance between two vectors, using both
-                              directions and magnitudes.
-                            </span>
-                          </label>
-                        </div>
-                      </RadioGroup_Shadcn_>
+                            <div className="flex flex-col gap-y-1">
+                              <p className="text-foreground text-left">{metric.label}</p>
+                              <p className="text-foreground-lighter text-left">
+                                {metric.description}
+                              </p>
+                            </div>
+                          </RadioGroupStackedItem>
+                        ))}
+                      </RadioGroupStacked>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
             </SheetSection>
             <Separator />
-            <SheetSection>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-foreground">Metadata keys</label>
-                  <a
-                    href="https://supabase.com/docs/guides/storage/vector"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-brand hover:underline inline-flex items-center gap-1"
-                  >
-                    About keys
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                </div>
+            <SheetSection className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground">Metadata keys</label>
+                <Link
+                  href="https://supabase.com/docs/guides/storage/vector"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-link text-foreground-light hover:text-foreground inline-flex items-center gap-x-1.5"
+                >
+                  <span>About keys</span>
+                  <ExternalLink className="text-foreground-lighter" size={14} />
+                </Link>
+              </div>
 
-                <div className="space-y-2">
-                  {fields.map((field, index) => (
-                    <div key={field.id} className="flex items-start gap-2">
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name={`metadataKeys.${index}.value`}
-                        render={({ field }) => (
-                          <FormItem_Shadcn_ className="flex-1">
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
-                                {...field}
-                                value={field.value}
-                                size="small"
-                                className="w-full"
-                                placeholder="Header value"
-                              />
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                      <Button
-                        type="default"
-                        size="small"
-                        icon={<Trash2 />}
-                        onClick={() => remove(index)}
-                      />
-                    </div>
-                  ))}
-                </div>
-
+              <div className="space-y-2">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-start gap-2">
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name={`metadataKeys.${index}.value`}
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex-1">
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              {...field}
+                              value={field.value}
+                              size="small"
+                              className="w-full"
+                              placeholder="Header value"
+                              data-1p-ignore
+                              data-lpignore="true"
+                              data-form-type="other"
+                              data-bwignore
+                            />
+                          </FormControl_Shadcn_>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                    <Button
+                      type="outline"
+                      className="px-2"
+                      size="small"
+                      icon={<Trash2 className="w-2 h-2" size={12} />}
+                      onClick={() => remove(index)}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
                 <Button type="default" size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>

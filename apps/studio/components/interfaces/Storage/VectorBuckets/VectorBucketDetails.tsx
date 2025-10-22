@@ -28,7 +28,6 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { BUCKET_TYPES } from '../Storage.constants'
 import { CreateVectorIndexSheet } from './CreateVectorIndexSheet'
 
@@ -37,14 +36,20 @@ const MOCK_VECTOR_INDEXES = [
   {
     indexName: 'documents_index',
     creationTime: '1704067200', // Jan 1, 2024
+    dimension: 1536,
+    distanceMetric: 'cosine',
   },
   {
     indexName: 'embeddings_index',
     creationTime: '1704153600', // Jan 2, 2024
+    dimension: 1536,
+    distanceMetric: 'cosine',
   },
   {
     indexName: 'search_index',
     creationTime: '1704240000', // Jan 3, 2024
+    dimension: 1536,
+    distanceMetric: 'cosine',
   },
 ]
 
@@ -64,8 +69,8 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
   })
 
   // Mock data for development - replace with real data when backend is ready
-  // const allIndexes = MOCK_VECTOR_INDEXES
-  const allIndexes = data?.vectorBuckets ?? []
+  const allIndexes = MOCK_VECTOR_INDEXES
+  // const allIndexes = data?.vectorBuckets ?? []
   const config = BUCKET_TYPES['vectors']
   const [filterString, setFilterString] = useState('')
 
@@ -95,7 +100,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
             <ScaffoldHeader className="pt-0 pb-3">
               <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
               <ScaffoldSectionDescription>
-                Vector indexes stored in this bucket.
+                Vector tables stored in this bucket.
               </ScaffoldSectionDescription>
             </ScaffoldHeader>
 
@@ -116,14 +121,19 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                 <TableHeader>
                   <TableRow>
                     <TableHead
-                      className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
+                      className={indexesList.length === 0 ? 'text-foreground-muted' : undefined}
                     >
                       Name
                     </TableHead>
                     <TableHead
-                      className={indexesList.length === 0 ? 'text-foreground-lighter' : undefined}
+                      className={indexesList.length === 0 ? 'text-foreground-muted' : undefined}
                     >
-                      Created at
+                      Dimension
+                    </TableHead>
+                    <TableHead
+                      className={indexesList.length === 0 ? 'text-foreground-muted' : undefined}
+                    >
+                      Distance metric
                     </TableHead>
                     <TableHead />
                   </TableRow>
@@ -160,9 +170,10 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                         <TableRow key={id}>
                           <TableCell>{name}</TableCell>
                           <TableCell>
-                            <p className="text-foreground-light">
-                              <TimestampInfo utcTimestamp={created} className="text-sm" />
-                            </p>
+                            <p className="text-foreground-lighter">{index.dimension}</p>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-foreground-lighter">{index.distanceMetric}</p>
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-row justify-end gap-2">
