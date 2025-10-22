@@ -1979,7 +1979,7 @@ export interface CommandMenuOpenedEvent {
  * @page any
  */
 export interface CommandMenuInputTypedEvent {
-  action: 'command_input_typed'
+  action: 'command_menu_input_typed'
   properties: {
     /**
      * Search term typed into the command menu input

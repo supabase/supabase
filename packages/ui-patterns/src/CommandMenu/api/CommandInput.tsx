@@ -65,9 +65,8 @@ const CommandInput = forwardRef<
   const logTelemetryEvent = useCallback(
     (value: string) => {
       if (telemetryContext?.onTelemetry) {
-        // Create a CommandInputTypedEvent
         const event = {
-          action: 'command_input_typed' as const,
+          action: 'command_menu_input_typed' as const,
           properties: {
             value: value,
             app: telemetryContext.app,
