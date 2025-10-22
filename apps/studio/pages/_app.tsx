@@ -30,13 +30,12 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { ErrorInfo, PropsWithChildren, useCallback } from 'react'
+import { ErrorInfo, useCallback } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
   FeatureFlagProvider,
   getFlags,
-  LOCAL_STORAGE_KEYS,
   TelemetryTagManager,
   ThemeProvider,
   useThemeSandbox,
@@ -52,7 +51,6 @@ import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
@@ -79,15 +77,6 @@ loader.config({
       : `${BASE_PATH}/monaco-editor`,
   },
 })
-
-const CommandProviderWithPreferences = ({ children }: PropsWithChildren) => {
-  const [commandMenuHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU,
-    true
-  )
-
-  return <CommandProvider openKey={commandMenuHotkeyEnabled ? 'k' : ''}>{children}</CommandProvider>
-}
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
 // a lot of them are unnecessary and introduce way too many cluttered CSS especially with the height styles that make
@@ -160,7 +149,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         disableTransitionOnChange
                       >
                         <AppBannerContextProvider>
-                          <CommandProviderWithPreferences>
+                          <CommandProvider>
                             <FeaturePreviewContextProvider>
                               {getLayout(<Component {...pageProps} />)}
                               <StudioCommandMenu />
@@ -168,7 +157,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             </FeaturePreviewContextProvider>
                             <SonnerToaster position="top-right" />
                             <MonacoThemeProvider />
-                          </CommandProviderWithPreferences>
+                          </CommandProvider>
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
