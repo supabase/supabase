@@ -105,7 +105,7 @@ tmux a -t migration || tmux new -s migration
 
 ### Step 2: Prepare Supabase project
 
-1. Create a Supabase project at [supabase.com/dashboard](https://supabase.com/dashboard)
+1. Create a Supabase project at [supabase.com/dashboard](/dashboard)
 2. Note your database password
 3. Install required extensions via SQL or Dashboard
 4. Get your connection string:
@@ -125,7 +125,7 @@ tmux a -t migration || tmux new -s migration
 | 10-100 GB | Default-Small | 4 vCPUs, 8 GB RAM | Consider compute upgrade |
 | 100-500 GB | Large compute | 8 vCPUs, 16 GB RAM, NVMe | Upgrade compute before restore |
 | 500 GB - 1 TB | XL compute | 16 vCPUs, 32 GB RAM, NVMe | Upgrade compute before restore |
-| > 1 TB | Custom | Custom | [Contact support](https://supabase.com/dashboard/support/new) first |
+| > 1 TB | Custom | Custom | [Contact support](/dashboard/support/new) first |
 
 Also, you can temporarily increase compute size and/or disk IOPS and throughput via Settings → Compute and Disk if you want faster database restore (you can use larger -j for pg_restore if you do so).
 
@@ -580,8 +580,8 @@ For detailed restrictions, see [Postgres Logical Replication Restrictions](https
 
 ## Getting help
 
-- For databases > 150 GB: [Contact Supabase support](https://supabase.com/dashboard/support/new) before starting
-- [Supabase Dashboard Support](https://supabase.com/dashboard/support/new)
+- For databases > 150 GB: [Contact Supabase support](/dashboard/support/new) before starting
+- [Supabase Dashboard Support](/dashboard/support/new)
 - [Supabase Discord](https://discord.supabase.com)
 - [Postgres Roles and Privileges Guide](https://supabase.com/blog/postgres-roles-and-privileges)
-- [Row Level Security Guide](https://supabase.com/docs/guides/database/postgres/row-level-security)
+- [Row Level Security Guide](/docs/guides/database/postgres/row-level-security)
