@@ -49,6 +49,11 @@ const nextConfig = {
   },
   // Configure Sharp as an external package for server-side rendering
   serverExternalPackages: ['sharp'],
+  webpack: {
+    externals: {
+      sharp: 'commonjs sharp',
+    },
+  },
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })
