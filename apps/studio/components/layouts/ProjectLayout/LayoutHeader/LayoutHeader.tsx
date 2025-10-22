@@ -226,6 +226,7 @@ const LayoutHeader = ({
             {IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />
+
                 <div className="overflow-hidden flex items-center rounded-full border">
                   <HelpPopover />
                   <NotificationsPopoverV2 />
