@@ -1,7 +1,9 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
@@ -19,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { PolicyRow } from './PolicyRow'
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
@@ -50,6 +53,7 @@ export const PolicyTableRow = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
+  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   // [Joshen] Changes here are so that warnings are more accurate and granular instead of purely relying if RLS is disabled or enabled
@@ -92,7 +96,8 @@ export const PolicyTableRow = ({
       <CardHeader
         className={cn(
           'py-3 px-4',
-          (isPubliclyReadableWritable || rlsEnabledNoPolicies) && 'border-b-0'
+          (isPubliclyReadableWritable || rlsEnabledNoPolicies || !isTableExposedThroughAPI) &&
+            'border-b-0'
         )}
       >
         <PolicyTableRowHeader
@@ -103,9 +108,21 @@ export const PolicyTableRow = ({
         />
       </CardHeader>
 
-      {(isPubliclyReadableWritable || rlsEnabledNoPolicies) && (
+      {!isTableExposedThroughAPI && (
+        <Admonition
+          showIcon={false}
+          type="warning"
+          className="mb-0 border-0 border-y rounded-none [&>div]:text-foreground-light h-[50px] py-0 flex items-center"
+        >
+          No data will be selectable via Supabase APIs as this schema is not exposed. You may
+          configure this in your project's{' '}
+          <InlineLink href={`/project/${ref}/settings/api`}>API settings</InlineLink>.
+        </Admonition>
+      )}
+
+      {(isPubliclyReadableWritable || rlsEnabledNoPolicies) && isTableExposedThroughAPI && (
         <Alert_Shadcn_
-          className="border-0 rounded-none mb-0 border-b border-t"
+          className="border-0 rounded-none mb-0 border-y h-[50px] py-0 flex items-center"
           variant={isPubliclyReadableWritable ? 'warning' : 'default'}
         >
           <AlertDescription_Shadcn_>
