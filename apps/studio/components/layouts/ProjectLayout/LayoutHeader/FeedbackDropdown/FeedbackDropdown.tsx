@@ -1,7 +1,7 @@
 import { Lightbulb, TriangleAlert } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 import { FeedbackWidget } from './FeedbackWidget'
 
@@ -42,13 +42,13 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             <div className="font-medium text-sm">What would you like to share?</div>
             <div className="grid grid-cols-2 gap-3">
               <Button type="default" className="h-32" onClick={() => setIsOpen(false)} asChild>
-                <Link href="/support/new">
+                <SupportLink>
                   <span className="grid gap-1 text-center">
                     <TriangleAlert size="28" className="mx-auto text-destructive-600" />
                     <span className="text-base">Issue</span>
                     <span className="text-xm text-foreground-lighter">with my project</span>
                   </span>
-                </Link>
+                </SupportLink>
               </Button>
               <Button type="default" className="h-32" onClick={() => setStage('widget')}>
                 <span className="grid gap-1 text-center">

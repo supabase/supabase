@@ -23,8 +23,8 @@ import type { SupportFormValues } from './SupportForm.schema'
 import {
   createInitialSupportFormState,
   type SupportFormActions,
-  supportFormReducer,
   type SupportFormState,
+  supportFormReducer,
 } from './SupportForm.state'
 import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
