@@ -34,8 +34,10 @@ export const VectorsBuckets = () => {
   const router = useRouter()
   const { data, isLoading: isLoadingBuckets } = useVectorBucketsQuery({ projectRef })
   const [filterString, setFilterString] = useState('')
-  const [modal, setModal] = useState<{
-    bucket: { vectorBucketName: string; creationTime: string }
+  const [modal, setModal] = useState<'delete' | null>(null)
+  const [selectedBucket, setSelectedBucket] = useState<{
+    vectorBucketName: string
+    creationTime: string
   } | null>(null)
 
   const bucketsList = data?.vectorBuckets ?? []
@@ -49,6 +51,7 @@ export const VectorsBuckets = () => {
   const { mutate: deleteBucket } = useVectorBucketDeleteMutation({
     onSuccess: (data, vars) => {
       toast.success(`Bucket "${vars.bucketName}" deleted successfully`)
+      setModal(null) // Needed to close the delete bucket modal
       router.push(`/project/${projectRef}/storage/vectors`)
     },
   })
@@ -132,7 +135,8 @@ export const VectorsBuckets = () => {
                                 <DropdownMenuItem
                                   className="flex items-center space-x-2"
                                   onClick={() => {
-                                    setModal({ bucket })
+                                    setSelectedBucket(bucket)
+                                    setModal('delete')
                                   }}
                                 >
                                   <Trash2 size={12} />
@@ -152,24 +156,23 @@ export const VectorsBuckets = () => {
         </ScaffoldSection>
       )}
 
-      {modal && (
-        <DeleteBucketModal
-          visible={true}
-          bucket={{
-            id: modal.bucket.vectorBucketName,
-            name: modal.bucket.vectorBucketName,
-            created_at: modal.bucket.creationTime,
-            updated_at: modal.bucket.creationTime,
-            owner: '',
-            public: false,
-            type: 'STANDARD' as const,
-          }}
-          onClose={() => setModal(null)}
-          onDelete={() =>
-            deleteBucket({ projectRef: projectRef!, bucketName: modal.bucket.vectorBucketName })
-          }
-        />
-      )}
+      <DeleteBucketModal
+        visible={modal === 'delete'}
+        bucket={{
+          id: selectedBucket?.vectorBucketName || '',
+          name: selectedBucket?.vectorBucketName || '',
+          created_at: selectedBucket?.creationTime || '',
+          updated_at: selectedBucket?.creationTime || '',
+          owner: '',
+          public: false,
+          type: 'STANDARD' as const,
+        }}
+        onClose={() => setModal(null)}
+        onDelete={() =>
+          selectedBucket &&
+          deleteBucket({ projectRef: projectRef!, bucketName: selectedBucket.vectorBucketName })
+        }
+      />
     </>
   )
 }
