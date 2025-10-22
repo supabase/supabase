@@ -4,12 +4,11 @@ import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
   Command_Shadcn_,
-  CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
@@ -17,10 +16,14 @@ import {
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  ScrollArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { McpConfigPanel as McpConfigPanelBase } from 'ui-patterns/McpUrlBuilder'
-import { useProjectsQuery } from '~/lib/fetch/projects'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { useDebounce } from '~/hooks/useDebounce'
+import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
+import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -29,6 +32,7 @@ const PLATFORMS = [
   { value: 'local', label: 'CLI' },
 ] as const satisfies Array<{ value: string; label: string }>
 
+// [Joshen] Ideally we consolidate this component with what's in ProjectConfigVariables - they seem to be doing the same thing
 function ProjectSelector({
   className,
   selectedProject,
@@ -38,14 +42,57 @@ function ProjectSelector({
   selectedProject?: { ref: string; name: string } | null
   onProjectSelect?: (project: { ref: string; name: string } | null) => void
 }) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
+
+  const scrollRootRef = useRef<HTMLDivElement | null>(null)
+  const [sentinelRef, entry] = useIntersectionObserver({
+    root: scrollRootRef.current,
+    threshold: 0,
+    rootMargin: '0px',
+  })
+
   const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
-  const { data: projects, isLoading, isError } = useProjectsQuery({ enabled: isLoggedIn })
 
-  const [open, setOpen] = useState(false)
+  const {
+    data: projectsData,
+    isLoading,
+    isError,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useProjectsInfiniteQuery(
+    { search: search.length === 0 ? search : debouncedSearch },
+    { enabled: isLoggedIn }
+  )
+  const projects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
+
+  useEffect(() => {
+    if (
+      !isLoading &&
+      !isFetching &&
+      !isFetchingNextPage &&
+      hasNextPage &&
+      entry?.isIntersecting &&
+      !!fetchNextPage
+    ) {
+      fetchNextPage()
+    }
+  }, [isLoading, isFetching, isFetchingNextPage, hasNextPage, entry?.isIntersecting, fetchNextPage])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover_Shadcn_
+      modal={false}
+      open={open}
+      onOpenChange={(open) => {
+        setOpen(open)
+        if (!open) setSearch('')
+      }}
+    >
       <div className={cn('flex', className)}>
         <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
           Project
@@ -71,43 +118,68 @@ function ProjectSelector({
               }
             >
               <div className="flex items-center gap-2">
-                {isUserLoading || isLoading
-                  ? 'Loading projects...'
-                  : isError
-                    ? 'Error fetching projects'
-                    : selectedProject?.name ?? 'Select a project'}
+                {selectedProject?.name ??
+                  (isUserLoading || isLoading
+                    ? 'Loading projects...'
+                    : isError
+                      ? 'Error fetching projects'
+                      : 'Select a project')}
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
         )}
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search..." />
+      <PopoverContent_Shadcn_ className="mt-0 p-0 w-56" side="bottom" align="start">
+        <Command_Shadcn_ shouldFilter={false}>
+          <CommandInput_Shadcn_
+            placeholder="Search ..."
+            className="h-8"
+            showResetIcon
+            value={search}
+            onValueChange={setSearch}
+            handleReset={() => setSearch('')}
+          />
           <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
-              {projects?.map((project) => (
-                <CommandItem_Shadcn_
-                  key={project.ref}
-                  value={project.ref}
-                  onSelect={() => {
-                    onProjectSelect?.(project.ref === selectedProject?.ref ? null : project)
-                    setOpen(false)
-                  }}
-                  className="flex gap-2 items-center"
-                >
-                  {project.name}
-                  <Check
-                    aria-label={project.ref === selectedProject?.ref ? 'selected' : undefined}
-                    size={15}
-                    className={cn(
-                      'ml-auto',
-                      project.ref === selectedProject?.ref ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                </CommandItem_Shadcn_>
-              ))}
+              {isLoading ? (
+                <div className="px-2 py-1 flex flex-col gap-2">
+                  <ShimmeringLoader className="w-full" />
+                  <ShimmeringLoader className="w-4/5" />
+                </div>
+              ) : (
+                <>
+                  {search.length > 0 && projects.length === 0 && (
+                    <p className="text-xs text-center text-foreground-lighter py-3">
+                      No projects found based on your search
+                    </p>
+                  )}
+                  <ScrollArea className={projects.length > 7 ? 'h-[210px]' : ''}>
+                    {projects?.map((project) => (
+                      <CommandItem_Shadcn_
+                        key={project.ref}
+                        value={project.ref}
+                        onSelect={() => {
+                          onProjectSelect?.(project.ref === selectedProject?.ref ? null : project)
+                          setOpen(false)
+                        }}
+                        className="flex gap-2 items-center"
+                      >
+                        {project.name}
+                        <Check
+                          aria-label={project.ref === selectedProject?.ref ? 'selected' : undefined}
+                          size={15}
+                          className={cn(
+                            'ml-auto',
+                            project.ref === selectedProject?.ref ? 'opacity-100' : 'opacity-0'
+                          )}
+                        />
+                      </CommandItem_Shadcn_>
+                    ))}
+                    <div ref={sentinelRef} className="h-1 -mt-1" />
+                    {hasNextPage && <ShimmeringLoader className="px-2 py-3" />}
+                  </ScrollArea>
+                </>
+              )}
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
