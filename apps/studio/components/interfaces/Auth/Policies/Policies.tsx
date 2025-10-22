@@ -6,8 +6,8 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
-  PolicyTableRow,
-  PolicyTableRowProps,
+    PolicyTableRow,
+    PolicyTableRowProps,
 } from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
@@ -165,7 +165,7 @@ export const Policies = ({
                 </section>
               )
             })}
-            {Boolean(search) && visibleTableIds.size === 0 && (
+            {!!search && visibleTableIds.size === 0 && (
               <NoSearchResults searchString={search ?? ''} onResetFilter={onResetSearch} />
             )}
           </>

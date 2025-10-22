@@ -6,8 +6,8 @@ import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/Polici
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
@@ -48,8 +48,10 @@ export const RealtimePolicies = () => {
     connectionString: project?.connectionString,
   })
   const exposedSchemas = useMemo(() => {
-    if (!postgrestConfig?.db_schema) return []
-    return postgrestConfig.db_schema
+    const dbSchema = postgrestConfig?.db_schema
+    if (!dbSchema) return []
+
+    return dbSchema
       .split(',')
       .map((schema) => schema.trim())
       .filter((schema) => schema.length > 0)

@@ -6,7 +6,7 @@ import type { ResponseError } from 'types'
 
 type TableKey = `${string}.${string}`
 
-interface PoliciesDataContextValue {
+type PoliciesDataContextValue = {
   getPoliciesForTable: (schema: string, table: string) => PostgresPolicy[]
   isPoliciesLoading: boolean
   isPoliciesError: boolean
@@ -22,7 +22,7 @@ export const usePoliciesData = () => {
   return context
 }
 
-interface PoliciesDataProviderProps {
+type PoliciesDataProviderProps = {
   policies: PostgresPolicy[]
   isPoliciesLoading: boolean
   isPoliciesError: boolean
