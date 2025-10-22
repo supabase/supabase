@@ -75,7 +75,7 @@
   <tr>
     <th>प्रोग्रामिंग भाषा</th>
     <th>क्लाइंट</th>
-    <th colspan="5">फ़ीचर क्लाइंट (सुपाबेस क्लाइंट में बंडल)</th>
+    <th colspan="5" style="text-align:center">फ़ीचर क्लाइंट (सुपाबेस क्लाइंट में बंडल)</th>
   </tr>
   <!-- notranslate -->
   <tr>
@@ -98,7 +98,7 @@
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
-  <th colspan="7">⚡️ ऑफ़िशियल ⚡️</th>
+  <th colspan="7" style="text-align:center">⚡️ ऑफ़िशियल ⚡️</th>
   <!-- notranslate -->
   <tr>
     <td>जावास्क्रिप्ट (टाइप्स्क्रिप्ट)</td>
@@ -137,7 +137,7 @@
     <td><a href="https://github.com/supabase/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <!-- /notranslate -->
-  <th colspan="7">💚 समुदाय 💚</th>
+  <th colspan="7" style="text-align:center">💚 समुदाय 💚</th>
   <!-- notranslate -->
   <tr>
     <td>सीशार्प</td>
