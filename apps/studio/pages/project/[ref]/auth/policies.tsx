@@ -1,7 +1,7 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
-import { useDeferredValue, useState } from 'react'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
@@ -37,30 +37,39 @@ import { Input } from 'ui-patterns/DataInputs/Input'
  *
  * @returns list of table
  */
-const onFilterTables = (
+const getTableFilterState = (
   tables: PostgresTable[],
   policies: PostgresPolicy[],
   searchString?: string
 ) => {
-  if (!searchString) {
-    return tables.slice().sort((a: PostgresTable, b: PostgresTable) => a.name.localeCompare(b.name))
-  } else {
-    const filter = searchString.toLowerCase()
-    const findSearchString = (s: string) => s.toLowerCase().includes(filter)
-    // @ts-ignore Type instantiation is excessively deep and possibly infinite
-    const filteredPolicies = policies.filter((p: PostgresPolicy) => findSearchString(p.name))
+  const sortedTables = tables.slice().sort((a, b) => a.name.localeCompare(b.name))
+  const visibleTableIds = new Set<number>()
 
-    return tables
-      .slice()
-      .filter((x: PostgresTable) => {
-        return (
-          x.name.toLowerCase().includes(filter) ||
-          x.id.toString() === filter ||
-          filteredPolicies.some((p: PostgresPolicy) => p.table === x.name)
-        )
-      })
-      .sort((a: PostgresTable, b: PostgresTable) => a.name.localeCompare(b.name))
+  if (!searchString) {
+    sortedTables.forEach((table) => visibleTableIds.add(table.id))
+    return { tables: sortedTables, visibleTableIds }
   }
+
+  const filter = searchString.toLowerCase()
+  const matchingPolicyTables = new Set(
+    policies
+      // @ts-ignore Type instantiation is excessively deep and possibly infinite
+      .filter((policy: PostgresPolicy) => policy.name.toLowerCase().includes(filter))
+      .map((policy) => policy.table)
+  )
+
+  sortedTables.forEach((table) => {
+    const matches =
+      table.name.toLowerCase().includes(filter) ||
+      table.id.toString() === filter ||
+      matchingPolicyTables.has(table.name)
+
+    if (matches) {
+      visibleTableIds.add(table.id)
+    }
+  })
+
+  return { tables: sortedTables, visibleTableIds }
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
@@ -85,7 +94,12 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
 
-  const { data: policies } = useDatabasePoliciesQuery({
+  const {
+    data: policies,
+    isLoading: isLoadingPolicies,
+    isError: isPoliciesError,
+    error: policiesError,
+  } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -102,11 +116,42 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     schema: schema,
   })
 
-  const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
+  const { tables: tablesWithVisibility, visibleTableIds } = useMemo(
+    () => getTableFilterState(tables ?? [], policies ?? [], searchString),
+    [tables, policies, searchString]
+  )
   const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'policies'
   )
+
+  const handleSelectCreatePolicy = useCallback(
+    (table: string) => {
+      setSelectedTable(table)
+      setSelectedPolicyToEdit(undefined)
+      if (isInlineEditorEnabled) {
+        setEditorPanelOpen(true)
+      } else {
+        setShowPolicyAiEditor(true)
+      }
+    },
+    [isInlineEditorEnabled]
+  )
+
+  const handleSelectEditPolicy = useCallback(
+    (policy: PostgresPolicy) => {
+      setSelectedPolicyToEdit(policy)
+      setSelectedTable(undefined)
+      if (isInlineEditorEnabled) {
+        setEditorPanelOpen(true)
+      } else {
+        setShowPolicyAiEditor(true)
+      }
+    },
+    [isInlineEditorEnabled]
+  )
+
+  const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
@@ -149,28 +194,17 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           <Policies
             search={deferredSearchString}
             schema={schema}
-            tables={filteredTables}
-            hasTables={tables.length > 0}
+            tables={tablesWithVisibility}
+            hasTables={(tables ?? []).length > 0}
             isLocked={isSchemaLocked}
-            onSelectCreatePolicy={(table: string) => {
-              setSelectedTable(table)
-              setSelectedPolicyToEdit(undefined)
-              if (isInlineEditorEnabled) {
-                setEditorPanelOpen(true)
-              } else {
-                setShowPolicyAiEditor(true)
-              }
-            }}
-            onSelectEditPolicy={(policy) => {
-              setSelectedPolicyToEdit(policy)
-              setSelectedTable(undefined)
-              if (isInlineEditorEnabled) {
-                setEditorPanelOpen(true)
-              } else {
-                setShowPolicyAiEditor(true)
-              }
-            }}
-            onResetSearch={() => setSearchString('')}
+            policies={policies ?? []}
+            isLoadingPolicies={isLoadingPolicies}
+            isPoliciesError={isPoliciesError}
+            policiesError={policiesError}
+            visibleTableIds={visibleTableIds}
+            onSelectCreatePolicy={handleSelectCreatePolicy}
+            onSelectEditPolicy={handleSelectEditPolicy}
+            onResetSearch={handleResetSearch}
           />
         )}
 

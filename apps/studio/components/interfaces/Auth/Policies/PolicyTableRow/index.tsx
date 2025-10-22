@@ -1,13 +1,13 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
+import { memo, useMemo } from 'react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import type { ResponseError } from 'types'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -26,32 +26,39 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { PolicyRow } from './PolicyRow'
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
 
-export interface PolicyTableRowProps {
-  table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }
-  isLocked: boolean
-  onSelectToggleRLS: (table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }) => void
-  onSelectCreatePolicy: () => void
-  onSelectEditPolicy: (policy: PostgresPolicy) => void
-  onSelectDeletePolicy: (policy: PostgresPolicy) => void
+export type PolicyTable = {
+  id: number
+  schema: string
+  name: string
+  rls_enabled: boolean
 }
 
-export const PolicyTableRow = ({
+export interface PolicyTableRowProps {
+  table: PolicyTable
+  isLocked: boolean
+  onSelectToggleRLS: (table: PolicyTable) => void
+  onSelectCreatePolicy: (table: PolicyTable) => void
+  onSelectEditPolicy: (policy: PostgresPolicy) => void
+  onSelectDeletePolicy: (policy: PostgresPolicy) => void
+  policies: PostgresPolicy[]
+  isLoadingPolicies: boolean
+  isPoliciesError: boolean
+  policiesError?: ResponseError | Error
+  exposedSchemas: string[]
+}
+
+const PolicyTableRowComponent = ({
   table,
   isLocked,
   onSelectToggleRLS = noop,
-  onSelectCreatePolicy,
+  onSelectCreatePolicy = noop,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
+  policies,
+  isLoadingPolicies,
+  isPoliciesError,
+  policiesError,
+  exposedSchemas,
 }: PolicyTableRowProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -64,10 +71,11 @@ export const PolicyTableRow = ({
   // - They only consider the public schema
   // - They do not consider roles
   // Eventually if the security lints are able to cover those, we can look to using them as the source of truth instead then
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
-  const exposedSchemas = config?.db_schema ? config?.db_schema.replace(/ /g, '').split(',') : []
   const isRLSEnabled = table.rls_enabled
-  const isTableExposedThroughAPI = exposedSchemas.includes(table.schema)
+  const isTableExposedThroughAPI = useMemo(
+    () => exposedSchemas.includes(table.schema),
+    [exposedSchemas, table.schema]
+  )
 
   const { data: tablesWithAnonAuthAccess = new Set() } = useTablesRolesAccessQuery({
     projectRef: project?.ref,
@@ -78,18 +86,12 @@ export const PolicyTableRow = ({
   const hasAnonAuthenticatedRolesAccess = tablesWithAnonAuthAccess.has(table.name)
   const isPubliclyReadableWritable =
     !isRLSEnabled && isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
-
-  const { data, error, isLoading, isError, isSuccess } = useDatabasePoliciesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const policies = (data ?? [])
-    .filter((policy) => policy.schema === table.schema && policy.table === table.name)
-    .sort((a, b) => a.name.localeCompare(b.name))
   const rlsEnabledNoPolicies = isRLSEnabled && policies.length === 0
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
+
+  const showPolicies = !isLoadingPolicies && !isPoliciesError
 
   return (
     <Card className={cn(isPubliclyReadableWritable && 'border-warning-500')}>
@@ -133,23 +135,23 @@ export const PolicyTableRow = ({
         </Alert_Shadcn_>
       )}
 
-      {isLoading && (
+      {isLoadingPolicies && (
         <CardContent>
           <ShimmeringLoader />
         </CardContent>
       )}
 
-      {isError && (
+      {isPoliciesError && (
         <CardContent>
           <AlertError
             className="border-0 rounded-none"
-            error={error}
+            error={policiesError}
             subject="Failed to retrieve policies"
           />
         </CardContent>
       )}
 
-      {isSuccess && (
+      {showPolicies && (
         <CardContent className="p-0">
           {policies.length === 0 ? (
             <p className="text-foreground-lighter text-sm p-4">No policies created yet</p>
@@ -183,3 +185,6 @@ export const PolicyTableRow = ({
     </Card>
   )
 }
+
+export const PolicyTableRow = memo(PolicyTableRowComponent)
+PolicyTableRow.displayName = 'PolicyTableRow'

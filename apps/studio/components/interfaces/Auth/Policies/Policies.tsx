@@ -1,7 +1,7 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEmpty } from 'lodash'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -11,11 +11,15 @@ import {
 } from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import type { ResponseError } from 'types'
 import { Button, Card, CardContent } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+
+const EMPTY_POLICIES: PostgresPolicy[] = []
 
 interface PoliciesProps {
   search?: string
@@ -23,6 +27,11 @@ interface PoliciesProps {
   tables: PolicyTableRowProps['table'][]
   hasTables: boolean
   isLocked: boolean
+  policies: PostgresPolicy[]
+  isLoadingPolicies: boolean
+  isPoliciesError: boolean
+  policiesError?: ResponseError | Error
+  visibleTableIds: Set<number>
   onSelectCreatePolicy: (table: string) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onResetSearch?: () => void
@@ -34,12 +43,18 @@ export const Policies = ({
   tables,
   hasTables,
   isLocked,
+  policies,
+  isLoadingPolicies,
+  isPoliciesError,
+  policiesError,
+  visibleTableIds,
   onSelectCreatePolicy,
   onSelectEditPolicy: onSelectEditPolicyAI,
   onResetSearch,
 }: PoliciesProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
 
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
     id: number
@@ -66,27 +81,28 @@ export const Policies = ({
     },
   })
 
-  const closeConfirmModal = () => {
+  const closeConfirmModal = useCallback(() => {
     setSelectedPolicyToDelete({})
     setSelectedTableToToggleRLS(undefined)
-  }
+  }, [])
 
-  const onSelectToggleRLS = (table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }) => {
-    setSelectedTableToToggleRLS(table)
-  }
+  const onSelectToggleRLS = useCallback(
+    (table: { id: number; schema: string; name: string; rls_enabled: boolean }) => {
+      setSelectedTableToToggleRLS(table)
+    },
+    []
+  )
 
-  const onSelectEditPolicy = (policy: any) => {
-    onSelectEditPolicyAI(policy)
-  }
+  const onSelectEditPolicy = useCallback(
+    (policy: PostgresPolicy) => {
+      onSelectEditPolicyAI(policy)
+    },
+    [onSelectEditPolicyAI]
+  )
 
-  const onSelectDeletePolicy = (policy: any) => {
+  const onSelectDeletePolicy = useCallback((policy: PostgresPolicy) => {
     setSelectedPolicyToDelete(policy)
-  }
+  }, [])
 
   // Methods that involve some API
   const onToggleRLS = async () => {
@@ -116,6 +132,40 @@ export const Policies = ({
     })
   }
 
+  const exposedSchemas = useMemo(() => {
+    if (!postgrestConfig?.db_schema) return []
+    return postgrestConfig.db_schema
+      .split(',')
+      .map((schema) => schema.trim())
+      .filter((schema) => schema.length > 0)
+  }, [postgrestConfig?.db_schema])
+
+  const policiesByTable = useMemo(() => {
+    const map = new Map<string, PostgresPolicy[]>()
+    policies.forEach((policy) => {
+      const key = `${policy.schema}.${policy.table}`
+      const existing = map.get(key)
+      if (existing) {
+        existing.push(policy)
+      } else {
+        map.set(key, [policy])
+      }
+    })
+
+    map.forEach((policyList) => {
+      policyList.sort((a, b) => a.name.localeCompare(b.name))
+    })
+
+    return map
+  }, [policies])
+
+  const handleCreatePolicy = useCallback(
+    (tableData: PolicyTableRowProps['table']) => {
+      onSelectCreatePolicy(tableData.name)
+    },
+    [onSelectCreatePolicy]
+  )
+
   if (!hasTables) {
     return (
       <Card className="w-full bg-transparent">
@@ -139,18 +189,33 @@ export const Policies = ({
       <div className="flex flex-col gap-y-4 pb-4">
         {isLocked && <ProtectedSchemaWarning schema={schema} entity="policies" />}
         {tables.length > 0 ? (
-          tables.map((table) => (
-            <section key={table.id}>
-              <PolicyTableRow
-                table={table}
-                isLocked={schema === 'realtime' ? true : isLocked}
-                onSelectToggleRLS={onSelectToggleRLS}
-                onSelectCreatePolicy={() => onSelectCreatePolicy(table.name)}
-                onSelectEditPolicy={onSelectEditPolicy}
-                onSelectDeletePolicy={onSelectDeletePolicy}
-              />
-            </section>
-          ))
+          <>
+            {tables.map((table) => {
+              const isVisible = visibleTableIds.has(table.id)
+              return (
+                <section key={table.id} hidden={!isVisible} aria-hidden={!isVisible}>
+                  <PolicyTableRow
+                    table={table}
+                    isLocked={schema === 'realtime' ? true : isLocked}
+                    onSelectToggleRLS={onSelectToggleRLS}
+                    onSelectCreatePolicy={handleCreatePolicy}
+                    onSelectEditPolicy={onSelectEditPolicy}
+                    onSelectDeletePolicy={onSelectDeletePolicy}
+                    policies={
+                      policiesByTable.get(`${table.schema}.${table.name}`) ?? EMPTY_POLICIES
+                    }
+                    isLoadingPolicies={isLoadingPolicies}
+                    isPoliciesError={isPoliciesError}
+                    policiesError={policiesError}
+                    exposedSchemas={exposedSchemas}
+                  />
+                </section>
+              )
+            })}
+            {Boolean(search) && visibleTableIds.size === 0 && (
+              <NoSearchResults searchString={search ?? ''} onResetFilter={onResetSearch} />
+            )}
+          </>
         ) : hasTables ? (
           <NoSearchResults searchString={search ?? ''} onResetFilter={onResetSearch} />
         ) : null}

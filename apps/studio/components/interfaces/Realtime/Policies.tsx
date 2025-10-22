@@ -1,10 +1,11 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
@@ -26,7 +27,23 @@ export const RealtimePolicies = () => {
     schema: 'realtime',
   })
 
-  const filteredTables = (tables ?? []).filter((table) => table.name === 'messages')
+  const filteredTables = useMemo(
+    () => (tables ?? []).filter((table) => table.name === 'messages'),
+    [tables]
+  )
+  const visibleTableIds = useMemo(
+    () => new Set(filteredTables.map((table) => table.id)),
+    [filteredTables]
+  )
+  const {
+    data: policies,
+    isLoading: isLoadingPolicies,
+    isError: isPoliciesError,
+    error: policiesError,
+  } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   return (
     <>
@@ -40,7 +57,12 @@ export const RealtimePolicies = () => {
           tables={filteredTables}
           hasTables
           isLocked={false}
-          onSelectCreatePolicy={() => {
+          policies={policies ?? []}
+          isLoadingPolicies={isLoadingPolicies}
+          isPoliciesError={isPoliciesError}
+          policiesError={policiesError}
+          visibleTableIds={visibleTableIds}
+          onSelectCreatePolicy={(_tableName) => {
             setSelectedPolicyToEdit(undefined)
             setShowPolicyEditor(true)
           }}
