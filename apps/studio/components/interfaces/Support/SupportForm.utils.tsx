@@ -15,6 +15,7 @@ import {
   DocsSearchResultType as PageType,
 } from 'common'
 import { getProjectDetail } from 'data/projects/project-detail-query'
+import dayjs from 'dayjs'
 import { DOCS_URL } from 'lib/constants'
 import type { Organization } from 'types'
 import { CATEGORY_OPTIONS } from './Support.constants'
@@ -32,13 +33,16 @@ export const formatMessage = ({
   message: string
   attachments?: string[]
   error: string | null | undefined
-  commit: string | undefined
+  commit: { commitSha: string; commitTime: string } | undefined
   dashboardLogUrl?: string
 }) => {
   const errorString = error != null ? `\n\nError: ${error}` : ''
   const attachmentsString =
     attachments.length > 0 ? `\n\nAttachments:\n${attachments.join('\n')}` : ''
-  const commitString = commit != undefined ? `\n\n---\nSupabase Studio version:  SHA ${commit}` : ''
+  const commitString =
+    commit != undefined
+      ? `\n\n---\nSupabase Studio version: SHA ${commit.commitSha} deployed at ${commit.commitTime === 'unknown' ? 'unknown time' : dayjs(commit.commitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
+      : ''
   const logString = dashboardLogUrl ? `\nDashboard logs: ${dashboardLogUrl}` : ''
   return `${message}${errorString}${attachmentsString}${commitString}${logString}`
 }
@@ -144,7 +148,7 @@ export function createSupportFormUrl(initialParams: Partial<SupportFormUrlKeys>)
  * - URL param (if any)
  * - Fallback
  */
-export async function selectInitalOrgAndProject({
+export async function selectInitialOrgAndProject({
   projectRef,
   orgSlug,
   orgs,

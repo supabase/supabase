@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import dayjs from 'dayjs'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 // End of third-party imports
 
@@ -62,19 +63,25 @@ const mockProjects = [
   },
 ]
 
-const { mockCommitSha, mockUseDeploymentCommitQuery } = vi.hoisted(() => {
+const { mockCommitSha, mockCommitTime, mockUseDeploymentCommitQuery } = vi.hoisted(() => {
   const sha = 'mock-studio-commit-sha'
+  const commitTime = '2024-01-01T00:00:00Z'
 
   const createCommitResponse = () => ({
     commitSha: sha,
-    commitTime: '2024-01-01T00:00:00Z',
+    commitTime,
   })
 
   return {
     mockCommitSha: sha,
+    mockCommitTime: commitTime,
     mockUseDeploymentCommitQuery: vi.fn().mockReturnValue({ data: createCommitResponse() }),
   }
 })
+
+const supportVersionInfo = `\n\n---\nSupabase Studio version: SHA ${mockCommitSha} deployed at ${dayjs(
+  mockCommitTime
+).format('YYYY-MM-DD HH:mm:ss Z')}`
 
 vi.mock('react-inlinesvg', () => ({
   __esModule: true,
@@ -286,7 +293,7 @@ describe('SupportFormPage', () => {
 
   beforeEach(async () => {
     mockUseDeploymentCommitQuery.mockReturnValue({
-      data: { commitSha: mockCommitSha, commitTime: '2024-01-01T00:00:00Z' },
+      data: { commitSha: mockCommitSha, commitTime: mockCommitTime },
     })
     const { createSupportStorageClient } = await import('../support-storage-client')
     createSupportStorageClientMock = vi.mocked(createSupportStorageClient)
@@ -790,8 +797,7 @@ describe('SupportFormPage', () => {
       browserInformation: 'Chrome',
     })
     const expectedMessage =
-      'Requests return status 500 when calling the RPC endpoint\n\n---\nSupabase Studio version:  SHA ' +
-      mockCommitSha
+      'Requests return status 500 when calling the RPC endpoint' + supportVersionInfo
     expect(payload.message).toBe(expectedMessage)
 
     await waitFor(() => {
@@ -881,9 +887,7 @@ describe('SupportFormPage', () => {
       additionalRedirectUrls: 'https://project-2.supabase.dev/redirect',
       browserInformation: 'Chrome',
     })
-    const expectedMessage =
-      'MFA challenge fails with an unknown error code\n\n---\nSupabase Studio version:  SHA ' +
-      mockCommitSha
+    const expectedMessage = 'MFA challenge fails with an unknown error code' + supportVersionInfo
     expect(payload.message).toBe(expectedMessage)
 
     await waitFor(() => {
@@ -985,8 +989,8 @@ describe('SupportFormPage', () => {
       browserInformation: 'Chrome',
     })
     expect(payload.message).toBe(
-      'Connections time out after 30 seconds\n\nError: Connection timeout detected\n\n---\nSupabase Studio version:  SHA ' +
-        mockCommitSha
+      'Connections time out after 30 seconds\n\nError: Connection timeout detected' +
+        supportVersionInfo
     )
 
     await waitFor(() => {
@@ -1436,8 +1440,13 @@ describe('SupportFormPage', () => {
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.subject).toBe('Cannot access settings')
+<<<<<<< HEAD
     expect(payload.message).toContain(
       `Settings page shows 500 error - updated description\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}`
+=======
+    expect(payload.message).toBe(
+      'Settings page shows 500 error - updated description' + supportVersionInfo
+>>>>>>> master
     )
     expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
 
@@ -1661,9 +1670,14 @@ describe('SupportFormPage', () => {
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',
     })
+<<<<<<< HEAD
     const expectedMessage = `I need help accessing my Supabase account\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}`
     expect(payload.message).toContain(expectedMessage)
     expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
+=======
+    const expectedMessage = 'I need help accessing my Supabase account' + supportVersionInfo
+    expect(payload.message).toBe(expectedMessage)
+>>>>>>> master
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()

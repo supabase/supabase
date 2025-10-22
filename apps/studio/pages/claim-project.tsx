@@ -21,7 +21,7 @@ const ClaimProjectPageLayout = ({ children }: PropsWithChildren) => {
   return (
     <>
       <Head>
-        <title>Claim project | {appTitle || 'Supabase'}</title>
+        <title>{`Claim project | ${appTitle ?? 'Supabase'}`}</title>
       </Head>
       {children}
     </>

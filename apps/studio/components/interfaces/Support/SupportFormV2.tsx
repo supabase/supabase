@@ -1,8 +1,9 @@
-import { type Dispatch, type MouseEventHandler } from 'react'
+import { useEffect, type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
@@ -36,6 +37,15 @@ import {
 } from './SupportForm.utils'
 import { DASHBOARD_LOG_CATEGORIES, uploadDashboardLog } from './dashboard-logs'
 
+const useIsSimplifiedForm = (slug: string) => {
+  const simplifiedSupportForm = useFlag('simplifiedSupportForm')
+  if (typeof simplifiedSupportForm === 'string') {
+    const slugs = (simplifiedSupportForm as string).split(',').map((x) => x.trim())
+    return slugs.includes(slug)
+  }
+  return false
+}
+
 interface SupportFormV2Props {
   form: UseFormReturn<SupportFormValues>
   initialError: string | null
@@ -48,6 +58,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
+  const simplifiedSupportForm = useIsSimplifiedForm(organizationSlug)
 
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
   const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
@@ -99,6 +110,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
     const payload = {
       ...values,
+      category,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
       projectRef: values.projectRef ?? NO_PROJECT_MARKER,
       allowSupportAccess: SUPPORT_ACCESS_CATEGORIES.includes(values.category)
@@ -112,7 +124,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         message: values.message,
         attachments,
         error: initialError,
-        commit: commit?.commitSha,
+        commit,
         dashboardLogUrl: dashboardLogUrl?.[0],
       }),
       verified: true,
@@ -149,6 +161,15 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     handleFormSubmit(event)
   }
 
+  useEffect(() => {
+    if (simplifiedSupportForm) {
+      form.setValue('category', 'Others')
+    } else {
+      form.setValue('category', '' as any)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [simplifiedSupportForm])
+
   return (
     <Form_Shadcn_ {...form}>
       <form id="support-form" className="flex flex-col gap-y-6">
@@ -163,20 +184,26 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
             subscriptionPlanId={subscriptionPlanId}
             category={category}
           />
-          <CategoryAndSeverityInfo
-            form={form}
-            category={category}
-            severity={severity}
-            projectRef={projectRef}
-          />
+          {!simplifiedSupportForm && (
+            <CategoryAndSeverityInfo
+              form={form}
+              category={category}
+              severity={severity}
+              projectRef={projectRef}
+            />
+          )}
         </div>
 
         <DialogSectionSeparator />
 
         <div className="px-6 flex flex-col gap-y-8">
           <SubjectAndSuggestionsInfo form={form} subject={subject} category={category} />
-          <ClientLibraryInfo form={form} library={library} category={category} />
-          <AffectedServicesSelector form={form} category={category} />
+          {!simplifiedSupportForm && (
+            <>
+              <ClientLibraryInfo form={form} library={library} category={category} />
+              <AffectedServicesSelector form={form} category={category} />
+            </>
+          )}
           <MessageField form={form} originalError={initialError} />
           <AttachmentUploadDisplay {...attachmentUpload} />
         </div>

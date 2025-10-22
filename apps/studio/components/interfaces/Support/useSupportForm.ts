@@ -7,11 +7,11 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { SupportFormSchema, type SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions } from './SupportForm.state'
 import {
-  loadSupportFormInitialParams,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
   type SupportFormUrlKeys,
-  selectInitalOrgAndProject,
+  loadSupportFormInitialParams,
+  selectInitialOrgAndProject,
 } from './SupportForm.utils'
 
 const supportFormDefaultValues: DefaultValues<SupportFormValues> = {
@@ -86,7 +86,7 @@ export function useSupportForm(dispatch: Dispatch<SupportFormActions>): UseSuppo
         : null
     const projectRefFromUrl = urlParamsRef.current.projectRef ?? null
 
-    selectInitalOrgAndProject({
+    selectInitialOrgAndProject({
       projectRef: projectRefFromUrl,
       orgSlug: orgSlugFromUrl,
       orgs: organizations ?? [],

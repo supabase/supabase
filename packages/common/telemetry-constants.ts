@@ -239,7 +239,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
    * the instance size selected in the project creation form
    */
   properties: {
-    instanceSize: string
+    instanceSize?: string
   }
   groups: TelemetryGroups
 }
@@ -257,7 +257,7 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
    * the instance size selected in the project creation form
    */
   properties: {
-    instanceSize: string
+    instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }

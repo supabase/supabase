@@ -299,7 +299,6 @@ export const NewOrgForm = ({
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (formValues) => {
-    debugger
     const hasFreeOrgWithProjects = freeOrgs.some((it) => projectsByOrg[it.slug]?.length > 0)
 
     if (hasFreeOrgWithProjects && formValues.plan !== 'FREE') {
