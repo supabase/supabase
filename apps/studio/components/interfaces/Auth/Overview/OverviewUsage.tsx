@@ -52,13 +52,13 @@ export const StatCard = ({
 
   return (
     <Card className={cn(href, 'mb-0 flex flex-col')}>
-      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0">
+      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative">
         <CardTitle className="text-foreground-light">{title}</CardTitle>
         <ButtonTooltip
           type="text"
           size="tiny"
           icon={<ExternalLink />}
-          className="w-6 h-6"
+          className="w-6 h-6 absolute right-4 top-3"
           onClick={() => router.push(href || '')}
           tooltip={{
             content: {
@@ -155,7 +155,7 @@ export const OverviewUsage = () => {
         </Link>
       </div>
       <ScaffoldSectionContent className="gap-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <StatCard
             title="Active users"
             current={metrics.current.activeUsers}
