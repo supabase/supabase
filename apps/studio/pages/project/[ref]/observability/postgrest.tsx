@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useParams } from 'common'
@@ -7,68 +6,51 @@ import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   LogsDatePicker,
   DatePickerValue,
 } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import {
-  ResponseSpeedChartRenderer,
-  TopApiRoutesRenderer,
-  TotalRequestsChartRenderer,
-} from 'components/interfaces/Reports/renderers/ApiRenderers'
-import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-
-import { analyticsKeys } from 'data/analytics/keys'
-import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
-import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 
-const RealtimeReport: NextPageWithLayout = () => {
+const PostgRESTReport: NextPageWithLayout = () => {
   return (
     <ReportPadding>
-      <RealtimeUsage />
+      <PostgrestReport />
     </ReportPadding>
   )
 }
 
-RealtimeReport.getLayout = (page) => (
+PostgRESTReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="Realtime">{page}</ReportsLayout>
+    <ObservabilityLayout title="PostgREST">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
 export type UpdateDateRange = (from: string, to: string) => void
-export default RealtimeReport
+export default PostgRESTReport
 
-const RealtimeUsage = () => {
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const { db, chart, ref } = useParams()
-
+const PostgrestReport = () => {
+  const { db, chart } = useParams()
   const {
     selectedDateRange,
-    updateDateRange: updateDateRangeFromHook,
     datePickerValue,
     datePickerHelpers,
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange: handleDatePickerChangeFromHook,
-    isOrgPlanLoading,
-    orgPlan,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
-  const queryClient = useQueryClient()
+
   const {
     data,
     error,
@@ -81,40 +63,12 @@ const RealtimeUsage = () => {
     isLoadingData,
     sql,
   } = useSharedAPIReport({
-    filterBy: 'realtime',
+    filterBy: 'postgrest',
     start: selectedDateRange?.period_start?.date,
     end: selectedDateRange?.period_end?.date,
   })
 
   const state = useDatabaseSelectorStateSnapshot()
-
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
-  const REALTIME_REPORT_ATTRIBUTES = getRealtimeReportAttributes(isFreePlan)
-
-  const onRefreshReport = async () => {
-    if (!selectedDateRange) return
-
-    // [Joshen] Since we can't track individual loading states for each chart
-    // so for now we mock a loading state that only lasts for a second
-    setIsRefreshing(true)
-
-    const { period_start, period_end, interval } = selectedDateRange
-    REALTIME_REPORT_ATTRIBUTES.forEach((attr) => {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
-          attribute: attr?.id,
-          startDate: period_start.date,
-          endDate: period_end.date,
-          interval,
-          databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
-    })
-
-    refetch()
-
-    setTimeout(() => setIsRefreshing(false), 1000)
-  }
 
   // [Joshen] Empty dependency array as we only want this running once
   useEffect(() => {
@@ -135,27 +89,23 @@ const RealtimeUsage = () => {
   }, [])
 
   const handleDatePickerChange = (values: DatePickerValue) => {
-    const promptShown = handleDatePickerChangeFromHook(values)
-  }
-
-  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
-    updateDateRangeFromHook(from, to)
+    handleDatePickerChangeFromHook(values)
   }
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="Realtime" />
+      <ReportHeader showDatabaseSelector={false} title="PostgREST" />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             <div className="flex gap-2">
               <ButtonTooltip
                 type="default"
-                disabled={isRefreshing}
-                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                disabled={isRefetching}
+                icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                 className="w-7"
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={onRefreshReport}
+                onClick={() => refetch()}
               />
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
@@ -167,7 +117,7 @@ const RealtimeUsage = () => {
                 setShowUpgradePrompt={setShowUpgradePrompt}
                 title="Report date range"
                 description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
-                source="realtimeReportDateRange"
+                source="postgrestReportDateRange"
               />
               {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
@@ -183,25 +133,6 @@ const RealtimeUsage = () => {
                 </div>
               )}
             </div>
-          </div>
-        }
-      >
-        {selectedDateRange &&
-          REALTIME_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
-            <LazyComposedChartHandler
-              key={chart.id}
-              {...chart}
-              attributes={chart.attributes as MultiAttribute[]}
-              interval={selectedDateRange.interval}
-              startDate={selectedDateRange?.period_start?.date}
-              endDate={selectedDateRange?.period_end?.date}
-              updateDateRange={updateDateRange}
-              defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-            />
-          ))}
-        <div className="">
-          <div className="mb-4">
-            <h5 className="text-foreground mb-2">Realtime API Gateway</h5>
             <ReportFilterBar
               filters={filters}
               onAddFilter={addFilter}
@@ -209,16 +140,18 @@ const RealtimeUsage = () => {
               isLoading={isLoadingData || isRefetching}
               hideDatepicker={true}
               datepickerHelpers={datePickerHelpers}
-              selectedProduct={'realtime'}
+              selectedProduct={'postgrest'}
               showDatabaseSelector={false}
             />
           </div>
+        }
+      >
+        <div className="relative mt-8">
           <SharedAPIReport
             data={data}
             error={error}
             isLoading={isLoading}
             isRefetching={isRefetching}
-            hiddenReports={['networkTraffic']}
             sql={sql}
           />
         </div>

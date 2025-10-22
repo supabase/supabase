@@ -1,17 +1,19 @@
 import { PropsWithChildren } from 'react'
-
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 import { useParams } from 'common'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
-import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
-import ReportsMenu from './ReportsMenu'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import ObservabilityMenu from './ObservabilityMenu'
 
-interface ReportsLayoutProps {
+interface ObservabilityLayoutProps {
   title?: string
 }
 
-const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps>) => {
+export const ObservabilityLayout = ({
+  title,
+  children,
+}: PropsWithChildren<ObservabilityLayoutProps>) => {
   const { ref } = useParams()
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
@@ -19,8 +21,8 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
     return (
       <ProjectLayout
         title={title}
-        product="Custom Reports"
-        productMenu={<ReportsMenu />}
+        product="Observability"
+        productMenu={<ObservabilityMenu />}
         isBlocking={false}
       >
         {children}
@@ -31,4 +33,4 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
   }
 }
 
-export default withAuth(ReportsLayout)
+export default withAuth(ObservabilityLayout)

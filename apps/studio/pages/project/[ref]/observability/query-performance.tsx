@@ -9,7 +9,7 @@ import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -98,7 +98,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
 QueryPerformanceReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="Query performance">{page}</ReportsLayout>
+    <ObservabilityLayout title="Query performance">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

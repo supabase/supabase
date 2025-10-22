@@ -1,10 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -12,16 +13,26 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
-import { Menu } from 'ui'
+import { Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { ReportMenuItem } from './ReportMenuItem'
+import { ReportMenuItem } from '../ReportsLayout/ReportMenuItem'
 
-const ReportsMenu = () => {
+const ObservabilityMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
+  const authEnabled = useFlag('authreportv2')
+  const edgeFnEnabled = useFlag('edgefunctionreport')
+  const realtimeEnabled = useFlag('realtimeReport')
+  const storageReportEnabled = useFlag('storagereport')
+  const postgrestReportEnabled = useFlag('postgrestreport')
+
+  // b/c fly doesn't support storage
+  const storageSupported = useIsFeatureEnabled('project_storage:all')
+  const storageEnabled = storageReportEnabled && storageSupported
 
   const { can: canCreateCustomReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -102,6 +113,76 @@ const ReportsMenu = () => {
 
   const reportMenuItems = getReportMenuItems()
 
+  const menuItems = [
+    {
+      title: 'Built-in reports',
+      key: 'builtin-reports',
+      items: [
+        {
+          name: 'API Gateway',
+          key: 'api-overview',
+          url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
+        },
+        ...(authEnabled
+          ? [
+              {
+                name: 'Auth',
+                key: 'auth',
+                url: `/project/${ref}/observability/auth${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        {
+          name: 'Database',
+          key: 'database',
+          url: `/project/${ref}/observability/database${preservedQueryParams}`,
+        },
+        ...(edgeFnEnabled
+          ? [
+              {
+                name: 'Edge Functions',
+                key: 'edge-functions',
+                url: `/project/${ref}/observability/edge-functions${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
+        },
+        ...(postgrestReportEnabled
+          ? [
+              {
+                name: 'PostgREST',
+                key: 'postgrest',
+                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        ...(realtimeEnabled
+          ? [
+              {
+                name: 'Realtime',
+                key: 'realtime',
+                url: `/project/${ref}/observability/realtime${preservedQueryParams}`,
+              },
+            ]
+          : []),
+
+        ...(storageEnabled
+          ? [
+              {
+                name: 'Storage',
+                key: 'storage',
+                url: `/project/${ref}/observability/storage${preservedQueryParams}`,
+              },
+            ]
+          : []),
+      ],
+    },
+  ]
+
   return (
     <Menu type="pills" className="mt-6">
       {isLoading ? (
@@ -112,86 +193,40 @@ const ReportsMenu = () => {
         </div>
       ) : (
         <div className="flex flex-col px-2 gap-y-6">
-          <div className="px-2">
-            <ButtonTooltip
-              block
-              type="default"
-              icon={<Plus />}
-              disabled={!canCreateCustomReport}
-              className="justify-start flex-grow"
-              onClick={() => {
-                setShowNewReportModal(true)
-              }}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canCreateCustomReport
-                    ? 'You need additional permissions to create custom reports'
-                    : undefined,
-                },
-              }}
-            >
-              New custom report
-            </ButtonTooltip>
-          </div>
-
-          {reportMenuItems.length > 0 ? (
-            <div>
-              <Menu.Group
-                title={<span className="uppercase font-mono">Your custom reports</span>}
-              />
-              {reportMenuItems.map((item) => (
-                <ReportMenuItem
-                  key={item.id}
-                  item={item as any}
-                  pageKey={pageKey}
-                  onSelectEdit={() => {
-                    setSelectedReportToUpdate(item.report)
-                  }}
-                  onSelectDelete={() => {
-                    setSelectedReportToDelete(item.report)
-                    setDeleteModalOpen(true)
-                  }}
-                />
-              ))}
+          {menuItems.map((item) => (
+            <div key={item.key + '-menu-group'}>
+              {item.items ? (
+                <>
+                  <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
+                  <div key={item.key} className="flex flex-col">
+                    {item.items.map((subItem) => (
+                      <li
+                        key={subItem.key}
+                        className={cn(
+                          'pr-2 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
+                          'flex items-center justify-between rounded-md group relative',
+                          subItem.key === pageKey
+                            ? 'bg-surface-300 text-foreground'
+                            : 'hover:bg-surface-200'
+                        )}
+                      >
+                        <Link
+                          href={subItem.url}
+                          className="flex-grow h-7 flex justify-between items-center pl-3"
+                        >
+                          <span>{subItem.name}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </div>
+                </>
+              ) : null}
             </div>
-          ) : null}
-
-          <UpdateCustomReportModal
-            onCancel={() => setSelectedReportToUpdate(undefined)}
-            selectedReport={selectedReportToUpdate}
-            initialValues={{
-              name: selectedReportToUpdate?.name || '',
-              description: selectedReportToUpdate?.description || '',
-            }}
-          />
-
-          <ConfirmationModal
-            title="Delete custom report"
-            confirmLabel="Delete report"
-            confirmLabelLoading="Deleting report"
-            size="medium"
-            loading={isDeleting}
-            visible={deleteModalOpen}
-            onCancel={() => setDeleteModalOpen(false)}
-            onConfirm={onConfirmDeleteReport}
-          >
-            <div className="text-sm text-foreground-light grid gap-4">
-              <div className="grid gap-1">
-                <p>Are you sure you want to delete '{selectedReportToDelete?.name}'?</p>
-              </div>
-            </div>
-          </ConfirmationModal>
-
-          <CreateReportModal
-            visible={showNewReportModal}
-            onCancel={() => setShowNewReportModal(false)}
-            afterSubmit={() => setShowNewReportModal(false)}
-          />
+          ))}
         </div>
       )}
     </Menu>
   )
 }
 
-export default ReportsMenu
+export default ObservabilityMenu
