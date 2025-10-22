@@ -1,4 +1,4 @@
 {
   "buildCommand": "pnpm vercel-build",
-  "installCommand": "pnpm install --include=optional"
+  "installCommand": "pnpm install"
 }
