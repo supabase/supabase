@@ -1440,13 +1440,8 @@ describe('SupportFormPage', () => {
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.subject).toBe('Cannot access settings')
-<<<<<<< HEAD
-    expect(payload.message).toContain(
-      `Settings page shows 500 error - updated description\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}`
-=======
     expect(payload.message).toBe(
       'Settings page shows 500 error - updated description' + supportVersionInfo
->>>>>>> master
     )
     expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
 
@@ -1670,14 +1665,8 @@ describe('SupportFormPage', () => {
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',
     })
-<<<<<<< HEAD
-    const expectedMessage = `I need help accessing my Supabase account\n\n---\nSupabase Studio version:  SHA ${mockCommitSha}`
-    expect(payload.message).toContain(expectedMessage)
-    expect(payload.message).toMatch(/Dashboard logs: https:\/\/storage\.example\.com\/.+\.json/)
-=======
     const expectedMessage = 'I need help accessing my Supabase account' + supportVersionInfo
     expect(payload.message).toBe(expectedMessage)
->>>>>>> master
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /success/i })).toBeInTheDocument()
