@@ -80,3 +80,7 @@ export const useProjectsInfiniteQuery = <
     ...options,
   })
 }
+
+export function isProjectPaused(project: { status: string } | null): boolean | undefined {
+  return !project ? undefined : project.status === 'INACTIVE'
+}
