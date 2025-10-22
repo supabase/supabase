@@ -25,6 +25,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+import { DeleteBucketModal } from '../DeleteBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
 
@@ -33,6 +34,9 @@ export const VectorsBuckets = () => {
   const router = useRouter()
   const { data, isLoading: isLoadingBuckets } = useVectorBucketsQuery({ projectRef })
   const [filterString, setFilterString] = useState('')
+  const [modal, setModal] = useState<{
+    bucket: { vectorBucketName: string; creationTime: string }
+  } | null>(null)
 
   const bucketsList = data?.vectorBuckets ?? []
 
@@ -128,10 +132,7 @@ export const VectorsBuckets = () => {
                                 <DropdownMenuItem
                                   className="flex items-center space-x-2"
                                   onClick={() => {
-                                    deleteBucket({
-                                      bucketName: name,
-                                      projectRef: projectRef!,
-                                    })
+                                    setModal({ bucket })
                                   }}
                                 >
                                   <Trash2 size={12} />
@@ -149,6 +150,25 @@ export const VectorsBuckets = () => {
             </Card>
           )}
         </ScaffoldSection>
+      )}
+
+      {modal && (
+        <DeleteBucketModal
+          visible={true}
+          bucket={{
+            id: modal.bucket.vectorBucketName,
+            name: modal.bucket.vectorBucketName,
+            created_at: modal.bucket.creationTime,
+            updated_at: modal.bucket.creationTime,
+            owner: '',
+            public: false,
+            type: 'STANDARD' as const,
+          }}
+          onClose={() => setModal(null)}
+          onDelete={() =>
+            deleteBucket({ projectRef: projectRef!, bucketName: modal.bucket.vectorBucketName })
+          }
+        />
       )}
     </>
   )

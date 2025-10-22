@@ -34,6 +34,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { DeleteBucketModal } from '../DeleteBucketModal'
 import { BUCKET_TYPES } from '../Storage.constants'
 import { CreateVectorTableSheet } from './CreateVectorTableSheet'
 
@@ -42,6 +43,7 @@ interface VectorBucketDetailsProps {
 }
 
 export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
+  const [modal, setModal] = useState<'delete' | null>(null)
   const { ref: projectRef } = useParams()
   const router = useRouter()
 
@@ -236,10 +238,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                 <Button
                   type="danger"
                   onClick={() => {
-                    deleteBucket({
-                      projectRef: projectRef!,
-                      bucketName: bucket.vectorBucketName,
-                    })
+                    setModal('delete')
                   }}
                 >
                   Delete bucket
@@ -249,6 +248,23 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
           </ScaffoldSection>
         </ScaffoldContainer>
       </PageLayout>
+
+      <DeleteBucketModal
+        visible={modal === `delete`}
+        bucket={{
+          id: bucket.vectorBucketName,
+          name: bucket.vectorBucketName,
+          created_at: bucket.creationTime,
+          updated_at: bucket.creationTime,
+          owner: '',
+          public: false,
+          type: 'STANDARD' as const,
+        }}
+        onClose={() => setModal(null)}
+        onDelete={() =>
+          deleteBucket({ projectRef: projectRef!, bucketName: bucket.vectorBucketName })
+        }
+      />
     </>
   )
 }

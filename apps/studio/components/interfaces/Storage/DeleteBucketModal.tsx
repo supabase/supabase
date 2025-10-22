@@ -33,11 +33,17 @@ export interface DeleteBucketModalProps {
   visible: boolean
   bucket: Bucket
   onClose: () => void
+  onDelete?: (bucket: Bucket) => void
 }
 
 const formId = `delete-storage-bucket-form`
 
-export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModalProps) => {
+export const DeleteBucketModal = ({
+  visible,
+  bucket,
+  onClose,
+  onDelete, // Temporary prop for vector buckets specific deletion mutation
+}: DeleteBucketModalProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -103,7 +109,13 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
-    deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
+
+    // Temporary change for vector buckets specific deletion mutation
+    if (onDelete) {
+      onDelete(bucket)
+    } else {
+      deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
+    }
   }
 
   return (
