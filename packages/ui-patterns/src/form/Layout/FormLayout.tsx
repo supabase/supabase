@@ -81,8 +81,8 @@ const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
     layout: {
       horizontal: 'flex flex-col gap-2 col-span-4',
       vertical: 'flex flex-row gap-2 justify-between',
-      flex: 'flex flex-col gap-0',
-      'flex-row-reverse': 'flex flex-col',
+      flex: 'flex flex-col gap-0 min-w-0',
+      'flex-row-reverse': 'flex flex-col min-w-0',
     },
     labelLayout: {
       horizontal: '',
