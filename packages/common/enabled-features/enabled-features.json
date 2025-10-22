@@ -1,6 +1,8 @@
 {
   "$schema": "./enabled-features.schema.json",
 
+  "account:show_security_settings": true,
+
   "ai:opt_in_level_disabled": true,
   "ai:opt_in_level_schema": true,
   "ai:opt_in_level_schema_and_log": true,
@@ -22,13 +24,17 @@
   "authentication:show_sort_by_email": true,
   "authentication:show_sort_by_phone": true,
   "authentication:show_user_type_filter": true,
+
   "billing:all": true,
+
+  "branding:large_logo": false,
 
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,
   "dashboard_auth:sign_in_with_sso": true,
   "dashboard_auth:sign_in_with_email": true,
   "dashboard_auth:show_testimonial": true,
+  "dashboard_auth:show_tos": true,
 
   "database:replication": true,
   "database:roles": true,
@@ -73,6 +79,7 @@
 
   "organization:show_sso_settings": true,
   "organization:show_security_settings": true,
+  "organization:show_legal_documents": true,
 
   "profile:show_email": true,
   "profile:show_information": true,

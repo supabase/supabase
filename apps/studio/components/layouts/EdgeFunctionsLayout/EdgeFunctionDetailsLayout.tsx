@@ -27,7 +27,7 @@ import {
   Separator,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 
 interface EdgeFunctionDetailsLayoutProps {
@@ -168,6 +168,7 @@ const EdgeFunctionDetailsLayout = ({
                 section={
                   functionSlug !== undefined ? ['edge-functions', functionSlug] : ['edge-functions']
                 }
+                source="edge-functions"
               />
             )}
             <DocsButton href={`${DOCS_URL}/guides/functions`} />

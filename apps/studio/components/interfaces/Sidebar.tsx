@@ -13,6 +13,7 @@ import {
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
@@ -223,9 +224,11 @@ const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAppStateSnapshot()
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const isStorageV2 = useIsNewStorageUIEnabled()
@@ -297,18 +300,37 @@ const ProjectLinks = () => {
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {otherRoutes.map((route, i) => {
-          if (route.key === 'api' && isNewAPIDocsEnabled) {
+          if (route.key === 'api') {
+            const handleApiClick = () => {
+              if (isNewAPIDocsEnabled) {
+                snap.setShowProjectApiDocs(true)
+              }
+              sendEvent({
+                action: 'api_docs_opened',
+                properties: {
+                  source: 'sidebar',
+                },
+                groups: {
+                  project: ref ?? 'Unknown',
+                  organization: org?.slug ?? 'Unknown',
+                },
+              })
+            }
+
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={{
-                  label: route.label,
-                  icon: route.icon,
-                  key: route.key,
-                }}
-                onClick={() => {
-                  snap.setShowProjectApiDocs(true)
-                }}
+                route={
+                  isNewAPIDocsEnabled
+                    ? {
+                        label: route.label,
+                        icon: route.icon,
+                        key: route.key,
+                      }
+                    : route
+                }
+                active={activeRoute === route.key}
+                onClick={handleApiClick}
               />
             )
           } else if (route.key === 'advisors') {

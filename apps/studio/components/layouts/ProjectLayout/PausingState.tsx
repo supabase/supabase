@@ -1,10 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Badge } from 'ui'
 
-import { Project, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { Project, useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Circle, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -15,8 +14,10 @@ export interface PausingStateProps {
 
 const PausingState = ({ project }: PausingStateProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const [startPolling, setStartPolling] = useState(false)
+
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
   useProjectStatusQuery(
     { projectRef: ref },
@@ -27,8 +28,8 @@ const PausingState = ({ project }: PausingStateProps) => {
       },
       onSuccess: async (res) => {
         if (res.status === PROJECT_STATUS.INACTIVE) {
-          if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
-          await invalidateProjectsQuery(queryClient)
+          if (ref) await invalidateProjectDetailsQuery(ref)
+          await invalidateProjectsQuery()
         }
       },
     }

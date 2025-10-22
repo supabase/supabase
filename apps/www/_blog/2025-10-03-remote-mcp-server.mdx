@@ -13,7 +13,7 @@ date: '2025-10-03:10:00:00'
 toc_depth: 2
 ---
 
-Today we are launching our remote MCP server, allowing you to connect your Supabase projects with _many_ more AI agents than before, including ChatGPT, Claude, and Builder.io. We also added support for MCP auth (OAuth2), a faster and more secure way to connect agents with your Supabase account (via browser-based authentication). Last but not least, we’re adding official MCP support for local Supabase instances created through the [CLI](https://supabase.com/docs/guides/local-development/cli/getting-started).
+Today we are launching our remote MCP server, allowing you to connect your Supabase projects with _many_ more AI agents than before, including ChatGPT, Claude, and Builder.io. We also added support for MCP auth (OAuth2), a faster and more secure way to connect agents with your Supabase account (via browser-based authentication). Last but not least, we're adding official MCP support for local Supabase instances created through the [CLI](https://supabase.com/docs/guides/local-development/cli/getting-started).
 
 Now all you need is a single URL to connect your favorite AI agent to Supabase:
 
@@ -21,7 +21,7 @@ Now all you need is a single URL to connect your favorite AI agent to Supabase:
 https://mcp.supabase.com/mcp
 ```
 
-Or if you’re running Supabase locally:
+Or if you're running Supabase locally:
 
 ```bash
 http://localhost:54321/mcp
@@ -67,16 +67,14 @@ https://mcp.supabase.com/mcp
 # or http://localhost:54321/mcp for local
 ```
 
-We built this interactive widget to help you connect popular MCP clients to Supabase and customize the URL to your preferences (like project-scoped mode and read-only mode):
-
-{/* _<Interactive MCP UI>_ */}
+We also built an [interactive widget](https://supabase.com/mcp) to help you connect popular MCP clients to Supabase and customize the URL to your preferences (like project-scoped mode and read-only mode).
 
 ## New features
 
 Our philosophy on Supabase MCP comes down to two ideas:
 
-1. Supabase MCP should be used for development. It was designed from the beginning to assist with app development and shouldn’t be connected to production databases. See our post on [Defense in Depth for MCP Servers](https://supabase.com/blog/defense-in-depth-mcp).
-2. MCP is just another way to access the same platform features that you already use in the web dashboard and CLI. But - since it’s being used by an LLM, it should also lean into the strengths of an AI-first UX.
+1. Supabase MCP should be used for development. It was designed from the beginning to assist with app development and shouldn't be connected to production databases. See our post on [Defense in Depth for MCP Servers](https://supabase.com/blog/defense-in-depth-mcp).
+2. MCP is just another way to access the same platform features that you already use in the web dashboard and CLI. But - since it's being used by an LLM, it should also lean into the strengths of an AI-first UX.
 
 With these in mind, we added the following new features to assist AI agents while they help build your app:
 
@@ -121,16 +119,20 @@ Our solution is a feature that already exists on our platform - advisors. [Advis
 
 ### Storage
 
-We also added initial support for [Supabase Storage](https://supabase.com/docs/guides/storage) on our MCP server. This first version allows your agent to see which buckets exist on your project and update their configuration, but in the future we’ll look into more abilities like listing files and their details.
+We also added initial support for [Supabase Storage](https://supabase.com/docs/guides/storage) on our MCP server. This first version allows your agent to see which buckets exist on your project and update their configuration, but in the future we'll look into more abilities like listing files and their details.
 
-This feature was actually a community contribution (thanks [Nico](https://github.com/Ngineer101)!). If there are ever missing features that you’d like to see, [PR’s](https://github.com/supabase-community/supabase-mcp/issues/new/choose) are always welcome!
+This feature was actually a community contribution (thanks [Nico](https://github.com/Ngineer101)!). If there are ever missing features that you'd like to see, [PR's](https://github.com/supabase-community/supabase-mcp/issues/new/choose) are always welcome!
 
-## What’s next?
+## What's next?
 
 We have more exciting plans for MCP at Supabase:
 
-1. **Security:** Today our OAuth2 implementation requires you to make a binary decision on permissions: either grant _all_ permissions to your MCP client, or _none_. This isn’t ideal if you know that you never want to, say, allow your client to access to your Edge Functions.
+1. **Security:** Today our OAuth2 implementation requires you to make a binary decision on permissions: either grant _all_ permissions to your MCP client, or _none_. This isn't ideal if you know that you never want to, say, allow your client to access to your Edge Functions.
 
-To improve this, we’re working to support fine-grain permissions that can be toggled during authorization. It’s a big task to re-work our permission infrastructure to support this, but we believe it’s worth it. 2. **Double down on local:** We’re very excited to support local Supabase instances in this release, but we also believe there is a lot more that can be done. Supabase MCP is designed to be used for development, so we want the local experience to be first-class. 3. **Build your own MCP:** You might have thought about building _your own_ MCP server on top of Supabase. We’re using the playbook and lessons learned from our own MCP server to provide the tools you need to do the same - including remote MCP and auth. Stay tuned!
+   To improve this, we're working to support fine-grain permissions that can be toggled during authorization. It's a big task to re-work our permission infrastructure to support this, but we believe it's worth it.
 
-We’re keen to continue investing in MCP and excited to see how you use these new features!
+2. **Double down on local:** We're very excited to support local Supabase instances in this release, but we also believe there is a lot more that can be done. Supabase MCP is designed to be used for development, so we want the local experience to be first-class.
+
+3. **Build your own MCP:** You might have thought about building _your own_ MCP server on top of Supabase. We're using the playbook and lessons learned from our own MCP server to provide the tools you need to do the same - including remote MCP and auth. Stay tuned!
+
+We're keen to continue investing in MCP and excited to see how you use these new features!

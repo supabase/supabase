@@ -7,14 +7,17 @@ import { memo, useState } from 'react'
 // End of third-party imports
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { isFeatureEnabled } from 'common/enabled-features'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
-import { useCustomContent } from '../../../hooks/custom-content/useCustomContent'
+import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
+
+const largeLogo = isFeatureEnabled('branding:large_logo')
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
@@ -110,7 +113,7 @@ const TopNavBar: FC = () => {
 }
 
 const HeaderLogo = memo(() => {
-  const { navigationLogo } = useCustomContent(['navigation:logo'])
+  const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   return (
     <Link
@@ -121,7 +124,7 @@ const HeaderLogo = memo(() => {
       )}
     >
       <Image
-        className="hidden dark:block !m-0"
+        className={cn('hidden dark:block !m-0', largeLogo && 'h-[36px]')}
         src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
         priority={true}
         loading="eager"
@@ -130,7 +133,7 @@ const HeaderLogo = memo(() => {
         alt="Supabase wordmark"
       />
       <Image
-        className="block dark:hidden !m-0"
+        className={cn('block dark:hidden !m-0', largeLogo && 'h-[36px]')}
         src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"

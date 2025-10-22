@@ -1,14 +1,9 @@
 import type { CloudProvider, Region } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
-
-const smartRegionToExactRegionMap = new Map([
-  ['Americas', 'East US (North Virginia)'],
-  ['Europe', 'Central EU (Frankfurt)'],
-  ['APAC', 'Southeast Asia (Singapore)'],
-])
+import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
-  return smartRegionToExactRegionMap.get(smartOrExactRegion) ?? smartOrExactRegion
+  return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
 }
 
 export function getAvailableRegions(cloudProvider: CloudProvider): Region {

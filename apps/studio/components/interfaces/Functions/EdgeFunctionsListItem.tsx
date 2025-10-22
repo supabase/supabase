@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Check, Clipboard } from 'lucide-react'
+import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -66,7 +66,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
             ) : (
               <div className="relative">
                 <div className="block">
-                  <Clipboard size={14} strokeWidth={1.5} />
+                  <Copy size={14} strokeWidth={1.5} />
                 </div>
               </div>
             )}

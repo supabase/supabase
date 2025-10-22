@@ -156,7 +156,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
                         id="confirm"
                         autoComplete="off"
                         {...field}
-                        placeholder="Type in name of bucket"
+                        placeholder="Type bucket name"
                       />
                     </FormControl_Shadcn_>
                   </FormItemLayout>

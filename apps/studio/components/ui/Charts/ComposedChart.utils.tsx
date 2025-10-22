@@ -173,6 +173,8 @@ const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
+    const localTimeZone = dayjs.tz.guess()
+
     const total = showTotal && calculateTotalChartAggregate(payload, attributesToIgnoreFromTotal)
 
     const getIcon = (color: string, isMax: boolean) =>
@@ -212,6 +214,7 @@ const CustomTooltip = ({
           !isActiveHoveredChart && 'opacity-0'
         )}
       >
+        <p className="text-foreground-light text-xs">{localTimeZone}</p>
         <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
           {payload.reverse().map((entry: any, index: number) => (
