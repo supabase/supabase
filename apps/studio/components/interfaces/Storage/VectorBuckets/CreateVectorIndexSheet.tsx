@@ -86,7 +86,11 @@ const formId = 'create-vector-table-form'
 
 export type CreateVectorTableForm = z.infer<typeof FormSchema>
 
-export const CreateVectorIndexSheet = () => {
+interface CreateVectorIndexSheetProps {
+  bucketName: string
+}
+
+export const CreateVectorIndexSheet = ({ bucketName }: CreateVectorIndexSheetProps) => {
   const { ref } = useParams()
   const { mutate: createVectorBucket, isLoading: isCreating } = useVectorBucketCreateMutation()
   const [visible, setVisible] = useState(false)
@@ -95,7 +99,7 @@ export const CreateVectorIndexSheet = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
-      targetSchema: 'tdai_data',
+      targetSchema: '',
       dimension: undefined,
       distanceMetric: 'cosine',
       metadataKeys: [],
@@ -176,7 +180,7 @@ export const CreateVectorIndexSheet = () => {
               <X className="h-3 w-3" />
               <span className="sr-only">Close</span>
             </SheetClose>
-            <SheetTitle className="truncate">Create Vector Index</SheetTitle>
+            <SheetTitle className="truncate">Create vector index</SheetTitle>
           </div>
         </SheetHeader>
 
@@ -231,7 +235,7 @@ export const CreateVectorIndexSheet = () => {
                         <Input_Shadcn_
                           id="targetSchema"
                           {...field}
-                          placeholder="tdai_data"
+                          value={bucketName}
                           disabled
                           className="pr-10"
                         />

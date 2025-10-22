@@ -108,7 +108,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                 icon={<Search size={12} />}
                 className="w-48"
               />
-              <CreateVectorIndexSheet />
+              <CreateVectorIndexSheet bucketName={bucket.vectorBucketName} />
             </div>
 
             <Card>
