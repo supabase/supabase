@@ -35,9 +35,10 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useState } from 'react'
 
 const formId = 'realtime-configuration-form'
-
 export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -125,7 +126,9 @@ export const RealtimeSettings = () => {
       max_payload_size_in_kb: data.max_payload_size_in_kb,
       suspend: data.suspend,
     })
+    setIsConfirmNextModalOpen(false)
   }
+  const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
   return (
     <ScaffoldSection isFullWidth>
@@ -636,7 +639,8 @@ export const RealtimeSettings = () => {
                   )}
                   <Button
                     type="primary"
-                    htmlType="submit"
+                    htmlType="button"
+                    onClick={() => setIsConfirmNextModalOpen(true)}
                     form={formId}
                     disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
                     loading={isUpdatingConfig}
@@ -647,6 +651,18 @@ export const RealtimeSettings = () => {
               </CardFooter>
             </Card>
           )}
+          <ConfirmationModal
+            visible={isConfirmNextModalOpen}
+            title="Confirm saving changes"
+            confirmLabel="Save changes"
+            onCancel={() => setIsConfirmNextModalOpen(false)}
+            onConfirm={() => form.handleSubmit(onSubmit)()}
+          >
+            <p className="text-sm text-foreground-light">
+              Saving the changes will disconnect all the clients connected to your project. Are you
+              sure you want to continue?
+            </p>
+          </ConfirmationModal>
         </form>
       </Form_Shadcn_>
     </ScaffoldSection>
