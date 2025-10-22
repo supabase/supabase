@@ -8,22 +8,13 @@ import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Badge, CardTitle } from 'ui'
+import type { PolicyTable } from './PolicyTableRow.types'
 
 interface PolicyTableRowHeaderProps {
-  table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }
+  table: PolicyTable
   isLocked: boolean
-  onSelectToggleRLS: (table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }) => void
-  onSelectCreatePolicy: () => void
+  onSelectToggleRLS: (table: PolicyTable) => void
+  onSelectCreatePolicy: (table: PolicyTable) => void
 }
 
 export const PolicyTableRowHeader = ({
@@ -91,7 +82,7 @@ export const PolicyTableRowHeader = ({
             <ButtonTooltip
               type="default"
               disabled={!canToggleRLS || !canCreatePolicies}
-              onClick={() => onSelectCreatePolicy()}
+              onClick={() => onSelectCreatePolicy(table)}
               tooltip={{
                 content: {
                   side: 'bottom',
