@@ -6415,7 +6415,7 @@ export interface components {
       cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
-      customer_balance: number
+      customer_balance?: number
       next_invoice_at: number
       payment_method_type: string
       plan: {
