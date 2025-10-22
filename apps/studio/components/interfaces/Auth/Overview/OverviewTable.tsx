@@ -26,7 +26,10 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
         <TableHeader>
           <TableRow>
             {columns.map((col) => (
-              <TableHead key={String(col.key)} className={cn(col.className, 'bg-surface-100')}>
+              <TableHead
+                key={String(col.key)}
+                className={cn(col.className, 'bg-surface-200 border-t h-8 px-6')}
+              >
                 {col.header}
               </TableHead>
             ))}
@@ -59,13 +62,14 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
           (data as unknown as T[]).map((row, idx) => (
             <TableRow key={idx}>
               {columns.map((col) => (
-                <TableCell key={String(col.key)} className={cn('p-2 px-4', col.className)}>
+                <TableCell key={String(col.key)} className={cn('py-1.5 px-6', col.className)}>
                   {col.render ? col.render(row) : (row as any)[col.key as string]}
                 </TableCell>
               ))}
             </TableRow>
           ))
         )}
+        {data.length > 0 && <span className="h-2 flex border-t w-full" />}
       </TableBody>
     </Table>
   )

@@ -8,6 +8,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import {
   fetchTopAuthErrorCodes,
@@ -66,6 +67,23 @@ export const OverviewMonitoring = () => {
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
 
+  // test
+  const dummyResponseErrors: ResponseErrorRow[] = [
+    { method: 'POST', path: '/auth/v1/token', status_code: 400, count: 156 },
+    { method: 'GET', path: '/auth/v1/user', status_code: 401, count: 89 },
+    { method: 'POST', path: '/auth/v1/signup', status_code: 422, count: 45 },
+    { method: 'PUT', path: '/auth/v1/user', status_code: 500, count: 23 },
+    { method: 'POST', path: '/auth/v1/recover', status_code: 429, count: 12 },
+  ]
+
+  const dummyErrorCodes: AuthErrorCodeRow[] = [
+    { error_code: 'invalid_credentials', count: 234 },
+    { error_code: 'email_not_confirmed', count: 167 },
+    { error_code: 'user_not_found', count: 98 },
+    { error_code: 'weak_password', count: 56 },
+    { error_code: 'email_exists', count: 34 },
+  ]
+
   // Success rate metrics (reuse OverviewUsage fetching)
   const { data: currentData, isLoading: currentLoading } = useQuery({
     queryKey: ['auth-metrics', ref, 'current'],
@@ -105,7 +123,7 @@ export const OverviewMonitoring = () => {
         <ScaffoldSectionTitle>Monitoring</ScaffoldSectionTitle>
       </div>
       <ScaffoldSectionContent className="gap-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <StatCard
             title="Auth API Success Rate"
             current={Math.max(0, 100 - metrics.current.apiErrorRate)}
@@ -130,22 +148,24 @@ export const OverviewMonitoring = () => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
-            <CardHeader className="border-b-0 pb-0">
+            <CardHeader
+              className={cn('border-b-0', dummyResponseErrors.length > 0 ? 'pb-4' : 'pb-0')}
+            >
               <CardTitle className="text-foreground-light">Auth API Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<ResponseErrorRow>
                 isLoading={isLoadingResp || currentLoading || previousLoading}
-                data={responseErrors}
+                data={dummyResponseErrors}
                 columns={[
                   {
-                    key: 'method',
-                    header: 'Method',
+                    key: 'request',
+                    header: 'Request',
                     className: 'w-[60px]',
                     render: (row) => (
-                      <span className="text-foreground-lighter font-mono bg-background-alternative-200 px-2 py-1 rounded-md">
+                      <span className="font-mono text-xs truncate select-text cursor-text py-1 px-1.5 text-center rounded-md bg-alternative-200">
                         {row.method}
                       </span>
                     ),
@@ -158,15 +178,32 @@ export const OverviewMonitoring = () => {
                       <DataTableColumnStatusCode
                         value={row.status_code}
                         level={getStatusLevel(row.status_code)}
+                        className="text-sm"
                       />
                     ),
                   },
-                  { key: 'path', header: 'Path', className: 'w-full' },
-                  { key: 'count', header: 'Count', className: 'text-right' },
+                  {
+                    key: 'path',
+                    header: 'Path',
+                    className: 'flex-shrink-0 w-52',
+                    render: (row) => (
+                      <div className="line-clamp-1 font-mono text-foreground-light text-xs">
+                        {row.path}
+                      </div>
+                    ),
+                  },
+                  {
+                    key: 'count',
+                    header: 'Count',
+                    className: 'text-right flex-shrink-0 ml-auto justify-end',
+                    render: (row) => (
+                      <div className="text-right text-xs tabular-nums">{row.count}</div>
+                    ),
+                  },
                   {
                     key: 'actions',
                     header: '',
-                    className: 'text-right',
+                    className: 'text-right flex-shrink-0',
                     render: (row) => (
                       <div>
                         <LogsLink href={`/project/${ref}/logs/edge-logs?s=${row.path}`} />
@@ -179,16 +216,32 @@ export const OverviewMonitoring = () => {
           </Card>
 
           <Card>
-            <CardHeader className="border-b-0 pb-0">
+            <CardHeader className={cn('border-b-0', dummyErrorCodes.length > 0 ? 'pb-4' : 'pb-0')}>
               <CardTitle className="text-foreground-light">Auth Server Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<AuthErrorCodeRow>
                 isLoading={isLoadingCodes || currentLoading || previousLoading}
-                data={errorCodes}
+                data={dummyErrorCodes}
                 columns={[
-                  { key: 'error_code', header: 'Error code', className: 'w-full' },
-                  { key: 'count', header: 'Count', className: 'text-right' },
+                  {
+                    key: 'error_code',
+                    header: 'Error code',
+                    className: 'w-full',
+                    render: (row) => (
+                      <div className="line-clamp-1 font-mono text-foreground uppercase text-xs">
+                        {row.error_code}
+                      </div>
+                    ),
+                  },
+                  {
+                    key: 'count',
+                    header: 'Count',
+                    className: 'text-right',
+                    render: (row) => (
+                      <div className="text-right text-xs tabular-nums">{row.count}</div>
+                    ),
+                  },
                   {
                     key: 'actions',
                     header: '',
