@@ -10,7 +10,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { DisableInteraction } from 'components/ui/DisableInteraction'
 import type { NextPageWithLayout } from 'types'
-import { Separator } from 'ui'
 
 const ApiKeysNewPage: NextPageWithLayout = () => {
   const { shouldDisableUI, canInitApiKeys } = useApiKeysVisibility()
@@ -21,7 +20,6 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
       <ApiKeysFeedbackBanner />
       <DisableInteraction disabled={shouldDisableUI} className="flex flex-col gap-8">
         <PublishableAPIKeys />
-        <Separator />
         <SecretAPIKeys />
       </DisableInteraction>
     </>
