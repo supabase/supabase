@@ -3,10 +3,10 @@ import {
   ScaffoldSectionTitle,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
-import { ChevronRight, Loader2, ExternalLink } from 'lucide-react'
+import { ChevronRight, ExternalLink } from 'lucide-react'
 import { Reports } from 'icons'
 import {
   getChangeColor,
@@ -71,11 +71,14 @@ export const StatCard = ({
       <CardContent
         className={cn(
           'pb-4 px-6 pt-0 flex-1 h-full overflow-hidden',
-          loading && 'opacity-50 items-center justify-center min-h-[108px]'
+          loading && 'pt-2 opacity-50 items-center justify-center'
         )}
       >
         {loading ? (
-          <Loader2 className="size-5 animate-spin text-foreground-light" />
+          <div className="flex flex-col gap-0.5">
+            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-3 w-16" />
+          </div>
         ) : (
           <div className="flex flex-col gap-0.5">
             <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
