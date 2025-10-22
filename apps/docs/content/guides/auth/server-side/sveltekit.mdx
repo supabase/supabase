@@ -37,6 +37,12 @@ Fill in your `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_PUBLISHABLE_KEY`:
 <ProjectConfigVariables variable="publishable" />
 <ProjectConfigVariables variable="anon" />
 
+<Admonition type="caution">
+
+`PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` are intentionally exposed to the client. These values are safe to expose as long as you [enable and create Row Level Security policies](https://supabase.com/docs/guides/getting-started/tutorials/with-sveltekit#set-up-the-database-schema).
+
+</Admonition>
+
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
