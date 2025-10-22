@@ -375,7 +375,7 @@ allow_list = [
     "uBlock Origin",
     "unbilled",
     "untrusted",
-    "vCPU",
+    "vCPUs",
     "vecs",
     "vs",
     "watchOS",

@@ -552,7 +552,7 @@ DROP REPLICATION SLOT slot_name;  -- if any remain
 | "publication does not exist"         | Verify publication name and that it was created successfully        |
 | Replication lag growing              | Check network bandwidth, source database load, add more WAL senders |
 | Tables stuck in `i` state            | Check for locks on source tables, verify table structure matches    |
-| "out of replication slots"           | Increase max_replication_slots in Postgres.conf                   |
+| "out of replication slots"           | Increase max_replication_slots in Postgres.conf                     |
 
 ### Important limitations
 
@@ -585,5 +585,5 @@ For detailed restrictions, see [Postgres Logical Replication Restrictions](https
 - For databases > 150 GB: [Contact Supabase support](/dashboard/support/new) before starting
 - [Supabase Dashboard Support](/dashboard/support/new)
 - [Supabase Discord](https://discord.supabase.com)
-- [Postgres Roles and Privileges Guide](https://supabase.com/blog/postgres-roles-and-privileges)
+- [Postgres Roles and Privileges Guide](/blog/postgres-roles-and-privileges)
 - [Row Level Security Guide](/docs/guides/database/postgres/row-level-security)
