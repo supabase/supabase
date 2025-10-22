@@ -268,15 +268,16 @@ export const Connect = () => {
 
   useEffect(() => {
     if (!showConnect) return
-    const hasConnectTabInUrl = typeof router.query.connectTab !== 'undefined'
-    if (!hasConnectTabInUrl && (queryFramework || queryUsing || queryWith)) {
-      const inferred = inferConnectTabFromParentKey(queryFramework)
-      if (inferred) {
-        setTab(inferred)
-        if (inferred === 'frameworks') setConnectionObject(FRAMEWORKS)
-        if (inferred === 'mobiles') setConnectionObject(MOBILES)
-        if (inferred === 'orms') setConnectionObject(ORMS)
-      }
+
+    const noConnectTabInUrl = typeof router.query.connectTab === 'undefined'
+    const hasQuery = Boolean(queryFramework || queryUsing || queryWith)
+    const inferred = inferConnectTabFromParentKey(queryFramework)
+
+    if (noConnectTabInUrl && hasQuery && inferred) {
+      setTab(inferred)
+      if (inferred === 'frameworks') setConnectionObject(FRAMEWORKS)
+      if (inferred === 'mobiles') setConnectionObject(MOBILES)
+      if (inferred === 'orms') setConnectionObject(ORMS)
     }
   }, [showConnect, router.query.connectTab, queryFramework, queryUsing, queryWith, setTab])
 
