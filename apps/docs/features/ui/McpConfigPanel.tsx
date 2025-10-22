@@ -32,6 +32,7 @@ const PLATFORMS = [
   { value: 'local', label: 'CLI' },
 ] as const satisfies Array<{ value: string; label: string }>
 
+// [Joshen] Ideally we consolidate this component with what's in ProjectConfigVariables - they seem to be doing the same thing
 function ProjectSelector({
   className,
   selectedProject,

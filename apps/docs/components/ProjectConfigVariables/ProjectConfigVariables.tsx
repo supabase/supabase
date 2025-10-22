@@ -3,7 +3,6 @@
 import type {
   Branch,
   Org,
-  Project,
   Variable,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
 
@@ -35,7 +34,11 @@ import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
 import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
 import { useProjectKeysQuery, useProjectSettingsQuery } from '~/lib/fetch/projectApi'
-import { isProjectPaused, useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
+import {
+  isProjectPaused,
+  ProjectInfoInfinite,
+  useProjectsInfiniteQuery,
+} from '~/lib/fetch/projects-infinite'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 
@@ -67,8 +70,8 @@ type VariableDataState =
 
 const projectsStore = proxy({
   selectedOrg: null as Org | null,
-  selectedProject: null as Project | null,
-  setSelectedOrgProject: (org: Org | null, project: Project | null) => {
+  selectedProject: null as ProjectInfoInfinite | null,
+  setSelectedOrgProject: (org: Org | null, project: ProjectInfoInfinite | null) => {
     projectsStore.selectedOrg = org
     storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org?.id.toString())
 
@@ -154,7 +157,7 @@ function OrgProjectSelector() {
       const storedMaybeProjectRef = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT)
 
       let storedOrg: Org | undefined
-      let storedProject: Project | undefined
+      let storedProject: ProjectInfoInfinite | undefined
       if (storedMaybeOrgId && storedMaybeProjectRef) {
         storedOrg = organizations!.find((org) => org.id === Number(storedMaybeOrgId))
         storedProject = projects!.find((project) => project.ref === storedMaybeProjectRef)
