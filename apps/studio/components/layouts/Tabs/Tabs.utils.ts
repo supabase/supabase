@@ -79,16 +79,30 @@ export function useSqlEditorTabsCleanup() {
     ]
 
     // Remove any snippet tabs that might no longer be existing (removed outside of the dashboard session)
-    const snippetTabsToBeCleaned = openTabsRef.current.filter(
-      (id: string) => id.startsWith('sql') && !currentContentIds.includes(id)
-    )
+    // BUT keep local tabs (tabs without snippetId metadata)
+    const snippetTabsToBeCleaned = openTabsRef.current.filter((id: string) => {
+      if (!id.startsWith('sql')) return false
+      const tab = tabMapRef.current[id]
+      // Keep local tabs (no snippetId)
+      if (!tab?.metadata?.snippetId) return false
+      // Remove tabs that have snippetId but snippet no longer exists
+      return !currentContentIds.includes(id)
+    })
     tabs.removeTabs(snippetTabsToBeCleaned)
 
     // Remove any recent items that might no longer be existing (removed outside of the dashboard session)
+    // BUT keep local tabs (tabs without snippetId metadata)
     const recentItems = tabs.getRecentItemsByType('sql')
     tabs.removeRecentItems(
       recentItems
-        ? recentItems.filter((item) => !currentContentIds.includes(item.id)).map((item) => item.id)
+        ? recentItems
+            .filter((item) => {
+              // Keep local tabs (no snippetId)
+              if (!item.metadata?.snippetId) return false
+              // Remove items that have snippetId but snippet no longer exists
+              return !currentContentIds.includes(item.id)
+            })
+            .map((item) => item.id)
         : []
     )
 

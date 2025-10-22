@@ -69,6 +69,10 @@ const MonacoEditor = ({
   const disableEdit =
     snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile?.id
 
+  // NEW: Get active tab data for reading/writing SQL
+  const activeTab = tabsSnap.activeTab ? tabsSnap.tabsMap[tabsSnap.activeTab] : null
+  const tabData = activeTab?.type === 'sql' ? activeTab : null
+
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
 
@@ -99,7 +103,8 @@ const MonacoEditor = ({
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
       run: () => {
-        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+        // Save is now handled by the Save button component
+        // Keyboard shortcut could trigger save button click if needed
       },
     })
 
@@ -168,29 +173,15 @@ const MonacoEditor = ({
 
   function handleEditorChange(value: string | undefined) {
     tabsSnap.makeActiveTabPermanent()
-    if (id && value) {
-      if (!!snippet) {
-        setValue(value)
-      } else if (ref && !!profile && !!project) {
-        const snippet = createSqlSnippetSkeletonV2({
-          id,
-          name: untitledSnippetTitle,
-          sql: value,
-          owner_id: profile?.id,
-          project_id: project?.id,
-        })
-        snapV2.addSnippet({ projectRef: ref, snippet })
-        router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-      }
+    if (value !== undefined && tabData) {
+      // NEW: Update SQL in tab metadata
+      tabsSnap.updateTabSql(tabData.id, value)
+      setValue(value)
     }
   }
 
-  useEffect(() => {
-    if (debouncedValue.length > 0 && snippet) {
-      snapV2.setSql(id, value)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedValue])
+  // Removed old snippet-based auto-save logic
+  // SQL is now stored in tab metadata and saved via the Save button
 
   // if an SQL query is passed by the content parameter, set the editor value to its content. This
   // is usually used for sending the user to SQL editor from other pages with SQL.
@@ -214,7 +205,7 @@ const MonacoEditor = ({
         onMount={handleEditorOnMount}
         onChange={handleEditorChange}
         defaultLanguage="pgsql"
-        defaultValue={snippet?.snippet.content?.sql}
+        defaultValue={tabData?.metadata?.sql ?? snippet?.snippet.content?.sql ?? ''}
         path={id}
         options={{
           tabSize: 2,
