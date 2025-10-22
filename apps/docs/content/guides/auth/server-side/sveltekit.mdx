@@ -421,6 +421,29 @@ export const actions: Actions = {
       redirect(303, '/private')
     }
   },
+  oauth: async ({ url, locals: { supabase } }) => {
+    const provider = url.searchParams.get("provider")
+
+    if (provider) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: `${url.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        console.error(error)
+        return redirect(303, '/auth/error')
+      }
+
+      if (data.url) {
+        return redirect(303, data.url)
+      }
+    }
+
+    return redirect(303, '/auth/error');
+  },
 }
 ```
 
@@ -436,7 +459,28 @@ export const actions: Actions = {
   </label>
   <button>Login</button>
   <button formaction="?/signup">Sign up</button>
+  <button formaction="?/oauth&provider=github">
+  Login with GitHub
+  </button>
+
+  <button formaction="?/oauth&provider=google">
+    Login with Google
+  </button>
 </form>
+```
+
+```svelte name=src/routes/auth/callback/+server.ts
+import { redirect } from '@sveltejs/kit'
+
+export const GET = async ({ url, locals: { supabase } }) => {
+  const code = url.searchParams.get('code')
+  
+  if (code) {
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
+  throw redirect(303, '/private')
+}
 ```
 
 ```svelte name=src/routes/auth/+layout.svelte
