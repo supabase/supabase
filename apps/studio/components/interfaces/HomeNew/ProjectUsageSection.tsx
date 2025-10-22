@@ -75,8 +75,6 @@ const CHART_INTERVALS: ChartIntervals[] = [
 
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
-// type imported from ProjectUsage.metrics
-
 type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
 
 type ServiceEntry = {
