@@ -3,7 +3,11 @@ import { useCallback } from 'react'
 import { useParams } from 'common'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import type { CommandMenuOpenedEvent } from 'common/telemetry-constants'
+import type {
+  CommandMenuOpenedEvent,
+  CommandMenuCommandSelectedEvent,
+  CommandMenuInputTypedEvent,
+} from 'common/telemetry-constants'
 
 export function useStudioCommandMenuTelemetry() {
   const { ref: projectRef } = useParams()
@@ -11,9 +15,11 @@ export function useStudioCommandMenuTelemetry() {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const onTelemetry = useCallback(
-    (event: CommandMenuOpenedEvent) => {
+    (
+      event: CommandMenuOpenedEvent | CommandMenuCommandSelectedEvent | CommandMenuInputTypedEvent
+    ) => {
       // Add studio-specific groups (project and organization)
-      const eventWithGroups: CommandMenuOpenedEvent = {
+      const eventWithGroups = {
         ...event,
         groups: {
           ...event.groups,

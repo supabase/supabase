@@ -68,12 +68,10 @@ const CommandItem = forwardRef<
           command_type: isActionCommand(command) ? ('action' as const) : ('route' as const),
           app: telemetryContext.app,
         },
-        groups: {} as Record<string, string>,
+        groups: {},
       }
 
-      telemetryContext.onTelemetry(
-        event as unknown as Parameters<typeof telemetryContext.onTelemetry>[0]
-      )
+      telemetryContext.onTelemetry(event)
     }
 
     // Execute the original command logic

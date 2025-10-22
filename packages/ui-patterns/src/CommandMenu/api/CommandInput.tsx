@@ -72,13 +72,9 @@ const CommandInput = forwardRef<
             value: value,
             app: telemetryContext.app,
           },
-          groups: {} as Record<string, string>, // Groups will be populated by the telemetry system
+          groups: {},
         }
-        // Cast to unknown first, then to the expected type to bypass type checking
-        // This is a workaround for the type mismatch between CommandInputTypedEvent and CommandMenuOpenedEvent
-        telemetryContext.onTelemetry(
-          event as unknown as Parameters<typeof telemetryContext.onTelemetry>[0]
-        )
+        telemetryContext.onTelemetry(event)
       }
     },
     [telemetryContext]
@@ -106,7 +102,6 @@ const CommandInput = forwardRef<
     [logTelemetryEvent]
   )
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (debounceTimeoutRef.current) {

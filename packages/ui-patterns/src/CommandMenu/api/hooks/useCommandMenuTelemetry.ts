@@ -1,8 +1,14 @@
 import { useCallback } from 'react'
 
-import type { CommandMenuOpenedEvent } from 'common/telemetry-constants'
+import type {
+  CommandMenuOpenedEvent,
+  CommandMenuCommandSelectedEvent,
+  CommandMenuInputTypedEvent,
+} from 'common/telemetry-constants'
 
-export type CommandMenuTelemetryCallback = (event: CommandMenuOpenedEvent) => void
+export type CommandMenuTelemetryCallback = (
+  event: CommandMenuOpenedEvent | CommandMenuCommandSelectedEvent | CommandMenuInputTypedEvent
+) => void
 
 export interface UseCommandMenuTelemetryOptions {
   /**
