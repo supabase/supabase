@@ -69,7 +69,7 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
             </TableRow>
           ))
         )}
-        {data.length > 0 && <span className="h-2 flex border-t w-full" />}
+        {data.length > 0 && <span className="h-2 flex w-full" />}
       </TableBody>
     </Table>
   )
