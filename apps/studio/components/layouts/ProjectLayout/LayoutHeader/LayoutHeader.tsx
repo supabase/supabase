@@ -30,7 +30,6 @@ import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
 import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
-import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu/api/CommandMenu'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -216,20 +215,6 @@ const LayoutHeader = ({
           </div>
           <div className="flex items-center gap-x-2">
             {customHeaderComponents && customHeaderComponents}
-            <CommandMenuTriggerInput
-              placeholder="Search..."
-              className="
-                hidden md:flex
-                border-transparent lg:border-default
-                bg-transparent lg:bg-surface-100/75
-                md:min-w-0 xl:!min-w-44
-                [&_p]:hidden [&_p]:lg:flex
-                [&>div:first-child]:text-foreground-lighter
-                [&>div:first-child]:lg:text-foreground-muted
-                [&_.command-shortcut]:hidden
-                [&_.command-shortcut]:lg:flex
-              "
-            />
             {IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />
