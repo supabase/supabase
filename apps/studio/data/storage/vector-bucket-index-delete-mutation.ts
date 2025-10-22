@@ -21,7 +21,7 @@ async function deleteVectorBucketIndex({
   if (!indexName) throw new Error('Index name is required')
 
   const { data, error } = await del(
-    '/platform/storage/{ref}/vector-buckets/{id}/indexes/vector-buckets/{id}/indexes/{indexName}',
+    '/platform/storage/{ref}/vector-buckets/{id}/indexes/{indexName}',
     {
       params: { path: { ref: projectRef, id: bucketName, indexName } },
     }

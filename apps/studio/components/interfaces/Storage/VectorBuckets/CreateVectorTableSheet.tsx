@@ -9,7 +9,7 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useVectorBucketIndexCreateMutation } from 'data/storage/vector-bucket-create-index-mutation'
+import { useVectorBucketIndexCreateMutation } from 'data/storage/vector-bucket-index-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
@@ -134,19 +134,12 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
       await createVectorBucketTable({
         projectRef: ref,
         bucketName: values.targetSchema,
-        indexName: 'documents-openai',
+        indexName: values.name,
         dataType: 'float32',
-        dimension: 1536,
-        distanceMetric: 'cosine',
-        metadataKeys: ['raw_text'],
+        dimension: values.dimension!,
+        distanceMetric: values.distanceMetric,
+        metadataKeys: values.metadataKeys.map((key) => key.value),
       })
-
-      //   indexName: values.name,
-      //   dataType: 'float32',
-      //   dimension: values.dimension!,
-      //   distanceMetric: values.distanceMetric,
-      //   metadataKeys: values.metadataKeys.map((key) => key.value),
-      // })
 
       toast.success(`Successfully created vector table ${values.name}`)
       form.reset()

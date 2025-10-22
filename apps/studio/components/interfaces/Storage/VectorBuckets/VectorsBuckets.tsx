@@ -1,10 +1,13 @@
 import { MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import {
   Button,
@@ -20,13 +23,14 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
 
 export const VectorsBuckets = () => {
   const { ref: projectRef } = useParams()
+  const router = useRouter()
   const { data, isLoading: isLoadingBuckets } = useVectorBucketsQuery({ projectRef })
   const [filterString, setFilterString] = useState('')
 
@@ -37,6 +41,13 @@ export const VectorsBuckets = () => {
       ? true
       : bucket.vectorBucketName.toLowerCase().includes(filterString.toLowerCase())
   )
+
+  const { mutate: deleteBucket } = useVectorBucketDeleteMutation({
+    onSuccess: (data, vars) => {
+      toast.success(`Bucket "${vars.bucketName}" deleted successfully`)
+      router.push(`/project/${projectRef}/storage/vectors`)
+    },
+  })
 
   return (
     <>
@@ -114,7 +125,15 @@ export const VectorsBuckets = () => {
                                 <Button type="default" className="px-1" icon={<MoreVertical />} />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="bottom" align="end" className="w-40">
-                                <DropdownMenuItem className="flex items-center space-x-2">
+                                <DropdownMenuItem
+                                  className="flex items-center space-x-2"
+                                  onClick={() => {
+                                    deleteBucket({
+                                      bucketName: name,
+                                      projectRef: projectRef!,
+                                    })
+                                  }}
+                                >
                                   <Trash2 size={12} />
                                   <p>Delete bucket</p>
                                 </DropdownMenuItem>
