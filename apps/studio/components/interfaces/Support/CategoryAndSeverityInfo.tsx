@@ -83,7 +83,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
                 </SelectTrigger_Shadcn_>
                 <SelectContent_Shadcn_>
                   <SelectGroup_Shadcn_>
-                    {CATEGORY_OPTIONS.map((option) => (
+                    {CATEGORY_OPTIONS.filter((option) => !option.hidden).map((option) => (
                       <SelectItem_Shadcn_ key={option.value} value={option.value}>
                         {option.label}
                         <span className="block text-xs text-foreground-lighter">
