@@ -142,14 +142,10 @@ function ProjectSelector({
           <CommandList_Shadcn_>
             <CommandGroup_Shadcn_>
               {isLoading ? (
-                <>
-                  <div className="px-2 py-1">
-                    <ShimmeringLoader className="py-2" />
-                  </div>
-                  <div className="px-2 py-1 w-4/5">
-                    <ShimmeringLoader className="py-2" />
-                  </div>
-                </>
+                <div className="px-2 py-1 flex flex-col gap-2">
+                  <ShimmeringLoader className="w-full" />
+                  <ShimmeringLoader className="w-4/5" />
+                </div>
               ) : (
                 <>
                   {search.length > 0 && projects.length === 0 && (
@@ -180,11 +176,7 @@ function ProjectSelector({
                       </CommandItem_Shadcn_>
                     ))}
                     <div ref={sentinelRef} className="h-1 -mt-1" />
-                    {hasNextPage && (
-                      <div className="px-2 py-1">
-                        <ShimmeringLoader className="py-2" />
-                      </div>
-                    )}
+                    {hasNextPage && <ShimmeringLoader className="px-2 py-3" />}
                   </ScrollArea>
                 </>
               )}
