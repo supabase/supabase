@@ -23,6 +23,7 @@ export interface ImportForeignSchemaDialogProps {
   bucketName: string
   namespace: string
   wrapperMeta: WrapperMeta
+  circumstance: 'fresh' | 'clash'
   visible: boolean
   onClose: () => void
 }
@@ -33,6 +34,7 @@ export const ImportForeignSchemaDialog = ({
   wrapperMeta,
   visible,
   onClose,
+  circumstance = 'clash',
 }: ImportForeignSchemaDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { ref } = useParams()
@@ -165,8 +167,10 @@ export const ImportForeignSchemaDialog = ({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-4">
             <p className="text-sm">
-              Namespace “<strong>{namespace}</strong>” must be linked to a new schema before tables
-              can be paired.
+              Namespace “<strong>{namespace}</strong>”{' '}
+              {circumstance === 'fresh'
+                ? 'must be linked to a new schema before tables can be paired.'
+                : 'clashes with an existing database schema. Create a new schema to use as the destination for this data.'}
             </p>
             <Separator />
             <FormField_Shadcn_
