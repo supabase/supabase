@@ -224,6 +224,16 @@ export const UsersV2 = () => {
     organization: selectedOrg?.slug ?? 'Unknown',
   }
 
+  const updateStorageFilter = (value: 'id' | 'email' | 'phone' | 'freeform') => {
+    setLocalStorageFilter(value)
+    setSpecificFilterColumn(value)
+  }
+
+  const updateSortByValue = (value: string) => {
+    if (isCountWithinThresholdForSortBy) setLocalStorageSortByValue(value)
+    setSortByValue(value)
+  }
+
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
     xScroll.current = event.currentTarget.scrollLeft
@@ -310,7 +320,7 @@ export const UsersV2 = () => {
         config: columnConfiguration ?? [],
         users: users ?? [],
         visibleColumns: selectedColumns,
-        setSortByValue,
+        setSortByValue: updateSortByValue,
         onSelectDeleteUser: setSelectedUserToDelete,
       })
       setColumns(columns)
@@ -330,33 +340,18 @@ export const UsersV2 = () => {
     specificFilterColumn,
   ])
 
-  // [Joshen] Load URL state for filter column only once, if no filter column found in URL params
+  // [Joshen] Load URL state for filter column and sort by only once, if no respective values found in URL params
   useEffect(() => {
-    if (
-      isLocalStorageFilterLoaded &&
-      specificFilterColumn === 'id' &&
-      localStorageFilter !== 'id'
-    ) {
-      setSpecificFilterColumn(localStorageFilter)
-    }
-  }, [isLocalStorageFilterLoaded])
+    if (isLocalStorageFilterLoaded && isLocalStorageSortByValueLoaded && isCountLoaded) {
+      if (specificFilterColumn === 'id' && localStorageFilter !== 'id') {
+        setSpecificFilterColumn(localStorageFilter)
+      }
 
-  // [Joshen] Only load sort by value if count is within threshold
-  useEffect(() => {
-    if (isLocalStorageSortByValueLoaded && isCountLoaded && isCountWithinThresholdForSortBy) {
-      setSortByValue(localStorageSortByValue)
+      if (isCountWithinThresholdForSortBy) {
+        setSortByValue(localStorageSortByValue)
+      }
     }
-  }, [isLocalStorageSortByValueLoaded, isCountLoaded])
-
-  useEffect(() => {
-    setLocalStorageFilter(specificFilterColumn)
-  }, [specificFilterColumn])
-
-  useEffect(() => {
-    if (isCountWithinThresholdForSortBy) {
-      setLocalStorageSortByValue(sortByValue)
-    }
-  }, [sortByValue])
+  }, [isLocalStorageFilterLoaded, isLocalStorageSortByValueLoaded, isCountLoaded])
 
   return (
     <>
@@ -400,12 +395,12 @@ export const UsersV2 = () => {
                   setSpecificFilterColumn={(value) => {
                     if (value === 'freeform') {
                       if (isCountWithinThresholdForSortBy) {
-                        setSpecificFilterColumn(value)
+                        updateStorageFilter(value)
                       } else {
                         setShowFreeformWarning(true)
                       }
                     } else {
-                      setSpecificFilterColumn(value)
+                      updateStorageFilter(value)
                     }
                   }}
                 />
@@ -519,7 +514,7 @@ export const UsersV2 = () => {
                       config: updatedConfig,
                       users: users ?? [],
                       visibleColumns: value,
-                      setSortByValue,
+                      setSortByValue: updateSortByValue,
                       onSelectDeleteUser: setSelectedUserToDelete,
                     })
 
@@ -536,7 +531,7 @@ export const UsersV2 = () => {
                   sortByValue={sortByValue}
                   setSortByValue={(value) => {
                     const [sortColumn, sortOrder] = value.split(':')
-                    setSortByValue(value)
+                    updateSortByValue(value)
                     sendEvent({
                       action: 'auth_users_search_submitted',
                       properties: {
@@ -719,7 +714,7 @@ export const UsersV2 = () => {
         confirmLabel="Confirm"
         title="Confirm to search across all columns"
         onConfirm={() => {
-          setSpecificFilterColumn('freeform')
+          updateStorageFilter('freeform')
           setShowFreeformWarning(false)
         }}
         onCancel={() => setShowFreeformWarning(false)}
