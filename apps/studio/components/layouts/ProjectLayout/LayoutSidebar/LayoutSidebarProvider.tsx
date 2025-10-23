@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useOpenSidebar } from 'state/sidebar-manager-state'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 
 export const SIDEBAR_KEYS = {
