@@ -61,7 +61,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
-  const { closeSidebar } = useSidebarManagerSnapshot()
+  const { closeSidebar, isSidebarOpen } = useSidebarManagerSnapshot()
 
   const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
 
@@ -434,10 +434,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
   }, [snap.initialInput])
 
-  const isSidebarOpen = sidebarManagerState.isSidebarOpen(SIDEBAR_KEYS.AI_ASSISTANT)
-
   useEffect(() => {
-    if (isSidebarOpen && isInSQLEditor && !!snippetContent) {
+    if (isSidebarOpen(SIDEBAR_KEYS.AI_ASSISTANT) && isInSQLEditor && !!snippetContent) {
       snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
