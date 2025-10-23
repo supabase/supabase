@@ -1,4 +1,4 @@
-import { type PropsWithChildren } from 'react'
+import { Fragment, type PropsWithChildren } from 'react'
 import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
@@ -71,22 +71,26 @@ export async function CodeBlock({
         className
       )}
     >
-      <pre>
-        <code className={lineNumbers ? 'flex' : ''}>
-          {lineNumbers && (
-            <div className="flex-shrink-0 select-none text-right text-muted bg-control py-6 px-2">
-              {tokens.map((_, idx) => (
-                <div key={idx} className="w-full">
+      <pre className="py-6">
+        <code className={lineNumbers ? 'grid grid-cols-[auto_1fr]' : ''}>
+          {lineNumbers ? (
+            tokens.map((line, idx) => (
+              <Fragment key={idx}>
+                <div className="select-none text-right text-muted bg-control px-2 min-h-5 leading-5">
                   {idx + 1}
                 </div>
+                <div className="code-content min-h-5 leading-5 pl-6 pr-6">
+                  <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
+                </div>
+              </Fragment>
+            ))
+          ) : (
+            <div className="code-content p-6">
+              {tokens.map((line, idx) => (
+                <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
               ))}
             </div>
           )}
-          <div className={cn('code-content p-6 overflow-x-auto', lineNumbers ? 'flex-grow' : '')}>
-            {tokens.map((line, idx) => (
-              <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
-            ))}
-          </div>
         </code>
       </pre>
       <CodeBlockControls content={code.trim()} />
