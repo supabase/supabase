@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { NO_PROJECT_MARKER } from 'components/interfaces/Support/SupportForm.utils'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfile } from 'lib/profile'
@@ -26,7 +28,6 @@ import {
   Input_Shadcn_,
   Separator,
 } from 'ui'
-import { LOCAL_STORAGE_KEYS } from 'common'
 
 const setDeletionRequestFlag = () => {
   const expiryDate = new Date()
@@ -92,7 +93,7 @@ export const DeleteAccountButton = () => {
       severity: 'Low',
       allowSupportAccess: false,
       verified: true,
-      projectRef: 'no-project',
+      projectRef: NO_PROJECT_MARKER,
     }
 
     submitSupportTicket(payload)

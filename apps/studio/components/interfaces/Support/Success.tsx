@@ -6,19 +6,23 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useProfile } from 'lib/profile'
 import { Button, Input, Separator } from 'ui'
 import { CATEGORY_OPTIONS } from './Support.constants'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface SuccessProps {
   sentCategory?: string
   selectedProject?: string
 }
 
-export const Success = ({ sentCategory = '', selectedProject = 'no-project' }: SuccessProps) => {
+export const Success = ({
+  sentCategory = '',
+  selectedProject = NO_PROJECT_MARKER,
+}: SuccessProps) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   const { data: project } = useProjectDetailQuery(
     { ref: selectedProject },
-    { enabled: selectedProject !== 'no-project' }
+    { enabled: selectedProject !== NO_PROJECT_MARKER }
   )
   const projectName = project ? project.name : 'No specific project'
 
@@ -40,7 +44,7 @@ export const Success = ({ sentCategory = '', selectedProject = 'no-project' }: S
         <p className="text-sm text-foreground-light">
           We will reach out to you at <span className="text-foreground">{respondToEmail}</span>.
         </p>
-        {selectedProject !== 'no-project' && (
+        {selectedProject !== NO_PROJECT_MARKER && (
           <p className="text-sm text-foreground-light">
             Your ticket has been logged for the project{' '}
             <span className="text-foreground">{projectName}</span>, reference ID:{' '}

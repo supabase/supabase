@@ -22,6 +22,7 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface CategoryAndSeverityInfoProps {
   form: UseFormReturn<SupportFormValues>
@@ -148,7 +149,7 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
 }
 
 const IssueSuggestion = ({ category, projectRef }: { category: string; projectRef?: string }) => {
-  const baseUrl = `/project/${projectRef === 'no-project' ? '_' : projectRef}`
+  const baseUrl = `/project/${projectRef === NO_PROJECT_MARKER ? '_' : projectRef}`
 
   const className = 'col-span-2 mb-0'
 

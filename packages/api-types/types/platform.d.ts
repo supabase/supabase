@@ -4679,6 +4679,7 @@ export interface components {
     CloudMarketplaceOnboardingInfoResponse: {
       aws_contract_auto_renewal: boolean
       aws_contract_end_date: string
+      aws_contract_is_private_offer: boolean
       aws_contract_settings_url: string
       aws_contract_start_date: string
       organization_linking_eligibility: {
@@ -6407,7 +6408,7 @@ export interface components {
       cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
-      customer_balance: number
+      customer_balance?: number
       next_invoice_at: number
       payment_method_type: string
       plan: {
@@ -24236,6 +24237,27 @@ export interface operations {
     parameters: {
       query: {
         cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+        desired_instance_size?:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
         organization_slug: string
       }
       header?: never

@@ -254,36 +254,44 @@ export const ServiceStatus = () => {
     (service) => !service.isHealthy && service.status !== 'COMING_UP'
   )
   const anyComingUp = services.some((service) => service.status === 'COMING_UP')
-  const overallStatusLabel = isLoadingChecks
-    ? 'Checking...'
-    : anyUnhealthy && !isProjectNew
-      ? 'Unhealthy'
-      : anyComingUp || isMigrationLoading || (isProjectNew && !allServicesOperational)
-        ? 'Coming up...'
-        : 'Healthy'
+  // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
+  const showSpinnerIcon = project?.status === 'COMING_UP'
+
+  const getOverallStatusLabel = (): string => {
+    if (isLoadingChecks) return 'Checking...'
+    if (anyComingUp) return 'Coming up...'
+    if (anyUnhealthy) return 'Unhealthy'
+    return 'Healthy'
+  }
+
+  const overallStatusLabel = getOverallStatusLabel()
 
   return (
     <Popover_Shadcn_>
       <PopoverTrigger_Shadcn_>
         <SingleStat
           icon={
-            <div className="grid grid-cols-3 gap-1">
-              {services.map((service, index) => (
-                <div
-                  key={`${service.name}-${index}`}
-                  className={cn(
-                    'w-1.5 h-1.5 rounded-full',
-                    service.isLoading ||
-                      service.status === 'COMING_UP' ||
-                      (isProjectNew && !service.isHealthy)
-                      ? 'bg-foreground-lighter animate-pulse'
-                      : service.isHealthy
-                        ? 'bg-brand'
-                        : 'bg-selection'
-                  )}
-                />
-              ))}
-            </div>
+            showSpinnerIcon ? (
+              <Loader2 className="animate-spin" size={18} />
+            ) : (
+              <div className="grid grid-cols-3 gap-1">
+                {services.map((service, index) => (
+                  <div
+                    key={`${service.name}-${index}`}
+                    className={cn(
+                      'w-1.5 h-1.5 rounded-full',
+                      service.isLoading ||
+                        service.status === 'COMING_UP' ||
+                        (isProjectNew && !service.isHealthy)
+                        ? 'bg-foreground-lighter animate-pulse'
+                        : service.isHealthy
+                          ? 'bg-brand'
+                          : 'bg-selection'
+                    )}
+                  />
+                ))}
+              </div>
+            )
           }
           label={<span>Status</span>}
           value={<span>{overallStatusLabel}</span>}
