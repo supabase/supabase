@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useCallback, useEffect, useMemo, useRef } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 import {
   sidebarManagerState,
   useRegisterSidebar,
@@ -15,28 +15,27 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const assistantComponent = useCallback(() => <AIAssistant />, [])
   useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, assistantComponent, {}, 'i')
 
-  const { sidebars } = useSidebarManagerSnapshot()
-
-  // Set sidebar state initially based on URL query param
   const router = useRouter()
-  const sidebarParamRaw = router.query.sidebar
-  const sidebarParam = useMemo(
-    () => (typeof sidebarParamRaw === 'string' ? sidebarParamRaw : null),
-    [sidebarParamRaw]
-  )
+  const { sidebars } = useSidebarManagerSnapshot()
+  const appliedUrlSidebarRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (!router.isReady) return
 
+    const sidebarParamRaw = router.query.sidebar
+    const sidebarParam = typeof sidebarParamRaw === 'string' ? sidebarParamRaw : null
+
     if (!sidebarParam) {
+      appliedUrlSidebarRef.current = null
       return
     }
-    const registeredSidebar = sidebars[sidebarParam]
 
-    if (!registeredSidebar) return
+    if (!sidebars[sidebarParam]) return
+    if (appliedUrlSidebarRef.current === sidebarParam) return
 
     sidebarManagerState.openSidebar(sidebarParam)
-  }, [router.isReady, sidebarParam])
+    appliedUrlSidebarRef.current = sidebarParam
+  }, [router.isReady, router.query.sidebar, sidebars])
 
   return <>{children}</>
 }
