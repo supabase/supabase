@@ -54,10 +54,14 @@ const TableRowComponent = ({
   tableName,
   isConnected,
   schema,
+  isLoading,
+  index,
 }: {
   tableName: string
   isConnected: boolean
   schema?: string
+  isLoading?: boolean
+  index: number
 }) => {
   const { data: project } = useSelectedProjectQuery()
 
@@ -82,8 +86,20 @@ const TableRowComponent = ({
             {/* Outer faded dot with pulsing background */}
             <span
               className={`absolute inset-0 rounded-full ${
-                isConnected ? 'bg-brand/20 animate-ping delay-[1s]' : 'hidden'
+                isConnected
+                  ? isLoading
+                    ? 'bg-brand/20 animate-ping'
+                    : 'bg-brand/20 animate-ping'
+                  : isLoading
+                    ? 'bg-warning-500/20 animate-ping'
+                    : 'hidden'
               }`}
+              style={{
+                // Stagger the animation delay for each table
+                animationDelay: `${1 + index * 0.15}s`,
+                // Slow the animation
+                animationDuration: '2s',
+              }}
             />
             {/* Inner colored dot */}
             <span
@@ -93,7 +109,7 @@ const TableRowComponent = ({
             />
           </div>
           <span className="text-foreground-lighter">
-            {isConnected ? 'Paired' : 'Waiting to be paired'}
+            {isLoading ? 'Pairing...' : isConnected ? 'Paired' : 'Waiting to be paired'}
           </span>
         </div>
       </TableCell>
@@ -313,12 +329,14 @@ export const NamespaceRow = ({
               </TableCell>
             </TableRow>
           ) : (
-            allTables.map(({ name, isConnected }) => (
+            allTables.map(({ name, isConnected }, index) => (
               <TableRowComponent
                 key={name}
                 tableName={name}
                 isConnected={isConnected}
                 schema={schema}
+                isLoading={isLoadingNamespaceTables}
+                index={index}
               />
             ))
           )}
