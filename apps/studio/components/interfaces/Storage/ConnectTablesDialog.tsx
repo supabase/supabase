@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -121,17 +121,19 @@ export const ConnectTablesDialog = ({}: ConnectTablesDialogProps) => {
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-4 flex-grow overflow-visible">
+            <DialogSection className="flex flex-col gap-y-4">
               <p className="text-sm">
                 Select the database tables you would like to send data from. A destination analytics
                 table will be created for each, and data will replicate automatically.
               </p>
-
+            </DialogSection>
+            <DialogSectionSeparator />
+            <DialogSection className="overflow-visible">
               <FormField_Shadcn_
                 control={form.control}
                 name="tables"
                 render={({ field }) => (
-                  <FormItemLayout label="Tables" description="Which tables to send data from">
+                  <FormItemLayout label="Tables">
                     <FormControl_Shadcn_>
                       <MultiSelector
                         values={field.value}
