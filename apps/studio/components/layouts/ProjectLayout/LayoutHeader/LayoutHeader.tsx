@@ -1,19 +1,19 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode, useMemo, useState } from 'react'
+import { ReactNode, useMemo } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
+import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
 import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
 import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
-import EditorPanel from 'components/ui/EditorPanel/EditorPanel'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -23,6 +23,7 @@ import { useHotKey } from 'hooks/ui/useHotKey'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import { Badge, cn } from 'ui'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
@@ -30,7 +31,6 @@ import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
-import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -74,8 +74,6 @@ const LayoutHeader = ({
 
   const isAccountPage = router.pathname.startsWith('/account')
 
-  const [showEditorPanel, setShowEditorPanel] = useState(false)
-
   const [inlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
     LOCAL_STORAGE_KEYS.HOTKEY_INLINE_EDITOR,
     true
@@ -83,10 +81,10 @@ const LayoutHeader = ({
 
   useHotKey(
     () => {
-      if (projectRef) setShowEditorPanel(!showEditorPanel)
+      if (projectRef) sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     },
     'e',
-    [showEditorPanel, projectRef],
+    [projectRef],
     { enabled: inlineEditorHotkeyEnabled }
   )
 
@@ -227,16 +225,13 @@ const LayoutHeader = ({
               <>
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="overflow-hidden flex items-center gap-2">
                   <HelpPopover />
-                  <NotificationsPopoverV2 />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => setShowEditorPanel(true)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <InlineEditorButton showShortcut={inlineEditorHotkeyEnabled} />
+                        <AdvisorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -251,10 +246,8 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => setShowEditorPanel(true)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <InlineEditorButton showShortcut={inlineEditorHotkeyEnabled} />
+                        <AdvisorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -266,11 +259,6 @@ const LayoutHeader = ({
           </div>
         </div>
       </header>
-      <EditorPanel
-        open={showEditorPanel}
-        onClose={() => setShowEditorPanel(false)}
-        isInlineEditorHotkeyEnabled={inlineEditorHotkeyEnabled}
-      />
     </>
   )
 }

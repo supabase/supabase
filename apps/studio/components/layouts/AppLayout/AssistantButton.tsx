@@ -2,23 +2,30 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, KeyboardShortcut } from 'ui'
+import { SIDEBAR_KEYS, sidebarManagerState, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation, cn, KeyboardShortcut } from 'ui'
 
 export const AssistantButton = () => {
-  const snap = useAiAssistantStateSnapshot()
+  useAiAssistantStateSnapshot()
+  const sidebarSnap = useSidebarManagerSnapshot()
   const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
     LOCAL_STORAGE_KEYS.HOTKEY_AI_ASSISTANT,
     true
   )
 
+  const isOpen = sidebarSnap.panels[SIDEBAR_KEYS.AI_ASSISTANT]?.open
+
   return (
     <ButtonTooltip
-      type="text"
+      type="outline"
       size="tiny"
       id="assistant-trigger"
-      className="rounded-none w-[32px] h-[30px] flex items-center justify-center p-0 hover:bg-brand-400"
+      className={cn(
+        "rounded-full w-[32px] h-[32px] flex items-center justify-center p-0",
+        isOpen && "bg-foreground text-background"
+      )}
       onClick={() => {
-        snap.toggleAssistant()
+        sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       }}
       tooltip={{
         content: {
@@ -31,7 +38,11 @@ export const AssistantButton = () => {
         },
       }}
     >
-      <AiIconAnimation allowHoverEffect={false} size={16} />
+      <AiIconAnimation
+        allowHoverEffect={false}
+        size={16}
+        className={cn(isOpen && "text-background")}
+      />
     </ButtonTooltip>
   )
 }

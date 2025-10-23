@@ -1,16 +1,17 @@
-import { Book, Save, X } from 'lucide-react'
+import { Book, Maximize2, X } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import {
   createSqlSnippetSkeletonV2,
   suffixWithLimit,
 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -38,19 +39,14 @@ import {
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
   SQL_ICON,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { InlineLink } from '../InlineLink'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
+import { SQLSnippetSelector } from './SQLSnippetSelector'
 
 type Template = {
   name: string
@@ -59,8 +55,8 @@ type Template = {
 }
 
 interface EditorPanelProps {
-  open: boolean
-  onClose: () => void
+  open?: boolean
+  onClose?: () => void
   initialValue?: string
   label?: string
   saveLabel?: string
@@ -76,28 +72,45 @@ interface EditorPanelProps {
 }
 
 export const EditorPanel = ({
-  open,
-  onClose,
+  open: propOpen = true,
+  onClose: propOnClose,
   isInlineEditorHotkeyEnabled = true,
-  initialValue = '',
-  label = '',
-  saveLabel = 'Save',
-  saveValue = '',
-  onSave,
-  onRunSuccess,
-  onRunError,
-  templates = [],
-  initialPrompt = '',
-  onChange,
+  initialValue: propInitialValue,
+  label: propLabel,
+  saveLabel: propSaveLabel = 'Save',
+  saveValue: propSaveValue,
+  onSave: propOnSave,
+  onRunSuccess: propOnRunSuccess,
+  onRunError: propOnRunError,
+  templates: propTemplates,
+  initialPrompt: propInitialPrompt,
+  onChange: propOnChange,
 }: EditorPanelProps) => {
+  const editorStateSnap = useEditorPanelStateSnapshot()
+
+  // Prefer state values over props for new state-based usage
+  const onClose = propOnClose ?? (() => {})
+  const initialValue = editorStateSnap.initialValue || propInitialValue || ''
+  const saveLabel = editorStateSnap.saveLabel || propSaveLabel || 'Save'
+  const saveValue = editorStateSnap.saveValue || propSaveValue || ''
+  const onSave = editorStateSnap.onSave || propOnSave
+  const onRunSuccess = editorStateSnap.onRunSuccess || propOnRunSuccess
+  const onRunError = editorStateSnap.onRunError || propOnRunError
+  const templates =
+    (editorStateSnap.templates.length > 0 ? editorStateSnap.templates : propTemplates) || []
+  const initialPrompt = editorStateSnap.initialPrompt || propInitialPrompt || ''
+  const onChange = editorStateSnap.onChange || propOnChange
+
   const { ref } = useParams()
+  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const [isSaving, setIsSaving] = useState(false)
+  const selectedSnippetId = editorStateSnap.selectedSnippetId
+  const currentSnippet = selectedSnippetId ? snapV2.snippets[selectedSnippetId]?.snippet : undefined
+
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
@@ -187,270 +200,259 @@ export const EditorPanel = ({
   }, [saveValue, saveForm])
 
   return (
-    <Sheet open={open} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent
-        showClose={false}
-        className="w-full sm:max-w-3xl flex flex-col h-full p-0 space-y-0 gap-0"
-      >
-        <SheetHeader className="flex shrink-0 items-center gap-x-3">
-          <div className="flex-1">
-            <SheetTitle className="text-sm">SQL Editor</SheetTitle>
-            {label && <SheetDescription className="text-sm">{label}</SheetDescription>}
-          </div>
-          <div className="flex gap-2 items-center">
-            {templates.length > 0 && (
-              <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
-                <PopoverTrigger_Shadcn_ asChild>
-                  <Button
-                    size="tiny"
-                    type="default"
-                    role="combobox"
-                    aria-expanded={isTemplatesOpen}
-                    icon={<Book size={14} />}
-                  >
-                    Templates
-                  </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
-                  <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search templates..." />
-                    <CommandList_Shadcn_>
-                      <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
-                      <CommandGroup_Shadcn_>
-                        {templates.map((template) => (
-                          <HoverCard_Shadcn_ key={template.name}>
-                            <HoverCardTrigger_Shadcn_ asChild>
-                              <CommandItem_Shadcn_
-                                value={template.name}
-                                onSelect={() => onSelectTemplate(template.content)}
-                                className="cursor-pointer"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <SQL_ICON
-                                    size={16}
-                                    className={cn(
-                                      'w-5 h-5 flex-0 mr-2 transition-colors fill-foreground-muted'
-                                    )}
-                                  />
-                                  <div className="flex-1">
-                                    <h4 className="text-foreground flex-1">{template.name}</h4>
-                                    <p className="text-xs text-foreground-light">
-                                      {template.description}
-                                    </p>
-                                  </div>
-                                </div>
-                              </CommandItem_Shadcn_>
-                            </HoverCardTrigger_Shadcn_>
-                            <HoverCardContent_Shadcn_ side="left" className="w-[500px] p-0">
-                              <CodeBlock
-                                language="sql"
-                                className="language-sql border-none"
-                                hideLineNumbers
-                                value={template.content}
-                              />
-                            </HoverCardContent_Shadcn_>
-                          </HoverCard_Shadcn_>
-                        ))}
-                      </CommandGroup_Shadcn_>
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
-            )}
-            <ButtonTooltip
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: 'Save as snippet',
-                },
-              }}
-              size="tiny"
-              type="default"
-              className="w-7 h-7"
-              loading={isSaving}
-              icon={<Save size={16} />}
-              onClick={async () => {
-                if (!ref) return console.error('Project ref is required')
-                if (!project) return console.error('Project is required')
-                if (!profile) return console.error('Profile is required')
-
-                try {
-                  setIsSaving(true)
-                  const { title: name } = await generateSqlTitle({
-                    sql: currentValue,
-                  })
-                  const snippet = createSqlSnippetSkeletonV2({
-                    id: uuidv4(),
-                    name,
-                    sql: currentValue,
-                    owner_id: profile.id,
-                    project_id: project.id,
-                  })
-                  snapV2.addSnippet({ projectRef: ref, snippet })
-                  snapV2.addNeedsSaving(snippet.id)
-                  toast.success(
-                    <div>
-                      Saved snippet! View it{' '}
-                      <InlineLink href={`/project/${ref}/sql/${snippet.id}`}>here</InlineLink>
-                    </div>
-                  )
-                } catch (error: any) {
-                  toast.error(`Failed to create new query: ${error.message}`)
-                } finally {
-                  setIsSaving(false)
-                }
-              }}
-            />
-
-            <ButtonTooltip
-              size="tiny"
-              type="default"
-              className="w-7 h-7"
-              onClick={onClose}
-              icon={<X size={16} />}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: (
-                    <div className="flex items-center gap-4">
-                      <span>Close Editor</span>
-                      {isInlineEditorHotkeyEnabled && <KeyboardShortcut keys={['Meta', 'e']} />}
-                    </div>
-                  ),
-                },
-              }}
-            />
-          </div>
-        </SheetHeader>
-
-        <div className="flex-1 overflow-hidden flex flex-col h-full">
-          <div className="flex-1 min-h-0 relative">
-            <AIEditor
-              autoFocus
-              language="pgsql"
-              value={currentValue}
-              onChange={handleChange}
-              aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
-              aiMetadata={{
-                projectRef: project?.ref,
-                connectionString: project?.connectionString,
-                orgSlug: org?.slug,
-              }}
-              initialPrompt={initialPrompt}
-              options={{
-                tabSize: 2,
-                fontSize: 13,
-                minimap: { enabled: false },
-                wordWrap: 'on',
-                lineNumbers: 'on',
-                folding: false,
-                padding: { top: 16 },
-                lineNumbersMinChars: 3,
-              }}
-              executeQuery={onExecuteSql}
-              onClose={() => onClose()}
-              closeShortcutEnabled={isInlineEditorHotkeyEnabled}
-            />
-          </div>
-
-          {error !== undefined && (
-            <div className="shrink-0">
-              <Admonition
-                type="warning"
-                className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
-                title={errorHeader || 'Error running SQL query'}
-                description={
-                  <div>
-                    {errorContent.length > 0 ? (
-                      errorContent.map((errorText: string, i: number) => (
-                        <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
-                          {errorText}
-                        </pre>
-                      ))
-                    ) : (
-                      <p className="font-mono text-xs">{error.error}</p>
-                    )}
-                  </div>
-                }
-              />
-            </div>
-          )}
-
-          {showWarning && (
-            <SqlWarningAdmonition
-              className="border-t"
-              warningType={showWarning}
-              onCancel={() => setShowWarning(undefined)}
-              onConfirm={() => {
-                setShowWarning(undefined)
-                onExecuteSql(true)
-              }}
-            />
-          )}
-
-          {results !== undefined && results.length > 0 && (
-            <div className={`max-h-72 shrink-0 flex flex-col ${showResults && 'h-full'}`}>
-              {showResults && (
-                <div className="border-t flex-1 overflow-auto">
-                  <Results rows={results} />
-                </div>
-              )}
-              <p className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
-                <span className="font-mono">
-                  {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
-                </span>
+    <div className="flex h-full flex-col bg-background">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 px-4 h-[46px]">
+        <div className="flex-1 flex items-center gap-x-2">
+          <SQLSnippetSelector
+            currentSnippetName={currentSnippet?.name || 'SQL Editor'}
+            currentSnippetId={selectedSnippetId}
+          />
+        </div>
+        <div className="flex items-center">
+          {templates.length > 0 && (
+            <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
+              <PopoverTrigger_Shadcn_ asChild>
                 <Button
                   size="tiny"
                   type="default"
-                  className="ml-2"
-                  onClick={() => setShowResults((prev) => !prev)}
+                  role="combobox"
+                  className="mr-2"
+                  aria-expanded={isTemplatesOpen}
+                  icon={<Book size={14} />}
                 >
-                  {showResults ? 'Hide Results' : 'Show Results'}
+                  Templates
                 </Button>
-              </p>
-            </div>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Search templates..." />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      {templates.map((template) => (
+                        <HoverCard_Shadcn_ key={template.name}>
+                          <HoverCardTrigger_Shadcn_ asChild>
+                            <CommandItem_Shadcn_
+                              value={template.name}
+                              onSelect={() => onSelectTemplate(template.content)}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex items-center gap-3">
+                                <SQL_ICON
+                                  size={16}
+                                  className={cn(
+                                    'w-5 h-5 flex-0 mr-2 transition-colors fill-foreground-muted'
+                                  )}
+                                />
+                                <div className="flex-1">
+                                  <h4 className="text-foreground flex-1">{template.name}</h4>
+                                  <p className="text-xs text-foreground-light">
+                                    {template.description}
+                                  </p>
+                                </div>
+                              </div>
+                            </CommandItem_Shadcn_>
+                          </HoverCardTrigger_Shadcn_>
+                          <HoverCardContent_Shadcn_ side="left" className="w-[500px] p-0">
+                            <CodeBlock
+                              language="sql"
+                              className="language-sql border-none"
+                              hideLineNumbers
+                              value={template.content}
+                            />
+                          </HoverCardContent_Shadcn_>
+                        </HoverCard_Shadcn_>
+                      ))}
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           )}
-          {results !== undefined && results.length === 0 && !error && (
-            <div className="shrink-0">
-              <p className="text-xs text-foreground-light font-mono py-2 px-5">
-                Success. No rows returned.
-              </p>
-            </div>
-          )}
+          <ButtonTooltip
+            type="text"
+            className="w-7 h-7 p-0"
+            icon={<Maximize2 strokeWidth={1.5} />}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'Expand to SQL editor',
+              },
+            }}
+            onClick={() => {
+              if (!ref) return console.error('Project ref is required')
 
-          <div className="flex items-center gap-2 justify-end px-5 py-4 w-full border-t shrink-0">
-            {onSave && (
-              <Form_Shadcn_ {...saveForm}>
-                <form
-                  onSubmit={saveForm.handleSubmit((values) => {
-                    onSave(currentValue, values.saveValue)
-                  })}
-                  className="flex items-center gap-2"
-                >
-                  {saveValue && (
-                    <FormField_Shadcn_
-                      control={saveForm.control}
-                      name="saveValue"
-                      render={({ field }) => (
-                        <Input size="tiny" placeholder="Enter save value..." {...field} />
-                      )}
-                    />
+              // If a snippet is selected, navigate to it
+              if (selectedSnippetId) {
+                router.push(`/project/${ref}/sql/${selectedSnippetId}`)
+                sidebarManagerState.closeSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+                return
+              }
+
+              // Otherwise create a new snippet with current SQL
+              if (!project) return console.error('Project is required')
+              if (!profile) return console.error('Profile is required')
+
+              const snippet = createSqlSnippetSkeletonV2({
+                id: uuidv4(),
+                name: 'New query',
+                sql: currentValue,
+                owner_id: profile.id,
+                project_id: project.id,
+              })
+              snapV2.addSnippet({ projectRef: ref, snippet })
+              snapV2.addNeedsSaving(snippet.id)
+              router.push(`/project/${ref}/sql/${snippet.id}`)
+              sidebarManagerState.closeSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+            }}
+          />
+
+          <ButtonTooltip
+            type="text"
+            className="w-7 h-7 p-0"
+            onClick={() => {
+              onClose()
+              sidebarManagerState.closeSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+            }}
+            icon={<X strokeWidth={1.5} />}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: (
+                  <div className="flex items-center gap-4">
+                    <span>Close Editor</span>
+                    {isInlineEditorHotkeyEnabled && <KeyboardShortcut keys={['Meta', 'e']} />}
+                  </div>
+                ),
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-hidden flex flex-col h-full">
+        <div className="flex-1 min-h-0 relative [&_.monaco-editor]:!bg [&_.monaco-editor_.margin]:!bg [&_.monaco-editor_.monaco-editor-background]:!bg">
+          <AIEditor
+            autoFocus
+            language="pgsql"
+            value={currentValue}
+            onChange={handleChange}
+            aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
+            aiMetadata={{
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              orgSlug: org?.slug,
+            }}
+            initialPrompt={initialPrompt}
+            options={{
+              tabSize: 2,
+              fontSize: 13,
+              minimap: { enabled: false },
+              wordWrap: 'on',
+              lineNumbers: 'on',
+              folding: false,
+              padding: { top: 16 },
+              lineNumbersMinChars: 3,
+            }}
+            executeQuery={onExecuteSql}
+            onClose={() => onClose()}
+            closeShortcutEnabled={isInlineEditorHotkeyEnabled}
+          />
+        </div>
+
+        {error !== undefined && (
+          <div className="shrink-0">
+            <Admonition
+              type="warning"
+              className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
+              title={errorHeader || 'Error running SQL query'}
+              description={
+                <div>
+                  {errorContent.length > 0 ? (
+                    errorContent.map((errorText: string, i: number) => (
+                      <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
+                        {errorText}
+                      </pre>
+                    ))
+                  ) : (
+                    <p className="font-mono text-xs">{error.error}</p>
                   )}
-                  <Button size="tiny" type="default" htmlType="submit">
-                    {saveLabel}
-                  </Button>
-                </form>
-              </Form_Shadcn_>
-            )}
-            <SqlRunButton
-              isDisabled={isExecuting}
-              isExecuting={isExecuting}
-              onClick={onExecuteSql}
+                </div>
+              }
             />
           </div>
+        )}
+
+        {showWarning && (
+          <SqlWarningAdmonition
+            className="border-t"
+            warningType={showWarning}
+            onCancel={() => setShowWarning(undefined)}
+            onConfirm={() => {
+              setShowWarning(undefined)
+              onExecuteSql(true)
+            }}
+          />
+        )}
+
+        {results !== undefined && results.length > 0 && (
+          <div className={`max-h-72 shrink-0 flex flex-col ${showResults && 'h-full'}`}>
+            {showResults && (
+              <div className="border-t flex-1 overflow-auto">
+                <Results rows={results} />
+              </div>
+            )}
+            <div className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
+              <span className="font-mono">
+                {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
+              </span>
+              <Button
+                size="tiny"
+                type="default"
+                className="ml-2"
+                onClick={() => setShowResults((prev) => !prev)}
+              >
+                {showResults ? 'Hide Results' : 'Show Results'}
+              </Button>
+            </div>
+          </div>
+        )}
+        {results !== undefined && results.length === 0 && !error && (
+          <div className="shrink-0">
+            <p className="text-xs text-foreground-light font-mono py-2 px-5">
+              Success. No rows returned.
+            </p>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 justify-end px-5 py-4 w-full border-t shrink-0">
+          {onSave && (
+            <Form_Shadcn_ {...saveForm}>
+              <form
+                onSubmit={saveForm.handleSubmit((values) => {
+                  onSave(currentValue, values.saveValue)
+                })}
+                className="flex items-center gap-2"
+              >
+                {saveValue && (
+                  <FormField_Shadcn_
+                    control={saveForm.control}
+                    name="saveValue"
+                    render={({ field }) => (
+                      <Input size="tiny" placeholder="Enter save value..." {...field} />
+                    )}
+                  />
+                )}
+                <Button size="tiny" type="default" htmlType="submit">
+                  {saveLabel}
+                </Button>
+              </form>
+            </Form_Shadcn_>
+          )}
+          <SqlRunButton isDisabled={isExecuting} isExecuting={isExecuting} onClick={onExecuteSql} />
         </div>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </div>
   )
 }
 

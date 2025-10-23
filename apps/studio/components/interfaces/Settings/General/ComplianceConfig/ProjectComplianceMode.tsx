@@ -9,12 +9,14 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { InlineLink } from 'components/ui/InlineLink'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { advisorCenterState } from 'state/advisor-center-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const ComplianceConfig = () => {
@@ -78,9 +80,17 @@ const ComplianceConfig = () => {
               description={
                 <p className="text-sm text-foreground-light">
                   Enable security warnings in the{' '}
-                  <InlineLink href={`/project/${ref}/advisors/security`}>
-                    Security Advisor
-                  </InlineLink>{' '}
+                  <button
+                    type="button"
+                    className={InlineLinkClassName}
+                    onClick={() => {
+                      advisorCenterState.clearSeverityFilters()
+                      advisorCenterState.setActiveTab('security')
+                      sidebarManagerState.openSidebar(SIDEBAR_KEYS.ADVISOR_CENTER)
+                    }}
+                  >
+                    Advisor Center
+                  </button>{' '}
                   to enforce requirements for managing sensitive data
                 </p>
               }

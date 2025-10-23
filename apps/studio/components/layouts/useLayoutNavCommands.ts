@@ -1,6 +1,5 @@
 import { useIsLoggedIn } from 'common'
 import { useApiDocsGotoCommands } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs.Commands'
-import { useAdvisorsGoToCommands } from './AdvisorsLayout/Advisors.Commands'
 import { useAuthGotoCommands } from './AuthLayout/Auth.Commands'
 import { useDatabaseGotoCommands } from './DatabaseLayout/Database.Commands'
 import { useFunctionsGotoCommands } from './EdgeFunctionsLayout/EdgeFunctions.Commands'
@@ -19,7 +18,6 @@ export function useLayoutNavCommands() {
   useSqlEditorGotoCommands({ enabled: isLoggedIn })
   useDatabaseGotoCommands({ enabled: isLoggedIn })
   useAuthGotoCommands({ enabled: isLoggedIn })
-  useAdvisorsGoToCommands({ enabled: isLoggedIn })
   useStorageGotoCommands({ enabled: isLoggedIn })
   useFunctionsGotoCommands({ enabled: isLoggedIn })
   useLogsGotoCommands({ enabled: isLoggedIn })

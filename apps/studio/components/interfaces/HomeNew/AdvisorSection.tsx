@@ -14,6 +14,7 @@ import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -57,7 +58,7 @@ export const AdvisorSection = () => {
   }, [totalErrors])
 
   const handleAskAssistant = useCallback(() => {
-    snap.toggleAssistant()
+    sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     if (projectRef && organization?.slug) {
       sendEvent({
         action: 'home_advisor_ask_assistant_clicked',
@@ -70,7 +71,7 @@ export const AdvisorSection = () => {
         },
       })
     }
-  }, [snap, sendEvent, projectRef, organization, totalErrors])
+  }, [sendEvent, projectRef, organization, totalErrors])
 
   const handleCardClick = useCallback(
     (lint: Lint) => {

@@ -164,20 +164,6 @@ export const generateDatabaseMenu = (
       title: 'Tools',
       items: [
         {
-          name: 'Security Advisor',
-          key: 'security-advisor',
-          url: `/project/${ref}/advisors/security`,
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          items: [],
-        },
-        {
-          name: 'Performance Advisor',
-          key: 'performance-advisor',
-          url: `/project/${ref}/advisors/performance`,
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          items: [],
-        },
-        {
           name: 'Query Performance',
           key: 'query-performance',
           url: `/project/${ref}/reports/query-performance`,

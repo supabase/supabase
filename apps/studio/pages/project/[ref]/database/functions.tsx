@@ -7,12 +7,13 @@ import FunctionsList from 'components/interfaces/Database/Functions/FunctionsLis
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
+import { editorPanelState } from 'state/editor-panel-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
@@ -21,12 +22,6 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
-  // Local editor panel state
-  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
-  const [selectedFunctionForEditor, setSelectedFunctionForEditor] = useState<
-    DatabaseFunction | undefined
-  >()
-
   const { can: canReadFunctions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'functions'
@@ -34,8 +29,19 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
 
   const createFunction = () => {
     if (isInlineEditorEnabled) {
-      setSelectedFunctionForEditor(undefined)
-      setEditorPanelOpen(true)
+      editorPanelState.configure({
+        sql: `create function function_name()
+returns void
+language plpgsql
+as $$
+begin
+  -- Write your function logic here
+end;
+$$;`,
+        label: 'Create new database function',
+        prompt: 'Create a new database function that...',
+      })
+      sidebarManagerState.openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedFunction(undefined)
       setShowCreateFunctionForm(true)
@@ -44,8 +50,12 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
 
   const editFunction = (fn: DatabaseFunction) => {
     if (isInlineEditorEnabled) {
-      setSelectedFunctionForEditor(fn)
-      setEditorPanelOpen(true)
+      editorPanelState.configure({
+        sql: fn.complete_statement,
+        label: `Edit function "${fn.name}"`,
+        prompt: `Update the database function "${fn.name}" to...`,
+      })
+      sidebarManagerState.openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedFunction(fn)
       setShowCreateFunctionForm(true)
@@ -87,40 +97,6 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
         func={selectedFunction}
         visible={showDeleteFunctionForm}
         setVisible={setShowDeleteFunctionForm}
-      />
-
-      <EditorPanel
-        open={editorPanelOpen}
-        onRunSuccess={() => {
-          setEditorPanelOpen(false)
-          setSelectedFunctionForEditor(undefined)
-        }}
-        onClose={() => {
-          setEditorPanelOpen(false)
-          setSelectedFunctionForEditor(undefined)
-        }}
-        initialValue={
-          selectedFunctionForEditor
-            ? selectedFunctionForEditor.complete_statement
-            : `create function function_name()
-returns void
-language plpgsql
-as $$
-begin
-  -- Write your function logic here
-end;
-$$;`
-        }
-        label={
-          selectedFunctionForEditor
-            ? `Edit function "${selectedFunctionForEditor.name}"`
-            : 'Create new database function'
-        }
-        initialPrompt={
-          selectedFunctionForEditor
-            ? `Update the database function "${selectedFunctionForEditor.name}" to...`
-            : 'Create a new database function that...'
-        }
       />
     </>
   )

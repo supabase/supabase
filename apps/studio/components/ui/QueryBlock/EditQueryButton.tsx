@@ -10,6 +10,8 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import Link from 'next/link'
 import { ComponentProps } from 'react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { editorPanelState } from 'state/editor-panel-state'
+import { SIDEBAR_KEYS, sidebarManagerState } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   cn,
@@ -41,7 +43,7 @@ export const EditQueryButton = ({
   const { newQuery } = useNewQuery()
 
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
-  const snap = useAiAssistantStateSnapshot()
+  useAiAssistantStateSnapshot()
 
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
@@ -76,10 +78,11 @@ export const EditQueryButton = ({
       icon={<Edit size={14} strokeWidth={1.5} />}
       onClick={() => {
         if (isInlineEditorEnabled) {
-          // This component needs to be updated to work with local EditorPanel state
-          // For now, fall back to creating a new query
-          if (sql) newQuery(sql, title)
-          snap.closeAssistant()
+          if (sql) {
+            editorPanelState.configure({ sql, label: title })
+            sidebarManagerState.closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+            sidebarManagerState.openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+          }
         } else {
           if (sql) newQuery(sql, title)
         }

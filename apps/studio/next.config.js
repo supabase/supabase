@@ -325,17 +325,17 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/database/linter',
-        destination: '/project/:ref/database/security-advisor',
+        destination: '/project/:ref',
       },
       {
         permanent: true,
         source: '/project/:ref/database/security-advisor',
-        destination: '/project/:ref/advisors/security',
+        destination: '/project/:ref',
       },
       {
         permanent: true,
         source: '/project/:ref/database/performance-advisor',
-        destination: '/project/:ref/advisors/performance',
+        destination: '/project/:ref',
       },
       {
         permanent: true,
