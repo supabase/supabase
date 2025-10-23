@@ -69,12 +69,7 @@ const FormSchema = z.object({
     .optional(),
 })
 
-const CreateFunction = ({
-  func,
-  visible,
-  isDuplicating = false,
-  onClose,
-}: CreateFunctionProps) => {
+const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: CreateFunctionProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
@@ -169,10 +164,7 @@ const CreateFunction = ({
         )}
       >
         <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
-          <CreateFunctionHeader
-            selectedFunction={func?.name}
-            isDuplicating={isDuplicating}
-          />
+          <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
           <Separator />
           <Form_Shadcn_ {...form}>
             <form
