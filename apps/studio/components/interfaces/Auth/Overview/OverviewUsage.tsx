@@ -75,9 +75,9 @@ export const StatCard = ({
         )}
       >
         {loading ? (
-          <div className="flex flex-col gap-0.5">
-            <Skeleton className="h-6 w-24" />
-            <Skeleton className="h-3 w-16" />
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-6 w-20" />
+            <Skeleton className="h-3 w-8" />
           </div>
         ) : (
           <div className="flex flex-col gap-0.5">
