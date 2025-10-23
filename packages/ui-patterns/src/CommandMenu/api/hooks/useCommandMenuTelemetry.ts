@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback } from 'react'
 import { useCommandMenuTelemetryContext } from './useCommandMenuTelemetryContext'
 import { useCommandMenuOpen } from './viewHooks'
