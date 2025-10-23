@@ -16,7 +16,7 @@ import {
   type CommandMenuTelemetryCallback,
 } from './hooks/useCommandMenuTelemetry'
 import { CommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
-import { useSetCommandMenuOpen, useToggleCommandMenu } from './hooks/viewHooks'
+import { useCommandMenuOpen, useSetCommandMenuOpen, useToggleCommandMenu } from './hooks/viewHooks'
 
 const CommandProviderInternal = ({ children }: PropsWithChildren) => {
   const combinedState = useConstant(() => ({
@@ -40,6 +40,7 @@ const CommandShortcut = ({
   onTelemetry?: CommandMenuTelemetryCallback
 }) => {
   const toggleOpen = useToggleCommandMenu()
+  const isOpen = useCommandMenuOpen()
   const { sendTelemetry } = useCommandMenuTelemetry({
     app: app ?? 'studio',
     onTelemetry,
@@ -54,14 +55,14 @@ const CommandShortcut = ({
       if (evt.key === openKey && usesPrimaryModifier && !otherModifiersActive) {
         evt.preventDefault()
         toggleOpen()
-        sendTelemetry('keyboard_shortcut')
+        !isOpen && sendTelemetry('keyboard_shortcut')
       }
     }
 
     document.addEventListener('keydown', handleKeydown)
 
     return () => document.removeEventListener('keydown', handleKeydown)
-  }, [openKey, sendTelemetry, toggleOpen])
+  }, [isOpen, openKey, sendTelemetry, toggleOpen])
 
   return null
 }
