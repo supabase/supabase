@@ -8,18 +8,22 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { NotOrganizationOwnerWarning } from 'components/interfaces/Organization/NewProject'
 import { FreeProjectLimitWarning } from 'components/interfaces/Organization/NewProject/FreeProjectLimitWarning'
 import { OrgNotFound } from 'components/interfaces/Organization/OrgNotFound'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
+import { CloudProviderSelector } from 'components/interfaces/ProjectCreation/CloudProviderSelector'
 import {
   extractPostgresVersionDetails,
   PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
-import { smartRegionToExactRegion } from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
+import {
+  instanceLabel,
+  smartRegionToExactRegion,
+} from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
+import { ProjectCreationFooter } from 'components/interfaces/ProjectCreation/ProjectCreationFooter'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
@@ -52,10 +56,8 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { withAuth } from 'hooks/misc/withAuth'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
-  AWS_REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DOCS_URL,
-  FLY_REGIONS_DEFAULT,
   MANAGED_BY,
   PROJECT_STATUS,
   PROVIDERS,
@@ -78,20 +80,17 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
+/**
+ * [Joshen] This page is getting rather big and complex, let's aim to break this down into smaller components
+ */
+
+export const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
@@ -238,26 +237,6 @@ const Wizard: NextPageWithLayout = () => {
   )
   const hasOutstandingInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
 
-  const {
-    mutate: createProject,
-    isLoading: isCreatingNewProject,
-    isSuccess: isSuccessNewProject,
-  } = useProjectCreateMutation({
-    onSuccess: (res) => {
-      sendEvent({
-        action: 'project_creation_simple_version_submitted',
-        properties: {
-          instanceSize: form.getValues('instanceSize'),
-        },
-        groups: {
-          project: res.ref,
-          organization: res.organization_slug,
-        },
-      })
-      router.push(`/project/${res.ref}/building`)
-    },
-  })
-
   const { data: orgProjectsFromApi } = useOrgProjectsInfiniteQuery({ slug: currentOrg?.slug })
   const allOrgProjects = useMemo(
     () => orgProjectsFromApi?.pages.flatMap((page) => page.projects),
@@ -284,7 +263,7 @@ const Wizard: NextPageWithLayout = () => {
     useOrganizationAvailableRegionsQuery(
       {
         slug: slug,
-        cloudProvider: PROVIDERS[defaultProvider].id,
+        cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
         desiredInstanceSize: instanceSize as DesiredInstanceSize,
       },
       {
@@ -306,8 +285,32 @@ const Wizard: NextPageWithLayout = () => {
         ? availableRegionsData?.recommendations.smartGroup.name
         : _defaultRegion
 
+  const recommendedSmartRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : undefined
+
   const canCreateProject =
     isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel && !hasOutstandingInvoices
+
+  const {
+    mutate: createProject,
+    isLoading: isCreatingNewProject,
+    isSuccess: isSuccessNewProject,
+  } = useProjectCreateMutation({
+    onSuccess: (res) => {
+      sendEvent({
+        action: 'project_creation_simple_version_submitted',
+        properties: {
+          instanceSize: form.getValues('instanceSize'),
+        },
+        groups: {
+          project: res.ref,
+          organization: res.organization_slug,
+        },
+      })
+      router.push(`/project/${res.ref}/building`)
+    },
+  })
 
   const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
@@ -319,19 +322,6 @@ const Wizard: NextPageWithLayout = () => {
     },
     { enabled: currentOrg !== null && !isManagedByVercel }
   )
-
-  // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
-  const monthlyComputeCosts =
-    // current project costs
-    organizationProjects.reduce((prev, acc) => {
-      const primaryDatabase = acc.databases.find((db) => db.identifier === acc.ref)
-      const cost = !!primaryDatabase ? monthlyInstancePrice(primaryDatabase.infra_compute_size) : 0
-      return prev + cost
-    }, 0) +
-    // selected compute size
-    monthlyInstancePrice(instanceSize) -
-    // compute credits
-    10
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
@@ -468,6 +458,12 @@ const Wizard: NextPageWithLayout = () => {
   }, [defaultRegion])
 
   useEffect(() => {
+    if (recommendedSmartRegion) {
+      form.setValue('dbRegion', recommendedSmartRegion)
+    }
+  }, [recommendedSmartRegion])
+
+  useEffect(() => {
     if (regionError) {
       form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
     }
@@ -498,137 +494,13 @@ const Wizard: NextPageWithLayout = () => {
             </div>
           }
           footer={
-            <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center">
-              <div className="col-span-4">
-                {!isFreePlan &&
-                  !projectCreationDisabled &&
-                  canCreateProject &&
-                  additionalMonthlySpend > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span>Additional costs</span>
-                      <div className="text-brand flex gap-1 items-center font-mono font-medium">
-                        <span>${additionalMonthlySpend}/m</span>
-                        <InfoTooltip side="top" className="max-w-[450px] p-0">
-                          <div className="p-4 text-sm text-foreground-light space-y-1">
-                            <p>
-                              Each project includes a dedicated Postgres instance running on its own
-                              server. You are charged for the{' '}
-                              <InlineLink href={`${DOCS_URL}/guides/platform/billing-on-supabase`}>
-                                Compute resource
-                              </InlineLink>{' '}
-                              of that server, independent of your database usage.
-                            </p>
-                            {monthlyComputeCosts > 0 && (
-                              <p>
-                                Compute costs are applied on top of your subscription plan costs.
-                              </p>
-                            )}
-                          </div>
-
-                          <Table className="mt-2">
-                            <TableHeader className="[&_th]:h-7">
-                              <TableRow className="py-2">
-                                <TableHead className="w-[170px]">Project</TableHead>
-                                <TableHead>Compute Size</TableHead>
-                                <TableHead className="text-right">Monthly Costs</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody className="[&_td]:py-2">
-                              {organizationProjects.map((project) => {
-                                const primaryDb = project.databases.find(
-                                  (db) => db.identifier === project.ref
-                                )
-                                return (
-                                  <TableRow key={project.ref} className="text-foreground-light">
-                                    <TableCell className="w-[170px] truncate">
-                                      {project.name}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                      {instanceLabel(primaryDb?.infra_compute_size)}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                      ${monthlyInstancePrice(primaryDb?.infra_compute_size)}
-                                    </TableCell>
-                                  </TableRow>
-                                )
-                              })}
-
-                              <TableRow>
-                                <TableCell className="w-[170px] flex gap-2">
-                                  <span className="truncate">
-                                    {form.getValues('projectName')
-                                      ? form.getValues('projectName')
-                                      : 'New project'}
-                                  </span>
-                                  <Badge size={'small'} variant={'default'}>
-                                    NEW
-                                  </Badge>
-                                </TableCell>
-                                <TableCell className="text-center">
-                                  {instanceLabel(instanceSize)}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                  ${monthlyInstancePrice(instanceSize)}
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                          <PopoverSeparator />
-                          <Table>
-                            <TableHeader className="[&_th]:h-7">
-                              <TableRow>
-                                <TableHead colSpan={2}>Compute Credits</TableHead>
-                                <TableHead colSpan={1} className="text-right">
-                                  -$10
-                                </TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody className="[&_td]:py-2">
-                              <TableRow className="text-foreground">
-                                <TableCell colSpan={2}>
-                                  Total Monthly Compute Costs
-                                  {/**
-                                   * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                                   * Will be adjusted in the future [kevin]
-                                   */}
-                                  {organizationProjects.length > 0 && (
-                                    <p className="text-xs text-foreground-lighter">
-                                      Excluding Read replicas
-                                    </p>
-                                  )}
-                                </TableCell>
-                                <TableCell colSpan={1} className="text-right">
-                                  ${monthlyComputeCosts}
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                        </InfoTooltip>
-                      </div>
-                    </div>
-                  )}
-              </div>
-
-              <div className="flex items-end col-span-8 space-x-2 ml-auto">
-                <Button
-                  type="default"
-                  disabled={isCreatingNewProject || isSuccessNewProject}
-                  onClick={() => {
-                    if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-                    else router.push('/organizations')
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  htmlType="submit"
-                  loading={isCreatingNewProject || isSuccessNewProject}
-                  disabled={!canCreateProject || isCreatingNewProject || isSuccessNewProject}
-                >
-                  Create new project
-                </Button>
-              </div>
-            </div>
+            <ProjectCreationFooter
+              form={form}
+              allProjects={allProjects}
+              canCreateProject={canCreateProject}
+              isCreatingNewProject={isCreatingNewProject}
+              isSuccessNewProject={isSuccessNewProject}
+            />
           }
         >
           <>
@@ -638,7 +510,7 @@ const Wizard: NextPageWithLayout = () => {
               </Panel.Content>
             ) : (
               <div className="divide-y divide-border-muted">
-                <Panel.Content className={['space-y-4'].join(' ')}>
+                <Panel.Content className="space-y-4">
                   {isAdmin && !isInvalidSlug && (
                     <FormField_Shadcn_
                       control={form.control}
@@ -703,52 +575,7 @@ const Wizard: NextPageWithLayout = () => {
                     </Panel.Content>
 
                     {cloudProviderEnabled && showNonProdFields && (
-                      <Panel.Content>
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="cloudProvider"
-                          render={({ field }) => (
-                            <FormItemLayout label="Cloud provider" layout="horizontal">
-                              <Select_Shadcn_
-                                onValueChange={(value) => {
-                                  field.onChange(value)
-                                  form.setValue(
-                                    'dbRegion',
-                                    value === 'FLY'
-                                      ? FLY_REGIONS_DEFAULT.displayName
-                                      : AWS_REGIONS_DEFAULT.displayName
-                                  )
-                                }}
-                                defaultValue={field.value}
-                              >
-                                <FormControl_Shadcn_>
-                                  <SelectTrigger_Shadcn_>
-                                    <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
-                                  </SelectTrigger_Shadcn_>
-                                </FormControl_Shadcn_>
-                                <SelectContent_Shadcn_>
-                                  <SelectGroup_Shadcn_>
-                                    {Object.values(PROVIDERS)
-                                      .filter(
-                                        (provider) =>
-                                          validCloudProviders?.includes(provider.id) ?? true
-                                      )
-                                      .map((providerObj) => {
-                                        const label = providerObj['name']
-                                        const value = providerObj['id']
-                                        return (
-                                          <SelectItem_Shadcn_ key={value} value={value}>
-                                            {label}
-                                          </SelectItem_Shadcn_>
-                                        )
-                                      })}
-                                  </SelectGroup_Shadcn_>
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </Panel.Content>
+                      <CloudProviderSelector form={form} />
                     )}
 
                     {canChooseInstanceSize && (
@@ -1044,20 +871,6 @@ const Wizard: NextPageWithLayout = () => {
       </form>
     </Form_Shadcn_>
   )
-}
-
-/**
- * When launching new projects, they only get assigned a compute size once successfully launched,
- * this might assume wrong compute size, but only for projects being rapidly launched after one another on non-default compute sizes.
- *
- * Needs to be in the API in the future [kevin]
- */
-const monthlyInstancePrice = (instance: string | undefined): number => {
-  return instanceSizeSpecs[instance as DesiredInstanceSize]?.priceMonthly || 10
-}
-
-const instanceLabel = (instance: string | undefined): string => {
-  return instanceSizeSpecs[instance as DesiredInstanceSize]?.label || 'Micro'
 }
 
 const PageLayout = withAuth(({ children }: PropsWithChildren) => {
