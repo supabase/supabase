@@ -163,7 +163,16 @@ export const TriggerSheet = ({
     if (open && isSuccess) {
       form.clearErrors()
 
-      if (isEditing || isDuplicatingTrigger) {
+      if (isDuplicatingTrigger && selectedTrigger) {
+        form.reset(selectedTrigger)
+
+        const initalSelectedTable = tables.find((t) => t.name === selectedTrigger.table)
+        if (initalSelectedTable) {
+          form.setValue('tableId', initalSelectedTable.id.toString())
+          form.setValue('table', initalSelectedTable.name)
+          form.setValue('schema', initalSelectedTable.schema)
+        }
+      } else if (isEditing) {
         form.reset(selectedTrigger)
       } else if (tables.length > 0) {
         form.reset({
@@ -183,9 +192,11 @@ export const TriggerSheet = ({
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
-              {isEditing
-                ? `Edit database trigger: ${selectedTrigger.name}`
-                : 'Create a new database trigger'}
+              {isDuplicatingTrigger
+                ? 'Duplicate trigger'
+                : isEditing
+                  ? `Edit database trigger: ${selectedTrigger.name}`
+                  : 'Create a new database trigger'}
             </SheetTitle>
           </SheetHeader>
 
