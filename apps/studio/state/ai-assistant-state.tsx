@@ -421,28 +421,19 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
   const { data: project } = useSelectedProjectQuery()
   // Initialize state. createAiAssistantState now just sets defaults.
   const [state] = useState(() => createAiAssistantState())
-  const previousProjectRef = useRef<string | undefined>(project?.ref)
 
   // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {
     let isMounted = true
 
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    if (!project?.ref) {
-      // Only reset if we previously had a project ref (e.g., navigating away)
-      if (previousProjectRef.current) {
-        state.resetAiAssistantPanel()
-      }
-      previousProjectRef.current = project?.ref
-      return
-    }
-
-    previousProjectRef.current = project.ref
-
     async function loadAndInitializeState() {
+      if (!project?.ref || typeof window === 'undefined') {
+        if (project?.ref === undefined) {
+          state.resetAiAssistantPanel()
+        }
+        return // Don't load if no projectRef or not in browser
+      }
+
       let loadedState: StoredAiAssistantState | null = null
 
       // 1. Try loading from IndexedDB
