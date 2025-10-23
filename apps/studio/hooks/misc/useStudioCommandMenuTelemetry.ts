@@ -6,7 +6,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import type {
   CommandMenuOpenedEvent,
   CommandMenuCommandSelectedEvent,
-  CommandMenuInputTypedEvent,
+  CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
 
 export function useStudioCommandMenuTelemetry() {
@@ -16,7 +16,10 @@ export function useStudioCommandMenuTelemetry() {
 
   const onTelemetry = useCallback(
     (
-      event: CommandMenuOpenedEvent | CommandMenuCommandSelectedEvent | CommandMenuInputTypedEvent
+      event:
+        | CommandMenuOpenedEvent
+        | CommandMenuCommandSelectedEvent
+        | CommandMenuSearchSubmittedEvent
     ) => {
       // Add studio-specific groups (project and organization)
       const eventWithGroups = {

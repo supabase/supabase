@@ -81,7 +81,7 @@ export interface ConnectionStringCopiedEvent {
      */
     connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -103,7 +103,7 @@ export interface CronJobCreatedEvent {
      */
     schedule: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -125,7 +125,7 @@ export interface CronJobUpdatedEvent {
      */
     schedule: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -137,7 +137,7 @@ export interface CronJobUpdatedEvent {
  */
 export interface CronJobDeletedEvent {
   action: 'cron_job_deleted'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -149,7 +149,7 @@ export interface CronJobDeletedEvent {
  */
 export interface CronJobCreateClickedEvent {
   action: 'cron_job_create_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -161,7 +161,7 @@ export interface CronJobCreateClickedEvent {
  */
 export interface CronJobUpdateClickedEvent {
   action: 'cron_job_update_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -173,7 +173,7 @@ export interface CronJobUpdateClickedEvent {
  */
 export interface CronJobDeleteClickedEvent {
   action: 'cron_job_delete_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -185,7 +185,7 @@ export interface CronJobDeleteClickedEvent {
  */
 export interface CronJobHistoryClickedEvent {
   action: 'cron_job_history_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -204,7 +204,7 @@ export interface FeaturePreviewEnabledEvent {
      */
     feature: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -223,7 +223,7 @@ export interface FeaturePreviewDisabledEvent {
      */
     feature: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -241,7 +241,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
   properties: {
     instanceSize?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -337,7 +337,7 @@ export interface ProjectCreationSecondStepSubmittedEvent {
  */
 export interface RealtimeInspectorListenChannelClickedEvent {
   action: 'realtime_inspector_listen_channel_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -349,7 +349,7 @@ export interface RealtimeInspectorListenChannelClickedEvent {
  */
 export interface RealtimeInspectorBroadcastSentEvent {
   action: 'realtime_inspector_broadcast_sent'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -361,7 +361,7 @@ export interface RealtimeInspectorBroadcastSentEvent {
  */
 export interface RealtimeInspectorMessageClickedEvent {
   action: 'realtime_inspector_message_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -373,7 +373,7 @@ export interface RealtimeInspectorMessageClickedEvent {
  */
 export interface RealtimeInspectorCopyMessageClickedEvent {
   action: 'realtime_inspector_copy_message_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -385,7 +385,7 @@ export interface RealtimeInspectorCopyMessageClickedEvent {
  */
 export interface RealtimeInspectorFiltersAppliedEvent {
   action: 'realtime_inspector_filters_applied'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -397,7 +397,7 @@ export interface RealtimeInspectorFiltersAppliedEvent {
  */
 export interface RealtimeInspectorDatabaseRoleUpdatedEvent {
   action: 'realtime_inspector_database_role_updated'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -419,7 +419,7 @@ export interface RealtimeToggleTableClickedEvent {
      */
     origin: 'tableSidePanel' | 'tableGridHeader'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -437,7 +437,7 @@ export interface SqlEditorQuickstartClickedEvent {
      */
     quickstartName: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -455,7 +455,7 @@ export interface SqlEditorTemplateClickedEvent {
      */
     templateName: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -467,7 +467,7 @@ export interface SqlEditorTemplateClickedEvent {
  */
 export interface SqlEditorResultDownloadCsvClickedEvent {
   action: 'sql_editor_result_download_csv_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -479,7 +479,7 @@ export interface SqlEditorResultDownloadCsvClickedEvent {
  */
 export interface SqlEditorResultCopyMarkdownClickedEvent {
   action: 'sql_editor_result_copy_markdown_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -491,7 +491,7 @@ export interface SqlEditorResultCopyMarkdownClickedEvent {
  */
 export interface SqlEditorResultCopyJsonClickedEvent {
   action: 'sql_editor_result_copy_json_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -502,7 +502,7 @@ export interface SqlEditorResultCopyJsonClickedEvent {
  */
 export interface AssistantPromptSubmittedEvent {
   action: 'assistant_prompt_submitted'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -513,7 +513,7 @@ export interface AssistantPromptSubmittedEvent {
  */
 export interface AssistantDebugSubmittedEvent {
   action: 'assistant_debug_submitted'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -531,7 +531,7 @@ export interface AssistantSuggestionRunQueryClickedEvent {
     queryType: string
     category?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -552,7 +552,7 @@ export interface AssistantSqlDiffHandlerEvaluatedEvent {
      */
     handlerAccepted: boolean
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -570,7 +570,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
     isInSQLEditor: boolean
     isInNewSnippet: boolean
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -582,7 +582,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
  */
 export interface CustomReportAddSQLBlockClicked {
   action: 'custom_report_add_sql_block_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -594,7 +594,7 @@ export interface CustomReportAddSQLBlockClicked {
  */
 export interface CustomReportAssistantSQLBlockAddedEvent {
   action: 'custom_report_assistant_sql_block_added'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -864,7 +864,7 @@ export interface SignInButtonClickedEvent {
  */
 export interface HelpButtonClickedEvent {
   action: 'help_button_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -875,7 +875,7 @@ export interface HelpButtonClickedEvent {
  */
 export interface SendFeedbackButtonClickedEvent {
   action: 'send_feedback_button_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -893,7 +893,7 @@ export interface ExampleProjectCardClickedEvent {
      */
     cardTitle: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -913,7 +913,7 @@ export interface ImportDataButtonClickedEvent {
      */
     tableType: 'New Table' | 'Existing Table'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -925,7 +925,7 @@ export interface ImportDataButtonClickedEvent {
  */
 export interface ImportDataFileDroppedEvent {
   action: 'import_data_dropzone_file_added'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -937,7 +937,7 @@ export interface ImportDataFileDroppedEvent {
  */
 export interface ImportDataAddedEvent {
   action: 'import_data_added'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -949,7 +949,7 @@ export interface ImportDataAddedEvent {
  */
 export interface SqlEditorQueryRunButtonClickedEvent {
   action: 'sql_editor_query_run_button_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1002,7 +1002,7 @@ export interface StudioPricingSidePanelOpenedEvent {
  */
 export interface ReportsDatabaseGrafanaBannerClickedEvent {
   action: 'reports_database_grafana_banner_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1022,7 +1022,7 @@ export interface EdgeFunctionDeployButtonClickedEvent {
      */
     origin: 'functions_editor' | 'functions_ai_assistant'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1034,7 +1034,7 @@ export interface EdgeFunctionDeployButtonClickedEvent {
  */
 export interface EdgeFunctionDeployUpdatesConfirmClickedEvent {
   action: 'edge_function_deploy_updates_confirm_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1055,7 +1055,7 @@ export interface EdgeFunctionAiAssistantButtonClickedEvent {
      */
     origin: 'no_functions_block' | 'secondary_action' | 'functions_editor_chat'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1075,7 +1075,7 @@ export interface EdgeFunctionViaEditorButtonClickedEvent {
      */
     origin: 'no_functions_block' | 'secondary_action'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1096,7 +1096,7 @@ export interface EdgeFunctionTemplateClickedEvent {
      */
     origin: 'functions_page' | 'editor_page'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1116,7 +1116,7 @@ export interface EdgeFunctionViaCliButtonClickedEvent {
      */
     origin: 'no_functions_block' | 'secondary_action'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1128,7 +1128,7 @@ export interface EdgeFunctionViaCliButtonClickedEvent {
  */
 export interface EdgeFunctionDeployUpdatesButtonClickedEvent {
   action: 'edge_function_deploy_updates_button_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1146,7 +1146,7 @@ export interface EdgeFunctionTestSendButtonClickedEvent {
      */
     httpMethod: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1158,7 +1158,7 @@ export interface EdgeFunctionTestSendButtonClickedEvent {
  */
 export interface EdgeFunctionTestSidePanelOpenedEvent {
   action: 'edge_function_test_side_panel_opened'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1173,7 +1173,7 @@ export interface SupportTicketSubmittedEvent {
   properties: {
     ticketCategory: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1186,7 +1186,7 @@ export interface SupportTicketSubmittedEvent {
  */
 export interface AiAssistantInSupportFormClickedEvent {
   action: 'ai_assistant_in_support_form_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1215,7 +1215,7 @@ export interface AssistantMessageRatingSubmittedEvent {
       | 'general_help'
       | 'other'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1265,7 +1265,7 @@ export interface ForeignDataWrapperCreatedEvent {
      */
     wrapperType: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1283,7 +1283,7 @@ export interface StorageBucketCreatedEvent {
      */
     bucketType?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1305,7 +1305,7 @@ export interface BranchCreateButtonClickedEvent {
      */
     gitlessBranching: boolean
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1327,7 +1327,7 @@ export interface BranchDeleteButtonClickedEvent {
      */
     origin: 'branches_page' | 'merge_page'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1346,7 +1346,7 @@ export interface BranchCreateMergeRequestButtonClickedEvent {
     branchType: 'preview' | 'persistent'
     origin: 'header' | 'merge_page' | 'branch_selector'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1358,7 +1358,7 @@ export interface BranchCreateMergeRequestButtonClickedEvent {
  */
 export interface BranchCloseMergeRequestButtonClickedEvent {
   action: 'branch_close_merge_request_button_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1370,7 +1370,7 @@ export interface BranchCloseMergeRequestButtonClickedEvent {
  */
 export interface BranchMergeSubmittedEvent {
   action: 'branch_merge_submitted'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1388,7 +1388,7 @@ export interface BranchMergeSucceededEvent {
      */
     branchType: 'preview' | 'persistent'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1410,7 +1410,7 @@ export interface BranchMergeFailedEvent {
      */
     error?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1430,7 +1430,7 @@ export interface BranchUpdatedEvent {
     source: 'merge_page' | 'out_of_date_notice'
     modifiedEdgeFunctions?: boolean
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1442,7 +1442,7 @@ export interface BranchUpdatedEvent {
  */
 export interface BranchReviewWithAssistantClickedEvent {
   action: 'branch_review_with_assistant_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1480,7 +1480,7 @@ export interface HomeGettingStartedWorkflowClickedEvent {
      */
     is_switch: boolean
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1514,7 +1514,7 @@ export interface HomeGettingStartedStepClickedEvent {
      */
     was_completed: boolean
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1536,7 +1536,7 @@ export interface HomeActivityStatClickedEvent {
      */
     stat_value: number
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1554,7 +1554,7 @@ export interface HomeAdvisorAskAssistantClickedEvent {
      */
     issues_count: number
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1577,7 +1577,7 @@ export interface HomeAdvisorIssueCardClickedEvent {
     issue_name: string
     issues_count: number
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1599,7 +1599,7 @@ export interface HomeAdvisorFixIssueClickedEvent {
      */
     issue_name: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1625,7 +1625,7 @@ export interface HomeProjectUsageServiceClickedEvent {
      */
     error_count: number
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1647,7 +1647,7 @@ export interface HomeProjectUsageChartClickedEvent {
      */
     bar_timestamp: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1669,7 +1669,7 @@ export interface HomeCustomReportBlockAddedEvent {
      */
     position: number
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1687,7 +1687,7 @@ export interface HomeCustomReportBlockRemovedEvent {
      */
     block_id: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1713,7 +1713,7 @@ export interface HomeGettingStartedClosedEvent {
      */
     total_steps: number
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1739,7 +1739,7 @@ export interface HomeSectionRowsMovedEvent {
      */
     new_position: number
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1806,7 +1806,7 @@ export interface TableCreatedEvent {
      */
     table_name?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1832,7 +1832,7 @@ export interface TableDataAddedEvent {
      */
     table_name?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1858,7 +1858,7 @@ export interface TableRLSEnabledEvent {
      */
     table_name?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1876,7 +1876,7 @@ export interface ApiDocsOpenedEvent {
      */
     source: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1898,7 +1898,7 @@ export interface ApiDocsCodeCopyButtonClickedEvent {
      */
     selectedLanguage?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1946,7 +1946,7 @@ export interface AuthUsersSearchSubmittedEvent {
      */
     filter_column?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1968,7 +1968,7 @@ export interface CommandMenuOpenedEvent {
      */
     app: 'studio' | 'docs' | 'www'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -1978,8 +1978,8 @@ export interface CommandMenuOpenedEvent {
  * @source ui-patterns
  * @page any
  */
-export interface CommandMenuInputTypedEvent {
-  action: 'command_menu_input_typed'
+export interface CommandMenuSearchSubmittedEvent {
+  action: 'command_menu_search_submitted'
   properties: {
     /**
      * Search term typed into the command menu input
@@ -1990,7 +1990,7 @@ export interface CommandMenuInputTypedEvent {
      */
     app: 'studio' | 'docs' | 'www'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -2014,7 +2014,7 @@ export interface CommandMenuCommandSelectedEvent {
      */
     app: 'studio' | 'docs' | 'www'
   }
-  groups: Partial<TelemetryGroups>
+  groups: TelemetryGroups
 }
 
 /**
@@ -2132,5 +2132,5 @@ export type TelemetryEvent =
   | TableRLSEnabledEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
-  | CommandMenuInputTypedEvent
+  | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandSelectedEvent

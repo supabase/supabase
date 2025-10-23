@@ -3,11 +3,11 @@ import { useCallback } from 'react'
 import type {
   CommandMenuOpenedEvent,
   CommandMenuCommandSelectedEvent,
-  CommandMenuInputTypedEvent,
+  CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
 
 export type CommandMenuTelemetryCallback = (
-  event: CommandMenuOpenedEvent | CommandMenuCommandSelectedEvent | CommandMenuInputTypedEvent
+  event: CommandMenuOpenedEvent | CommandMenuCommandSelectedEvent | CommandMenuSearchSubmittedEvent
 ) => void
 
 export interface UseCommandMenuTelemetryOptions {

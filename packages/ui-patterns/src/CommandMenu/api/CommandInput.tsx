@@ -5,6 +5,7 @@ import type React from 'react'
 
 import { useBreakpoint, useDebounce } from 'common'
 import { CommandInput_Shadcn_, cn } from 'ui'
+import type { CommandMenuSearchSubmittedEvent } from 'common/telemetry-constants'
 
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
@@ -65,14 +66,14 @@ const CommandInput = forwardRef<
     (value: string) => {
       if (telemetryContext?.onTelemetry) {
         const event = {
-          action: 'command_menu_input_typed' as const,
+          action: 'command_menu_search_submitted' as const,
           properties: {
             value: value,
             app: telemetryContext.app,
           },
           groups: {},
         }
-        telemetryContext.onTelemetry(event)
+        telemetryContext.onTelemetry(event as CommandMenuSearchSubmittedEvent)
       }
     },
     [telemetryContext]
