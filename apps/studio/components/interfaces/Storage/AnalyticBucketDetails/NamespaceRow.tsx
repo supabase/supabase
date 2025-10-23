@@ -1,19 +1,23 @@
-import { Code, Eye, MoreVertical, RefreshCw, Trash2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
-
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { FDW } from 'data/fdw/fdws-query'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
+  ChevronRight,
+  ChevronsLeftRightEllipsis,
+  Code,
+  MoreVertical,
+  Replace,
+  Trash2,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+import {
   Button,
   Card,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
   DropdownMenu,
@@ -26,6 +30,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from 'ui'
 
 type NamespaceRowProps = {
@@ -50,9 +58,6 @@ const TableRowComponent = ({
   schema?: string
 }) => {
   const { data: project } = useSelectedProjectQuery()
-
-  // console.log({ schema })
-  // console.log({ project })
 
   console.log({ tableName, isConnected })
 
@@ -85,30 +90,47 @@ const TableRowComponent = ({
               }`}
             />
           </div>
-          <span className="text-foreground-light">{isConnected ? 'Synced' : 'Needs syncing'}</span>
+          <span className="text-foreground-lighter">{isConnected ? 'Paired' : 'Waiting'}</span>
         </div>
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end">
         {isConnected && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button type="default" className="px-1" icon={<MoreVertical />} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="end" className="w-fit min-w-[180px]">
-              <DropdownMenuItem className="flex items-center space-x-2">
-                <Eye size={12} className="text-foreground-lighter" />
-                <p>View in Table Editor</p>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center space-x-2" onClick={handleQueryTable}>
-                <Code size={12} className="text-foreground-lighter" />
-                <p>Query in SQL Editor</p>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center space-x-2" onClick={handleDeleteTable}>
-                <Trash2 size={12} className="text-foreground-lighter" />
-                <p>Delete table</p>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <>
+            <Button asChild type="default" size="tiny">
+              <Link href={`/project/${project?.ref}/editor/${tableName}`}>
+                <p>View table</p>
+              </Link>
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" className="px-1" icon={<MoreVertical />} />
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent side="bottom" align="end" className="w-fit min-w-[180px]">
+                <DropdownMenuItem
+                  className="flex items-center space-x-2"
+                  onClick={handleQueryTable}
+                >
+                  <Code size={12} className="text-foreground-lighter" />
+                  <p>Query in SQL Editor</p>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="flex items-center space-x-2">
+                  <Link href={`/project/${project?.ref}/database/replication/${tableName}`}>
+                    <Replace size={12} className="text-foreground-lighter" />
+                    <p>View replication status</p>
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  className="flex items-center space-x-2"
+                  onClick={handleDeleteTable}
+                >
+                  <Trash2 size={12} className="text-foreground-lighter" />
+                  <p>Delete table</p>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
         )}
       </TableCell>
     </TableRow>
@@ -162,11 +184,11 @@ export const NamespaceRow = ({
   console.log({ missingTables })
 
   let scanTooltip = useMemo(() => {
-    if (isImportingForeignSchema) return 'Scanning for new tables...'
-    if (isLoadingNamespaceTables) return 'Loading tables...'
+    if (isImportingForeignSchema) return 'Looking for new tables...'
+    if (isLoadingNamespaceTables) return 'Loading new tables...'
     if (missingTables.length > 0)
       return `${missingTables.length} new table${missingTables.length > 1 ? 's' : ''} found`
-    if (tables.length === 0) return 'No tables found'
+    if (tables.length === 0) return 'No new tables found'
     return 'All tables are up to date'
   }, [isImportingForeignSchema, isLoadingNamespaceTables, missingTables.length, tables.length])
 
@@ -181,36 +203,50 @@ export const NamespaceRow = ({
     }))
   }, [tables, missingTables])
 
-  console.log({ allTables })
-
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between items-center px-4 py-5 space-y-0">
-        <div className="flex flex-col gap-y-1">
-          <CardTitle className="text-md font-normal font-sans normal-case leading-none">
-            {namespace}
-          </CardTitle>
+        <CardTitle className="text-sm font-normal font-sans normal-case leading-none flex flex-row items-center gap-x-1">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="flex flex-row items-center gap-x-1 text-foreground-lighter">
+                  {namespace}
+                  <ChevronRight size={12} className="text-foreground-muted" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Source namespace</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {schema && (
-            <CardDescription className="text-foreground-lighter">
-              Target schema “{schema}”
-            </CardDescription>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="text-foreground">{schema}</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {' '}
+                  <p>Destination schema</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
-        </div>
+        </CardTitle>
+
         <div className="flex flex-row gap-x-2">
+          {tables.length > 0 && <p className="text-sm text-foreground-muted">{scanTooltip}</p>}
+
           {missingTables.length > 0 && (
             <Button
               type="default"
               size="tiny"
-              icon={<RefreshCw size={14} />}
+              icon={<ChevronsLeftRightEllipsis size={14} />}
               onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
               loading={isImportingForeignSchema || isLoadingNamespaceTables}
             >
-              Sync
-            </Button>
-          )}
-          {tables.length > 0 && (
-            <Button type="default" size="tiny" icon={<Eye size={14} />}>
-              Table Editor
+              Pair new table{missingTables.length > 1 ? 's' : ''}
             </Button>
           )}
         </div>
@@ -254,11 +290,6 @@ export const NamespaceRow = ({
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}
       />
-      {tables.length > 0 && (
-        <CardFooter className="px-4 py-4 text-sm text-foreground-muted border-t border-border">
-          {scanTooltip ? <p>{scanTooltip}</p> : <ShimmeringLoader className="py-0 w-20" />}
-        </CardFooter>
-      )}
     </Card>
   )
 }

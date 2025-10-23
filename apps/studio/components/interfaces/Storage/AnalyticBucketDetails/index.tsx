@@ -182,14 +182,14 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
               <ScaffoldSection isFullWidth>
                 <ScaffoldHeader className="pt-0 flex flex-row justify-between items-end gap-x-8">
                   <div>
-                    <ScaffoldSectionTitle>Namespaces</ScaffoldSectionTitle>
+                    <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
                     <ScaffoldSectionDescription>
-                      Namespaces and tables connected to this bucket.
+                      Analytic tables stored in this bucket.
                     </ScaffoldSectionDescription>
                   </div>
                   {namespaces.length > 0 && (
                     <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
-                      Add namespace
+                      Connect tables
                     </Button>
                   )}
                 </ScaffoldHeader>
@@ -200,13 +200,13 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
                   <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
                     <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
                     <div className="flex flex-col items-center text-center">
-                      <h3>Add a namespace</h3>
+                      <h3>Connect database tables</h3>
                       <p className="text-foreground-light text-sm">
-                        Then populate it with data using the below connection details.
+                        Stream data from tables for archival, backups, or analytical queries.
                       </p>
                     </div>
                     <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
-                      Add namespace
+                      Connect tables
                     </Button>
                   </aside>
                 ) : (
@@ -233,9 +233,9 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
               <ScaffoldSection isFullWidth>
                 <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
                   <div>
-                    <ScaffoldSectionTitle>Configuration</ScaffoldSectionTitle>
+                    <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
                     <ScaffoldSectionDescription>
-                      Connect to this bucket from an Iceberg client.{' '}
+                      Connect an Iceberg client to this bucket.{' '}
                       <InlineLink
                         href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
                       >
