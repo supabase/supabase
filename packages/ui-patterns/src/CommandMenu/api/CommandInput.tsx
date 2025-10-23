@@ -3,11 +3,13 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
 
-import { useBreakpoint } from 'common'
+import { useBreakpoint, useDebounce } from 'common'
 import { CommandInput_Shadcn_, cn } from 'ui'
 
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
+
+const INPUT_TYPED_EVENT_DEBOUNCE_TIME = 2000 // 2s
 
 function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) {
   const isBelowSm = useBreakpoint('sm')
@@ -57,12 +59,9 @@ const CommandInput = forwardRef<
 
   // Get telemetry context
   const telemetryContext = useCommandMenuTelemetryContext()
-
-  // Debounced telemetry tracking
-  const debounceTimeoutRef = useRef<NodeJS.Timeout>()
   const previousValueRef = useRef<string>(inputValue)
 
-  const logTelemetryEvent = useCallback(
+  const inputTelemetryEvent = useCallback(
     (value: string) => {
       if (telemetryContext?.onTelemetry) {
         const event = {
@@ -79,8 +78,18 @@ const CommandInput = forwardRef<
     [telemetryContext]
   )
 
-  const debouncedLogTelemetry = useCallback(
+  const debouncedTelemetry = useDebounce(
+    useCallback(() => {
+      inputTelemetryEvent(inputValue)
+      previousValueRef.current = inputValue
+    }, [inputTelemetryEvent, inputValue]),
+    INPUT_TYPED_EVENT_DEBOUNCE_TIME
+  )
+
+  const handleValueChange = useCallback(
     (value: string) => {
+      setInputValue(value)
+
       // Only trigger telemetry if the user is adding characters (not removing with backspace)
       const isAddingCharacters = value.length > previousValueRef.current.length
 
@@ -89,30 +98,11 @@ const CommandInput = forwardRef<
         return
       }
 
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current)
-      }
-
-      debounceTimeoutRef.current = setTimeout(() => {
-        logTelemetryEvent(value)
-        previousValueRef.current = value
-      }, 2500)
+      // Trigger debounced telemetry
+      debouncedTelemetry()
     },
-    [logTelemetryEvent]
+    [debouncedTelemetry]
   )
-
-  useEffect(() => {
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current)
-      }
-    }
-  }, [])
-
-  const handleValueChange = (value: string) => {
-    setInputValue(value)
-    debouncedLogTelemetry(value)
-  }
 
   // To handle CJK input
   const [imeComposing, setImeComposing] = useState(false)
