@@ -75,11 +75,12 @@ const defaultValues: z.infer<typeof FormSchema> = {
 
 interface TriggerSheetProps {
   selectedTrigger?: PostgresTrigger
+  isDuplicatingTrigger?: boolean
   open: boolean
-  setOpen: (val: boolean) => void
+  onClose: () => void
 }
 
-export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetProps) => {
+export const TriggerSheet = ({ selectedTrigger, isDuplicatingTrigger, open, onClose }: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
@@ -88,7 +89,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     {
       onSuccess: (res) => {
         toast.success(`Successfully created trigger ${res.name}`)
-        setOpen(false)
+        onClose()
       },
       onError: (error) => {
         toast.error(`Failed to create trigger: ${error.message}`)
@@ -99,7 +100,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     {
       onSuccess: (res) => {
         toast.success(`Successfully updated trigger ${res.name}`)
-        setOpen(false)
+        onClose()
       },
       onError: (error) => {
         toast.error(`Failed to update trigger: ${error.message}`)
@@ -117,7 +118,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
   const tables = data
     .sort((a, b) => a.schema.localeCompare(b.schema))
     .filter((a) => !protectedSchemas.find((s) => s.name === a.schema))
-  const isEditing = !!selectedTrigger
+  const isEditing = !isDuplicatingTrigger && !!selectedTrigger
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -151,7 +152,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     if (open && isSuccess) {
       form.clearErrors()
 
-      if (isEditing) {
+      if (isEditing || isDuplicatingTrigger) {
         form.reset(selectedTrigger)
       } else if (tables.length > 0) {
         form.reset({
@@ -167,7 +168,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
   return (
     <>
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet open={open} onOpenChange={() => onClose()}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
@@ -446,7 +447,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
               type="default"
               htmlType="reset"
               disabled={isCreating || isUpdating}
-              onClick={() => setOpen(false)}
+              onClick={() => onClose()}
             >
               Cancel
             </Button>
