@@ -61,7 +61,7 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
           (data as unknown as T[]).map((row, idx) => (
             <TableRow key={idx}>
               {columns.map((col) => (
-                <TableCell key={String(col.key)} className={cn('py-1.5 px-6', col.className)}>
+                <TableCell key={String(col.key)} className={cn('py-1.5 pl-6 pr-4', col.className)}>
                   {col.render ? col.render(row) : (row as any)[col.key as string]}
                 </TableCell>
               ))}
