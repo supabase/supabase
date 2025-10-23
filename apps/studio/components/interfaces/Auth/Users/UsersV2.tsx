@@ -55,7 +55,7 @@ import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
 
-const SORT_BY_VALUE_COUNT_THRESHOLD = 10
+const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
