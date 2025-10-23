@@ -168,7 +168,6 @@ export const useRegisterSidebar = (
     function hotKeyHandler(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === hotKey && !e.altKey && !e.shiftKey) {
         toggleSidebar(id)
-        console.log('hotKeyHandler', e)
       }
     }
 

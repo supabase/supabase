@@ -462,7 +462,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       ]}
     >
       <div
-        className={cn('flex flex-col h-full"w-full h-[100dvh] md:h-full max-h-[100dvh]', className)}
+        className={cn('flex flex-col h-full w-full h-[100dvh] md:h-full max-h-[100dvh]', className)}
       >
         <AIAssistantHeader
           isChatLoading={isChatLoading}
