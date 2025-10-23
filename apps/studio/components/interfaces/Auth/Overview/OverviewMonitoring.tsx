@@ -8,6 +8,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import {
   fetchTopAuthErrorCodes,
@@ -93,10 +94,10 @@ export const OverviewMonitoring = () => {
   })
 
   const responseErrors: ResponseErrorRow[] = Array.isArray(respErrData?.result)
-    ? (respErrData.result as unknown[]).filter(isResponseErrorRow)
+    ? (respErrData?.result as unknown[]).filter(isResponseErrorRow)
     : []
   const errorCodes: AuthErrorCodeRow[] = Array.isArray(codeErrData?.result)
-    ? (codeErrData.result as unknown[]).filter(isAuthErrorCodeRow)
+    ? (codeErrData?.result as unknown[]).filter(isAuthErrorCodeRow)
     : []
 
   return (
@@ -105,7 +106,7 @@ export const OverviewMonitoring = () => {
         <ScaffoldSectionTitle>Monitoring</ScaffoldSectionTitle>
       </div>
       <ScaffoldSectionContent className="gap-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <StatCard
             title="Auth API Success Rate"
             current={Math.max(0, 100 - metrics.current.apiErrorRate)}
@@ -130,10 +131,10 @@ export const OverviewMonitoring = () => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-foreground-lighter">Auth API Errors</CardTitle>
+            <CardHeader className={cn('border-b-0', responseErrors.length > 0 ? 'pb-4' : 'pb-0')}>
+              <CardTitle className="text-foreground-light">Auth API Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<ResponseErrorRow>
@@ -141,11 +142,11 @@ export const OverviewMonitoring = () => {
                 data={responseErrors}
                 columns={[
                   {
-                    key: 'method',
-                    header: 'Method',
+                    key: 'request',
+                    header: 'Request',
                     className: 'w-[60px]',
                     render: (row) => (
-                      <span className="text-foreground-lighter font-mono bg-background-alternative-200 px-2 py-1 rounded-md">
+                      <span className="font-mono text-xs truncate select-text cursor-text py-1 px-1.5 text-center rounded-md bg-alternative-200">
                         {row.method}
                       </span>
                     ),
@@ -158,15 +159,32 @@ export const OverviewMonitoring = () => {
                       <DataTableColumnStatusCode
                         value={row.status_code}
                         level={getStatusLevel(row.status_code)}
+                        className="text-sm"
                       />
                     ),
                   },
-                  { key: 'path', header: 'Path', className: 'w-full' },
-                  { key: 'count', header: 'Count', className: 'text-right' },
+                  {
+                    key: 'path',
+                    header: 'Path',
+                    className: 'flex-shrink-0 w-52',
+                    render: (row) => (
+                      <div className="line-clamp-1 font-mono text-foreground-light text-xs">
+                        {row.path}
+                      </div>
+                    ),
+                  },
+                  {
+                    key: 'count',
+                    header: 'Count',
+                    className: 'text-right flex-shrink-0 ml-auto justify-end',
+                    render: (row) => (
+                      <div className="text-right text-xs tabular-nums">{row.count}</div>
+                    ),
+                  },
                   {
                     key: 'actions',
                     header: '',
-                    className: 'text-right',
+                    className: 'text-right flex-shrink-0',
                     render: (row) => (
                       <div>
                         <LogsLink href={`/project/${ref}/logs/edge-logs?s=${row.path}`} />
@@ -179,16 +197,32 @@ export const OverviewMonitoring = () => {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-foreground-lighter">Auth Server Errors</CardTitle>
+            <CardHeader className={cn('border-b-0', errorCodes.length > 0 ? 'pb-4' : 'pb-0')}>
+              <CardTitle className="text-foreground-light">Auth Server Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<AuthErrorCodeRow>
                 isLoading={isLoadingCodes || currentLoading || previousLoading}
                 data={errorCodes}
                 columns={[
-                  { key: 'error_code', header: 'Error code', className: 'w-full' },
-                  { key: 'count', header: 'Count', className: 'text-right' },
+                  {
+                    key: 'error_code',
+                    header: 'Error code',
+                    className: 'w-full',
+                    render: (row) => (
+                      <div className="line-clamp-1 font-mono text-foreground uppercase text-xs">
+                        {row.error_code}
+                      </div>
+                    ),
+                  },
+                  {
+                    key: 'count',
+                    header: 'Count',
+                    className: 'text-right',
+                    render: (row) => (
+                      <div className="text-right text-xs tabular-nums">{row.count}</div>
+                    ),
+                  },
                   {
                     key: 'actions',
                     header: '',

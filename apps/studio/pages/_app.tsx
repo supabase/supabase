@@ -48,7 +48,7 @@ import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
-import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState'
+import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
@@ -143,6 +143,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     <title>{appTitle ?? 'Supabase'}</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                     <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
+                    <meta name="googlebot" content="notranslate" />
                     {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
                     <style
                       dangerouslySetInnerHTML={{
