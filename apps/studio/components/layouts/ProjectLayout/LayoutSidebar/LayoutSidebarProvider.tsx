@@ -15,30 +15,28 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const assistantComponent = useCallback(() => <AIAssistant />, [])
   useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, assistantComponent, {}, 'i')
 
-  const router = useRouter()
   const { sidebars } = useSidebarManagerSnapshot()
-  const appliedUrlSidebarRef = useRef<string | null>(null)
+
+  // Set sidebar state initially based on URL query param
+  const router = useRouter()
   const sidebarParamRaw = router.query.sidebar
   const sidebarParam = useMemo(
     () => (typeof sidebarParamRaw === 'string' ? sidebarParamRaw : null),
     [sidebarParamRaw]
   )
-  const registeredSidebar = sidebarParam ? sidebars[sidebarParam] : undefined
 
   useEffect(() => {
     if (!router.isReady) return
 
     if (!sidebarParam) {
-      appliedUrlSidebarRef.current = null
       return
     }
+    const registeredSidebar = sidebars[sidebarParam]
 
     if (!registeredSidebar) return
-    if (appliedUrlSidebarRef.current === sidebarParam) return
 
     sidebarManagerState.openSidebar(sidebarParam)
-    appliedUrlSidebarRef.current = sidebarParam
-  }, [router.isReady, sidebarParam, registeredSidebar])
+  }, [router.isReady, sidebarParam])
 
   return <>{children}</>
 }
