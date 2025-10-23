@@ -1,12 +1,11 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, render, screen, waitFor } from '@testing-library/react'
-import router from 'next-router-mock'
-import { ReactNode } from 'react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
 
 import { LayoutSidebar } from './index'
 import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 import { sidebarManagerState } from 'state/sidebar-manager-state'
+import { render } from 'tests/helpers'
+import { routerMock } from 'tests/lib/route-mock'
 
 vi.mock('components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar">AI Assistant</div>,
@@ -20,32 +19,22 @@ const resetSidebarManagerState = () => {
 }
 
 describe('LayoutSidebar', () => {
-  let queryClient: QueryClient
-  let wrapper: ({ children }: { children: ReactNode }) => ReactNode
-
   beforeEach(() => {
-    queryClient = new QueryClient()
-    wrapper = ({ children }) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    )
-
-    router.setCurrentUrl('/')
+    routerMock.setCurrentUrl('/projects/default')
   })
 
   afterEach(() => {
     resetSidebarManagerState()
-    queryClient.clear()
     localStorage.clear()
     vi.clearAllMocks()
-    router.setCurrentUrl('/')
+    routerMock.setCurrentUrl('/projects/default')
   })
 
   const renderSidebar = () =>
     render(
       <LayoutSidebarProvider>
         <LayoutSidebar />
-      </LayoutSidebarProvider>,
-      { wrapper }
+      </LayoutSidebarProvider>
     )
 
   it('does not render when there is no active sidebar', () => {
@@ -69,7 +58,7 @@ describe('LayoutSidebar', () => {
   })
 
   it('auto-opens when sidebar query param matches a registered sidebar', async () => {
-    router.setCurrentUrl(`/?sidebar=${SIDEBAR_KEYS.AI_ASSISTANT}`)
+    routerMock.setCurrentUrl(`/?sidebar=${SIDEBAR_KEYS.AI_ASSISTANT}`)
 
     renderSidebar()
 
