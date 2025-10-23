@@ -115,14 +115,34 @@ const ObservabilityMenu = () => {
 
   const menuItems = [
     {
-      title: 'Built-in reports',
-      key: 'builtin-reports',
+      title: 'Performance Reports',
+      key: 'performance-reports',
       items: [
         {
           name: 'API Gateway',
           key: 'api-overview',
           url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
         },
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
+        },
+        ...(postgrestReportEnabled
+          ? [
+              {
+                name: 'PostgREST',
+                key: 'postgrest',
+                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
+              },
+            ]
+          : []),
+      ],
+    },
+    {
+      title: 'Product Reports',
+      key: 'product-reports',
+      items: [
         ...(authEnabled
           ? [
               {
@@ -146,20 +166,6 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
-        },
-        ...(postgrestReportEnabled
-          ? [
-              {
-                name: 'PostgREST',
-                key: 'postgrest',
-                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
-              },
-            ]
-          : []),
         ...(realtimeEnabled
           ? [
               {
@@ -169,7 +175,6 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-
         ...(storageEnabled
           ? [
               {
@@ -192,13 +197,13 @@ const ObservabilityMenu = () => {
           <ShimmeringLoader className="w-1/2" />
         </div>
       ) : (
-        <div className="flex flex-col px-2 gap-y-6">
-          {menuItems.map((item) => (
+        <div className="flex flex-col gap-y-6">
+          {menuItems.map((item, idx) => (
             <div key={item.key + '-menu-group'}>
               {item.items ? (
                 <>
                   <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
-                  <div key={item.key} className="flex flex-col">
+                  <div key={item.key} className="flex flex-col px-2 pb-6">
                     {item.items.map((subItem) => (
                       <li
                         key={subItem.key}
@@ -221,6 +226,7 @@ const ObservabilityMenu = () => {
                   </div>
                 </>
               ) : null}
+              {idx !== menuItems.length - 1 && <div className="h-px w-full bg-border-overlay" />}
             </div>
           ))}
         </div>
