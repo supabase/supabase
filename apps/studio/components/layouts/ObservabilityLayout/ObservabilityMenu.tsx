@@ -199,35 +199,37 @@ const ObservabilityMenu = () => {
       ) : (
         <div className="flex flex-col gap-y-6">
           {menuItems.map((item, idx) => (
-            <div key={item.key + '-menu-group'}>
-              {item.items ? (
-                <>
-                  <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
-                  <div key={item.key} className="flex flex-col px-2 pb-6">
-                    {item.items.map((subItem) => (
-                      <li
-                        key={subItem.key}
-                        className={cn(
-                          'pr-2 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-                          'flex items-center justify-between rounded-md group relative',
-                          subItem.key === pageKey
-                            ? 'bg-surface-300 text-foreground'
-                            : 'hover:bg-surface-200'
-                        )}
-                      >
-                        <Link
-                          href={subItem.url}
-                          className="flex-grow h-7 flex justify-between items-center pl-3"
+            <>
+              <div className="h-px w-full bg-border-overlay first:hidden" />
+              <div key={item.key + '-menu-group'}>
+                {item.items ? (
+                  <div className="px-2">
+                    <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
+                    <div key={item.key} className="flex flex-col">
+                      {item.items.map((subItem) => (
+                        <li
+                          key={subItem.key}
+                          className={cn(
+                            'pr-2 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
+                            'flex items-center justify-between rounded-md group relative',
+                            subItem.key === pageKey
+                              ? 'bg-surface-300 text-foreground'
+                              : 'hover:bg-surface-200'
+                          )}
                         >
-                          <span>{subItem.name}</span>
-                        </Link>
-                      </li>
-                    ))}
+                          <Link
+                            href={subItem.url}
+                            className="flex-grow h-7 flex justify-between items-center pl-3"
+                          >
+                            <span>{subItem.name}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </div>
                   </div>
-                </>
-              ) : null}
-              {idx !== menuItems.length - 1 && <div className="h-px w-full bg-border-overlay" />}
-            </div>
+                ) : null}
+              </div>
+            </>
           ))}
         </div>
       )}
