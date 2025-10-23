@@ -146,6 +146,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  const isHomeNew = useFlag('homeNew')
 
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
   const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
@@ -254,7 +255,7 @@ const Wizard: NextPageWithLayout = () => {
           organization: res.organization_slug,
         },
       })
-      router.push(`/project/${res.ref}/building`)
+      router.push(isHomeNew ? `/project/${res.ref}` : `/project/${res.ref}/building`)
     },
   })
 
