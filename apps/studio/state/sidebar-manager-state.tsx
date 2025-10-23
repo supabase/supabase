@@ -155,44 +155,35 @@ export const useRegisterSidebar = (
   handlers: SidebarHandlers = {},
   hotKey?: string
 ) => {
-  const { onOpen, onClose } = handlers
-  const { registerSidebar, unregisterSidebar, toggleSidebar } = sidebarManagerState
   const [isSidebarHotkeyEnabled] = useLocalStorageQuery<boolean>(
     LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(id),
     true
   )
 
   useEffect(() => {
-    registerSidebar(id, component, { onOpen, onClose })
+    const { registerSidebar, unregisterSidebar } = sidebarManagerState
 
-    function hotKeyHandler(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === hotKey && !e.altKey && !e.shiftKey) {
-        toggleSidebar(id)
-      }
-    }
-
-    if (hotKey && isSidebarHotkeyEnabled) {
-      window.addEventListener('keydown', hotKeyHandler)
-    }
-    if (!isSidebarHotkeyEnabled) {
-      window.removeEventListener('keydown', hotKeyHandler)
-    }
+    registerSidebar(id, component, handlers)
 
     return () => {
       unregisterSidebar(id)
-      if (hotKey && isSidebarHotkeyEnabled) {
+    }
+  }, [id])
+
+  useEffect(() => {
+    if (!hotKey) return
+
+    function hotKeyHandler(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === hotKey && !e.altKey && !e.shiftKey) {
+        sidebarManagerState.toggleSidebar(id)
+      }
+    }
+
+    if (isSidebarHotkeyEnabled) {
+      window.addEventListener('keydown', hotKeyHandler)
+      return () => {
         window.removeEventListener('keydown', hotKeyHandler)
       }
     }
-  }, [
-    component,
-    hotKey,
-    id,
-    isSidebarHotkeyEnabled,
-    onClose,
-    onOpen,
-    registerSidebar,
-    unregisterSidebar,
-    toggleSidebar,
-  ])
+  }, [id, hotKey, isSidebarHotkeyEnabled])
 }

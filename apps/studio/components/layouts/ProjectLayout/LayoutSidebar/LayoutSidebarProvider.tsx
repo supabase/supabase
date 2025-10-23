@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
+import { PropsWithChildren, useEffect, useRef } from 'react'
 import {
   sidebarManagerState,
   useRegisterSidebar,
@@ -12,8 +12,7 @@ export const SIDEBAR_KEYS = {
 } as const
 
 export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
-  const assistantComponent = useCallback(() => <AIAssistant />, [])
-  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, assistantComponent, {}, 'i')
+  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, 'i')
 
   const router = useRouter()
   const { sidebars } = useSidebarManagerSnapshot()
