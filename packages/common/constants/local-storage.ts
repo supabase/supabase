@@ -77,7 +77,9 @@ export const LOCAL_STORAGE_KEYS = {
 
   HOTKEY_INLINE_EDITOR: 'supabase-dashboard-hotkey-inline-editor',
   HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
-  HOTKEY_AI_ASSISTANT: 'supabase-dashboard-hotkey-ai-assistant',
+
+  // Project
+  HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
 
   /**
    * COMMON

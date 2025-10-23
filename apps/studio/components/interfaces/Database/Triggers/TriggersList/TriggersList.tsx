@@ -10,6 +10,7 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -17,6 +18,7 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -47,6 +49,7 @@ const TriggersList = ({
 }: TriggersListProps) => {
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
@@ -132,10 +135,10 @@ const TriggersList = ({
                 disabled={!hasTables || !canCreateTriggers}
                 className="px-1 pointer-events-auto"
                 icon={<AiIconAnimation size={16} />}
-                onClick={() =>
+                onClick={() => {
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                   aiSnap.newChat({
                     name: 'Create new trigger',
-                    open: true,
                     initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
                     suggestions: {
                       title:
@@ -156,7 +159,7 @@ const TriggersList = ({
                       ],
                     },
                   })
-                }
+                }}
                 tooltip={{
                   content: {
                     side: 'bottom',

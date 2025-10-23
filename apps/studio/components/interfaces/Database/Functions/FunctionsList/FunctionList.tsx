@@ -4,10 +4,12 @@ import { Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   DropdownMenu,
@@ -37,6 +39,7 @@ const FunctionList = ({
   const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,
@@ -139,9 +142,9 @@ const FunctionList = ({
                         <DropdownMenuItem
                           className="space-x-2"
                           onClick={() => {
+                            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                             aiSnap.newChat({
                               name: `Update function ${x.name}`,
-                              open: true,
                               initialInput: 'Update this function to do...',
                               suggestions: {
                                 title:
