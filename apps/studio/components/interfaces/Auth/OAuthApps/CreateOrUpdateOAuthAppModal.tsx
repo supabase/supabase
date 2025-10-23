@@ -554,8 +554,8 @@ export const CreateOrUpdateOAuthAppModal = ({
           <OAuthAppCredentialsModal
             visible={showCredentialsModal}
             onClose={handleCredentialsModalClose}
-            clientId={generatedCredentials.clientId}
-            clientSecret={generatedCredentials.clientSecret}
+            clientId={generatedCredentials?.clientId}
+            clientSecret={generatedCredentials?.clientSecret}
           />
         )}
       </Fragment>

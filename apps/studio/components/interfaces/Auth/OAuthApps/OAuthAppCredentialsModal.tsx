@@ -4,8 +4,8 @@ import { Admonition } from 'ui-patterns'
 interface OAuthAppCredentialsModalProps {
   visible: boolean
   onClose: () => void
-  clientId: string
-  clientSecret: string
+  clientId?: string
+  clientSecret?: string
 }
 
 const OAuthAppCredentialsModal = ({

@@ -21,7 +21,7 @@ export const DeleteOAuthAppModal = ({
   const { ref: projectRef } = useParams()
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const { data: supabaseClient } = useSupabaseClientQuery({ projectRef })
+  const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
   const { mutateAsync: deleteOAuthApp } = useOAuthServerAppDeleteMutation()
 
@@ -33,7 +33,7 @@ export const DeleteOAuthAppModal = ({
     try {
       await deleteOAuthApp({
         projectRef,
-        supabaseClient,
+        supabaseClient: supabaseClientData?.supabaseClient,
         clientId: selectedApp.client_id,
       })
 

@@ -11,6 +11,7 @@ import { FilterPopover } from 'components/ui/FilterPopover'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
+import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import {
   Badge,
@@ -31,7 +32,7 @@ import {
 } from 'ui'
 import { CreateOrUpdateOAuthAppModal } from './CreateOrUpdateOAuthAppModal'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
-import { RegenerateClientSecretDialog } from './RegenerateClientSecretDialog'
+import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
 
 export const OAUTH_APP_SCOPE_OPTIONS = [
   { name: 'email', value: 'email' },
@@ -51,9 +52,13 @@ const OAuthAppsList = () => {
 
   // State for OAuth apps
   const [showCreateOrUpdateModal, setShowCreateOrUpdateModal] = useState(false)
-  const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
+  const [generatedCredentials, setGeneratedCredentials] = useState<{
+    clientId: string
+    clientSecret: string
+  } | null>(null)
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
   const error = { message: 'Failed to retrieve oauth apps' }
@@ -69,6 +74,8 @@ const OAuthAppsList = () => {
     { enabled: isOAuthServerEnabled }
   )
 
+  const { mutateAsync: regenerateSecret } = useOAuthServerAppRegenerateSecretMutation()
+
   const oAuthApps = data?.clients || []
 
   const handleEditClick = (app: OAuthClient) => {
@@ -79,6 +86,31 @@ const OAuthAppsList = () => {
   const handleDeleteClick = (app: OAuthClient) => {
     setSelectedApp(app)
     setShowDeleteModal(true)
+  }
+
+  const handleRegenerateSecret = async (app: OAuthClient) => {
+    try {
+      const result = await regenerateSecret({
+        projectRef,
+        supabaseClient: supabaseClientData?.supabaseClient,
+        clientId: app.client_id,
+      })
+
+      if (result?.client_secret) {
+        setGeneratedCredentials({
+          clientId: app.client_id,
+          clientSecret: result.client_secret,
+        })
+        setShowCredentialsModal(true)
+      }
+    } catch (error) {
+      console.error('Error regenerating secret:', error)
+    }
+  }
+
+  const handleCredentialsModalClose = () => {
+    setShowCredentialsModal(false)
+    setGeneratedCredentials(null)
   }
 
   const [filterString, setFilterString] = useState<string>('')
@@ -174,9 +206,7 @@ const OAuthAppsList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="name" className="w-1/4">
-                    Name
-                  </TableHead>
+                  <TableHead key="name">Name</TableHead>
                   <TableHead key="table">Client ID</TableHead>
                   <TableHead key="function">Type</TableHead>
                   <TableHead key="function">Scope</TableHead>
@@ -195,18 +225,18 @@ const OAuthAppsList = () => {
                 {oAuthApps.length > 0 &&
                   oAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
-                      <TableCell className="max-w-64 truncate">
+                      <TableCell className="w-52 max-w-52 truncate">
                         <button type="button" onClick={() => handleEditClick(app)}>
                           {app.client_name}
                         </button>
                       </TableCell>
-                      <TableCell className="w-64 max-w-64 truncate" title={app.client_id}>
+                      <TableCell className="w-100 max-w-64 truncate" title={app.client_id}>
                         {app.client_id}
                       </TableCell>
-                      <TableCell className="w-40">
+                      <TableCell className="max-w-40">
                         <Badge>{app.registration_type}</Badge>
                       </TableCell>
-                      <TableCell className="min-w-40">
+                      <TableCell className="max-w-40">
                         {app.scope ? (
                           <Badge key={`${app.client_id}-${app.scope}-badge`}>{app.scope}</Badge>
                         ) : (
@@ -234,10 +264,7 @@ const OAuthAppsList = () => {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="space-x-2"
-                                onClick={() => {
-                                  setSelectedApp(app)
-                                  setShowRegenerateDialog(true)
-                                }}
+                                onClick={() => handleRegenerateSecret(app)}
                               >
                                 <RotateCw size={14} />
                                 <p>Regenerate client secret</p>
@@ -263,15 +290,18 @@ const OAuthAppsList = () => {
 
       <CreateOrUpdateOAuthAppModal
         visible={showCreateOrUpdateModal}
-        onClose={() => setShowCreateOrUpdateModal(false)}
+        onClose={() => {
+          setShowCreateOrUpdateModal(false)
+          setSelectedApp(undefined)
+        }}
         selectedApp={selectedApp}
         onDeleteClick={handleDeleteClick}
       />
-      <RegenerateClientSecretDialog
-        visible={showRegenerateDialog}
-        onClose={() => setShowRegenerateDialog(false)}
-        clientId={selectedApp?.client_id ?? ''}
-        clientSecret={selectedApp?.client_secret ?? ''}
+      <OAuthAppCredentialsModal
+        visible={showCredentialsModal}
+        onClose={handleCredentialsModalClose}
+        clientId={generatedCredentials?.clientId}
+        clientSecret={generatedCredentials?.clientSecret}
       />
       <DeleteOAuthAppModal
         visible={showDeleteModal}
