@@ -67,22 +67,6 @@ export const OverviewMonitoring = () => {
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
 
-  const dummyResponseErrors: ResponseErrorRow[] = [
-    { method: 'POST', path: '/auth/v1/signup', status_code: 422, count: 142 },
-    { method: 'POST', path: '/auth/v1/token', status_code: 400, count: 87 },
-    { method: 'GET', path: '/auth/v1/user', status_code: 401, count: 64 },
-    { method: 'POST', path: '/auth/v1/verify', status_code: 500, count: 23 },
-    { method: 'PUT', path: '/auth/v1/user', status_code: 403, count: 15 },
-  ]
-
-  const dummyErrorCodes: AuthErrorCodeRow[] = [
-    { error_code: 'invalid_credentials', count: 234 },
-    { error_code: 'email_not_confirmed', count: 156 },
-    { error_code: 'user_already_exists', count: 89 },
-    { error_code: 'weak_password', count: 67 },
-    { error_code: 'token_expired', count: 45 },
-  ]
-
   // Success rate metrics (reuse OverviewUsage fetching)
   const { data: currentData, isLoading: currentLoading } = useQuery({
     queryKey: ['auth-metrics', ref, 'current'],
@@ -149,15 +133,13 @@ export const OverviewMonitoring = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
-            <CardHeader
-              className={cn('border-b-0', dummyResponseErrors.length > 0 ? 'pb-4' : 'pb-0')}
-            >
+            <CardHeader className={cn('border-b-0', responseErrors.length > 0 ? 'pb-4' : 'pb-0')}>
               <CardTitle className="text-foreground-light">Auth API Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<ResponseErrorRow>
                 isLoading={isLoadingResp || currentLoading || previousLoading}
-                data={dummyResponseErrors}
+                data={responseErrors}
                 columns={[
                   {
                     key: 'request',
@@ -215,13 +197,13 @@ export const OverviewMonitoring = () => {
           </Card>
 
           <Card>
-            <CardHeader className={cn('border-b-0', dummyErrorCodes.length > 0 ? 'pb-4' : 'pb-0')}>
+            <CardHeader className={cn('border-b-0', errorCodes.length > 0 ? 'pb-4' : 'pb-0')}>
               <CardTitle className="text-foreground-light">Auth Server Errors</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <OverviewTable<AuthErrorCodeRow>
                 isLoading={isLoadingCodes || currentLoading || previousLoading}
-                data={dummyErrorCodes}
+                data={errorCodes}
                 columns={[
                   {
                     key: 'error_code',
