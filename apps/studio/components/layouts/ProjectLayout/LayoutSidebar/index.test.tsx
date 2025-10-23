@@ -1,27 +1,16 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor } from '@testing-library/react'
-import Router from 'next/router'
+import router from 'next-router-mock'
 import { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  LayoutSidebarProvider,
-  SIDEBAR_KEYS,
-} from './LayoutSidebarProvider'
 import { LayoutSidebar } from './index'
+import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 import { sidebarManagerState } from 'state/sidebar-manager-state'
 
 vi.mock('components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar">AI Assistant</div>,
 }))
-
-vi.mock('next/router', async () => {
-  const actual = await vi.importActual<typeof import('next/router')>('next/router')
-  return {
-    ...actual,
-    useRouter: () => Router,
-  }
-})
 
 const resetSidebarManagerState = () => {
   Object.keys(sidebarManagerState.sidebars).forEach((id) => {
@@ -40,21 +29,7 @@ describe('LayoutSidebar', () => {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
-    Object.assign(Router, {
-      isReady: true,
-      query: {},
-      events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
-      push: vi.fn(),
-      replace: vi.fn(),
-      prefetch: vi.fn(),
-      pathname: '/',
-      route: '/',
-      asPath: '/',
-      basePath: '',
-      back: vi.fn(),
-      beforePopState: vi.fn(),
-      reload: vi.fn(),
-    })
+    router.setCurrentUrl('/')
   })
 
   afterEach(() => {
@@ -62,6 +37,7 @@ describe('LayoutSidebar', () => {
     queryClient.clear()
     localStorage.clear()
     vi.clearAllMocks()
+    router.setCurrentUrl('/')
   })
 
   const renderSidebar = () =>
@@ -93,7 +69,7 @@ describe('LayoutSidebar', () => {
   })
 
   it('auto-opens when sidebar query param matches a registered sidebar', async () => {
-    Object.assign(Router, { isReady: true, query: { sidebar: SIDEBAR_KEYS.AI_ASSISTANT } })
+    router.setCurrentUrl(`/?sidebar=${SIDEBAR_KEYS.AI_ASSISTANT}`)
 
     renderSidebar()
 

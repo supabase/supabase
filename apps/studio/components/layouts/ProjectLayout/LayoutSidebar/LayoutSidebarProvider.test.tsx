@@ -3,14 +3,8 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  getSidebarManagerSnapshot,
-  sidebarManagerState,
-} from 'state/sidebar-manager-state'
-import {
-  LayoutSidebarProvider,
-  SIDEBAR_KEYS,
-} from './LayoutSidebarProvider'
+import { getSidebarManagerSnapshot, sidebarManagerState } from 'state/sidebar-manager-state'
+import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 
 vi.mock('components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar" />,

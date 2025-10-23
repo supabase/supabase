@@ -141,7 +141,6 @@ export const AdvisorSection = () => {
                         e.preventDefault()
                         snap.newChat({
                           name: 'Summarize lint',
-                          open: true,
                           initialInput: createLintSummaryPrompt(lint),
                         })
                         if (projectRef && organization?.slug) {
