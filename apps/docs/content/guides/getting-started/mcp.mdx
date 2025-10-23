@@ -39,7 +39,7 @@ To authenticate the MCP server in a CI environment, you can create a personal ac
 
 1. Remember to never connect the MCP server to production data. Supabase MCP is only designed for development and testing purposes. See [Security risks](#security-risks).
 
-1. Navigate to your Supabase [access tokens](https://supabase.com/dashboard/account/tokens) and generate a new token. Name the token based on its purpose, e.g. "My App MCP CI token".
+1. Navigate to your Supabase [access tokens](/dashboard/account/tokens) and generate a new token. Name the token based on its purpose, e.g. "Example App MCP CI token".
 
 1. Pass the token to the `Authorization` header in your MCP server configuration. For example if you are using [Claude Code](https://docs.claude.com/en/docs/claude-code/github-actions), your MCP server configuration might look like this:
 
@@ -67,7 +67,7 @@ If your MCP client requires an OAuth client ID and secret (e.g. Azure API Center
 
 1. Remember to never connect the MCP server to production data. Supabase MCP is only designed for development and testing purposes. See [Security risks](#security-risks).
 
-1. Navigate to your Supabase organization's [OAuth apps](https://supabase.com/dashboard/org/_/apps) and add a new application. Name the app based on its purpose, e.g. "My App MCP".
+1. Navigate to your Supabase organization's [OAuth apps](/dashboard/org/_/apps) and add a new application. Name the app based on its purpose, e.g. "Example App MCP".
 
    Your client should provide you the website URL and callback URL that it expects for the OAuth app. Use these values when creating the OAuth app in Supabase.
 
