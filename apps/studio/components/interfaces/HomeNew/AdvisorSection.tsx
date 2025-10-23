@@ -9,11 +9,13 @@ import {
   LintCategoryBadge,
   lintInfoMap,
 } from 'components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -29,8 +31,6 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 export const AdvisorSection = () => {
   const { ref: projectRef } = useParams()
@@ -73,7 +73,7 @@ export const AdvisorSection = () => {
         },
       })
     }
-  }, [snap, sendEvent, projectRef, organization, totalErrors])
+  }, [sendEvent, openSidebar, projectRef, organization, totalErrors])
 
   const handleCardClick = useCallback(
     (lint: Lint) => {
@@ -142,6 +142,7 @@ export const AdvisorSection = () => {
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
+                        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                         snap.newChat({
                           name: 'Summarize lint',
                           initialInput: createLintSummaryPrompt(lint),
