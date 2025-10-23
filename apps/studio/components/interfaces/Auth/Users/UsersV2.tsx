@@ -100,7 +100,7 @@ export const UsersV2 = () => {
     parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
   )
   const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
-  const [sortByValue, setSortByValue] = useQueryState('id:asc', { defaultValue: 'id:asc' })
+  const [sortByValue, setSortByValue] = useQueryState('sortBy', { defaultValue: 'id:asc' })
   const [sortColumn, sortOrder] = sortByValue.split(':')
   const [selectedColumns, setSelectedColumns] = useQueryState(
     'columns',
@@ -227,6 +227,9 @@ export const UsersV2 = () => {
   const updateStorageFilter = (value: 'id' | 'email' | 'phone' | 'freeform') => {
     setLocalStorageFilter(value)
     setSpecificFilterColumn(value)
+    if (value !== 'freeform') {
+      updateSortByValue('id:asc')
+    }
   }
 
   const updateSortByValue = (value: string) => {
@@ -342,12 +345,16 @@ export const UsersV2 = () => {
 
   // [Joshen] Load URL state for filter column and sort by only once, if no respective values found in URL params
   useEffect(() => {
-    if (isLocalStorageFilterLoaded && isLocalStorageSortByValueLoaded && isCountLoaded) {
+    if (
+      isLocalStorageFilterLoaded &&
+      isLocalStorageSortByValueLoaded &&
+      isCountLoaded &&
+      isCountWithinThresholdForSortBy
+    ) {
       if (specificFilterColumn === 'id' && localStorageFilter !== 'id') {
         setSpecificFilterColumn(localStorageFilter)
       }
-
-      if (isCountWithinThresholdForSortBy) {
+      if (sortByValue === 'id:asc' && localStorageSortByValue !== 'id:asc') {
         setSortByValue(localStorageSortByValue)
       }
     }
