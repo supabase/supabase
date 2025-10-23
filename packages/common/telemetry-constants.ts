@@ -1962,7 +1962,11 @@ export interface CommandMenuOpenedEvent {
     /**
      * The trigger that opened the command menu
      */
-    trigger: 'keyboard_shortcut' | 'search_input'
+    trigger_type: 'keyboard_shortcut' | 'search_input'
+    /**
+     * The location where the command menu was opened
+     */
+    trigger_location?: string
     /**
      * In which app the command input was typed
      */

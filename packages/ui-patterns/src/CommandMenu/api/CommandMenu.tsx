@@ -129,7 +129,7 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
       const event = {
         action: 'command_menu_opened' as const,
         properties: {
-          trigger: 'search_input' as const,
+          trigger_type: 'search_input' as const,
           app: telemetryContext.app,
         },
         groups: {},

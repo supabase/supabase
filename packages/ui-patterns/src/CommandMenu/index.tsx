@@ -16,6 +16,10 @@ export * from './api/hooks/pagesHooks'
 export * from './api/hooks/queryHooks'
 export { useCommandFilterState } from './api/hooks/useCommandFilterState'
 export { useCrossCompatRouter } from './api/hooks/useCrossCompatRouter'
+export {
+  useCommandMenuOpenedTelemetry,
+  useCommandMenuTelemetry,
+} from './api/hooks/useCommandMenuTelemetry'
 export { useHistoryKeys } from './api/hooks/useHistoryKeys'
 export * from './api/hooks/viewHooks'
 export * from './api/utils'
