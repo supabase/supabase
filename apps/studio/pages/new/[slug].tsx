@@ -91,6 +91,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
+// [Joshen] This page is getting rather big and complex, let's aim to break this down into smaller components
+
 const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
@@ -284,7 +286,7 @@ const Wizard: NextPageWithLayout = () => {
     useOrganizationAvailableRegionsQuery(
       {
         slug: slug,
-        cloudProvider: PROVIDERS[defaultProvider].id,
+        cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
         desiredInstanceSize: instanceSize as DesiredInstanceSize,
       },
       {
@@ -295,6 +297,9 @@ const Wizard: NextPageWithLayout = () => {
         refetchOnReconnect: false,
       }
     )
+  const recommendedSmartRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : undefined
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
@@ -472,6 +477,12 @@ const Wizard: NextPageWithLayout = () => {
       form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
     }
   }, [regionError])
+
+  useEffect(() => {
+    if (recommendedSmartRegion) {
+      form.setValue('dbRegion', recommendedSmartRegion)
+    }
+  }, [recommendedSmartRegion])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
