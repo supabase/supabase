@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
 import {
   Button,
   Dialog,
@@ -15,7 +17,12 @@ import {
   DialogTitle,
   DialogTrigger,
   Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { MultiSelector } from 'ui-patterns/multi-select'
+import z from 'zod'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 
 const FormSchema = z
@@ -33,6 +40,7 @@ const FormSchema = z
         (value) => value !== 'public',
         '"public" is a reserved name. Please choose another name'
       ),
+    tables: z.array(z.string()).min(1, 'At least one table is required'),
   })
   .superRefine((data, ctx) => {
     if (!validBucketNameRegex.test(data.name)) {
@@ -57,10 +65,18 @@ export const ConnectTablesDialog = ({}: ConnectTablesDialogProps) => {
   // Temporary loading state before muteAsync is implemented
   const isConnecting = false
   const [visible, setVisible] = useState(false)
+  const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const { data: tables } = useTablesQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+    includeColumns: false,
+  })
 
   const form = useForm<ConnectTablesForm>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { name: '' },
+    defaultValues: { name: '', tables: [] },
   })
 
   const onSubmit: SubmitHandler<ConnectTablesForm> = async (values) => {
@@ -101,15 +117,47 @@ export const ConnectTablesDialog = ({}: ConnectTablesDialogProps) => {
           <DialogTitle>Connect tables</DialogTitle>
         </DialogHeader>
 
-        {/* <DialogSectionSeparator /> */}
+        <DialogSectionSeparator />
 
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-4">
+            <DialogSection className="flex flex-col gap-y-4 flex-grow overflow-visible">
               <p className="text-sm">
                 Select the database tables you would like to send data from. A destination analytics
                 table will be created for each, and data will replicate automatically.
               </p>
+
+              <FormField_Shadcn_
+                control={form.control}
+                name="tables"
+                render={({ field }) => (
+                  <FormItemLayout label="Tables" description="Which tables to send data from">
+                    <FormControl_Shadcn_>
+                      <MultiSelector
+                        values={field.value}
+                        onValuesChange={field.onChange}
+                        disabled={isConnecting}
+                      >
+                        <MultiSelector.Trigger>
+                          <MultiSelector.Input placeholder="Select tables" />
+                        </MultiSelector.Trigger>
+                        <MultiSelector.Content>
+                          <MultiSelector.List>
+                            {tables?.map((table) => (
+                              <MultiSelector.Item
+                                key={`${table.schema}.${table.name}`}
+                                value={`${table.schema}.${table.name}`}
+                              >
+                                {`${table.schema}.${table.name}`}
+                              </MultiSelector.Item>
+                            ))}
+                          </MultiSelector.List>
+                        </MultiSelector.Content>
+                      </MultiSelector>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
             </DialogSection>
           </form>
         </Form_Shadcn_>
