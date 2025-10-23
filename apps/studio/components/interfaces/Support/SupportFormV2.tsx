@@ -8,10 +8,11 @@ import { CLIENT_LIBRARIES } from 'common/constants'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { DialogSectionSeparator, Form_Shadcn_, Separator } from 'ui'
+import { DialogSectionSeparator, Form_Shadcn_ } from 'ui'
 import {
   AffectedServicesSelector,
   CATEGORIES_WITHOUT_AFFECTED_SERVICES,
@@ -19,6 +20,7 @@ import {
 import { AttachmentUploadDisplay, useAttachmentUpload } from './AttachmentUpload'
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
 import { ClientLibraryInfo } from './ClientLibraryInfo'
+import { DashboardLogsToggle } from './DashboardLogsToggle'
 import { MessageField } from './MessageField'
 import { OrganizationSelector } from './OrganizationSelector'
 import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
@@ -33,6 +35,7 @@ import {
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
 } from './SupportForm.utils'
+import { DASHBOARD_LOG_CATEGORIES, uploadDashboardLog } from './dashboard-logs'
 
 const useIsSimplifiedForm = (slug: string) => {
   const simplifiedSupportForm = useFlag('simplifiedSupportForm')
@@ -64,6 +67,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)
 
   const attachmentUpload = useAttachmentUpload()
+  const { mutateAsync: uploadDashboardLogFn } = useGenerateAttachmentURLsMutation()
 
   const { data: commit } = useDeploymentCommitQuery({
     staleTime: 1000 * 60 * 10, // 10 minutes
@@ -86,9 +90,19 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     },
   })
 
-  const onSubmit: SubmitHandler<SupportFormValues> = async (values) => {
+  const onSubmit: SubmitHandler<SupportFormValues> = async (formValues) => {
     dispatch({ type: 'SUBMIT' })
-    const attachments = await attachmentUpload.createAttachments()
+
+    const { attachDashboardLogs: formAttachDashboardLogs, ...values } = formValues
+    const attachDashboardLogs =
+      formAttachDashboardLogs && DASHBOARD_LOG_CATEGORIES.includes(values.category)
+
+    const [attachments, dashboardLogUrl] = await Promise.all([
+      attachmentUpload.createAttachments(),
+      attachDashboardLogs
+        ? uploadDashboardLog({ userId: profile?.gotrue_id, uploadDashboardLogFn })
+        : undefined,
+    ])
 
     const selectedLibrary = values.library
       ? CLIENT_LIBRARIES.find((library) => library.language === values.library)
@@ -111,6 +125,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         attachments,
         error: initialError,
         commit,
+        dashboardLogUrl: dashboardLogUrl?.[0],
       }),
       verified: true,
       tags: ['dashboard-support-form'],
@@ -195,13 +210,21 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         <DialogSectionSeparator />
 
-        <div className="px-6 flex flex-col gap-y-8">
-          {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
-            <>
-              <SupportAccessToggle form={form} />
-              <Separator />
-            </>
-          )}
+        {DASHBOARD_LOG_CATEGORIES.includes(category) && (
+          <>
+            <DashboardLogsToggle form={form} />
+            <DialogSectionSeparator />
+          </>
+        )}
+
+        {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+          <>
+            <SupportAccessToggle form={form} />
+            <DialogSectionSeparator />
+          </>
+        )}
+
+        <div className="px-6 pt-2">
           <SubmitButton
             isSubmitting={state.type === 'submitting'}
             userEmail={respondToEmail}

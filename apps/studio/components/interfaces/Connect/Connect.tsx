@@ -14,6 +14,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { useRouter } from 'next/router'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -32,11 +33,12 @@ import {
   cn,
 } from 'ui'
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
-import { getContentFilePath } from './Connect.utils'
+import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
 
 export const Connect = () => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -83,7 +85,7 @@ export const Connect = () => {
     }
   }
 
-  const [tab, setTab] = useQueryState('tab', parseAsString.withDefault('direct'))
+  const [tab, setTab] = useQueryState('connectTab', parseAsString.withDefault('direct'))
   const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
   const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
   const [queryWith, setQueryWith] = useQueryState('with', parseAsString)
@@ -266,6 +268,20 @@ export const Connect = () => {
 
   useEffect(() => {
     if (!showConnect) return
+    const noConnectTabInUrl = typeof router.query.connectTab === 'undefined'
+    const hasQuery = queryFramework || queryUsing || queryWith
+    const inferred = inferConnectTabFromParentKey(queryFramework)
+
+    if (noConnectTabInUrl && hasQuery && inferred) {
+      setTab(inferred)
+      if (inferred === 'frameworks') setConnectionObject(FRAMEWORKS)
+      if (inferred === 'mobiles') setConnectionObject(MOBILES)
+      if (inferred === 'orms') setConnectionObject(ORMS)
+    }
+  }, [showConnect, router.query.connectTab, queryFramework, queryUsing, queryWith, setTab])
+
+  useEffect(() => {
+    if (!showConnect) return
 
     const newConnectionObject = getConnectionObjectForTab(tab)
     setConnectionObject(newConnectionObject)
@@ -293,7 +309,16 @@ export const Connect = () => {
     if (queryWith) {
       if (grandchild?.key !== queryWith) setQueryWith(grandchild?.key ?? null)
     }
-  }, [showConnect, tab, FRAMEWORKS, queryFramework, queryUsing, queryWith])
+  }, [
+    showConnect,
+    tab,
+    queryFramework,
+    setQueryFramework,
+    queryUsing,
+    setQueryUsing,
+    queryWith,
+    setQueryWith,
+  ])
 
   if (!isActiveHealthy) {
     return (
@@ -333,7 +358,7 @@ export const Connect = () => {
         </DialogHeader>
 
         <Tabs_Shadcn_
-          defaultValue={tab}
+          value={tab}
           onValueChange={(value) => {
             resetQueryStates()
             handleConnectionType(value)
