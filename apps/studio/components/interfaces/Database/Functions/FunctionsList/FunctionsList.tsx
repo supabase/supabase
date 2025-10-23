@@ -32,6 +32,7 @@ import FunctionList from './FunctionList'
 
 interface FunctionsListProps {
   createFunction: () => void
+  duplicateFunction: (fn: PostgresFunction) => void
   editFunction: (fn: PostgresFunction) => void
   deleteFunction: (fn: PostgresFunction) => void
 }
@@ -40,6 +41,7 @@ const FunctionsList = ({
   createFunction = noop,
   editFunction = noop,
   deleteFunction = noop,
+  duplicateFunction = noop,
 }: FunctionsListProps) => {
   const router = useRouter()
   const { search } = useParams()
@@ -199,6 +201,7 @@ const FunctionsList = ({
                   schema={selectedSchema}
                   filterString={filterString}
                   isLocked={isSchemaLocked}
+                  duplicateFunction={duplicateFunction}
                   editFunction={editFunction}
                   deleteFunction={deleteFunction}
                 />

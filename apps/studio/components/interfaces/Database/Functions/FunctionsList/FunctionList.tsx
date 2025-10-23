@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop, sortBy } from 'lodash'
-import { Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
+import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -23,6 +23,7 @@ interface FunctionListProps {
   schema: string
   filterString: string
   isLocked: boolean
+  duplicateFunction: (fn: any) => void
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
 }
@@ -31,6 +32,7 @@ const FunctionList = ({
   schema,
   filterString,
   isLocked,
+  duplicateFunction = noop,
   editFunction = noop,
   deleteFunction = noop,
 }: FunctionListProps) => {
@@ -132,6 +134,7 @@ const FunctionList = ({
                             <p>Client API docs</p>
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
                           <Edit2 size={14} />
                           <p>Edit function</p>
@@ -168,6 +171,13 @@ const FunctionList = ({
                         >
                           <Edit size={14} />
                           <p>Edit function with Assistant</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="space-x-2"
+                          onClick={() => duplicateFunction(x)}
+                        >
+                          <Copy size={14} />
+                          <p>Duplicate function</p>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
