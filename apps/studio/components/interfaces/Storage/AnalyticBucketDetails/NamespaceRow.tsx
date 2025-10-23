@@ -79,8 +79,8 @@ const TableRowComponent = ({
 
   return (
     <TableRow>
-      <TableCell>{tableName}</TableCell>
-      <TableCell colSpan={isConnected ? 1 : 2}>
+      <TableCell className="min-w-[120px]">{tableName}</TableCell>
+      <TableCell colSpan={isConnected ? 1 : 2} className="min-w-[150px]">
         <div className="flex flex-row items-center text-foregroung-lighter">
           <div className="relative mr-2 align-middle w-3 h-3">
             {/* Outer faded dot with pulsing background */}
@@ -109,7 +109,11 @@ const TableRowComponent = ({
             />
           </div>
           <span className="text-foreground-lighter">
-            {isLoading ? 'Pairing...' : isConnected ? 'Paired' : 'Waiting to be paired'}
+            {isLoading && !isConnected
+              ? 'Pairing...'
+              : isConnected
+                ? 'Paired'
+                : 'Waiting to be paired'}
           </span>
         </div>
       </TableCell>
@@ -335,7 +339,7 @@ export const NamespaceRow = ({
                 tableName={name}
                 isConnected={isConnected}
                 schema={schema}
-                isLoading={isLoadingNamespaceTables}
+                isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
                 index={index}
               />
             ))
