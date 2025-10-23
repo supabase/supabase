@@ -81,6 +81,7 @@ export const RealtimeSettings = () => {
       onSuccess: () => {
         form.reset(form.getValues())
         toast.success('Successfully updated realtime settings')
+        setIsConfirmNextModalOpen(false)
       },
     })
 
@@ -138,7 +139,6 @@ export const RealtimeSettings = () => {
       max_payload_size_in_kb: Number(data.max_payload_size_in_kb),
       suspend: data.suspend,
     })
-    setIsConfirmNextModalOpen(false)
   }
 
   return (
@@ -677,6 +677,7 @@ export const RealtimeSettings = () => {
         visible={isConfirmNextModalOpen}
         title="Confirm saving changes"
         confirmLabel="Save changes"
+        loading={isUpdatingConfig}
         onCancel={() => setIsConfirmNextModalOpen(false)}
         onConfirm={() => onConfirmSave()}
       >
