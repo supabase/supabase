@@ -6,7 +6,6 @@ import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo 
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { useBreakpoint } from 'common'
-import type { CommandMenuOpenedEvent } from 'common/telemetry-constants'
 import useDragToClose from 'common/hooks/useDragToClose'
 import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
 
@@ -133,7 +132,7 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
           trigger: 'search_input' as const,
           app: telemetryContext.app,
         },
-        groups: {} as CommandMenuOpenedEvent['groups'],
+        groups: {},
       }
 
       telemetryContext.onTelemetry(event)

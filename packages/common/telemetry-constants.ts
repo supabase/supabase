@@ -864,7 +864,7 @@ export interface SignInButtonClickedEvent {
  */
 export interface HelpButtonClickedEvent {
   action: 'help_button_clicked'
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -875,7 +875,7 @@ export interface HelpButtonClickedEvent {
  */
 export interface SendFeedbackButtonClickedEvent {
   action: 'send_feedback_button_clicked'
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1173,7 +1173,7 @@ export interface SupportTicketSubmittedEvent {
   properties: {
     ticketCategory: string
   }
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1186,7 +1186,7 @@ export interface SupportTicketSubmittedEvent {
  */
 export interface AiAssistantInSupportFormClickedEvent {
   action: 'ai_assistant_in_support_form_clicked'
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1806,7 +1806,7 @@ export interface TableCreatedEvent {
      */
     table_name?: string
   }
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1832,7 +1832,7 @@ export interface TableDataAddedEvent {
      */
     table_name?: string
   }
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1858,7 +1858,7 @@ export interface TableRLSEnabledEvent {
      */
     table_name?: string
   }
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1876,7 +1876,7 @@ export interface ApiDocsOpenedEvent {
      */
     source: string
   }
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1898,7 +1898,7 @@ export interface ApiDocsCodeCopyButtonClickedEvent {
      */
     selectedLanguage?: string
   }
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1968,7 +1968,7 @@ export interface CommandMenuOpenedEvent {
      */
     app: 'studio' | 'docs' | 'www'
   }
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -1990,7 +1990,7 @@ export interface CommandMenuSearchSubmittedEvent {
      */
     app: 'studio' | 'docs' | 'www'
   }
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -2014,7 +2014,7 @@ export interface CommandMenuCommandSelectedEvent {
      */
     app: 'studio' | 'docs' | 'www'
   }
-  groups: TelemetryGroups
+  groups: Partial<TelemetryGroups>
 }
 
 /**

@@ -6,7 +6,6 @@ import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
 import { useCommandMenuTelemetryContext } from '../api/hooks/useCommandMenuTelemetryContext'
 import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 import type { ICommand, IActionCommand, IRouteCommand } from './types'
-import type { CommandMenuCommandSelectedEvent } from 'common/telemetry-constants'
 
 const isActionCommand = (command: ICommand): command is IActionCommand => 'action' in command
 const isRouteCommand = (command: ICommand): command is IRouteCommand => 'route' in command
@@ -72,7 +71,7 @@ const CommandItem = forwardRef<
         groups: {},
       }
 
-      telemetryContext.onTelemetry(event as CommandMenuCommandSelectedEvent)
+      telemetryContext.onTelemetry(event)
     }
 
     // Execute the original command logic
