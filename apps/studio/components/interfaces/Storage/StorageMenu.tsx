@@ -1,14 +1,17 @@
-import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 
-import { useParams } from 'common'
-import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
+import { useFlag, useParams } from 'common'
+import { CreateBucketModal } from 'components/interfaces/Storage/CreateBucketModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Menu } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -16,13 +19,22 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
-import BucketRow from './BucketRow'
+import { BucketRow } from './BucketRow'
 
-const StorageMenu = () => {
+export const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
   const { data: projectDetails } = useSelectedProjectQuery()
   const snap = useStorageExplorerStateSnapshot()
+
+  const showMigrationCallout = useFlag('storageMigrationCallout')
+  const { data: config } = useProjectStorageConfigQuery(
+    { projectRef: ref },
+    { enabled: showMigrationCallout }
+  )
+  const isListV2UpgradeAvailable =
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'main'
+
   const isBranch = projectDetails?.parent_project_ref !== undefined
 
   const [searchText, setSearchText] = useState<string>('')
@@ -155,16 +167,21 @@ const StorageMenu = () => {
                 <p className="truncate">Policies</p>
               </Menu.Item>
             </Link>
-            <Link href={`/project/${ref}/storage/settings`}>
-              <Menu.Item rounded active={page === 'settings'}>
-                <p className="truncate">Settings</p>
-              </Menu.Item>
-            </Link>
+            {IS_PLATFORM && (
+              <Link href={`/project/${ref}/storage/settings`}>
+                <Menu.Item rounded active={page === 'settings'}>
+                  <div className="flex items-center gap-x-2">
+                    <p className="truncate">Settings</p>
+                    {isListV2UpgradeAvailable && (
+                      <InfoTooltip side="right">Upgrade available</InfoTooltip>
+                    )}
+                  </div>
+                </Menu.Item>
+              </Link>
+            )}
           </div>
         </div>
       </Menu>
     </>
   )
 }
-
-export default StorageMenu

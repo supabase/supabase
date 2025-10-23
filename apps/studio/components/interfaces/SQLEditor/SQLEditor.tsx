@@ -676,7 +676,7 @@ export const SQLEditor = () => {
           direction="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <ResizablePanel maxSize={70}>
+          <ResizablePanel defaultSize={50} maxSize={70}>
             <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
@@ -705,6 +705,11 @@ export const SQLEditor = () => {
                           padding: { top: 4 },
                           lineNumbersMinChars: 3,
                         }}
+                        // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
+                        // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
+                        // Error: TextModel got disposed before DiffEditorWidget model got reset
+                        keepCurrentModifiedModel={true}
+                        keepCurrentOriginalModel={true}
                       />
                       {showWidget && (
                         <ResizableAIWidget
@@ -793,7 +798,7 @@ export const SQLEditor = () => {
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel maxSize={70}>
+          <ResizablePanel defaultSize={50} maxSize={70}>
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="animate-spin text-brand" />
@@ -811,7 +816,7 @@ export const SQLEditor = () => {
             )}
           </ResizablePanel>
 
-          <div className="max-h-9">
+          <div className="h-9">
             {results?.rows !== undefined && !isExecuting && (
               <GridFooter className="flex items-center justify-between gap-2">
                 <Tooltip>

@@ -3125,7 +3125,7 @@ functions:
       - name: provider
         isOptional: false
         type: OAuthProvider
-        description: The OAuth provider to use for the user's authentication, for example `Google` or `Github`.
+        description: The OAuth provider to use for the user's authentication, for example `Google` or `GitHub`.
       - name: redirectUrl
         isOptional: true
         type: String?

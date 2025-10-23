@@ -1,8 +1,8 @@
 import lodash from 'lodash'
-import { Registry } from 'shadcn/registry'
+import type { RegistryItem } from 'shadcn/schema'
 const { uniq, uniqBy } = lodash
 
-const registryItemAppend = (item: Registry['items'][number], items: Registry['items']) => {
+const registryItemAppend = (item: RegistryItem, items: RegistryItem[]) => {
   const neededRegDependencies = [
     ...(item.registryDependencies || []),
     ...items.flatMap((i) => i.registryDependencies),

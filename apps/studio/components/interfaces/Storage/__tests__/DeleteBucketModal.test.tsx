@@ -1,15 +1,15 @@
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen, waitFor, fireEvent } from '@testing-library/dom'
+import { faker } from '@faker-js/faker'
+import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { faker } from '@faker-js/faker'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { addAPIMock } from 'tests/lib/msw'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
-import DeleteBucketModal from '../DeleteBucketModal'
 import { render } from 'tests/helpers'
+import { addAPIMock } from 'tests/lib/msw'
 import { routerMock } from 'tests/lib/route-mock'
+import { DeleteBucketModal } from '../DeleteBucketModal'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
@@ -113,7 +113,7 @@ describe(`DeleteBucketModal`, () => {
     const input = screen.getByLabelText(/Type/)
     await userEvent.type(input, `test`)
 
-    const confirmButton = screen.getByRole(`button`, { name: `Delete Bucket` })
+    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
@@ -131,7 +131,7 @@ describe(`DeleteBucketModal`, () => {
     const input = screen.getByLabelText(/Type/)
     await userEvent.type(input, `invalid`)
 
-    const confirmButton = screen.getByRole(`button`, { name: `Delete Bucket` })
+    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
     fireEvent.click(confirmButton)
 
     await waitFor(() => {

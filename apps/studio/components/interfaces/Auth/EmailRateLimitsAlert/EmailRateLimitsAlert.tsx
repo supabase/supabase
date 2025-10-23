@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -20,7 +21,7 @@ export function EmailRateLimitsAlert() {
       <AlertDescription_Shadcn_>
         You're using the built-in email service. The service has rate limits and it's not meant to
         be used for production apps. Check the{' '}
-        <InlineLink href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits">
+        <InlineLink href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}>
           documentation
         </InlineLink>{' '}
         for an up-to-date information on the current rate limits.

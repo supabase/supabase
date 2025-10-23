@@ -2,7 +2,11 @@ import { expect, Page } from '@playwright/test'
 import { env } from '../env.config'
 import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
-import { waitForApiResponse } from '../utils/wait-for-response'
+import {
+  waitForApiResponse,
+  waitForDatabaseToLoad,
+  createApiResponseWaiter,
+} from '../utils/wait-for-response'
 
 const databaseTableName = 'pw_database_table'
 const databaseTableNameNew = 'pw_database_table_new'
@@ -61,13 +65,14 @@ const deleteTable = async (page: Page, tableName: string) => {
   ).toBeVisible()
 }
 
-test.describe('Database', () => {
+test.describe.serial('Database', () => {
   let page: Page
 
   test.beforeAll(async ({ browser, ref }) => {
     page = await browser.newPage()
+    const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
     await page.goto(toUrl(`/project/${ref}/editor`))
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
+    await wait
 
     if ((await page.getByRole('button', { name: `View ${databaseTableName}` }).count()) > 0) {
       await deleteTable(page, databaseTableName)
@@ -77,8 +82,9 @@ test.describe('Database', () => {
   })
 
   test.afterAll(async ({ ref }) => {
+    const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
     await page.goto(toUrl(`/project/${ref}/editor`))
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=entity-types-public-0')
+    await wait
     if ((await page.getByRole('button', { name: `View ${databaseTableName}` }).count()) > 0) {
       await deleteTable(page, databaseTableName)
     }
@@ -86,15 +92,14 @@ test.describe('Database', () => {
 
   test.describe('Schema Visualizer', () => {
     test('actions works as expected', async ({ page, ref }) => {
-      await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-
-      // Wait for schema visualizer to load
-      await waitForApiResponse(
+      const wait = createApiResponseWaiter(
         page,
         'pg-meta',
         ref,
         'tables?include_columns=true&included_schemas=public'
       )
+      await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
+      await wait
 
       // validates table and column exists
       await page.waitForTimeout(500)
@@ -122,12 +127,7 @@ test.describe('Database', () => {
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=auth'
-      )
+      await waitForDatabaseToLoad(page, ref, 'auth')
       await expect(page.getByText('users')).toBeVisible()
       await expect(page.getByText('sso_providers')).toBeVisible()
       await expect(page.getByText('saml_providers')).toBeVisible()
@@ -140,17 +140,16 @@ test.describe('Database', () => {
     })
   })
 
-  test.describe('Tables', () => {
+  test.describe.serial('Tables', () => {
     test('actions works as expected', async ({ page, ref }) => {
-      await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
-
-      // Wait for database tables to be populated
-      await waitForApiResponse(
+      const wait = createApiResponseWaiter(
         page,
         'pg-meta',
         ref,
         'tables?include_columns=true&included_schemas=public'
       )
+      await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
+      await wait
 
       // check new table button is present in public schema
       await expect(page.getByRole('button', { name: 'New table' })).toBeVisible()
@@ -166,12 +165,7 @@ test.describe('Database', () => {
       await page.getByTestId('schema-selector').click()
       await page.getByPlaceholder('Find schema...').fill('auth')
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=auth'
-      )
+      await waitForDatabaseToLoad(page, ref, 'auth')
       await expect(page.getByText('sso_providers')).toBeVisible()
       // check new table button is not present in other schemas
       await expect(page.getByRole('button', { name: 'New table' })).not.toBeVisible()
@@ -187,12 +181,7 @@ test.describe('Database', () => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
 
       // drop database tables if exists
       if ((await page.getByText(databaseTableNameNew, { exact: true }).count()) > 0) {
@@ -229,12 +218,7 @@ test.describe('Database', () => {
 
       // validate table creation
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-create')
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameNew, { exact: true })).toBeVisible()
 
       // edit a new table
@@ -245,12 +229,7 @@ test.describe('Database', () => {
 
       // validate table update
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-update')
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameUpdated, { exact: true })).toBeVisible()
 
       // duplicate table
@@ -262,12 +241,7 @@ test.describe('Database', () => {
 
       // validate table duplicate
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=')
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameDuplicate, { exact: true })).toBeVisible()
 
       // delete tables
@@ -298,16 +272,11 @@ test.describe('Database', () => {
   })
 
   test.describe('Tables columns', () => {
-    test('everything works as expected', async ({ page, ref }) => {
+    test('can view, create, update, delete, and filter table columns', async ({ page, ref }) => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      await waitForDatabaseToLoad(page, ref)
 
       // navigate to table columns
       const databaseRow = page.getByRole('row', { name: databaseTableName })
@@ -367,7 +336,7 @@ test.describe('Database', () => {
     })
   })
 
-  test.describe('Triggers', () => {
+  test.describe.serial('Triggers', () => {
     test('actions works as expected', async ({ page, ref }) => {
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
@@ -422,7 +391,7 @@ test.describe('Database', () => {
       await page.getByRole('checkbox').nth(2).click()
       await page.getByRole('button', { name: 'Choose a function to trigger' }).click()
       await page.getByRole('paragraph').filter({ hasText: 'subscription_check_filters' }).click()
-      await page.getByRole('button', { name: 'Create trigger' }).click()
+      await page.getByRole('button', { name: /^(Create|Save) trigger$/ }).click()
 
       // validate trigger creation
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=trigger-create')
@@ -440,7 +409,7 @@ test.describe('Database', () => {
       await triggerRow.getByRole('button', { name: 'More options' }).click()
       await page.getByRole('menuitem', { name: 'Edit trigger' }).click()
       await page.getByRole('textbox', { name: 'Name of trigger' }).fill(databaseTriggerNameUpdated)
-      await page.getByRole('button', { name: 'Create trigger' }).click()
+      await page.getByRole('button', { name: /^(Create|Save) trigger$/ }).click()
 
       // validate trigger update
       await waitForApiResponse(page, 'pg-meta', ref, 'query?key=trigger-update')
@@ -486,7 +455,6 @@ test.describe('Database', () => {
       await page.getByTestId('schema-selector').click()
       await page.getByPlaceholder('Find schema...').fill('auth')
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-auth')
       await page.waitForTimeout(500)
       expect(page.getByText('sso_providers_pkey')).toBeVisible()
       expect(page.getByText('confirmation_token_idx')).toBeVisible()
@@ -624,12 +592,13 @@ test.describe('Database', () => {
   })
 })
 
-test.describe('Database Enumerated Types', () => {
+test.describe.serial('Database Enumerated Types', () => {
   test('actions works as expected', async ({ page, ref }) => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
     // Wait for database enumerated types to be populated
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=schemas')
+    // await waitForApiResponse(page, 'pg-meta', ref, 'query?key=schemas')
+    await page.waitForLoadState('networkidle')
 
     // create new type button exists in public schema
     await expect(page.getByRole('button', { name: 'Create type' })).toBeVisible()
@@ -638,23 +607,26 @@ test.describe('Database Enumerated Types', () => {
     await page.getByTestId('schema-selector').click()
     await page.getByPlaceholder('Find schema...').fill('auth')
     await page.getByRole('option', { name: 'auth' }).click()
-    expect(page.getByText('factor_type')).toBeVisible()
-    expect(page.getByText('code_challenge_method')).toBeVisible()
+
+    await expect(page.getByText('factor_type')).toBeVisible()
+    await expect(page.getByText('code_challenge_method')).toBeVisible()
     // create new type button does not exist in other schemas
-    expect(page.getByRole('button', { name: 'Create type' })).not.toBeVisible()
+    await expect(page.getByRole('button', { name: 'Create type' })).not.toBeVisible()
 
     // filter by querying
     await page.getByRole('textbox', { name: 'Search for a type' }).fill('code')
-    await page.waitForTimeout(500) // wait for enum types to be loaded
-    expect(page.getByText('factor_type')).not.toBeVisible()
-    expect(page.getByText('code_challenge_method')).toBeVisible()
+    await page.waitForTimeout(1000) // wait for enum types to be loaded
+    await expect(page.getByText('factor_type')).not.toBeVisible()
+    await expect(page.getByText('code_challenge_method')).toBeVisible()
   })
 
   test('CRUD operations works as expected', async ({ page, ref }) => {
+    const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=schemas')
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
     // Wait for database roles list to be populated
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=schemas')
+    await wait
+    // await page.waitForLoadState('networkidle')
 
     // if enum exists, delete it.
     await page.waitForTimeout(500)
@@ -706,12 +678,13 @@ test.describe('Database Enumerated Types', () => {
   })
 })
 
-test.describe('Database Functions', () => {
+test.describe.serial('Database Functions', () => {
   test('actions works as expected', async ({ page, ref }) => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/functions?schema=public`))
 
     // Wait for database functions to be populated
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
+    await page.waitForLoadState('networkidle')
+    // await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
 
     // create a new function button exists in public schema
     await expect(page.getByRole('button', { name: 'Create a new function' })).toBeVisible()
@@ -736,7 +709,8 @@ test.describe('Database Functions', () => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/functions?schema=public`))
 
     // Wait for database functions to be populated
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
+    // await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-functions')
+    await page.waitForLoadState('networkidle')
 
     // delete function if exists
     if ((await page.getByRole('button', { name: databaseFunctionName }).count()) > 0) {
@@ -748,7 +722,7 @@ test.describe('Database Functions', () => {
         .fill(databaseFunctionName)
       await page.getByRole('button', { name: `Delete function ${databaseFunctionName}` }).click()
       await expect(
-        page.getByText(`Successfully removed ${databaseFunctionName}`),
+        page.getByText(`Successfully removed function ${databaseFunctionName}`),
         'Delete confirmation toast should be visible'
       ).toBeVisible({
         timeout: 50000,
@@ -764,7 +738,7 @@ test.describe('Database Functions', () => {
 END;`)
     await page.waitForTimeout(500) // wait for text content to be visible
     expect(await page.getByRole('presentation').textContent()).toBe(`BEGINEND;`)
-    await page.getByRole('button', { name: 'Confirm' }).click()
+    await page.getByRole('button', { name: 'Create function' }).click()
 
     // validate function creation
     await waitForApiResponse(page, 'pg-meta', ref, 'query?key=functions-create')
@@ -782,7 +756,7 @@ END;`)
     await functionRow.getByRole('button', { name: 'More options' }).click()
     await page.getByRole('menuitem', { name: 'Edit function', exact: true }).click()
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionNameUpdated)
-    await page.getByRole('button', { name: 'Confirm' }).click()
+    await page.getByRole('button', { name: 'Save function' }).click()
 
     // validate function update
     await waitForApiResponse(page, 'pg-meta', ref, 'query?key=functions-update')

@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
 import { Loader } from 'lucide-react'
@@ -42,7 +42,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
   const hasChanged = value != contentText
   const animateCss = `transition duration-150`
 
-  const { can: canUpdateDescription } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateDescription } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_QUERY,
     '*'
   )

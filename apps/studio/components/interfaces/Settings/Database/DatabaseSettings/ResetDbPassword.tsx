@@ -9,7 +9,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
@@ -21,7 +21,7 @@ const ResetDbPassword = ({ disabled = false }) => {
   const isProjectActive = useIsProjectActive()
   const { data: project } = useSelectedProjectQuery()
 
-  const { can: canResetDbPassword } = useAsyncCheckProjectPermissions(
+  const { can: canResetDbPassword } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {

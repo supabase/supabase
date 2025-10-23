@@ -14,19 +14,21 @@ import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { InlineEditorPreview } from './InlineEditorPreview'
-import { RealtimeSettingsPreview } from './RealtimeSettingsPreview'
+import { NewStorageUIPreview } from './NewStorageUIPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
+import { SecurityNotificationsPreview } from './SecurityNotificationsPreview'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
 } = {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]: <Branching2Preview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS]: <RealtimeSettingsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]: <AdvisorRulesPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]: <InlineEditorPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]: <NewStorageUIPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]: <SecurityNotificationsPreview />,
 }
 
 const FeaturePreviewModal = () => {
@@ -129,7 +131,7 @@ const FeaturePreviewModal = () => {
           <div className="mt-1 mb-3 flex flex-col items-center gap-y-0.5">
             <p className="text-sm">No feature previews available</p>
             <p className="text-sm text-foreground-light">
-              Have an idea for the dashboard? Let us know via Github Discussions!
+              Have an idea for the dashboard? Let us know via GitHub Discussions!
             </p>
           </div>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
@@ -138,7 +140,7 @@ const FeaturePreviewModal = () => {
               target="_blank"
               rel="noreferrer"
             >
-              Github Discussions
+              GitHub Discussions
             </Link>
           </Button>
         </div>

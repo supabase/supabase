@@ -3,9 +3,12 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
+import { match } from 'path-to-regexp'
+
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
-import { match } from 'path-to-regexp'
+import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
+import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from 'lib/sanitize'
 
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
@@ -48,6 +51,21 @@ Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+  beforeBreadcrumb(breadcrumb, _hint) {
+    const cleanedBreadcrumb = { ...breadcrumb }
+
+    if (cleanedBreadcrumb.category === 'navigation') {
+      if (typeof cleanedBreadcrumb.data?.from === 'string') {
+        cleanedBreadcrumb.data.from = sanitizeUrlHashParams(cleanedBreadcrumb.data.from)
+      }
+      if (typeof cleanedBreadcrumb.data?.to === 'string') {
+        cleanedBreadcrumb.data.to = sanitizeUrlHashParams(cleanedBreadcrumb.data.to)
+      }
+    }
+
+    MIRRORED_BREADCRUMBS.pushBack(cleanedBreadcrumb)
+    return cleanedBreadcrumb
+  },
   beforeSend(event, hint) {
     const consent = hasConsented()
 
@@ -64,7 +82,7 @@ Sentry.init({
       `Failed to construct 'URL': Invalid URL`
     )
     // [Joshen] Similar behaviour for this error from SessionTimeoutModal to control the quota usage
-    const isSessionTimeoutEvent = (hint.originalException as any)?.message.includes(
+    const isSessionTimeoutEvent = (hint.originalException as any)?.message?.includes(
       'Session error detected'
     )
 
@@ -90,6 +108,9 @@ Sentry.init({
       return null
     }
 
+    if (event.breadcrumbs) {
+      event.breadcrumbs = sanitizeArrayOfObjects(event.breadcrumbs) as Sentry.Breadcrumb[]
+    }
     return event
   },
   ignoreErrors: [
@@ -112,7 +133,7 @@ Sentry.init({
     // [Joshen] Seems to be from hcaptcha
     "undefined is not an object (evaluating 'n.chat.setReady')",
     "undefined is not an object (evaluating 'i.chat.setReady')",
-    // [Terry] When users paste in an embedded Github Gist
+    // [Terry] When users paste in an embedded GitHub Gist
     // Error thrown by `sql-formatter` lexer when given invalid input
     // Original format: new Error(`Parse error: Unexpected "${text}" at line ${line} column ${col}`)
     /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
@@ -152,3 +173,6 @@ function standardiseRouterUrl(url: string) {
 
   return finalUrl
 }
+
+// This export will instrument router navigations, and is only relevant if you enable tracing.
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart

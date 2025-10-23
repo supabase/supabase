@@ -2,7 +2,7 @@ import Authentication from 'components/interfaces/Docs/Authentication'
 import Introduction from 'components/interfaces/Docs/Introduction'
 import RpcIntroduction from 'components/interfaces/Docs/Pages/Rpc/Introduction'
 import TablesIntroduction from 'components/interfaces/Docs/Pages/Tables/Introduction'
-import UserManagement from 'components/interfaces/Docs/Pages/UserManagement'
+import { UserManagement } from 'components/interfaces/Docs/Pages/UserManagement'
 
 interface GeneralContentProps {
   page?: string

@@ -3,7 +3,7 @@ import { Globe, Trash } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EmptyListState } from 'components/ui/States'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, Checkbox_Shadcn_ } from 'ui'
 import { ValueContainer } from './ValueContainer'
 
@@ -24,7 +24,7 @@ export const RedirectUrlList = ({
   onSelectRemoveURLs,
   onSelectClearSelection,
 }: RedirectUrlListProps) => {
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -124,7 +124,7 @@ export const RedirectUrlList = ({
         <div
           className={[
             'flex items-center border-overlay bg-studio text-foreground',
-            'justify-center gap-2 rounded border px-6 py-8 text-sm',
+            'justify-center gap-2 rounded-b border px-6 py-8 text-sm',
           ].join(' ')}
         >
           <EmptyListState

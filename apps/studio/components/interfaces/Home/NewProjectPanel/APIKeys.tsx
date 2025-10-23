@@ -9,7 +9,7 @@ import Panel from 'components/ui/Panel'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Input, SimpleCodeBlock } from 'ui'
 
@@ -42,7 +42,10 @@ export const APIKeys = () => {
   ])
 
   const availableLanguages = [
-    ...(javascriptExampleEnabled ? [{ name: 'Javascript', key: 'js' }] : []),
+    {
+      name: javascriptExampleEnabled ? 'Javascript' : 'Typescript',
+      key: 'js',
+    },
     ...(dartExampleEnabled ? [{ name: 'Dart', key: 'dart' }] : []),
   ]
   const [selectedLanguage, setSelectedLanguage] = useState(availableLanguages[0])
@@ -74,7 +77,7 @@ export const APIKeys = () => {
 
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const { can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )

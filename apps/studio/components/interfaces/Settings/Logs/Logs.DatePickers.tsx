@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, Clock, HistoryIcon, XIcon } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Clock, HistoryIcon } from 'lucide-react'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
 
-import { Label } from '@ui/components/shadcn/ui/label'
 import { Badge } from '@ui/components/shadcn/ui/badge'
+import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
-import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import {
   Button,
@@ -20,7 +21,6 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type DatePickerValue = {
   to: string
@@ -29,13 +29,14 @@ export type DatePickerValue = {
   text?: string
 }
 
-interface Props {
+interface LogsDatePickerProps {
   value: DatePickerValue
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
   popoverContentProps?: typeof PopoverContent_Shadcn_
   hideWarnings?: boolean
+  align?: 'start' | 'end' | 'center'
 }
 
 export const LogsDatePicker = ({
@@ -45,7 +46,8 @@ export const LogsDatePicker = ({
   buttonTriggerProps,
   popoverContentProps,
   hideWarnings,
-}: PropsWithChildren<Props>) => {
+  align = 'end',
+}: PropsWithChildren<LogsDatePickerProps>) => {
   const [open, setOpen] = useState(false)
 
   const todayButtonRef = useRef<HTMLButtonElement>(null)
@@ -253,7 +255,7 @@ export const LogsDatePicker = ({
       <PopoverContent_Shadcn_
         className="flex w-full p-0"
         side="bottom"
-        align="end"
+        align={align}
         portal={true}
         {...popoverContentProps}
       >
@@ -389,7 +391,7 @@ export const LogsDatePicker = ({
             />
           </div>
           {isLargeRange && !hideWarnings && (
-            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning-600">
+            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning">
               Large ranges may result in memory errors for <br /> big projects.
             </div>
           )}

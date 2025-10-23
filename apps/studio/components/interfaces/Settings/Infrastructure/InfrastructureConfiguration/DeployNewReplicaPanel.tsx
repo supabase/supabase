@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import {
   calculateIOPSPrice,
@@ -12,6 +13,7 @@ import {
   DISK_PRICING,
   DiskType,
 } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
@@ -26,7 +28,7 @@ import {
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
+import { AWS_REGIONS_DEFAULT, BASE_PATH, DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
@@ -259,7 +261,7 @@ const DeployNewReplicaPanel = ({
               <DocsButton
                 abbrev={false}
                 className="mt-3"
-                href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                href={`${DOCS_URL}/guides/platform/read-replicas#prerequisites`}
               />
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
@@ -287,13 +289,16 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-2">
               <Button type="default">
-                <Link
-                  href={`/support/new?category=Sales&ref=${projectRef}&subject=Enquiry%20on%20read%20replicas&message=Project%20DB%20version:%20${project?.dbVersion}`}
-                  target="_blank"
-                  rel="noreferrer"
+                <SupportLink
+                  queryParams={{
+                    projectRef,
+                    category: SupportCategories.SALES_ENQUIRY,
+                    subject: 'Enquiry on read replicas',
+                    message: `Project DB version: ${project?.dbVersion}`,
+                  }}
                 >
                   Contact support
-                </Link>
+                </SupportLink>
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
@@ -322,7 +327,7 @@ const DeployNewReplicaPanel = ({
                 </Button>
                 <DocsButton
                   abbrev={false}
-                  href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                  href={`${DOCS_URL}/guides/platform/read-replicas#prerequisites`}
                 />
               </div>
             </AlertDescription_Shadcn_>
@@ -363,7 +368,7 @@ const DeployNewReplicaPanel = ({
                 </Button>
                 <DocsButton
                   abbrev={false}
-                  href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
+                  href={`${DOCS_URL}/guides/platform/read-replicas#how-are-read-replicas-made`}
                 />
               </AlertDescription_Shadcn_>
             )}
@@ -443,11 +448,14 @@ const DeployNewReplicaPanel = ({
                   <img
                     alt="region icon"
                     className="w-5 rounded-sm"
-                    src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+                    src={`${BASE_PATH}/img/regions/${region.region}.svg`}
                   />
                 )}
               >
-                {region.name}
+                <p className="flex items-center gap-x-2">
+                  <span>{region.name}</span>
+                  <span className="text-xs text-foreground-lighter font-mono">{region.region}</span>
+                </p>
               </Listbox.Option>
             ))}
           </Listbox>
@@ -541,7 +549,7 @@ const DeployNewReplicaPanel = ({
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/manage-your-usage/read-replicas"
+                href={`${DOCS_URL}/guides/platform/manage-your-usage/read-replicas`}
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"

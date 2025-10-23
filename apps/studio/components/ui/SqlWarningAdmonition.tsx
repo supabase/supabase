@@ -7,32 +7,46 @@ export interface SqlWarningAdmonitionProps {
   onConfirm: () => void
   disabled?: boolean
   className?: string
+  /** Optional override primary message */
+  message?: string
+  /** Optional override secondary message */
+  subMessage?: string
+  /** Optional override labels */
+  cancelLabel?: string
+  confirmLabel?: string
 }
 
-const SqlWarningAdmonition = ({
+export const SqlWarningAdmonition = ({
   warningType,
   onCancel,
   onConfirm,
   disabled = false,
   className,
+  message,
+  subMessage,
+  cancelLabel,
+  confirmLabel,
 }: SqlWarningAdmonitionProps) => {
   return (
     <Admonition
       type="warning"
       className={`mb-0 rounded-none border-0 shrink-0 bg-background-100 ${className}`}
     >
-      <p className="text-xs !mb-1">
-        {warningType === 'hasWriteOperation'
-          ? 'This query contains write operations.'
-          : 'This query involves running a function.'}{' '}
-        Are you sure you want to execute it?
-      </p>
+      {!!message && (
+        <p className="text-xs !mb-1">
+          {`${
+            warningType === 'hasWriteOperation'
+              ? 'This query contains write operations.'
+              : 'This query involves running a function.'
+          } Are you sure you want to execute it?`}
+        </p>
+      )}
       <p className="text-foreground-light text-xs">
-        Make sure you are not accidentally removing something important.
+        {subMessage ?? 'Make sure you are not accidentally removing something important.'}
       </p>
       <div className="flex justify-stretch mt-2 gap-2">
         <Button type="outline" size="tiny" className="w-full flex-1" onClick={onCancel}>
-          Cancel
+          {cancelLabel ?? 'Cancel'}
         </Button>
         <Button
           type="danger"
@@ -41,11 +55,9 @@ const SqlWarningAdmonition = ({
           className="w-full flex-1"
           onClick={onConfirm}
         >
-          Run
+          {confirmLabel ?? 'Run'}
         </Button>
       </div>
     </Admonition>
   )
 }
-
-export default SqlWarningAdmonition

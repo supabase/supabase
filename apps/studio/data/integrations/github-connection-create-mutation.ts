@@ -44,7 +44,7 @@ export const useGitHubConnectionCreateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to create Github connection: ${data.message}`)
+          toast.error(`Failed to create GitHub connection: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

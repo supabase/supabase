@@ -11,17 +11,25 @@ export const generateSettingsMenu = (
   organization?: Organization,
   features?: {
     auth?: boolean
+    authProviders?: boolean
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
+    legacyJwtKeys?: boolean
+    logDrains?: boolean
+    billing?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
   const authEnabled = features?.auth ?? true
+  const authProvidersEnabled = features?.authProviders ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
+  const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
+  const logDrainsEnabled = features?.logDrains ?? true
+  const billingEnabled = features?.billing ?? true
 
   return [
     {
@@ -57,12 +65,16 @@ export const generateSettingsMenu = (
                 url: `/project/${ref}/settings/integrations`,
                 items: [],
               },
-              {
-                name: `Log Drains`,
-                key: `log-drains`,
-                url: `/project/${ref}/settings/log-drains`,
-                items: [],
-              },
+              ...(logDrainsEnabled
+                ? [
+                    {
+                      name: `Log Drains`,
+                      key: `log-drains`,
+                      url: `/project/${ref}/settings/log-drains`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'Data API',
                 key: 'api',
@@ -79,7 +91,9 @@ export const generateSettingsMenu = (
               {
                 name: 'JWT Keys',
                 key: 'jwt',
-                url: `/project/${ref}/settings/jwt`,
+                url: legacyJwtKeysEnabled
+                  ? `/project/${ref}/settings/jwt`
+                  : `/project/${ref}/settings/jwt/signing-keys`,
                 items: [],
                 label: 'NEW',
               },
@@ -97,7 +111,7 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'Alpha',
+          label: 'ALPHA',
         },
       ],
     },
@@ -116,8 +130,11 @@ export const generateSettingsMenu = (
               {
                 name: 'Authentication',
                 key: 'auth',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
+                url: authProvidersEnabled
+                  ? `/project/${ref}/auth/providers`
+                  : `/project/${ref}/auth/policies`,
                 items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },
             ]
           : []),
@@ -149,14 +166,17 @@ export const generateSettingsMenu = (
     {
       title: 'Billing',
       items: [
-        {
-          name: 'Subscription',
-          key: 'subscription',
-          url: `/org/${organization?.slug}/billing`,
-          items: [],
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-        },
-
+        ...(billingEnabled
+          ? [
+              {
+                name: 'Subscription',
+                key: 'subscription',
+                url: `/org/${organization?.slug}/billing`,
+                items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+              },
+            ]
+          : []),
         {
           name: 'Usage',
           key: 'usage',

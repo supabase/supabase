@@ -94,7 +94,7 @@ export const SecurityOptions = ({
           control={form.control}
           render={({ field }) => (
             <>
-              <FormItemLayout className="mt-6" layout={layout} label="Data API Configuration">
+              <FormItemLayout className="mt-6" layout={layout} label="Data API configuration">
                 <FormControl_Shadcn_>
                   <RadioGroupStacked
                     defaultValue={field.value.toString()}
@@ -147,7 +147,7 @@ export const SecurityOptions = ({
         />
       )}
       <p className="text-xs text-foreground-lighter mt-3">
-        These settings can be changed after the project is created via the project's settings
+        These two security options can be changed after your project is created
       </p>
     </>
   )

@@ -10,6 +10,7 @@ import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { auth } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const forgotPasswordSchema = z.object({
@@ -78,6 +79,11 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
         className="flex flex-col pt-4 space-y-4"
         onSubmit={codeForm.handleSubmit(onCodeEntered)}
       >
+        <Admonition
+          type="default"
+          title="Check your email for a reset code"
+          description="You'll receive an email if an account associated with the email address exists"
+        />
         <FormField_Shadcn_
           control={codeForm.control}
           name="code"

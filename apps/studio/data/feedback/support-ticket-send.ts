@@ -1,13 +1,15 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { type UseMutationOptions, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+// End of third-party imports
 
+import type { ExtendedSupportCategories } from 'components/interfaces/Support/Support.constants'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type sendSupportTicketVariables = {
   subject: string
   message: string
-  category: string
+  category: ExtendedSupportCategories
   severity: string
   projectRef?: string
   organizationSlug?: string
@@ -17,6 +19,7 @@ export type sendSupportTicketVariables = {
   allowSupportAccess: boolean
   siteUrl?: string
   additionalRedirectUrls?: string
+  dashboardSentryIssueId?: string
 }
 
 export async function sendSupportTicket({
@@ -32,6 +35,7 @@ export async function sendSupportTicket({
   allowSupportAccess,
   siteUrl,
   additionalRedirectUrls,
+  dashboardSentryIssueId,
 }: sendSupportTicketVariables) {
   const { data, error } = await post('/platform/feedback/send', {
     body: {
@@ -49,10 +53,20 @@ export async function sendSupportTicket({
       affectedServices,
       browserInformation,
       allowSupportAccess,
+      dashboardSentryIssueId,
     },
   })
 
-  if (error) handleError(error, { alwaysCapture: true })
+  if (error) {
+    handleError(error, {
+      alwaysCapture: true,
+      sentryContext: {
+        tags: {
+          dashboardSupportForm: true,
+        },
+      },
+    })
+  }
   return data
 }
 

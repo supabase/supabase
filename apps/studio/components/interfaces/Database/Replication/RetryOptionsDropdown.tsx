@@ -40,7 +40,7 @@ export const RetryOptionsDropdown = ({ tableId, tableName }: RetryOptionsDropdow
   const { mutate: rollbackTable, isLoading: isRollingBack } = useRollbackTableMutation({
     onSuccess: (_, vars) => {
       const { projectRef, pipelineId } = vars
-      toast.success(`Table "${tableName}" rolled back successfully`)
+      toast.success(`Table "${tableName}" rolled back successfully and pipeline is being restarted`)
       startPipeline({ projectRef, pipelineId })
     },
     onError: (error, vars) => {

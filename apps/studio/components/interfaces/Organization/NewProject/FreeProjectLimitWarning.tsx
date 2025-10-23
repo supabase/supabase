@@ -1,18 +1,12 @@
-import Link from 'next/link'
-
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import type { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'
-import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 interface FreeProjectLimitWarningProps {
   membersExceededLimit: MemberWithFreeProjectLimit[]
-  orgSlug: string
 }
 
-const FreeProjectLimitWarning = ({
-  membersExceededLimit,
-  orgSlug,
-}: FreeProjectLimitWarningProps) => {
+export const FreeProjectLimitWarning = ({ membersExceededLimit }: FreeProjectLimitWarningProps) => {
   return (
     <Admonition
       type={'default'}
@@ -36,19 +30,9 @@ const FreeProjectLimitWarning = ({
             projects before you're able to create a free project within this organization.
           </p>
 
-          <div>
-            <Button asChild type="default">
-              <Link
-                href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=freeProjectLimitWarning`}
-              >
-                Upgrade plan
-              </Link>
-            </Button>
-          </div>
+          <UpgradePlanButton source="freeProjectLimitWarning">Upgrade plan</UpgradePlanButton>
         </div>
       }
     />
   )
 }
-
-export default FreeProjectLimitWarning

@@ -1,13 +1,13 @@
-import { useState } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Columns3, Edit2, MoreVertical, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
+import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
+import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
+import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
 import type { Bucket } from 'data/storage/buckets-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
-import DeleteBucketModal from 'components/interfaces/Storage/DeleteBucketModal'
-import EmptyBucketModal from 'components/interfaces/Storage/EmptyBucketModal'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,
@@ -28,11 +28,8 @@ export interface BucketRowProps {
   isSelected: boolean
 }
 
-const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowProps) => {
-  const { can: canUpdateBuckets } = useAsyncCheckProjectPermissions(
-    PermissionAction.STORAGE_WRITE,
-    '*'
-  )
+export const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowProps) => {
+  const { can: canUpdateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const [modal, setModal] = useState<string | null>(null)
   const onClose = () => setModal(null)
 
@@ -47,13 +44,14 @@ const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowPro
       {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}
       <Link
         href={`/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}
-        className={'py-1 px-3 grow'}
+        className="py-1 pl-3 pr-1 flex-grow min-w-0"
       >
         <div className="flex items-center justify-between space-x-2 truncate w-full">
           <p
-            className={`text-sm group-hover:text-foreground transition truncate ${
+            className={cn(
+              'text-sm group-hover:text-foreground transition truncate',
               isSelected ? 'text-foreground' : 'text-foreground-light'
-            }`}
+            )}
             title={bucket.name}
           >
             {bucket.name}
@@ -109,7 +107,7 @@ const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowPro
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <div className="w-7 mr-1" />
+        <div className="min-w-6 mr-1" />
       )}
 
       <EditBucketModal visible={modal === `edit`} bucket={bucket} onClose={onClose} />
@@ -118,5 +116,3 @@ const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowPro
     </div>
   )
 }
-
-export default BucketRow

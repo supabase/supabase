@@ -9,7 +9,7 @@
     "@hono/node-server": "^1.12.2",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.10",
-    "hono": "^4.5.10"
+    "hono": "^4.9.7"
   },
   "devDependencies": {
     "@hono/vite-build": "^1.1.0",

@@ -11,7 +11,7 @@ interface DeleteQueueProps {
   onClose: () => void
 }
 
-const DeleteQueue = ({ queueName, visible, onClose }: DeleteQueueProps) => {
+export const DeleteQueue = ({ queueName, visible, onClose }: DeleteQueueProps) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
 
@@ -58,5 +58,3 @@ const DeleteQueue = ({ queueName, visible, onClose }: DeleteQueueProps) => {
     />
   )
 }
-
-export default DeleteQueue

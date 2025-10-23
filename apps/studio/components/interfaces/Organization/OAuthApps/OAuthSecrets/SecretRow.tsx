@@ -10,7 +10,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { useClientSecretDeleteMutation } from 'data/oauth-secrets/client-secret-delete-mutation'
 import { Secret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -22,7 +22,7 @@ export interface SecretRowProps {
 export const SecretRow = ({ secret, appId }: SecretRowProps) => {
   const { slug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const canManageSecrets = useCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
+  const { can: canManageSecrets } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
 
   const { data } = useClientSecretsQuery({ slug, appId })
   const secrets = data?.client_secrets ?? []

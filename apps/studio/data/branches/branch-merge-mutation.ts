@@ -8,20 +8,14 @@ import { getBranchDiff } from './branch-diff-query'
 import { upsertMigration } from '../database/migration-upsert-mutation'
 
 export type BranchMergeVariables = {
-  id: string
   branchProjectRef: string
   baseProjectRef: string
   migration_version?: string
 }
 
-export async function mergeBranch({
-  id,
-  branchProjectRef,
-  baseProjectRef,
-  migration_version,
-}: BranchMergeVariables) {
+export async function mergeBranch({ branchProjectRef, migration_version }: BranchMergeVariables) {
   // Step 1: Get the diff output from the branch
-  const diffContent = await getBranchDiff({ branchId: id })
+  const diffContent = await getBranchDiff({ branchRef: branchProjectRef })
 
   let migrationCreated = false
 
@@ -41,8 +35,8 @@ export async function mergeBranch({
   }
 
   // Step 3: Call POST /v1/branches/id/merge to merge the branch
-  const { data, error } = await post('/v1/branches/{branch_id}/merge', {
-    params: { path: { branch_id: id } },
+  const { data, error } = await post('/v1/branches/{branch_id_or_ref}/merge', {
+    params: { path: { branch_id_or_ref: branchProjectRef } },
     body: { migration_version },
   })
 
