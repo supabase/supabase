@@ -73,7 +73,11 @@ export const StorageMenu = () => {
 
   return (
     <>
-      <Menu type="pills" className="mt-6 flex flex-grow flex-col">
+      <Menu
+        type="pills"
+        className="pt-6 h-full flex flex-col"
+        ulClassName="flex flex-col flex-grow"
+      >
         <div className="mb-6 mx-5 flex flex-col gap-y-1.5">
           <CreateBucketModal />
 
@@ -106,8 +110,8 @@ export const StorageMenu = () => {
           </InnerSideBarFilters>
         </div>
 
-        <div className="space-y-6">
-          <div className="mx-3">
+        <div className="flex flex-col flex-grow">
+          <div className="flex-grow ml-3 flex flex-col">
             <Menu.Group title={<span className="uppercase font-mono">All buckets</span>} />
 
             {isLoading && (

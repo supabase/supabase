@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { memo, useMemo } from 'react'
+import { memo, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { ListChildComponentProps } from 'react-window'
 import { FixedSizeList as List, areEqual } from 'react-window'
 
@@ -46,6 +46,25 @@ const VirtualizedBucketRow = memo(
 VirtualizedBucketRow.displayName = 'VirtualizedBucketRow'
 
 const BucketListVirtualized = ({ buckets, selectedBucketId, projectRef = '' }: BucketListProps) => {
+  const [listHeight, setListHeight] = useState(500)
+  const sizerRef = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    if (sizerRef.current) {
+      const resizeObserver = new ResizeObserver(([entry]) => {
+        const { height } = entry.contentRect
+        setListHeight(height)
+      })
+
+      resizeObserver.observe(sizerRef.current)
+      setListHeight(sizerRef.current.getBoundingClientRect().height)
+
+      return () => {
+        resizeObserver.disconnect()
+      }
+    }
+  }, [])
+
   const itemData = useMemo<BucketListProps>(
     () => ({
       buckets,
@@ -56,17 +75,19 @@ const BucketListVirtualized = ({ buckets, selectedBucketId, projectRef = '' }: B
   )
 
   return (
-    <List
-      itemCount={buckets.length}
-      itemData={itemData}
-      itemKey={(index) => buckets[index].id}
-      height={500}
-      // itemSize should match the height of BucketRow + any gap/margin
-      itemSize={28}
-      width="100%"
-    >
-      {VirtualizedBucketRow}
-    </List>
+    <div ref={sizerRef} className="flex-grow">
+      <List
+        itemCount={buckets.length}
+        itemData={itemData}
+        itemKey={(index) => buckets[index].id}
+        height={listHeight}
+        // itemSize should match the height of BucketRow + any gap/margin
+        itemSize={28}
+        width="100%"
+      >
+        {VirtualizedBucketRow}
+      </List>
+    </div>
   )
 }
 
@@ -75,7 +96,7 @@ export const BucketList = ({ buckets, selectedBucketId, projectRef = '' }: Bucke
 
   if (numBuckets <= 50) {
     return (
-      <>
+      <div className="mr-3 mb-6">
         {buckets.map((bucket) => (
           <BucketRow
             key={bucket.id}
@@ -85,7 +106,7 @@ export const BucketList = ({ buckets, selectedBucketId, projectRef = '' }: Bucke
             className={BUCKET_ROW_HEIGHT}
           />
         ))}
-      </>
+      </div>
     )
   }
 
