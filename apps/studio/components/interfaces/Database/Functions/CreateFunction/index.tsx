@@ -73,8 +73,6 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
   const { data: project } = useSelectedProjectQuery()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
-  // For now, there's no AI assistant for functions
-  const [assistantVisible, setAssistantVisible] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
   const isEditing = !isDuplicating && !!func?.id
@@ -156,14 +154,10 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
     <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
       <SheetContent
         showClose={false}
-        size={assistantVisible ? 'lg' : 'default'}
-        className={cn(
-          // 'bg-surface-200',
-          'p-0 flex flex-row gap-0',
-          assistantVisible ? '!min-w-screen lg:!min-w-[1200px]' : '!min-w-screen lg:!min-w-[600px]'
-        )}
+        size={'default'}
+        className={'p-0 flex flex-row gap-0 !min-w-screen lg:!min-w-[600px]'}
       >
-        <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
+        <div className="flex flex-col grow w-full">
           <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
           <Separator />
           <Form_Shadcn_ {...form}>
@@ -402,11 +396,6 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
             </Button>
           </SheetFooter>
         </div>
-        {assistantVisible ? (
-          <div className="border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10 w-[50%] bg-studio">
-            {/* This is where the AI assistant would be added */}
-          </div>
-        ) : null}
         <ConfirmationModal
           visible={isClosingPanel}
           title="Discard changes"
