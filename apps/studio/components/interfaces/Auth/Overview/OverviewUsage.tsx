@@ -3,10 +3,20 @@ import {
   ScaffoldSectionTitle,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  cn,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
-import { ChevronRight, ExternalLink } from 'lucide-react'
+import { ChevronRight, ExternalLink, HelpCircle } from 'lucide-react'
 import { Reports } from 'icons'
 import {
   getChangeColor,
@@ -28,6 +38,7 @@ export const StatCard = ({
   suffix = '',
   invert = false,
   href,
+  tooltip,
 }: {
   title: string
   current: number
@@ -36,6 +47,7 @@ export const StatCard = ({
   suffix?: string
   invert?: boolean
   href?: string
+  tooltip?: string
 }) => {
   const router = useRouter()
   const isZeroChange = previous === 0
@@ -53,7 +65,19 @@ export const StatCard = ({
   return (
     <Card className={cn(href, 'mb-0 flex flex-col')}>
       <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative">
-        <CardTitle className="text-foreground-light">{title}</CardTitle>
+        <CardTitle className="text-foreground-light flex items-center gap-2">
+          {title}
+          {tooltip && (
+            <Tooltip>
+              <TooltipTrigger>
+                <HelpCircle className="text-foreground-light" size={14} strokeWidth={1.5} />
+              </TooltipTrigger>
+              <TooltipContent className="w-[300px]">
+                <p>{tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </CardTitle>
         <ButtonTooltip
           type="text"
           size="tiny"
@@ -160,11 +184,12 @@ export const OverviewUsage = () => {
       <ScaffoldSectionContent className="gap-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <StatCard
-            title="Active users"
+            title="Auth Activity" // https://supabase.slack.com/archives/C08N7894QTG/p1761210058358439?thread_ts=1761147906.491599&cid=C08N7894QTG
             current={metrics.current.activeUsers}
             previous={activeUsersChange}
             loading={isLoading}
             href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
+            tooltip="Users who generated any Auth event in this period. This metric tracks authentication activity, not total product usage. Some active users won't appear here if their session stayed valid."
           />
           <StatCard
             title="Sign ups"
