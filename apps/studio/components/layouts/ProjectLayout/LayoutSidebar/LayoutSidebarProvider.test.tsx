@@ -10,6 +10,16 @@ vi.mock('components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar" />,
 }))
 
+vi.mock('hooks/misc/useLocalStorage', () => ({
+  useLocalStorageQuery: () => [true, () => {}],
+}))
+
+vi.mock('common/constants', () => ({
+  LOCAL_STORAGE_KEYS: {
+    HOTKEY_SIDEBAR: (id: string) => `hotkey-sidebar-${id}`,
+  },
+}))
+
 const resetSidebarManagerState = () => {
   Object.keys(sidebarManagerState.sidebars).forEach((id) => {
     sidebarManagerState.unregisterSidebar(id)
