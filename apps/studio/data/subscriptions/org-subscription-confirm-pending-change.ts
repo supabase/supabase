@@ -65,7 +65,8 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
       const { slug } = variables
 
       // Handle 202 Accepted - show toast and skip query invalidation
-      if (data && 'message' in data && !('slug' in data)) {
+      // The 200 success response returns void, so if data exists it must be 202
+      if (data && 'message' in data) {
         const pendingResponse = data as components['schemas']['PendingConfirmationResponse']
         toast.success(pendingResponse.message, {
           dismissible: true,
