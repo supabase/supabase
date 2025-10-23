@@ -1,4 +1,5 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import type { UseQueryOptions } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { get, handleError } from 'data/fetchers'
@@ -39,5 +40,16 @@ export const useAWSAccountsQuery = <TData = AWSAccountsData>(
   useQuery<AWSAccountsData, AWSAccountsError, TData>(
     awsAccountKeys.list(projectRef),
     ({ signal }) => getAWSAccounts({ projectRef }, signal),
-    { enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined', ...options }
+    {
+      enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined',
+      refetchInterval: (data) => {
+        // Poll every 5 seconds if any accounts are in transitional states
+        const accounts = data as unknown as AWSAccount[]
+        const hasTransitionalStates = accounts?.some(
+          (account: AWSAccount) => account.status === 'CREATING' || account.status === 'DELETING'
+        )
+        return hasTransitionalStates ? 5000 : false
+      },
+      ...options,
+    }
   )
