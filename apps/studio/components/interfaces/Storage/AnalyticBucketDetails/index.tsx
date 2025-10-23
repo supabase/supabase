@@ -1,8 +1,3 @@
-import { snakeCase, uniq } from 'lodash'
-import { Plus, SquarePlus } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
-
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
@@ -34,9 +29,14 @@ import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-cr
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { snakeCase, uniq } from 'lodash'
+import { SquarePlus } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ConnectTablesDialog } from '../ConnectTablesDialog'
 import { DeleteBucketModal } from '../DeleteBucketModal'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
@@ -187,11 +187,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
                       Analytics tables stored in this bucket
                     </ScaffoldSectionDescription>
                   </div>
-                  {namespaces.length > 0 && (
-                    <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
-                      Connect tables
-                    </Button>
-                  )}
+                  {namespaces.length > 0 && <ConnectTablesDialog />}
                 </ScaffoldHeader>
 
                 {isLoadingNamespaces || isFDWsLoading ? (
@@ -205,9 +201,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
                         Stream data from tables for archival, backups, or analytical queries.
                       </p>
                     </div>
-                    <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
-                      Connect tables
-                    </Button>
+                    <ConnectTablesDialog />
                   </aside>
                 ) : (
                   <div className="flex flex-col gap-y-10">
