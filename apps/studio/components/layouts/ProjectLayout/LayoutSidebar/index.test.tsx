@@ -6,6 +6,7 @@ import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
 import { sidebarManagerState } from 'state/sidebar-manager-state'
 import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
+import { ResizablePanel, ResizablePanelGroup } from 'ui'
 
 vi.mock('components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar">AI Assistant</div>,
@@ -32,9 +33,14 @@ describe('LayoutSidebar', () => {
 
   const renderSidebar = () =>
     render(
-      <LayoutSidebarProvider>
-        <LayoutSidebar />
-      </LayoutSidebarProvider>
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel>
+          <div />
+        </ResizablePanel>
+        <LayoutSidebarProvider>
+          <LayoutSidebar />
+        </LayoutSidebarProvider>
+      </ResizablePanelGroup>
     )
 
   it('does not render when there is no active sidebar', () => {
