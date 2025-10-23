@@ -164,14 +164,14 @@ export const TriggerSheet = ({
       form.clearErrors()
 
       if (isDuplicatingTrigger && selectedTrigger) {
-        form.reset(selectedTrigger)
-
         const initalSelectedTable = tables.find((t) => t.name === selectedTrigger.table)
-        if (initalSelectedTable) {
-          form.setValue('tableId', initalSelectedTable.id.toString())
-          form.setValue('table', initalSelectedTable.name)
-          form.setValue('schema', initalSelectedTable.schema)
-        }
+
+        form.reset({
+          ...selectedTrigger,
+          tableId: initalSelectedTable?.id.toString(),
+          table: initalSelectedTable?.name,
+          schema: initalSelectedTable?.schema,
+        })
       } else if (isEditing) {
         form.reset(selectedTrigger)
       } else if (tables.length > 0) {
