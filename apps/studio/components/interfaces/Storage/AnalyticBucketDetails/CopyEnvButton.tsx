@@ -34,7 +34,7 @@ export const CopyEnvButton = ({
     ).then((values) => values.join('\n'))
 
     copyToClipboard(envFile, () => {
-      toast.success('Copied to clipboard as .env file')
+      toast.success('Copied to clipboard as environment variables')
       setIsLoading(false)
     })
   }, [serverOptions, values])
