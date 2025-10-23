@@ -15,6 +15,7 @@
     "lint": "eslint .",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/migrate.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "postinstall": "pnpm rebuild sharp",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "vercel-build": "pnpm migrate && pnpm build",
     "typecheck_IGNORED": "tsc --noEmit"
