@@ -40,6 +40,7 @@ import {
   TRIGGER_ORIENTATIONS,
   TRIGGER_TYPES,
 } from './Triggers.constants'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const formId = 'create-trigger'
 
@@ -88,6 +89,7 @@ export const TriggerSheet = ({
 }: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
 
+  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
   const { mutate: createDatabaseTrigger, isLoading: isCreating } = useDatabaseTriggerCreateMutation(
@@ -133,6 +135,10 @@ export const TriggerSheet = ({
   })
   const { function_name, function_schema } = form.watch()
 
+  function isClosingSidePanel() {
+    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
+  }
+
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
     const { tableId, ...payload } = values
@@ -173,7 +179,7 @@ export const TriggerSheet = ({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={() => onClose()}>
+      <Sheet open={open} onOpenChange={() => isClosingSidePanel()}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
@@ -460,6 +466,22 @@ export const TriggerSheet = ({
               {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>
+
+          <ConfirmationModal
+            visible={isClosingPanel}
+            title="Discard changes"
+            confirmLabel="Discard"
+            onCancel={() => setIsClosingPanel(false)}
+            onConfirm={() => {
+              setIsClosingPanel(false)
+              onClose()
+            }}
+          >
+            <p className="text-sm text-foreground-light">
+              There are unsaved changes. Are you sure you want to close the panel? Your changes will
+              be lost.
+            </p>
+          </ConfirmationModal>
         </SheetContent>
       </Sheet>
 

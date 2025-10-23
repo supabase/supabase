@@ -58,11 +58,16 @@ const TriggersPage: NextPageWithLayout = () => {
   const duplicateTrigger = (trigger: PostgresTrigger) => {
     setIsDuplicatingTrigger(true)
 
+    const dupTrigger = {
+      ...trigger,
+      name: `${trigger.name}_duplicate`,
+    }
+
     if (isInlineEditorEnabled) {
-      setSelectedTriggerForEditor(trigger)
+      setSelectedTriggerForEditor(dupTrigger)
       setEditorPanelOpen(true)
     } else {
-      setSelectedTrigger(trigger)
+      setSelectedTrigger(dupTrigger)
       setShowCreateTriggerForm(true)
     }
   }
