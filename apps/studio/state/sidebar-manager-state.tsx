@@ -27,7 +27,7 @@ type SidebarManagerState = SidebarManagerData & {
   unregisterSidebar: (id: string) => void
   openSidebar: (id: string) => void
   toggleSidebar: (id: string) => void
-  close: (id: string) => void
+  closeSidebar: (id: string) => void
   isSidebarOpen: (id: string) => boolean
   closeAll: () => void
 }
@@ -117,7 +117,7 @@ const createSidebarManagerState = () => {
       panel.onOpen?.()
     },
 
-    close(id: string) {
+    closeSidebar(id: string) {
       if (state.activeSidebar?.id !== id) return
 
       const panel = state.sidebars[id]

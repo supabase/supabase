@@ -29,6 +29,8 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 export const AdvisorSection = () => {
   const { ref: projectRef } = useParams()
@@ -36,6 +38,7 @@ export const AdvisorSection = () => {
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
@@ -57,7 +60,7 @@ export const AdvisorSection = () => {
   }, [totalErrors])
 
   const handleAskAssistant = useCallback(() => {
-    snap.toggleAssistant()
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     if (projectRef && organization?.slug) {
       sendEvent({
         action: 'home_advisor_ask_assistant_clicked',
