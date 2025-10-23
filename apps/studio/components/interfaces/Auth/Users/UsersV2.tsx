@@ -146,7 +146,7 @@ export const UsersV2 = () => {
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
   const [showFreeformWarning, setShowFreeformWarning] = useState(false)
 
-  const { data: countData, isSuccess: isCountLoaded } = useUsersCountQuery(
+  const { data: totalUsersCountData, isSuccess: isCountLoaded } = useUsersCountQuery(
     {
       projectRef,
       connectionString: project?.connectionString,
@@ -160,7 +160,7 @@ export const UsersV2 = () => {
     },
     { keepPreviousData: true }
   )
-  const totalUsers = countData?.count ?? 0
+  const totalUsers = totalUsersCountData?.count ?? 0
   const isCountWithinThresholdForSortBy = totalUsers <= SORT_BY_VALUE_COUNT_THRESHOLD
 
   const {
