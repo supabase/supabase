@@ -50,8 +50,9 @@ const FORM_ID = 'create-function-sidepanel'
 
 interface CreateFunctionProps {
   func?: DatabaseFunction
+  isDuplicating?: boolean
   visible: boolean
-  setVisible: (value: boolean) => void
+  onClose: () => void
 }
 
 const FormSchema = z.object({
@@ -68,7 +69,12 @@ const FormSchema = z.object({
     .optional(),
 })
 
-const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
+const CreateFunction = ({
+  func,
+  visible,
+  isDuplicating = false,
+  onClose,
+}: CreateFunctionProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
@@ -76,7 +82,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   const [assistantVisible, setAssistantVisible] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
-  const isEditing = !!func?.id
+  const isEditing = !isDuplicating && !!func?.id
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -89,7 +95,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     useDatabaseFunctionUpdateMutation()
 
   function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
+    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
@@ -111,7 +117,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully updated function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -125,7 +131,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully created function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -165,8 +171,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
           <CreateFunctionHeader
             selectedFunction={func?.name}
-            assistantVisible={assistantVisible}
-            setAssistantVisible={setAssistantVisible}
+            isDuplicating={isDuplicating}
           />
           <Separator />
           <Form_Shadcn_ {...form}>
@@ -417,7 +422,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
           onCancel={() => setIsClosingPanel(false)}
           onConfirm={() => {
             setIsClosingPanel(false)
-            setVisible(!visible)
+            onClose()
           }}
         >
           <p className="text-sm text-foreground-light">
