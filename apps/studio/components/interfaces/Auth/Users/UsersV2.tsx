@@ -55,7 +55,7 @@ import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
 
-const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
+const SORT_BY_VALUE_COUNT_THRESHOLD = 10
 
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
@@ -727,9 +727,9 @@ export const UsersV2 = () => {
         onCancel={() => setShowFreeformWarning(false)}
         alert={{
           base: { variant: 'warning' },
-          title: 'Searching across all columns is not recommended',
+          title: 'Searching across all columns is not recommended with many users',
           description:
-            'This may adversely impact your database, in particular if your project has a large number of users - use with caution.',
+            'This may adversely impact your database, in particular if your project has a large number of users - use with caution. Search mode will not be persisted across browser sessions as a safeguard.',
         }}
       >
         <p className="text-foreground-light text-sm">
