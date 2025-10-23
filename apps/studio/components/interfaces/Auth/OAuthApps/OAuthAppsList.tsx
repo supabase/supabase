@@ -29,10 +29,9 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { CreateOAuthAppModal } from './CreateOAuthAppModal'
+import { CreateOrUpdateOAuthAppModal } from './CreateOrUpdateOAuthAppModal'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
 import { RegenerateClientSecretDialog } from './RegenerateClientSecretDialog'
-import { UpdateOAuthAppSidePanel } from './UpdateOAuthAppSidePanel'
 
 export const OAUTH_APP_SCOPE_OPTIONS = [
   { name: 'email', value: 'email' },
@@ -51,8 +50,7 @@ const OAuthAppsList = () => {
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
 
   // State for OAuth apps
-  const [showCreatePanel, setShowCreatePanel] = useState(false)
-  const [showUpdatePanel, setShowUpdatePanel] = useState(false)
+  const [showCreateOrUpdateModal, setShowCreateOrUpdateModal] = useState(false)
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
@@ -75,7 +73,7 @@ const OAuthAppsList = () => {
 
   const handleEditClick = (app: OAuthClient) => {
     setSelectedApp(app)
-    setShowUpdatePanel(true)
+    setShowCreateOrUpdateModal(true)
   }
 
   const handleDeleteClick = (app: OAuthClient) => {
@@ -155,7 +153,7 @@ const OAuthAppsList = () => {
             <ButtonTooltip
               disabled={!isOAuthServerEnabled}
               icon={<Plus />}
-              onClick={() => setShowCreatePanel(true)}
+              onClick={() => setShowCreateOrUpdateModal(true)}
               className="flex-grow"
               tooltip={{
                 content: {
@@ -263,15 +261,12 @@ const OAuthAppsList = () => {
         </div>
       </div>
 
-      <CreateOAuthAppModal visible={showCreatePanel} onClose={() => setShowCreatePanel(false)} />
-
-      <UpdateOAuthAppSidePanel
-        visible={showUpdatePanel}
-        onClose={() => setShowUpdatePanel(false)}
+      <CreateOrUpdateOAuthAppModal
+        visible={showCreateOrUpdateModal}
+        onClose={() => setShowCreateOrUpdateModal(false)}
         selectedApp={selectedApp}
         onDeleteClick={handleDeleteClick}
       />
-
       <RegenerateClientSecretDialog
         visible={showRegenerateDialog}
         onClose={() => setShowRegenerateDialog(false)}
