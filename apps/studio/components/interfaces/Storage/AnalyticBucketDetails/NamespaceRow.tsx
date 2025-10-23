@@ -9,6 +9,7 @@ import {
   ChevronRight,
   ChevronsLeftRightEllipsis,
   Code,
+  Info,
   MoreVertical,
   Replace,
   Trash2,
@@ -39,6 +40,7 @@ import {
 type NamespaceRowProps = {
   bucketName: string
   namespace: string
+  sourceType: 'replication' | 'direct'
   schema: string
   tables: (FormattedWrapperTable & { id: number })[]
   token: string
@@ -74,7 +76,7 @@ const TableRowComponent = ({
   return (
     <TableRow>
       <TableCell>{tableName}</TableCell>
-      <TableCell>
+      <TableCell colSpan={isConnected ? 1 : 2}>
         <div className="flex flex-row items-center text-foregroung-lighter">
           <div className="relative mr-2 align-middle w-3 h-3">
             {/* Outer faded dot with pulsing background */}
@@ -90,11 +92,13 @@ const TableRowComponent = ({
               }`}
             />
           </div>
-          <span className="text-foreground-lighter">{isConnected ? 'Paired' : 'Waiting'}</span>
+          <span className="text-foreground-lighter">
+            {isConnected ? 'Paired' : 'Waiting to be paired'}
+          </span>
         </div>
       </TableCell>
-      <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end">
-        {isConnected && (
+      {isConnected && (
+        <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end">
           <>
             <Button asChild type="default" size="tiny">
               <Link href={`/project/${project?.ref}/editor/${tableName}`}>
@@ -131,8 +135,8 @@ const TableRowComponent = ({
               </DropdownMenuContent>
             </DropdownMenu>
           </>
-        )}
-      </TableCell>
+        </TableCell>
+      )}
     </TableRow>
   )
 }
@@ -140,6 +144,7 @@ const TableRowComponent = ({
 export const NamespaceRow = ({
   bucketName,
   namespace,
+  sourceType = 'direct',
   schema,
   tables,
   token,
@@ -203,6 +208,29 @@ export const NamespaceRow = ({
     }))
   }, [tables, missingTables])
 
+  // Determine if schema is valid (no clashes with Postgres schema)
+  // TODO: Replace with actual clash check logic
+  const validSchema = useMemo(() => {
+    // If schema exists and has tables, it's always valid
+    if (schema && tables.length > 0) return true
+
+    // For uploaded namespaces without tables, check for clashes against incoming schema (namespace name)
+    // TODO: Replace with actual clash check against Postgres schema
+    const hasClashes = false // Mock: no clashes for now
+
+    // Show incoming schema if no clashes (even without tables)
+    return !hasClashes
+  }, [schema, tables.length])
+
+  // Determine what schema name to display
+  const displaySchema = useMemo(() => {
+    // If we have a target schema, use it
+    if (schema) return schema
+
+    // Otherwise, show the incoming schema (namespace name)
+    return `fdw_analytics_${namespace.replaceAll('-', '_')}`
+  }, [schema, namespace])
+
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between items-center px-4 py-5 space-y-0">
@@ -211,24 +239,35 @@ export const NamespaceRow = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="flex flex-row items-center gap-x-1 text-foreground-lighter">
-                  {namespace}
+                  {sourceType === 'direct' ? namespace : 'public'}
                   <ChevronRight size={12} className="text-foreground-muted" />
                 </span>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Source namespace</p>
+                <p>Source {sourceType === 'direct' ? 'namespace' : 'schema'}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {schema && (
+          {validSchema && (
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-foreground">{schema}</span>
+                <TooltipTrigger
+                  asChild
+                  className={tables.length === 0 ? `flex flex-row items-center gap-x-1` : undefined}
+                >
+                  <span
+                    className={
+                      tables.length > 0
+                        ? `text-foreground`
+                        : `text-foreground-muted flex flex-row items-center gap-x-1`
+                    }
+                  >
+                    {displaySchema}
+                    {tables.length === 0 && <Info size={12} />}
+                  </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {' '}
-                  <p>Destination schema</p>
+                  <p>Target schema{tables.length === 0 && ' that will be created'}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -236,11 +275,11 @@ export const NamespaceRow = ({
         </CardTitle>
 
         <div className="flex flex-row gap-x-2">
-          {tables.length > 0 && <p className="text-sm text-foreground-muted">{scanTooltip}</p>}
-
+          {/* {tables.length > 0 && <p className="text-sm text-foreground-muted">{scanTooltip}</p>} */}
+          {/* {scanTooltip && <p className="text-sm text-foreground-muted">{scanTooltip}</p>} */}
           {missingTables.length > 0 && (
             <Button
-              type="default"
+              type={missingTables.length > 0 ? 'warning' : 'default'}
               size="tiny"
               icon={<ChevronsLeftRightEllipsis size={14} />}
               onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
@@ -255,7 +294,7 @@ export const NamespaceRow = ({
         <TableHeader>
           <TableRow>
             <TableHead className={allTables.length === 0 ? 'text-foreground-muted' : undefined}>
-              Table
+              Table name
             </TableHead>
             <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>Status</TableHead>
             <TableHead />
@@ -267,7 +306,9 @@ export const NamespaceRow = ({
               <TableCell colSpan={3}>
                 <p className="text-sm text-foreground">No tables yet</p>
                 <p className="text-sm text-foreground-lighter">
-                  Publish an analytics table to this namespace.
+                  {sourceType === 'direct'
+                    ? ' Publish an analytics table from your Iceberg client'
+                    : 'Connect a table from your database'}
                 </p>
               </TableCell>
             </TableRow>

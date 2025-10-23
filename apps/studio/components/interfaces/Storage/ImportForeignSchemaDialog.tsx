@@ -42,7 +42,7 @@ export const ImportForeignSchemaDialog = ({
   const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({})
   const { mutateAsync: updateFDW } = useFDWUpdateMutation({
     onSuccess: () => {
-      toast.success(`Successfully connected ${bucketName} to the database.`)
+      toast.success(`Successfully connected “${bucketName}” to the database.`)
       onClose()
     },
   })
@@ -158,15 +158,15 @@ export const ImportForeignSchemaDialog = ({
       hideFooter
       visible={visible}
       size="medium"
-      header={<span>Create new schema</span>}
+      header={<span>Create target schema</span>}
       onCancel={() => onClose()}
     >
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-4">
             <p className="text-sm">
-              Namespace “<strong>{namespace}</strong>” must be linked to a new database schema
-              before its tables can be queried.
+              Namespace “<strong>{namespace}</strong>” must be linked to a new schema before tables
+              can be paired.
             </p>
             <Separator />
             <FormField_Shadcn_
@@ -176,7 +176,7 @@ export const ImportForeignSchemaDialog = ({
                 <FormItemLayout
                   layout="vertical"
                   label="Target schema"
-                  description="The new database schema where your analytics data will be accessible."
+                  description="Where your analytics tables will be stored."
                 >
                   <Input_Shadcn_ {...field} placeholder="Enter schema name" />
                 </FormItemLayout>

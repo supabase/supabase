@@ -184,7 +184,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
                   <div>
                     <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
                     <ScaffoldSectionDescription>
-                      Analytic tables stored in this bucket.
+                      Analytics tables stored in this bucket
                     </ScaffoldSectionDescription>
                   </div>
                   {namespaces.length > 0 && (
