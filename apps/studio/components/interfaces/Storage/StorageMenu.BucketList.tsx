@@ -12,6 +12,8 @@ type BucketListProps = {
   projectRef?: string
 }
 
+const BUCKET_ROW_HEIGHT = 'h-7'
+
 const VirtualizedBucketRow = memo(
   ({ index, style, data }: ListChildComponentProps<BucketListProps>) => {
     const bucket = data.buckets[index]
@@ -23,7 +25,7 @@ const VirtualizedBucketRow = memo(
         isSelected={isSelected}
         projectRef={data.projectRef}
         style={style as CSSProperties}
-        className="h-7"
+        className={BUCKET_ROW_HEIGHT}
       />
     )
   },
@@ -69,6 +71,24 @@ const BucketListVirtualized = ({ buckets, selectedBucketId, projectRef = '' }: B
 }
 
 export const BucketList = ({ buckets, selectedBucketId, projectRef = '' }: BucketListProps) => {
+  const numBuckets = buckets.length
+
+  if (numBuckets <= 50) {
+    return (
+      <>
+        {buckets.map((bucket) => (
+          <BucketRow
+            key={bucket.id}
+            bucket={bucket}
+            isSelected={selectedBucketId === bucket.id}
+            projectRef={projectRef}
+            className={BUCKET_ROW_HEIGHT}
+          />
+        ))}
+      </>
+    )
+  }
+
   return (
     <BucketListVirtualized
       buckets={buckets}
