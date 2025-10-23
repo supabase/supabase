@@ -5,8 +5,6 @@ import { ResizableHandle, ResizablePanel, cn } from 'ui'
 export const LayoutSidebar = () => {
   const { activeSidebar } = useSidebarManagerSnapshot()
 
-  if (!activeSidebar) return null
-
   if (!activeSidebar?.component) {
     return null
   }
