@@ -1,7 +1,7 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
