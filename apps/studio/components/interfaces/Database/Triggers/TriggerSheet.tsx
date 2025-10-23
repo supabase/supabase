@@ -80,7 +80,12 @@ interface TriggerSheetProps {
   onClose: () => void
 }
 
-export const TriggerSheet = ({ selectedTrigger, isDuplicatingTrigger, open, onClose }: TriggerSheetProps) => {
+export const TriggerSheet = ({
+  selectedTrigger,
+  isDuplicatingTrigger,
+  open,
+  onClose,
+}: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
