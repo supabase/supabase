@@ -96,7 +96,7 @@ const CommandInput = forwardRef<
       debounceTimeoutRef.current = setTimeout(() => {
         logTelemetryEvent(value)
         previousValueRef.current = value
-      }, 500)
+      }, 2500)
     },
     [logTelemetryEvent]
   )
