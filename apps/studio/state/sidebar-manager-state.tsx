@@ -46,7 +46,7 @@ const createSidebarManagerState = () => {
       component: () => ReactNode | undefined,
       handlers: SidebarHandlers = {}
     ) {
-      const existing = state.sidebars[id]
+      const existing = !!state.sidebars[id]
       state.sidebars[id] = {
         id,
         component,
