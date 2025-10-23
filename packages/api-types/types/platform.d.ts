@@ -4679,6 +4679,7 @@ export interface components {
     CloudMarketplaceOnboardingInfoResponse: {
       aws_contract_auto_renewal: boolean
       aws_contract_end_date: string
+      aws_contract_is_private_offer: boolean
       aws_contract_settings_url: string
       aws_contract_start_date: string
       organization_linking_eligibility: {
