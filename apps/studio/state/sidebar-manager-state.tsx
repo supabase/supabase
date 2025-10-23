@@ -149,6 +149,10 @@ export const getSidebarManagerSnapshot = () => snapshot(sidebarManagerState)
 export const useSidebarManagerSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
   useSnapshot(sidebarManagerState, options)
 
+export const useOpenSidebar = () => {
+  return sidebarManagerState.openSidebar
+}
+
 export const useRegisterSidebar = (
   id: string,
   component: () => ReactNode,
