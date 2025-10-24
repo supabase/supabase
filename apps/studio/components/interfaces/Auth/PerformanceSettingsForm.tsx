@@ -46,7 +46,7 @@ const FormSchema = z.object({
   DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
 })
 
-export const AdvancedAuthSettingsForm = () => {
+export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { can: canReadConfig } = useAsyncCheckPermissions(
