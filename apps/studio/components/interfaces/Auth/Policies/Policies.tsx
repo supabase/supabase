@@ -1,7 +1,7 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEmpty } from 'lodash'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -23,6 +23,7 @@ interface PoliciesProps {
   tables: PolicyTableRowProps['table'][]
   hasTables: boolean
   isLocked: boolean
+  visibleTableIds: Set<number>
   onSelectCreatePolicy: (table: string) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onResetSearch?: () => void
@@ -34,6 +35,7 @@ export const Policies = ({
   tables,
   hasTables,
   isLocked,
+  visibleTableIds,
   onSelectCreatePolicy,
   onSelectEditPolicy: onSelectEditPolicyAI,
   onResetSearch,
@@ -66,27 +68,28 @@ export const Policies = ({
     },
   })
 
-  const closeConfirmModal = () => {
+  const closeConfirmModal = useCallback(() => {
     setSelectedPolicyToDelete({})
     setSelectedTableToToggleRLS(undefined)
-  }
+  }, [])
 
-  const onSelectToggleRLS = (table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }) => {
-    setSelectedTableToToggleRLS(table)
-  }
+  const onSelectToggleRLS = useCallback(
+    (table: { id: number; schema: string; name: string; rls_enabled: boolean }) => {
+      setSelectedTableToToggleRLS(table)
+    },
+    []
+  )
 
-  const onSelectEditPolicy = (policy: any) => {
-    onSelectEditPolicyAI(policy)
-  }
+  const onSelectEditPolicy = useCallback(
+    (policy: PostgresPolicy) => {
+      onSelectEditPolicyAI(policy)
+    },
+    [onSelectEditPolicyAI]
+  )
 
-  const onSelectDeletePolicy = (policy: any) => {
+  const onSelectDeletePolicy = useCallback((policy: PostgresPolicy) => {
     setSelectedPolicyToDelete(policy)
-  }
+  }, [])
 
   // Methods that involve some API
   const onToggleRLS = async () => {
@@ -116,6 +119,13 @@ export const Policies = ({
     })
   }
 
+  const handleCreatePolicy = useCallback(
+    (tableData: PolicyTableRowProps['table']) => {
+      onSelectCreatePolicy(tableData.name)
+    },
+    [onSelectCreatePolicy]
+  )
+
   if (!hasTables) {
     return (
       <Card className="w-full bg-transparent">
@@ -139,18 +149,26 @@ export const Policies = ({
       <div className="flex flex-col gap-y-4 pb-4">
         {isLocked && <ProtectedSchemaWarning schema={schema} entity="policies" />}
         {tables.length > 0 ? (
-          tables.map((table) => (
-            <section key={table.id}>
-              <PolicyTableRow
-                table={table}
-                isLocked={schema === 'realtime' ? true : isLocked}
-                onSelectToggleRLS={onSelectToggleRLS}
-                onSelectCreatePolicy={() => onSelectCreatePolicy(table.name)}
-                onSelectEditPolicy={onSelectEditPolicy}
-                onSelectDeletePolicy={onSelectDeletePolicy}
-              />
-            </section>
-          ))
+          <>
+            {tables.map((table) => {
+              const isVisible = visibleTableIds.has(table.id)
+              return (
+                <section key={table.id} hidden={!isVisible} aria-hidden={!isVisible}>
+                  <PolicyTableRow
+                    table={table}
+                    isLocked={schema === 'realtime' ? true : isLocked}
+                    onSelectToggleRLS={onSelectToggleRLS}
+                    onSelectCreatePolicy={handleCreatePolicy}
+                    onSelectEditPolicy={onSelectEditPolicy}
+                    onSelectDeletePolicy={onSelectDeletePolicy}
+                  />
+                </section>
+              )
+            })}
+            {!!search && visibleTableIds.size === 0 && (
+              <NoSearchResults searchString={search ?? ''} onResetFilter={onResetSearch} />
+            )}
+          </>
         ) : hasTables ? (
           <NoSearchResults searchString={search ?? ''} onResetFilter={onResetSearch} />
         ) : null}

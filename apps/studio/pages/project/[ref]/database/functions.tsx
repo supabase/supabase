@@ -19,6 +19,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
+  const [isDuplicating, setIsDuplicating] = useState(false)
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   // Local editor panel state
@@ -42,6 +43,23 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
     }
   }
 
+  const duplicateFunction = (fn: DatabaseFunction) => {
+    setIsDuplicating(true)
+
+    const dupFn = {
+      ...fn,
+      name: `${fn.name}_duplicate`,
+    }
+
+    if (isInlineEditorEnabled) {
+      setSelectedFunctionForEditor(dupFn)
+      setEditorPanelOpen(true)
+    } else {
+      setSelectedFunction(dupFn)
+      setShowCreateFunctionForm(true)
+    }
+  }
+
   const editFunction = (fn: DatabaseFunction) => {
     if (isInlineEditorEnabled) {
       setSelectedFunctionForEditor(fn)
@@ -55,6 +73,12 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const deleteFunction = (fn: any) => {
     setSelectedFunction(fn)
     setShowDeleteFunctionForm(true)
+  }
+
+  const resetEditorPanel = () => {
+    setIsDuplicating(false)
+    setEditorPanelOpen(false)
+    setSelectedFunctionForEditor(undefined)
   }
 
   if (isPermissionsLoaded && !canReadFunctions) {
@@ -72,6 +96,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
             />
             <FunctionsList
               createFunction={createFunction}
+              duplicateFunction={duplicateFunction}
               editFunction={editFunction}
               deleteFunction={deleteFunction}
             />
@@ -81,7 +106,11 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
       <CreateFunction
         func={selectedFunction}
         visible={showCreateFunctionForm}
-        setVisible={setShowCreateFunctionForm}
+        onClose={() => {
+          setShowCreateFunctionForm(false)
+          setIsDuplicating(false)
+        }}
+        isDuplicating={isDuplicating}
       />
       <DeleteFunction
         func={selectedFunction}
@@ -91,14 +120,8 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
 
       <EditorPanel
         open={editorPanelOpen}
-        onRunSuccess={() => {
-          setEditorPanelOpen(false)
-          setSelectedFunctionForEditor(undefined)
-        }}
-        onClose={() => {
-          setEditorPanelOpen(false)
-          setSelectedFunctionForEditor(undefined)
-        }}
+        onRunSuccess={resetEditorPanel}
+        onClose={resetEditorPanel}
         initialValue={
           selectedFunctionForEditor
             ? selectedFunctionForEditor.complete_statement
@@ -113,12 +136,16 @@ $$;`
         }
         label={
           selectedFunctionForEditor
-            ? `Edit function "${selectedFunctionForEditor.name}"`
+            ? isDuplicating
+              ? `Duplicate function "${selectedFunctionForEditor.name}"`
+              : `Edit function "${selectedFunctionForEditor.name}"`
             : 'Create new database function'
         }
         initialPrompt={
           selectedFunctionForEditor
-            ? `Update the database function "${selectedFunctionForEditor.name}" to...`
+            ? isDuplicating
+              ? `Duplicate the database function "${selectedFunctionForEditor.name}" to...`
+              : `Update the database function "${selectedFunctionForEditor.name}" to...`
             : 'Create a new database function that...'
         }
       />

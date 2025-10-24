@@ -14,6 +14,7 @@ import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
+import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -53,6 +54,8 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+
+const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 
 export const UsersV2 = () => {
   const queryClient = useQueryClient()
@@ -97,7 +100,7 @@ export const UsersV2 = () => {
     parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
   )
   const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
-  const [sortByValue, setSortByValue] = useQueryState('id:asc', { defaultValue: 'id:asc' })
+  const [sortByValue, setSortByValue] = useQueryState('sortBy', { defaultValue: 'id:asc' })
   const [sortColumn, sortOrder] = sortByValue.split(':')
   const [selectedColumns, setSelectedColumns] = useQueryState(
     'columns',
@@ -117,6 +120,15 @@ export const UsersV2 = () => {
     )
 
   const [
+    localStorageSortByValue,
+    setLocalStorageSortByValue,
+    { isSuccess: isLocalStorageSortByValueLoaded },
+  ] = useLocalStorageQuery<string>(
+    LOCAL_STORAGE_KEYS.AUTH_USERS_SORT_BY_VALUE(projectRef ?? ''),
+    'id'
+  )
+
+  const [
     columnConfiguration,
     setColumnConfiguration,
     { isSuccess: isSuccessStorage, isError: isErrorStorage, error: errorStorage },
@@ -133,6 +145,23 @@ export const UsersV2 = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
   const [showFreeformWarning, setShowFreeformWarning] = useState(false)
+
+  const { data: totalUsersCountData, isSuccess: isCountLoaded } = useUsersCountQuery(
+    {
+      projectRef,
+      connectionString: project?.connectionString,
+      // [Joshen] Do not change the following, these are to match the count query in UsersFooter
+      // on initial load with no search configuration so that we only fire 1 count request at the
+      // beginning. The count value is for all users - should disregard any search configuration
+      keywords: '',
+      filter: undefined,
+      providers: [],
+      forceExactCount: false,
+    },
+    { keepPreviousData: true }
+  )
+  const totalUsers = totalUsersCountData?.count ?? 0
+  const isCountWithinThresholdForSortBy = totalUsers <= SORT_BY_VALUE_COUNT_THRESHOLD
 
   const {
     data,
@@ -193,6 +222,19 @@ export const UsersV2 = () => {
   const telemetryGroups = {
     project: projectRef ?? 'Unknown',
     organization: selectedOrg?.slug ?? 'Unknown',
+  }
+
+  const updateStorageFilter = (value: 'id' | 'email' | 'phone' | 'freeform') => {
+    setLocalStorageFilter(value)
+    setSpecificFilterColumn(value)
+    if (value !== 'freeform') {
+      updateSortByValue('id:asc')
+    }
+  }
+
+  const updateSortByValue = (value: string) => {
+    if (isCountWithinThresholdForSortBy) setLocalStorageSortByValue(value)
+    setSortByValue(value)
   }
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
@@ -281,7 +323,7 @@ export const UsersV2 = () => {
         config: columnConfiguration ?? [],
         users: users ?? [],
         visibleColumns: selectedColumns,
-        setSortByValue,
+        setSortByValue: updateSortByValue,
         onSelectDeleteUser: setSelectedUserToDelete,
       })
       setColumns(columns)
@@ -301,16 +343,22 @@ export const UsersV2 = () => {
     specificFilterColumn,
   ])
 
-  // [Joshen] Load URL state for filter column only once, if no filter column found in URL params
+  // [Joshen] Load URL state for filter column and sort by only once, if no respective values found in URL params
   useEffect(() => {
-    if (specificFilterColumn === 'id' && localStorageFilter !== 'id') {
-      setSpecificFilterColumn(localStorageFilter)
+    if (
+      isLocalStorageFilterLoaded &&
+      isLocalStorageSortByValueLoaded &&
+      isCountLoaded &&
+      isCountWithinThresholdForSortBy
+    ) {
+      if (specificFilterColumn === 'id' && localStorageFilter !== 'id') {
+        setSpecificFilterColumn(localStorageFilter)
+      }
+      if (sortByValue === 'id:asc' && localStorageSortByValue !== 'id:asc') {
+        setSortByValue(localStorageSortByValue)
+      }
     }
-  }, [])
-
-  useEffect(() => {
-    setLocalStorageFilter(specificFilterColumn)
-  }, [specificFilterColumn])
+  }, [isLocalStorageFilterLoaded, isLocalStorageSortByValueLoaded, isCountLoaded])
 
   return (
     <>
@@ -353,9 +401,13 @@ export const UsersV2 = () => {
                   }}
                   setSpecificFilterColumn={(value) => {
                     if (value === 'freeform') {
-                      setShowFreeformWarning(true)
+                      if (isCountWithinThresholdForSortBy) {
+                        updateStorageFilter(value)
+                      } else {
+                        setShowFreeformWarning(true)
+                      }
                     } else {
-                      setSpecificFilterColumn(value)
+                      updateStorageFilter(value)
                     }
                   }}
                 />
@@ -469,7 +521,7 @@ export const UsersV2 = () => {
                       config: updatedConfig,
                       users: users ?? [],
                       visibleColumns: value,
-                      setSortByValue,
+                      setSortByValue: updateSortByValue,
                       onSelectDeleteUser: setSelectedUserToDelete,
                     })
 
@@ -486,7 +538,7 @@ export const UsersV2 = () => {
                   sortByValue={sortByValue}
                   setSortByValue={(value) => {
                     const [sortColumn, sortOrder] = value.split(':')
-                    setSortByValue(value)
+                    updateSortByValue(value)
                     sendEvent({
                       action: 'auth_users_search_submitted',
                       properties: {
@@ -669,15 +721,15 @@ export const UsersV2 = () => {
         confirmLabel="Confirm"
         title="Confirm to search across all columns"
         onConfirm={() => {
-          setSpecificFilterColumn('freeform')
+          updateStorageFilter('freeform')
           setShowFreeformWarning(false)
         }}
         onCancel={() => setShowFreeformWarning(false)}
         alert={{
           base: { variant: 'warning' },
-          title: 'Searching across all columns is not recommended',
+          title: 'Searching across all columns is not recommended with many users',
           description:
-            'This may adversely impact your database, in particular if your project has a large number of users - use with caution.',
+            'This may adversely impact your database, in particular if your project has a large number of users - use with caution. Search mode will not be persisted across browser sessions as a safeguard.',
         }}
       >
         <p className="text-foreground-light text-sm">

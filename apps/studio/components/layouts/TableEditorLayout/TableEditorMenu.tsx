@@ -147,7 +147,7 @@ export const TableEditorMenu = () => {
                 icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
                 type="default"
                 className="justify-start"
-                onClick={snap.onAddTable}
+                onClick={() => snap.onAddTable()}
                 tooltip={{
                   content: {
                     side: 'bottom',
