@@ -188,7 +188,7 @@ export const TriggerSheet = ({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={() => isClosingSidePanel()}>
+      <Sheet open={open} onOpenChange={isClosingSidePanel}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
