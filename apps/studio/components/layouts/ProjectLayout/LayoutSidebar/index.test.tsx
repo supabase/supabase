@@ -16,7 +16,7 @@ const resetSidebarManagerState = () => {
   Object.keys(sidebarManagerState.sidebars).forEach((id) => {
     sidebarManagerState.unregisterSidebar(id)
   })
-  sidebarManagerState.closeAll()
+  sidebarManagerState.closeActive()
 }
 
 describe('LayoutSidebar', () => {
@@ -28,7 +28,6 @@ describe('LayoutSidebar', () => {
     resetSidebarManagerState()
     localStorage.clear()
     vi.clearAllMocks()
-    routerMock.setCurrentUrl('/projects/default')
   })
 
   const renderSidebar = () =>

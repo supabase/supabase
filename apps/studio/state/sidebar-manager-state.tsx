@@ -29,7 +29,7 @@ type SidebarManagerState = SidebarManagerData & {
   toggleSidebar: (id: string) => void
   closeSidebar: (id: string) => void
   isSidebarOpen: (id: string) => boolean
-  closeAll: () => void
+  closeActive: () => void
 }
 
 const INITIAL_SIDEBAR_MANAGER_DATA: SidebarManagerData = {
@@ -46,20 +46,10 @@ const createSidebarManagerState = () => {
       component: () => ReactNode | undefined,
       handlers: SidebarHandlers = {}
     ) {
-      const existing = state.sidebars[id]
       state.sidebars[id] = {
         id,
         component,
         ...handlers,
-      }
-
-      const panel = state.sidebars[id]
-      if (!panel) return
-
-      if (state.activeSidebar?.id === id) {
-        panel.onOpen?.()
-      } else if (!existing) {
-        panel.onClose?.()
       }
     },
 
@@ -132,7 +122,7 @@ const createSidebarManagerState = () => {
       return state.activeSidebar?.id === id
     },
 
-    closeAll() {
+    closeActive() {
       if (!state.activeSidebar) return
       state.activeSidebar?.onClose?.()
       state.activeSidebar = undefined
