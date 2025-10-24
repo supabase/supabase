@@ -471,7 +471,7 @@ export const TriggerSheet = ({
               type="default"
               htmlType="reset"
               disabled={isCreating || isUpdating}
-              onClick={() => onClose()}
+              onClick={onClose}
             >
               Cancel
             </Button>
