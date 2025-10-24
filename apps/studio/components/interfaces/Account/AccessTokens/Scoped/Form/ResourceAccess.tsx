@@ -2,7 +2,7 @@ import { Box, Check } from 'lucide-react'
 import { Control, useWatch, useFormContext } from 'react-hook-form'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useProfile } from 'lib/profile'
 import { FormControl_Shadcn_, FormField_Shadcn_, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -13,7 +13,7 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 interface ResourceAccessProps {
   control: Control<{
@@ -37,13 +37,15 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
     enabled: !!profile,
   })
   const {
-    data: projects = { projects: [] },
+    data: projectsData,
     isLoading: isLoadingProjects,
     isError: isErrorProjects,
     error: projectsError,
-  } = useProjectsQuery({
-    enabled: !!profile,
+  } = useProjectsInfiniteQuery({
+    limit: 100,
   })
+  const projects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData]) ?? []
   const { setValue } = useFormContext()
 
   const selectedOrganizations = useWatch({ control, name: 'selectedOrganizations' })
@@ -279,13 +281,13 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
                       <div className="px-3 py-2 text-sm text-foreground-light">
                         Loading projects...
                       </div>
-                    ) : projects?.projects?.length === 0 ? (
+                    ) : projects?.length === 0 ? (
                       <div className="px-3 py-2 text-sm text-foreground-light">
                         No projects available
                       </div>
                     ) : (
                       <MultiSelectorList>
-                        {projects?.projects?.map((project) => (
+                        {projects?.map((project) => (
                           <MultiSelectorItem key={project.ref} value={project.ref}>
                             {project.name}
                           </MultiSelectorItem>

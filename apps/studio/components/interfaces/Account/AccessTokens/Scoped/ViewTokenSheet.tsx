@@ -16,7 +16,8 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { Card, CardContent } from 'ui'
 import { ACCESS_TOKEN_PERMISSIONS, PERMISSION_MAP } from '../AccessToken.constants'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { useMemo } from 'react'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -26,7 +27,12 @@ interface ViewTokenSheetProps {
 
 export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProps) {
   const { data: organizations = [] } = useOrganizationsQuery()
-  const { data: projects = [] } = useProjectsQuery()
+  const { data: projectsData } = useProjectsInfiniteQuery({
+    limit: 100,
+  })
+
+  const projects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData]) ?? []
 
   const {
     data: token,
