@@ -57,8 +57,8 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
   })
 
   const { mutate: deleteIndex } = useVectorBucketIndexDeleteMutation({
-    onSuccess: (data, vars) => {
-      toast.success(`Table "${data.name}" deleted successfully`)
+    onSuccess: (_, vars) => {
+      toast.success(`Table "${vars.indexName}" deleted successfully`)
     },
   })
 
