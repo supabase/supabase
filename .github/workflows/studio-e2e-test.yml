@@ -28,8 +28,8 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    # Require approval only for external contributors
-    environment: ${{ github.event.pull_request.author_association != 'MEMBER' && 'Studio E2E Tests' || '' }}
+    # Require approval only for pull requests from forks
+    environment: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork && 'Studio E2E Tests' || '' }}
 
     env:
       EMAIL: ${{ secrets.CI_EMAIL }}
