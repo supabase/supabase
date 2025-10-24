@@ -59,7 +59,11 @@ export const StatCard = ({
         : 'text-brand'
       : getChangeColor(previous)
   const formattedCurrent =
-    suffix === 'ms' ? current.toFixed(2) : suffix === '%' ? current.toFixed(1) : Math.round(current)
+    suffix === 'ms'
+      ? current.toFixed(2)
+      : suffix === '%'
+        ? current.toFixed(1)
+        : Math.round(current).toLocaleString()
   const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
   return (
