@@ -215,9 +215,14 @@ const PreviewBranchActions = ({
 
   const { data } = useBranchQuery({ projectRef, branchRef })
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
+  const isPersistentBranch = branch.persistent
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
+  const [
+    showPersistentBranchDeleteConfirmationModal,
+    setShowPersistentBranchDeleteConfirmationModal,
+  ] = useState(false)
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
   const { mutate: resetBranch, isLoading: isResetting } = useBranchResetMutation({
@@ -253,6 +258,15 @@ const PreviewBranchActions = ({
 
   const onTogglePersistent = () => {
     updateBranch({ branchRef, projectRef, persistent: !branch.persistent })
+  }
+
+  const onDeleteBranch = (e: Event | React.MouseEvent<HTMLDivElement>) => {
+    if (isPersistentBranch) {
+      setShowPersistentBranchDeleteConfirmationModal(true)
+    } else {
+      e.stopPropagation()
+      onSelectDeleteBranch()
+    }
   }
 
   return (
@@ -350,14 +364,8 @@ const PreviewBranchActions = ({
           <DropdownMenuItemTooltip
             className="gap-x-2"
             disabled={!canDeleteBranches}
-            onSelect={(e) => {
-              e.stopPropagation()
-              onSelectDeleteBranch()
-            }}
-            onClick={(e) => {
-              e.stopPropagation()
-              onSelectDeleteBranch()
-            }}
+            onSelect={onDeleteBranch}
+            onClick={onDeleteBranch}
             tooltip={{
               content: {
                 side: 'left',
@@ -439,6 +447,20 @@ const PreviewBranchActions = ({
         <p className="text-sm text-foreground-light">
           Are you sure you want to switch the branch "{branch.name}" to{' '}
           {branch.persistent ? 'preview' : 'persistent'}?
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        variant="warning"
+        visible={showPersistentBranchDeleteConfirmationModal}
+        confirmLabel={'Switch to preview'}
+        title="Branch must be switched to preview before deletion"
+        loading={isUpdatingBranch}
+        onCancel={() => setShowPersistentBranchDeleteConfirmationModal(false)}
+        onConfirm={onTogglePersistent}
+      >
+        <p className="text-sm text-foreground-light">
+          You must switch the branch "{branch.name}" to preview before deleting it.
         </p>
       </ConfirmationModal>
 
