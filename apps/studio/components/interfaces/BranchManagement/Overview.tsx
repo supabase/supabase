@@ -423,7 +423,6 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
           {repo ? (
             <Link passHref href={`/project/${projectRef}/settings/integrations`}>
               <DropdownMenuItem asChild className="gap-x-2">
-                {/** biome-ignore lint/a11y/useValidAnchor: href is passed above in the Link component */}
                 <a>Change production branch</a>
               </DropdownMenuItem>
             </Link>
