@@ -9,18 +9,17 @@ import {
   ScaffoldContainer,
   ScaffoldHeader,
   ScaffoldSection,
-  ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { Card, CardContent } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
-import { Button, Card, CardContent } from 'ui'
 
 const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
@@ -59,6 +58,8 @@ const RedirectToTemplates = () => {
     return template?.id
   }
 
+  // Convert templateId slug to one lowercase word to match docs anchor tag
+  const templateIdForDocs = templateId.replace(/-/g, '').toLowerCase()
   const template = TEMPLATES_SCHEMAS.find(
     (template) => template.id === templateIdFromSlug(templateId as string)
   )
@@ -74,7 +75,10 @@ const RedirectToTemplates = () => {
         },
       ]}
       secondaryActions={[
-        <DocsButton key="docs" href={`${DOCS_URL}/reference/javascript/subscribe`} />,
+        <DocsButton
+          key="docs"
+          href={`${DOCS_URL}/guides/local-development/customizing-email-templates#authemailtemplate${templateIdForDocs}`}
+        />,
       ]}
     >
       <ScaffoldContainer bottomPadding>
