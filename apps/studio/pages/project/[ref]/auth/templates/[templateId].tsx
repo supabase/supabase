@@ -6,12 +6,7 @@ import TemplateEditor from 'components/interfaces/Auth/EmailTemplates/TemplateEd
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSection,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -19,7 +14,7 @@ import { DOCS_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { Card, CardContent } from 'ui'
+import { Card } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
 const TemplatePage: NextPageWithLayout = () => {
@@ -58,17 +53,28 @@ const RedirectToTemplates = () => {
     })
     return template?.id
   }
-  const template = TEMPLATES_SCHEMAS.find(
-    (template) => template.id === templateIdFromSlug(templateId as string)
-  )
+
+  const template =
+    templateId && typeof templateId === 'string'
+      ? TEMPLATES_SCHEMAS.find((template) => template.id === templateIdFromSlug(templateId))
+      : null
+
+  // Show error if templateId is invalid or template is not found
+  if (!template || !templateId || typeof templateId !== 'string') {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <p className="text-sm text-foreground-light">Template "{templateId}" cannot be found</p>
+      </div>
+    )
+  }
 
   // Convert templateId slug to one lowercase word to match docs anchor tag
   const templateIdForDocs = templateId.replace(/-/g, '').toLowerCase()
 
   return (
     <PageLayout
-      title={template?.title || 'Email template'}
-      subtitle={template?.purpose || 'Configure and customize email templates.'}
+      title={template.title}
+      subtitle={template.purpose || 'Configure and customize email templates.'}
       breadcrumbs={[
         {
           label: 'Emails',
