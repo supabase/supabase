@@ -20,7 +20,6 @@ export async function getVectorBucket(
     signal,
   })
 
-  await new Promise((resolve) => setTimeout(resolve, 4000)) // wait for next tick
   if (error) handleError(error)
   return data as { vectorBucketName: string; creationTime: string }
 }

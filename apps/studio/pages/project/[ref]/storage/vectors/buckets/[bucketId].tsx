@@ -1,12 +1,12 @@
-import { VectorBucketDetails } from 'components/interfaces/Storage/VectorBuckets/VectorBucketDetails'
-
 import { useParams } from 'common'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
+import { VectorBucketDetails } from 'components/interfaces/Storage/VectorBuckets/VectorBucketDetails'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { useVectorBucketQuery } from 'data/storage/vector-bucket-query'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const VectorsBucketPage: NextPageWithLayout = () => {
   const { bucketId } = useParams()
@@ -15,6 +15,7 @@ const VectorsBucketPage: NextPageWithLayout = () => {
   const {
     data: vectorBucket,
     isSuccess,
+    isLoading,
     isError,
     error,
   } = useVectorBucketQuery({ projectRef, vectorBucketName: bucketId })
@@ -22,6 +23,8 @@ const VectorsBucketPage: NextPageWithLayout = () => {
   return (
     <div className="storage-container flex flex-grow p-4">
       {isError && <StorageBucketsError error={error as any} />}
+
+      {isLoading && <GenericSkeletonLoader className="w-full" />}
 
       {isSuccess ? (
         !vectorBucket ? (
