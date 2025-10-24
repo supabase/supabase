@@ -43,7 +43,7 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTrack } from 'lib/telemetry/track'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -171,7 +171,7 @@ const Wizard: NextPageWithLayout = () => {
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
     if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -247,16 +247,16 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
-      sendEvent({
-        action: 'project_creation_simple_version_submitted',
-        properties: {
+      track(
+        'project_creation_simple_version_submitted',
+        {
           instanceSize: form.getValues('instanceSize'),
         },
-        groups: {
+        {
           project: res.ref,
           organization: res.organization_slug,
-        },
-      })
+        }
+      )
       router.push(isHomeNew ? `/project/${res.ref}` : `/project/${res.ref}/building`)
     },
   })
@@ -372,14 +372,8 @@ const Wizard: NextPageWithLayout = () => {
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
     if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
-      sendEvent({
-        action: 'project_creation_simple_version_confirm_modal_opened',
-        properties: {
-          instanceSize: values.instanceSize,
-        },
-        groups: {
-          organization: currentOrg?.slug ?? 'Unknown',
-        },
+      track('project_creation_simple_version_confirm_modal_opened', {
+        instanceSize: values.instanceSize,
       })
       setIsComputeCostsConfirmationModalVisible(true)
     } else {
