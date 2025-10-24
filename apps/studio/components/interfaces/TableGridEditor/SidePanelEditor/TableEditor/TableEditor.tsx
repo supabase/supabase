@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
@@ -141,14 +141,18 @@ export const TableEditor = ({
     (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
   )
 
-  const { data: foreignKeyMeta, isSuccess: isSuccessForeignKeyMeta } =
+  const { data: foreignKeyMeta = [], isSuccess: isSuccessForeignKeyMeta } =
     useForeignKeyConstraintsQuery({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       schema: table?.schema,
     })
-  const foreignKeys = (foreignKeyMeta ?? []).filter(
-    (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
+  const foreignKeys = useMemo(
+    () =>
+      foreignKeyMeta.filter(
+        (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
+      ),
+    [foreignKeyMeta, table]
   )
 
   const onUpdateField = (changes: Partial<TableField>) => {
@@ -245,7 +249,7 @@ export const TableEditor = ({
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
           table,
-          foreignKeyMeta || [],
+          foreignKeyMeta,
           isDuplicating,
           isRealtimeEnabled
         )
