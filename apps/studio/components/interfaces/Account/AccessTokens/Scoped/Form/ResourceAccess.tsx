@@ -17,11 +17,14 @@ import { useEffect, useMemo } from 'react'
 
 interface ResourceAccessProps {
   control: Control<{
-    organization_slugs: string[]
-    project_refs: string[]
-    resourceAccess: string
-    selectedOrganizations: string[]
-    selectedProjects: string[]
+    resourceAccess: 'selected-orgs' | 'selected-projects' | 'all-orgs'
+    tokenName: string
+    selectedOrganizations?: string[]
+    selectedProjects?: string[]
+    expiresAt?: string
+    organizationPermissions?: Record<string, string>
+    projectPermissions?: Record<string, string>
+    permissionRows?: { resource: string; action: string }[]
   }>
   resourceAccess: string
 }
