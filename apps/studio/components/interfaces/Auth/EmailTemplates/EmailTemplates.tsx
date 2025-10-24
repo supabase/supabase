@@ -34,8 +34,6 @@ export const EmailTemplates = () => {
     authConfig &&
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
 
-  console.log({ TEMPLATES_SCHEMAS })
-
   return (
     <ScaffoldSection isFullWidth className="!pt-0">
       {isError && (
