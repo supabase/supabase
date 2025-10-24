@@ -48,6 +48,9 @@ jobs:
           # Update @supabase/realtime-js
           sed -i "s/'@supabase\/realtime-js': .*/'@supabase\/realtime-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
 
+          # Update @supabase/postgrest-js
+          sed -i "s/'@supabase\/postgrest-js': .*/'@supabase\/postgrest-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
+
           echo "Updated pnpm-workspace.yaml:"
           cat pnpm-workspace.yaml
 
@@ -69,6 +72,7 @@ jobs:
             - Updated @supabase/supabase-js to ${{ github.event.inputs.version }}
             - Updated @supabase/auth-js to ${{ github.event.inputs.version }}
             - Updated @supabase/realtime-js to ${{ github.event.inputs.version }}
+            - Updated @supabase/postgest-js to ${{ github.event.inputs.version }}
             - Refreshed pnpm-lock.yaml
 
             This PR was created automatically.
