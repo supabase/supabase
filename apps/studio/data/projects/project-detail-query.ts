@@ -44,30 +44,24 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
   { ref }: ProjectDetailVariables,
   { enabled = true, ...options }: UseQueryOptions<ProjectDetailData, ProjectDetailError, TData> = {}
 ) =>
-  useQuery<ProjectDetailData, ProjectDetailError, TData>(
-    projectKeys.detail(ref),
-    ({ signal }) => getProjectDetail({ ref }, signal),
-    {
-      enabled: enabled && typeof ref !== 'undefined',
-      staleTime: 30 * 1000, // 30 seconds
-      refetchInterval(data) {
-        const result = data && (data as unknown as ProjectDetailData)
-        const status = result && result.status
-        const connectionString = result && result.connectionString
+  useQuery<ProjectDetailData, ProjectDetailError, TData>({
+    queryKey: projectKeys.detail(ref),
+    queryFn: ({ signal }) => getProjectDetail({ ref }, signal),
+    enabled: enabled && typeof ref !== 'undefined',
+    staleTime: 30 * 1000,
+    refetchInterval(data) {
+      const result = data && (data as unknown as ProjectDetailData)
+      const status = result && result.status
+      const connectionString = result && result.connectionString
 
-        if (
-          status === 'COMING_UP' ||
-          status === 'UNKNOWN' ||
-          !isValidConnString(connectionString)
-        ) {
-          return 5 * 1000 // 5 seconds
-        }
+      if (status === 'COMING_UP' || status === 'UNKNOWN' || !isValidConnString(connectionString)) {
+        return 5 * 1000 // 5 seconds
+      }
 
-        return false
-      },
-      ...options,
-    }
-  )
+      return false
+    },
+    ...options,
+  })
 
 export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
   return client.fetchQuery(projectKeys.detail(ref), ({ signal }) =>

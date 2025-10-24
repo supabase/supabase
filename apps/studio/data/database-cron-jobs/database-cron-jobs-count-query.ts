@@ -35,11 +35,9 @@ export const useCronJobsCountQuery = <TData = DatabaseCronJobData>(
     ...options
   }: UseQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
 ) =>
-  useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
-    databaseCronJobsKeys.count(projectRef),
-    () => getDatabaseCronJobsCount({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>({
+    queryKey: databaseCronJobsKeys.count(projectRef),
+    queryFn: () => getDatabaseCronJobsCount({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -63,24 +63,22 @@ export const useBranchMergeMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchMergeData, ResponseError, BranchMergeVariables>(
-    (vars) => mergeBranch(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { baseProjectRef } = variables
-        await queryClient.invalidateQueries(branchKeys.list(baseProjectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          let errorMessage = data.message || 'Unknown error occurred'
+  return useMutation<BranchMergeData, ResponseError, BranchMergeVariables>({
+    mutationFn: (vars) => mergeBranch(vars),
+    async onSuccess(data, variables, context) {
+      const { baseProjectRef } = variables
+      await queryClient.invalidateQueries(branchKeys.list(baseProjectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        let errorMessage = data.message || 'Unknown error occurred'
 
-          toast.error(`Failed to merge branch: ${errorMessage}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+        toast.error(`Failed to merge branch: ${errorMessage}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

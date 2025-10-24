@@ -31,20 +31,18 @@ export const useOrganizationByFlyOrgIdMutation = ({
   UseMutationOptions<OrganizationByFlyOrgIdData, ResponseError, OrganizationByFlyOrgIdVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<OrganizationByFlyOrgIdData, ResponseError, OrganizationByFlyOrgIdVariables>(
-    (vars) => getOrganizationByFlyOrgId(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to get organization: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<OrganizationByFlyOrgIdData, ResponseError, OrganizationByFlyOrgIdVariables>({
+    mutationFn: (vars) => getOrganizationByFlyOrgId(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to get organization: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

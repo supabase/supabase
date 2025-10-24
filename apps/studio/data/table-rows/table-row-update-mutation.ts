@@ -74,24 +74,22 @@ export const useTableRowUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowUpdateData, ResponseError, TableRowUpdateVariables>(
-    (vars) => updateTableRow(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, table } = variables
-        await queryClient.invalidateQueries(
-          tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update table row: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<TableRowUpdateData, ResponseError, TableRowUpdateVariables>({
+    mutationFn: (vars) => updateTableRow(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, table } = variables
+      await queryClient.invalidateQueries(
+        tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
+      )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update table row: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -37,11 +37,13 @@ export const useOrganizationQuery = <TData = OrganizationsData>(
   { slug }: OrganizationVariables,
   { enabled = true, ...options }: UseQueryOptions<OrganizationsData, OrganizationsError, TData> = {}
 ) => {
-  return useQuery<OrganizationsData, OrganizationsError, TData>(
-    organizationKeys.detail(slug),
-    ({ signal }) => getOrganization({ slug }, signal),
-    { enabled: enabled && typeof slug !== 'undefined', ...options, staleTime: 30 * 60 * 1000 }
-  )
+  return useQuery<OrganizationsData, OrganizationsError, TData>({
+    queryKey: organizationKeys.detail(slug),
+    queryFn: ({ signal }) => getOrganization({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+    staleTime: 30 * 60 * 1000,
+  })
 }
 
 export function invalidateOrganizationsQuery(client: QueryClient) {

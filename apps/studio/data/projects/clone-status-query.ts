@@ -24,9 +24,10 @@ export const useCloneStatusQuery = <TData = CloneStatusData>(
   { projectRef }: { projectRef?: string },
   options: UseQueryOptions<CloneStatusData, CloneStatusError, TData> = {}
 ) => {
-  return useQuery<CloneStatusData, CloneStatusError, TData>(
-    projectKeys.listCloneStatus(projectRef),
-    () => getCloneStatus(projectRef),
-    { enabled: !!projectRef, ...options }
-  )
+  return useQuery<CloneStatusData, CloneStatusError, TData>({
+    queryKey: projectKeys.listCloneStatus(projectRef),
+    queryFn: () => getCloneStatus(projectRef),
+    enabled: !!projectRef,
+    ...options,
+  })
 }

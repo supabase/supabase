@@ -31,13 +31,11 @@ export const useProfileQuery = <TData = ProfileData>({
   enabled = true,
   ...options
 }: UseQueryOptions<ProfileData, ProfileError, TData> = {}) => {
-  return useQuery<ProfileData, ProfileError, TData>(
-    profileKeys.profile(),
-    ({ signal }) => getProfile(signal),
-    {
-      staleTime: 1000 * 60 * 30, // default good for 30 mins
-      ...options,
-      enabled,
-    }
-  )
+  return useQuery<ProfileData, ProfileError, TData>({
+    queryKey: profileKeys.profile(),
+    queryFn: ({ signal }) => getProfile(signal),
+    staleTime: 1000 * 60 * 30,
+    ...options,
+    enabled,
+  })
 }
