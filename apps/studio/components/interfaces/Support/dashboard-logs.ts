@@ -26,9 +26,11 @@ export const getSanitizedBreadcrumbs = (): unknown[] => {
 
 export const uploadDashboardLog = async ({
   userId,
+  sanitizedLogs,
   uploadDashboardLogFn,
 }: {
   userId: string | undefined
+  sanitizedLogs: unknown[]
   uploadDashboardLogFn: (
     vars: GenerateAttachmentURLsVariables
   ) => Promise<GenerateAttachmentURLsData>
@@ -40,13 +42,12 @@ export const uploadDashboardLog = async ({
     return []
   }
 
-  const sanitized = getSanitizedBreadcrumbs()
-  if (sanitized.length === 0) return []
+  if (sanitizedLogs.length === 0) return []
 
   try {
     const supportStorageClient = createSupportStorageClient()
     const objectKey = `${userId}/${uuidv4()}.json`
-    const body = new Blob([JSON.stringify(sanitized, null, 2)], {
+    const body = new Blob([JSON.stringify(sanitizedLogs, null, 2)], {
       type: 'application/json',
     })
 
