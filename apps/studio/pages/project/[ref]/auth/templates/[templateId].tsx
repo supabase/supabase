@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TEMPLATES_SCHEMAS } from 'components/interfaces/Auth/AuthTemplatesValidation'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -12,20 +13,36 @@ import {
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
 const TemplatePage: NextPageWithLayout = () => {
+  return <RedirectToTemplates />
+}
+
+const RedirectToTemplates = () => {
   const router = useRouter()
-  const { templateId } = router.query
+  const { templateId, ref } = router.query
+  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
 
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
 
+  useEffect(() => {
+    if (isPermissionsLoaded && !isSecurityNotificationsEnabled) {
+      router.replace(`/project/${ref}/auth/templates/`)
+    }
+  }, [isPermissionsLoaded, isSecurityNotificationsEnabled, ref, router])
+
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's email settings" />
+  }
+
+  if (!isSecurityNotificationsEnabled) {
+    return null
   }
 
   // Convert templateId slug back to template ID for lookup
