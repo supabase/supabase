@@ -273,10 +273,12 @@ export const TriggerSheet = ({
                           <Select_Shadcn_
                             defaultValue={field.value}
                             onValueChange={(val) => {
+                              // mark table ID as dirty to trigger validation
+                              field.onChange(val)
                               const table = tables.find((x) => x.id.toString() === val)
                               if (table) {
-                                form.setValue('table', table.name)
-                                form.setValue('schema', table.schema)
+                                form.setValue('table', table.name, { shouldDirty: true })
+                                form.setValue('schema', table.schema, { shouldDirty: true })
                               }
                             }}
                           >
