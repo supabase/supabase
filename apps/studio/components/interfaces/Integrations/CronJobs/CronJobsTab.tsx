@@ -5,7 +5,7 @@ import { UIEvent, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
-import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
+import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
@@ -17,7 +17,8 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { isAtBottom } from 'lib/helpers'
+import { BASE_PATH } from 'lib/constants'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import { Button, cn, LoadingLine, Sheet, SheetContent } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { formatCronJobColumns } from './CronJobs.utils'
@@ -143,7 +144,7 @@ export const CronjobsTab = () => {
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
-                if (e.code === 'Enter') setSearchQuery(search.trim())
+                if (e.code === 'Enter' || e.code === 'NumpadEnter') setSearchQuery(search.trim())
               }}
               actions={[
                 search && (
@@ -211,7 +212,7 @@ export const CronjobsTab = () => {
                       })
 
                       if (e.metaKey) {
-                        window.open(url, '_blank')
+                        window.open(`${BASE_PATH}/${url}`, '_blank')
                       } else {
                         router.push(url)
                       }
@@ -278,6 +279,7 @@ export const CronjobsTab = () => {
               setIsClosingCreateCronJobSheet(false)
               setCronJobForEditing(undefined)
               setCreateCronJobSheetShown(false)
+              cleanPointerEventsNoneOnBody(500)
             }}
             isClosing={isClosingCreateCronJobSheet}
             setIsClosing={setIsClosingCreateCronJobSheet}

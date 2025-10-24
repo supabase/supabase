@@ -224,7 +224,7 @@ const CreateProject = () => {
       <div className="py-2">
         <Input
           id="dbPass"
-          label="Database Password"
+          label="Database password"
           type="password"
           placeholder="Type in a strong password"
           value={dbPass}

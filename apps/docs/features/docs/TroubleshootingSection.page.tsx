@@ -12,6 +12,9 @@ import {
   getTroubleshootingKeywordsByTopic,
 } from '~/features/docs/Troubleshooting.utils'
 import { PROD_URL } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 interface SectionTroubleshootingPageProps {
   topic: ITroubleshootingMetadata['topics'][number]
@@ -60,7 +63,7 @@ export function generateSectionTroubleshootingMetadata(
   sectionName: string
 ): Metadata {
   return {
-    title: `Supabase Docs | ${sectionName} Troubleshooting`,
+    title: `${metadataTitle ?? 'Supabase'} | ${sectionName} Troubleshooting`,
     alternates: {
       canonical: `${PROD_URL}/guides/${topic}/troubleshooting`,
     },

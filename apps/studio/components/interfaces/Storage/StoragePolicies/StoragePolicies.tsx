@@ -22,7 +22,7 @@ import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
-const StoragePolicies = () => {
+export const StoragePolicies = () => {
   const { data: project } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
 
@@ -284,5 +284,3 @@ const StoragePolicies = () => {
     </div>
   )
 }
-
-export default StoragePolicies

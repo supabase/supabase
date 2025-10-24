@@ -1,9 +1,12 @@
 import { screen, waitFor } from '@testing-library/react'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { beforeEach, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
-import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import {
+  LogsPreviewer,
+  calculateBarClickTimeRange,
+} from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import { customRender, customRenderHook } from 'tests/lib/custom-render'
 import userEvent from '@testing-library/user-event'
 
@@ -126,4 +129,89 @@ test('can click load older', async () => {
   await userEvent.click(loadOlder)
 
   expect(loadOlder.onclick).toHaveBeenCalled()
+})
+
+describe('calculateBarClickTimeRange', () => {
+  const clickedTime = '2024-01-15T12:30:00.000Z'
+
+  test('uses 15-second range for time ranges less than 2 minutes', () => {
+    const rangeStart = '2024-01-15T12:00:00.000Z'
+    const rangeEnd = '2024-01-15T12:01:30.000Z' // 1.5 minutes
+
+    const result = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTime)
+
+    expect(result.start).toBe('2024-01-15T12:29:52.500Z') // 7.5 seconds before
+    expect(result.end).toBe('2024-01-15T12:30:07.500Z') // 7.5 seconds after
+  })
+
+  test('uses 2-minute range for time ranges between 2 minutes and 1 hour', () => {
+    const rangeStart = '2024-01-15T12:00:00.000Z'
+    const rangeEnd = '2024-01-15T12:30:00.000Z' // 30 minutes
+
+    const result = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTime)
+
+    expect(result.start).toBe('2024-01-15T12:29:00.000Z') // 1 minute before
+    expect(result.end).toBe('2024-01-15T12:31:00.000Z') // 1 minute after
+  })
+
+  test('uses 5-minute range for time ranges between 1 and 12 hours', () => {
+    const rangeStart = '2024-01-15T10:00:00.000Z'
+    const rangeEnd = '2024-01-15T14:00:00.000Z' // 4 hours
+
+    const result = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTime)
+
+    expect(result.start).toBe('2024-01-15T12:27:30.000Z') // 2.5 minutes before
+    expect(result.end).toBe('2024-01-15T12:32:30.000Z') // 2.5 minutes after
+  })
+
+  test('uses 1-hour range for time ranges 12 hours or more', () => {
+    const rangeStart = '2024-01-15T00:00:00.000Z'
+    const rangeEnd = '2024-01-15T24:00:00.000Z' // 24 hours
+
+    const result = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTime)
+
+    expect(result.start).toBe('2024-01-15T12:00:00.000Z') // 30 minutes before
+    expect(result.end).toBe('2024-01-15T13:00:00.000Z') // 30 minutes after
+  })
+
+  test('handles edge case of exactly 2 minutes range', () => {
+    const rangeStart = '2024-01-15T12:00:00.000Z'
+    const rangeEnd = '2024-01-15T12:02:00.000Z' // exactly 2 minutes
+
+    const result = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTime)
+
+    expect(result.start).toBe('2024-01-15T12:29:00.000Z') // 1 minute before
+    expect(result.end).toBe('2024-01-15T12:31:00.000Z') // 1 minute after
+  })
+
+  test('handles edge case of exactly 1 hour range', () => {
+    const rangeStart = '2024-01-15T12:00:00.000Z'
+    const rangeEnd = '2024-01-15T13:00:00.000Z' // exactly 1 hour
+
+    const result = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTime)
+
+    expect(result.start).toBe('2024-01-15T12:27:30.000Z') // 2.5 minutes before
+    expect(result.end).toBe('2024-01-15T12:32:30.000Z') // 2.5 minutes after
+  })
+
+  test('handles edge case of exactly 12 hours range', () => {
+    const rangeStart = '2024-01-15T00:00:00.000Z'
+    const rangeEnd = '2024-01-15T12:00:00.000Z' // exactly 12 hours
+
+    const result = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTime)
+
+    expect(result.start).toBe('2024-01-15T12:00:00.000Z') // 30 minutes before
+    expect(result.end).toBe('2024-01-15T13:00:00.000Z') // 30 minutes after
+  })
+
+  test('handles different clicked timestamps correctly', () => {
+    const rangeStart = '2024-01-15T00:00:00.000Z'
+    const rangeEnd = '2024-01-15T24:00:00.000Z' // 24 hours
+    const differentClickedTime = '2024-01-15T06:15:30.000Z'
+
+    const result = calculateBarClickTimeRange(rangeStart, rangeEnd, differentClickedTime)
+
+    expect(result.start).toBe('2024-01-15T05:45:30.000Z') // 30 minutes before
+    expect(result.end).toBe('2024-01-15T06:45:30.000Z') // 30 minutes after
+  })
 })

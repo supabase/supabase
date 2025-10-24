@@ -1,14 +1,9 @@
 import type { CloudProvider, Region } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
-
-const smartRegionToExactRegionMap = new Map([
-  ['Americas', 'East US (North Virginia)'],
-  ['Europe', 'Central EU (Frankfurt)'],
-  ['APAC', 'Southeast Asia (Singapore)'],
-])
+import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
-  return smartRegionToExactRegionMap.get(smartOrExactRegion) ?? smartOrExactRegion
+  return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
 }
 
 export function getAvailableRegions(cloudProvider: CloudProvider): Region {
@@ -16,6 +11,18 @@ export function getAvailableRegions(cloudProvider: CloudProvider): Region {
     case 'AWS':
     case 'AWS_K8S':
       return AWS_REGIONS
+    case 'AWS_NIMBUS':
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') {
+        // Only allow Southeast Asia for Nimbus (local/staging)
+        return {
+          SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA,
+        }
+      }
+
+      // Only allow US East for Nimbus (prod)
+      return {
+        EAST_US: AWS_REGIONS.EAST_US,
+      }
     case 'FLY':
       return FLY_REGIONS
     default:

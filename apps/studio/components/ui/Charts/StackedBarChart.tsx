@@ -1,9 +1,8 @@
+import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { useChartHoverState } from './useChartHoverState'
-import ChartHeader from './ChartHeader'
+
+import { ChartHeader } from './ChartHeader'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -20,7 +19,7 @@ import {
   useStacked,
 } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-dayjs.extend(utc)
+import { useChartHoverState } from './useChartHoverState'
 
 interface Props extends CommonChartProps<any> {
   xAxisKey: string
@@ -81,7 +80,17 @@ const StackedBarChart: React.FC<Props> = ({
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
-  if (!data || data.length === 0) return <NoDataPlaceholder size={size} />
+  if (!data || data.length === 0) {
+    return (
+      <NoDataPlaceholder
+        description="It may take up to 24 hours for data to refresh"
+        size={size}
+        attribute={title}
+        format={format}
+      />
+    )
+  }
+
   const stackColorScales = genStackColorScales(stackColors)
   return (
     <div className="w-full">

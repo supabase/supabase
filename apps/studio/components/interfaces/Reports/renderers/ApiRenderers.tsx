@@ -220,22 +220,6 @@ export const TopApiRoutesRenderer = (
           >
             {!showMore ? 'Show more' : 'Show less'}
           </Button>
-          <Button
-            type="text"
-            className="text-foreground-lighter"
-            onClick={() => {
-              props.router.push({
-                pathname: `/project/${projectRef}/logs/explorer`,
-                query: {
-                  q: props.params?.sql,
-                  its: props.params!.iso_timestamp_start,
-                  ite: props.params!.iso_timestamp_end,
-                },
-              })
-            }}
-          >
-            Open in Logs Explorer
-          </Button>
         </div>
       </Collapsible.Trigger>
     </Collapsible>

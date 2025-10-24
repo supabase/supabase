@@ -1,10 +1,10 @@
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { StorageSettings } from 'components/interfaces/Storage'
 import { S3Connection } from 'components/interfaces/Storage/StorageSettings/S3Connection'
-import type { NextPageWithLayout } from 'types'
+import { StorageSettings } from 'components/interfaces/Storage/StorageSettings/StorageSettings'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import type { NextPageWithLayout } from 'types'
 
 const StorageSettingsPage: NextPageWithLayout = () => {
   return (

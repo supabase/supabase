@@ -96,12 +96,6 @@
         "type": "cli-command"
       },
       {
-        "id": "supabase-gen-keys",
-        "title": "Generate keys (Preview branch)",
-        "slug": "supabase-gen-keys",
-        "type": "cli-command"
-      },
-      {
         "id": "supabase-gen-signing-key",
         "title": "Generate a JWT signing key",
         "slug": "supabase-gen-signing-key",
@@ -482,6 +476,18 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-branches-pause",
+        "title": "Pause a preview branch",
+        "slug": "supabase-branches-pause",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-branches-unpause",
+        "title": "Unpause a preview branch",
+        "slug": "supabase-branches-unpause",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-branches-delete",
         "title": "Delete a preview branch",
         "slug": "supabase-branches-delete",
@@ -605,30 +611,6 @@
         "id": "supabase-storage-rm",
         "title": "Delete objects from Storage",
         "slug": "supabase-storage-rm",
-        "type": "cli-command"
-      }
-    ]
-  },
-  {
-    "type": "category",
-    "title": "Encryption",
-    "items": [
-      {
-        "id": "supabase-encryption",
-        "title": "Manage encryption keys",
-        "slug": "supabase-encryption",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-encryption-get-root-key",
-        "title": "Retrieve the root encryption key",
-        "slug": "supabase-encryption-get-root-key",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-encryption-update-root-key",
-        "title": "Update root encryption key",
-        "slug": "supabase-encryption-update-root-key",
         "type": "cli-command"
       }
     ]
@@ -838,7 +820,7 @@
       {
         "id": "supabase-postgres-config",
         "title": "Manage Postgres configurations",
-        "slug": "supabase-ssl-enforcement",
+        "slug": "supabase-postgres-config",
         "type": "cli-command"
       },
       {

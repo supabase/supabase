@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -20,7 +20,7 @@ import {
   STORAGE_VIEWS,
 } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
-import FileExplorerRow from './FileExplorerRow'
+import { FileExplorerRow } from './FileExplorerRow'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
   return (
@@ -68,7 +68,7 @@ export interface FileExplorerColumnProps {
   onColumnLoadMore: (index: number, column: StorageColumn) => void
 }
 
-const FileExplorerColumn = ({
+export const FileExplorerColumn = ({
   index = 0,
   column,
   fullWidth = false,
@@ -83,7 +83,7 @@ const FileExplorerColumn = ({
   const fileExplorerColumnRef = useRef<any>(null)
 
   const snap = useStorageExplorerStateSnapshot()
-  const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
     if (fileExplorerColumnRef) {
@@ -275,5 +275,3 @@ const FileExplorerColumn = ({
     </div>
   )
 }
-
-export default FileExplorerColumn

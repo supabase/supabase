@@ -1,13 +1,13 @@
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DataPoint } from 'data/analytics/constants'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
-import DiskUsage from './DiskUsage'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import DatabaseSizeUsage from './DatabaseSizeUsage'
+import { DiskUsage } from './DiskUsage'
 
 export interface ChartMeta {
   [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
@@ -46,10 +46,12 @@ const UsageSection = ({
   return (
     <>
       <ScaffoldContainer>
-        <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
+        <SectionHeader
+          title={categoryMeta.name}
+          description={categoryMeta.description}
+          className="pb-0"
+        />
       </ScaffoldContainer>
-
-      <ScaffoldDivider />
 
       {categoryMeta.attributes.map((attribute) =>
         attribute.key === 'diskSize' ? (

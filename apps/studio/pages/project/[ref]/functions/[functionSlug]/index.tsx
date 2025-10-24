@@ -1,11 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs, { Dayjs } from 'dayjs'
+import maxBy from 'lodash/maxBy'
 import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 
+import { useFlag } from 'common'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
@@ -13,16 +15,12 @@ import AreaChart from 'components/ui/Charts/AreaChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'
 import {
-  FunctionsReqStatsVariables,
-  useFunctionsReqStatsQuery,
-} from 'data/analytics/functions-req-stats-query'
-import {
-  FunctionsResourceUsageVariables,
-  useFunctionsResourceUsageQuery,
-} from 'data/analytics/functions-resource-usage-query'
+  FunctionsCombinedStatsVariables,
+  useFunctionsCombinedStatsQuery,
+} from 'data/analytics/functions-combined-stats-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
@@ -48,24 +46,25 @@ const CHART_INTERVALS: ChartIntervals[] = [
     format: 'MMM D, h:mma',
   },
   {
+    key: '3hr',
+    label: '3 hours',
+    startValue: 3,
+    startUnit: 'hour',
+    format: 'MMM D, h:mma',
+  },
+  {
     key: '1day',
     label: '1 day',
     startValue: 1,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
   },
-  // {
-  //   key: '7day',
-  //   label: '7 days',
-  //   startValue: 7,
-  //   startUnit: 'day',
-  //   format: 'MMM D',
-  // },
 ]
 
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
+  const newChartsEnabled = useFlag('newEdgeFunctionOverviewCharts')
   const [interval, setInterval] = useState<string>('15min')
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const { data: selectedFunction } = useEdgeFunctionQuery({
@@ -73,26 +72,16 @@ const PageLayout: NextPageWithLayout = () => {
     slug: functionSlug,
   })
   const id = selectedFunction?.id
-  const reqStatsResult = useFunctionsReqStatsQuery({
+  const combinedStatsResults = useFunctionsCombinedStatsQuery({
     projectRef,
     functionId: id,
-    interval: selectedInterval.key as FunctionsReqStatsVariables['interval'],
+    interval: selectedInterval.key as FunctionsCombinedStatsVariables['interval'],
   })
 
-  const resourceUsageResult = useFunctionsResourceUsageQuery({
-    projectRef,
-    functionId: id,
-    interval: selectedInterval.key as FunctionsResourceUsageVariables['interval'],
-  })
-
-  const reqStatsData = useMemo(() => {
-    const result = reqStatsResult.data?.result
+  const combinedStatsData = useMemo(() => {
+    const result = combinedStatsResults.data?.result
     return result || []
-  }, [reqStatsResult.data])
-
-  const resourceUsageData = useMemo(() => {
-    return resourceUsageResult.data?.result || []
-  }, [resourceUsageResult.data])
+  }, [combinedStatsResults.data])
 
   const [startDate, endDate]: [Dayjs, Dayjs] = useMemo(() => {
     const start = dayjs()
@@ -104,45 +93,36 @@ const PageLayout: NextPageWithLayout = () => {
   }, [selectedInterval])
 
   const {
-    data: execTimeChartData,
-    error: execTimeError,
-    isError: isErrorExecTime,
+    data: combinedStatsChartData,
+    error: combinedStatsError,
+    isError: isErrorCombinedStats,
   } = useFillTimeseriesSorted(
-    reqStatsData,
+    combinedStatsData,
     'timestamp',
-    ['avg_execution_time'],
+    [
+      'requests_count',
+      'log_count',
+      'log_info_count',
+      'log_warn_count',
+      'log_error_count',
+      'success_count',
+      'redirect_count',
+      'client_err_count',
+      'server_err_count',
+      'avg_cpu_time_used',
+      'avg_memory_used',
+      'avg_execution_time',
+      'max_execution_time',
+      'avg_heap_memory_used',
+      'avg_external_memory_used',
+      'max_cpu_time_used',
+    ],
     0,
     startDate.toISOString(),
     endDate.toISOString()
   )
 
-  const {
-    data: invocationsChartData,
-    error: invocationsError,
-    isError: isErrorInvocations,
-  } = useFillTimeseriesSorted(
-    reqStatsData,
-    'timestamp',
-    ['count', 'success_count', 'redirect_count', 'client_err_count', 'server_err_count'],
-    0,
-    startDate.toISOString(),
-    endDate.toISOString()
-  )
-
-  const {
-    data: resourceUsageChartData,
-    error: resourceUsageError,
-    isError: isErrorResourceUsage,
-  } = useFillTimeseriesSorted(
-    resourceUsageData,
-    'timestamp',
-    ['avg_cpu_time_used', 'avg_memory_used'],
-    0,
-    startDate.toISOString(),
-    endDate.toISOString()
-  )
-
-  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckProjectPermissions(
+  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
     functionSlug as string
   )
@@ -151,7 +131,7 @@ const PageLayout: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="px-6 w-full pt-6">
+    <div className="px-6 w-full py-6">
       <div className="space-y-6">
         <div className="flex flex-row items-center gap-2">
           <div className="flex items-center">
@@ -188,45 +168,65 @@ const PageLayout: NextPageWithLayout = () => {
             <ReportWidget
               title="Execution time"
               tooltip="Average execution time of function invocations"
-              data={execTimeChartData}
-              isLoading={reqStatsResult.isLoading}
+              data={combinedStatsChartData}
+              isLoading={combinedStatsResults.isLoading}
               renderer={(props) => {
-                return isErrorExecTime ? (
+                return isErrorCombinedStats ? (
                   <Alert_Shadcn_ variant="warning">
                     <WarningIcon />
                     <AlertTitle_Shadcn_>Failed to reterieve execution time</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>{execTimeError.message}</AlertDescription_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      {combinedStatsError.message}
+                    </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 ) : (
-                  <AreaChart
-                    className="w-full"
-                    xAxisKey="timestamp"
-                    customDateFormat={selectedInterval.format}
-                    yAxisKey="avg_execution_time"
-                    data={props.data}
-                    format="ms"
-                    highlightedValue={meanBy(props.data, 'avg_execution_time')}
-                  />
+                  <div className="space-y-8">
+                    <AreaChart
+                      title="Average execution time"
+                      className="w-full"
+                      xAxisKey="timestamp"
+                      customDateFormat={selectedInterval.format}
+                      yAxisKey="avg_execution_time"
+                      data={props.data}
+                      format="ms"
+                      highlightedValue={meanBy(props.data, 'avg_execution_time')}
+                    />
+                    {newChartsEnabled && (
+                      <AreaChart
+                        title="Max execution time"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        customDateFormat={selectedInterval.format}
+                        yAxisKey="max_execution_time"
+                        data={props.data}
+                        format="ms"
+                        highlightedValue={
+                          maxBy(props.data, 'max_execution_time')?.max_execution_time
+                        }
+                      />
+                    )}
+                  </div>
                 )
               }}
             />
             <ReportWidget
               title="Invocations"
-              data={invocationsChartData}
-              isLoading={reqStatsResult.isLoading}
+              tooltip="Requests made to a function are considered invocations, and each invocation may have worker logs."
+              data={combinedStatsChartData}
+              isLoading={combinedStatsResults.isLoading}
               renderer={(props) => {
-                if (isErrorInvocations) {
+                if (isErrorCombinedStats) {
                   return (
                     <Alert_Shadcn_ variant="warning">
                       <WarningIcon />
                       <AlertTitle_Shadcn_>Failed to reterieve invocations</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {invocationsError.message}
+                        {combinedStatsError.message}
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   )
                 } else {
-                  const data = props.data
+                  const requestData = props.data
                     .map((d: any) => [
                       {
                         status: '2xx',
@@ -251,22 +251,63 @@ const PageLayout: NextPageWithLayout = () => {
                     ])
                     .flat()
 
+                  const logsData = props.data
+                    .map((d: any) => [
+                      {
+                        status: 'error',
+                        count: d.log_error_count,
+                        timestamp: d.timestamp,
+                      },
+                      {
+                        status: 'info',
+                        count: d.log_info_count,
+                        timestamp: d.timestamp,
+                      },
+                      {
+                        status: 'warn',
+                        count: d.log_warn_count,
+                        timestamp: d.timestamp,
+                      },
+                    ])
+                    .flat()
+
                   return (
-                    <StackedBarChart
-                      className="w-full"
-                      xAxisKey="timestamp"
-                      yAxisKey="count"
-                      stackKey="status"
-                      data={data}
-                      highlightedValue={sumBy(data, 'count')}
-                      customDateFormat={selectedInterval.format}
-                      stackColors={['brand', 'slate', 'yellow', 'red']}
-                      onBarClick={() => {
-                        router.push(
-                          `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}`
-                        )
-                      }}
-                    />
+                    <div className="space-y-8">
+                      <StackedBarChart
+                        title="Invocation Requests"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        yAxisKey="count"
+                        stackKey="status"
+                        data={requestData}
+                        highlightedValue={sumBy(requestData, 'count')}
+                        customDateFormat={selectedInterval.format}
+                        stackColors={['brand', 'slate', 'yellow', 'red']}
+                        onBarClick={() => {
+                          router.push(
+                            `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}`
+                          )
+                        }}
+                      />
+                      {newChartsEnabled && (
+                        <StackedBarChart
+                          title="Worker Logs"
+                          className="w-full"
+                          xAxisKey="timestamp"
+                          yAxisKey="count"
+                          stackKey="status"
+                          data={logsData}
+                          highlightedValue={sumBy(logsData, 'count')}
+                          customDateFormat={selectedInterval.format}
+                          stackColors={['red', 'brand', 'yellow']}
+                          onBarClick={() => {
+                            router.push(
+                              `/project/${projectRef}/functions/${functionSlug}/logs?its=${startDate.toISOString()}`
+                            )
+                          }}
+                        />
+                      )}
+                    </div>
                   )
                 }
               }}
@@ -274,54 +315,105 @@ const PageLayout: NextPageWithLayout = () => {
             <ReportWidget
               title="CPU time"
               tooltip="Average CPU time usage for the function"
-              data={resourceUsageChartData}
-              isLoading={resourceUsageResult.isLoading}
+              data={combinedStatsChartData}
+              isLoading={combinedStatsResults.isLoading}
               renderer={(props) => {
-                return isErrorResourceUsage ? (
+                return isErrorCombinedStats ? (
                   <Alert_Shadcn_ variant="warning">
                     <WarningIcon />
                     <AlertTitle_Shadcn_>Failed to retrieve CPU time</AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
-                      {resourceUsageError.message}
+                      {combinedStatsError.message}
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 ) : (
-                  <AreaChart
-                    className="w-full"
-                    xAxisKey="timestamp"
-                    customDateFormat={selectedInterval.format}
-                    yAxisKey="avg_cpu_time_used"
-                    data={props.data}
-                    format="ms"
-                    highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
-                  />
+                  <div className="space-y-8">
+                    <AreaChart
+                      title="Average CPU Time"
+                      className="w-full"
+                      xAxisKey="timestamp"
+                      customDateFormat={selectedInterval.format}
+                      yAxisKey="avg_cpu_time_used"
+                      data={props.data}
+                      format="ms"
+                      highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
+                    />
+                    {newChartsEnabled && (
+                      <AreaChart
+                        title="Max CPU Time"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        customDateFormat={selectedInterval.format}
+                        yAxisKey="max_cpu_time_used"
+                        data={props.data}
+                        format="ms"
+                        highlightedValue={maxBy(props.data, 'max_cpu_time_used')?.max_cpu_time_used}
+                      />
+                    )}
+                  </div>
                 )
               }}
             />
             <ReportWidget
               title="Memory"
               tooltip="Average memory usage for the function"
-              data={resourceUsageChartData}
-              isLoading={resourceUsageResult.isLoading}
+              data={combinedStatsChartData}
+              isLoading={combinedStatsResults.isLoading}
               renderer={(props) => {
-                return isErrorResourceUsage ? (
-                  <Alert_Shadcn_ variant="warning">
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>Failed to retrieve memory usage</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      {resourceUsageError.message}
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                ) : (
-                  <AreaChart
-                    className="w-full"
-                    xAxisKey="timestamp"
-                    customDateFormat={selectedInterval.format}
-                    yAxisKey="avg_memory_used"
-                    data={props.data}
-                    format="MB"
-                    highlightedValue={meanBy(props.data, 'avg_memory_used')}
-                  />
+                if (isErrorCombinedStats) {
+                  return (
+                    <Alert_Shadcn_ variant="warning">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>Failed to retrieve memory usage</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        {combinedStatsError.message}
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )
+                }
+
+                const memoryData = props.data
+                  .map((d: any) => [
+                    {
+                      type: 'heap',
+                      count: d.avg_heap_memory_used,
+                      timestamp: d.timestamp,
+                    },
+                    {
+                      type: 'external',
+                      count: d.avg_external_memory_used,
+                      timestamp: d.timestamp,
+                    },
+                  ])
+                  .flat()
+
+                return (
+                  <div className="space-y-8">
+                    <AreaChart
+                      title="Average Memory Usage"
+                      className="w-full"
+                      xAxisKey="timestamp"
+                      customDateFormat={selectedInterval.format}
+                      yAxisKey="avg_memory_used"
+                      data={props.data}
+                      format="MB"
+                      highlightedValue={meanBy(props.data, 'avg_memory_used')}
+                    />
+                    {newChartsEnabled && (
+                      <StackedBarChart
+                        title="Average Memory Usage by Type"
+                        className="w-full"
+                        xAxisKey="timestamp"
+                        yAxisKey="count"
+                        stackKey="type"
+                        format="MB"
+                        data={memoryData}
+                        highlightedValue={sumBy(memoryData, 'count')}
+                        customDateFormat={selectedInterval.format}
+                        stackColors={['blue', 'brand']}
+                      />
+                    )}
+                  </div>
                 )
               }}
             />

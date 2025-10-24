@@ -14,7 +14,7 @@ import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
@@ -28,14 +28,11 @@ const CodePage = () => {
   const { mutate: sendEvent } = useSendEventMutation()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
-  const { can: canDeployFunction } = useAsyncCheckProjectPermissions(
-    PermissionAction.FUNCTIONS_WRITE,
-    '*'
-  )
+  const { can: canDeployFunction } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
   const {
-    data: functionFiles,
+    data: functionBody,
     isLoading: isLoadingFiles,
     isError: isErrorLoadingFiles,
     isSuccess: isSuccessLoadingFiles,
@@ -123,15 +120,29 @@ const CodePage = () => {
     }
   }
 
-  function getBasePath(entrypoint: string | undefined): string {
+  function getBasePath(
+    entrypoint: string | undefined,
+    fileNames: string[],
+    version: number
+  ): string {
     if (!entrypoint) {
       return '/'
     }
 
+    let qualifiedEntrypoint = entrypoint
+
+    if (version >= 2) {
+      const candidate = fileNames.find((name) => entrypoint.endsWith(name))
+      if (candidate) {
+        qualifiedEntrypoint = `file://${candidate}`
+      } else {
+        qualifiedEntrypoint = entrypoint
+      }
+    }
     try {
-      return dirname(new URL(entrypoint).pathname)
+      return dirname(new URL(qualifiedEntrypoint).pathname)
     } catch (e) {
-      console.error('Failed to parse entrypoint', entrypoint)
+      console.error('Failed to parse entrypoint', qualifiedEntrypoint)
       return '/'
     }
   }
@@ -155,9 +166,13 @@ const CodePage = () => {
 
   useEffect(() => {
     // Set files from API response when available
-    if (selectedFunction?.entrypoint_path && functionFiles) {
-      const base_path = getBasePath(selectedFunction?.entrypoint_path)
-      const filesWithRelPath = functionFiles
+    if (selectedFunction?.entrypoint_path && functionBody) {
+      const base_path = getBasePath(
+        selectedFunction?.entrypoint_path,
+        functionBody.files.map((file) => file.name),
+        functionBody.version
+      )
+      const filesWithRelPath = functionBody.files
         // ignore empty files
         .filter((file: { name: string; content: string }) => !!file.content.length)
         // set file paths relative to entrypoint
@@ -192,7 +207,7 @@ const CodePage = () => {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [functionFiles])
+  }, [functionBody])
 
   return (
     <div className="flex flex-col h-full">

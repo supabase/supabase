@@ -2,15 +2,15 @@ import { useQueryClient } from '@tanstack/react-query'
 import { RefreshCw } from 'lucide-react'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { tableRowKeys } from 'data/table-rows/keys'
-import { Button } from 'ui'
 
 export type RefreshButtonProps = {
   tableId?: number
   isRefetching?: boolean
 }
 
-const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => {
+export const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const queryKey = tableRowKeys.tableRowsAndCount(ref, tableId)
@@ -20,14 +20,18 @@ const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => {
   }
 
   return (
-    <Button
-      type="text"
+    <ButtonTooltip
+      type="outline"
       loading={isRefetching}
-      icon={<RefreshCw className="text-foreground-muted" strokeWidth={1.5} />}
+      icon={<RefreshCw />}
       onClick={() => onClick()}
-    >
-      Refresh
-    </Button>
+      className="w-7 h-7 p-0"
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: 'Refresh table data',
+        },
+      }}
+    />
   )
 }
-export default RefreshButton

@@ -314,6 +314,10 @@
       "import": "./src/LogsBarChart/index.tsx",
       "types": "./src/LogsBarChart/index.tsx"
     },
+    "./McpUrlBuilder": {
+      "import": "./src/McpUrlBuilder/index.ts",
+      "types": "./src/McpUrlBuilder/index.ts"
+    },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
       "types": "./src/MobileSheetNav/MobileSheetNav.tsx"
@@ -487,7 +491,7 @@
     "@vitest/coverage-v8": "^3.0.9",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
-    "cmdk": "^1.0.0",
+    "cmdk": "^1.1.1",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "dayjs": "^1.11.13",
@@ -521,7 +525,7 @@
     "ui": "workspace:*",
     "unist-util-visit": "^5.0.0",
     "valtio": "catalog:",
-    "zod": "^3.25.76"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.0.0",
@@ -536,8 +540,8 @@
     "@types/react-dom": "catalog:",
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
-    "typescript": "~5.5.0",
     "tsx": "^4.19.3",
+    "typescript": "catalog:",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",
     "vite": "catalog:",

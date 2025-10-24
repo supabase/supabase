@@ -1,14 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { ExternalLink, Loader, Monitor, Server } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { Badge, Button } from 'ui'
 
+import { useParams } from 'common'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import { invalidateProjectDetailsQuery, type Project } from 'data/projects/project-detail-query'
-import { setProjectPostgrestStatus } from 'data/projects/projects-query'
+import {
+  useInvalidateProjectDetailsQuery,
+  useSetProjectPostgrestStatus,
+  type Project,
+} from 'data/projects/project-detail-query'
+import { DOCS_URL } from 'lib/constants'
 import pingPostgrest from 'lib/pingPostgrest'
-import { Loader, Monitor, Server, ExternalLink } from 'lucide-react'
+import { Badge, Button } from 'ui'
 
 export interface ConnectingStateProps {
   project: Project
@@ -16,8 +19,10 @@ export interface ConnectingStateProps {
 
 const ConnectingState = ({ project }: ConnectingStateProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const checkProjectConnectionIntervalRef = useRef<number>()
+
+  const { setProjectPostgrestStatus } = useSetProjectPostgrestStatus()
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
   useEffect(() => {
     if (!project.restUrl) return
@@ -34,8 +39,8 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
     const result = await pingPostgrest(project.ref)
     if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
-      setProjectPostgrestStatus(queryClient, project.ref, 'ONLINE')
-      await invalidateProjectDetailsQuery(queryClient, project.ref)
+      setProjectPostgrestStatus(project.ref, 'ONLINE')
+      await invalidateProjectDetailsQuery(project.ref)
     }
   }
 
@@ -86,9 +91,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
                 </Button>
                 <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <Link
-                    href={
-                      'https://supabase.com/docs/guides/platform/troubleshooting#unable-to-connect-to-your-supabase-project'
-                    }
+                    href={`${DOCS_URL}/guides/platform/troubleshooting#unable-to-connect-to-your-supabase-project`}
                     className="translate-y-[1px]"
                   >
                     Troubleshooting

@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { debounce } from 'lodash'
-import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
@@ -10,12 +9,9 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
-import { components } from 'api-types'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import {
-  FreeProjectLimitWarning,
-  NotOrganizationOwnerWarning,
-} from 'components/interfaces/Organization/NewProject'
+import { NotOrganizationOwnerWarning } from 'components/interfaces/Organization/NewProject'
+import { FreeProjectLimitWarning } from 'components/interfaces/Organization/NewProject/FreeProjectLimitWarning'
 import { OrgNotFound } from 'components/interfaces/Organization/OrgNotFound'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import {
@@ -42,13 +38,14 @@ import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-l
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
+import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -57,15 +54,16 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  DEFAULT_PROVIDER,
+  DOCS_URL,
   FLY_REGIONS_DEFAULT,
   MANAGED_BY,
   PROJECT_STATUS,
   PROVIDERS,
+  useDefaultProvider,
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
-import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -92,6 +90,8 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
+// [Joshen] This page is getting rather big and complex, let's aim to break this down into smaller components
 
 const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
 
@@ -120,7 +120,7 @@ const FormSchema = z.object({
   dbPass: z
     .string({ required_error: 'Please enter a database password.' })
     .min(1, 'Password is required.'),
-  instanceSize: z.string(),
+  instanceSize: z.string().optional(),
   dataApi: z.boolean(),
   useApiSchema: z.boolean(),
   postgresVersionSelection: z.string(),
@@ -132,14 +132,29 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
+  const defaultProvider = useDefaultProvider()
+
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
+  const canChooseInstanceSize = !isFreePlan
+
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
+  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+
+  const smartRegionEnabled = useFlag('enableSmartRegion')
+  const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
+  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  const isHomeNew = useFlag('homeNew')
 
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
+  const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+
+  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -150,31 +165,68 @@ const Wizard: NextPageWithLayout = () => {
     }
   }
 
+  const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
+  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
+  const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
+  const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
+    useState(false)
+
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const smartRegionEnabled = useFlag('enableSmartRegion')
-  const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
-  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
+    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+      refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['dbPass'],
+        message: passwordStrengthWarning || 'Password not secure enough',
+      })
+    }
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    mode: 'onChange',
+    defaultValues: {
+      organization: slug,
+      projectName: projectName || '',
+      postgresVersion: '',
+      cloudProvider: PROVIDERS[defaultProvider].id,
+      dbPass: '',
+      dbPassStrength: 0,
+      dbRegion: undefined,
+      instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
+      dataApi: true,
+      useApiSchema: false,
+      postgresVersionSelection: '',
+      useOrioleDb: false,
+    },
+  })
+  const { instanceSize: watchedInstanceSize, cloudProvider, dbRegion, organization } = form.watch()
+
+  // [Charis] Since the form is updated in a useEffect, there is an edge case
+  // when switching from free to paid, where canChooseInstanceSize is true for
+  // an in-between render, but watchedInstanceSize is still undefined from the
+  // form state carried over from the free plan. To avoid this, we set a
+  // default instance size in this case.
+  const instanceSize = canChooseInstanceSize ? watchedInstanceSize ?? sizes[0] : undefined
+
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }
   )
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+  const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
+
+  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
+  const orgNotFound = isOrganizationsSuccess && (organizations?.length ?? 0) > 0 && isInvalidSlug
+  const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
 
   const { data: approvedOAuthApps } = useAuthorizedAppsQuery(
     { slug },
     { enabled: !isFreePlan && slug !== '_' }
   )
-
   const hasOAuthApps = approvedOAuthApps && approvedOAuthApps.length > 0
-
-  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
-  const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
-
-  const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
-    useState(false)
-
-  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
 
   const isNotOnTeamOrEnterprisePlan = useMemo(
     () => !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
@@ -184,7 +236,6 @@ const Wizard: NextPageWithLayout = () => {
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
     enabled: isNotOnTeamOrEnterprisePlan,
   })
-
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === currentOrg?.id
   )
@@ -206,24 +257,21 @@ const Wizard: NextPageWithLayout = () => {
           organization: res.organization_slug,
         },
       })
-      router.push(`/project/${res.ref}/building`)
+      router.push(isHomeNew ? `/project/${res.ref}` : `/project/${res.ref}/building`)
     },
   })
 
-  const { data: allProjectsFromApi } = useProjectsQuery()
-  const [allProjects, setAllProjects] = useState<
-    components['schemas']['ProjectInfo'][] | undefined
-  >(undefined)
-
+  const { data: orgProjectsFromApi } = useOrgProjectsInfiniteQuery({ slug: currentOrg?.slug })
+  const allOrgProjects = useMemo(
+    () => orgProjectsFromApi?.pages.flatMap((page) => page.projects),
+    [orgProjectsFromApi?.pages]
+  )
   const organizationProjects =
-    allProjects?.filter(
-      (project) =>
-        project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
-    ) ?? []
+    allProjects?.filter((project) => project.status !== PROJECT_STATUS.INACTIVE) ?? []
 
   const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
-      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+      cloudProvider: PROVIDERS[defaultProvider].id,
     },
     {
       enabled: !smartRegionEnabled,
@@ -239,7 +287,8 @@ const Wizard: NextPageWithLayout = () => {
     useOrganizationAvailableRegionsQuery(
       {
         slug: slug,
-        cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+        cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
+        desiredInstanceSize: instanceSize as DesiredInstanceSize,
       },
       {
         enabled: smartRegionEnabled,
@@ -249,74 +298,23 @@ const Wizard: NextPageWithLayout = () => {
         refetchOnReconnect: false,
       }
     )
-
-  const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion = smartRegionEnabled
+  const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
-    : _defaultRegion
-
-  const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
-
-  const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
-  const orgNotFound = isOrganizationsSuccess && (organizations?.length ?? 0) > 0 && isInvalidSlug
-  const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
-
-  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
-
-  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-
-  const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
-
-  const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
+    : undefined
+  const regionError =
+    smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
+      ? availableRegionsError
+      : defaultRegionError
+  const defaultRegion =
+    defaultProvider === 'AWS_NIMBUS'
+      ? AWS_REGIONS.EAST_US.displayName
+      : smartRegionEnabled
+        ? availableRegionsData?.recommendations.smartGroup.name
+        : _defaultRegion
 
   const canCreateProject =
     isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel && !hasOutstandingInvoices
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value) => checkPasswordStrength(value), 300)
-  ).current
-
-  async function checkPasswordStrength(value: any) {
-    const { message, warning, strength } = await passwordStrength(value)
-
-    form.setValue('dbPassStrength', strength)
-    form.trigger('dbPassStrength')
-    form.trigger('dbPass')
-
-    setPasswordStrengthWarning(warning)
-    setPasswordStrengthMessage(message)
-  }
-
-  FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
-    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-      refinementContext.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['dbPass'],
-        message: passwordStrengthWarning || 'Password not secure enough',
-      })
-    }
-  })
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    mode: 'onChange',
-    defaultValues: {
-      organization: slug,
-      projectName: projectName || '',
-      postgresVersion: '',
-      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
-      dbPass: '',
-      dbPassStrength: 0,
-      dbRegion: defaultRegion || undefined,
-      instanceSize: sizes[0],
-      dataApi: true,
-      useApiSchema: false,
-      postgresVersionSelection: '',
-      useOrioleDb: false,
-    },
-  })
-
-  const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
   const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
@@ -331,14 +329,35 @@ const Wizard: NextPageWithLayout = () => {
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
     // current project costs
-    organizationProjects.reduce(
-      (prev, acc) => prev + monthlyInstancePrice(acc.infra_compute_size),
-      0
-    ) +
+    organizationProjects.reduce((prev, acc) => {
+      const primaryDatabase = acc.databases.find((db) => db.identifier === acc.ref)
+      const cost = !!primaryDatabase ? monthlyInstancePrice(primaryDatabase.infra_compute_size) : 0
+      return prev + cost
+    }, 0) +
     // selected compute size
     monthlyInstancePrice(instanceSize) -
     // compute credits
     10
+
+  const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
+
+  const additionalMonthlySpend = isFreePlan
+    ? 0
+    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+
+  async function checkPasswordStrength(value: any) {
+    const { message, warning, strength } = await passwordStrength(value)
+
+    form.setValue('dbPassStrength', strength)
+    form.trigger('dbPassStrength')
+    form.trigger('dbPass')
+
+    setPasswordStrengthWarning(warning)
+    setPasswordStrengthMessage(message)
+  }
+  const delayedCheckPasswordStrength = useRef(
+    debounce((value) => checkPasswordStrength(value), 300)
+  ).current
 
   // [Refactor] DB Password could be a common component used in multiple pages with repeated logic
   function generatePassword() {
@@ -351,6 +370,7 @@ const Wizard: NextPageWithLayout = () => {
     const launchingLargerInstance =
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
+
     if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
       sendEvent({
         action: 'project_creation_simple_version_confirm_modal_opened',
@@ -428,10 +448,10 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
-    if (allProjectsFromApi && !allProjects) {
-      setAllProjects(allProjectsFromApi.projects)
+    if (allOrgProjects && allOrgProjects.length > 0 && !allProjects) {
+      setAllProjects(allOrgProjects)
     }
-  }, [allProjectsFromApi, allProjects, setAllProjects])
+  }, [allOrgProjects, allProjects, setAllProjects])
 
   useEffect(() => {
     // Handle no org: redirect to new org route
@@ -455,15 +475,25 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (regionError) {
-      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
+      form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
     }
   }, [regionError])
 
-  const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
+  useEffect(() => {
+    if (recommendedSmartRegion) {
+      form.setValue('dbRegion', recommendedSmartRegion)
+    }
+  }, [recommendedSmartRegion])
 
-  const additionalMonthlySpend = isFreePlan
-    ? 0
-    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+  useEffect(() => {
+    if (watchedInstanceSize !== instanceSize) {
+      form.setValue('instanceSize', instanceSize, {
+        shouldDirty: false,
+        shouldValidate: false,
+        shouldTouch: false,
+      })
+    }
+  }, [instanceSize, watchedInstanceSize, form])
 
   return (
     <Form_Shadcn_ {...form}>
@@ -473,11 +503,9 @@ const Wizard: NextPageWithLayout = () => {
           title={
             <div key="panel-title">
               <h3>Create a new project</h3>
-              <p className="text-sm text-foreground-lighter">
-                Your project will have its own dedicated instance and full Postgres database.
-                <br />
-                An API will be set up so you can easily interact with your new database.
-                <br />
+              <p className="text-sm text-foreground-lighter text-balance">
+                Your project will have its own dedicated instance and full Postgres database. An API
+                will be set up so you can easily interact with your new database.
               </p>
             </div>
           }
@@ -489,7 +517,7 @@ const Wizard: NextPageWithLayout = () => {
                   canCreateProject &&
                   additionalMonthlySpend > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span>Additional Costs</span>
+                      <span>Additional costs</span>
                       <div className="text-brand flex gap-1 items-center font-mono font-medium">
                         <span>${additionalMonthlySpend}/m</span>
                         <InfoTooltip side="top" className="max-w-[450px] p-0">
@@ -497,7 +525,7 @@ const Wizard: NextPageWithLayout = () => {
                             <p>
                               Each project includes a dedicated Postgres instance running on its own
                               server. You are charged for the{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
+                              <InlineLink href={`${DOCS_URL}/guides/platform/billing-on-supabase`}>
                                 Compute resource
                               </InlineLink>{' '}
                               of that server, independent of your database usage.
@@ -518,19 +546,24 @@ const Wizard: NextPageWithLayout = () => {
                               </TableRow>
                             </TableHeader>
                             <TableBody className="[&_td]:py-2">
-                              {organizationProjects.map((project) => (
-                                <TableRow key={project.ref} className="text-foreground-light">
-                                  <TableCell className="w-[170px] truncate">
-                                    {project.name}
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    {instanceLabel(project.infra_compute_size)}
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    ${monthlyInstancePrice(project.infra_compute_size)}
-                                  </TableCell>
-                                </TableRow>
-                              ))}
+                              {organizationProjects.map((project) => {
+                                const primaryDb = project.databases.find(
+                                  (db) => db.identifier === project.ref
+                                )
+                                return (
+                                  <TableRow key={project.ref} className="text-foreground-light">
+                                    <TableCell className="w-[170px] truncate">
+                                      {project.name}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                      {instanceLabel(primaryDb?.infra_compute_size)}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                      ${monthlyInstancePrice(primaryDb?.infra_compute_size)}
+                                    </TableCell>
+                                  </TableRow>
+                                )
+                              })}
 
                               <TableRow>
                                 <TableCell className="w-[170px] flex gap-2">
@@ -707,15 +740,20 @@ const Wizard: NextPageWithLayout = () => {
                                 </FormControl_Shadcn_>
                                 <SelectContent_Shadcn_>
                                   <SelectGroup_Shadcn_>
-                                    {Object.values(PROVIDERS).map((providerObj) => {
-                                      const label = providerObj['name']
-                                      const value = providerObj['id']
-                                      return (
-                                        <SelectItem_Shadcn_ key={value} value={value}>
-                                          {label}
-                                        </SelectItem_Shadcn_>
+                                    {Object.values(PROVIDERS)
+                                      .filter(
+                                        (provider) =>
+                                          validCloudProviders?.includes(provider.id) ?? true
                                       )
-                                    })}
+                                      .map((providerObj) => {
+                                        const label = providerObj['name']
+                                        const value = providerObj['id']
+                                        return (
+                                          <SelectItem_Shadcn_ key={value} value={value}>
+                                            {label}
+                                          </SelectItem_Shadcn_>
+                                        )
+                                      })}
                                   </SelectGroup_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
@@ -725,7 +763,7 @@ const Wizard: NextPageWithLayout = () => {
                       </Panel.Content>
                     )}
 
-                    {currentOrg?.plan && currentOrg?.plan.id !== 'free' && (
+                    {canChooseInstanceSize && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}
@@ -733,38 +771,30 @@ const Wizard: NextPageWithLayout = () => {
                           render={({ field }) => (
                             <FormItemLayout
                               layout="horizontal"
-                              label={
-                                <div className="flex flex-col gap-y-4">
-                                  <span>Compute Size</span>
-
-                                  <div className="flex flex-col gap-y-2">
-                                    <Link
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
-                                    >
-                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Compute Add-Ons</p>
-                                        <ExternalLink size={16} strokeWidth={1.5} />
-                                      </div>
-                                    </Link>
-                                    <Link
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
-                                    >
-                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                        <p className="text-sm m-0">Compute Billing</p>
-                                        <ExternalLink size={16} strokeWidth={1.5} />
-                                      </div>
-                                    </Link>
-                                  </div>
-                                </div>
-                              }
+                              label="Compute size"
                               description={
                                 <>
                                   <p>
                                     The size for your dedicated database. You can change this later.
+                                    Learn more about{' '}
+                                    <InlineLink
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-inherit hover:text-foreground transition-colors"
+                                      href={`${DOCS_URL}/guides/platform/compute-add-ons`}
+                                    >
+                                      compute add-ons
+                                    </InlineLink>{' '}
+                                    and{' '}
+                                    <InlineLink
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-inherit hover:text-foreground transition-colors"
+                                      href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
+                                    >
+                                      compute billing
+                                    </InlineLink>
+                                    .
                                   </p>
                                 </>
                               }
@@ -845,7 +875,7 @@ const Wizard: NextPageWithLayout = () => {
 
                           return (
                             <FormItemLayout
-                              label="Database Password"
+                              label="Database password"
                               layout="horizontal"
                               description={
                                 <>
@@ -892,8 +922,8 @@ const Wizard: NextPageWithLayout = () => {
                         render={({ field }) => (
                           <RegionSelector
                             field={field}
-                            form={form}
                             cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                            instanceSize={instanceSize as DesiredInstanceSize}
                           />
                         )}
                       />
@@ -926,7 +956,7 @@ const Wizard: NextPageWithLayout = () => {
                             <FormItemLayout
                               label="Custom Postgres version"
                               layout="horizontal"
-                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
+                              description="Specify a custom version of Postgres (defaults to the latest). This is only applicable for local/staging projects."
                             >
                               <FormControl_Shadcn_>
                                 <Input_Shadcn_
@@ -952,10 +982,7 @@ const Wizard: NextPageWithLayout = () => {
                   isAdmin &&
                   slug && (
                     <Panel.Content>
-                      <FreeProjectLimitWarning
-                        membersExceededLimit={membersExceededLimit || []}
-                        orgSlug={slug}
-                      />
+                      <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
                     </Panel.Content>
                   )
                 ) : isManagedByVercel ? (
@@ -1016,7 +1043,7 @@ const Wizard: NextPageWithLayout = () => {
               monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
               clicking "I understand", you agree to the additional costs.{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
+                href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                 target="_blank"
                 className="underline"
               >

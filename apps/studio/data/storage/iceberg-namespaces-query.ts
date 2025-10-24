@@ -10,6 +10,7 @@ type GetNamespacesVariables = {
   token: string
 }
 
+// [Joshen] Investigate if we can use the temp API keys here
 async function getNamespaces({ catalogUri, warehouse, token }: GetNamespacesVariables) {
   let headers = new Headers()
   // handle both secret key and service role key

@@ -44,3 +44,162 @@ export const stripEmojis = (str: string) =>
     )
     .replace(/\s+/g, ' ')
     .trim()
+
+// Vanilla JavaScript implementations to replace lodash functions
+
+/**
+ * Creates an array of numbers (positive and/or negative) progressing from start up to, but not including, end.
+ * @param start The start of the range
+ * @param end The end of the range
+ * @param step The value to increment or decrement by
+ * @returns Returns the range of numbers
+ */
+export const range = (start: number, end?: number, step: number = 1): number[] => {
+  if (end === undefined) {
+    end = start
+    start = 0
+  }
+
+  const result: number[] = []
+  for (let i = start; step > 0 ? i < end : i > end; i += step) {
+    result.push(i)
+  }
+  return result
+}
+
+/**
+ * Converts string to start case.
+ * @param string The string to convert
+ * @returns Returns the start cased string
+ */
+export const startCase = (string: string): string => {
+  if (!string) return string
+
+  return string
+    .replace(/[-_\s]+/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .trim()
+}
+
+/**
+ * Creates a debounced function that delays invoking func until after wait milliseconds have elapsed since the last time the debounced function was invoked.
+ * @param func The function to debounce
+ * @param wait The number of milliseconds to delay
+ * @param options The options object
+ * @returns Returns the new debounced function
+ */
+export const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number,
+  options: { leading?: boolean; trailing?: boolean } = {}
+): ((...args: Parameters<T>) => void) & {
+  cancel: () => void
+  flush: () => void | undefined
+  pending: () => boolean
+} => {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+  let lastCallTime: number | undefined
+  let lastInvokeTime = 0
+
+  const { leading = false, trailing = true } = options
+
+  function invokeFunc(time: number, ...args: Parameters<T>) {
+    lastInvokeTime = time
+    func.apply(null, args)
+  }
+
+  function startTimer(pendingFunc: () => void, wait: number) {
+    return setTimeout(pendingFunc, wait)
+  }
+
+  function cancelTimer(id: ReturnType<typeof setTimeout>) {
+    clearTimeout(id)
+  }
+
+  function leadingEdge(time: number, ...args: Parameters<T>) {
+    lastInvokeTime = time
+    timeoutId = startTimer(timerExpired, wait)
+    return leading ? invokeFunc(time, ...args) : undefined
+  }
+
+  function remainingWait(time: number) {
+    const timeSinceLastCall = time - (lastCallTime || 0)
+    const timeSinceLastInvoke = time - lastInvokeTime
+    const timeWaiting = wait - timeSinceLastCall
+
+    return Math.min(timeWaiting, wait - timeSinceLastInvoke)
+  }
+
+  function shouldInvoke(time: number) {
+    const timeSinceLastCall = time - (lastCallTime || 0)
+    const timeSinceLastInvoke = time - lastInvokeTime
+
+    return (
+      lastCallTime === undefined ||
+      timeSinceLastCall >= wait ||
+      timeSinceLastCall < 0 ||
+      timeSinceLastInvoke >= wait
+    )
+  }
+
+  function timerExpired() {
+    const time = Date.now()
+    if (shouldInvoke(time)) {
+      return trailingEdge(time)
+    }
+    timeoutId = startTimer(timerExpired, remainingWait(time))
+  }
+
+  function trailingEdge(time: number) {
+    timeoutId = undefined
+
+    if (trailing) {
+      // For trailing edge, we don't have the original arguments, so we call without them
+      return invokeFunc(time, ...([] as any))
+    }
+  }
+
+  function cancel() {
+    if (timeoutId !== undefined) {
+      cancelTimer(timeoutId)
+    }
+    lastInvokeTime = 0
+    lastCallTime = undefined
+    timeoutId = undefined
+  }
+
+  function flush() {
+    return timeoutId === undefined ? undefined : trailingEdge(Date.now())
+  }
+
+  function pending() {
+    return timeoutId !== undefined
+  }
+
+  function debounced(this: any, ...args: Parameters<T>) {
+    const time = Date.now()
+    const isInvoking = shouldInvoke(time)
+
+    lastCallTime = time
+
+    if (isInvoking) {
+      if (timeoutId === undefined) {
+        return leadingEdge(lastCallTime, ...args)
+      }
+      if (trailing) {
+        timeoutId = startTimer(timerExpired, wait)
+        return invokeFunc(lastCallTime, ...args)
+      }
+    }
+    if (timeoutId === undefined) {
+      timeoutId = startTimer(timerExpired, wait)
+    }
+  }
+
+  debounced.cancel = cancel
+  debounced.flush = flush
+  debounced.pending = pending
+
+  return debounced
+}

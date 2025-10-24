@@ -4,7 +4,6 @@ import { useParams } from 'common'
 import { BillingSettings } from 'components/interfaces/Organization/BillingSettings/BillingSettings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
@@ -37,9 +36,7 @@ const OrgBillingSettings: NextPageWithLayout = () => {
 
 OrgBillingSettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
-    </OrganizationLayout>
+    <OrganizationLayout>{page}</OrganizationLayout>
   </DefaultLayout>
 )
 export default OrgBillingSettings

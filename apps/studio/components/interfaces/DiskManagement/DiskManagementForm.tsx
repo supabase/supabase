@@ -1,9 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -11,6 +9,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
@@ -19,20 +18,21 @@ import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-upd
 import { useDiskAutoscaleCustomConfigQuery } from 'data/config/disk-autoscale-config-query'
 import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale-config-update-mutation'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { setProjectStatus } from 'data/projects/projects-query'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
   useIsAwsK8sCloudProvider,
+  useIsAwsNimbusCloudProvider,
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
-import { GB, PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
   Button,
@@ -66,21 +66,23 @@ import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
 export function DiskManagementForm() {
+  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const { ref: projectRef } = useParams()
-  const queryClient = useQueryClient()
+  const { setProjectStatus } = useSetProjectStatus()
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === project?.ref
   )
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.UPDATE, 'projects', {
+    useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
       resource: {
         project_id: project?.id,
       },
@@ -156,7 +158,10 @@ export function DiskManagementForm() {
 
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(
-      CreateDiskStorageSchema(defaultValues.totalSize, project?.cloud_provider as CloudProvider)
+      CreateDiskStorageSchema({
+        defaultTotalSize: defaultValues.totalSize,
+        cloudProvider: project?.cloud_provider as CloudProvider,
+      })
     ),
     defaultValues,
     mode: 'onBlur',
@@ -225,7 +230,7 @@ export function DiskManagementForm() {
       onError: () => {},
       onSuccess: () => {
         //Manually set project status to RESIZING, Project status should be RESIZING on next project status request.
-        setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
+        if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
       },
     })
   const { mutateAsync: updateDiskAutoscaleConfig, isLoading: isUpdatingDiskAutoscaleConfig } =
@@ -241,12 +246,14 @@ export function DiskManagementForm() {
     let willUpdateDiskConfiguration = false
     setMessageState(null)
 
+    // [Joshen] Skip disk configuration related stuff for AWS Nimbus
     try {
       if (
-        payload.storageType !== form.formState.defaultValues?.storageType ||
-        payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
-        payload.throughput !== form.formState.defaultValues?.throughput ||
-        payload.totalSize !== form.formState.defaultValues?.totalSize
+        !isAwsNimbus &&
+        (payload.storageType !== form.formState.defaultValues?.storageType ||
+          payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
+          payload.throughput !== form.formState.defaultValues?.throughput ||
+          payload.totalSize !== form.formState.defaultValues?.totalSize)
       ) {
         willUpdateDiskConfiguration = true
 
@@ -260,9 +267,10 @@ export function DiskManagementForm() {
       }
 
       if (
-        payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
-        payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
-        payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb
+        !isAwsNimbus &&
+        (payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
+          payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
+          payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb)
       ) {
         await updateDiskAutoscaleConfig({
           projectRef,
@@ -310,15 +318,7 @@ export function DiskManagementForm() {
             type="default"
             visible={isPlanUpgradeRequired}
             title="Compute and Disk configuration is not available on the Free Plan"
-            actions={
-              <Button type="default" asChild>
-                <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=diskManagementConfigure`}
-                >
-                  Upgrade plan
-                </Link>
-              </Button>
-            }
+            actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
           />
 
@@ -344,12 +344,16 @@ export function DiskManagementForm() {
             </div>
           ) : null}
           <Separator />
+
           <ComputeSizeField form={form} disabled={disableComputeInputs} />
-          <Separator />
+
+          {!(isAws || isAwsNimbus) && <Separator />}
+
           <SpendCapDisabledSection />
+
           <NoticeBar
             type="default"
-            visible={!isAws}
+            visible={!(isAws || isAwsNimbus)}
             title="Disk configuration is only available for projects in the AWS cloud provider"
             description={
               isAwsK8s
@@ -372,7 +376,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#read-only-mode`}
                     />
                   </Admonition>
                 )}
@@ -385,7 +389,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                     />
                   </Admonition>
                 )}

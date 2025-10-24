@@ -44,7 +44,7 @@ export const useOrgUsageQuery = <TData = OrgUsageData>(
     ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
     {
       enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined',
-      staleTime: 1000 * 60 * 30, // 30 mins, underlying usage data only refreshes once an hour, so safe to cache for a while
+      staleTime: 1000 * 60 * 60, // 60 mins, underlying usage data only refreshes once an hour, so safe to cache for a while
       ...options,
     }
   )
