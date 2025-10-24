@@ -69,11 +69,14 @@ export const EmailTemplates = () => {
                     >
                       <div className="flex flex-col">
                         <h3 className="text-sm text-foreground">{template.title}</h3>
-                        <p className="text-sm text-foreground-lighter">
-                          Email description goes here.
-                        </p>
+                        {template.purpose && (
+                          <p className="text-sm text-foreground-lighter">{template.purpose}</p>
+                        )}
                       </div>
-                      <ChevronRight size={16} className="text-foreground-muted group-hover:text-foreground transition-colors" />
+                      <ChevronRight
+                        size={16}
+                        className="text-foreground-muted group-hover:text-foreground transition-colors"
+                      />
                     </Link>
                   </CardContent>
                 )
