@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TEMPLATES_SCHEMAS } from 'components/interfaces/Auth/AuthTemplatesValidation'
+import TemplateEditor from 'components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -57,12 +58,12 @@ const RedirectToTemplates = () => {
     })
     return template?.id
   }
-
-  // Convert templateId slug to one lowercase word to match docs anchor tag
-  const templateIdForDocs = templateId.replace(/-/g, '').toLowerCase()
   const template = TEMPLATES_SCHEMAS.find(
     (template) => template.id === templateIdFromSlug(templateId as string)
   )
+
+  // Convert templateId slug to one lowercase word to match docs anchor tag
+  const templateIdForDocs = templateId.replace(/-/g, '').toLowerCase()
 
   return (
     <PageLayout
@@ -88,14 +89,8 @@ const RedirectToTemplates = () => {
           </ScaffoldSection>
         ) : (
           <ScaffoldSection isFullWidth>
-            <ScaffoldHeader>
-              <ScaffoldSectionTitle>Contents</ScaffoldSectionTitle>
-            </ScaffoldHeader>
-            {/* Template content will go here */}
             <Card>
-              <CardContent>
-                <p className="text-foreground-light">Template editor will be implemented here.</p>
-              </CardContent>
+              <TemplateEditor template={template} />
             </Card>
           </ScaffoldSection>
         )}
