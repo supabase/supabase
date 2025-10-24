@@ -9,7 +9,7 @@
  * @module telemetry-frontend
  */
 
-type TelemetryGroups = {
+export type TelemetryGroups = {
   project: string
   organization: string
 }
