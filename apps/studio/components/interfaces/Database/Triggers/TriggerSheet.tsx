@@ -94,8 +94,8 @@ export const TriggerSheet = ({
 
   const { mutate: createDatabaseTrigger, isLoading: isCreating } = useDatabaseTriggerCreateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully created trigger ${res.name}`)
+      onSuccess: () => {
+        toast.success(`Successfully created trigger`)
         onClose()
       },
       onError: (error) => {
@@ -105,8 +105,8 @@ export const TriggerSheet = ({
   )
   const { mutate: updateDatabaseTrigger, isLoading: isUpdating } = useDatabaseTriggerUpdateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully updated trigger ${res.name}`)
+      onSuccess: () => {
+        toast.success(`Successfully updated trigger`)
         onClose()
       },
       onError: (error) => {
