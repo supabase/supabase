@@ -1,5 +1,4 @@
 import { LifeBuoy, Activity } from 'lucide-react'
-import { IconDiscordOutline } from 'ui'
 import { useMemo } from 'react'
 
 import { useRegisterCommands, useSetCommandMenuOpen, type ICommand } from '..'
@@ -20,15 +19,15 @@ const useSupportCommands = ({ enabled = true }: { enabled?: boolean } = {}) => {
         },
         {
           id: 'discord-community',
-          name: 'Ask the community',
-          value: 'Support: Ask the community',
+          name: 'Ask Discord community',
+          value: 'Support: Ask Discord community',
           href: 'https://discord.supabase.com',
-          icon: () => <IconDiscordOutline />,
+          icon: () => <LifeBuoy />,
         },
         {
           id: 'support-team',
-          name: 'Contact support team',
-          value: 'Support: Contact support team',
+          name: 'Contact support',
+          value: 'Support: Contact support',
           href: '/support',
           icon: () => <LifeBuoy />,
         },

@@ -1,6 +1,6 @@
 import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
 import { Activity } from 'lucide-react'
-import { IconDiscordSolid, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
+import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 import { companyStats } from 'data/company-stats'
 
 export const data = (isDark: boolean) => ({
@@ -89,7 +89,7 @@ We're committed to our Free Plan - we know the importance of this for testing ho
         number: '25,000',
         text: 'Discord members',
         url: 'https://discord.com/invite/R7bSpeBSJE',
-        icon: <IconDiscordSolid />,
+        icon: <IconDiscord />,
       },
       {
         number: '23,000',

@@ -10,7 +10,7 @@ import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wo
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import footerData from 'data/Footer'
 import { usePathname } from 'next/navigation'
-import { Badge, IconDiscordSolid, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
+import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
@@ -118,7 +118,7 @@ const Footer = (props: Props) => {
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Discord</span>
-                <IconDiscordSolid size={22} />
+                <IconDiscord size={22} />
               </a>
 
               <a
