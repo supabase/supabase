@@ -40,17 +40,11 @@ export interface DeleteBucketModalProps {
   visible: boolean
   bucket: Bucket | AnalyticsBucket
   onClose: () => void
-  onDelete?: (bucket: Bucket) => void
 }
 
 const formId = `delete-storage-bucket-form`
 
-export const DeleteBucketModal = ({
-  visible,
-  bucket,
-  onClose,
-  onDelete, // Temporary prop for vector buckets specific deletion mutation
-}: DeleteBucketModalProps) => {
+export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModalProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -158,12 +152,7 @@ export const DeleteBucketModal = ({
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
 
-    // Temporary change for vector buckets specific deletion mutation
-    if (onDelete) {
-      onDelete(bucket)
-    } else {
-      deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
-    }
+    deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
   }
 
   const isDeleting = isDeletingBucket || isDeletingAnalyticsBucket || isCleaningUpAnalyticsBucket

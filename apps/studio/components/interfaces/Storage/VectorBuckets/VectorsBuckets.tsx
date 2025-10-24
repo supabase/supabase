@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import {
   Button,
@@ -25,17 +24,16 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
-import { DeleteBucketModal } from '../DeleteBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
+import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
 
 export const VectorsBuckets = () => {
   const { ref: projectRef } = useParams()
   const router = useRouter()
   const { data, isLoading: isLoadingBuckets } = useVectorBucketsQuery({ projectRef })
   const [filterString, setFilterString] = useState('')
-  const [modal, setModal] = useState<'delete' | null>(null)
-  const [selectedBucket, setSelectedBucket] = useState<{
+  const [bucketForDeletion, setBucketForDeletion] = useState<{
     vectorBucketName: string
     creationTime: string
   } | null>(null)
@@ -47,14 +45,6 @@ export const VectorsBuckets = () => {
       ? true
       : bucket.vectorBucketName.toLowerCase().includes(filterString.toLowerCase())
   )
-
-  const { mutate: deleteBucket } = useVectorBucketDeleteMutation({
-    onSuccess: (data, vars) => {
-      toast.success(`Bucket "${vars.bucketName}" deleted successfully`)
-      setModal(null) // Needed to close the delete bucket modal
-      router.push(`/project/${projectRef}/storage/vectors`)
-    },
-  })
 
   return (
     <>
@@ -135,8 +125,7 @@ export const VectorsBuckets = () => {
                                 <DropdownMenuItem
                                   className="flex items-center space-x-2"
                                   onClick={() => {
-                                    setSelectedBucket(bucket)
-                                    setModal('delete')
+                                    setBucketForDeletion(bucket)
                                   }}
                                 >
                                   <Trash2 size={12} />
@@ -156,22 +145,15 @@ export const VectorsBuckets = () => {
         </ScaffoldSection>
       )}
 
-      <DeleteBucketModal
-        visible={modal === 'delete'}
-        bucket={{
-          id: selectedBucket?.vectorBucketName || '',
-          name: selectedBucket?.vectorBucketName || '',
-          created_at: selectedBucket?.creationTime || '',
-          updated_at: selectedBucket?.creationTime || '',
-          owner: '',
-          public: false,
-          type: 'STANDARD' as const,
+      <DeleteVectorBucketModal
+        visible={!!bucketForDeletion}
+        bucketName={bucketForDeletion?.vectorBucketName!}
+        onCancel={() => setBucketForDeletion(null)}
+        onSuccess={() => {
+          toast.success(`Bucket "${bucketForDeletion?.vectorBucketName}" deleted successfully`)
+          setBucketForDeletion(null)
+          router.push(`/project/${projectRef}/storage/vectors`)
         }}
-        onClose={() => setModal(null)}
-        onDelete={() =>
-          selectedBucket &&
-          deleteBucket({ projectRef: projectRef!, bucketName: selectedBucket.vectorBucketName })
-        }
       />
     </>
   )
