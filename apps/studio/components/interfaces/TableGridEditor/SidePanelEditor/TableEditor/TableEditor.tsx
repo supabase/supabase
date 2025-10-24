@@ -141,7 +141,7 @@ export const TableEditor = ({
     (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
   )
 
-  const { data: foreignKeyMeta = [], isSuccess: isSuccessForeignKeyMeta } =
+  const { data: foreignKeyMeta, isSuccess: isSuccessForeignKeyMeta } =
     useForeignKeyConstraintsQuery({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -149,7 +149,7 @@ export const TableEditor = ({
     })
   const foreignKeys = useMemo(
     () =>
-      foreignKeyMeta.filter(
+      (foreignKeyMeta ?? []).filter(
         (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
       ),
     [foreignKeyMeta, table]
@@ -249,7 +249,7 @@ export const TableEditor = ({
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
           table,
-          foreignKeyMeta,
+          foreignKeyMeta ?? [],
           isDuplicating,
           isRealtimeEnabled
         )
