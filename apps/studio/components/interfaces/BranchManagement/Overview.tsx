@@ -215,6 +215,15 @@ const PreviewBranchActions = ({
     updateBranch({ branchRef, projectRef, persistent: !branch.persistent })
   }
 
+  const onDeleteBranch = (e: Event | React.MouseEvent<HTMLDivElement>) => {
+    if (isPersistentBranch) {
+      setShowPersistentBranchDeleteConfirmationModal(true)
+    } else {
+      e.stopPropagation()
+      onSelectDeleteBranch()
+    }
+  }
+
   return (
     <>
       <DropdownMenu>
@@ -312,22 +321,8 @@ const PreviewBranchActions = ({
           <DropdownMenuItemTooltip
             className="gap-x-2"
             disabled={!canDeleteBranches}
-            onSelect={(e) => {
-              if (isPersistentBranch) {
-                setShowPersistentBranchDeleteConfirmationModal(true)
-              } else {
-                e.stopPropagation()
-                onSelectDeleteBranch()
-              }
-            }}
-            onClick={(e) => {
-              if (isPersistentBranch) {
-                setShowPersistentBranchDeleteConfirmationModal(true)
-              } else {
-                e.stopPropagation()
-                onSelectDeleteBranch()
-              }
-            }}
+            onSelect={onDeleteBranch}
+            onClick={onDeleteBranch}
             tooltip={{
               content: {
                 side: 'left',
