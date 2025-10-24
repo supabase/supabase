@@ -131,8 +131,8 @@ const ObservabilityMenu = () => {
         ...(postgrestReportEnabled
           ? [
               {
-                name: 'PostgREST',
-                key: 'postgrest',
+                name: 'Data API',
+                key: 'data-api',
                 url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
               },
             ]

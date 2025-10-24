@@ -33,7 +33,7 @@ const PostgRESTReport: NextPageWithLayout = () => {
 
 PostgRESTReport.getLayout = (page) => (
   <DefaultLayout>
-    <ObservabilityLayout title="PostgREST">{page}</ObservabilityLayout>
+    <ObservabilityLayout title="Data API">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
@@ -94,7 +94,7 @@ const PostgrestReport = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="PostgREST" />
+      <ReportHeader showDatabaseSelector={false} title="Data API" />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

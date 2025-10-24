@@ -1,4 +1,4 @@
-import { Blocks, FileText, Lightbulb, Glasses, List, Settings } from 'lucide-react'
+import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
@@ -158,16 +158,16 @@ export const generateOtherRoutes = (
     ...(IS_PLATFORM && reportsEnabled
       ? [
           {
-            key: 'observability',
-            label: 'Observability',
-            icon: <Glasses size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
-          },
-          {
             key: 'reports',
-            label: 'Custom Reports',
+            label: 'Reports',
             icon: <Reports size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
+          },
+          {
+            key: 'observability',
+            label: 'Observability',
+            icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
           },
         ]
       : []),
