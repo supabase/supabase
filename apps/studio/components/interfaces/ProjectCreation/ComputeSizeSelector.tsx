@@ -61,7 +61,7 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
             }
           >
             <Select_Shadcn_ value={field.value} onValueChange={(value) => field.onChange(value)}>
-              <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
+              <SelectTrigger_Shadcn_ className="[&>span>div>div>[data-field=instance-details]]:hidden">
                 <SelectValue_Shadcn_ placeholder="Select a compute size" />
               </SelectTrigger_Shadcn_>
               <SelectContent_Shadcn_>
@@ -75,7 +75,7 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                     .map((option) => {
                       return (
                         <SelectItem_Shadcn_ key={option} value={option}>
-                          <div className="flex flex-row i gap-2">
+                          <div className="flex flex-row gap-2">
                             <div className="text-center w-[80px]">
                               <Badge
                                 variant={option === 'micro' ? 'default' : 'brand'}
@@ -94,8 +94,9 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                                 CPU
                               </span>
                               <p
-                                className="text-xs text-foreground-light instance-details"
                                 translate="no"
+                                className="text-xs text-foreground-light"
+                                data-field="instance-details"
                               >
                                 ${instanceSizeSpecs[option].priceHourly}/hour (~$
                                 {instanceSizeSpecs[option].priceMonthly}/month)

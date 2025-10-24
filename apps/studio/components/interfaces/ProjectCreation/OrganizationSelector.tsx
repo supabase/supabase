@@ -35,7 +35,7 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
-  const orgNotFound = isOrganizationsSuccess && (organizations?.length ?? 0) > 0 && isInvalidSlug
+  const orgNotFound = (organizations?.length ?? 0) > 0 && isInvalidSlug
 
   return (
     <Panel.Content className="space-y-4">

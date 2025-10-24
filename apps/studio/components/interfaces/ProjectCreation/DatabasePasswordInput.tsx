@@ -9,7 +9,7 @@ import { generateStrongPassword } from 'lib/project'
 import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { SPECIAL_CHARS_REGEX } from './ProjectCreation.constants'
+import { DATABASE_PASSWORD_REGEX } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { SpecialSymbolsCallout } from './SpecialSymbolsCallout'
 
@@ -54,8 +54,8 @@ export const DatabasePasswordInput = ({
         control={form.control}
         name="dbPass"
         render={({ field }) => {
-          const hasSpecialCharacters =
-            field.value.length > 0 && !field.value.match(SPECIAL_CHARS_REGEX)
+          const isInvalidDatabasePassword =
+            field.value.length > 0 && !field.value.match(DATABASE_PASSWORD_REGEX)
 
           return (
             <FormItemLayout
@@ -63,7 +63,7 @@ export const DatabasePasswordInput = ({
               layout="horizontal"
               description={
                 <>
-                  {hasSpecialCharacters && <SpecialSymbolsCallout />}
+                  {isInvalidDatabasePassword && <SpecialSymbolsCallout />}
                   <PasswordStrengthBar
                     passwordStrengthScore={form.getValues('dbPassStrength')}
                     password={field.value}

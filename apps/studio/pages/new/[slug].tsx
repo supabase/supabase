@@ -95,10 +95,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
-  const isNotOnTeamOrEnterprisePlan = useMemo(
-    () => !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
-    [currentOrg]
-  )
+  const isNotOnTeamOrEnterprisePlan = !['team', 'enterprise'].includes(currentOrg?.plan.id ?? '')
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
