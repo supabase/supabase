@@ -7628,6 +7628,9 @@ export interface components {
       }[]
       defaultPaymentMethodId: string | null
     }
+    PendingConfirmationResponse: {
+      message: string
+    }
     PgbouncerConfigResponse: {
       connection_string: string
       db_dns_name: string
@@ -13835,6 +13838,14 @@ export interface operations {
         }
         content?: never
       }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
+        }
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -16171,6 +16182,14 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['CreateOrganizationResponse']
+        }
+      }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
         }
       }
       /** @description Failed to confirm subscription changes */
