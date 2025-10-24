@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { AuthEmailsLayout } from 'components/layouts/AuthLayout/AuthEmailsLayout'
+import { TEMPLATES_SCHEMAS } from 'components/interfaces/Auth/AuthTemplatesValidation'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   ScaffoldContainer,
@@ -27,6 +28,19 @@ const TemplatePage: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="access your project's email settings" />
   }
 
+  // Convert templateId slug back to template ID for lookup
+  const templateIdFromSlug = (slug: string) => {
+    const template = TEMPLATES_SCHEMAS.find((template) => {
+      const templateSlug = template.title.trim().replace(/\s+/g, '-').toLowerCase()
+      return templateSlug === slug
+    })
+    return template?.id
+  }
+
+  const template = TEMPLATES_SCHEMAS.find(
+    (template) => template.id === templateIdFromSlug(templateId as string)
+  )
+
   return (
     <ScaffoldContainer bottomPadding>
       {!isPermissionsLoaded ? (
@@ -36,9 +50,9 @@ const TemplatePage: NextPageWithLayout = () => {
       ) : (
         <ScaffoldSection isFullWidth>
           <div>
-            <ScaffoldSectionTitle>Email Template: {templateId}</ScaffoldSectionTitle>
+            <ScaffoldSectionTitle>{template?.title || 'Email template'}</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
-              Configure and customize your email template settings.
+              {template?.purpose || 'Configure and customize your email template settings.'}
             </ScaffoldSectionDescription>
           </div>
           {/* Template content will go here */}
@@ -53,7 +67,7 @@ const TemplatePage: NextPageWithLayout = () => {
 
 TemplatePage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthEmailsLayout>{page}</AuthEmailsLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 
