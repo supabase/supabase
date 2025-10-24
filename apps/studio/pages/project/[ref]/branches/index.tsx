@@ -35,7 +35,9 @@ const BranchesPage: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
 
-  const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
+  const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<
+    [Branch, boolean] | undefined
+  >()
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -93,10 +95,11 @@ const BranchesPage: NextPageWithLayout = () => {
   }
 
   const onConfirmDeleteBranch = () => {
-    if (selectedBranchToDelete == undefined) return console.error('No branch selected')
-    const { project_ref: branchRef, parent_project_ref: projectRef } = selectedBranchToDelete
+    if (selectedBranchToDelete === undefined) return console.error('No branch selected')
+    const [branchToDelete, force] = selectedBranchToDelete
+    const { project_ref: branchRef, parent_project_ref: projectRef, persistent } = branchToDelete
     deleteBranch(
-      { branchRef, projectRef },
+      { branchRef, projectRef, force },
       {
         onSuccess: () => {
           if (branchRef === ref) {
@@ -106,7 +109,7 @@ const BranchesPage: NextPageWithLayout = () => {
           sendEvent({
             action: 'branch_delete_button_clicked',
             properties: {
-              branchType: selectedBranchToDelete.persistent ? 'persistent' : 'preview',
+              branchType: persistent ? 'persistent' : 'preview',
               origin: 'branches_page',
             },
             groups: {
@@ -118,6 +121,10 @@ const BranchesPage: NextPageWithLayout = () => {
       }
     )
   }
+
+  const selectedBranchWillBeDeletedImmediately =
+    selectedBranchToDelete?.[1] ||
+    selectedBranchToDelete?.[0].preview_project_status !== 'ACTIVE_HEALTHY'
 
   return (
     <>
@@ -151,7 +158,9 @@ const BranchesPage: NextPageWithLayout = () => {
                       mainBranch={mainBranch}
                       previewBranches={previewBranches}
                       onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
-                      onSelectDeleteBranch={setSelectedBranchToDelete}
+                      onSelectDeleteBranch={(branch, force) =>
+                        setSelectedBranchToDelete([branch, force ?? false])
+                      }
                       generateCreatePullRequestURL={generateCreatePullRequestURL}
                     />
                   )}
@@ -171,12 +180,18 @@ const BranchesPage: NextPageWithLayout = () => {
         title="Delete branch"
         confirmLabel="Delete branch"
         confirmPlaceholder="Type in name of branch"
-        confirmString={selectedBranchToDelete?.name ?? ''}
-        alert={{ title: 'You cannot recover this branch once deleted' }}
+        confirmString={selectedBranchToDelete?.[0].name ?? ''}
+        alert={{
+          title: selectedBranchWillBeDeletedImmediately
+            ? 'You cannot recover this branch once deleted'
+            : 'You can unpause this branch for one hour before it is permanently deleted',
+        }}
         text={
           <>
-            This will delete your database preview branch{' '}
-            <span className="text-bold text-foreground">{selectedBranchToDelete?.name}</span>.
+            {selectedBranchWillBeDeletedImmediately
+              ? 'This will delete your database preview branc '
+              : 'This will pause your branch for one hour then permanently delete it '}
+            <span className="text-bold text-foreground">{selectedBranchToDelete?.[0].name}</span>.
           </>
         }
       />
