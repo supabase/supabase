@@ -74,7 +74,7 @@ export const PerformanceSettingsForm = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const maxConnectionLimit = maxConnData?.maxConnections
+  const maxConnectionLimit = maxConnData?.maxConnections ?? 60
 
   const isLoading = isLoadingAuthConfig || isLoadingMaxConns
 
@@ -129,13 +129,13 @@ export const PerformanceSettingsForm = () => {
   }, [authConfig, isUpdatingRequestDurationForm, isUpdatingDatabaseForm])
 
   const onSubmitRequestDurationForm = (values: any) => {
-    if (!projectRef) return console.error('Project ref is required')
+    if (!project?.ref) return console.error('Project ref is required')
     if (!isProPlan) return
 
     setIsUpdatingRequestDurationForm(true)
 
     updateAuthConfig(
-      { projectRef: projectRef, config: values },
+      { projectRef: project?.ref, config: values },
       {
         onError: (error) => {
           toast.error(`Failed to update request duration settings: ${error?.message}`)
@@ -294,13 +294,15 @@ export const PerformanceSettingsForm = () => {
 
                             field.onChange(value)
 
-                            if (values.DB_MAX_POOL_SIZE_UNIT !== value) {
-                              let preservedPoolSize
 
+                            if (values.DB_MAX_POOL_SIZE_UNIT !== value) {
+                              let currentValue = values.DB_MAX_POOL_SIZE!
+
+                              let preservedPoolSize: number
                               if (value === 'percent') {
                                 // convert from absolute number to roughly the same percentage
                                 preservedPoolSize = Math.ceil(
-                                  (Math.min(maxConnectionLimit, values.DB_MAX_POOL_SIZE) /
+                                  (Math.min(maxConnectionLimit, currentValue) /
                                     maxConnectionLimit) *
                                     100
                                 )
@@ -308,7 +310,7 @@ export const PerformanceSettingsForm = () => {
                                 // convert from percentage to roughly the same connection number
                                 preservedPoolSize = Math.floor(
                                   maxConnectionLimit *
-                                    (Math.min(100, values.DB_MAX_POOL_SIZE) / 100)
+                                    (Math.min(100, currentValue) / 100)
                                 )
                               }
 
@@ -372,9 +374,9 @@ export const PerformanceSettingsForm = () => {
                             <span className="text-brand">
                               {chosenUnit === 'percent'
                                 ? Math.floor(
-                                    maxConnectionLimit * (Math.min(100, field.value) / 100)
+                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
                                   ).toString()
-                                : Math.min(maxConnectionLimit, field.value)}
+                                : Math.min(maxConnectionLimit, field.value!)}
                             </span>{' '}
                             / {maxConnectionLimit} max
                           </div>
