@@ -37,12 +37,14 @@ import Link from 'next/link'
 interface TriggersListProps {
   createTrigger: () => void
   editTrigger: (trigger: PostgresTrigger) => void
+  duplicateTrigger: (trigger: PostgresTrigger) => void
   deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
 const TriggersList = ({
   createTrigger = noop,
   editTrigger = noop,
+  duplicateTrigger = noop,
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { data: project } = useSelectedProjectQuery()
@@ -232,6 +234,7 @@ const TriggersList = ({
                   filterString={filterString}
                   isLocked={isSchemaLocked}
                   editTrigger={editTrigger}
+                  duplicateTrigger={duplicateTrigger}
                   deleteTrigger={deleteTrigger}
                 />
               </TableBody>
