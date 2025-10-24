@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useFlag, useParams } from 'common'
 import { CreateBucketModal } from 'components/interfaces/Storage/CreateBucketModal'
@@ -19,7 +19,7 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
-import { BucketRow } from './BucketRow'
+import { BucketList } from './StorageMenu.BucketList'
 
 export const StorageMenu = () => {
   const router = useRouter()
@@ -53,21 +53,31 @@ export const StorageMenu = () => {
     isError,
     isSuccess,
   } = useBucketsQuery({ projectRef: ref })
-  const sortedBuckets =
-    snap.sortBucket === 'alphabetical'
-      ? buckets.sort((a, b) =>
-          a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
-        )
-      : buckets.sort((a, b) => (new Date(b.created_at) > new Date(a.created_at) ? -1 : 1))
-  const filteredBuckets =
-    searchText.length > 1
-      ? sortedBuckets.filter((bucket) => bucket.name.includes(searchText.trim()))
-      : sortedBuckets
+  const sortedBuckets = useMemo(
+    () =>
+      snap.sortBucket === 'alphabetical'
+        ? buckets.sort((a, b) =>
+            a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
+          )
+        : buckets.sort((a, b) => (new Date(b.created_at) > new Date(a.created_at) ? -1 : 1)),
+    [buckets, snap.sortBucket]
+  )
+  const filteredBuckets = useMemo(
+    () =>
+      searchText.length > 1
+        ? sortedBuckets.filter((bucket) => bucket.name.includes(searchText.trim()))
+        : sortedBuckets,
+    [sortedBuckets, searchText]
+  )
   const tempNotSupported = error?.message.includes('Tenant config') && isBranch
 
   return (
     <>
-      <Menu type="pills" className="mt-6 flex flex-grow flex-col">
+      <Menu
+        type="pills"
+        className="pt-6 h-full flex flex-col"
+        ulClassName="flex flex-col flex-grow"
+      >
         <div className="mb-6 mx-5 flex flex-col gap-y-1.5">
           <CreateBucketModal />
 
@@ -100,8 +110,8 @@ export const StorageMenu = () => {
           </InnerSideBarFilters>
         </div>
 
-        <div className="space-y-6">
-          <div className="mx-3">
+        <div className="flex flex-col flex-grow">
+          <div className="flex-grow ml-3 flex flex-col">
             <Menu.Group title={<span className="uppercase font-mono">All buckets</span>} />
 
             {isLoading && (
@@ -145,17 +155,13 @@ export const StorageMenu = () => {
                     description={`Your search for "${searchText}" did not return any results`}
                   />
                 )}
-                {filteredBuckets.map((bucket, idx: number) => {
-                  const isSelected = bucketId === bucket.id
-                  return (
-                    <BucketRow
-                      key={`${idx}_${bucket.id}`}
-                      bucket={bucket}
-                      projectRef={ref}
-                      isSelected={isSelected}
-                    />
-                  )
-                })}
+                {filteredBuckets.length > 0 && (
+                  <BucketList
+                    buckets={filteredBuckets}
+                    selectedBucketId={bucketId}
+                    projectRef={ref}
+                  />
+                )}
               </>
             )}
           </div>
