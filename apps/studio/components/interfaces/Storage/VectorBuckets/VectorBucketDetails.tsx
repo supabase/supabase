@@ -14,7 +14,6 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
 import { useVectorBucketIndexDeleteMutation } from 'data/storage/vector-bucket-index-delete-mutation'
 import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
 import {
@@ -34,16 +33,16 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { DeleteBucketModal } from '../DeleteBucketModal'
 import { BUCKET_TYPES } from '../Storage.constants'
 import { CreateVectorTableSheet } from './CreateVectorTableSheet'
+import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
 
 interface VectorBucketDetailsProps {
   bucket: { vectorBucketName: string; creationTime: string }
 }
 
 export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
-  const [modal, setModal] = useState<'delete' | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const { ref: projectRef } = useParams()
   const router = useRouter()
 
@@ -60,13 +59,6 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
   const { mutate: deleteIndex } = useVectorBucketIndexDeleteMutation({
     onSuccess: (data, vars) => {
       toast.success(`Table "${data.name}" deleted successfully`)
-    },
-  })
-
-  const { mutate: deleteBucket } = useVectorBucketDeleteMutation({
-    onSuccess: () => {
-      toast.success(`Bucket "${bucket.vectorBucketName}" deleted successfully`)
-      router.push(`/project/${projectRef}/storage/vectors`)
     },
   })
 
@@ -235,12 +227,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                     you want to keep your data.
                   </p>
                 </div>
-                <Button
-                  type="danger"
-                  onClick={() => {
-                    setModal('delete')
-                  }}
-                >
+                <Button type="danger" onClick={() => setShowDeleteModal(true)}>
                   Delete bucket
                 </Button>
               </CardContent>
@@ -249,21 +236,15 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
         </ScaffoldContainer>
       </PageLayout>
 
-      <DeleteBucketModal
-        visible={modal === `delete`}
-        bucket={{
-          id: bucket.vectorBucketName,
-          name: bucket.vectorBucketName,
-          created_at: bucket.creationTime,
-          updated_at: bucket.creationTime,
-          owner: '',
-          public: false,
-          type: 'STANDARD' as const,
+      <DeleteVectorBucketModal
+        visible={showDeleteModal}
+        bucketName={bucket.vectorBucketName}
+        onCancel={() => setShowDeleteModal(false)}
+        onSuccess={() => {
+          setShowDeleteModal(false)
+          toast.success(`Bucket "${bucket.vectorBucketName}" deleted successfully`)
+          router.push(`/project/${projectRef}/storage/vectors`)
         }}
-        onClose={() => setModal(null)}
-        onDelete={() =>
-          deleteBucket({ projectRef: projectRef!, bucketName: bucket.vectorBucketName })
-        }
       />
     </>
   )
