@@ -4,8 +4,10 @@ import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/Fea
 import { TEMPLATES_SCHEMAS } from 'components/interfaces/Auth/AuthTemplatesValidation'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import {
   ScaffoldContainer,
+  ScaffoldHeader,
   ScaffoldSection,
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
@@ -16,6 +18,9 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
+import { Button, Card, CardContent } from 'ui'
 
 const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
@@ -59,26 +64,39 @@ const RedirectToTemplates = () => {
   )
 
   return (
-    <ScaffoldContainer bottomPadding>
-      {!isPermissionsLoaded ? (
-        <ScaffoldSection isFullWidth>
-          <GenericSkeletonLoader />
-        </ScaffoldSection>
-      ) : (
-        <ScaffoldSection isFullWidth>
-          <div>
-            <ScaffoldSectionTitle>{template?.title || 'Email template'}</ScaffoldSectionTitle>
-            <ScaffoldSectionDescription>
-              {template?.purpose || 'Configure and customize your email template settings.'}
-            </ScaffoldSectionDescription>
-          </div>
-          {/* Template content will go here */}
-          <div className="mt-6">
-            <p className="text-foreground-light">Template editor will be implemented here.</p>
-          </div>
-        </ScaffoldSection>
-      )}
-    </ScaffoldContainer>
+    <PageLayout
+      title={template?.title || 'Email template'}
+      subtitle={template?.purpose || 'Configure and customize email templates.'}
+      breadcrumbs={[
+        {
+          label: 'Emails',
+          href: `/project/${ref}/auth/templates`,
+        },
+      ]}
+      secondaryActions={[
+        <DocsButton key="docs" href={`${DOCS_URL}/reference/javascript/subscribe`} />,
+      ]}
+    >
+      <ScaffoldContainer bottomPadding>
+        {!isPermissionsLoaded ? (
+          <ScaffoldSection isFullWidth>
+            <GenericSkeletonLoader />
+          </ScaffoldSection>
+        ) : (
+          <ScaffoldSection isFullWidth>
+            <ScaffoldHeader>
+              <ScaffoldSectionTitle>Contents</ScaffoldSectionTitle>
+            </ScaffoldHeader>
+            {/* Template content will go here */}
+            <Card>
+              <CardContent>
+                <p className="text-foreground-light">Template editor will be implemented here.</p>
+              </CardContent>
+            </Card>
+          </ScaffoldSection>
+        )}
+      </ScaffoldContainer>
+    </PageLayout>
   )
 }
 
