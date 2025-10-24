@@ -71,6 +71,10 @@ const formUnion = z.discriminatedUnion('type', [
     username: z.string().optional(),
     password: z.string().optional(),
   }),
+  z.object({
+    type: z.literal('sentry'),
+    dsn: z.string().min(1, { message: 'Sentry DSN is required' }),
+  }),
 ])
 
 const formSchema = z
@@ -443,6 +447,29 @@ export function LogDrainDestinationSheetForm({
                       label="Password"
                       placeholder="glc_ABCD1234567890"
                       formControl={form.control}
+                    />
+                  </div>
+                )}
+                {type === 'sentry' && (
+                  <div className="grid gap-4 px-content">
+                    <LogDrainFormItem
+                      type="password"
+                      value="dsn"
+                      label="DSN"
+                      formControl={form.control}
+                      description={
+                        <>
+                          The DSN obtained from the Sentry dashboard{' '}
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm underline transition hover:text-foreground"
+                            href="https://docs.sentry.io/concepts/key-terms/dsn-explainer/"
+                          >
+                            here
+                          </a>
+                        </>
+                      }
                     />
                   </div>
                 )}
