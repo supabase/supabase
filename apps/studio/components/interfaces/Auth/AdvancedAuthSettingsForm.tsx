@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { StringNumberOrNull } from 'components/ui/Forms/Form.constants'
@@ -13,8 +12,11 @@ import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
@@ -26,6 +28,11 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   PrePostTab,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -35,11 +42,12 @@ const FormSchema = z.object({
     .number()
     .min(5, 'Must be 5 or larger')
     .max(30, 'Must be a value no greater than 30'),
-  DB_MAX_POOL_SIZE: StringNumberOrNull,
+  DB_MAX_POOL_SIZE: z.coerce.number().min(1),
+  DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
 })
 
 export const AdvancedAuthSettingsForm = () => {
-  const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
   const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -57,13 +65,21 @@ export const AdvancedAuthSettingsForm = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
-  } = useAuthConfigQuery({ projectRef })
+    isLoading: isLoadingAuthConfig,
+  } = useAuthConfigQuery({ projectRef: project?.ref })
 
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
-  const isTeamsEnterprisePlan = organization?.plan.id !== 'free' && organization?.plan.id !== 'pro'
-  const promptTeamsEnterpriseUpgrade = IS_PLATFORM && !isTeamsEnterprisePlan
+  const { data: maxConnData, isLoading: isLoadingMaxConns } = useMaxConnectionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const maxConnectionLimit = maxConnData?.maxConnections
+
+  const isLoading = isLoadingAuthConfig || isLoadingMaxConns
+
+  const isProPlan = organization?.plan.id !== 'free' && organization?.plan.id !== 'pro'
+  const promptProPlanUpgrade = IS_PLATFORM && !isProPlan
 
   const requestDurationForm = useForm({
     resolver: zodResolver(
@@ -80,12 +96,16 @@ export const AdvancedAuthSettingsForm = () => {
     resolver: zodResolver(
       z.object({
         DB_MAX_POOL_SIZE: FormSchema.shape.DB_MAX_POOL_SIZE,
+        DB_MAX_POOL_SIZE_UNIT: FormSchema.shape.DB_MAX_POOL_SIZE_UNIT,
       })
     ),
     defaultValues: {
-      DB_MAX_POOL_SIZE: '',
+      DB_MAX_POOL_SIZE: undefined,
+      DB_MAX_POOL_SIZE_UNIT: 'connections',
     },
   })
+
+  const chosenUnit = databaseForm.watch('DB_MAX_POOL_SIZE_UNIT')
 
   useEffect(() => {
     if (authConfig) {
@@ -98,7 +118,11 @@ export const AdvancedAuthSettingsForm = () => {
       if (!isUpdatingDatabaseForm) {
         databaseForm.reset({
           DB_MAX_POOL_SIZE:
-            authConfig?.DB_MAX_POOL_SIZE !== null ? String(authConfig?.DB_MAX_POOL_SIZE) : '',
+            authConfig?.DB_MAX_POOL_SIZE !== null ? authConfig?.DB_MAX_POOL_SIZE : 10,
+          DB_MAX_POOL_SIZE_UNIT:
+            authConfig?.DB_MAX_POOL_SIZE_UNIT !== null
+              ? authConfig?.DB_MAX_POOL_SIZE_UNIT
+              : 'connections',
         })
       }
     }
@@ -106,7 +130,7 @@ export const AdvancedAuthSettingsForm = () => {
 
   const onSubmitRequestDurationForm = (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!isTeamsEnterprisePlan) return
+    if (!isProPlan) return
 
     setIsUpdatingRequestDurationForm(true)
 
@@ -126,19 +150,19 @@ export const AdvancedAuthSettingsForm = () => {
   }
 
   const onSubmitDatabaseForm = (values: any) => {
-    if (!projectRef) return console.error('Project ref is required')
+    if (!project?.ref) return console.error('Project ref is required')
 
     setIsUpdatingDatabaseForm(true)
 
     const config = {
       DB_MAX_POOL_SIZE: values.DB_MAX_POOL_SIZE,
+      DB_MAX_POOL_SIZE_UNIT: values.DB_MAX_POOL_SIZE_UNIT,
     }
 
     updateAuthConfig(
-      { projectRef: projectRef, config },
+      { projectRef: project?.ref, config },
       {
         onError: (error) => {
-          toast.error(`Failed to update database connection settings: ${error?.message}`)
           setIsUpdatingDatabaseForm(false)
         },
         onSuccess: () => {
@@ -175,12 +199,12 @@ export const AdvancedAuthSettingsForm = () => {
 
   return (
     <>
-      {promptTeamsEnterpriseUpgrade && (
+      {promptProPlanUpgrade && (
         <div className="my-4">
           <UpgradeToPro
-            primaryText="Upgrade to Team or Enterprise"
-            secondaryText="Advanced Auth server settings are only available on the Team Plan and up."
-            buttonText="Upgrade to Team"
+            primaryText="Upgrade to Pro"
+            secondaryText="Adjusting low-level Auth settings is only available on the Pro plan or higher."
+            buttonText="Upgrade to Pro"
           />
         </div>
       )}
@@ -200,8 +224,8 @@ export const AdvancedAuthSettingsForm = () => {
                   render={({ field }) => (
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Maximum time allowed for an Auth request to last"
-                      description="Number of seconds to wait for an Auth request to complete before canceling it. In certain high-load situations setting a larger or smaller value can be used to control load-shedding. Recommended: 10 seconds."
+                      label="Terminate long-running requests"
+                      description="Requests that have not completed within this timeframe will be terminated. Adjust this value to control load-shedding. Recommended: not less than 10 seconds."
                     >
                       <FormControl_Shadcn_>
                         <div className="relative">
@@ -211,7 +235,7 @@ export const AdvancedAuthSettingsForm = () => {
                               min={5}
                               max={30}
                               {...field}
-                              disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
+                              disabled={!canUpdateConfig || promptProPlanUpgrade}
                             />
                           </PrePostTab>
                         </div>
@@ -234,7 +258,7 @@ export const AdvancedAuthSettingsForm = () => {
                     !canUpdateConfig ||
                     isUpdatingRequestDurationForm ||
                     !requestDurationForm.formState.isDirty ||
-                    promptTeamsEnterpriseUpgrade
+                    promptProPlanUpgrade
                   }
                   loading={isUpdatingRequestDurationForm}
                 >
@@ -247,28 +271,114 @@ export const AdvancedAuthSettingsForm = () => {
       </ScaffoldSection>
 
       <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Auth Database Connections</ScaffoldSectionTitle>
+        <ScaffoldSectionTitle className="mb-4">Connection Management</ScaffoldSectionTitle>
 
         <Form_Shadcn_ {...databaseForm}>
           <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-6 flex flex-col gap-4">
+                <FormField_Shadcn_
+                  control={databaseForm.control}
+                  name="DB_MAX_POOL_SIZE_UNIT"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Allocation strategy"
+                      description="Choose to allocate a percentage or an absolute number of connections to the Auth server. Prefer a percentage strategy as it grows with your instance size."
+                    >
+                      <FormControl_Shadcn_>
+                        <Select_Shadcn_
+                          value={field.value}
+                          onValueChange={(value) => {
+                            const values = databaseForm.getValues()
+
+                            field.onChange(value)
+
+                            if (values.DB_MAX_POOL_SIZE_UNIT !== value) {
+                              let preservedPoolSize
+
+                              if (value === 'percent') {
+                                // convert from absolute number to roughly the same percentage
+                                preservedPoolSize = Math.ceil(
+                                  (Math.min(maxConnectionLimit, values.DB_MAX_POOL_SIZE) /
+                                    maxConnectionLimit) *
+                                    100
+                                )
+                              } else {
+                                // convert from percentage to roughly the same connection number
+                                preservedPoolSize = Math.floor(
+                                  maxConnectionLimit *
+                                    (Math.min(100, values.DB_MAX_POOL_SIZE) / 100)
+                                )
+                              }
+
+                              databaseForm.setValue('DB_MAX_POOL_SIZE', preservedPoolSize)
+                            }
+                          }}
+                        >
+                          <SelectTrigger_Shadcn_ size="small">
+                            <SelectValue_Shadcn_>
+                              {field.value === 'percent' ? 'Percentage' : 'Absolute'}
+                            </SelectValue_Shadcn_>
+                          </SelectTrigger_Shadcn_>
+                          <SelectContent_Shadcn_>
+                            <SelectItem_Shadcn_ value="connections" className="text-xs">
+                              Absolute number of connections
+                            </SelectItem_Shadcn_>
+                            <SelectItem_Shadcn_ value="percent" className="text-xs">
+                              Percent of max connections
+                            </SelectItem_Shadcn_>
+                          </SelectContent_Shadcn_>
+                        </Select_Shadcn_>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
                 <FormField_Shadcn_
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE"
                   render={({ field }) => (
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Max Direct Auth Connections"
-                      description="Auth will take up no more than this number of connections from the total number of available connections to serve requests. These connections are not reserved, so when unused they are released. Defaults to 10 connections."
+                      label="Maximum connections"
+                      description={
+                        <>
+                          Limit the maximum number of connections that the Auth server will take up
+                          under highest load.{' '}
+                          <em className="text-brand !not-italic">Connections are not reserved</em>{' '}
+                          and returned to Postgres a few minutes after being idle.
+                        </>
+                      }
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          type="number"
-                          placeholder="10"
-                          {...field}
-                          disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
-                        />
+                        <div className="flex flex-col gap-2">
+                          <div className="relative">
+                            <PrePostTab postTab={chosenUnit === 'percent' ? '%' : 'connections'}>
+                              <Input_Shadcn_
+                                className="w-20"
+                                type="number"
+                                {...field}
+                                min={3}
+                                max={
+                                  chosenUnit === 'percent'
+                                    ? 80
+                                    : Math.floor(maxConnectionLimit * 0.8)
+                                }
+                                disabled={!canUpdateConfig || promptProPlanUpgrade}
+                              />
+                            </PrePostTab>
+                          </div>
+                          <div className="px-2 text-xs text-muted w-full text-end">
+                            <span className="text-brand">
+                              {chosenUnit === 'percent'
+                                ? Math.floor(
+                                    maxConnectionLimit * (Math.min(100, field.value) / 100)
+                                  ).toString()
+                                : Math.min(maxConnectionLimit, field.value)}
+                            </span>{' '}
+                            / {maxConnectionLimit} max
+                          </div>
+                        </div>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

@@ -46,7 +46,10 @@ const AdvancedPage: NextPageWithLayout = () => {
 AdvancedPage.getLayout = (page) => (
   <DefaultLayout>
     <AuthLayout>
-      <PageLayout title="Advanced" subtitle="Configure advanced authentication server settings">
+      <PageLayout
+        title="Performance tuning"
+        subtitle="Adjust low-level Auth settings for increased performance in certain situations"
+      >
         {page}
       </PageLayout>
     </AuthLayout>
