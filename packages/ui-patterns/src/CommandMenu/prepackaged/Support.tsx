@@ -1,4 +1,4 @@
-import { LifeBuoy } from 'lucide-react'
+import { LifeBuoy, Activity } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { useRegisterCommands, useSetCommandMenuOpen, type ICommand } from '..'
@@ -11,24 +11,24 @@ const useSupportCommands = ({ enabled = true }: { enabled?: boolean } = {}) => {
     () =>
       [
         {
-          id: 'support',
-          name: 'Go to Support',
-          value: 'Support: Go to Support',
-          href: '/support',
-          icon: () => <LifeBuoy />,
-        },
-        {
           id: 'system-status',
-          name: 'Go to System Status',
-          value: 'Support: Go to System Status',
+          name: 'View system status',
+          value: 'Support: View system status',
           href: 'https://status.supabase.com',
+          icon: () => <Activity />,
+        },
+        {
+          id: 'discord-community',
+          name: 'Ask Discord community',
+          value: 'Support: Ask Discord community',
+          href: 'https://discord.supabase.com',
           icon: () => <LifeBuoy />,
         },
         {
-          id: 'github-discussions',
-          name: 'Go to GitHub Discussions',
-          value: 'Support: Go to GitHub Discussions',
-          href: 'https://github.com/orgs/supabase/discussions',
+          id: 'support-team',
+          name: 'Contact support',
+          value: 'Support: Contact support',
+          href: '/support',
           icon: () => <LifeBuoy />,
         },
       ].map((command) => ({
