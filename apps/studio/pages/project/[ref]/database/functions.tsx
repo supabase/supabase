@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
@@ -7,13 +7,15 @@ import FunctionsList from 'components/interfaces/Database/Functions/FunctionsLis
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
@@ -21,9 +23,14 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
   const [isDuplicating, setIsDuplicating] = useState(false)
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const {
+    templates: editorPanelTemplates,
+    setValue: setEditorPanelValue,
+    setTemplates: setEditorPanelTemplates,
+  } = useEditorPanelStateSnapshot()
 
   // Local editor panel state
-  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
   const [selectedFunctionForEditor, setSelectedFunctionForEditor] = useState<
     DatabaseFunction | undefined
   >()
@@ -36,7 +43,19 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const createFunction = () => {
     if (isInlineEditorEnabled) {
       setSelectedFunctionForEditor(undefined)
-      setEditorPanelOpen(true)
+      setIsDuplicating(false)
+      setEditorPanelValue(`create function function_name()
+returns void
+language plpgsql
+as $$
+begin
+  -- Write your function logic here
+end;
+$$;`)
+      if (editorPanelTemplates.length > 0) {
+        setEditorPanelTemplates([])
+      }
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedFunction(undefined)
       setShowCreateFunctionForm(true)
@@ -53,7 +72,9 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
 
     if (isInlineEditorEnabled) {
       setSelectedFunctionForEditor(dupFn)
-      setEditorPanelOpen(true)
+      setEditorPanelValue(dupFn.complete_statement)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedFunction(dupFn)
       setShowCreateFunctionForm(true)
@@ -63,7 +84,10 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const editFunction = (fn: DatabaseFunction) => {
     if (isInlineEditorEnabled) {
       setSelectedFunctionForEditor(fn)
-      setEditorPanelOpen(true)
+      setIsDuplicating(false)
+      setEditorPanelValue(fn.complete_statement)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedFunction(fn)
       setShowCreateFunctionForm(true)
@@ -75,11 +99,19 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
     setShowDeleteFunctionForm(true)
   }
 
-  const resetEditorPanel = () => {
-    setIsDuplicating(false)
-    setEditorPanelOpen(false)
+  const isEditorPanelActive = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
+
+  useEffect(() => {
+    if (isEditorPanelActive) return
+
     setSelectedFunctionForEditor(undefined)
-  }
+    if (isDuplicating) {
+      setIsDuplicating(false)
+    }
+    if (editorPanelTemplates.length > 0) {
+      setEditorPanelTemplates([])
+    }
+  }, [editorPanelTemplates.length, isDuplicating, isEditorPanelActive, setEditorPanelTemplates])
 
   if (isPermissionsLoaded && !canReadFunctions) {
     return <NoPermission isFullPage resourceText="view database functions" />
@@ -116,38 +148,6 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
         func={selectedFunction}
         visible={showDeleteFunctionForm}
         setVisible={setShowDeleteFunctionForm}
-      />
-
-      <EditorPanel
-        open={editorPanelOpen}
-        onRunSuccess={resetEditorPanel}
-        onClose={resetEditorPanel}
-        initialValue={
-          selectedFunctionForEditor
-            ? selectedFunctionForEditor.complete_statement
-            : `create function function_name()
-returns void
-language plpgsql
-as $$
-begin
-  -- Write your function logic here
-end;
-$$;`
-        }
-        label={
-          selectedFunctionForEditor
-            ? isDuplicating
-              ? `Duplicate function "${selectedFunctionForEditor.name}"`
-              : `Edit function "${selectedFunctionForEditor.name}"`
-            : 'Create new database function'
-        }
-        initialPrompt={
-          selectedFunctionForEditor
-            ? isDuplicating
-              ? `Duplicate the database function "${selectedFunctionForEditor.name}" to...`
-              : `Update the database function "${selectedFunctionForEditor.name}" to...`
-            : 'Create a new database function that...'
-        }
       />
     </>
   )
