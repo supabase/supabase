@@ -67,7 +67,7 @@ const OrganizationCard = ({
                       organization.
                     </p>
                   </div>
-                ) : null,
+                ) : undefined,
             },
           }}
           size="small"
@@ -75,7 +75,7 @@ const OrganizationCard = ({
             onSelect(org.slug)
           }}
           className="shrink-0"
-          disabled={freePlanWithExceedingLimits}
+          disabled={isSuccess && freePlanWithExceedingLimits}
         >
           Choose
         </ButtonTooltip>
