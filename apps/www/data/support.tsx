@@ -1,5 +1,5 @@
 import { ArrowUpRight } from 'lucide-react'
-import { IconDiscord, IconDiscussions, IconGitHubSolid } from 'ui'
+import { IconDiscordSolid, IconDiscussions, IconGitHubSolid } from 'ui'
 
 const data = {
   meta_title: 'Help & Support | Supabase',
@@ -52,7 +52,7 @@ const data = {
           label: 'Join Discord',
           link: 'https://discord.supabase.com/',
           target: '_blank',
-          icon: <IconDiscord fill="hsl(var(--background-default))" />,
+          icon: <IconDiscordSolid fill="hsl(var(--background-default))" />,
           type: 'secondary',
         },
       ],

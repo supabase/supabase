@@ -10,8 +10,8 @@ const src = (
   />
 )
 
-function IconDiscord(props: any) {
+function IconDiscordSolid(props: any) {
   return <IconBase src={src} stroke="none" {...props} />
 }
 
-export default IconDiscord
+export default IconDiscordSolid
