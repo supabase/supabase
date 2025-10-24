@@ -261,9 +261,6 @@ services:
       #    allow:
       #      - 127.0.0.1
       #      - ::1
-      #      #- 192.168.0.0/16
-      #      #- 172.16.0.0/12
-      #      #- 10.0.0.0/8
       #    deny: []
 
   ## Protected Dashboard - catch all remaining routes
