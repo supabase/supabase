@@ -3,6 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { parseAsJson, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -27,6 +28,10 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
@@ -50,6 +55,16 @@ const FunctionsList = ({
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const filterString = search ?? ''
+
+  // Filters
+  const [returnTypeFilter, setReturnTypeFilter] = useQueryState(
+    'return_type',
+    parseAsJson(selectFilterSchema.parse)
+  )
+  const [securityFilter, setSecurityFilter] = useQueryState(
+    'security',
+    parseAsJson(selectFilterSchema.parse)
+  )
 
   const setFilterString = (str: string) => {
     const url = new URL(document.URL)
@@ -83,6 +98,18 @@ const FunctionsList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  // Get unique return types from functions in the selected schema
+  const schemaFunctions = (functions ?? []).filter((fn) => fn.schema === selectedSchema)
+  const uniqueReturnTypes = Array.from(new Set(schemaFunctions.map((fn) => fn.return_type))).sort()
+
+  // Get security options based on what exists in the selected schema
+  const hasDefiner = schemaFunctions.some((fn) => fn.security_definer)
+  const hasInvoker = schemaFunctions.some((fn) => !fn.security_definer)
+  const securityOptions = [
+    ...(hasDefiner ? [{ label: 'Definer', value: 'definer' }] : []),
+    ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
+  ]
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
@@ -131,6 +158,22 @@ const FunctionsList = ({
                 value={filterString}
                 className="w-full lg:w-52"
                 onChange={(e) => setFilterString(e.target.value)}
+              />
+              <ReportsSelectFilter
+                label="Return Type"
+                options={uniqueReturnTypes.map((type) => ({
+                  label: type,
+                  value: type,
+                }))}
+                value={returnTypeFilter ?? []}
+                onChange={setReturnTypeFilter}
+                showSearch
+              />
+              <ReportsSelectFilter
+                label="Security"
+                options={securityOptions}
+                value={securityFilter ?? []}
+                onChange={setSecurityFilter}
               />
             </div>
 
@@ -201,6 +244,8 @@ const FunctionsList = ({
                   schema={selectedSchema}
                   filterString={filterString}
                   isLocked={isSchemaLocked}
+                  returnTypeFilter={returnTypeFilter ?? []}
+                  securityFilter={securityFilter ?? []}
                   duplicateFunction={duplicateFunction}
                   editFunction={editFunction}
                   deleteFunction={deleteFunction}
