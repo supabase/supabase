@@ -1,6 +1,6 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
@@ -10,22 +10,29 @@ import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/T
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 const TriggersPage: NextPageWithLayout = () => {
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const {
+    templates: editorPanelTemplates,
+    setValue: setEditorPanelValue,
+    setTemplates: setEditorPanelTemplates,
+  } = useEditorPanelStateSnapshot()
 
   const [selectedTrigger, setSelectedTrigger] = useState<PostgresTrigger>()
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
-  // Local editor panel state
-  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
+  // Track selection when using inline editor
   const [selectedTriggerForEditor, setSelectedTriggerForEditor] = useState<PostgresTrigger>()
 
   const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
@@ -36,7 +43,14 @@ const TriggersPage: NextPageWithLayout = () => {
   const createTrigger = () => {
     if (isInlineEditorEnabled) {
       setSelectedTriggerForEditor(undefined)
-      setEditorPanelOpen(true)
+      setEditorPanelValue(`create trigger trigger_name
+after insert or update or delete on table_name
+for each row
+execute function function_name();`)
+      if (editorPanelTemplates.length > 0) {
+        setEditorPanelTemplates([])
+      }
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedTrigger(undefined)
       setShowCreateTriggerForm(true)
@@ -46,7 +60,11 @@ const TriggersPage: NextPageWithLayout = () => {
   const editTrigger = (trigger: PostgresTrigger) => {
     if (isInlineEditorEnabled) {
       setSelectedTriggerForEditor(trigger)
-      setEditorPanelOpen(true)
+      setEditorPanelValue(generateTriggerCreateSQL(trigger))
+      if (editorPanelTemplates.length > 0) {
+        setEditorPanelTemplates([])
+      }
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedTrigger(trigger)
       setShowCreateTriggerForm(true)
@@ -57,6 +75,17 @@ const TriggersPage: NextPageWithLayout = () => {
     setSelectedTrigger(trigger)
     setShowDeleteTriggerForm(true)
   }
+
+  const isEditorPanelActive = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
+
+  useEffect(() => {
+    if (isEditorPanelActive) return
+
+    setSelectedTriggerForEditor(undefined)
+    if (editorPanelTemplates.length > 0) {
+      setEditorPanelTemplates([])
+    }
+  }, [editorPanelTemplates.length, isEditorPanelActive, setEditorPanelTemplates])
 
   if (isPermissionsLoaded && !canReadTriggers) {
     return <NoPermission isFullPage resourceText="view database triggers" />
@@ -89,36 +118,6 @@ const TriggersPage: NextPageWithLayout = () => {
         trigger={selectedTrigger}
         visible={showDeleteTriggerForm}
         setVisible={setShowDeleteTriggerForm}
-      />
-
-      <EditorPanel
-        open={editorPanelOpen}
-        onRunSuccess={() => {
-          setEditorPanelOpen(false)
-          setSelectedTriggerForEditor(undefined)
-        }}
-        onClose={() => {
-          setEditorPanelOpen(false)
-          setSelectedTriggerForEditor(undefined)
-        }}
-        initialValue={
-          selectedTriggerForEditor
-            ? generateTriggerCreateSQL(selectedTriggerForEditor)
-            : `create trigger trigger_name
-after insert or update or delete on table_name
-for each row
-execute function function_name();`
-        }
-        label={
-          selectedTriggerForEditor
-            ? `Edit trigger "${selectedTriggerForEditor.name}"`
-            : 'Create new database trigger'
-        }
-        initialPrompt={
-          selectedTriggerForEditor
-            ? `Update the database trigger "${selectedTriggerForEditor.name}" to...`
-            : 'Create a new database trigger that...'
-        }
       />
     </>
   )
