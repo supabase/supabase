@@ -13,10 +13,16 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
-import React from 'react'
+import { useEffect } from 'react'
 
 interface ResourceAccessProps {
-  control: Control<any>
+  control: Control<{
+    organization_slugs: string[]
+    project_refs: string[]
+    resourceAccess: string
+    selectedOrganizations: string[]
+    selectedProjects: string[]
+  }>
   resourceAccess: string
 }
 
@@ -31,7 +37,7 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
     enabled: !!profile,
   })
   const {
-    data: projects = [],
+    data: projects = { projects: [] },
     isLoading: isLoadingProjects,
     isError: isErrorProjects,
     error: projectsError,
@@ -43,7 +49,7 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
   const selectedOrganizations = useWatch({ control, name: 'selectedOrganizations' })
   const selectedProjects = useWatch({ control, name: 'selectedProjects' })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (resourceAccess === 'selected-orgs' && selectedOrganizations) {
       setValue('organization_slugs', selectedOrganizations)
     } else if (resourceAccess === 'selected-projects' && selectedProjects) {
@@ -273,13 +279,13 @@ export const ResourceAccess = ({ control, resourceAccess }: ResourceAccessProps)
                       <div className="px-3 py-2 text-sm text-foreground-light">
                         Loading projects...
                       </div>
-                    ) : projects.length === 0 ? (
+                    ) : projects?.projects?.length === 0 ? (
                       <div className="px-3 py-2 text-sm text-foreground-light">
                         No projects available
                       </div>
                     ) : (
                       <MultiSelectorList>
-                        {projects.map((project) => (
+                        {projects?.projects?.map((project) => (
                           <MultiSelectorItem key={project.ref} value={project.ref}>
                             {project.name}
                           </MultiSelectorItem>
