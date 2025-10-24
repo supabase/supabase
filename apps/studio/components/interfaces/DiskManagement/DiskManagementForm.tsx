@@ -195,7 +195,7 @@ export function DiskManagementForm() {
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const isPlanUpgradeRequired = org?.plan.id === 'free'
+  const isPlanUpgradeRequired = !hasAccess
 
   const { formState } = form
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
@@ -204,7 +204,7 @@ export function DiskManagementForm() {
 
   const disableIopsThroughputConfig =
     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
-    org?.plan.id !== 'free'
+    !hasAccess
 
   const isBranch = project?.parent_project_ref !== undefined
 
