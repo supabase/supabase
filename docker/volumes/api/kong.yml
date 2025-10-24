@@ -255,6 +255,7 @@ services:
         config:
           status_code: 403
           message: "Access is forbidden."
+      # Enable local access (danger zone!)
       #- name: cors
       #- name: ip-restriction
       #  config:
