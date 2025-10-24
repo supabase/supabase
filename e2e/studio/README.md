@@ -6,13 +6,13 @@
 cp .env.local.example .env.local
 ```
 
-Edit the `.env.local` file with your credentials and environment.
-
 ### Install the playwright browser
 
 ⚠️ This should be done in the `e2e/studio` directory
 
 ```bash
+cd e2e/studio
+
 pnpm exec playwright install
 ```
 
@@ -31,8 +31,6 @@ supabase start
 ## Running the tests
 
 Check the `package.json` for the available commands and environments.
-
-#### Example:
 
 ```bash
 pnpm run e2e
