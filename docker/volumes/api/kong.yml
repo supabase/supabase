@@ -250,16 +250,21 @@ services:
         paths:
           - /mcp
     plugins:
-      - name: cors
-      - name: ip-restriction
+      # Block access to /mcp by default
+      - name: request-termination
         config:
-          allow:
-            - 127.0.0.1
-            - ::1
-            #- 192.168.0.0/16
-            #- 172.16.0.0/12
-            #- 10.0.0.0/8
-          deny: []
+          status_code: 403
+          message: "Access is forbidden."
+      #- name: cors
+      #- name: ip-restriction
+      #  config:
+      #    allow:
+      #      - 127.0.0.1
+      #      - ::1
+      #      #- 192.168.0.0/16
+      #      #- 172.16.0.0/12
+      #      #- 10.0.0.0/8
+      #    deny: []
 
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
