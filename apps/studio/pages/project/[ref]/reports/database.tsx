@@ -6,12 +6,14 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import { ReportChartUpsell } from 'components/interfaces/Reports/v2/ReportChartUpsell'
+import { POOLING_OPTIMIZATIONS } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
@@ -31,19 +33,18 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
+import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { ReportChartUpsell } from 'components/interfaces/Reports/v2/ReportChartUpsell'
-import { POOLING_OPTIMIZATIONS } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -64,7 +65,6 @@ export default DatabaseReport
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
-  const isReportsV2 = useFlag('reportsDatabaseV2')
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -79,10 +79,6 @@ const DatabaseUsage = () => {
     setShowUpgradePrompt,
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
-
-  const isTeamsOrEnterprisePlan =
-    !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
-  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
@@ -129,8 +125,7 @@ const DatabaseUsage = () => {
     }
   )
 
-  const REPORT_ATTRIBUTES = getReportAttributes(diskConfig)
-  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(
+  const REPORT_ATTRIBUTES = getReportAttributesV2(
     org!,
     project!,
     diskConfig,
@@ -148,51 +143,22 @@ const DatabaseUsage = () => {
   const onRefreshReport = async () => {
     if (!selectedDateRange) return
 
-    // [Joshen] Since we can't track individual loading states for each chart
-    // so for now we mock a loading state that only lasts for a second
     setIsRefreshing(true)
     refresh()
     const { period_start, period_end, interval } = selectedDateRange
-    REPORT_ATTRIBUTES.forEach((attr) => {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
-          attribute: attr?.id,
-          startDate: period_start.date,
-          endDate: period_end.date,
-          interval,
-          databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
+    REPORT_ATTRIBUTES.forEach((chart: any) => {
+      chart.attributes.forEach((attr: any) => {
+        queryClient.invalidateQueries(
+          analyticsKeys.infraMonitoring(ref, {
+            attribute: attr.attribute,
+            startDate: period_start.date,
+            endDate: period_end.date,
+            interval,
+            databaseIdentifier: state.selectedDatabaseId,
+          })
+        )
+      })
     })
-    if (showChartsV2) {
-      REPORT_ATTRIBUTES_V2.forEach((chart: any) => {
-        chart.attributes.forEach((attr: any) => {
-          queryClient.invalidateQueries(
-            analyticsKeys.infraMonitoring(ref, {
-              attribute: attr.attribute,
-              startDate: period_start.date,
-              endDate: period_end.date,
-              interval,
-              databaseIdentifier: state.selectedDatabaseId,
-            })
-          )
-        })
-      })
-    } else {
-      REPORT_ATTRIBUTES.forEach((chart: any) => {
-        chart.attributes.forEach((attr: any) => {
-          queryClient.invalidateQueries(
-            analyticsKeys.infraMonitoring(ref, {
-              attribute: attr.attribute,
-              startDate: period_start.date,
-              endDate: period_end.date,
-              interval,
-              databaseIdentifier: state.selectedDatabaseId,
-            })
-          )
-        })
-      })
-    }
     if (isReplicaSelected) {
       queryClient.invalidateQueries(
         analyticsKeys.infraMonitoring(ref, {
@@ -273,56 +239,37 @@ const DatabaseUsage = () => {
       >
         {selectedDateRange &&
           orgPlan?.id &&
-          (showChartsV2
-            ? REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <LazyComposedChartHandler
-                  key={chart.id}
-                  {...chart}
-                  attributes={chart.attributes as MultiAttribute[]}
-                  interval={selectedDateRange.interval}
-                  startDate={selectedDateRange?.period_start?.date}
-                  endDate={selectedDateRange?.period_end?.date}
-                  updateDateRange={updateDateRange}
-                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                  syncId="database-charts"
-                  showMaxValue={
-                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                      ? true
-                      : chart.showMaxValue
-                  }
-                />
-              ))
-            : REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart, i) =>
-                chart.availableIn?.includes(orgPlan?.id) ? (
-                  <LazyComposedChartHandler
-                    key={chart.id}
-                    {...chart}
-                    attributes={chart.attributes as MultiAttribute[]}
-                    interval={selectedDateRange.interval}
-                    startDate={selectedDateRange?.period_start?.date}
-                    endDate={selectedDateRange?.period_end?.date}
-                    updateDateRange={updateDateRange}
-                    defaultChartStyle={
-                      chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'
-                    }
-                    syncId="database-charts"
-                    showMaxValue={
-                      chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                        ? true
-                        : chart.showMaxValue
-                    }
-                  />
-                ) : (
-                  <ReportChartUpsell
-                    key={chart.id}
-                    report={{
-                      label: chart.label,
-                      availableIn: chart.availableIn ?? [],
-                    }}
-                    orgSlug={org?.slug ?? ''}
-                  />
-                )
-              ))}
+          REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) =>
+            chart.availableIn?.includes(orgPlan?.id) ? (
+              <LazyComposedChartHandler
+                key={chart.id}
+                {...chart}
+                attributes={chart.attributes as MultiAttribute[]}
+                interval={selectedDateRange.interval}
+                startDate={selectedDateRange?.period_start?.date}
+                endDate={selectedDateRange?.period_end?.date}
+                updateDateRange={updateDateRange}
+                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                syncId="database-charts"
+                showMaxValue={
+                  chart.id === 'client-connections' ||
+                  chart.id === 'client-connections-basic' ||
+                  chart.id === 'pgbouncer-connections'
+                    ? true
+                    : chart.showMaxValue
+                }
+              />
+            ) : (
+              <ReportChartUpsell
+                key={chart.id}
+                report={{
+                  label: chart.label,
+                  availableIn: chart.availableIn ?? [],
+                }}
+                orgSlug={org?.slug ?? ''}
+              />
+            )
+          )}
         {selectedDateRange && isReplicaSelected && (
           <Panel title="Replica Information">
             <Panel.Content>
@@ -438,7 +385,7 @@ const DatabaseUsage = () => {
 
                     <Button asChild type="default" icon={<ExternalLink />}>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/database-size#disk-space-usage"
+                        href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
                         target="_blank"
                         rel="noreferrer"
                       >

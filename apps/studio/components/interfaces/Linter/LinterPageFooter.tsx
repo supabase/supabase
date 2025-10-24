@@ -1,6 +1,7 @@
-import { X } from 'lucide-react'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { DOCS_URL } from 'lib/constants'
+import { X } from 'lucide-react'
 import { Button, cn } from 'ui'
 import { Markdown } from '../Markdown'
 
@@ -75,8 +76,8 @@ const LinterPageFooter = ({
           <p>Inspect your database for potential issues</p>
           <Markdown
             className="text-xs"
-            content="The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
-            potential issues. [Learn more here](https://supabase.com/docs/guides/database/inspect)."
+            content={`The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
+            potential issues. [Learn more here](${DOCS_URL}/guides/database/inspect).`}
           />
         </div>
       )}

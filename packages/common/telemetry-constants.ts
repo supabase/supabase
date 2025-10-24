@@ -14,6 +14,16 @@ type TelemetryGroups = {
   organization: string
 }
 
+export const TABLE_EVENT_ACTIONS = {
+  TableCreated: 'table_created',
+  TableDataAdded: 'table_data_added',
+  TableRLSEnabled: 'table_rls_enabled',
+} as const
+
+export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
+
+export const TABLE_EVENT_VALUES: TableEventAction[] = Object.values(TABLE_EVENT_ACTIONS)
+
 /**
  * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
  *
@@ -229,7 +239,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
    * the instance size selected in the project creation form
    */
   properties: {
-    instanceSize: string
+    instanceSize?: string
   }
   groups: TelemetryGroups
 }
@@ -247,7 +257,7 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
    * the instance size selected in the project creation form
    */
   properties: {
-    instanceSize: string
+    instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -1180,6 +1190,35 @@ export interface AiAssistantInSupportFormClickedEvent {
 }
 
 /**
+ * User rated an AI assistant message with thumbs up or thumbs down.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantMessageRatingSubmittedEvent {
+  action: 'assistant_message_rating_submitted'
+  properties: {
+    /**
+     * The rating given by the user: positive (thumbs up) or negative (thumbs down)
+     */
+    rating: 'positive' | 'negative'
+    /**
+     * The category of the conversation
+     */
+    category:
+      | 'sql_generation'
+      | 'schema_design'
+      | 'rls_policies'
+      | 'edge_functions'
+      | 'database_optimization'
+      | 'debugging'
+      | 'general_help'
+      | 'other'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User copied the command for a Supabase UI component.
  *
  * @group Events
@@ -1745,12 +1784,252 @@ export interface HipaaRequestButtonClickedEvent {
 }
 
 /**
+ * User successfully created a table in the project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableCreatedEvent {
+  action: 'table_created'
+  properties: {
+    /**
+     * Method used to create the table
+     */
+    method: 'sql_editor' | 'table_editor'
+    /**
+     * Schema where table was created
+     */
+    schema_name?: string
+    /**
+     * Name of the table created
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User successfully added data to a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableDataAddedEvent {
+  action: 'table_data_added'
+  properties: {
+    /**
+     * Method used to insert data
+     */
+    method: 'sql_editor' | 'table_editor' | 'spreadsheet_import'
+    /**
+     * Schema of the table
+     */
+    schema_name?: string
+    /**
+     * Name of the table
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User successfully enabled RLS on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableRLSEnabledEvent {
+  action: 'table_rls_enabled'
+  properties: {
+    /**
+     * Method used to enable RLS
+     */
+    method: 'sql_editor' | 'table_editor'
+    /**
+     * Schema of the table
+     */
+    schema_name?: string
+    /**
+     * Name of the table
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened API docs panel.
+ *
+ * @group Events
+ * @source studio
+ * @page Various pages with API docs button
+ */
+export interface ApiDocsOpenedEvent {
+  action: 'api_docs_opened'
+  properties: {
+    /**
+     * Source of the API docs button click, e.g. table_editor, sidebar
+     */
+    source: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked copy button in API docs panel.
+ *
+ * @group Events
+ * @source studio
+ * @page API docs panel
+ */
+export interface ApiDocsCodeCopyButtonClickedEvent {
+  action: 'api_docs_code_copy_button_clicked'
+  properties: {
+    /**
+     * Title of the content being copied
+     */
+    title?: string
+    /**
+     * Selected programming language, e.g. js, bash
+     */
+    selectedLanguage?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User performed a search via the Auth Users page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/auth/users
+ */
+export interface AuthUsersSearchSubmittedEvent {
+  action: 'auth_users_search_submitted'
+  properties: {
+    /**
+     * The trigger that initiated the search
+     */
+    trigger:
+      | 'search_input'
+      | 'refresh_button'
+      | 'sort_change'
+      | 'provider_filter'
+      | 'user_type_filter'
+    /**
+     * The column being sorted on, e.g. email, phone, created_at, last_sign_in_at
+     */
+    sort_column: string
+    /**
+     * The sort order, either ascending or descending
+     */
+    sort_order: string
+    /**
+     * The authentication provider(s) being filtered on, e.g. email, phone, google, github
+     */
+    providers?: string[]
+    /**
+     * The user role(s) being filtered on, e.g. verified, unverified, anonymous
+     */
+    user_type?: string
+    /**
+     * The keywords being searched for
+     */
+    keywords?: string
+    /**
+     * The column being filtered on, e.g. email, phone
+     * (only included if filtering by a specific column and not all columns)
+     */
+    filter_column?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the command menu.
+ *
+ * @group Events
+ * @source ui-patterns
+ * @page any
+ */
+export interface CommandMenuOpenedEvent {
+  action: 'command_menu_opened'
+  properties: {
+    /**
+     * The trigger that opened the command menu
+     */
+    trigger_type: 'keyboard_shortcut' | 'search_input'
+    /**
+     * The location where the command menu was opened
+     */
+    trigger_location?: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User typed a search term in the command menu input.
+ *
+ * @group Events
+ * @source ui-patterns
+ * @page any
+ */
+export interface CommandMenuSearchSubmittedEvent {
+  action: 'command_menu_search_submitted'
+  properties: {
+    /**
+     * Search term typed into the command menu input
+     */
+    value: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User selected a command from the command menu.
+ *
+ * @group Events
+ * @source ui-patterns
+ * @page any
+ */
+export interface CommandMenuCommandSelectedEvent {
+  action: 'command_menu_command_selected'
+  properties: {
+    /**
+     * The selected command
+     */
+    command_name: string
+    command_value?: string
+    command_type: 'action' | 'route'
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
   | ConnectionStringCopiedEvent
+  | ApiDocsOpenedEvent
+  | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent
   | CronJobUpdatedEvent
   | CronJobDeletedEvent
@@ -1783,6 +2062,7 @@ export type TelemetryEvent =
   | AssistantSuggestionRunQueryClickedEvent
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
+  | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
@@ -1851,3 +2131,10 @@ export type TelemetryEvent =
   | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
+  | TableCreatedEvent
+  | TableDataAddedEvent
+  | TableRLSEnabledEvent
+  | AuthUsersSearchSubmittedEvent
+  | CommandMenuOpenedEvent
+  | CommandMenuSearchSubmittedEvent
+  | CommandMenuCommandSelectedEvent

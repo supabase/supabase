@@ -1,22 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { template } from 'lodash'
 import { Download, Loader2 } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const SSLConfiguration = () => {
@@ -89,7 +91,7 @@ const SSLConfiguration = () => {
     <div id="ssl-configuration">
       <div className="flex items-center justify-between mb-6">
         <FormHeader className="mb-0" title="SSL Configuration" description="" />
-        <DocsButton href="https://supabase.com/docs/guides/platform/ssl-enforcement" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/ssl-enforcement`} />
       </div>
       <FormPanel>
         <FormSection
@@ -108,15 +110,8 @@ const SSLConfiguration = () => {
                       title="SSL enforcement was not updated successfully"
                     >
                       Please try updating again, or contact{' '}
-                      <Link
-                        href="/support/new"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline"
-                      >
-                        support
-                      </Link>{' '}
-                      if this error persists
+                      <SupportLink className={InlineLinkClassName}>support</SupportLink> if this
+                      error persists
                     </Alert>
                   )}
                 </div>

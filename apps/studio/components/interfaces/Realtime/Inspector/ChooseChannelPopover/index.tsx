@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -9,6 +9,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -66,7 +67,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
     let token = config.token
 
     // [Joshen] Refresh if starting to listen + using temp API key, since it has a low refresh rate
-    if (token.startsWith('sb_temp')) {
+    if (token.startsWith('sb_temp') || !IS_PLATFORM) {
       const data = await getTemporaryAPIKey({ projectRef: config.projectRef, expiry: 3600 })
       token = data.api_key
     }
@@ -135,7 +136,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                             target="_blank"
                             rel="noreferrer"
                             className="underline hover:text-foreground transition"
-                            href="https://supabase.com/docs/guides/realtime/concepts#channels"
+                            href={`${DOCS_URL}/guides/realtime/concepts#channels`}
                           >
                             our docs
                           </a>
@@ -173,7 +174,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                   <DocsButton
                     abbrev={false}
                     className="w-min"
-                    href="https://supabase.com/docs/guides/realtime/authorization"
+                    href={`${DOCS_URL}/guides/realtime/authorization`}
                   />
                 </form>
               </Form_Shadcn_>

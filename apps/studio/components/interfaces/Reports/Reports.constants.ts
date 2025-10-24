@@ -638,6 +638,20 @@ export const DEPRECATED_REPORTS = [
   'total_storage_options_requests',
   'total_storage_patch_requests',
   'total_options_requests',
+  'total_rest_ingress',
+  'total_rest_get_requests',
+  'total_rest_post_requests',
+  'total_rest_patch_requests',
+  'total_rest_delete_requests',
+  'total_storage_get_requests',
+  'total_storage_post_requests',
+  'total_storage_delete_requests',
+  'total_auth_delete_requests',
+  'total_get_requests',
+  'total_patch_requests',
+  'total_post_requests',
+  'total_ingress',
+  'total_delete_requests',
 ]
 
 export const EDGE_FUNCTION_REGIONS = [

@@ -3,8 +3,9 @@
 import { type PropsWithChildren, forwardRef } from 'react'
 import { CommandItem_Shadcn_, cn } from 'ui'
 import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
+import { useCommandMenuTelemetryContext } from '../api/hooks/useCommandMenuTelemetryContext'
 import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
-import { type ICommand, type IActionCommand, type IRouteCommand } from './types'
+import type { ICommand, IActionCommand, IRouteCommand } from './types'
 
 const isActionCommand = (command: ICommand): command is IActionCommand => 'action' in command
 const isRouteCommand = (command: ICommand): command is IRouteCommand => 'route' in command
@@ -52,23 +53,44 @@ const CommandItem = forwardRef<
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useCrossCompatRouter()
   const setIsOpen = useSetCommandMenuOpen()
+  const telemetryContext = useCommandMenuTelemetryContext()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
+
+  const handleCommandSelect = () => {
+    // Send telemetry event
+    if (telemetryContext?.onTelemetry) {
+      const event = {
+        action: 'command_menu_command_selected' as const,
+        properties: {
+          command_name: command.name,
+          command_value: command.value,
+          command_type: isActionCommand(command) ? ('action' as const) : ('route' as const),
+          app: telemetryContext.app,
+        },
+        groups: {},
+      }
+
+      telemetryContext.onTelemetry(event)
+    }
+
+    // Execute the original command logic
+    if (isActionCommand(command)) {
+      command.action()
+    } else if (isRouteCommand(command)) {
+      if (command.route.startsWith('http')) {
+        setIsOpen(false)
+        window.open(command.route, '_blank', 'noreferrer,noopener')
+      } else {
+        router.push(command.route)
+      }
+    }
+  }
 
   return (
     <CommandItem_Shadcn_
       ref={ref}
-      onSelect={
-        isActionCommand(command)
-          ? command.action
-          : isRouteCommand(command)
-            ? () => {
-                command.route.startsWith('http')
-                  ? (setIsOpen(false), window.open(command.route, '_blank', 'noreferrer,noopener'))
-                  : router.push(command.route)
-              }
-            : () => {}
-      }
+      onSelect={handleCommandSelect}
       value={command.value ?? command.name}
       forceMount={command.forceMount}
       className={cn(

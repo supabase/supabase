@@ -4,7 +4,7 @@ import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn
 
 import { isFeatureEnabled } from 'common'
 import ApiSchema from '~/components/ApiSchema'
-import { REFERENCES } from '~/content/navigation.references'
+import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import {
@@ -43,7 +43,7 @@ async function RefSections({ libraryId, version }: RefSectionsProps) {
     flattenedSections = trimIntro(flattenedSections)
   }
 
-  if (!isFeatureEnabled('sdk:auth')) {
+  if (!isFeatureEnabled('sdk:auth') && clientSdkIds.includes(libraryId)) {
     flattenedSections = flattenedSections?.filter(
       (section) =>
         'product' in section && section.product !== 'auth' && section.product !== 'auth-admin'
@@ -340,6 +340,18 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           <ReactMarkdown className="prose break-words mb-8">
             {endpointDetails.description}
           </ReactMarkdown>
+        )}
+        {endpointDetails['x-oauth-scope'] && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">OAuth scopes</h3>
+            <ul>
+              <li key={endpointDetails['x-oauth-scope']} className="list-['-'] ml-2 pl-2">
+                <span className="font-mono text-sm font-medium text-foreground">
+                  {endpointDetails['x-oauth-scope']}
+                </span>
+              </li>
+            </ul>
+          </section>
         )}
         {pathParameters.length > 0 && (
           <section>

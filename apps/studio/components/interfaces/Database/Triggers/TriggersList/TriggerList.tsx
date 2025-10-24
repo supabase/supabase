@@ -44,8 +44,10 @@ const TriggerList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter((x) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
+  const filteredTriggers = (triggers ?? []).filter(
+    (x) =>
+      includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
+      (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase()))
   )
 
   const _triggers = sortBy(

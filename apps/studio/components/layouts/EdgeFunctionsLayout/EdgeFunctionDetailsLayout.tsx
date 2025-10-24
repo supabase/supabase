@@ -18,6 +18,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Popover_Shadcn_,
@@ -26,7 +27,7 @@ import {
   Separator,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 
 interface EdgeFunctionDetailsLayoutProps {
@@ -167,9 +168,10 @@ const EdgeFunctionDetailsLayout = ({
                 section={
                   functionSlug !== undefined ? ['edge-functions', functionSlug] : ['edge-functions']
                 }
+                source="edge-functions"
               />
             )}
-            <DocsButton href="https://supabase.com/docs/guides/functions" />
+            <DocsButton href={`${DOCS_URL}/guides/functions`} />
             <Popover_Shadcn_>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="default" icon={<Download />}>

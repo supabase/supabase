@@ -3,6 +3,8 @@ import { Button, Input, copyToClipboard } from 'ui'
 
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Copy } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ContentSnippet from '../ContentSnippet'
@@ -13,6 +15,8 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
   const { ref } = useParams()
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
   const { data } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [copied, setCopied] = useState<'anon' | 'service'>()
 
@@ -54,6 +58,17 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                   onClick={() => {
                     setCopied('anon')
                     copyToClipboard(anonApiKey ?? 'SUPABASE_CLIENT_ANON_KEY')
+                    sendEvent({
+                      action: 'api_docs_code_copy_button_clicked',
+                      properties: {
+                        title: 'Client API key',
+                        selectedLanguage: language,
+                      },
+                      groups: {
+                        project: ref ?? 'Unknown',
+                        organization: org?.slug ?? 'Unknown',
+                      },
+                    })
                   }}
                 >
                   {copied === 'anon' ? 'Copied' : 'Copy'}
@@ -87,6 +102,17 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                   onClick={() => {
                     setCopied('service')
                     copyToClipboard(serviceApiKey)
+                    sendEvent({
+                      action: 'api_docs_code_copy_button_clicked',
+                      properties: {
+                        title: 'Service key',
+                        selectedLanguage: language,
+                      },
+                      groups: {
+                        project: ref ?? 'Unknown',
+                        organization: org?.slug ?? 'Unknown',
+                      },
+                    })
                   }}
                 >
                   {copied === 'service' ? 'Copied' : 'Copy'}

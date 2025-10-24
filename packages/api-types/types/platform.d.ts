@@ -11,14 +11,14 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets GoTrue config */
+    /** Gets Auth config */
     get: operations['GoTrueConfigController_getGoTrueConfig']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
-    /** Updates GoTrue config */
+    /** Updates Auth config */
     patch: operations['GoTrueConfigController_updateGoTrueConfig']
     trace?: never
   }
@@ -35,7 +35,7 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    /** Updates GoTrue config hooks */
+    /** Updates Auth config hooks */
     patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
     trace?: never
   }
@@ -114,7 +114,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets GoTrue template */
+    /** Gets Auth template */
     get: operations['TemplateController_getTemplate']
     put?: never
     post?: never
@@ -552,7 +552,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/github/branches/{connectionId}': {
+  '/platform/integrations/github/branches/{connection_id}': {
     parameters: {
       query?: never
       header?: never
@@ -569,7 +569,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/github/branches/{connectionId}/{branchName}': {
+  '/platform/integrations/github/branches/{connection_id}/{branch_name}': {
     parameters: {
       query?: never
       header?: never
@@ -639,7 +639,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/github/repositories/{repositoryId}/branches': {
+  '/platform/integrations/github/repositories/{repository_id}/branches': {
     parameters: {
       query?: never
       header?: never
@@ -656,7 +656,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/github/repositories/{repositoryId}/branches/{branchName}': {
+  '/platform/integrations/github/repositories/{repository_id}/branches/{branch_name}': {
     parameters: {
       query?: never
       header?: never
@@ -801,7 +801,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/vercel/connections/project/{project_ref}': {
+  '/platform/integrations/vercel/connections/project/{ref}': {
     parameters: {
       query?: never
       header?: never
@@ -1028,7 +1028,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/billing/invoices/{invoiceId}': {
+  '/platform/organizations/{slug}/billing/invoices/{invoice_id}': {
     parameters: {
       query?: never
       header?: never
@@ -1045,7 +1045,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/billing/invoices/{invoiceId}/payment-link': {
+  '/platform/organizations/{slug}/billing/invoices/{invoice_id}/payment-link': {
     parameters: {
       query?: never
       header?: never
@@ -1200,40 +1200,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/daily-stats': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets daily organization stats */
-    get: operations['OrgDailyStatsController_getDailyStats']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/{slug}/daily-stats/compute': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets daily organization stats for compute */
-    get: operations['OrgDailyStatsController_getDailyStatsCompute']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/organizations/{slug}/documents/dpa': {
     parameters: {
       query?: never
@@ -1277,6 +1243,46 @@ export interface paths {
     }
     /** Get standard security questionnaire URL */
     get: operations['OrgDocumentsController_getStandardSecurityQuestionnaireUrl']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['OrganizationEntitlementsController_getEntitlements']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/entitlements/entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['OrganizationEntitlementsController_getEntitlements']
     put?: never
     post?: never
     delete?: never
@@ -1671,6 +1677,23 @@ export interface paths {
     }
     /** Gets usage stats */
     get: operations['OrgUsageController_getOrgUsage']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/usage/daily': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets daily aggregated usage stats */
+    get: operations['OrgUsageController_getDailyOrgUsage']
     put?: never
     post?: never
     delete?: never
@@ -2151,6 +2174,42 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/profile/scoped-access-tokens': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the user's scoped access tokens */
+    get: operations['ScopedAccessTokensController_getAccessTokens']
+    put?: never
+    /** Creates a new scoped access token */
+    post: operations['ScopedAccessTokensController_createAccessToken']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/profile/scoped-access-tokens/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the scoped access token with the given ID */
+    get: operations['ScopedAccessTokensController_getAccessToken']
+    put?: never
+    post?: never
+    /** Deletes the scoped access token with the given ID */
+    delete: operations['ScopedAccessTokensController_deleteAccessToken']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects': {
     parameters: {
       query?: never
@@ -2619,7 +2678,10 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets project's pgbouncer config */
+    /**
+     * Gets project's pgbouncer config
+     * @description Returns pgbouncer config. To check pgbouncer status, use `GET /v0/projects/{ref}/config/pgbouncer/status`
+     */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
     put?: never
     post?: never
@@ -3034,6 +3096,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/members': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the list of users with access to the project */
+    get: operations['ProjectMembersController_getProjecMembers']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/notifications/advisor/exceptions': {
     parameters: {
       query?: never
@@ -3099,6 +3178,63 @@ export interface paths {
     put?: never
     post?: never
     delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/privatelink/associations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get AWS accounts attached to PrivateLink share for the project. */
+    get: operations['ProjectPrivateLinkController_getPrivateLink']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/privatelink/associations/aws-account': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Add AWS account to PrivateLink share for the project
+     * @description Add an AWS account to the project's PrivateLink configuration. Creates middleware entry and manages AWS resources.
+     */
+    post: operations['ProjectPrivateLinkController_addAwsAccountToPrivateLink']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Remove AWS account from PrivateLink share for the project
+     * @description Removes an AWS account from the project's PrivateLink configuration. Cleans up associated AWS resources.
+     */
+    delete: operations['ProjectPrivateLinkController_removeAwsAccountFromPrivateLink']
     options?: never
     head?: never
     patch?: never
@@ -4391,6 +4527,10 @@ export interface components {
       scope?: 'V0'
       token_alias: string
     }
+    AddAwsAccountToPrivateLinkBody: {
+      account_name?: string
+      aws_account_id: string
+    }
     AnalyticsResponse: {
       error?:
         | string
@@ -4539,6 +4679,7 @@ export interface components {
     CloudMarketplaceOnboardingInfoResponse: {
       aws_contract_auto_renewal: boolean
       aws_contract_end_date: string
+      aws_contract_is_private_offer: boolean
       aws_contract_settings_url: string
       aws_contract_start_date: string
       organization_linking_eligibility: {
@@ -4631,6 +4772,9 @@ export interface components {
             password?: string | null
             url: string
             username?: string | null
+          }
+        | {
+            dsn: string
           }
       description?: string
       name: string
@@ -4905,11 +5049,12 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
+          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
           opt_in_tags: string[]
+          organization_missing_address: boolean
           organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
@@ -5070,32 +5215,74 @@ export interface components {
     }
     CreateReplicationDestinationBody: {
       /** @description Destination configuration */
-      config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -5104,32 +5291,74 @@ export interface components {
     }
     CreateReplicationDestinationPipelineBody: {
       /** @description Destination configuration */
-      destination_config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      destination_config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -5218,6 +5447,89 @@ export interface components {
     CreateSchemaBody: {
       name: string
       owner: string
+    }
+    CreateScopedAccessTokenBody: {
+      /** Format: date-time */
+      expires_at?: string
+      name: string
+      organization_slugs?: string[]
+      permissions: (
+        | 'organizations_read'
+        | 'organizations_write'
+        | 'projects_read'
+        | 'available_regions_read'
+        | 'snippets_read'
+        | 'organization_admin_read'
+        | 'organization_admin_write'
+        | 'members_read'
+        | 'members_write'
+        | 'project_admin_read'
+        | 'project_admin_write'
+        | 'advisors_read'
+        | 'api_gateway_keys_read'
+        | 'api_gateway_keys_write'
+        | 'auth_config_read'
+        | 'auth_config_write'
+        | 'auth_signing_keys_read'
+        | 'auth_signing_keys_write'
+        | 'backups_read'
+        | 'backups_write'
+        | 'branching_development_read'
+        | 'branching_development_write'
+        | 'branching_production_read'
+        | 'branching_production_write'
+        | 'custom_domain_read'
+        | 'custom_domain_write'
+        | 'data_api_config_read'
+        | 'data_api_config_write'
+        | 'database_read'
+        | 'database_write'
+        | 'database_config_read'
+        | 'database_config_write'
+        | 'database_network_bans_read'
+        | 'database_network_bans_write'
+        | 'database_network_restrictions_read'
+        | 'database_network_restrictions_write'
+        | 'database_migrations_read'
+        | 'database_migrations_write'
+        | 'database_pooling_config_read'
+        | 'database_pooling_config_write'
+        | 'database_readonly_config_read'
+        | 'database_readonly_config_write'
+        | 'database_ssl_config_read'
+        | 'database_ssl_config_write'
+        | 'database_webhooks_config_read'
+        | 'database_webhooks_config_write'
+        | 'edge_functions_read'
+        | 'edge_functions_write'
+        | 'edge_functions_secrets_read'
+        | 'edge_functions_secrets_write'
+        | 'infra_add-ons_read'
+        | 'infra_add-ons_write'
+        | 'infra_read_replicas_read'
+        | 'infra_read_replicas_write'
+        | 'project_snippets_read'
+        | 'project_snippets_write'
+        | 'storage_read'
+        | 'storage_write'
+        | 'storage_config_read'
+        | 'storage_config_write'
+        | 'telemetry_logs_read'
+        | 'telemetry_usage_read'
+      )[]
+      project_refs?: string[]
+    }
+    CreateScopedAccessTokenResponse: {
+      created_at: string
+      expires_at: string | null
+      id: string
+      last_used_at: string | null
+      name: string
+      organization_slugs?: string[]
+      permissions: string[]
+      project_refs?: string[]
+      token: string
+      token_alias: string
     }
     CreateSourceResponse: {
       /** @description Source ID */
@@ -5460,6 +5772,11 @@ export interface components {
       billing_name?: string
       billing_via_partner: boolean
       email: string
+      tax_id: {
+        country: string
+        type: string
+        value: string
+      } | null
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
@@ -5829,6 +6146,35 @@ export interface components {
       max_rows: number
       role_claim_key: string
     }
+    GetPrivateLinkResponse: {
+      private_link_associations: {
+        account_name?: string
+        aws_account_id: string
+        /**
+         * Format: date-time
+         * @description The time and date at which the AWS Resource Share Association was requested from Supabase. `null` means that the association was not yet requested while the PrivateLink Association is pending.
+         */
+        shared_at: string | null
+        /**
+         * @description
+         *       - `CREATING`: The PrivateLink resources and the Association are in the process of being created. The PrivateLink Share cannot be accepted yet.
+         *       - `READY`: The PrivateLink resources have been created and the PrivateLink Share can be accepted for the duration of 12h after sharing. See `shared_at`.
+         *       - `ASSOCIATION_REQUEST_EXPIRED`: The PrivateLink Share has not been accepted within the 12h time limit. This association can now be deleted.
+         *       - `ASSOCIATION_ACCEPTED`: The PrivateLink Share was successfully accepted.
+         *       - `CREATION_FAILED`: The PrivateLink resources failed to create. This likely means something went wrong on Supabase's and and support should be contacted.
+         *       - `DELETING`: The PrivateLink resources and the Association are in the process of being deleted. The PrivateLink Share cannot be accepted yet.
+         *
+         * @enum {string}
+         */
+        status:
+          | 'CREATING'
+          | 'READY'
+          | 'ASSOCIATION_REQUEST_EXPIRED'
+          | 'ASSOCIATION_ACCEPTED'
+          | 'CREATION_FAILED'
+          | 'DELETING'
+      }[]
+    }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
     }
@@ -5887,6 +6233,7 @@ export interface components {
     GetProjectLogsBody: {
       iso_timestamp_end?: string
       iso_timestamp_start?: string
+      lql?: string
       sql?: string
     }
     GetProjectVercelConnectionsResponse: {
@@ -5967,6 +6314,27 @@ export interface components {
       }
       path: string
     }
+    GetScopedAccessTokenResponse: {
+      created_at: string
+      expires_at: string | null
+      id: string
+      last_used_at: string | null
+      name: string
+      organization_slugs?: string[]
+      permissions: string[]
+      project_refs?: string[]
+      token_alias: string
+    }
+    GetScopedAccessTokensResponse: {
+      tokens: {
+        created_at: string
+        expires_at: string | null
+        id: string
+        last_used_at: string | null
+        name: string
+        token_alias: string
+      }[]
+    }
     GetSignedUrlBody: {
       expiresIn: number
       options?: {
@@ -6035,12 +6403,12 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
       cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
-      customer_balance: number
+      customer_balance?: number
       next_invoice_at: number
       payment_method_type: string
       plan: {
@@ -6256,75 +6624,96 @@ export interface components {
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string
       EXTERNAL_APPLE_CLIENT_ID: string
+      EXTERNAL_APPLE_EMAIL_OPTIONAL: boolean
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_SECRET: string
       EXTERNAL_AZURE_CLIENT_ID: string
+      EXTERNAL_AZURE_EMAIL_OPTIONAL: boolean
       EXTERNAL_AZURE_ENABLED: boolean
       EXTERNAL_AZURE_SECRET: string
       EXTERNAL_AZURE_URL: string
       EXTERNAL_BITBUCKET_CLIENT_ID: string
+      EXTERNAL_BITBUCKET_EMAIL_OPTIONAL: boolean
       EXTERNAL_BITBUCKET_ENABLED: boolean
       EXTERNAL_BITBUCKET_SECRET: string
       EXTERNAL_DISCORD_CLIENT_ID: string
+      EXTERNAL_DISCORD_EMAIL_OPTIONAL: boolean
       EXTERNAL_DISCORD_ENABLED: boolean
       EXTERNAL_DISCORD_SECRET: string
       EXTERNAL_EMAIL_ENABLED: boolean
       EXTERNAL_FACEBOOK_CLIENT_ID: string
+      EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: boolean
       EXTERNAL_FACEBOOK_ENABLED: boolean
       EXTERNAL_FACEBOOK_SECRET: string
       EXTERNAL_FIGMA_CLIENT_ID: string
+      EXTERNAL_FIGMA_EMAIL_OPTIONAL: boolean
       EXTERNAL_FIGMA_ENABLED: boolean
       EXTERNAL_FIGMA_SECRET: string
       EXTERNAL_GITHUB_CLIENT_ID: string
+      EXTERNAL_GITHUB_EMAIL_OPTIONAL: boolean
       EXTERNAL_GITHUB_ENABLED: boolean
       EXTERNAL_GITHUB_SECRET: string
       EXTERNAL_GITLAB_CLIENT_ID: string
+      EXTERNAL_GITLAB_EMAIL_OPTIONAL: boolean
       EXTERNAL_GITLAB_ENABLED: boolean
       EXTERNAL_GITLAB_SECRET: string
       EXTERNAL_GITLAB_URL: string
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string
       EXTERNAL_GOOGLE_CLIENT_ID: string
+      EXTERNAL_GOOGLE_EMAIL_OPTIONAL: boolean
       EXTERNAL_GOOGLE_ENABLED: boolean
       EXTERNAL_GOOGLE_SECRET: string
       EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean
       EXTERNAL_KAKAO_CLIENT_ID: string
+      EXTERNAL_KAKAO_EMAIL_OPTIONAL: boolean
       EXTERNAL_KAKAO_ENABLED: boolean
       EXTERNAL_KAKAO_SECRET: string
       EXTERNAL_KEYCLOAK_CLIENT_ID: string
+      EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: boolean
       EXTERNAL_KEYCLOAK_ENABLED: boolean
       EXTERNAL_KEYCLOAK_SECRET: string
       EXTERNAL_KEYCLOAK_URL: string
       EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string
+      EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: boolean
       EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean
       EXTERNAL_LINKEDIN_OIDC_SECRET: string
       EXTERNAL_NOTION_CLIENT_ID: string
+      EXTERNAL_NOTION_EMAIL_OPTIONAL: boolean
       EXTERNAL_NOTION_ENABLED: boolean
       EXTERNAL_NOTION_SECRET: string
       EXTERNAL_PHONE_ENABLED: boolean
       EXTERNAL_SLACK_CLIENT_ID: string
+      EXTERNAL_SLACK_EMAIL_OPTIONAL: boolean
       EXTERNAL_SLACK_ENABLED: boolean
       EXTERNAL_SLACK_OIDC_CLIENT_ID: string
+      EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: boolean
       EXTERNAL_SLACK_OIDC_ENABLED: boolean
       EXTERNAL_SLACK_OIDC_SECRET: string
       EXTERNAL_SLACK_SECRET: string
       EXTERNAL_SPOTIFY_CLIENT_ID: string
+      EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: boolean
       EXTERNAL_SPOTIFY_ENABLED: boolean
       EXTERNAL_SPOTIFY_SECRET: string
       EXTERNAL_TWITCH_CLIENT_ID: string
+      EXTERNAL_TWITCH_EMAIL_OPTIONAL: boolean
       EXTERNAL_TWITCH_ENABLED: boolean
       EXTERNAL_TWITCH_SECRET: string
       EXTERNAL_TWITTER_CLIENT_ID: string
+      EXTERNAL_TWITTER_EMAIL_OPTIONAL: boolean
       EXTERNAL_TWITTER_ENABLED: boolean
       EXTERNAL_TWITTER_SECRET: string
       EXTERNAL_WEB3_ETHEREUM_ENABLED: boolean
       EXTERNAL_WEB3_SOLANA_ENABLED: boolean
       EXTERNAL_WORKOS_CLIENT_ID: string
-      EXTERNAL_WORKOS_ENABLED: boolean
       EXTERNAL_WORKOS_SECRET: string
       EXTERNAL_WORKOS_URL: string
       EXTERNAL_ZOOM_CLIENT_ID: string
+      EXTERNAL_ZOOM_EMAIL_OPTIONAL: boolean
       EXTERNAL_ZOOM_ENABLED: boolean
       EXTERNAL_ZOOM_SECRET: string
+      HOOK_AFTER_USER_CREATED_ENABLED: boolean
+      HOOK_AFTER_USER_CREATED_SECRETS: string
+      HOOK_AFTER_USER_CREATED_URI: string
       HOOK_BEFORE_USER_CREATED_ENABLED: boolean
       HOOK_BEFORE_USER_CREATED_SECRETS: string
       HOOK_BEFORE_USER_CREATED_URI: string
@@ -6346,19 +6735,40 @@ export interface components {
       JWT_EXP: number
       MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS: boolean
       MAILER_AUTOCONFIRM: boolean
+      MAILER_NOTIFICATIONS_EMAIL_CHANGED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_IDENTITY_LINKED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_IDENTITY_UNLINKED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_MFA_FACTOR_ENROLLED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_MFA_FACTOR_UNENROLLED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_PASSWORD_CHANGED_ENABLED: boolean
+      MAILER_NOTIFICATIONS_PHONE_CHANGED_ENABLED: boolean
       MAILER_OTP_EXP: number
       MAILER_OTP_LENGTH: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       MAILER_SUBJECTS_CONFIRMATION: string
       MAILER_SUBJECTS_EMAIL_CHANGE: string
+      MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: string
+      MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: string
+      MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: string
       MAILER_SUBJECTS_INVITE: string
       MAILER_SUBJECTS_MAGIC_LINK: string
+      MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: string
+      MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: string
+      MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: string
+      MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: string
       MAILER_SUBJECTS_REAUTHENTICATION: string
       MAILER_SUBJECTS_RECOVERY: string
       MAILER_TEMPLATES_CONFIRMATION_CONTENT: string
       MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string
+      MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_IDENTITY_LINKED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_IDENTITY_UNLINKED_NOTIFICATION_CONTENT: string
       MAILER_TEMPLATES_INVITE_CONTENT: string
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string
+      MAILER_TEMPLATES_MFA_FACTOR_ENROLLED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_MFA_FACTOR_UNENROLLED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION_CONTENT: string
+      MAILER_TEMPLATES_PHONE_CHANGED_NOTIFICATION_CONTENT: string
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
       MFA_ALLOW_LOW_AAL: boolean
@@ -6374,6 +6784,9 @@ export interface components {
       MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
       NIMBUS_OAUTH_CLIENT_ID: string | null
       NIMBUS_OAUTH_CLIENT_SECRET: string | null
+      OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
+      OAUTH_SERVER_AUTHORIZATION_PATH: string | null
+      OAUTH_SERVER_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -6516,6 +6929,9 @@ export interface components {
             url: string
             username?: string | null
           }
+        | {
+            dsn: string
+          }
       description?: string
       id: number
       metadata: {
@@ -6571,6 +6987,29 @@ export interface components {
     }
     LinkClazarBuyerBody: {
       buyer_id: string
+    }
+    ListEntitlementsResponse: {
+      entitlements: {
+        config:
+          | {
+              enabled: boolean
+            }
+          | {
+              enabled: boolean
+              unlimited: boolean
+              value: number
+            }
+          | {
+              enabled: boolean
+              set: string[]
+            }
+        feature: {
+          key: string
+          /** @enum {string} */
+          type: 'boolean' | 'numeric' | 'set'
+        }
+        hasAccess: boolean
+      }[]
     }
     ListGitHubConnectionsResponse: {
       connections: {
@@ -6885,11 +7324,12 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       id: number
       is_owner: boolean
       name: string
       opt_in_tags: string[]
+      organization_missing_address: boolean
       organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
@@ -6939,7 +7379,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws' | 'aws_marketplace' | 'vercel_marketplace' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -6995,6 +7435,69 @@ export interface components {
       restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       slug: string
       usage_billing_enabled: boolean
+    }
+    OrgDailyUsageResponse: {
+      usages: {
+        breakdown: {
+          egress_function: number
+          egress_graphql: number
+          egress_logdrain: number
+          egress_realtime: number
+          egress_rest: number
+          egress_storage: number
+          egress_supavisor: number
+        } | null
+        date: string
+        /** @enum {string} */
+        metric:
+          | 'EGRESS'
+          | 'CACHED_EGRESS'
+          | 'DATABASE_SIZE'
+          | 'STORAGE_SIZE'
+          | 'MONTHLY_ACTIVE_USERS'
+          | 'MONTHLY_ACTIVE_SSO_USERS'
+          | 'FUNCTION_INVOCATIONS'
+          | 'FUNCTION_CPU_MILLISECONDS'
+          | 'STORAGE_IMAGES_TRANSFORMED'
+          | 'REALTIME_MESSAGE_COUNT'
+          | 'REALTIME_PEAK_CONNECTIONS'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'AUTH_MFA_PHONE'
+          | 'AUTH_MFA_WEB_AUTHN'
+          | 'LOG_DRAIN_EVENTS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
+          | 'COMPUTE_HOURS_BRANCH'
+          | 'COMPUTE_HOURS_XS'
+          | 'COMPUTE_HOURS_SM'
+          | 'COMPUTE_HOURS_MD'
+          | 'COMPUTE_HOURS_L'
+          | 'COMPUTE_HOURS_XL'
+          | 'COMPUTE_HOURS_2XL'
+          | 'COMPUTE_HOURS_4XL'
+          | 'COMPUTE_HOURS_8XL'
+          | 'COMPUTE_HOURS_12XL'
+          | 'COMPUTE_HOURS_16XL'
+          | 'COMPUTE_HOURS_24XL'
+          | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+          | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+          | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+          | 'COMPUTE_HOURS_48XL'
+          | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+          | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+          | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+          | 'CUSTOM_DOMAIN'
+          | 'PITR_7'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'IPV4'
+          | 'LOG_DRAIN'
+        usage: number
+        usage_original: number
+      }[]
     }
     OrgDocumentUrlResponse: {
       fileUrl: string
@@ -7088,6 +7591,7 @@ export interface components {
     }
     PauseStatusResponse: {
       can_restore: boolean
+      last_paused_on: string | null
       latest_downloadable_backup_id: number | null
       max_days_till_restore_disabled: number
       remaining_days_till_restore_disabled: number | null
@@ -7108,6 +7612,9 @@ export interface components {
       }[]
       defaultPaymentMethodId: string | null
     }
+    PendingConfirmationResponse: {
+      message: string
+    }
     PgbouncerConfigResponse: {
       connection_string: string
       db_dns_name: string
@@ -7120,8 +7627,6 @@ export interface components {
       inserted_at: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
-      /** @enum {string} */
-      pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
       /** @enum {string} */
       pool_mode: 'transaction' | 'session' | 'statement'
       query_wait_timeout?: number
@@ -7443,11 +7948,8 @@ export interface components {
         limit: number
         name: string
       }[]
-      source_project_eligible: boolean
       /** @enum {string} */
       source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
-      target_organization_eligible: boolean | null
-      target_organization_has_free_project_slots: boolean | null
       /** @enum {string|null} */
       target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
       valid: boolean
@@ -7723,6 +8225,13 @@ export interface components {
       status: string
       subscription_id: string | null
     }
+    ProjectMembersResponse: {
+      members: {
+        primary_email: string
+        user_id: string
+        username: string
+      }[]
+    }
     ProjectRefResponse: {
       id: number
       name: string
@@ -7803,8 +8312,14 @@ export interface components {
       max_events_per_second: number | null
       /** @description Sets maximum number of joins per second rate limit */
       max_joins_per_second: number | null
+      /** @description Sets maximum number of payload size in KB rate limit */
+      max_payload_size_in_kb: number | null
+      /** @description Sets maximum number of presence events per second rate limit */
+      max_presence_events_per_second: number | null
       /** @description Whether to only allow private channels */
       private_only: boolean | null
+      /** @description Whether to suspend realtime */
+      suspend: boolean | null
     }
     RegionsInfo: {
       all: {
@@ -7856,32 +8371,74 @@ export interface components {
     }
     ReplicationDestinationResponse: {
       /** @description Destination configuration */
-      config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination id
        * @example 2001
@@ -7902,32 +8459,74 @@ export interface components {
       /** @description List of destinations */
       destinations: {
         /** @description Destination configuration */
-        config: {
-          big_query: {
-            /**
-             * @description BigQuery dataset id
-             * @example analytics
-             */
-            dataset_id: string
-            /**
-             * @description Maximum number of concurrent write streams
-             * @example 8
-             */
-            max_concurrent_streams?: number
-            /**
-             * @description Maximum data staleness in minutes
-             * @example 5
-             */
-            max_staleness_mins?: number
-            /**
-             * @description BigQuery project id
-             * @example my-gcp-project
-             */
-            project_id: string
-            /** @description BigQuery service account key */
-            service_account_key: string
-          }
-        }
+        config:
+          | {
+              big_query: {
+                /**
+                 * @description BigQuery dataset id
+                 * @example analytics
+                 */
+                dataset_id: string
+                /**
+                 * @description Maximum number of concurrent write streams
+                 * @example 8
+                 */
+                max_concurrent_streams?: number
+                /**
+                 * @description Maximum data staleness in minutes
+                 * @example 5
+                 */
+                max_staleness_mins?: number
+                /**
+                 * @description BigQuery project id
+                 * @example my-gcp-project
+                 */
+                project_id: string
+                /** @description BigQuery service account key */
+                service_account_key: string
+              }
+            }
+          | {
+              iceberg: {
+                supabase: {
+                  /**
+                   * @description Catalog token
+                   * @example A jwt secret
+                   */
+                  catalog_token: string
+                  /**
+                   * @description Namespace
+                   * @example my-namespace
+                   */
+                  namespace: string
+                  /**
+                   * @description Project ref
+                   * @example abcdefghijklmnopqrst
+                   */
+                  project_ref: string
+                  /**
+                   * @description S3 access key ID
+                   * @example 53383b1d0cdb16a3afa63152656aa3cc
+                   */
+                  s3_access_key_id: string
+                  /**
+                   * @description S3 region
+                   * @example ap-southeast-1
+                   */
+                  s3_region: string
+                  /**
+                   * @description S3 secret access key
+                   * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                   */
+                  s3_secret_access_key: string
+                  /**
+                   * @description Warehouse name
+                   * @example my-warehouse
+                   */
+                  warehouse_name: string
+                }
+              }
+            }
         /**
          * @description Destination id
          * @example 2001
@@ -7946,7 +8545,7 @@ export interface components {
       }[]
     }
     ReplicationPipelineReplicationStatusResponse: {
-      /** @description The apply worker lag */
+      /** @description Stats about apply worker lag */
       apply_lag?: {
         /**
          * @description Bytes between the current WAL location and the confirmed flush LSN.
@@ -8033,7 +8632,7 @@ export interface components {
          * @example public.orders
          */
         table_name: string
-        /** @description The table sync worker lag */
+        /** @description Stats about table sync worker lag */
         table_sync_lag?: {
           /**
            * @description Bytes between the current WAL location and the confirmed flush LSN.
@@ -8957,10 +9556,22 @@ export interface components {
             url: string
             username?: string | null
           }
+        | {
+            dsn: string
+          }
       description?: string
       name?: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
+      type:
+        | 'postgres'
+        | 'bigquery'
+        | 'clickhouse'
+        | 'webhook'
+        | 'datadog'
+        | 'elastic'
+        | 'loki'
+        | 'sentry'
+        | 's3'
     }
     UpdateCollectionBody: {
       name: string
@@ -9034,64 +9645,82 @@ export interface components {
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string | null
       EXTERNAL_APPLE_CLIENT_ID?: string | null
+      EXTERNAL_APPLE_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_APPLE_ENABLED?: boolean | null
       EXTERNAL_APPLE_SECRET?: string | null
       EXTERNAL_AZURE_CLIENT_ID?: string | null
+      EXTERNAL_AZURE_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_AZURE_ENABLED?: boolean | null
       EXTERNAL_AZURE_SECRET?: string | null
       EXTERNAL_AZURE_URL?: string | null
       EXTERNAL_BITBUCKET_CLIENT_ID?: string | null
+      EXTERNAL_BITBUCKET_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_BITBUCKET_ENABLED?: boolean | null
       EXTERNAL_BITBUCKET_SECRET?: string | null
       EXTERNAL_DISCORD_CLIENT_ID?: string | null
+      EXTERNAL_DISCORD_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_DISCORD_ENABLED?: boolean | null
       EXTERNAL_DISCORD_SECRET?: string | null
       EXTERNAL_EMAIL_ENABLED?: boolean | null
       EXTERNAL_FACEBOOK_CLIENT_ID?: string | null
+      EXTERNAL_FACEBOOK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_FACEBOOK_ENABLED?: boolean | null
       EXTERNAL_FACEBOOK_SECRET?: string | null
       EXTERNAL_FIGMA_CLIENT_ID?: string | null
+      EXTERNAL_FIGMA_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_FIGMA_ENABLED?: boolean | null
       EXTERNAL_FIGMA_SECRET?: string | null
       EXTERNAL_GITHUB_CLIENT_ID?: string | null
+      EXTERNAL_GITHUB_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_GITHUB_ENABLED?: boolean | null
       EXTERNAL_GITHUB_SECRET?: string | null
       EXTERNAL_GITLAB_CLIENT_ID?: string | null
+      EXTERNAL_GITLAB_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_GITLAB_ENABLED?: boolean | null
       EXTERNAL_GITLAB_SECRET?: string | null
       EXTERNAL_GITLAB_URL?: string | null
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string | null
       EXTERNAL_GOOGLE_CLIENT_ID?: string | null
+      EXTERNAL_GOOGLE_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_GOOGLE_ENABLED?: boolean | null
       EXTERNAL_GOOGLE_SECRET?: string | null
       EXTERNAL_GOOGLE_SKIP_NONCE_CHECK?: boolean | null
       EXTERNAL_KAKAO_CLIENT_ID?: string | null
+      EXTERNAL_KAKAO_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_KAKAO_ENABLED?: boolean | null
       EXTERNAL_KAKAO_SECRET?: string | null
       EXTERNAL_KEYCLOAK_CLIENT_ID?: string | null
+      EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_KEYCLOAK_ENABLED?: boolean | null
       EXTERNAL_KEYCLOAK_SECRET?: string | null
       EXTERNAL_KEYCLOAK_URL?: string | null
       EXTERNAL_LINKEDIN_OIDC_CLIENT_ID?: string | null
+      EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_LINKEDIN_OIDC_ENABLED?: boolean | null
       EXTERNAL_LINKEDIN_OIDC_SECRET?: string | null
       EXTERNAL_NOTION_CLIENT_ID?: string | null
+      EXTERNAL_NOTION_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_NOTION_ENABLED?: boolean | null
       EXTERNAL_NOTION_SECRET?: string | null
       EXTERNAL_PHONE_ENABLED?: boolean | null
       EXTERNAL_SLACK_CLIENT_ID?: string | null
+      EXTERNAL_SLACK_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_SLACK_ENABLED?: boolean | null
       EXTERNAL_SLACK_OIDC_CLIENT_ID?: string | null
+      EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_SLACK_OIDC_ENABLED?: boolean | null
       EXTERNAL_SLACK_OIDC_SECRET?: string | null
       EXTERNAL_SLACK_SECRET?: string | null
       EXTERNAL_SPOTIFY_CLIENT_ID?: string | null
+      EXTERNAL_SPOTIFY_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_SPOTIFY_ENABLED?: boolean | null
       EXTERNAL_SPOTIFY_SECRET?: string | null
       EXTERNAL_TWITCH_CLIENT_ID?: string | null
+      EXTERNAL_TWITCH_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_TWITCH_ENABLED?: boolean | null
       EXTERNAL_TWITCH_SECRET?: string | null
       EXTERNAL_TWITTER_CLIENT_ID?: string | null
+      EXTERNAL_TWITTER_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_TWITTER_ENABLED?: boolean | null
       EXTERNAL_TWITTER_SECRET?: string | null
       EXTERNAL_WEB3_ETHEREUM_ENABLED?: boolean | null
@@ -9101,8 +9730,12 @@ export interface components {
       EXTERNAL_WORKOS_SECRET?: string | null
       EXTERNAL_WORKOS_URL?: string | null
       EXTERNAL_ZOOM_CLIENT_ID?: string | null
+      EXTERNAL_ZOOM_EMAIL_OPTIONAL?: boolean | null
       EXTERNAL_ZOOM_ENABLED?: boolean | null
       EXTERNAL_ZOOM_SECRET?: string | null
+      HOOK_AFTER_USER_CREATED_ENABLED?: boolean | null
+      HOOK_AFTER_USER_CREATED_SECRETS?: string | null
+      HOOK_AFTER_USER_CREATED_URI?: string | null
       HOOK_BEFORE_USER_CREATED_ENABLED?: boolean | null
       HOOK_BEFORE_USER_CREATED_SECRETS?: string | null
       HOOK_BEFORE_USER_CREATED_URI?: string | null
@@ -9124,19 +9757,40 @@ export interface components {
       JWT_EXP?: number | null
       MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS?: boolean | null
       MAILER_AUTOCONFIRM?: boolean | null
+      MAILER_NOTIFICATIONS_EMAIL_CHANGED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_IDENTITY_LINKED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_IDENTITY_UNLINKED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_MFA_FACTOR_ENROLLED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_MFA_FACTOR_UNENROLLED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_PASSWORD_CHANGED_ENABLED?: boolean | null
+      MAILER_NOTIFICATIONS_PHONE_CHANGED_ENABLED?: boolean | null
       MAILER_OTP_EXP?: number
       MAILER_OTP_LENGTH?: number | null
       MAILER_SECURE_EMAIL_CHANGE_ENABLED?: boolean | null
       MAILER_SUBJECTS_CONFIRMATION?: string | null
       MAILER_SUBJECTS_EMAIL_CHANGE?: string | null
+      MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION?: string | null
       MAILER_SUBJECTS_INVITE?: string | null
       MAILER_SUBJECTS_MAGIC_LINK?: string | null
+      MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION?: string | null
+      MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION?: string | null
       MAILER_SUBJECTS_REAUTHENTICATION?: string | null
       MAILER_SUBJECTS_RECOVERY?: string | null
       MAILER_TEMPLATES_CONFIRMATION_CONTENT?: string | null
       MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT?: string | null
+      MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_IDENTITY_LINKED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_IDENTITY_UNLINKED_NOTIFICATION_CONTENT?: string | null
       MAILER_TEMPLATES_INVITE_CONTENT?: string | null
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string | null
+      MAILER_TEMPLATES_MFA_FACTOR_ENROLLED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_MFA_FACTOR_UNENROLLED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION_CONTENT?: string | null
+      MAILER_TEMPLATES_PHONE_CHANGED_NOTIFICATION_CONTENT?: string | null
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string | null
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string | null
       MFA_ALLOW_LOW_AAL?: boolean | null
@@ -9152,6 +9806,9 @@ export interface components {
       MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean | null
       NIMBUS_OAUTH_CLIENT_ID?: string | null
       NIMBUS_OAUTH_CLIENT_SECRET?: string | null
+      OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION?: boolean | null
+      OAUTH_SERVER_AUTHORIZATION_PATH?: string | null
+      OAUTH_SERVER_ENABLED?: boolean | null
       PASSWORD_HIBP_ENABLED?: boolean | null
       PASSWORD_MIN_LENGTH?: number | null
       /** @enum {string|null} */
@@ -9219,6 +9876,9 @@ export interface components {
       URI_ALLOW_LIST?: string | null
     }
     UpdateGoTrueConfigHooksBody: {
+      HOOK_AFTER_USER_CREATED_ENABLED?: boolean | null
+      HOOK_AFTER_USER_CREATED_SECRETS?: string | null
+      HOOK_AFTER_USER_CREATED_URI?: string | null
       HOOK_BEFORE_USER_CREATED_ENABLED?: boolean | null
       HOOK_BEFORE_USER_CREATED_SECRETS?: string | null
       HOOK_BEFORE_USER_CREATED_URI?: string | null
@@ -9409,37 +10069,85 @@ export interface components {
       max_events_per_second?: number
       /** @description Sets maximum number of joins per second rate limit */
       max_joins_per_second?: number
+      /** @description Sets maximum number of payload size in KB rate limit */
+      max_payload_size_in_kb?: number
+      /** @description Sets maximum number of presence events per second rate limit */
+      max_presence_events_per_second?: number
       /** @description Whether to only allow private channels */
       private_only?: boolean
+      /** @description Whether to suspend realtime */
+      suspend?: boolean
     }
     UpdateReplicationDestinationBody: {
       /** @description Destination configuration */
-      config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -9448,32 +10156,74 @@ export interface components {
     }
     UpdateReplicationDestinationPipelineBody: {
       /** @description Destination configuration */
-      destination_config: {
-        big_query: {
-          /**
-           * @description BigQuery dataset id
-           * @example analytics
-           */
-          dataset_id: string
-          /**
-           * @description Maximum number of concurrent write streams
-           * @example 8
-           */
-          max_concurrent_streams?: number
-          /**
-           * @description Maximum data staleness in minutes
-           * @example 5
-           */
-          max_staleness_mins?: number
-          /**
-           * @description BigQuery project id
-           * @example my-gcp-project
-           */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
+      destination_config:
+        | {
+            big_query: {
+              /**
+               * @description BigQuery dataset id
+               * @example analytics
+               */
+              dataset_id: string
+              /**
+               * @description Maximum number of concurrent write streams
+               * @example 8
+               */
+              max_concurrent_streams?: number
+              /**
+               * @description Maximum data staleness in minutes
+               * @example 5
+               */
+              max_staleness_mins?: number
+              /**
+               * @description BigQuery project id
+               * @example my-gcp-project
+               */
+              project_id: string
+              /** @description BigQuery service account key */
+              service_account_key: string
+            }
+          }
+        | {
+            iceberg: {
+              supabase: {
+                /**
+                 * @description Catalog token
+                 * @example A jwt secret
+                 */
+                catalog_token: string
+                /**
+                 * @description Namespace
+                 * @example my-namespace
+                 */
+                namespace: string
+                /**
+                 * @description Project ref
+                 * @example abcdefghijklmnopqrst
+                 */
+                project_ref: string
+                /**
+                 * @description S3 access key ID
+                 * @example 53383b1d0cdb16a3afa63152656aa3cc
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3 region
+                 * @example ap-southeast-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3 secret access key
+                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description Warehouse name
+                 * @example my-warehouse
+                 */
+                warehouse_name: string
+              }
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -9919,7 +10669,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to retrieve GoTrue config */
+      /** @description Failed to retrieve Auth config */
       500: {
         headers: {
           [name: string]: unknown
@@ -9973,7 +10723,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update GoTrue config */
+      /** @description Failed to update Auth config */
       500: {
         headers: {
           [name: string]: unknown
@@ -10027,7 +10777,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update GoTrue config hooks */
+      /** @description Failed to update Auth config hooks */
       500: {
         headers: {
           [name: string]: unknown
@@ -10257,6 +11007,13 @@ export interface operations {
           | 'magic-link'
           | 'recovery'
           | 'reauthentication'
+          | 'password-changed-notification'
+          | 'email-changed-notification'
+          | 'phone-changed-notification'
+          | 'mfa-factor-enrolled-notification'
+          | 'mfa-factor-unenrolled-notification'
+          | 'identity-linked-notification'
+          | 'identity-unlinked-notification'
       }
       cookie?: never
     }
@@ -10268,7 +11025,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to retrieve GoTrue template */
+      /** @description Failed to retrieve Auth template */
       500: {
         headers: {
           [name: string]: unknown
@@ -11493,7 +12250,7 @@ export interface operations {
       }
       header?: never
       path: {
-        connectionId: number
+        connection_id: number
       }
       cookie?: never
     }
@@ -11521,8 +12278,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        branchName: string
-        connectionId: number
+        branch_name: string
+        connection_id: number
       }
       cookie?: never
     }
@@ -11690,7 +12447,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        repositoryId: number
+        repository_id: number
       }
       cookie?: never
     }
@@ -11718,8 +12475,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        branchName: string
-        repositoryId: number
+        branch_name: string
+        repository_id: number
       }
       cookie?: never
     }
@@ -12045,7 +12802,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        project_ref: string
+        ref: string
       }
       cookie?: never
     }
@@ -12754,7 +13511,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        invoiceId: string
+        invoice_id: string
         /** @description Organization slug */
         slug: string
       }
@@ -12805,7 +13562,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        invoiceId: string
+        invoice_id: string
         /** @description Organization slug */
         slug: string
       }
@@ -13076,6 +13833,14 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
+        }
       }
       /** @description Unauthorized */
       401: {
@@ -13363,157 +14128,6 @@ export interface operations {
       }
     }
   }
-  OrgDailyStatsController_getDailyStats: {
-    parameters: {
-      query: {
-        endDate: string
-        interval?: string
-        metric:
-          | 'EGRESS'
-          | 'CACHED_EGRESS'
-          | 'DATABASE_SIZE'
-          | 'STORAGE_SIZE'
-          | 'MONTHLY_ACTIVE_USERS'
-          | 'MONTHLY_ACTIVE_SSO_USERS'
-          | 'FUNCTION_INVOCATIONS'
-          | 'FUNCTION_CPU_MILLISECONDS'
-          | 'STORAGE_IMAGES_TRANSFORMED'
-          | 'REALTIME_MESSAGE_COUNT'
-          | 'REALTIME_PEAK_CONNECTIONS'
-          | 'DISK_SIZE_GB_HOURS_GP3'
-          | 'DISK_SIZE_GB_HOURS_IO2'
-          | 'AUTH_MFA_PHONE'
-          | 'AUTH_MFA_WEB_AUTHN'
-          | 'LOG_DRAIN_EVENTS'
-          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
-          | 'DISK_THROUGHPUT_GP3'
-          | 'DISK_IOPS_GP3'
-          | 'DISK_IOPS_IO2'
-          | 'COMPUTE_HOURS_BRANCH'
-          | 'COMPUTE_HOURS_XS'
-          | 'COMPUTE_HOURS_SM'
-          | 'COMPUTE_HOURS_MD'
-          | 'COMPUTE_HOURS_L'
-          | 'COMPUTE_HOURS_XL'
-          | 'COMPUTE_HOURS_2XL'
-          | 'COMPUTE_HOURS_4XL'
-          | 'COMPUTE_HOURS_8XL'
-          | 'COMPUTE_HOURS_12XL'
-          | 'COMPUTE_HOURS_16XL'
-          | 'COMPUTE_HOURS_24XL'
-          | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
-          | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
-          | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
-          | 'COMPUTE_HOURS_48XL'
-          | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
-          | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
-          | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
-          | 'CUSTOM_DOMAIN'
-          | 'PITR_7'
-          | 'PITR_14'
-          | 'PITR_28'
-          | 'IPV4'
-          | 'LOG_DRAIN'
-        projectRef?: string
-        startDate: string
-      }
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get daily organization stats */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrgDailyStatsController_getDailyStatsCompute: {
-    parameters: {
-      query: {
-        endDate: string
-        projectRef?: string
-        startDate: string
-      }
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get daily organization stats for compute */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   OrgDocumentsController_createDpaDocument: {
     parameters: {
       query?: never
@@ -13619,6 +14233,92 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationEntitlementsController_getEntitlements: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListEntitlementsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationEntitlementsController_getEntitlements: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListEntitlementsResponse']
         }
       }
       /** @description Unauthorized */
@@ -15374,6 +16074,61 @@ export interface operations {
       }
     }
   }
+  OrgUsageController_getDailyOrgUsage: {
+    parameters: {
+      query?: {
+        apikey?: string
+        end?: string
+        project_ref?: string
+        start?: string
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrgDailyUsageResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get usage stats */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrganizationsController_createAwsBilledOrganization: {
     parameters: {
       query?: never
@@ -15423,6 +16178,14 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['CreateOrganizationResponse']
+        }
+      }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
         }
       }
       /** @description Failed to confirm subscription changes */
@@ -18143,6 +18906,116 @@ export interface operations {
       }
     }
   }
+  ScopedAccessTokensController_getAccessTokens: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetScopedAccessTokensResponse']
+        }
+      }
+      /** @description Failed to get user's scoped access tokens */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ScopedAccessTokensController_createAccessToken: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateScopedAccessTokenBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateScopedAccessTokenResponse']
+        }
+      }
+      /** @description Failed to create scoped access token */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ScopedAccessTokensController_getAccessToken: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetScopedAccessTokenResponse']
+        }
+      }
+      /** @description Failed to get scoped access token */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ScopedAccessTokensController_deleteAccessToken: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete scoped access token */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ProjectsController_getProjects: {
     parameters: {
       query?: never
@@ -18187,7 +19060,12 @@ export interface operations {
   }
   ProjectsResourceWarningsController_getProjectsResourceWarnings: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description Project ref */
+        ref?: string
+        /** @description Organization slug */
+        slug?: string
+      }
       header?: never
       path?: never
       cookie?: never
@@ -18508,6 +19386,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
+        lql?: string
         sql?: string
       }
       header?: never
@@ -21401,39 +22280,25 @@ export interface operations {
         attribute:
           | 'total_realtime_requests'
           | 'total_realtime_egress'
-          | 'total_ingress'
           | 'total_egress'
           | 'total_cached_egress'
           | 'total_requests'
-          | 'total_get_requests'
-          | 'total_patch_requests'
-          | 'total_post_requests'
           | 'total_delete_requests'
           | 'total_supavisor_egress_bytes'
-          | 'total_rest_ingress'
           | 'total_rest_egress'
           | 'total_rest_requests'
-          | 'total_rest_get_requests'
-          | 'total_rest_post_requests'
-          | 'total_rest_patch_requests'
-          | 'total_rest_delete_requests'
           | 'total_auth_billing_period_mau'
           | 'total_auth_billing_period_sso_mau'
           | 'total_auth_egress'
           | 'total_auth_requests'
-          | 'total_auth_delete_requests'
           | 'total_storage_ingress'
           | 'total_storage_egress'
           | 'total_storage_image_render_count'
           | 'total_storage_requests'
-          | 'total_storage_get_requests'
-          | 'total_storage_post_requests'
-          | 'total_storage_delete_requests'
           | 'total_logdrain_egress'
           | 'total_func_invocations'
           | 'total_func_cpu_time_ms'
         endDate: string
-        interval?: string
         startDate: string
       }
       header?: never
@@ -22080,6 +22945,49 @@ export interface operations {
       }
     }
   }
+  ProjectMembersController_getProjecMembers: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectMembersResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ProjectAdvisorNotificationsController_listNotificationExceptions: {
     parameters: {
       query?: never
@@ -22371,6 +23279,173 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectPrivateLinkController_getPrivateLink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetPrivateLinkResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve AWS accounts from privateLink middleware */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectPrivateLinkController_addAwsAccountToPrivateLink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddAwsAccountToPrivateLinkBody']
+      }
+    }
+    responses: {
+      /** @description Scheduled AWS PrivateLink resources to be created. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description AWS PrivateLink is not available for the current billing plan. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to add AWS account to PrivateLink share */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectPrivateLinkController_removeAwsAccountFromPrivateLink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        aws_account_id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Scheduled AWS PrivateLink resources to be removed. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Invalid AWS account ID format or association does not have a valid status for deletion. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to remove AWS account from PrivateLink share */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -23181,6 +24256,27 @@ export interface operations {
     parameters: {
       query: {
         cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+        desired_instance_size?:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
         organization_slug: string
       }
       header?: never

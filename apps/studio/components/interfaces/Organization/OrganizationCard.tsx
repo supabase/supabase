@@ -3,29 +3,37 @@ import Link from 'next/link'
 
 import { useIsMFAEnabled } from 'common'
 import { ActionCard } from 'components/ui/ActionCard'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { Fragment } from 'react'
 import { Organization } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export const OrganizationCard = ({
   organization,
   href,
+  isLink = true,
+  className,
 }: {
   organization: Organization
   href?: string
+  isLink?: boolean
+  className?: string
 }) => {
   const isUserMFAEnabled = useIsMFAEnabled()
-  const { data } = useProjectsQuery()
-  const allProjects = data?.projects ?? []
-
-  const numProjects = allProjects.filter((x) => x.organization_slug === organization.slug).length
+  const { data } = useOrgProjectsInfiniteQuery({ slug: organization.slug })
+  const numProjects = data?.pages[0].pagination.count ?? 0
   const isMfaRequired = organization.organization_requires_mfa
 
+  const Parent = isLink ? Link : Fragment
+
   return (
-    <Link href={href ?? `/org/${organization.slug}`}>
+    <Parent href={href ?? `/org/${organization.slug}`}>
       <ActionCard
         bgColor="bg border"
-        className={cn('flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center')}
+        className={cn(
+          'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center',
+          className
+        )}
         icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
         title={organization.name}
         description={
@@ -54,6 +62,6 @@ export const OrganizationCard = ({
           </div>
         }
       />
-    </Link>
+    </Parent>
   )
 }

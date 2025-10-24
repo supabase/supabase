@@ -16,12 +16,14 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -47,6 +49,7 @@ import {
 export interface TableEditorProps {
   table?: PostgresTable
   isDuplicating: boolean
+  templateData?: Partial<TableField>
   visible: boolean
   closePanel: () => void
   saveChanges: (
@@ -75,6 +78,7 @@ export interface TableEditorProps {
 export const TableEditor = ({
   table,
   isDuplicating,
+  templateData,
   visible = false,
   closePanel = noop,
   saveChanges = noop,
@@ -87,6 +91,8 @@ export const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -230,7 +236,11 @@ export const TableEditor = ({
       setIsDuplicateRows(false)
       if (isNewRecord) {
         const tableFields = generateTableField()
-        setTableFields(tableFields)
+        if (templateData) {
+          setTableFields({ ...tableFields, ...templateData })
+        } else {
+          setTableFields(tableFields)
+        }
         setFkRelations([])
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
@@ -242,11 +252,11 @@ export const TableEditor = ({
         setTableFields(tableFields)
       }
     }
-  }, [visible])
+  }, [visible, templateData])
 
   useEffect(() => {
     if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
-  }, [isSuccessForeignKeyMeta])
+  }, [isSuccessForeignKeyMeta, foreignKeys])
 
   useEffect(() => {
     if (importContent && !isEmpty(importContent)) {
@@ -334,7 +344,7 @@ export const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         ) : (
@@ -352,7 +362,7 @@ export const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         )}

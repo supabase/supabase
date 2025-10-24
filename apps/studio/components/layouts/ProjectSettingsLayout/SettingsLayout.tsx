@@ -8,7 +8,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
 interface SettingsLayoutProps {
@@ -35,6 +35,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
 
   const {
     projectAuthAll: authEnabled,
+    authenticationShowProviders: authProvidersEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
     billingInvoices: invoicesEnabled,
@@ -43,6 +44,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     billingAll,
   } = useIsFeatureEnabled([
     'project_auth:all',
+    'authentication:show_providers',
     'project_edge_function:all',
     'project_storage:all',
     'billing:invoices',
@@ -53,6 +55,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
     auth: authEnabled,
+    authProviders: authProvidersEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,

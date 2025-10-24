@@ -3,12 +3,14 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams, useFlag } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -70,7 +72,7 @@ export interface ProjectLayoutProps {
   productMenuClassName?: string
 }
 
-const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
+export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
   (
     {
       title,
@@ -90,11 +92,19 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
-
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
+    const [isAiAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
+      LOCAL_STORAGE_KEYS.HOTKEY_AI_ASSISTANT,
+      true
+    )
 
-    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap])
+    const { appTitle } = useCustomContent(['app:title'])
+    const titleSuffix = appTitle || 'Supabase'
+
+    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap], {
+      enabled: isAiAssistantHotkeyEnabled,
+    })
 
     const editor = useEditorType()
     const forceShowProductMenu = editor === undefined
@@ -124,14 +134,14 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
         <Head>
           <title>
             {title
-              ? `${title} | Supabase`
+              ? `${title} | ${titleSuffix}`
               : selectedTable
-                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                ? `${selectedTable} | ${projectName} | ${organizationName} | ${titleSuffix}`
                 : projectName
-                  ? `${projectName} | ${organizationName} | Supabase`
+                  ? `${projectName} | ${organizationName} | ${titleSuffix}`
                   : organizationName
-                    ? `${organizationName} | Supabase`
-                    : 'Supabase'}
+                    ? `${organizationName} | ${titleSuffix}`
+                    : titleSuffix}
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
@@ -258,8 +268,6 @@ ProjectLayout.displayName = 'ProjectLayout'
 
 export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
 
-export default ProjectLayout
-
 interface MenuBarWrapperProps {
   isLoading: boolean
   isBlocking?: boolean
@@ -310,11 +318,13 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
+  const isHomeNewFlag = useFlag('homeNew')
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
+  const isHomePage = router.pathname === '/project/[ref]'
 
   const requiresDbConnection: boolean =
     (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
@@ -334,6 +344,20 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
+
+  // handle redirect to home for building state
+  const shouldRedirectToHomeForBuilding =
+    isHomeNewFlag && requiresDbConnection && isProjectBuilding && !isBranchesPage && !isHomePage
+
+  // We won't be showing the building state with the new home page
+  const shouldShowBuildingState =
+    requiresDbConnection && isProjectBuilding && !isBranchesPage && !(isHomeNewFlag && isHomePage)
+
+  useEffect(() => {
+    if (shouldRedirectToHomeForBuilding && ref) {
+      router.replace(`/project/${ref}`)
+    }
+  }, [shouldRedirectToHomeForBuilding, ref, router])
 
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
@@ -375,7 +399,11 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoreFailedState />
   }
 
-  if (requiresDbConnection && isProjectBuilding && !isBranchesPage) {
+  if (shouldRedirectToHomeForBuilding) {
+    return <Loading />
+  }
+
+  if (shouldShowBuildingState) {
     return <BuildingState />
   }
 

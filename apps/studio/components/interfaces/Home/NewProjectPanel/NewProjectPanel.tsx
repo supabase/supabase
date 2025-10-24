@@ -6,6 +6,7 @@ import Panel from 'components/ui/Panel'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
+import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
 import { APIKeys } from './APIKeys'
 import { GetStartedHero } from './GetStartedHero'
@@ -51,11 +52,7 @@ export const NewProjectPanel = () => {
                   <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
                 <Button asChild type="default" icon={<ExternalLink />}>
-                  <Link
-                    href="https://supabase.com/docs/guides/database"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <Link href={`${DOCS_URL}/guides/database`} target="_blank" rel="noreferrer">
                     About Database
                   </Link>
                 </Button>
@@ -100,11 +97,7 @@ export const NewProjectPanel = () => {
                         type="default"
                         asChild
                       >
-                        <Link
-                          href="https://supabase.com/docs/guides/auth"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <Link href={`${DOCS_URL}/guides/auth`} target="_blank" rel="noreferrer">
                           About Auth
                         </Link>
                       </Button>
@@ -136,11 +129,7 @@ export const NewProjectPanel = () => {
                         type="default"
                         asChild
                       >
-                        <Link
-                          href="https://supabase.com/docs/guides/storage"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <Link href={`${DOCS_URL}/guides/storage`} target="_blank" rel="noreferrer">
                           About Storage
                         </Link>
                       </Button>
@@ -173,7 +162,7 @@ export const NewProjectPanel = () => {
                         asChild
                       >
                         <Link
-                          href="https://supabase.com/docs/guides/functions"
+                          href={`${DOCS_URL}/guides/functions`}
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -206,11 +195,7 @@ export const NewProjectPanel = () => {
                         type="default"
                         asChild
                       >
-                        <Link
-                          href="https://supabase.com/docs/guides/realtime"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <Link href={`${DOCS_URL}/guides/realtime`} target="_blank" rel="noreferrer">
                           About Realtime
                         </Link>
                       </Button>
@@ -229,7 +214,7 @@ export const NewProjectPanel = () => {
             <h2>Connecting to your new project</h2>
             <p className="text-base text-foreground-light lg:max-w-sm">
               Interact with your database through the{' '}
-              <Link href="https://supabase.com/docs/reference" className="text-brand">
+              <Link href={`${DOCS_URL}/reference`} className="text-brand">
                 Supabase client libraries
               </Link>{' '}
               with your API keys.
@@ -244,11 +229,7 @@ export const NewProjectPanel = () => {
               <Link href={`/project/${ref}/settings/api`}>View API settings</Link>
             </Button>
             <Button asChild className="translate-y-[1px]" type="default" icon={<ExternalLink />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/api"
-                target="_blank"
-                rel="noreferrer"
-              >
+              <Link href={`${DOCS_URL}/guides/database/api`} target="_blank" rel="noreferrer">
                 About APIs
               </Link>
             </Button>

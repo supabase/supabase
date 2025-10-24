@@ -10,6 +10,7 @@ import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorL
 import { TableEditorMenu } from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
@@ -17,10 +18,13 @@ const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const tabStore = useTabsStateSnapshot()
+  const { selectedSchema } = useQuerySchemaState()
   const { history, isHistoryLoaded } = useDashboardHistory()
 
   const onTableCreated = (table: { id: number }) => {
-    router.push(`/project/${projectRef}/editor/${table.id}`)
+    router.push(
+      `/project/${projectRef}/editor/${table.id}${!!selectedSchema ? `?schema=${selectedSchema}` : ''}`
+    )
   }
 
   useEffect(() => {
