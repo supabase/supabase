@@ -3,59 +3,117 @@ import {
   ScaffoldSectionTitle,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import { Card, CardContent, cn } from 'ui'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  cn,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import Link from 'next/link'
 import { useParams } from 'common'
-import { ChevronRight, Loader2 } from 'lucide-react'
+import { ChevronRight, ExternalLink, HelpCircle } from 'lucide-react'
 import { Reports } from 'icons'
 import {
-  getChangeSign,
   getChangeColor,
   fetchAllAuthMetrics,
   processAllAuthMetrics,
   calculatePercentageChange,
 } from './OverviewUsage.constants'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
-import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
-import { createAuthReportConfig } from 'data/reports/v2/auth.config'
 import dayjs from 'dayjs'
+import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useRouter } from 'next/router'
 
-const StatCard = ({
+export const StatCard = ({
   title,
   current,
   previous,
   loading,
   suffix = '',
+  invert = false,
+  href,
+  tooltip,
 }: {
   title: string
   current: number
   previous: number
   loading: boolean
   suffix?: string
+  invert?: boolean
+  href?: string
+  tooltip?: string
 }) => {
-  const changeColor = getChangeColor(previous)
-  const changeSign = getChangeSign(previous)
-  const formattedCurrent = suffix === 'ms' ? current.toFixed(2) : current
+  const router = useRouter()
+  const isZeroChange = previous === 0
+  const changeColor = isZeroChange
+    ? 'text-foreground-lighter'
+    : invert
+      ? previous >= 0
+        ? 'text-destructive'
+        : 'text-brand'
+      : getChangeColor(previous)
+  const formattedCurrent =
+    suffix === 'ms'
+      ? current.toFixed(2)
+      : suffix === '%'
+        ? current.toFixed(1)
+        : Math.round(current).toLocaleString()
+  const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
   return (
-    <Card>
+    <Card className={cn(href, 'mb-0 flex flex-col')}>
+      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative">
+        <CardTitle className="text-foreground-light flex items-center gap-2">
+          {title}
+          {tooltip && (
+            <Tooltip>
+              <TooltipTrigger>
+                <HelpCircle className="text-foreground-light" size={14} strokeWidth={1.5} />
+              </TooltipTrigger>
+              <TooltipContent className="w-[300px]">
+                <p>{tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </CardTitle>
+        <ButtonTooltip
+          type="text"
+          size="tiny"
+          icon={<ExternalLink />}
+          className="w-6 h-6 absolute right-4 top-3"
+          onClick={() => router.push(href || '')}
+          tooltip={{
+            content: {
+              side: 'top',
+              text: 'Go to Auth Report',
+            },
+          }}
+        />
+      </CardHeader>
       <CardContent
         className={cn(
-          'flex flex-col my-1 gap-1',
-          loading && 'opacity-50 items-center justify-center min-h-[108px]'
+          'pb-4 px-6 pt-0 flex-1 h-full overflow-hidden',
+          loading && 'pt-2 opacity-50 items-center justify-center'
         )}
       >
         {loading ? (
-          <Loader2 className="size-5 animate-spin text-foreground-light" />
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-6 w-20" />
+            <Skeleton className="h-3 w-8" />
+          </div>
         ) : (
-          <>
-            <h4 className="text-sm text-foreground-lighter font-normal mb-0 truncate">{title}</h4>
+          <div className="flex flex-col gap-0.5">
             <p className="text-xl">{`${formattedCurrent}${suffix}`}</p>
-            <p className={cn('text-sm text-foreground-lighter', changeColor)}>
-              {`${changeSign}${previous.toFixed(1)}%`}
-            </p>
-          </>
+            <span className={cn('flex items-center gap-1 text-sm', changeColor)}>
+              <span>{`${signChar}${Math.abs(previous).toFixed(1)}%`}</span>
+            </span>
+          </div>
         )}
       </CardContent>
     </Card>
@@ -65,13 +123,21 @@ const StatCard = ({
 export const OverviewUsage = () => {
   const { ref } = useParams()
 
-  const { data: currentData, isLoading: currentLoading } = useQuery({
+  const {
+    data: currentData,
+    isLoading: currentLoading,
+    error: currentError,
+  } = useQuery({
     queryKey: ['auth-metrics', ref, 'current'],
     queryFn: () => fetchAllAuthMetrics(ref as string, 'current'),
     enabled: !!ref,
   })
 
-  const { data: previousData, isLoading: previousLoading } = useQuery({
+  const {
+    data: previousData,
+    isLoading: previousLoading,
+    error: previousError,
+  } = useQuery({
     queryKey: ['auth-metrics', ref, 'previous'],
     queryFn: () => fetchAllAuthMetrics(ref as string, 'previous'),
     enabled: !!ref,
@@ -79,63 +145,35 @@ export const OverviewUsage = () => {
 
   const metrics = processAllAuthMetrics(currentData?.result || [], previousData?.result || [])
   const isLoading = currentLoading || previousLoading
+  const isError = !!previousError || !!currentError
+  const errorMessage =
+    (previousError as any)?.message ||
+    (currentError as any)?.message ||
+    'There was an error fetching the auth metrics.'
 
   const activeUsersChange = calculatePercentageChange(
     metrics.current.activeUsers,
     metrics.previous.activeUsers
   )
-  const passwordResetChange = calculatePercentageChange(
-    metrics.current.passwordResets,
-    metrics.previous.passwordResets
-  )
-  const signInLatencyChange = calculatePercentageChange(
-    metrics.current.signInLatency,
-    metrics.previous.signInLatency
-  )
-  const signUpLatencyChange = calculatePercentageChange(
-    metrics.current.signUpLatency,
-    metrics.previous.signUpLatency
-  )
+
+  const signUpsChange = calculatePercentageChange(metrics.current.signUps, metrics.previous.signUps)
 
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
 
-  const signUpChartConfig = useMemo(() => {
-    const config = createAuthReportConfig({
-      projectRef: ref as string,
-      startDate,
-      endDate,
-      interval: '1h',
-      filters: { status_code: null },
-    })
-    const chart = config.find((c) => c.id === 'signups')
-    if (chart) {
-      return { ...chart, defaultChartStyle: 'bar' }
-    }
-    return chart
-  }, [ref, startDate, endDate])
-
-  const signInChartConfig = useMemo(() => {
-    const config = createAuthReportConfig({
-      projectRef: ref as string,
-      startDate,
-      endDate,
-      interval: '1h',
-      filters: { status_code: null },
-    })
-    const chart = config.find((c) => c.id === 'sign-in-attempts')
-    if (chart) {
-      return { ...chart, defaultChartStyle: 'bar' }
-    }
-    return chart
-  }, [ref, startDate, endDate])
-
-  const updateDateRange = (from: string, to: string) => {
-    console.log('Date range update:', from, to)
-  }
+  // No charts on overview; keep date range for link only
 
   return (
     <ScaffoldSection isFullWidth>
+      {isError && (
+        <AlertError
+          className="mb-4"
+          subject="Error fetching auth metrics"
+          error={{
+            message: errorMessage,
+          }}
+        />
+      )}
       <div className="flex items-center justify-between mb-4">
         <ScaffoldSectionTitle>Usage</ScaffoldSectionTitle>
         <Link
@@ -148,55 +186,22 @@ export const OverviewUsage = () => {
         </Link>
       </div>
       <ScaffoldSectionContent className="gap-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <StatCard
-            title="Active Users"
+            title="Auth Activity" // https://supabase.slack.com/archives/C08N7894QTG/p1761210058358439?thread_ts=1761147906.491599&cid=C08N7894QTG
             current={metrics.current.activeUsers}
             previous={activeUsersChange}
             loading={isLoading}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
+            tooltip="Users who generated any Auth event in this period. This metric tracks authentication activity, not total product usage. Some active users won't appear here if their session stayed valid."
           />
           <StatCard
-            title="Password Reset Requests"
-            current={metrics.current.passwordResets}
-            previous={passwordResetChange}
+            title="Sign ups"
+            current={metrics.current.signUps}
+            previous={signUpsChange}
             loading={isLoading}
+            href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
           />
-          <StatCard
-            title="Sign up Latency"
-            current={Number(metrics.current.signUpLatency.toFixed(2))}
-            previous={signUpLatencyChange}
-            loading={isLoading}
-            suffix="ms"
-          />
-          <StatCard
-            title="Sign in Latency"
-            current={Number(metrics.current.signInLatency.toFixed(2))}
-            previous={signInLatencyChange}
-            loading={isLoading}
-            suffix="ms"
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {signUpChartConfig && (
-            <ReportChartV2
-              report={signUpChartConfig}
-              projectRef={ref as string}
-              startDate={startDate}
-              endDate={endDate}
-              interval="1h"
-              updateDateRange={updateDateRange}
-            />
-          )}
-          {signInChartConfig && (
-            <ReportChartV2
-              report={signInChartConfig}
-              projectRef={ref as string}
-              startDate={startDate}
-              endDate={endDate}
-              interval="1h"
-              updateDateRange={updateDateRange}
-            />
-          )}
         </div>
       </ScaffoldSectionContent>
     </ScaffoldSection>

@@ -47,14 +47,7 @@ export const ProjectClaimConfirm = ({
 
   const onClaimProject = async () => {
     try {
-      try {
-        await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
-      } catch (error: any) {
-        // if the org is already approved with this auth id, we can ignore the error. Otherwise, we throw it again
-        if (!error.message.includes('already approved')) {
-          throw error
-        }
-      }
+      const response = await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
 
       await claimProject({
         slug: selectedOrganization.slug,
@@ -62,9 +55,15 @@ export const ProjectClaimConfirm = ({
       })
 
       toast.success('Project claimed successfully')
-      // invalidate the org projects to force them to be refetched
-      queryClient.invalidateQueries(projectKeys.list())
-      router.push(`/org/${selectedOrganization.slug}`)
+      try {
+        // check if the redirect url is valid. If not, redirect the user to the org dashboard
+        const url = new URL(response.url)
+        window.location.href = url.toString()
+      } catch {
+        // invalidate the org projects to force them to be refetched
+        queryClient.invalidateQueries(projectKeys.list())
+        router.push(`/org/${selectedOrganization.slug}`)
+      }
     } catch (error: any) {
       toast.error(`Failed to claim project ${error.message}`)
     }

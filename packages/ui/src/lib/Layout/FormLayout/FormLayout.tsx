@@ -116,7 +116,7 @@ export function FormLayout({
 
   // console.log('error', error)
 
-  const renderError = (
+  const renderError = error && (
     <p
       data-state={error ? 'show' : 'hide'}
       className={[__styles.error.base, __styles.error.size[size]].join(' ')}

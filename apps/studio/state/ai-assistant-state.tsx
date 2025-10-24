@@ -17,6 +17,8 @@ export type AssistantMessageType = MessageType & { results?: { [id: string]: any
 
 export type SqlSnippet = string | { label: string; content: string }
 
+export type AssistantModel = 'gpt-5' | 'gpt-5-mini'
+
 type ChatSession = {
   id: string
   name: string
@@ -33,6 +35,7 @@ type AiAssistantData = {
   tables: { schema: string; name: string }[]
   chats: Record<string, ChatSession>
   activeChatId?: string
+  model: AssistantModel
 }
 
 // Data structure stored in IndexedDB
@@ -41,6 +44,7 @@ type StoredAiAssistantState = {
   open: boolean
   activeChatId?: string
   chats: Record<string, ChatSession>
+  model?: AssistantModel
 }
 
 const INITIAL_AI_ASSISTANT: AiAssistantData = {
@@ -51,6 +55,7 @@ const INITIAL_AI_ASSISTANT: AiAssistantData = {
   tables: [],
   chats: {},
   activeChatId: undefined,
+  model: 'gpt-5',
 }
 
 const DB_NAME = 'ai-assistant-db'
@@ -165,6 +170,7 @@ async function tryMigrateFromLocalStorage(
         open: parsedFromLocalStorage.open ?? false,
         activeChatId: parsedFromLocalStorage.activeChatId,
         chats: parsedFromLocalStorage.chats,
+        model: parsedFromLocalStorage.model ?? INITIAL_AI_ASSISTANT.model,
       }
     } else {
       console.warn('Data in localStorage is not in the expected format, ignoring.')
@@ -249,6 +255,10 @@ export const createAiAssistantState = (): AiAssistantState => {
 
     toggleAssistant: () => {
       state.open = !state.open
+    },
+
+    setModel: (model: AssistantModel) => {
+      state.model = model
     },
 
     // Chat management
@@ -392,6 +402,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.open = persistedState.open
       state.chats = persistedState.chats
       state.activeChatId = persistedState.activeChatId
+      state.model = persistedState.model ?? INITIAL_AI_ASSISTANT.model
 
       // Check URL param again to override loaded 'open' state if present
       if (typeof window !== 'undefined') {
@@ -433,6 +444,7 @@ export type AiAssistantState = AiAssistantData & {
   closeAssistant: () => void
   toggleAssistant: () => void
   activeChat: ChatSession | undefined
+  setModel: (model: AssistantModel) => void
   newChat: (
     options?: { name?: string } & Partial<
       Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
@@ -512,6 +524,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
           projectRef: project?.ref,
           open: snap.open,
           activeChatId: snap.activeChatId,
+          model: snap.model,
           chats: snap.chats
             ? Object.entries(snap.chats).reduce((acc, [chatId, chat]) => {
                 // Limit messages before saving

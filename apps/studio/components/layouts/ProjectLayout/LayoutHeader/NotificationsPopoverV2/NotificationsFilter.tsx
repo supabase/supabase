@@ -40,7 +40,7 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
   const { data: organizations } = useOrganizationsQuery()
   const { data } = useProjectsInfiniteQuery(
     { search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true }
+    { keepPreviousData: true, enabled: open }
   )
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
   const projectCount = data?.pages[0].pagination.count ?? 0

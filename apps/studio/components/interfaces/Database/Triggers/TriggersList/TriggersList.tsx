@@ -2,7 +2,7 @@ import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { DatabaseZap, FunctionSquare, Plus, Search, Shield } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsString, useQueryState } from 'nuqs'
 
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -48,7 +48,11 @@ const TriggersList = ({
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [filterString, setFilterString] = useState<string>('')
+
+  const [filterString, setFilterString] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
+  )
 
   const { data: protectedSchemas } = useProtectedSchemas()
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })

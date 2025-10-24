@@ -2,8 +2,7 @@ import { cache } from 'react'
 import { z } from 'zod'
 
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
-import { IS_PLATFORM } from '~/lib/constants'
-import { supabaseAdmin } from '~/lib/supabaseAdmin'
+import { supabase } from '~/lib/supabase'
 import {
   getAllTroubleshootingEntriesInternal,
   getArticleSlug as getArticleSlugInternal,
@@ -27,10 +26,9 @@ export interface ITroubleshootingEntry {
 export const getArticleSlug = getArticleSlugInternal
 
 async function getAllTroubleshootingEntriesTyped() {
-  const result: ITroubleshootingEntry[] = (
-    IS_PLATFORM ? await getAllTroubleshootingEntriesInternal() : []
-  ) as ITroubleshootingEntry[]
-  return result
+  const result: ITroubleshootingEntry[] =
+    (await getAllTroubleshootingEntriesInternal()) as ITroubleshootingEntry[]
+  return result ?? []
 }
 export const getAllTroubleshootingEntries = cache_fullProcess_withDevCacheBust(
   getAllTroubleshootingEntriesTyped,
@@ -91,15 +89,11 @@ export async function getAllTroubleshootingErrors() {
 }
 
 async function getTroubleshootingUpdatedDatesInternal() {
-  if (!IS_PLATFORM) {
-    return new Map<string, Date>()
-  }
-
   const databaseIds = (await getAllTroubleshootingEntries())
     .map((entry) => entry.data.database_id)
     .filter((id) => !id.startsWith('pseudo-'))
 
-  const { data, error } = await supabaseAdmin()
+  const { data, error } = await supabase()
     .from('troubleshooting_entries')
     .select('id, date_updated')
     .in('id', databaseIds)
