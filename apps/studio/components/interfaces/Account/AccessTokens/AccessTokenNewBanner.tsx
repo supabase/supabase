@@ -14,13 +14,13 @@ interface AccessTokenNewBannerProps<T> {
   description?: string
 }
 
-export const AccessTokenNewBanner = <T,>({ 
-  token, 
-  onClose, 
+export const AccessTokenNewBanner = <T,>({
+  token,
+  onClose,
   getTokenValue,
   getTokenPermissions,
-  title = "Successfully generated a new token!",
-  description = "Do copy this access token and store it in a secure place - you will not be able to see it again."
+  title = 'Successfully generated a new token!',
+  description = 'Do copy this access token and store it in a secure place - you will not be able to see it again.',
 }: AccessTokenNewBannerProps<T>) => {
   const permissions = getTokenPermissions?.(token)
 
@@ -31,9 +31,7 @@ export const AccessTokenNewBanner = <T,>({
       title={title}
       description={
         <div className="w-full space-y-2">
-          <p className="text-sm">
-            {description}
-          </p>
+          <p className="text-sm">{description}</p>
           <div className="max-w-xl">
             <Input
               copy

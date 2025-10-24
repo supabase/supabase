@@ -33,169 +33,169 @@ export const ExpiresAtOptions: Record<string, { value: string; label: string }> 
 // Simple direct mapping from resource-action to permission strings
 export const PERMISSION_MAP: Record<string, Record<string, string[]>> = {
   'user:organizations': {
-    'read': ['organizations_read'],
+    read: ['organizations_read'],
     'read-write': ['organizations_read', 'organizations_write'],
-    'no access': []
+    'no access': [],
   },
   'user:projects': {
-    'read': ['projects_read'],
-    'no access': []
+    read: ['projects_read'],
+    'no access': [],
   },
   'user:available_regions': {
-    'read': ['available_regions_read'],
-    'no access': []
+    read: ['available_regions_read'],
+    'no access': [],
   },
   'user:snippets': {
-    'read': ['snippets_read'],
-    'no access': []
+    read: ['snippets_read'],
+    'no access': [],
   },
   'organization:admin': {
-    'read': ['organization_admin_read'],
+    read: ['organization_admin_read'],
     'read-write': ['organization_admin_read', 'organization_admin_write'],
-    'no access': []
+    'no access': [],
   },
   'organization:members': {
-    'read': ['members_read'],
+    read: ['members_read'],
     'read-write': ['members_read', 'members_write'],
-    'no access': []
+    'no access': [],
   },
   'project:admin': {
-    'read': ['project_admin_read'],
+    read: ['project_admin_read'],
     'read-write': ['project_admin_read', 'project_admin_write'],
-    'no access': []
+    'no access': [],
   },
   'project:advisors': {
-    'read': ['advisors_read'],
-    'no access': []
+    read: ['advisors_read'],
+    'no access': [],
   },
   'project:api_gateway:keys': {
-    'read': ['api_gateway_keys_read'],
+    read: ['api_gateway_keys_read'],
     'read-write': ['api_gateway_keys_read', 'api_gateway_keys_write'],
-    'no access': []
+    'no access': [],
   },
   'project:auth:config': {
-    'read': ['auth_config_read'],
+    read: ['auth_config_read'],
     'read-write': ['auth_config_read', 'auth_config_write'],
-    'no access': []
+    'no access': [],
   },
   'project:auth:signing_keys': {
-    'read': ['auth_signing_keys_read'],
+    read: ['auth_signing_keys_read'],
     'read-write': ['auth_signing_keys_read', 'auth_signing_keys_write'],
-    'no access': []
+    'no access': [],
   },
   'project:backups': {
-    'read': ['backups_read'],
+    read: ['backups_read'],
     'read-write': ['backups_read', 'backups_write'],
-    'no access': []
+    'no access': [],
   },
   'project:branching:development': {
-    'read': ['branching_development_read'],
+    read: ['branching_development_read'],
     'read-write': ['branching_development_read', 'branching_development_write'],
-    'no access': []
+    'no access': [],
   },
   'project:branching:production': {
-    'read': ['branching_production_read'],
+    read: ['branching_production_read'],
     'read-write': ['branching_production_read', 'branching_production_write'],
-    'no access': []
+    'no access': [],
   },
   'project:custom_domain': {
-    'read': ['custom_domain_read'],
+    read: ['custom_domain_read'],
     'read-write': ['custom_domain_read', 'custom_domain_write'],
-    'no access': []
+    'no access': [],
   },
   'project:data_api:config': {
-    'read': ['data_api_config_read'],
+    read: ['data_api_config_read'],
     'read-write': ['data_api_config_read', 'data_api_config_write'],
-    'no access': []
+    'no access': [],
   },
   'project:database': {
-    'read': ['database_read'],
+    read: ['database_read'],
     'read-write': ['database_read', 'database_write'],
-    'no access': []
+    'no access': [],
   },
   'project:database:config': {
-    'read': ['database_config_read'],
+    read: ['database_config_read'],
     'read-write': ['database_config_read', 'database_config_write'],
-    'no access': []
+    'no access': [],
   },
   'project:database:network_bans': {
-    'read': ['database_network_bans_read'],
+    read: ['database_network_bans_read'],
     'read-write': ['database_network_bans_read', 'database_network_bans_write'],
-    'no access': []
+    'no access': [],
   },
   'project:database:network_restrictions': {
-    'read': ['database_network_restrictions_read'],
+    read: ['database_network_restrictions_read'],
     'read-write': ['database_network_restrictions_read', 'database_network_restrictions_write'],
-    'no access': []
+    'no access': [],
   },
   'project:database:migrations': {
-    'read': ['database_migrations_read'],
+    read: ['database_migrations_read'],
     'read-write': ['database_migrations_read', 'database_migrations_write'],
-    'no access': []
+    'no access': [],
   },
   'project:database:pooling_config': {
-    'read': ['database_pooling_config_read'],
+    read: ['database_pooling_config_read'],
     'read-write': ['database_pooling_config_read', 'database_pooling_config_write'],
-    'no access': []
+    'no access': [],
   },
   'project:database:readonly_config': {
-    'read': ['database_readonly_config_read'],
+    read: ['database_readonly_config_read'],
     'read-write': ['database_readonly_config_read', 'database_readonly_config_write'],
-    'no access': []
+    'no access': [],
   },
   'project:database:ssl_config': {
-    'read': ['database_ssl_config_read'],
+    read: ['database_ssl_config_read'],
     'read-write': ['database_ssl_config_read', 'database_ssl_config_write'],
-    'no access': []
+    'no access': [],
   },
   'project:database:webhooks_config': {
-    'read': ['database_webhooks_config_read'],
+    read: ['database_webhooks_config_read'],
     'read-write': ['database_webhooks_config_read', 'database_webhooks_config_write'],
-    'no access': []
+    'no access': [],
   },
   'project:edge_functions': {
-    'read': ['edge_functions_read'],
+    read: ['edge_functions_read'],
     'read-write': ['edge_functions_read', 'edge_functions_write'],
-    'no access': []
+    'no access': [],
   },
   'project:edge_functions:secrets': {
-    'read': ['edge_functions_secrets_read'],
+    read: ['edge_functions_secrets_read'],
     'read-write': ['edge_functions_secrets_read', 'edge_functions_secrets_write'],
-    'no access': []
+    'no access': [],
   },
   'project:infra:add-ons': {
-    'read': ['infra_add-ons_read'],
+    read: ['infra_add-ons_read'],
     'read-write': ['infra_add-ons_read', 'infra_add-ons_write'],
-    'no access': []
+    'no access': [],
   },
   'project:infra:read_replicas': {
-    'read': ['infra_read_replicas_read'],
+    read: ['infra_read_replicas_read'],
     'read-write': ['infra_read_replicas_read', 'infra_read_replicas_write'],
-    'no access': []
+    'no access': [],
   },
   'project:snippets': {
-    'read': ['project_snippets_read'],
+    read: ['project_snippets_read'],
     'read-write': ['project_snippets_read', 'project_snippets_write'],
-    'no access': []
+    'no access': [],
   },
   'project:storage': {
-    'read': ['storage_read'],
+    read: ['storage_read'],
     'read-write': ['storage_read', 'storage_write'],
-    'no access': []
+    'no access': [],
   },
   'project:storage:config': {
-    'read': ['storage_config_read'],
+    read: ['storage_config_read'],
     'read-write': ['storage_config_read', 'storage_config_write'],
-    'no access': []
+    'no access': [],
   },
   'project:telemetry:logs': {
-    'read': ['telemetry_logs_read'],
-    'no access': []
+    read: ['telemetry_logs_read'],
+    'no access': [],
   },
   'project:telemetry:usage': {
-    'read': ['telemetry_usage_read'],
-    'no access': []
-  }
+    read: ['telemetry_usage_read'],
+    'no access': [],
+  },
 }
 
 // Simple mapping function

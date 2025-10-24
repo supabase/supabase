@@ -46,7 +46,10 @@ export const useScopedAccessTokensQuery = <TData = ScopedAccessTokensData>({
 
 export const useScopedAccessTokenQuery = <TData = ScopedAccessTokenData>(
   { id }: { id: string },
-  { enabled = true, ...options }: UseQueryOptions<ScopedAccessTokenData, ScopedAccessTokensError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<ScopedAccessTokenData, ScopedAccessTokensError, TData> = {}
 ) =>
   useQuery<ScopedAccessTokenData, ScopedAccessTokensError, TData>(
     scopedAccessTokenKeys.detail(id),
