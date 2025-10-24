@@ -19,6 +19,8 @@ export const editorPanelState = proxy({
   setValue(value: string) {
     editorPanelState.value = value
     editorPanelState.onChange?.(value)
+    editorPanelState.setResults(undefined)
+    editorPanelState.setError(undefined)
   },
   setTemplates(templates: Template[]) {
     editorPanelState.templates = templates
