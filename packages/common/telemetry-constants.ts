@@ -1950,6 +1950,78 @@ export interface AuthUsersSearchSubmittedEvent {
 }
 
 /**
+ * User opened the command menu.
+ *
+ * @group Events
+ * @source ui-patterns
+ * @page any
+ */
+export interface CommandMenuOpenedEvent {
+  action: 'command_menu_opened'
+  properties: {
+    /**
+     * The trigger that opened the command menu
+     */
+    trigger_type: 'keyboard_shortcut' | 'search_input'
+    /**
+     * The location where the command menu was opened
+     */
+    trigger_location?: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User typed a search term in the command menu input.
+ *
+ * @group Events
+ * @source ui-patterns
+ * @page any
+ */
+export interface CommandMenuSearchSubmittedEvent {
+  action: 'command_menu_search_submitted'
+  properties: {
+    /**
+     * Search term typed into the command menu input
+     */
+    value: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User selected a command from the command menu.
+ *
+ * @group Events
+ * @source ui-patterns
+ * @page any
+ */
+export interface CommandMenuCommandSelectedEvent {
+  action: 'command_menu_command_selected'
+  properties: {
+    /**
+     * The selected command
+     */
+    command_name: string
+    command_value?: string
+    command_type: 'action' | 'route'
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2063,3 +2135,6 @@ export type TelemetryEvent =
   | TableDataAddedEvent
   | TableRLSEnabledEvent
   | AuthUsersSearchSubmittedEvent
+  | CommandMenuOpenedEvent
+  | CommandMenuSearchSubmittedEvent
+  | CommandMenuCommandSelectedEvent
