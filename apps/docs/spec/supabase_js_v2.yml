@@ -6571,7 +6571,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('name')
             .range(0, 1)
           ```
