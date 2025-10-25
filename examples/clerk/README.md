@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Clerk and Supabase Integration Example
+
+This is a Next.js application demonstrating integration between [Clerk](https://clerk.com/) for authentication and user management, and [Supabase](https://supabase.com/) for database operations with Row Level Security (RLS).
+
+## Features
+
+- **Clerk Authentication**: User sign-in, sign-up, and organization management
+- **Supabase Integration**: Secure database access with Clerk tokens
+- **Row Level Security (RLS)**: Fine-grained access controls based on organization membership and roles
+- **Organization Support**: Multi-tenant data isolation using Clerk organizations
+- **Secure Data Access**: Data access restricted to organization members only
+
+## How It Works
+
+1. **Authentication**: Uses Clerk for user authentication and organization management
+2. **Token Integration**: The `useSupabaseClient` hook passes Clerk session tokens to Supabase, enabling RLS policies to validate user permissions
+3. **Secure Access**: Database operations are restricted by Supabase RLS policies based on Clerk organization roles
+4. **Data Isolation**: Each organization can only access their own data through RLS policies
+
+## Database Schema
+
+The project includes a `secured_table` with the following RLS policies:
+- Only organization admins can insert records in their organization
+- Users can only select records from their own organization
+- Only users that have passed second factor verification can read from the table
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+1. Create accounts for:
+   - [Clerk](https://clerk.com/)
+   - [Supabase](https://supabase.com/)
+
+2. Install the Supabase CLI: https://supabase.com/docs/guides/cli/getting-started
+
+### Environment Setup
+
+Create a `.env.local` file in the root of this project with the following variables:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Running the Project
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Start the Supabase local development environment:
+   ```bash
+   supabase start
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+
+3. Run the development server:
+   ```bash
+   pnpm dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Project Structure
+
+- `app/` - Next.js App Router pages
+- `components/` - Reusable UI components for data operations
+- `hooks/useSupabaseClient.ts` - Custom hook for Supabase client with Clerk integration
+- `supabase/` - Supabase configuration, migrations and seed files
+- `middleware.ts` - Clerk middleware for authentication
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Clerk Documentation](https://clerk.com/docs)
+- [Supabase Documentation](https://supabase.com/docs)
+- [Next.js Documentation](https://nextjs.org/docs)
