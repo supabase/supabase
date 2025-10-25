@@ -15,6 +15,7 @@
     "lint": "eslint .",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/migrate.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "postinstall": "pnpm rebuild sharp",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "vercel-build": "pnpm migrate && pnpm build",
     "typecheck_IGNORED": "tsc --noEmit"
@@ -51,14 +52,21 @@
     "payload": "3.52.0",
     "pg": "^8.16.3",
     "prism-react-renderer": "^2.3.1",
+    "prismjs": "^1.30.0",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "~0.34.0",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
+    "sharp": "0.32.6",
     "tailwind-merge": "^1.13.2",
     "tsx": "^4.19.3",
     "typescript": "catalog:"
   },
   "externals": {
     "sharp": "commonjs sharp"
+  },
+  "devDependencies": {
+    "@types/prismjs": "^1.26.5"
   }
 }
