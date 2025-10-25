@@ -3,29 +3,26 @@ import { toast } from 'sonner'
 
 import { del, handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { BucketType } from './buckets-query'
 import { storageKeys } from './keys'
 
 type BucketDeleteVariables = {
   projectRef: string
   id: string
-  type: BucketType
 }
 
-async function deleteBucket({ projectRef, id, type }: BucketDeleteVariables) {
+async function deleteBucket({ projectRef, id }: BucketDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!id) throw new Error('Bucket name is requried')
 
-  if (type !== 'ANALYTICS') {
-    const { error: emptyBucketError } = await post('/platform/storage/{ref}/buckets/{id}/empty', {
-      params: { path: { ref: projectRef, id } },
-    })
-    if (emptyBucketError) handleError(emptyBucketError)
-  }
+  const { error: emptyBucketError } = await post('/platform/storage/{ref}/buckets/{id}/empty', {
+    params: { path: { ref: projectRef, id } },
+  })
+  if (emptyBucketError) handleError(emptyBucketError)
 
   const { data, error: deleteBucketError } = await del('/platform/storage/{ref}/buckets/{id}', {
-    params: { path: { ref: projectRef, id }, query: { type } },
+    params: { path: { ref: projectRef, id } },
   } as any)
+
   if (deleteBucketError) handleError(deleteBucketError)
   return data
 }

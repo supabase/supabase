@@ -1,3 +1,8 @@
+import { snakeCase, uniq } from 'lodash'
+import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
@@ -23,16 +28,12 @@ import {
   useDatabaseExtensionsQuery,
 } from 'data/database-extensions/database-extensions-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { Bucket } from 'data/storage/buckets-query'
+import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { snakeCase, uniq } from 'lodash'
-import { Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
 import {
   Button,
   Card,
@@ -54,7 +55,7 @@ import { NamespaceRow } from './NamespaceRow'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
-export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
+export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) => {
   const [modal, setModal] = useState<'delete' | null>(null)
   const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
@@ -83,8 +84,8 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           wrapper
         )
       )
-      .find((w) => w.name === snakeCase(`${bucket.name}_fdw`))
-  }, [data, bucket.name])
+      .find((w) => w.name === snakeCase(`${bucket.id}_fdw`))
+  }, [data, bucket.id])
 
   const { state: extensionState } = useIcebergWrapperExtension()
 
@@ -150,7 +151,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
   return (
     <>
       <PageLayout
-        title={bucket.name}
+        title={bucket.id}
         breadcrumbs={
           isStorageV2
             ? [
@@ -171,7 +172,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           )}
           {state === 'not-installed' && (
             <ExtensionNotInstalled
-              bucketName={bucket.name}
+              bucketName={bucket.id}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
@@ -179,7 +180,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           )}
           {state === 'needs-upgrade' && (
             <ExtensionNeedsUpgrade
-              bucketName={bucket.name}
+              bucketName={bucket.id}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
@@ -275,7 +276,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                           {namespaces.map(({ namespace, schema, tables }) => (
                             <NamespaceRow
                               key={namespace}
-                              bucketName={bucket.name}
+                              bucketName={bucket.id}
                               namespace={namespace}
                               schema={schema}
                               tables={tables as any}
@@ -332,7 +333,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
               </ScaffoldSection>
             </>
           )}
-          {state === 'missing' && <WrapperMissing bucketName={bucket.name} />}
+          {state === 'missing' && <WrapperMissing bucketName={bucket.id} />}
 
           <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
             <header>
