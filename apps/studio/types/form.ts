@@ -9,6 +9,7 @@ export interface FormSchema {
   id?: string
   type: 'object'
   title: string
+  purpose?: string
   properties: {
     [x: string]: {
       title: string

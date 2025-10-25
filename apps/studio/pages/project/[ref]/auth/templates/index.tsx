@@ -20,7 +20,7 @@ const TemplatesPage: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer>
+    <ScaffoldContainer bottomPadding>
       {!isPermissionsLoaded ? (
         <ScaffoldSection isFullWidth>
           <GenericSkeletonLoader />

@@ -9,7 +9,8 @@ const CONFIRMATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'CONFIRMATION',
   type: 'object',
-  title: 'Confirm signup',
+  title: 'Confirm sign up',
+  purpose: 'Email verification for new user registrations',
   properties: {
     MAILER_SUBJECTS_CONFIRMATION: {
       title: 'Subject heading',
@@ -20,7 +21,7 @@ const CONFIRMATION: FormSchema = {
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
-- \`{{ .ConfirmationURL }}\` : URL to confirm the e-mail address for the new account
+- \`{{ .ConfirmationURL }}\` : URL to confirm the email address for the new account
 - \`{{ .Token }}\` : The 6-digit numeric email OTP 
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
@@ -45,6 +46,7 @@ const INVITE: FormSchema = {
   id: 'INVITE',
   type: 'object',
   title: 'Invite user',
+  purpose: "Allows administrators to invite users who don't have accounts yet",
   properties: {
     MAILER_SUBJECTS_INVITE: {
       title: 'Subject heading',
@@ -79,7 +81,8 @@ const MAGIC_LINK: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MAGIC_LINK',
   type: 'object',
-  title: 'Magic Link',
+  title: 'Magic link',
+  purpose: 'Passwordless login using email links',
   properties: {
     MAILER_SUBJECTS_MAGIC_LINK: {
       title: 'Subject heading',
@@ -114,7 +117,8 @@ const EMAIL_CHANGE: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'EMAIL_CHANGE',
   type: 'object',
-  title: 'Change Email Address',
+  title: 'Change email address',
+  purpose: 'Verification for email address changes',
   properties: {
     MAILER_SUBJECTS_EMAIL_CHANGE: {
       title: 'Subject heading',
@@ -150,7 +154,8 @@ const RECOVERY: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'RECOVERY',
   type: 'object',
-  title: 'Reset Password',
+  title: 'Reset password',
+  purpose: 'Password recovery flow for users who forgot their password',
   properties: {
     MAILER_SUBJECTS_RECOVERY: {
       title: 'Subject heading',
@@ -185,6 +190,8 @@ const REAUTHENTICATION: FormSchema = {
   id: 'REAUTHENTICATION',
   type: 'object',
   title: 'Reauthentication',
+  purpose:
+    'Additional verification for sensitive actions (like changing password, deleting account)',
   properties: {
     MAILER_SUBJECTS_REAUTHENTICATION: {
       title: 'Subject heading',
