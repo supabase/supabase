@@ -46,12 +46,10 @@ export const useCheckPrimaryKeysExists = <TData = CheckPrimaryKeysExistsData>(
     ...options
   }: UseQueryOptions<CheckPrimaryKeysExistsData, CheckPrimaryKeysExistsError, TData> = {}
 ) =>
-  useQuery<CheckPrimaryKeysExistsData, CheckPrimaryKeysExistsError, TData>(
-    databaseKeys.checkPrimaryKeysExists(projectRef, tables),
-    () => checkPrimaryKeysExists({ projectRef, connectionString, tables }),
-    {
-      retry: false,
-      enabled: enabled && typeof projectRef !== 'undefined' && tables.length > 0,
-      ...options,
-    }
-  )
+  useQuery<CheckPrimaryKeysExistsData, CheckPrimaryKeysExistsError, TData>({
+    queryKey: databaseKeys.checkPrimaryKeysExists(projectRef, tables),
+    queryFn: () => checkPrimaryKeysExists({ projectRef, connectionString, tables }),
+    retry: false,
+    enabled: enabled && typeof projectRef !== 'undefined' && tables.length > 0,
+    ...options,
+  })

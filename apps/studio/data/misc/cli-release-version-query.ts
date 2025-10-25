@@ -23,8 +23,9 @@ export const useCLIReleaseVersionQuery = <TData = CLIReleaseVersionData>({
   enabled = true,
   ...options
 }: UseQueryOptions<CLIReleaseVersionData, CLIReleaseVersionError, TData> = {}) =>
-  useQuery<CLIReleaseVersionData, CLIReleaseVersionError, TData>(
-    miscKeys.cliReleaseVersion(),
-    () => getCLIReleaseVersion(),
-    { enabled: enabled && !IS_PLATFORM, ...options }
-  )
+  useQuery<CLIReleaseVersionData, CLIReleaseVersionError, TData>({
+    queryKey: miscKeys.cliReleaseVersion(),
+    queryFn: () => getCLIReleaseVersion(),
+    enabled: enabled && !IS_PLATFORM,
+    ...options,
+  })

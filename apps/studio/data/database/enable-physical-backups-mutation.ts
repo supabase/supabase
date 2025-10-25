@@ -26,20 +26,18 @@ export const useEnablePhysicalBackupsMutation = ({
   UseMutationOptions<BackupRestoreData, ResponseError, EnablePhysicalBackupsVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupRestoreData, ResponseError, EnablePhysicalBackupsVariables>(
-    (vars) => enablePhysicalBackups(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to enable physical backups: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BackupRestoreData, ResponseError, EnablePhysicalBackupsVariables>({
+    mutationFn: (vars) => enablePhysicalBackups(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to enable physical backups: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

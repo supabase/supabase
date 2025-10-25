@@ -41,22 +41,20 @@ export const useDatabaseRoleCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseRoleCreateData, ResponseError, DatabaseRoleCreateVariables>(
-    (vars) => createDatabaseRole(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await invalidateRolesQuery(queryClient, projectRef)
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database role: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseRoleCreateData, ResponseError, DatabaseRoleCreateVariables>({
+    mutationFn: (vars) => createDatabaseRole(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await invalidateRolesQuery(queryClient, projectRef)
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database role: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

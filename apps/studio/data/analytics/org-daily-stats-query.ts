@@ -151,16 +151,14 @@ export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
   { orgSlug, startDate, endDate, projectRef }: OrgDailyStatsVariables,
   { enabled = true, ...options }: UseQueryOptions<OrgDailyStatsData, OrgDailyStatsError, TData> = {}
 ) =>
-  useQuery<OrgDailyStatsData, OrgDailyStatsError, TData>(
-    analyticsKeys.orgDailyStats(orgSlug, { startDate, endDate, projectRef }),
-    ({ signal }) => getOrgDailyStats({ orgSlug, startDate, endDate, projectRef }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof orgSlug !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined',
-      staleTime: 1000 * 60 * 60, // default good for an hour for now
-      ...options,
-    }
-  )
+  useQuery<OrgDailyStatsData, OrgDailyStatsError, TData>({
+    queryKey: analyticsKeys.orgDailyStats(orgSlug, { startDate, endDate, projectRef }),
+    queryFn: ({ signal }) => getOrgDailyStats({ orgSlug, startDate, endDate, projectRef }, signal),
+    enabled:
+      enabled &&
+      typeof orgSlug !== 'undefined' &&
+      typeof startDate !== 'undefined' &&
+      typeof endDate !== 'undefined',
+    staleTime: 1000 * 60 * 60,
+    ...options,
+  })

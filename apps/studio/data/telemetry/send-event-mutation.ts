@@ -29,22 +29,20 @@ export const useSendEventMutation = ({
 }: Omit<UseMutationOptions<SendEventData, ResponseError, TelemetryEvent>, 'mutationFn'> = {}) => {
   const router = useRouter()
 
-  return useMutation<SendEventData, ResponseError, TelemetryEvent>(
-    (event) => {
+  return useMutation<SendEventData, ResponseError, TelemetryEvent>({
+    mutationFn: (event) => {
       return sendEvent({ event, pathname: router.pathname })
     },
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          console.error(`Failed to send Telemetry event: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        console.error(`Failed to send Telemetry event: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

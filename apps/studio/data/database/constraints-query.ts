@@ -77,11 +77,9 @@ export const useTableConstraintsQuery = <TData = TableConstraintsData>(
     ...options
   }: UseQueryOptions<TableConstraintsData, TableConstraintsError, TData> = {}
 ) =>
-  useQuery<TableConstraintsData, TableConstraintsError, TData>(
-    databaseKeys.tableConstraints(projectRef, id),
-    ({ signal }) => getTableConstraints({ projectRef, connectionString, id }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<TableConstraintsData, TableConstraintsError, TData>({
+    queryKey: databaseKeys.tableConstraints(projectRef, id),
+    queryFn: ({ signal }) => getTableConstraints({ projectRef, connectionString, id }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    ...options,
+  })

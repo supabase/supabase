@@ -262,18 +262,16 @@ export const useTableRowsQuery = <TData = TableRowsData>(
   { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  return useQuery<TableRowsData, TableRowsError, TData>(
-    tableRowKeys.tableRows(projectRef, {
+  return useQuery<TableRowsData, TableRowsError, TData>({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+    ...options,
+  })
 }
 
 export function prefetchTableRows(

@@ -28,20 +28,18 @@ export const usePitrRestoreMutation = ({
   UseMutationOptions<PitrRestoreData, ResponseError, PitrRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<PitrRestoreData, ResponseError, PitrRestoreVariables>(
-    (vars) => restoreFromPitr(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to start PITR restoration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<PitrRestoreData, ResponseError, PitrRestoreVariables>({
+    mutationFn: (vars) => restoreFromPitr(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to start PITR restoration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

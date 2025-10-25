@@ -50,20 +50,18 @@ export const useCheckCNAMERecordMutation = ({
   UseMutationOptions<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>(
-    (vars) => checkCNAMERecord(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to check CNAME record: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>({
+    mutationFn: (vars) => checkCNAMERecord(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to check CNAME record: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -33,11 +33,9 @@ export const useJWTSigningKeysQuery = <TData = JWTSigningKeysData>(
   { projectRef }: JWTSigningKeysVariables,
   { enabled, ...options }: UseQueryOptions<JWTSigningKeysData, ResponseError, TData> = {}
 ) =>
-  useQuery<JWTSigningKeysData, ResponseError, TData>(
-    jwtSigningKeysKeys.list(projectRef),
-    ({ signal }) => getJWTSigningKeys({ projectRef }, signal),
-    {
-      enabled: enabled && !!projectRef,
-      ...options,
-    }
-  )
+  useQuery<JWTSigningKeysData, ResponseError, TData>({
+    queryKey: jwtSigningKeysKeys.list(projectRef),
+    queryFn: ({ signal }) => getJWTSigningKeys({ projectRef }, signal),
+    enabled: enabled && !!projectRef,
+    ...options,
+  })

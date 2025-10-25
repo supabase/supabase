@@ -33,14 +33,12 @@ export const useResourceQuery = <TData = ResourceData>(
   { projectRef, id }: ResourceVariables,
   { enabled = true, ...options }: UseQueryOptions<ResourceData, ResourceError, TData> = {}
 ) =>
-  useQuery<ResourceData, ResourceError, TData>(
-    resourceKeys.resource(projectRef, id),
-    ({ signal }) => getResource({ projectRef, id }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ResourceData, ResourceError, TData>({
+    queryKey: resourceKeys.resource(projectRef, id),
+    queryFn: ({ signal }) => getResource({ projectRef, id }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    ...options,
+  })
 
 /**
  * useResourcePrefetch is used for prefetching data. For example, starting a query loading before a page is navigated to.

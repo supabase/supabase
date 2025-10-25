@@ -40,11 +40,10 @@ export const useReplicationPipelineReplicationStatusQuery = <
     ...options
   }: UseQueryOptions<ReplicationPipelineReplicationStatusData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelineReplicationStatusData, ResponseError, TData>(
-    replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
-    ({ signal }) => fetchReplicationPipelineReplicationStatus({ projectRef, pipelineId }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ReplicationPipelineReplicationStatusData, ResponseError, TData>({
+    queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
+    queryFn: ({ signal }) =>
+      fetchReplicationPipelineReplicationStatus({ projectRef, pipelineId }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
+    ...options,
+  })

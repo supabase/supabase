@@ -29,8 +29,10 @@ export const useActionRunLogsQuery = <TData = ActionLogsData>(
   { ref, run_id }: ActionLogsVariables,
   { enabled = true, ...options }: UseQueryOptions<ActionLogsData, WorkflowRunLogsError, TData> = {}
 ) =>
-  useQuery<ActionLogsData, WorkflowRunLogsError, TData>(
-    actionKeys.detail(ref, run_id),
-    ({ signal }) => getActionRunLogs({ ref, run_id }, signal),
-    { enabled: enabled && Boolean(ref) && Boolean(run_id), staleTime: 0, ...options }
-  )
+  useQuery<ActionLogsData, WorkflowRunLogsError, TData>({
+    queryKey: actionKeys.detail(ref, run_id),
+    queryFn: ({ signal }) => getActionRunLogs({ ref, run_id }, signal),
+    enabled: enabled && Boolean(ref) && Boolean(run_id),
+    staleTime: 0,
+    ...options,
+  })

@@ -32,13 +32,11 @@ export const useLegacyJWTSigningKeyQuery = <TData = LegacyJWTSigningKeyData>(
   { projectRef }: LegacyJWTSigningKeyVariables,
   { enabled, ...options }: UseQueryOptions<LegacyJWTSigningKeyData, ResponseError, TData> = {}
 ) =>
-  useQuery<LegacyJWTSigningKeyData, ResponseError, TData>(
-    jwtSigningKeysKeys.legacy(projectRef),
-    ({ signal }) => getLegacyJWTSigningKey({ projectRef }, signal),
-    {
-      enabled: enabled && !!projectRef,
-      retry: false,
-      refetchOnWindowFocus: false,
-      ...options,
-    }
-  )
+  useQuery<LegacyJWTSigningKeyData, ResponseError, TData>({
+    queryKey: jwtSigningKeysKeys.legacy(projectRef),
+    queryFn: ({ signal }) => getLegacyJWTSigningKey({ projectRef }, signal),
+    enabled: enabled && !!projectRef,
+    retry: false,
+    refetchOnWindowFocus: false,
+    ...options,
+  })

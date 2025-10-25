@@ -31,11 +31,9 @@ export const useProjectPauseStatusQuery = <TData = ProjectPauseStatusData>(
     ...options
   }: UseQueryOptions<ProjectPauseStatusData, ProjectPauseStatusError, TData> = {}
 ) =>
-  useQuery<ProjectPauseStatusData, ProjectPauseStatusError, TData>(
-    projectKeys.pauseStatus(ref),
-    ({ signal }) => getProjectPausedStatus({ ref }, signal),
-    {
-      enabled: enabled && typeof ref !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectPauseStatusData, ProjectPauseStatusError, TData>({
+    queryKey: projectKeys.pauseStatus(ref),
+    queryFn: ({ signal }) => getProjectPausedStatus({ ref }, signal),
+    enabled: enabled && typeof ref !== 'undefined',
+    ...options,
+  })

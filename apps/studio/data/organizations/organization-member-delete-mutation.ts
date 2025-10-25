@@ -41,7 +41,8 @@ export const useOrganizationMemberDeleteMutation = ({
     OrganizationMemberDeleteData,
     ResponseError,
     OrganizationMemberDeleteVariables
-  >((vars) => deleteOrganizationMember(vars), {
+  >({
+    mutationFn: (vars) => deleteOrganizationMember(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
 

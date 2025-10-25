@@ -44,7 +44,8 @@ export const useOrganizationDeleteInvitationMutation = ({
     OrganizationDeleteInvitationData,
     ResponseError,
     OrganizationDeleteInvitationVariables
-  >((vars) => deleteOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => deleteOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       const { slug, skipInvalidation } = variables
 

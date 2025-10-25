@@ -53,22 +53,20 @@ export const useOAuthAppCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppCreateData, ResponseError, OAuthAppCreateVariables>(
-    (vars) => createOAuthApp(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
-        await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create OAuth application: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<OAuthAppCreateData, ResponseError, OAuthAppCreateVariables>({
+    mutationFn: (vars) => createOAuthApp(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
+      await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create OAuth application: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

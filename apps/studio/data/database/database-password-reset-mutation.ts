@@ -34,22 +34,20 @@ export const useDatabasePasswordResetMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabasePasswordResetData, ResponseError, DatabasePasswordResetVariables>(
-    (vars) => resetDatabasePassword(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(projectKeys.detail(variables.ref))
+  return useMutation<DatabasePasswordResetData, ResponseError, DatabasePasswordResetVariables>({
+    mutationFn: (vars) => resetDatabasePassword(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries(projectKeys.detail(variables.ref))
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to reset database password: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to reset database password: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

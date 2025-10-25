@@ -48,12 +48,10 @@ export const useReadReplicasStatusesQuery = <TData = ReadReplicasStatusesData>(
     ...options
   }: UseQueryOptions<ReadReplicasStatusesData, ReadReplicasStatusesError, TData> = {}
 ) => {
-  return useQuery<ReadReplicasStatusesData, ReadReplicasStatusesError, TData>(
-    replicaKeys.statuses(projectRef),
-    ({ signal }) => getReadReplicasStatuses({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<ReadReplicasStatusesData, ReadReplicasStatusesError, TData>({
+    queryKey: replicaKeys.statuses(projectRef),
+    queryFn: ({ signal }) => getReadReplicasStatuses({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }

@@ -28,22 +28,20 @@ export const useClientSecretCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<any, ResponseError, ClientSecretCreateVariables>(
-    (vars) => createClientSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug, appId } = variables
-        await queryClient.invalidateQueries(clientSecretKeys.list(slug, appId))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create client secret: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<any, ResponseError, ClientSecretCreateVariables>({
+    mutationFn: (vars) => createClientSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { slug, appId } = variables
+      await queryClient.invalidateQueries(clientSecretKeys.list(slug, appId))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create client secret: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

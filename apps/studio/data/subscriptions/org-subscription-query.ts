@@ -42,15 +42,13 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
     'stripe.subscriptions'
   )
 
-  return useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>(
-    subscriptionKeys.orgSubscription(orgSlug),
-    ({ signal }) => getOrgSubscription({ orgSlug }, signal),
-    {
-      enabled: enabled && canReadSubscriptions && typeof orgSlug !== 'undefined',
-      staleTime: 60 * 60 * 1000, // 60 minutes
-      ...options,
-    }
-  )
+  return useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>({
+    queryKey: subscriptionKeys.orgSubscription(orgSlug),
+    queryFn: ({ signal }) => getOrgSubscription({ orgSlug }, signal),
+    enabled: enabled && canReadSubscriptions && typeof orgSlug !== 'undefined',
+    staleTime: 60 * 60 * 1000,
+    ...options,
+  })
 }
 
 export const useHasAccessToProjectLevelPermissions = (slug: string) => {

@@ -32,12 +32,10 @@ export const useOrgPlansQuery = <TData = OrgPlansData>(
     'stripe.subscriptions'
   )
 
-  return useQuery<OrgPlansData, OrgPlansError, TData>(
-    subscriptionKeys.orgPlans(orgSlug),
-    ({ signal }) => getOrgPlans({ orgSlug }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined' && canReadSubscriptions,
-      ...options,
-    }
-  )
+  return useQuery<OrgPlansData, OrgPlansError, TData>({
+    queryKey: subscriptionKeys.orgPlans(orgSlug),
+    queryFn: ({ signal }) => getOrgPlans({ orgSlug }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined' && canReadSubscriptions,
+    ...options,
+  })
 }

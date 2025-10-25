@@ -32,24 +32,22 @@ export const useEmailUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EmailUpdateData, ResponseError, EmailUpdateVariables>(
-    (vars) => updateEmail(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          auth.refreshSession(),
-          queryClient.invalidateQueries(profileKeys.profile()),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update email: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<EmailUpdateData, ResponseError, EmailUpdateVariables>({
+    mutationFn: (vars) => updateEmail(vars),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        auth.refreshSession(),
+        queryClient.invalidateQueries(profileKeys.profile()),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update email: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

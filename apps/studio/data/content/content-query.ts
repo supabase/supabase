@@ -61,8 +61,9 @@ export const useContentQuery = <TData = ContentData>(
   { projectRef, type, name, limit }: GetContentVariables,
   { enabled = true, ...options }: UseQueryOptions<ContentData, ContentError, TData> = {}
 ) =>
-  useQuery<ContentData, ContentError, TData>(
-    contentKeys.list(projectRef, { type, name, limit }),
-    ({ signal }) => getContent({ projectRef, type, name, limit }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ContentData, ContentError, TData>({
+    queryKey: contentKeys.list(projectRef, { type, name, limit }),
+    queryFn: ({ signal }) => getContent({ projectRef, type, name, limit }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

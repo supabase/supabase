@@ -32,11 +32,9 @@ export const useGitHubBranchesQuery = <TData = GitHubBranchesData>(
     ...options
   }: UseQueryOptions<GitHubBranchesData, GitHubBranchesError, TData> = {}
 ) =>
-  useQuery<GitHubBranchesData, GitHubBranchesError, TData>(
-    integrationKeys.githubBranchesList(connectionId),
-    ({ signal }) => getGitHubBranches({ connectionId }, signal),
-    {
-      enabled: enabled && typeof connectionId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<GitHubBranchesData, GitHubBranchesError, TData>({
+    queryKey: integrationKeys.githubBranchesList(connectionId),
+    queryFn: ({ signal }) => getGitHubBranches({ connectionId }, signal),
+    enabled: enabled && typeof connectionId !== 'undefined',
+    ...options,
+  })

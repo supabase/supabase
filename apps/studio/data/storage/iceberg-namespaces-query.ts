@@ -57,9 +57,9 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
   params: GetNamespacesVariables,
   { ...options }: UseQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
-  return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>(
-    storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
-    () => getNamespaces(params),
-    { ...options }
-  )
+  return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
+    queryKey: storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
+    queryFn: () => getNamespaces(params),
+    ...options,
+  })
 }

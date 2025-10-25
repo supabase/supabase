@@ -32,24 +32,22 @@ export const useDeleteLogDrainMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<LogDrainDeleteData, ResponseError, LogDrainDeleteVariables>(
-    (vars) => deleteLogDrain(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<LogDrainDeleteData, ResponseError, LogDrainDeleteVariables>({
+    mutationFn: (vars) => deleteLogDrain(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(logDrainsKeys.list(projectRef))
+      await queryClient.invalidateQueries(logDrainsKeys.list(projectRef))
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

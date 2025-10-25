@@ -31,34 +31,32 @@ export const useMfaChallengeAndVerifyMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation(
-    (vars) => {
+  return useMutation({
+    mutationFn: (vars) => {
       const { refreshFactors, ...params } = vars
       return mfaChallengeAndVerify(params)
     },
-    {
-      async onSuccess(data, variables, context) {
-        // when a MFA is added, the aaLevel is bumped up
-        const refreshFactors = variables.refreshFactors ?? true
+    async onSuccess(data, variables, context) {
+      // when a MFA is added, the aaLevel is bumped up
+      const refreshFactors = variables.refreshFactors ?? true
 
-        await Promise.all([
-          ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.mfaFactors())] : []),
-          queryClient.invalidateQueries(profileKeys.aaLevel()),
-        ])
+      await Promise.all([
+        ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.mfaFactors())] : []),
+        queryClient.invalidateQueries(profileKeys.aaLevel()),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to sign in: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-          Sentry.captureMessage('[CRITICAL] Failed to sign in via MFA: ' + data.message)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to sign in: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+      if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+        Sentry.captureMessage('[CRITICAL] Failed to sign in via MFA: ' + data.message)
+      }
+    },
+    ...options,
+  })
 }

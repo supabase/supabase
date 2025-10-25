@@ -34,8 +34,10 @@ export const useAuthenticatorAssuranceLevelQuery = <
     CustomAuthMFAGetAuthenticatorAssuranceLevelData,
     CustomAuthMFAGetAuthenticatorAssuranceLevelError,
     TData
-  >(profileKeys.aaLevel(), () => getMfaAuthenticatorAssuranceLevel(), {
-    staleTime: 1000 * 60 * 30, // default good for 30 mins
+  >({
+    queryKey: profileKeys.aaLevel(),
+    queryFn: () => getMfaAuthenticatorAssuranceLevel(),
+    staleTime: 1000 * 60 * 30,
     ...options,
   })
 }

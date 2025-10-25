@@ -52,22 +52,20 @@ export const useContentInsertMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<InsertContentData, ResponseError, InsertContentVariables>(
-    (args) => insertContent(args),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to insert content: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<InsertContentData, ResponseError, InsertContentVariables>({
+    mutationFn: (args) => insertContent(args),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to insert content: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

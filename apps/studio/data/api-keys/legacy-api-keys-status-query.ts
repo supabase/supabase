@@ -33,11 +33,9 @@ export const useLegacyAPIKeysStatusQuery = <TData = LegacyAPIKeysStatusData>(
     ...options
   }: UseQueryOptions<LegacyAPIKeysStatusData, ResponseError, TData> = {}
 ) =>
-  useQuery<LegacyAPIKeysStatusData, ResponseError, TData>(
-    apiKeysKeys.status(projectRef),
-    ({ signal }) => getLegacyAPIKeysStatus({ projectRef }, signal),
-    {
-      enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<LegacyAPIKeysStatusData, ResponseError, TData>({
+    queryKey: apiKeysKeys.status(projectRef),
+    queryFn: ({ signal }) => getLegacyAPIKeysStatus({ projectRef }, signal),
+    enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

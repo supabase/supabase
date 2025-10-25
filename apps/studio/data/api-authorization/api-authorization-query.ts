@@ -42,11 +42,9 @@ export const useApiAuthorizationQuery = <TData = ResourceData>(
   { id }: ApiAuthorizationVariables,
   { enabled = true, ...options }: UseQueryOptions<ResourceData, ResourceError, TData> = {}
 ) =>
-  useQuery<ResourceData, ResourceError, TData>(
-    resourceKeys.resource(id),
-    ({ signal }) => getApiAuthorizationDetails({ id }, signal),
-    {
-      enabled: enabled && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ResourceData, ResourceError, TData>({
+    queryKey: resourceKeys.resource(id),
+    queryFn: ({ signal }) => getApiAuthorizationDetails({ id }, signal),
+    enabled: enabled && typeof id !== 'undefined',
+    ...options,
+  })

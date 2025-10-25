@@ -33,8 +33,9 @@ export const useDiskUtilizationQuery = <TData = DiskUtilizationData>(
     ...options
   }: UseQueryOptions<DiskUtilizationData, DiskUtilizationError, TData> = {}
 ) =>
-  useQuery<DiskUtilizationData, DiskUtilizationError, TData>(
-    configKeys.diskUtilization(projectRef),
-    ({ signal }) => getDiskUtilization({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DiskUtilizationData, DiskUtilizationError, TData>({
+    queryKey: configKeys.diskUtilization(projectRef),
+    queryFn: ({ signal }) => getDiskUtilization({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -23,9 +23,11 @@ export const useGitHubRepositoriesQuery = <TData = GitHubRepositoriesData>({
   enabled = true,
   ...options
 }: UseQueryOptions<GitHubRepositoriesData, GitHubRepositoriesError, TData> = {}) => {
-  return useQuery<GitHubRepositoriesData, GitHubRepositoriesError, TData>(
-    integrationKeys.githubRepositoriesList(),
-    ({ signal }) => getGitHubRepositories(signal),
-    { enabled, staleTime: 0, ...options }
-  )
+  return useQuery<GitHubRepositoriesData, GitHubRepositoriesError, TData>({
+    queryKey: integrationKeys.githubRepositoriesList(),
+    queryFn: ({ signal }) => getGitHubRepositories(signal),
+    enabled,
+    staleTime: 0,
+    ...options,
+  })
 }

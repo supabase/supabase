@@ -59,24 +59,22 @@ export const useOrganizationTaxIdUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationTaxIdUpdateVariables>(
-    (vars) => updateOrganizationTaxId(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
+  return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationTaxIdUpdateVariables>({
+    mutationFn: (vars) => updateOrganizationTaxId(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
 
-        // We already have the data, no need to refetch
-        queryClient.setQueryData(organizationKeys.taxId(slug), data.tax_id)
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update tax id: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      // We already have the data, no need to refetch
+      queryClient.setQueryData(organizationKeys.taxId(slug), data.tax_id)
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update tax id: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

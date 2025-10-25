@@ -54,11 +54,13 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   ...options
 }: UseQueryOptions<OrganizationsData, OrganizationsError, TData> = {}) => {
   const { profile } = useProfile()
-  return useQuery<OrganizationsData, OrganizationsError, TData>(
-    organizationKeys.list(),
-    ({ signal }) => getOrganizations({ signal }),
-    { enabled: enabled && profile !== undefined, ...options, staleTime: 30 * 60 * 1000 }
-  )
+  return useQuery<OrganizationsData, OrganizationsError, TData>({
+    queryKey: organizationKeys.list(),
+    queryFn: ({ signal }) => getOrganizations({ signal }),
+    enabled: enabled && profile !== undefined,
+    ...options,
+    staleTime: 30 * 60 * 1000,
+  })
 }
 
 export function invalidateOrganizationsQuery(client: QueryClient) {

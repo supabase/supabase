@@ -29,21 +29,19 @@ export const useDisableReadOnlyModeMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<DisableReadOnlyModeData, ResponseError, TempDisableReadOnlyModeVariables>(
-    (vars) => tempDisableReadOnlyMode(vars),
-    {
-      async onSuccess(data, variables, context) {
-        setTimeout(() => queryClient.invalidateQueries(usageKeys.resourceWarnings()), 2000)
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to disable read only mode: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DisableReadOnlyModeData, ResponseError, TempDisableReadOnlyModeVariables>({
+    mutationFn: (vars) => tempDisableReadOnlyMode(vars),
+    async onSuccess(data, variables, context) {
+      setTimeout(() => queryClient.invalidateQueries(usageKeys.resourceWarnings()), 2000)
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to disable read only mode: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -40,14 +40,12 @@ export const useContentCountQuery = <TData = ContentIdData>(
   { projectRef, cumulative, type, name }: GetContentCountVariables,
   { enabled = true, ...options }: UseQueryOptions<ContentIdData, ContentIdError, TData> = {}
 ) =>
-  useQuery<ContentIdData, ContentIdError, TData>(
-    contentKeys.count(projectRef, type, {
+  useQuery<ContentIdData, ContentIdError, TData>({
+    queryKey: contentKeys.count(projectRef, type, {
       cumulative,
       name,
     }),
-    ({ signal }) => getContentCount({ projectRef, cumulative, type, name }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) => getContentCount({ projectRef, cumulative, type, name }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

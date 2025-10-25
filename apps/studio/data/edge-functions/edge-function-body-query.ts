@@ -73,12 +73,10 @@ export const useEdgeFunctionBodyQuery = <TData = EdgeFunctionBodyData>(
     ...options
   }: UseQueryOptions<EdgeFunctionBodyData, EdgeFunctionBodyError, TData> = {}
 ) =>
-  useQuery<EdgeFunctionBodyData, EdgeFunctionBodyError, TData>(
-    edgeFunctionsKeys.body(projectRef, slug),
-    ({ signal }) => getEdgeFunctionBody({ projectRef, slug }, signal),
-    {
-      enabled:
-        IS_PLATFORM && enabled && typeof projectRef !== 'undefined' && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EdgeFunctionBodyData, EdgeFunctionBodyError, TData>({
+    queryKey: edgeFunctionsKeys.body(projectRef, slug),
+    queryFn: ({ signal }) => getEdgeFunctionBody({ projectRef, slug }, signal),
+    enabled:
+      IS_PLATFORM && enabled && typeof projectRef !== 'undefined' && typeof slug !== 'undefined',
+    ...options,
+  })

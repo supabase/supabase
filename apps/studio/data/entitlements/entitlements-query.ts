@@ -30,9 +30,11 @@ export const useEntitlementsQuery = <TData = EntitlementsData>(
   { slug }: EntitlementsVariables,
   { enabled = true, ...options }: UseQueryOptions<EntitlementsData, EntitlementsError, TData> = {}
 ) => {
-  return useQuery<EntitlementsData, EntitlementsError, TData>(
-    ['entitlements', slug],
-    ({ signal }) => getEntitlements({ slug }, signal),
-    { enabled: enabled && typeof slug !== 'undefined', ...options, staleTime: 1 * 60 * 1000 }
-  )
+  return useQuery<EntitlementsData, EntitlementsError, TData>({
+    queryKey: ['entitlements', slug],
+    queryFn: ({ signal }) => getEntitlements({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+    staleTime: 1 * 60 * 1000,
+  })
 }

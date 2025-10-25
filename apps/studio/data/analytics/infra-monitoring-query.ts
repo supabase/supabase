@@ -78,40 +78,38 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
     ...options
   }: UseQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
 ) =>
-  useQuery<InfraMonitoringData, InfraMonitoringError, TData>(
-    analyticsKeys.infraMonitoring(projectRef, {
+  useQuery<InfraMonitoringData, InfraMonitoringError, TData>({
+    queryKey: analyticsKeys.infraMonitoring(projectRef, {
       attribute,
       startDate,
       endDate,
       interval,
       databaseIdentifier,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       getInfraMonitoring(
         { projectRef, attribute, startDate, endDate, interval, databaseIdentifier },
         signal
       ),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof attribute !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined',
-      select(data) {
-        return {
-          ...data,
-          data: data.data.map((x) => {
-            return {
-              ...x,
-              [attribute]:
-                modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-              periodStartFormatted: dayjs(x.period_start).format(dateFormat),
-            }
-          }),
-        } as TData
-      },
-      staleTime: 1000 * 60, // default good for a minute
-      ...options,
-    }
-  )
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof attribute !== 'undefined' &&
+      typeof startDate !== 'undefined' &&
+      typeof endDate !== 'undefined',
+    select(data) {
+      return {
+        ...data,
+        data: data.data.map((x) => {
+          return {
+            ...x,
+            [attribute]:
+              modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
+            periodStartFormatted: dayjs(x.period_start).format(dateFormat),
+          }
+        }),
+      } as TData
+    },
+    staleTime: 1000 * 60,
+    ...options,
+  })

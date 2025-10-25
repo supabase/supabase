@@ -55,20 +55,18 @@ export const useRateMessageMutation = ({
   UseMutationOptions<RateMessageData, ResponseError, RateMessageVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<RateMessageData, ResponseError, RateMessageVariables>(
-    (vars) => rateMessage(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          console.error(`Failed to rate message: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<RateMessageData, ResponseError, RateMessageVariables>({
+    mutationFn: (vars) => rateMessage(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        console.error(`Failed to rate message: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

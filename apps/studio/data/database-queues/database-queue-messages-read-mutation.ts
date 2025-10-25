@@ -50,7 +50,8 @@ export const useDatabaseQueueMessageReadMutation = ({
     DatabaseQueueMessageReadData,
     ResponseError,
     DatabaseQueueMessageReadVariables
-  >((vars) => readDatabaseQueueMessage(vars), {
+  >({
+    mutationFn: (vars) => readDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queryName } = variables
       await queryClient.invalidateQueries(

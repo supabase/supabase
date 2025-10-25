@@ -44,22 +44,18 @@ export const useInvoicePaymentLinkGetMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<InvoicePaymentLinkGetData, ResponseError, InvoicePaymentLinkGetVariables>(
-    (vars) => updateInvoicePaymentLink(vars),
-    {
-      async onError(error, variables, context) {
-        // In case of an error, there is a good chance that the invoice status has changed, so we invalidate the cache to reflect the updated status
-        await Promise.all([
-          queryClient.invalidateQueries(invoicesKeys.listAndCount(variables.slug)),
-        ])
+  return useMutation<InvoicePaymentLinkGetData, ResponseError, InvoicePaymentLinkGetVariables>({
+    mutationFn: (vars) => updateInvoicePaymentLink(vars),
+    async onError(error, variables, context) {
+      // In case of an error, there is a good chance that the invoice status has changed, so we invalidate the cache to reflect the updated status
+      await Promise.all([queryClient.invalidateQueries(invoicesKeys.listAndCount(variables.slug))])
 
-        if (onError === undefined) {
-          toast.error(error.message)
-        } else {
-          onError(error, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      if (onError === undefined) {
+        toast.error(error.message)
+      } else {
+        onError(error, variables, context)
+      }
+    },
+    ...options,
+  })
 }

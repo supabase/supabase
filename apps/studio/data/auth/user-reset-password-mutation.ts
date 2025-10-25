@@ -31,21 +31,19 @@ export const useUserResetPasswordMutation = ({
   UseMutationOptions<UserResetPasswordData, ResponseError, UserResetPasswordVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<UserResetPasswordData, ResponseError, UserResetPasswordVariables>(
-    (vars) => resetPassword(vars),
-    {
-      async onSuccess(data, variables, context) {
-        // [Joshen] If we need to invalidate any queries
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to reset user password: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UserResetPasswordData, ResponseError, UserResetPasswordVariables>({
+    mutationFn: (vars) => resetPassword(vars),
+    async onSuccess(data, variables, context) {
+      // [Joshen] If we need to invalidate any queries
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to reset user password: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

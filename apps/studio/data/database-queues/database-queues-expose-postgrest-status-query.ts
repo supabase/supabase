@@ -37,11 +37,9 @@ export const useQueuesExposePostgrestStatusQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,
   { enabled = true, ...options }: UseQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
 ) =>
-  useQuery<DatabaseQueueData, DatabaseQueueError, TData>(
-    databaseQueuesKeys.exposePostgrestStatus(projectRef),
-    () => getDatabaseQueuesExposePostgrestStatus({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseQueueData, DatabaseQueueError, TData>({
+    queryKey: databaseQueuesKeys.exposePostgrestStatus(projectRef),
+    queryFn: () => getDatabaseQueuesExposePostgrestStatus({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

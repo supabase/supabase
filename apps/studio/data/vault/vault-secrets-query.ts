@@ -39,11 +39,9 @@ export const useVaultSecretsQuery = <TData = VaultSecretsData>(
   { projectRef, connectionString }: VaultSecretsVariables,
   { enabled = true, ...options }: UseQueryOptions<VaultSecretsData, VaultSecretsError, TData> = {}
 ) =>
-  useQuery<VaultSecretsData, VaultSecretsError, TData>(
-    vaultSecretsKeys.list(projectRef),
-    ({ signal }) => getVaultSecrets({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<VaultSecretsData, VaultSecretsError, TData>({
+    queryKey: vaultSecretsKeys.list(projectRef),
+    queryFn: ({ signal }) => getVaultSecrets({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

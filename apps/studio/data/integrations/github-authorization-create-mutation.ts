@@ -48,7 +48,8 @@ export const useGitHubAuthorizationCreateMutation = ({
     GitHubAuthorizationCreateData,
     ResponseError,
     GitHubAuthorizationCreateVariables
-  >((vars) => createGitHubAuthorization(vars), {
+  >({
+    mutationFn: (vars) => createGitHubAuthorization(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

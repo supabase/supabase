@@ -54,7 +54,8 @@ export const useDatabaseExtensionDisableMutation = ({
     DatabaseExtensionDisableData,
     ResponseError,
     DatabaseExtensionDisableVariables
-  >((vars) => disableDatabaseExtension(vars), {
+  >({
+    mutationFn: (vars) => disableDatabaseExtension(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([

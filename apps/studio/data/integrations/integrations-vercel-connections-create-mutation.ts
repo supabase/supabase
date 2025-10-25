@@ -48,7 +48,8 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
     IntegrationVercelConnectionsCreateData,
     ResponseError,
     IntegrationConnectionsCreateVariables
-  >((vars) => createIntegrationVercelConnections(vars), {
+  >({
+    mutationFn: (vars) => createIntegrationVercelConnections(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
         queryClient.invalidateQueries(integrationKeys.integrationsList()),

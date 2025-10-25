@@ -34,8 +34,9 @@ export const useCheckOpenAIKeyQuery = <TData = ResourceData>({
   enabled = true,
   ...options
 }: UseQueryOptions<ResourceData, ResourceError, TData> = {}) =>
-  useQuery<ResourceData, ResourceError, TData>(
-    aiKeys.apiKey(),
-    ({ signal }) => checkOpenAIKey(signal),
-    { enabled: !IS_PLATFORM && enabled, ...options }
-  )
+  useQuery<ResourceData, ResourceError, TData>({
+    queryKey: aiKeys.apiKey(),
+    queryFn: ({ signal }) => checkOpenAIKey(signal),
+    enabled: !IS_PLATFORM && enabled,
+    ...options,
+  })

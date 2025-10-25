@@ -35,7 +35,8 @@ export const useOrganizationProjectClaimMutation = ({
     ClaimOrganizationProjectData,
     ResponseError,
     OrganizationProjectClaimVariables
-  >((vars) => claimOrganizationProject(vars), {
+  >({
+    mutationFn: (vars) => claimOrganizationProject(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

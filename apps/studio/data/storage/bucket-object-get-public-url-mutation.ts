@@ -42,20 +42,18 @@ export const useGetBucketObjectPublicUrlMutation = ({
   UseMutationOptions<BucketObjectPublicUrlData, ResponseError, BucketObjectPublicUrlParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BucketObjectPublicUrlData, ResponseError, BucketObjectPublicUrlParams>(
-    (vars) => getPublicUrlForBucketObject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to get public URL of bucket object: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BucketObjectPublicUrlData, ResponseError, BucketObjectPublicUrlParams>({
+    mutationFn: (vars) => getPublicUrlForBucketObject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to get public URL of bucket object: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

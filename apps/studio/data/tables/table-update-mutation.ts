@@ -52,26 +52,24 @@ export const useTableUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableUpdateData, ResponseError, TableUpdateVariables>(
-    (vars) => updateTable(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, schema, id } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, id)),
-          queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
-          queryClient.invalidateQueries(lintKeys.lint(projectRef)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update database table: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<TableUpdateData, ResponseError, TableUpdateVariables>({
+    mutationFn: (vars) => updateTable(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, schema, id } = variables
+      await Promise.all([
+        queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, id)),
+        queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
+        queryClient.invalidateQueries(lintKeys.lint(projectRef)),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update database table: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

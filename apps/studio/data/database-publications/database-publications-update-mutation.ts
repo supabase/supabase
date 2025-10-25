@@ -65,7 +65,8 @@ export const useDatabasePublicationUpdateMutation = ({
     DatabasePublicationUpdateData,
     ResponseError,
     DatabasePublicationUpdateVariables
-  >((vars) => updateDatabasePublication(vars), {
+  >({
+    mutationFn: (vars) => updateDatabasePublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries(databasePublicationsKeys.list(projectRef))

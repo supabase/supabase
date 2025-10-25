@@ -55,20 +55,18 @@ export const useGenerateAttachmentURLsMutation = ({
   UseMutationOptions<GenerateAttachmentURLsData, ResponseError, GenerateAttachmentURLsVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<GenerateAttachmentURLsData, ResponseError, GenerateAttachmentURLsVariables>(
-    (vars) => generateAttachmentURLs(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to generate attachment URLS: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<GenerateAttachmentURLsData, ResponseError, GenerateAttachmentURLsVariables>({
+    mutationFn: (vars) => generateAttachmentURLs(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to generate attachment URLS: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

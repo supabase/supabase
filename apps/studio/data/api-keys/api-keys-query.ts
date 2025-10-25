@@ -70,14 +70,12 @@ export const useAPIKeysQuery = <TData = APIKeysData>(
   { projectRef, reveal = false }: APIKeysVariables,
   { enabled = true, ...options }: UseQueryOptions<APIKeysData, ResponseError, TData> = {}
 ) => {
-  return useQuery<APIKeysData, ResponseError, TData>(
-    apiKeysKeys.list(projectRef, reveal),
-    ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<APIKeysData, ResponseError, TData>({
+    queryKey: apiKeysKeys.list(projectRef, reveal),
+    queryFn: ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }
 
 export const getKeys = (apiKeys: APIKey[] = []) => {

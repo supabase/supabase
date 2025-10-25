@@ -28,11 +28,9 @@ export const useAwsRedirectQuery = <TData = AwsRedirectData>(
   { organizationSlug }: AwsRedirectVariables,
   { enabled = true, ...options }: UseQueryOptions<AwsRedirectData, AwsRedirectError, TData> = {}
 ) =>
-  useQuery<AwsRedirectData, AwsRedirectError, TData>(
-    integrationKeys.awsRedirect(organizationSlug),
-    ({ signal }) => getAwsRedirect({ organizationSlug }, signal),
-    {
-      enabled: enabled && typeof organizationSlug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<AwsRedirectData, AwsRedirectError, TData>({
+    queryKey: integrationKeys.awsRedirect(organizationSlug),
+    queryFn: ({ signal }) => getAwsRedirect({ organizationSlug }, signal),
+    enabled: enabled && typeof organizationSlug !== 'undefined',
+    ...options,
+  })

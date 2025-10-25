@@ -43,12 +43,10 @@ export const useOrgSSOConfigQuery = <TData = OrgSSOConfigData>(
   const plan = organization?.plan.id
   const canSetupSSOConfig = ['team', 'enterprise'].includes(plan ?? '')
 
-  return useQuery<OrgSSOConfigData, OrgSSOConfigError, TData>(
-    orgSSOKeys.orgSSOConfig(orgSlug),
-    ({ signal }) => getOrgSSOConfig({ orgSlug }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined' && canSetupSSOConfig,
-      ...options,
-    }
-  )
+  return useQuery<OrgSSOConfigData, OrgSSOConfigError, TData>({
+    queryKey: orgSSOKeys.orgSSOConfig(orgSlug),
+    queryFn: ({ signal }) => getOrgSSOConfig({ orgSlug }, signal),
+    enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined' && canSetupSSOConfig,
+    ...options,
+  })
 }

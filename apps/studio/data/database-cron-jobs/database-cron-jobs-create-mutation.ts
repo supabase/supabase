@@ -40,29 +40,27 @@ export const useDatabaseCronJobCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseCronJobCreateData, ResponseError, DatabaseCronJobCreateVariables>(
-    (vars) => createDatabaseCronJob(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, searchTerm, identifier } = variables
+  return useMutation<DatabaseCronJobCreateData, ResponseError, DatabaseCronJobCreateVariables>({
+    mutationFn: (vars) => createDatabaseCronJob(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, searchTerm, identifier } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(databaseCronJobsKeys.listInfinite(projectRef, searchTerm)),
-          ...(!!identifier
-            ? [queryClient.invalidateQueries(databaseCronJobsKeys.job(projectRef, identifier))]
-            : []),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries(databaseCronJobsKeys.listInfinite(projectRef, searchTerm)),
+        ...(!!identifier
+          ? [queryClient.invalidateQueries(databaseCronJobsKeys.job(projectRef, identifier))]
+          : []),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database cron job: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database cron job: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

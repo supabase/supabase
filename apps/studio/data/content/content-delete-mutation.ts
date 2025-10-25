@@ -36,26 +36,24 @@ export const useContentDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteContentData, ResponseError, DeleteContentVariables>(
-    (args) => deleteContents(args),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(contentKeys.allContentLists(projectRef)),
-          queryClient.invalidateQueries(contentKeys.infiniteList(projectRef)),
-        ])
+  return useMutation<DeleteContentData, ResponseError, DeleteContentVariables>({
+    mutationFn: (args) => deleteContents(args),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await Promise.all([
+        queryClient.invalidateQueries(contentKeys.allContentLists(projectRef)),
+        queryClient.invalidateQueries(contentKeys.infiniteList(projectRef)),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete contents: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete contents: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -74,7 +74,8 @@ export const useFDWUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<FDWUpdateData, ResponseError, FDWUpdateVariables>((vars) => updateFDW(vars), {
+  return useMutation<FDWUpdateData, ResponseError, FDWUpdateVariables>({
+    mutationFn: (vars) => updateFDW(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 

@@ -44,8 +44,8 @@ export const useDeleteDestinationPipelineMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<DeleteDestinationPipelineData, ResponseError, DeleteDestinationPipelineParams>(
-    (vars) => deleteDestinationPipeline(vars),
     {
+      mutationFn: (vars) => deleteDestinationPipeline(vars),
       async onSuccess(data, variables, context) {
         const { projectRef, destinationId, pipelineId } = variables
 

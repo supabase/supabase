@@ -32,20 +32,18 @@ export const useProjectUpgradeMutation = ({
   UseMutationOptions<ProjectUpgradeData, ResponseError, ProjectUpgradeVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectUpgradeData, ResponseError, ProjectUpgradeVariables>(
-    (vars) => upgradeProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to upgrade project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectUpgradeData, ResponseError, ProjectUpgradeVariables>({
+    mutationFn: (vars) => upgradeProject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to upgrade project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

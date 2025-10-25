@@ -39,11 +39,9 @@ export const useProjectPostgrestConfigQuery = <TData = ProjectPostgrestConfigDat
     ...options
   }: UseQueryOptions<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData> = {}
 ) =>
-  useQuery<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData>(
-    configKeys.postgrest(projectRef),
-    ({ signal }) => getProjectPostgrestConfig({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData>({
+    queryKey: configKeys.postgrest(projectRef),
+    queryFn: ({ signal }) => getProjectPostgrestConfig({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

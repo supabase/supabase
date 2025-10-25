@@ -52,11 +52,9 @@ export const useRealtimeConfigurationQuery = <TData = RealtimeConfigurationData>
     ...options
   }: UseQueryOptions<RealtimeConfigurationData, RealtimeConfigurationError, TData> = {}
 ) =>
-  useQuery<RealtimeConfigurationData, RealtimeConfigurationError, TData>(
-    realtimeKeys.configuration(projectRef),
-    ({ signal }) => getRealtimeConfiguration({ projectRef }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<RealtimeConfigurationData, RealtimeConfigurationError, TData>({
+    queryKey: realtimeKeys.configuration(projectRef),
+    queryFn: ({ signal }) => getRealtimeConfiguration({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    ...options,
+  })

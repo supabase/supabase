@@ -34,24 +34,22 @@ export const useOrganizationMfaToggleMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationMfaToggleData, ResponseError, OrganizationMfaToggleVariables>(
-    (vars) => toggleOrganizationMfa(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
+  return useMutation<OrganizationMfaToggleData, ResponseError, OrganizationMfaToggleVariables>({
+    mutationFn: (vars) => toggleOrganizationMfa(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
 
-        // We already have the data, no need to refetch
-        queryClient.setQueryData(organizationKeys.mfa(slug), data.enforced)
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update MFA enforcement: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      // We already have the data, no need to refetch
+      queryClient.setQueryData(organizationKeys.mfa(slug), data.enforced)
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update MFA enforcement: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

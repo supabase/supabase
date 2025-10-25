@@ -41,24 +41,20 @@ export const useDatabaseCronJobToggleMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseCronJobToggleData, ResponseError, DatabaseCronJobToggleVariables>(
-    (vars) => toggleDatabaseCronJob(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, searchTerm } = variables
-        await queryClient.invalidateQueries(
-          databaseCronJobsKeys.listInfinite(projectRef, searchTerm)
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to toggle database cron job: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseCronJobToggleData, ResponseError, DatabaseCronJobToggleVariables>({
+    mutationFn: (vars) => toggleDatabaseCronJob(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, searchTerm } = variables
+      await queryClient.invalidateQueries(databaseCronJobsKeys.listInfinite(projectRef, searchTerm))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to toggle database cron job: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

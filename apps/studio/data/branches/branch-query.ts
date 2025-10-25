@@ -29,11 +29,9 @@ export const useBranchQuery = <TData = BranchData>(
   { projectRef, branchRef }: BranchVariables,
   { enabled = true, ...options }: UseQueryOptions<BranchData, BranchError, TData> = {}
 ) =>
-  useQuery<BranchData, BranchError, TData>(
-    branchKeys.detail(projectRef, branchRef),
-    ({ signal }) => getBranch({ branchRef }, signal),
-    {
-      enabled: IS_PLATFORM && enabled && Boolean(branchRef),
-      ...options,
-    }
-  )
+  useQuery<BranchData, BranchError, TData>({
+    queryKey: branchKeys.detail(projectRef, branchRef),
+    queryFn: ({ signal }) => getBranch({ branchRef }, signal),
+    enabled: IS_PLATFORM && enabled && Boolean(branchRef),
+    ...options,
+  })

@@ -57,23 +57,21 @@ export const useDatabaseQueueCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseQueueCreateData, ResponseError, DatabaseQueueCreateVariables>(
-    (vars) => createDatabaseQueue(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
-        queryClient.invalidateQueries(tableKeys.list(projectRef, 'pgmq'))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database queue: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseQueueCreateData, ResponseError, DatabaseQueueCreateVariables>({
+    mutationFn: (vars) => createDatabaseQueue(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
+      queryClient.invalidateQueries(tableKeys.list(projectRef, 'pgmq'))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database queue: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -104,7 +104,8 @@ export const useFDWDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<FDWDeleteData, ResponseError, FDWDeleteVariables>((vars) => deleteFDW(vars), {
+  return useMutation<FDWDeleteData, ResponseError, FDWDeleteVariables>({
+    mutationFn: (vars) => deleteFDW(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 

@@ -55,8 +55,9 @@ export const useNetworkRestrictionsQuery = <TData = NetworkRestrictionsData>(
     ...options
   }: UseQueryOptions<NetworkRestrictionsData, NetworkRestrictionsError, TData> = {}
 ) =>
-  useQuery<NetworkRestrictionsData, NetworkRestrictionsError, TData>(
-    networkRestrictionKeys.list(projectRef),
-    ({ signal }) => getNetworkRestrictions({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<NetworkRestrictionsData, NetworkRestrictionsError, TData>({
+    queryKey: networkRestrictionKeys.list(projectRef),
+    queryFn: ({ signal }) => getNetworkRestrictions({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

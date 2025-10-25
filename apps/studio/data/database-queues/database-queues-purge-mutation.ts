@@ -38,24 +38,22 @@ export const useDatabaseQueuePurgeMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>(
-    (vars) => purgeDatabaseQueue(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, queueName } = variables
-        await queryClient.invalidateQueries(
-          databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to purge database queue: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>({
+    mutationFn: (vars) => purgeDatabaseQueue(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, queueName } = variables
+      await queryClient.invalidateQueries(
+        databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
+      )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to purge database queue: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -37,32 +37,27 @@ export const useProjectTransferPreviewQuery = <TData = ProjectTransferPreviewDat
     ...options
   }: UseQueryOptions<ProjectTransferPreviewData, ProjectTransferPreviewError, TData> = {}
 ) =>
-  useQuery<ProjectTransferPreviewData, ProjectTransferPreviewError, TData>(
-    projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug),
-    ({ signal }) => previewProjectTransfer({ projectRef, targetOrganizationSlug }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof targetOrganizationSlug !== 'undefined',
-      ...options,
-
-      retry: (failureCount, error) => {
-        // Don't retry on 400s
-        if (
-          typeof error === 'object' &&
-          error !== null &&
-          'code' in error &&
-          (error as any).code === 400
-        ) {
-          return false
-        }
-
-        if (failureCount < 3) {
-          return true
-        }
-
+  useQuery<ProjectTransferPreviewData, ProjectTransferPreviewError, TData>({
+    queryKey: projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug),
+    queryFn: ({ signal }) => previewProjectTransfer({ projectRef, targetOrganizationSlug }, signal),
+    enabled:
+      enabled && typeof projectRef !== 'undefined' && typeof targetOrganizationSlug !== 'undefined',
+    ...options,
+    retry: (failureCount, error) => {
+      // Don't retry on 400s
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as any).code === 400
+      ) {
         return false
-      },
-    }
-  )
+      }
+
+      if (failureCount < 3) {
+        return true
+      }
+
+      return false
+    },
+  })

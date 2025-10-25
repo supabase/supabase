@@ -56,15 +56,14 @@ export const useFunctionsCombinedStatsQuery = <TData = FunctionsCombinedStatsDat
     ...options
   }: UseQueryOptions<FunctionsCombinedStatsData, FunctionsCombinedStatsError, TData> = {}
 ) =>
-  useQuery<FunctionsCombinedStatsData, FunctionsCombinedStatsError, TData>(
-    analyticsKeys.functionsCombinedStats(projectRef, { functionId, interval }),
-    ({ signal }) => getFunctionsCombinedStats({ projectRef, functionId, interval }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof functionId !== 'undefined' &&
-        typeof interval !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<FunctionsCombinedStatsData, FunctionsCombinedStatsError, TData>({
+    queryKey: analyticsKeys.functionsCombinedStats(projectRef, { functionId, interval }),
+    queryFn: ({ signal }) =>
+      getFunctionsCombinedStats({ projectRef, functionId, interval }, signal),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof functionId !== 'undefined' &&
+      typeof interval !== 'undefined',
+    ...options,
+  })

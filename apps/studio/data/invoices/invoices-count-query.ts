@@ -27,11 +27,9 @@ export const useInvoicesCountQuery = <TData = InvoicesCountData>(
   { slug }: InvoicesCountVariables,
   { enabled = true, ...options }: UseQueryOptions<InvoicesCountData, InvoicesCountError, TData> = {}
 ) =>
-  useQuery<InvoicesCountData, InvoicesCountError, TData>(
-    invoicesKeys.count(slug),
-    ({ signal }) => getInvoicesCount({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<InvoicesCountData, InvoicesCountError, TData>({
+    queryKey: invoicesKeys.count(slug),
+    queryFn: ({ signal }) => getInvoicesCount({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

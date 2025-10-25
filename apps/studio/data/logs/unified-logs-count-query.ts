@@ -83,12 +83,10 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     ...options
   }: UseQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
 ) =>
-  useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>(
-    logsKeys.unifiedLogsCount(projectRef, search),
-    ({ signal }) => getUnifiedLogsCount({ projectRef, search }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+  useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
+    queryKey: logsKeys.unifiedLogsCount(projectRef, search),
+    queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })

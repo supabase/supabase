@@ -41,17 +41,15 @@ export const useSendUpgradeFeedbackMutation = ({
   UseMutationOptions<SendUpgradeFeedbackData, ResponseError, SendUpgradeFeedbackVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendUpgradeFeedbackData, ResponseError, SendUpgradeFeedbackVariables>(
-    (vars) => sendUpgradeFeedback(vars),
-    {
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit upgrade survey: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SendUpgradeFeedbackData, ResponseError, SendUpgradeFeedbackVariables>({
+    mutationFn: (vars) => sendUpgradeFeedback(vars),
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to submit upgrade survey: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

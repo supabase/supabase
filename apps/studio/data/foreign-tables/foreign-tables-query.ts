@@ -48,11 +48,11 @@ export const useForeignTablesQuery = <TData = ForeignTablesData>(
   { projectRef, connectionString, schema }: ForeignTablesVariables,
   { enabled = true, ...options }: UseQueryOptions<ForeignTablesData, ForeignTablesError, TData> = {}
 ) =>
-  useQuery<ForeignTablesData, ForeignTablesError, TData>(
-    schema ? foreignTableKeys.listBySchema(projectRef, schema) : foreignTableKeys.list(projectRef),
-    ({ signal }) => getForeignTables({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ForeignTablesData, ForeignTablesError, TData>({
+    queryKey: schema
+      ? foreignTableKeys.listBySchema(projectRef, schema)
+      : foreignTableKeys.list(projectRef),
+    queryFn: ({ signal }) => getForeignTables({ projectRef, connectionString, schema }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

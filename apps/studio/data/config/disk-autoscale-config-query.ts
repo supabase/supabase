@@ -35,8 +35,9 @@ export const useDiskAutoscaleCustomConfigQuery = <TData = DiskAutoscaleCustomCon
     ...options
   }: UseQueryOptions<DiskAutoscaleCustomConfigData, DiskAutoscaleCustomConfigError, TData> = {}
 ) =>
-  useQuery<DiskAutoscaleCustomConfigData, DiskAutoscaleCustomConfigError, TData>(
-    configKeys.diskAutoscaleConfig(projectRef),
-    ({ signal }) => getDiskAutoscaleCustomConfig({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DiskAutoscaleCustomConfigData, DiskAutoscaleCustomConfigError, TData>({
+    queryKey: configKeys.diskAutoscaleConfig(projectRef),
+    queryFn: ({ signal }) => getDiskAutoscaleCustomConfig({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -57,17 +57,15 @@ export const useVaultSecretDecryptedValueQuery = <TData = string>(
     ...options
   }: UseQueryOptions<getDecryptedValueResult, VaultSecretsDecryptedValueError, TData> = {}
 ) =>
-  useQuery<getDecryptedValueResult, VaultSecretsDecryptedValueError, TData>(
-    vaultSecretsKeys.getDecryptedValue(projectRef, id),
-    ({ signal }) => getDecryptedValue({ projectRef, connectionString, id }, signal),
-    {
-      select(data) {
-        return (data[0]?.decrypted_secret ?? '') as TData
-      },
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<getDecryptedValueResult, VaultSecretsDecryptedValueError, TData>({
+    queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id),
+    queryFn: ({ signal }) => getDecryptedValue({ projectRef, connectionString, id }, signal),
+    select(data) {
+      return (data[0]?.decrypted_secret ?? '') as TData
+    },
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 // [Joshen] Considering to consolidate fetching single and multiple decrypted values by just passing in a string array
 // This is currently used in ImportForeignSchemaDialog, but reckon EditWrapperSheet can use this too to replace the useEffect on L153

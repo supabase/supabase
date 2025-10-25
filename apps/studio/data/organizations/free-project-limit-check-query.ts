@@ -38,11 +38,9 @@ export const useFreeProjectLimitCheckQuery = <TData = FreeProjectLimitCheckData>
     ...options
   }: UseQueryOptions<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData> = {}
 ) =>
-  useQuery<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData>(
-    organizationKeys.freeProjectLimitCheck(slug),
-    ({ signal }) => getFreeProjectLimitCheck({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData>({
+    queryKey: organizationKeys.freeProjectLimitCheck(slug),
+    queryFn: ({ signal }) => getFreeProjectLimitCheck({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

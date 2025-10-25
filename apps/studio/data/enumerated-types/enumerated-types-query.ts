@@ -48,11 +48,9 @@ export const useEnumeratedTypesQuery = <TData = EnumeratedTypesData>(
     ...options
   }: UseQueryOptions<EnumeratedTypesData, EnumeratedTypesError, TData> = {}
 ) =>
-  useQuery<EnumeratedTypesData, EnumeratedTypesError, TData>(
-    enumeratedTypesKeys.list(projectRef),
-    ({ signal }) => getEnumeratedTypes({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EnumeratedTypesData, EnumeratedTypesError, TData>({
+    queryKey: enumeratedTypesKeys.list(projectRef),
+    queryFn: ({ signal }) => getEnumeratedTypes({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

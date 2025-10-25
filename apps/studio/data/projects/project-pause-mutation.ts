@@ -26,20 +26,18 @@ export const useProjectPauseMutation = ({
   UseMutationOptions<ProjectPauseData, ResponseError, ProjectPauseVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectPauseData, ResponseError, ProjectPauseVariables>(
-    (vars) => pauseProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to pause project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectPauseData, ResponseError, ProjectPauseVariables>({
+    mutationFn: (vars) => pauseProject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to pause project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

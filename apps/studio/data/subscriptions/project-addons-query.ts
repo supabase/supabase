@@ -34,12 +34,10 @@ export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
   { projectRef }: ProjectAddonsVariables,
   { enabled = true, ...options }: UseQueryOptions<ProjectAddonsData, ProjectAddonsError, TData> = {}
 ) =>
-  useQuery<ProjectAddonsData, ProjectAddonsError, TData>(
-    subscriptionKeys.addons(projectRef),
-    ({ signal }) => getProjectAddons({ projectRef }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
-      staleTime: 60 * 60 * 1000, // 60 minutes
-      ...options,
-    }
-  )
+  useQuery<ProjectAddonsData, ProjectAddonsError, TData>({
+    queryKey: subscriptionKeys.addons(projectRef),
+    queryFn: ({ signal }) => getProjectAddons({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    staleTime: 60 * 60 * 1000,
+    ...options,
+  })

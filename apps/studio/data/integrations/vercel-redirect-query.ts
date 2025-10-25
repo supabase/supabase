@@ -32,11 +32,9 @@ export const useVercelRedirectQuery = <TData = VercelRedirectData>(
     ...options
   }: UseQueryOptions<VercelRedirectData, VercelRedirectError, TData> = {}
 ) =>
-  useQuery<VercelRedirectData, VercelRedirectError, TData>(
-    integrationKeys.vercelRedirect(installationId),
-    ({ signal }) => getVercelRedirect({ installationId }, signal),
-    {
-      enabled: enabled && typeof installationId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<VercelRedirectData, VercelRedirectError, TData>({
+    queryKey: integrationKeys.vercelRedirect(installationId),
+    queryFn: ({ signal }) => getVercelRedirect({ installationId }, signal),
+    enabled: enabled && typeof installationId !== 'undefined',
+    ...options,
+  })

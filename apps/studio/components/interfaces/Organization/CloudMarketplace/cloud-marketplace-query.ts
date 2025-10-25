@@ -42,9 +42,11 @@ export const useCloudMarketplaceOnboardingInfoQuery = <TData = CloudMarketplaceO
   > = {}
 ) => {
   const { profile } = useProfile()
-  return useQuery<CloudMarketplaceOnboardingInfo, CloudMarketplaceOnboardingInfoError, TData>(
-    cloudMarketplaceKeys.onboardingInfo(buyerId),
-    ({ signal }) => getCloudMarketplaceOnboardingInfo({ buyerId }, signal),
-    { enabled: enabled && profile !== undefined, ...options, staleTime: 30 * 60 * 1000 }
-  )
+  return useQuery<CloudMarketplaceOnboardingInfo, CloudMarketplaceOnboardingInfoError, TData>({
+    queryKey: cloudMarketplaceKeys.onboardingInfo(buyerId),
+    queryFn: ({ signal }) => getCloudMarketplaceOnboardingInfo({ buyerId }, signal),
+    enabled: enabled && profile !== undefined,
+    ...options,
+    staleTime: 30 * 60 * 1000,
+  })
 }

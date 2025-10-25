@@ -69,8 +69,8 @@ export const useOrganizationProjectClaimQuery = <TData = OrganizationProjectClai
     ...options
   }: UseQueryOptions<OrganizationProjectClaimData, OrganizationProjectClaimError, TData> = {}
 ) =>
-  useQuery<OrganizationProjectClaimData, OrganizationProjectClaimError, TData>(
-    organizationKeys.projectClaim(slug, token),
-    ({ signal }) => getOrganizationProjectClaim({ slug, token }, signal),
-    { ...options }
-  )
+  useQuery<OrganizationProjectClaimData, OrganizationProjectClaimError, TData>({
+    queryKey: organizationKeys.projectClaim(slug, token),
+    queryFn: ({ signal }) => getOrganizationProjectClaim({ slug, token }, signal),
+    ...options,
+  })

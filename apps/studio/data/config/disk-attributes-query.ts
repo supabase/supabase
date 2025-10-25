@@ -39,11 +39,12 @@ export const useDiskAttributesQuery = <TData = DiskAttributesData>(
     ...options
   }: UseQueryOptions<DiskAttributesData, DiskAttributesError, TData> = {}
 ) =>
-  useQuery<DiskAttributesData, DiskAttributesError, TData>(
-    configKeys.diskAttributes(projectRef),
-    ({ signal }) => getDiskAttributes({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DiskAttributesData, DiskAttributesError, TData>({
+    queryKey: configKeys.diskAttributes(projectRef),
+    queryFn: ({ signal }) => getDiskAttributes({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export const useRemainingDurationForDiskAttributeUpdate = ({
   projectRef,

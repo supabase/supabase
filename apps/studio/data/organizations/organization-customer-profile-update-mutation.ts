@@ -56,7 +56,8 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
     OrganizationCustomerProfileUpdateData,
     ResponseError,
     OrganizationCustomerProfileUpdateVariables
-  >((vars) => updateOrganizationCustomerProfile(vars), {
+  >({
+    mutationFn: (vars) => updateOrganizationCustomerProfile(vars),
     async onSuccess(data, variables, context) {
       const { address, slug, billing_name } = variables
 

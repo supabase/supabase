@@ -21,8 +21,8 @@ export type NotificationsError = ResponseError
 export const useNotificationsSummaryQuery = <TData = NotificationsData>(
   options: UseQueryOptions<NotificationsData, NotificationsError, TData> = {}
 ) =>
-  useQuery<NotificationsData, NotificationsError, TData>(
-    notificationKeys.summary(),
-    ({ signal }) => getNotificationsSummary(signal),
-    options
-  )
+  useQuery<NotificationsData, NotificationsError, TData>({
+    queryKey: notificationKeys.summary(),
+    queryFn: ({ signal }) => getNotificationsSummary(signal),
+    ...options,
+  })

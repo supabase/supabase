@@ -60,14 +60,12 @@ export const useProjectLogStatsQuery = <TData = ProjectLogStatsData>(
     ...options
   }: UseQueryOptions<ProjectLogStatsData, ProjectLogStatsError, TData> = {}
 ) =>
-  useQuery<ProjectLogStatsData, ProjectLogStatsError, TData>(
-    analyticsKeys.usageApiCounts(projectRef, interval),
-    ({ signal }) => getProjectLogStats({ projectRef, interval }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof interval !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectLogStatsData, ProjectLogStatsError, TData>({
+    queryKey: analyticsKeys.usageApiCounts(projectRef, interval),
+    queryFn: ({ signal }) => getProjectLogStats({ projectRef, interval }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof interval !== 'undefined',
+    ...options,
+  })
 
 export function prefetchProjectLogStats(
   client: QueryClient,

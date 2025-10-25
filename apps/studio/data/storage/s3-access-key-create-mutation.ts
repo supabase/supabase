@@ -37,22 +37,20 @@ export function useS3AccessKeyCreateMutation({
 > = {}) {
   const queryClient = useQueryClient()
 
-  return useMutation<S3AccessKeyCreateData, ResponseError, CreateS3AccessKeyCredentialVariables>(
-    (vars) => createS3AccessKeyCredential(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageCredentialsKeys.credentials(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create S3 access key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<S3AccessKeyCreateData, ResponseError, CreateS3AccessKeyCredentialVariables>({
+    mutationFn: (vars) => createS3AccessKeyCredential(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(storageCredentialsKeys.credentials(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create S3 access key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

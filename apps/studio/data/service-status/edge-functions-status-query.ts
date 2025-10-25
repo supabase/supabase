@@ -30,11 +30,9 @@ export const useEdgeFunctionServiceStatusQuery = <TData = EdgeFunctionServiceSta
     ...options
   }: UseQueryOptions<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData> = {}
 ) =>
-  useQuery<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData>(
-    serviceStatusKeys.edgeFunctions(projectRef),
-    ({ signal }) => getEdgeFunctionServiceStatus(signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData>({
+    queryKey: serviceStatusKeys.edgeFunctions(projectRef),
+    queryFn: ({ signal }) => getEdgeFunctionServiceStatus(signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -29,21 +29,19 @@ export const useUserDeleteMFAFactorsMutation = ({
   UseMutationOptions<UserDeleteMFAFactorsData, ResponseError, UserDeleteMFAFactorsVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<UserDeleteMFAFactorsData, ResponseError, UserDeleteMFAFactorsVariables>(
-    (vars) => deleteMFAFactors(vars),
-    {
-      async onSuccess(data, variables, context) {
-        // [Joshen] If we need to invalidate any queries
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete the user's MFA factors: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UserDeleteMFAFactorsData, ResponseError, UserDeleteMFAFactorsVariables>({
+    mutationFn: (vars) => deleteMFAFactors(vars),
+    async onSuccess(data, variables, context) {
+      // [Joshen] If we need to invalidate any queries
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete the user's MFA factors: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

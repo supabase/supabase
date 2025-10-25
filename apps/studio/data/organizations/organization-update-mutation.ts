@@ -49,71 +49,69 @@ export const useOrganizationUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationUpdateData, ResponseError, OrganizationUpdateVariables>(
-    (vars) => updateOrganization(vars),
-    {
-      async onSuccess(data, variables, context) {
-        queryClient.setQueriesData(
-          {
-            queryKey: organizationKeys.list(),
-            exact: true,
-          },
-          (prev: components['schemas']['OrganizationResponse'][] | undefined) => {
-            if (!prev) return prev
+  return useMutation<OrganizationUpdateData, ResponseError, OrganizationUpdateVariables>({
+    mutationFn: (vars) => updateOrganization(vars),
+    async onSuccess(data, variables, context) {
+      queryClient.setQueriesData(
+        {
+          queryKey: organizationKeys.list(),
+          exact: true,
+        },
+        (prev: components['schemas']['OrganizationResponse'][] | undefined) => {
+          if (!prev) return prev
 
-            return prev.map((org) => {
-              if (org.slug !== variables.slug) return org
+          return prev.map((org) => {
+            if (org.slug !== variables.slug) return org
 
-              return {
-                ...org,
-                name: variables.name || org.name,
-                billing_email: variables.billing_email || org.billing_email,
-                opt_in_tags: variables.opt_in_tags || org.opt_in_tags,
-              }
-            })
-          }
-        )
-
-        queryClient.setQueriesData(
-          {
-            queryKey: organizationKeys.customerProfile(data.slug),
-            exact: true,
-          },
-          (prev: components['schemas']['CustomerResponse'] | undefined) => {
-            if (!prev) return prev
             return {
-              ...prev,
-              additional_emails: variables.additional_billing_emails || prev.additional_emails,
+              ...org,
+              name: variables.name || org.name,
+              billing_email: variables.billing_email || org.billing_email,
+              opt_in_tags: variables.opt_in_tags || org.opt_in_tags,
             }
-          }
-        )
-
-        queryClient.setQueriesData(
-          {
-            queryKey: organizationKeys.detail(data.slug),
-            exact: true,
-          },
-          (prev: components['schemas']['OrganizationSlugResponse'] | undefined) => {
-            if (!prev) return prev
-            return {
-              ...prev,
-              name: variables.name || prev.name,
-              billing_email: variables.billing_email || prev.billing_email,
-              opt_in_tags: variables.opt_in_tags || prev.opt_in_tags,
-            }
-          }
-        )
-
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update organization: ${data.message}`)
-        } else {
-          onError(data, variables, context)
+          })
         }
-      },
-      ...options,
-    }
-  )
+      )
+
+      queryClient.setQueriesData(
+        {
+          queryKey: organizationKeys.customerProfile(data.slug),
+          exact: true,
+        },
+        (prev: components['schemas']['CustomerResponse'] | undefined) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            additional_emails: variables.additional_billing_emails || prev.additional_emails,
+          }
+        }
+      )
+
+      queryClient.setQueriesData(
+        {
+          queryKey: organizationKeys.detail(data.slug),
+          exact: true,
+        },
+        (prev: components['schemas']['OrganizationSlugResponse'] | undefined) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            name: variables.name || prev.name,
+            billing_email: variables.billing_email || prev.billing_email,
+            opt_in_tags: variables.opt_in_tags || prev.opt_in_tags,
+          }
+        }
+      )
+
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update organization: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

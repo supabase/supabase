@@ -95,11 +95,9 @@ export const useProjectJsonSchemaQuery = <TData = ProjectJsonSchemaData>(
     ...options
   }: UseQueryOptions<ProjectJsonSchemaData, ProjectJsonSchemaError, TData> = {}
 ) =>
-  useQuery<ProjectJsonSchemaData, ProjectJsonSchemaError, TData>(
-    docsKeys.jsonSchema(projectRef),
-    ({ signal }) => getProjectJsonSchema({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectJsonSchemaData, ProjectJsonSchemaError, TData>({
+    queryKey: docsKeys.jsonSchema(projectRef),
+    queryFn: ({ signal }) => getProjectJsonSchema({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

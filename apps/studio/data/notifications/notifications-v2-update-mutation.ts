@@ -31,21 +31,19 @@ export const useNotificationsV2UpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<NotificationsUpdateData, ResponseError, NotificationsUpdateVariables>(
-    (vars) => updateNotifications(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(['notifications'])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update notifications: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<NotificationsUpdateData, ResponseError, NotificationsUpdateVariables>({
+    mutationFn: (vars) => updateNotifications(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries(['notifications'])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update notifications: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -44,11 +44,9 @@ export const useVercelProjectsQuery = <TData = VercelProjectsData>(
     ...options
   }: UseQueryOptions<VercelProjectsData, VercelProjectsError, TData> = {}
 ) =>
-  useQuery<VercelProjectsData, VercelProjectsError, TData>(
-    integrationKeys.vercelProjectList(organization_integration_id),
-    ({ signal }) => getVercelProjects({ organization_integration_id }, signal),
-    {
-      enabled: enabled && typeof organization_integration_id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<VercelProjectsData, VercelProjectsError, TData>({
+    queryKey: integrationKeys.vercelProjectList(organization_integration_id),
+    queryFn: ({ signal }) => getVercelProjects({ organization_integration_id }, signal),
+    enabled: enabled && typeof organization_integration_id !== 'undefined',
+    ...options,
+  })

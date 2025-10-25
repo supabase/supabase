@@ -29,9 +29,9 @@ export const useProfileIdentitiesQuery = <TData = ProfileIdentitiesData>({
   enabled = true,
   ...options
 }: UseQueryOptions<ProfileIdentitiesData, ProfileIdentitiesError, TData> = {}) => {
-  return useQuery<ProfileIdentitiesData, ProfileIdentitiesError, TData>(
-    profileKeys.identities(),
-    () => getProfileIdentities(),
-    { ...options }
-  )
+  return useQuery<ProfileIdentitiesData, ProfileIdentitiesError, TData>({
+    queryKey: profileKeys.identities(),
+    queryFn: () => getProfileIdentities(),
+    ...options,
+  })
 }

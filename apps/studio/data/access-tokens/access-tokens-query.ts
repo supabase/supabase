@@ -21,8 +21,8 @@ export const useAccessTokensQuery = <TData = AccessTokensData>({
   enabled = true,
   ...options
 }: UseQueryOptions<AccessTokensData, AccessTokensError, TData> = {}) =>
-  useQuery<AccessTokensData, AccessTokensError, TData>(
-    accessTokenKeys.list(),
-    ({ signal }) => getAccessTokens(signal),
-    options
-  )
+  useQuery<AccessTokensData, AccessTokensError, TData>({
+    queryKey: accessTokenKeys.list(),
+    queryFn: ({ signal }) => getAccessTokens(signal),
+    ...options,
+  })

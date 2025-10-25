@@ -27,8 +27,10 @@ export const useActionsQuery = <TData = ActionsData>(
   { ref }: ActionsVariables,
   { enabled = true, ...options }: UseQueryOptions<ActionsData, ActionsError, TData> = {}
 ) =>
-  useQuery<ActionsData, ActionsError, TData>(
-    actionKeys.list(ref),
-    ({ signal }) => listActionRuns({ ref }, signal),
-    { enabled: enabled && Boolean(ref), staleTime: 0, ...options }
-  )
+  useQuery<ActionsData, ActionsError, TData>({
+    queryKey: actionKeys.list(ref),
+    queryFn: ({ signal }) => listActionRuns({ ref }, signal),
+    enabled: enabled && Boolean(ref),
+    staleTime: 0,
+    ...options,
+  })

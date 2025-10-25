@@ -35,28 +35,26 @@ export const useBucketsQuery = <TData = BucketsData>(
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useQuery<BucketsData, BucketsError, TData>(
-    storageKeys.buckets(projectRef),
-    ({ signal }) => getBuckets({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-      ...options,
-      retry: (failureCount, error) => {
-        if (
-          typeof error === 'object' &&
-          error !== null &&
-          error.message.startsWith('Tenant config') &&
-          error.message.endsWith('not found')
-        ) {
-          return false
-        }
-
-        if (failureCount < 3) {
-          return true
-        }
-
+  return useQuery<BucketsData, BucketsError, TData>({
+    queryKey: storageKeys.buckets(projectRef),
+    queryFn: ({ signal }) => getBuckets({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    ...options,
+    retry: (failureCount, error) => {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        error.message.startsWith('Tenant config') &&
+        error.message.endsWith('not found')
+      ) {
         return false
-      },
-    }
-  )
+      }
+
+      if (failureCount < 3) {
+        return true
+      }
+
+      return false
+    },
+  })
 }

@@ -37,11 +37,9 @@ export const useContentIdQuery = <TData = ContentIdData>(
   { projectRef, id }: { projectRef?: string; id?: string },
   { enabled = true, ...options }: UseQueryOptions<ContentIdData, ContentIdError, TData> = {}
 ) =>
-  useQuery<ContentIdData, ContentIdError, TData>(
-    contentKeys.resource(projectRef, id),
-    ({ signal }) => getContentById({ projectRef, id }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ContentIdData, ContentIdError, TData>({
+    queryKey: contentKeys.resource(projectRef, id),
+    queryFn: ({ signal }) => getContentById({ projectRef, id }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    ...options,
+  })

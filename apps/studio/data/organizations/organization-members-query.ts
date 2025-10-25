@@ -60,11 +60,9 @@ export const useOrganizationMembersQuery = <TData = OrganizationMembersData>(
     ...options
   }: UseQueryOptions<OrganizationMembersData, OrganizationMembersError, TData> = {}
 ) =>
-  useQuery<OrganizationMembersData, OrganizationMembersError, TData>(
-    organizationKeys.members(slug),
-    ({ signal }) => getOrganizationMembers({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<OrganizationMembersData, OrganizationMembersError, TData>({
+    queryKey: organizationKeys.members(slug),
+    queryFn: ({ signal }) => getOrganizationMembers({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

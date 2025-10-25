@@ -41,12 +41,10 @@ export const useWorkflowRunQuery = <TData = WorkflowRunData>(
   { projectRef, workflowRunId }: WorkflowRunVariables,
   { enabled = true, ...options }: UseQueryOptions<WorkflowRunData, WorkflowRunError, TData> = {}
 ) =>
-  useQuery<WorkflowRunData, WorkflowRunError, TData>(
-    workflowRunKeys.detail(projectRef, workflowRunId),
-    ({ signal }) => getWorkflowRun({ workflowRunId }, signal),
-    {
-      enabled: enabled && typeof workflowRunId !== 'undefined',
-      staleTime: 0,
-      ...options,
-    }
-  )
+  useQuery<WorkflowRunData, WorkflowRunError, TData>({
+    queryKey: workflowRunKeys.detail(projectRef, workflowRunId),
+    queryFn: ({ signal }) => getWorkflowRun({ workflowRunId }, signal),
+    enabled: enabled && typeof workflowRunId !== 'undefined',
+    staleTime: 0,
+    ...options,
+  })

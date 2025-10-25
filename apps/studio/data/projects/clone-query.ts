@@ -27,9 +27,10 @@ export const useCloneBackupsQuery = <
   { projectRef }: { projectRef?: string },
   options: UseQueryOptions<CloneBackupsData, CloneBackupsError, TData> = {}
 ) => {
-  return useQuery<CloneBackupsData, CloneBackupsError, TData>(
-    projectKeys.listCloneBackups(projectRef),
-    () => getCloneBackups(projectRef),
-    { enabled: !!projectRef, ...options }
-  )
+  return useQuery<CloneBackupsData, CloneBackupsError, TData>({
+    queryKey: projectKeys.listCloneBackups(projectRef),
+    queryFn: () => getCloneBackups(projectRef),
+    enabled: !!projectRef,
+    ...options,
+  })
 }

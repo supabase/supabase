@@ -40,20 +40,18 @@ export const useCheckGithubBranchValidity = ({
   UseMutationOptions<GitHubIntegrationCreateData, ResponseError, GithubBranchVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<GitHubIntegrationCreateData, ResponseError, GithubBranchVariables>(
-    (vars) => checkGithubBranchValidity(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to check GitHub branch: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<GitHubIntegrationCreateData, ResponseError, GithubBranchVariables>({
+    mutationFn: (vars) => checkGithubBranchValidity(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to check GitHub branch: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

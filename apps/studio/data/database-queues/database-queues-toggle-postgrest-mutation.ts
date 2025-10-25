@@ -254,7 +254,8 @@ export const useDatabaseQueueToggleExposeMutation = ({
     DatabaseQueueExposePostgrestData,
     ResponseError,
     DatabaseQueueExposePostgrestVariables
-  >((vars) => toggleQueuesExposurePostgrest(vars), {
+  >({
+    mutationFn: (vars) => toggleQueuesExposurePostgrest(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries(databaseQueuesKeys.exposePostgrestStatus(projectRef))
