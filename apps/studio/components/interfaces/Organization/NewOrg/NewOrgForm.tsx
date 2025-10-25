@@ -581,7 +581,7 @@ export const NewOrgForm = ({
                         </InlineLink>
                         . If you want to upgrade your existing projects,{' '}
                         <InlineLink
-                          href="/org/_/billing"
+                          href="/org/_/billing?panel=subscriptionPlan"
                           className="text-inherit hover:text-foreground transition-colors"
                         >
                           upgrade your existing organization
