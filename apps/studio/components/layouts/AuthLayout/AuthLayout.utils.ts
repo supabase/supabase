@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
@@ -25,6 +26,8 @@ export const generateAuthMenu = (
     authenticationShowSecurityNotifications,
   } = flags ?? {}
 
+  const enableOAuth21 = useFlag('EnableOAuth21')
+
   return [
     {
       title: 'Manage',
@@ -33,6 +36,16 @@ export const generateAuthMenu = (
           ? [{ name: 'Overview', key: 'overview', url: `/project/${ref}/auth/overview`, items: [] }]
           : []),
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
+        ...(enableOAuth21
+          ? [
+              {
+                name: 'OAuth Apps',
+                key: 'oauth-apps',
+                url: `/project/${ref}/auth/oauth-apps`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
     ...(authenticationEmails && authenticationShowSecurityNotifications && IS_PLATFORM
@@ -74,6 +87,16 @@ export const generateAuthMenu = (
                       pages: ['providers', 'third-party'],
                       url: `/project/${ref}/auth/providers`,
                       items: [],
+                    },
+                  ]
+                : []),
+              ...(enableOAuth21
+                ? [
+                    {
+                      name: 'OAuth Server',
+                      key: 'oauth-server',
+                      url: `/project/${ref}/auth/oauth-server`,
+                      label: 'BETA',
                     },
                   ]
                 : []),
