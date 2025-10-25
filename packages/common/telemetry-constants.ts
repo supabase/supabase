@@ -1953,7 +1953,7 @@ export interface AuthUsersSearchSubmittedEvent {
  * User opened the command menu.
  *
  * @group Events
- * @source ui-patterns
+ * @source studio, docs, www
  * @page any
  */
 export interface CommandMenuOpenedEvent {
@@ -1979,7 +1979,7 @@ export interface CommandMenuOpenedEvent {
  * User typed a search term in the command menu input.
  *
  * @group Events
- * @source ui-patterns
+ * @source studio, docs, www
  * @page any
  */
 export interface CommandMenuSearchSubmittedEvent {
@@ -1998,17 +1998,17 @@ export interface CommandMenuSearchSubmittedEvent {
 }
 
 /**
- * User selected a command from the command menu.
+ * User clicked a command from the command menu.
  *
  * @group Events
- * @source ui-patterns
+ * @source studio, docs, www
  * @page any
  */
-export interface CommandMenuCommandSelectedEvent {
-  action: 'command_menu_command_selected'
+export interface CommandMenuCommandClickedEvent {
+  action: 'command_menu_command_clicked'
   properties: {
     /**
-     * The selected command
+     * The clicked command
      */
     command_name: string
     command_value?: string
@@ -2137,4 +2137,4 @@ export type TelemetryEvent =
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuSearchSubmittedEvent
-  | CommandMenuCommandSelectedEvent
+  | CommandMenuCommandClickedEvent

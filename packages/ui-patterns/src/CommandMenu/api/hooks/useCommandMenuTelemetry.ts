@@ -6,12 +6,12 @@ import { useCommandMenuOpen } from './viewHooks'
 
 import type {
   CommandMenuOpenedEvent,
-  CommandMenuCommandSelectedEvent,
+  CommandMenuCommandClickedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
 
 export type CommandMenuTelemetryCallback = (
-  event: CommandMenuOpenedEvent | CommandMenuCommandSelectedEvent | CommandMenuSearchSubmittedEvent
+  event: CommandMenuOpenedEvent | CommandMenuCommandClickedEvent | CommandMenuSearchSubmittedEvent
 ) => void
 
 export interface UseCommandMenuTelemetryOptions {
