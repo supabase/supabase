@@ -2982,6 +2982,7 @@ export interface components {
     }
     PostgresConfigResponse: {
       effective_cache_size?: string
+      hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -3620,6 +3621,7 @@ export interface components {
     }
     UpdatePostgresConfigBody: {
       effective_cache_size?: string
+      hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -4146,6 +4148,7 @@ export interface components {
       status: 'AVAILABLE' | 'PENDING' | 'REMOVED'
     }
     V1RunQueryBody: {
+      parameters?: unknown[]
       query: string
       read_only?: boolean
     }
@@ -4163,6 +4166,9 @@ export interface components {
             connected_cluster: number
             db_connected: boolean
             healthy: boolean
+          }
+        | {
+            db_schema: string
           }
       /** @enum {string} */
       name:
