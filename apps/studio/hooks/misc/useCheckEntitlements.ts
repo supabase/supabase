@@ -3,6 +3,20 @@ import { useMemo } from 'react'
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import type { EntitlementConfig } from 'data/entitlements/entitlements-query'
 
+function isNumericConfig(
+  config: EntitlementConfig
+): config is { enabled: boolean; unlimited: boolean; value: number } {
+  return 'unlimited' in config && 'value' in config
+}
+
+function isSetConfig(config: EntitlementConfig): config is { enabled: boolean; set: string[] } {
+  return 'set' in config
+}
+
+function isBooleanConfig(config: EntitlementConfig): config is { enabled: boolean } {
+  return !('unlimited' in config) && !('set' in config)
+}
+
 export function useCheckEntitlements(
   featureKey: string,
   organizationSlug?: string,
@@ -51,5 +65,17 @@ export function useCheckEntitlements(
     ? isSuccessSelectedOrg && isSuccessEntitlements
     : isSuccessEntitlements
 
-  return { hasAccess, entitlementConfig, isLoading, isSuccess }
+  console.log('entitlementConfig', entitlementConfig)
+  console.log('isNumericConfig(entitlementConfig)', isNumericConfig(entitlementConfig))
+  console.log('isNumericConfig(entitlementConfig)', isNumericConfig(entitlementConfig))
+  return {
+    hasAccess,
+    isLoading,
+    isSuccess,
+    getEntitlementNumericValue: () =>
+      isNumericConfig(entitlementConfig) ? entitlementConfig.value : undefined,
+    isEntitlementUnlimited: () =>
+      isNumericConfig(entitlementConfig) ? entitlementConfig.unlimited : false,
+    getEntitlementSetValues: () => (isSetConfig(entitlementConfig) ? entitlementConfig.set : []),
+  }
 }
