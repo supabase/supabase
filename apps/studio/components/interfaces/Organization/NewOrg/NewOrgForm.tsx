@@ -2,10 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import _ from 'lodash'
+import { groupBy } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -16,6 +15,10 @@ import { z } from 'zod'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
@@ -43,11 +46,7 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import {
-  NewPaymentMethodElement,
-  type PaymentMethodElementRef,
-} from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
-import { Admonition } from 'ui-patterns'
+import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -129,7 +128,7 @@ export const NewOrgForm = ({
   // in onSubmit below, which isn't a critical functionality imo so am okay for now. But ideally perhaps this data can
   // be computed on the API and returned in /profile or something (since this data is on the account level)
   const projectsByOrg = useMemo(() => {
-    return _.groupBy(projects, 'organization_slug')
+    return groupBy(projects, 'organization_slug')
   }, [projects])
 
   const stripeOptionsPaymentMethod: StripeElementsOptions = useMemo(
@@ -470,15 +469,7 @@ export const NewOrgForm = ({
                       description={
                         <>
                           Which plan fits your organization's needs best?{' '}
-                          <InlineLink
-                            href="https://supabase.com/pricing"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-inherit hover:text-foreground transition-colors"
-                          >
-                            Learn more
-                          </InlineLink>
-                          .
+                          <InlineLink href="https://supabase.com/pricing">Learn more</InlineLink>.
                         </>
                       }
                     >
@@ -563,35 +554,7 @@ export const NewOrgForm = ({
             )}
 
             {hasFreeOrgWithProjects && form.getValues('plan') !== 'FREE' && (
-              <Panel.Content>
-                <Admonition
-                  type="default"
-                  title="Looking to upgrade an existing project?"
-                  description={
-                    <div>
-                      <p className="text-sm text-foreground-light">
-                        Supabase{' '}
-                        <InlineLink
-                          href="https://supabase.com/docs/guides/platform/billing-on-supabase"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-inherit hover:text-foreground transition-colors"
-                        >
-                          bills per organization
-                        </InlineLink>
-                        . If you want to upgrade your existing projects,{' '}
-                        <InlineLink
-                          href="/org/_/billing?panel=subscriptionPlan"
-                          className="text-inherit hover:text-foreground transition-colors"
-                        >
-                          upgrade your existing organization
-                        </InlineLink>{' '}
-                        instead.
-                      </p>
-                    </div>
-                  }
-                />
-              </Panel.Content>
+              <UpgradeExistingOrganizationCallout />
             )}
           </div>
         </Panel>
