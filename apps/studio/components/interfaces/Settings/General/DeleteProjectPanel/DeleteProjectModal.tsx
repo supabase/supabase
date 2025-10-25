@@ -12,6 +12,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Input } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { DownloadBackupsSection } from './DownloadBackupsSection'
 
 export const DeleteProjectModal = ({
   visible,
@@ -100,14 +101,14 @@ export const DeleteProjectModal = ({
     <TextConfirmModal
       visible={visible}
       loading={isSubmitting}
-      size={isFree ? 'small' : 'xlarge'}
+      size={isFree ? 'medium' : 'xlarge'}
       title={`Confirm deletion of ${project?.name}`}
       variant="destructive"
       alert={{
         title: isFree
           ? 'This action cannot be undone.'
-          : `This will permanently delete the ${project?.name}`,
-        description: !isFree ? `All project data will be lost, and cannot be undone` : '',
+          : `This will permanently delete the project "${project?.name}"`,
+        description: !isFree ? `All project data will be lost and cannot be undone` : '',
       }}
       text={
         isFree
@@ -121,6 +122,7 @@ export const DeleteProjectModal = ({
       onCancel={() => {
         if (!isSubmitting) onClose()
       }}
+      className="md:px-0 pt-0 pb-2"
     >
       {/* 
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
@@ -128,9 +130,9 @@ export const DeleteProjectModal = ({
           but leaving that for the future.
         */}
       {!isFree && (
-        <>
+        <div className="px-5 pb-5 border-b">
           <div className="space-y-1">
-            <h4 className="text-base">
+            <h4 className="text-sm">
               Help us improve by sharing why you're deleting your project.
             </h4>
           </div>
@@ -174,8 +176,9 @@ export const DeleteProjectModal = ({
               />
             </div>
           </div>
-        </>
+        </div>
       )}
+      <DownloadBackupsSection />
     </TextConfirmModal>
   )
 }
