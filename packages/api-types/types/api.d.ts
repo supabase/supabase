@@ -1898,6 +1898,8 @@ export interface components {
     AuthConfigResponse: {
       api_max_request_duration: number | null
       db_max_pool_size: number | null
+      /** @enum {string|null} */
+      db_max_pool_size_unit: 'connections' | 'percent' | null
       disable_signup: boolean | null
       external_anonymous_users_enabled: boolean | null
       external_apple_additional_client_ids: string | null
@@ -3412,6 +3414,8 @@ export interface components {
     UpdateAuthConfigBody: {
       api_max_request_duration?: number | null
       db_max_pool_size?: number | null
+      /** @enum {string|null} */
+      db_max_pool_size_unit: 'connections' | 'percent' | null
       disable_signup?: boolean | null
       external_anonymous_users_enabled?: boolean | null
       external_apple_additional_client_ids?: string | null
