@@ -4007,6 +4007,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/storage/{ref}/buckets/{id}/objects/list-v2': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Gets list of objects with the given bucket */
+    post: operations['StorageObjectsController_getObjectsV2']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/storage/{ref}/buckets/{id}/objects/move': {
     parameters: {
       query?: never
@@ -5920,6 +5937,19 @@ export interface components {
         }
       }
       path: string
+    }
+    GetObjectsV2Body: {
+      cursor?: string
+      /** @default 1000 */
+      limit?: number
+      prefix?: string
+      sortBy?: {
+        /** @enum {string} */
+        column: 'name' | 'updated_at' | 'created_at'
+        /** @enum {string} */
+        order?: 'asc' | 'desc'
+      }
+      with_delimiter?: boolean
     }
     GetOrganizationByFlyOrganizationIdResponse: {
       slug: string
@@ -8968,6 +8998,33 @@ export interface components {
       }
       /** Format: int64 */
       fileSizeLimit: number
+    }
+    StorageListResponseV2: {
+      folders: {
+        created_at: string
+        key: string
+        name: string
+        updated_at: string
+      }[]
+      hasNext: boolean
+      nextCursor?: string
+      objects: {
+        created_at: string
+        id: string
+        key: string
+        last_accessed_at: string
+        metadata: {
+          cacheControl?: string | null
+          contentLength?: number | null
+          eTag?: string | null
+          httpStatusCode?: number | null
+          lastModified?: string | null
+          mimetype?: string | null
+          size?: number | null
+        }
+        name: string
+        updated_at: string
+      }[]
     }
     StorageObject: {
       bucket_id: string
@@ -24396,6 +24453,62 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['StorageObject'][]
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get list of objects with the given bucket */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageObjectsController_getObjectsV2: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage bucket id */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GetObjectsV2Body']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StorageListResponseV2']
         }
       }
       /** @description Unauthorized */
