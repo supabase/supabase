@@ -41,16 +41,13 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
 } from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import { Admonition } from 'ui-patterns'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -135,9 +132,6 @@ export const NewOrgForm = ({
     return _.groupBy(projects, 'organization_slug')
   }, [projects])
 
-  const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
-    useState(false)
-
   const stripeOptionsPaymentMethod: StripeElementsOptions = useMemo(
     () =>
       ({
@@ -197,6 +191,11 @@ export const NewOrgForm = ({
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
+
+  const hasFreeOrgWithProjects = useMemo(
+    () => freeOrgs.some((it) => projectsByOrg[it.slug]?.length > 0),
+    [freeOrgs, projectsByOrg]
+  )
 
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org) => {
@@ -299,13 +298,6 @@ export const NewOrgForm = ({
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (formValues) => {
-    const hasFreeOrgWithProjects = freeOrgs.some((it) => projectsByOrg[it.slug]?.length > 0)
-
-    if (hasFreeOrgWithProjects && formValues.plan !== 'FREE') {
-      setIsOrgCreationConfirmationModalVisible(true)
-      return
-    }
-
     setNewOrgLoading(true)
 
     if (formValues.plan === 'FREE') {
@@ -569,85 +561,40 @@ export const NewOrgForm = ({
                 </Elements>
               </Panel.Content>
             )}
+
+            {hasFreeOrgWithProjects && form.getValues('plan') !== 'FREE' && (
+              <Panel.Content>
+                <Admonition
+                  type="default"
+                  title="Looking to upgrade an existing project?"
+                  description={
+                    <div>
+                      <p className="text-sm text-foreground-light">
+                        Supabase{' '}
+                        <InlineLink
+                          href="https://supabase.com/docs/guides/platform/billing-on-supabase"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-inherit hover:text-foreground transition-colors"
+                        >
+                          bills per organization
+                        </InlineLink>
+                        . If you want to upgrade your existing projects,{' '}
+                        <InlineLink
+                          href="/org/_/billing"
+                          className="text-inherit hover:text-foreground transition-colors"
+                        >
+                          upgrade your existing organization
+                        </InlineLink>{' '}
+                        instead.
+                      </p>
+                    </div>
+                  }
+                />
+              </Panel.Content>
+            )}
           </div>
         </Panel>
-
-        <ConfirmationModal
-          size="large"
-          loading={newOrgLoading}
-          visible={isOrgCreationConfirmationModalVisible}
-          title="Confirm organization creation"
-          confirmLabel="Create new organization"
-          onCancel={() => setIsOrgCreationConfirmationModalVisible(false)}
-          onConfirm={async () => {
-            await onSubmit(form.getValues())
-            setIsOrgCreationConfirmationModalVisible(false)
-          }}
-          variant={'warning'}
-        >
-          <p className="text-sm text-foreground-light">
-            Supabase{' '}
-            <InlineLink
-              href="https://supabase.com/docs/guides/platform/billing-on-supabase"
-              target="_blank"
-              rel="noreferrer"
-              className="text-inherit hover:text-foreground transition-colors"
-            >
-              bills per organization
-            </InlineLink>
-            . If you want to upgrade your existing projects, upgrade your existing organization
-            instead.
-          </p>
-
-          <ul className="mt-4 divide-y divide-border-muted border-t border-t-border-muted">
-            {freeOrgs
-              .filter((it) => projectsByOrg[it.slug]?.length > 0)
-              .map((org) => {
-                const orgProjects = projectsByOrg[org.slug].map((it) => it.name)
-
-                return (
-                  <li
-                    key={`org_${org.slug}`}
-                    className="pt-3 [&:not(:last-child)]:pb-3 flex items-center justify-between"
-                  >
-                    <div className="flex flex-col">
-                      <h3 className="text-sm">{org.name}</h3>
-
-                      <div className="text-foreground-lighter text-xs">
-                        {orgProjects.length <= 2 ? (
-                          <span>{orgProjects.join(' and ')}</span>
-                        ) : (
-                          <div>
-                            {orgProjects.slice(0, 2).join(', ')} and{' '}
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="underline decoration-dotted">
-                                  {orgProjects.length - 2} other{' '}
-                                  {orgProjects.length === 3 ? 'project' : 'project'}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <ul className="list-disc list-inside">
-                                  {orgProjects.slice(2).map((project) => (
-                                    <li>{project}</li>
-                                  ))}
-                                </ul>
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <Button asChild type="default" size="tiny">
-                      <Link href={`/org/${org.slug}/billing?panel=subscriptionPlan`}>
-                        Change plan
-                      </Link>
-                    </Button>
-                  </li>
-                )
-              })}
-          </ul>
-        </ConfirmationModal>
 
         {stripePromise && paymentIntentSecret && paymentMethod && (
           <Elements stripe={stripePromise} options={stripeOptionsConfirm}>
