@@ -9,11 +9,13 @@ import {
   LintCategoryBadge,
   lintInfoMap,
 } from 'components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -43,6 +45,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
@@ -64,7 +67,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   }, [totalErrors])
 
   const handleAskAssistant = useCallback(() => {
-    snap.toggleAssistant()
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     if (projectRef && organization?.slug) {
       sendEvent({
         action: 'home_advisor_ask_assistant_clicked',
@@ -77,7 +80,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
         },
       })
     }
-  }, [snap, sendEvent, projectRef, organization, totalErrors])
+  }, [sendEvent, openSidebar, projectRef, organization, totalErrors])
 
   const handleCardClick = useCallback(
     (lint: Lint) => {
@@ -150,9 +153,9 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
+                        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                         snap.newChat({
                           name: 'Summarize lint',
-                          open: true,
                           initialInput: createLintSummaryPrompt(lint),
                         })
                         if (projectRef && organization?.slug) {

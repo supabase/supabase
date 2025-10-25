@@ -42,6 +42,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -104,6 +106,7 @@ const NewFunctionPage = () => {
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
@@ -167,9 +170,9 @@ const NewFunctionPage = () => {
 
   const handleChat = () => {
     const selectedFile = files.find((f) => f.selected) ?? files[0]
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     snap.newChat({
       name: 'Explain edge function',
-      open: true,
       sqlSnippets: [selectedFile.content],
       initialInput: 'Help me understand and improve this edge function...',
       suggestions: {

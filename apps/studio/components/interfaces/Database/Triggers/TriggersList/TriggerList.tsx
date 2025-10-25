@@ -3,10 +3,12 @@ import { includes, sortBy } from 'lodash'
 import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Badge,
   Button,
@@ -43,6 +45,7 @@ const TriggerList = ({
 }: TriggerListProps) => {
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -171,9 +174,9 @@ const TriggerList = ({
                         className="space-x-2"
                         onClick={() => {
                           const sql = generateTriggerCreateSQL(x)
+                          openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                           aiSnap.newChat({
                             name: `Update trigger ${X.name}`,
-                            open: true,
                             initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
                             suggestions: {
                               title:

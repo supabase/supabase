@@ -8,6 +8,8 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   DropdownMenu,
@@ -37,6 +39,7 @@ export const PolicyRow = ({
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { can: canUpdatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'policies'
@@ -119,9 +122,9 @@ export const PolicyRow = ({
                 className="space-x-2"
                 onClick={() => {
                   const sql = generatePolicyUpdateSQL(policy)
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                   aiSnap.newChat({
                     name: `Update policy ${policy.name}`,
-                    open: true,
                     sqlSnippets: [sql],
                     initialInput: `Update the policy with name \"${policy.name}\" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
                     suggestions: {

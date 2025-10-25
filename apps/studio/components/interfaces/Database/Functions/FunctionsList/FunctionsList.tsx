@@ -11,6 +11,7 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -18,6 +19,7 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Card,
@@ -52,6 +54,7 @@ const FunctionsList = ({
   const { search } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const filterString = search ?? ''
@@ -200,13 +203,13 @@ const FunctionsList = ({
                     disabled={!canCreateFunctions}
                     className="px-1 pointer-events-auto"
                     icon={<AiIconAnimation size={16} />}
-                    onClick={() =>
+                    onClick={() => {
+                      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                       aiSnap.newChat({
                         name: 'Create new function',
-                        open: true,
                         initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
                       })
-                    }
+                    }}
                     tooltip={{
                       content: {
                         side: 'bottom',

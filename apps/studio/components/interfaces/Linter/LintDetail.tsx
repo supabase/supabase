@@ -8,6 +8,8 @@ import { ExternalLink } from 'lucide-react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Button } from 'ui'
 import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 interface LintDetailProps {
   lint: Lint
@@ -17,6 +19,7 @@ interface LintDetailProps {
 
 const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
   const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   return (
     <div>
@@ -41,9 +44,9 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
           icon={<AiIconAnimation className="scale-75 w-3 h-3" />}
           onClick={() => {
             onAskAssistant?.()
+            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
             snap.newChat({
               name: 'Summarize lint',
-              open: true,
               initialInput: createLintSummaryPrompt(lint),
             })
           }}

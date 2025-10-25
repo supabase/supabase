@@ -19,13 +19,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 export const DeployEdgeFunctionButton = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
-
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
 
   return (
@@ -85,9 +87,9 @@ export const DeployEdgeFunctionButton = () => {
         <DropdownMenuItem
           className="gap-4"
           onSelect={() => {
+            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
             snap.newChat({
               name: 'Create new edge function',
-              open: true,
               initialInput: `Create a new edge function that ...`,
               suggestions: {
                 title:
