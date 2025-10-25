@@ -9,7 +9,6 @@ export const generateAuthMenu = (
     authenticationEmails: boolean
     authenticationMultiFactor: boolean
     authenticationAttackProtection: boolean
-    authenticationAdvanced: boolean
     authenticationShowOverview: boolean
     authenticationShowSecurityNotifications: boolean
   }
@@ -20,7 +19,6 @@ export const generateAuthMenu = (
     authenticationEmails,
     authenticationMultiFactor,
     authenticationAttackProtection,
-    authenticationAdvanced,
     authenticationShowOverview,
     authenticationShowSecurityNotifications,
   } = flags ?? {}
@@ -144,16 +142,12 @@ export const generateAuthMenu = (
                 items: [],
                 label: 'BETA',
               },
-              ...(authenticationAdvanced
-                ? [
-                    {
-                      name: 'Advanced',
-                      key: 'advanced',
-                      url: `/project/${ref}/auth/advanced`,
-                      items: [],
-                    },
-                  ]
-                : []),
+              {
+                name: 'Performance',
+                key: 'performance',
+                url: `/project/${ref}/auth/performance`,
+                items: [],
+              },
             ]
           : []),
       ],

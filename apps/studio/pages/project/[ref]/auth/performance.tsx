@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common'
-import { AdvancedAuthSettingsForm } from 'components/interfaces/Auth/AdvancedAuthSettingsForm'
+import { PerformanceSettingsForm } from 'components/interfaces/Auth/PerformanceSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -13,18 +13,13 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
 
-const AdvancedPage: NextPageWithLayout = () => {
+const PerformancePage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const showAdvanced = useIsFeatureEnabled('authentication:advanced')
 
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-
-  if (!showAdvanced) {
-    return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
-  }
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's authentication settings" />
@@ -37,20 +32,23 @@ const AdvancedPage: NextPageWithLayout = () => {
           <GenericSkeletonLoader />
         </ScaffoldSection>
       ) : (
-        <AdvancedAuthSettingsForm />
+        <PerformanceSettingsForm />
       )}
     </ScaffoldContainer>
   )
 }
 
-AdvancedPage.getLayout = (page) => (
+PerformancePage.getLayout = (page) => (
   <DefaultLayout>
     <AuthLayout>
-      <PageLayout title="Advanced" subtitle="Configure advanced authentication server settings">
+      <PageLayout
+        title="Performance tuning"
+        subtitle="Adjust low-level Auth settings for increased performance in certain situations"
+      >
         {page}
       </PageLayout>
     </AuthLayout>
   </DefaultLayout>
 )
 
-export default AdvancedPage
+export default PerformancePage
