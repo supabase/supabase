@@ -10,6 +10,7 @@ import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
+import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
 import { constructHeaders } from 'data/fetchers'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -21,12 +22,13 @@ import { useHotKey } from 'hooks/ui/useHotKey'
 import { prepareMessagesForAPI } from 'lib/ai/message-utils'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
+import type { AssistantModel } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { ErrorBoundary } from '../ErrorBoundary'
+import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import type { SqlSnippet } from './AIAssistant.types'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
@@ -58,6 +60,19 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
 
+  const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
+
+  const selectedModel = useMemo<AssistantModel>(() => {
+    const defaultModel: AssistantModel = isPaidPlan ? 'gpt-5' : 'gpt-5-mini'
+    const model = snap.model ?? defaultModel
+
+    if (!isPaidPlan && model === 'gpt-5') {
+      return 'gpt-5-mini'
+    }
+
+    return model
+  }, [isPaidPlan, snap.model])
+
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
     false
@@ -83,9 +98,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
   const [isResubmitting, setIsResubmitting] = useState(false)
+  const [messageRatings, setMessageRatings] = useState<Record<string, 'positive' | 'negative'>>({})
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+
+  const { mutateAsync: rateMessage } = useRateMessageMutation()
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
@@ -197,6 +215,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             table: currentTable?.name,
             chatName: currentChat,
             orgSlug: selectedOrganizationRef.current?.slug,
+            model: selectedModel,
           },
           headers: { Authorization: authorizationHeader ?? '' },
         }
@@ -260,6 +279,52 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setValue('')
   }, [setValue])
 
+  const handleRateMessage = useCallback(
+    async (messageId: string, rating: 'positive' | 'negative', reason?: string) => {
+      if (!project?.ref || !selectedOrganization?.slug) return
+
+      // Optimistically update UI
+      setMessageRatings((prev) => ({ ...prev, [messageId]: rating }))
+
+      try {
+        const result = await rateMessage({
+          rating,
+          messages: chatMessages,
+          messageId,
+          projectRef: project.ref,
+          orgSlug: selectedOrganization.slug,
+          reason,
+        })
+
+        sendEvent({
+          action: 'assistant_message_rating_submitted',
+          properties: {
+            rating,
+            category: result.category,
+            ...(reason && { reason }),
+          },
+          groups: {
+            project: project.ref,
+            organization: selectedOrganization.slug,
+          },
+        })
+      } catch (error) {
+        console.error('Failed to rate message:', error)
+        // Rollback on error
+        setMessageRatings((prev) => {
+          const { [messageId]: _, ...rest } = prev
+          return rest
+        })
+      }
+    },
+    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent]
+  )
+
+  const isContextExceededError =
+    error &&
+    (error.message?.includes('context_length_exceeded') ||
+      error.message?.includes('exceeds the context window'))
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message, index) => {
@@ -283,6 +348,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             isBeingEdited={isBeingEdited}
             onCancelEdit={cancelEdit}
             isLastMessage={isLastMessage}
+            onRate={handleRateMessage}
+            rating={messageRatings[message.id] ?? null}
           />
         )
       }),
@@ -294,6 +361,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       editingMessageId,
       chatStatus,
       addToolResult,
+      handleRateMessage,
+      messageRatings,
     ]
   )
 
@@ -409,29 +478,49 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <Info size={16} className="mt-0.5" />
                     </div>
                     <div>
-                      <p>
-                        Sorry, I'm having trouble responding right now. If the error persists while
-                        retrying, you may try clearing the conversation's messages and try again.
-                      </p>
+                      {isContextExceededError ? (
+                        <p>
+                          This conversation has become too long for the Assistant to process. Please
+                          start a new chat to continue.
+                        </p>
+                      ) : (
+                        <p>
+                          Sorry, I'm having trouble responding right now. If the error persists
+                          while retrying, you may try creating a new chat and try again.
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-x-2">
-                    <Button
-                      type="default"
-                      size="tiny"
-                      onClick={() => regenerate()}
-                      className="text-xs"
-                    >
-                      Retry
-                    </Button>
-                    <ButtonTooltip
-                      type="default"
-                      size="tiny"
-                      onClick={handleClearMessages}
-                      className="w-7 h-7"
-                      icon={<Eraser />}
-                      tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
-                    />
+                    {isContextExceededError ? (
+                      <Button
+                        type="default"
+                        size="tiny"
+                        onClick={() => snap.newChat()}
+                        className="text-xs"
+                      >
+                        New chat
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          type="default"
+                          size="tiny"
+                          onClick={() => regenerate()}
+                          className="text-xs"
+                        >
+                          Retry
+                        </Button>
+                        <ButtonTooltip
+                          type="default"
+                          size="tiny"
+                          onClick={handleClearMessages}
+                          className="w-7 h-7"
+                          icon={<Eraser />}
+                          tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -566,6 +655,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               snap.setSqlSnippets(newSnippets)
             }}
             includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
+            selectedModel={selectedModel}
+            onSelectModel={(model) => snap.setModel(model)}
           />
         </div>
       </div>

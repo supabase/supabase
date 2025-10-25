@@ -1,14 +1,18 @@
 import {
   ApplyMigrationOptions,
   DatabaseOperations,
+  DebuggingOperations,
   DevelopmentOperations,
   ExecuteSqlOptions,
+  GetLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
+import { ResponseError } from 'types'
+import { generateTypescriptTypes } from './generate-types'
+import { getLints } from './lints'
+import { getLogQuery, retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
-import { generateTypescriptTypes } from './generate-types'
-import { ResponseError } from 'types'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
@@ -18,13 +22,17 @@ export type GetDevelopmentOperationsOptions = {
   headers?: HeadersInit
 }
 
+export type GetDebuggingOperationsOptions = {
+  headers?: HeadersInit
+}
+
 export function getDatabaseOperations({
   headers,
 }: GetDatabaseOperationsOptions): DatabaseOperations {
   return {
     async executeSql<T>(_projectRef: string, options: ExecuteSqlOptions) {
-      const { query } = options
-      const { data, error } = await executeQuery<T>({ query, headers })
+      const { query, read_only: readOnly } = options
+      const { data, error } = await executeQuery<T>({ query, headers, readOnly })
 
       if (error) {
         throw error
@@ -78,6 +86,50 @@ export function getDevelopmentOperations({
       }
 
       return response
+    },
+  }
+}
+
+export function getDebuggingOperations({
+  headers,
+}: GetDebuggingOperationsOptions): DebuggingOperations {
+  return {
+    async getLogs(projectRef: string, options: GetLogsOptions) {
+      const sql = getLogQuery(options.service)
+
+      const { data, error } = await retrieveAnalyticsData({
+        name: 'logs.all',
+        projectRef,
+        params: {
+          sql,
+          iso_timestamp_start: options.iso_timestamp_start,
+          iso_timestamp_end: options.iso_timestamp_end,
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      return data
+    },
+    async getSecurityAdvisors(_projectRef) {
+      const { data, error } = await getLints({ headers })
+
+      if (error) {
+        throw error
+      }
+
+      return data.filter((lint) => lint.categories.includes('SECURITY'))
+    },
+    async getPerformanceAdvisors(_projectRef) {
+      const { data, error } = await getLints({ headers })
+
+      if (error) {
+        throw error
+      }
+
+      return data.filter((lint) => lint.categories.includes('PERFORMANCE'))
     },
   }
 }

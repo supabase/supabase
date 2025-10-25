@@ -50,6 +50,7 @@ export const HeaderBanner = ({
         type === 'incident' && 'hover:bg-brand-300',
         'flex-shrink-0'
       )}
+      layout="position"
     >
       <div className={cn('items-center flex flex-row gap-3')}>
         <div className="absolute inset-y-0 left-0 right-0 overflow-hidden z-0">
@@ -98,15 +99,16 @@ export const HeaderBanner = ({
           </span>
         </div>
         {link && (
-          <button
+          <a
+            href={link}
             className={cn(
               'lg:block hidden',
               'text-foreground-lighter text-sm z-[1] m-0',
               type === 'danger' ? 'text-destructive' : 'text-warning'
             )}
           >
-            <Link href={link}>View Details</Link>
-          </button>
+            View Details
+          </a>
         )}
       </div>
     </motion.div>

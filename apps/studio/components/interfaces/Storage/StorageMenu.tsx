@@ -1,15 +1,17 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { CreateBucketModal } from 'components/interfaces/Storage/CreateBucketModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Menu } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -17,13 +19,22 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
-import { BucketRow } from './BucketRow'
+import { BucketList } from './StorageMenu.BucketList'
 
 export const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
   const { data: projectDetails } = useSelectedProjectQuery()
   const snap = useStorageExplorerStateSnapshot()
+
+  const showMigrationCallout = useFlag('storageMigrationCallout')
+  const { data: config } = useProjectStorageConfigQuery(
+    { projectRef: ref },
+    { enabled: showMigrationCallout }
+  )
+  const isListV2UpgradeAvailable =
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'main'
+
   const isBranch = projectDetails?.parent_project_ref !== undefined
 
   const [searchText, setSearchText] = useState<string>('')
@@ -42,21 +53,31 @@ export const StorageMenu = () => {
     isError,
     isSuccess,
   } = useBucketsQuery({ projectRef: ref })
-  const sortedBuckets =
-    snap.sortBucket === 'alphabetical'
-      ? buckets.sort((a, b) =>
-          a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
-        )
-      : buckets.sort((a, b) => (new Date(b.created_at) > new Date(a.created_at) ? -1 : 1))
-  const filteredBuckets =
-    searchText.length > 1
-      ? sortedBuckets.filter((bucket) => bucket.name.includes(searchText.trim()))
-      : sortedBuckets
+  const sortedBuckets = useMemo(
+    () =>
+      snap.sortBucket === 'alphabetical'
+        ? buckets.sort((a, b) =>
+            a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
+          )
+        : buckets.sort((a, b) => (new Date(b.created_at) > new Date(a.created_at) ? -1 : 1)),
+    [buckets, snap.sortBucket]
+  )
+  const filteredBuckets = useMemo(
+    () =>
+      searchText.length > 1
+        ? sortedBuckets.filter((bucket) => bucket.name.includes(searchText.trim()))
+        : sortedBuckets,
+    [sortedBuckets, searchText]
+  )
   const tempNotSupported = error?.message.includes('Tenant config') && isBranch
 
   return (
     <>
-      <Menu type="pills" className="mt-6 flex flex-grow flex-col">
+      <Menu
+        type="pills"
+        className="pt-6 h-full flex flex-col"
+        ulClassName="flex flex-col flex-grow"
+      >
         <div className="mb-6 mx-5 flex flex-col gap-y-1.5">
           <CreateBucketModal />
 
@@ -89,8 +110,8 @@ export const StorageMenu = () => {
           </InnerSideBarFilters>
         </div>
 
-        <div className="space-y-6">
-          <div className="mx-3">
+        <div className="flex flex-col flex-grow">
+          <div className="flex-grow ml-3 flex flex-col">
             <Menu.Group title={<span className="uppercase font-mono">All buckets</span>} />
 
             {isLoading && (
@@ -134,17 +155,13 @@ export const StorageMenu = () => {
                     description={`Your search for "${searchText}" did not return any results`}
                   />
                 )}
-                {filteredBuckets.map((bucket, idx: number) => {
-                  const isSelected = bucketId === bucket.id
-                  return (
-                    <BucketRow
-                      key={`${idx}_${bucket.id}`}
-                      bucket={bucket}
-                      projectRef={ref}
-                      isSelected={isSelected}
-                    />
-                  )
-                })}
+                {filteredBuckets.length > 0 && (
+                  <BucketList
+                    buckets={filteredBuckets}
+                    selectedBucketId={bucketId}
+                    projectRef={ref}
+                  />
+                )}
               </>
             )}
           </div>
@@ -159,7 +176,12 @@ export const StorageMenu = () => {
             {IS_PLATFORM && (
               <Link href={`/project/${ref}/storage/settings`}>
                 <Menu.Item rounded active={page === 'settings'}>
-                  <p className="truncate">Settings</p>
+                  <div className="flex items-center gap-x-2">
+                    <p className="truncate">Settings</p>
+                    {isListV2UpgradeAvailable && (
+                      <InfoTooltip side="right">Upgrade available</InfoTooltip>
+                    )}
+                  </div>
                 </Menu.Item>
               </Link>
             )}
