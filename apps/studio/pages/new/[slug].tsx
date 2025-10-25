@@ -43,7 +43,6 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { useTrack } from 'lib/telemetry/track'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -63,6 +62,7 @@ import {
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
+import { useTrack } from 'lib/telemetry/track'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -772,18 +772,12 @@ const Wizard: NextPageWithLayout = () => {
                                     The size for your dedicated database. You can change this later.
                                     Learn more about{' '}
                                     <InlineLink
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-inherit hover:text-foreground transition-colors"
                                       href={`${DOCS_URL}/guides/platform/compute-add-ons`}
                                     >
                                       compute add-ons
                                     </InlineLink>{' '}
                                     and{' '}
                                     <InlineLink
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-inherit hover:text-foreground transition-colors"
                                       href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                                     >
                                       compute billing
