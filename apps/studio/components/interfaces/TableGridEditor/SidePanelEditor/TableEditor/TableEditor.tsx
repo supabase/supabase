@@ -15,12 +15,13 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTrack } from 'lib/telemetry/track'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
@@ -89,8 +90,9 @@ export const TableEditor = ({
   const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
+  const hideRealtimeButton = usePHFlag<boolean>('hideRealtimeButton')
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
@@ -371,23 +373,16 @@ export const TableEditor = ({
           </Admonition>
         )}
 
-        {realtimeEnabled && (
+        {!hideRealtimeButton && realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
             label="Enable Realtime"
             description="Broadcast changes on this table to authorized subscribers"
             checked={tableFields.isRealtimeEnabled}
             onChange={() => {
-              sendEvent({
-                action: 'realtime_toggle_table_clicked',
-                properties: {
-                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                  origin: 'tableSidePanel',
-                },
-                groups: {
-                  project: project?.ref ?? 'Unknown',
-                  organization: org?.slug ?? 'Unknown',
-                },
+              track('realtime_toggle_table_clicked', {
+                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                origin: 'tableSidePanel',
               })
               onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
             }}

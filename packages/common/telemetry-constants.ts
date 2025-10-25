@@ -423,6 +423,58 @@ export interface RealtimeToggleTableClickedEvent {
 }
 
 /**
+ * Realtime was enabled on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableRealtimeEnabledEvent {
+  action: 'table_realtime_enabled'
+  properties: {
+    /**
+     * The method used to enable realtime
+     */
+    method: 'ui' | 'sql_editor' | 'api'
+    /**
+     * Schema name
+     */
+    schema_name: string
+    /**
+     * Table name
+     */
+    table_name: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * Realtime was disabled on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableRealtimeDisabledEvent {
+  action: 'table_realtime_disabled'
+  properties: {
+    /**
+     * The method used to disable realtime
+     */
+    method: 'ui' | 'sql_editor' | 'api'
+    /**
+     * Schema name
+     */
+    schema_name: string
+    /**
+     * Table name
+     */
+    table_name: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the quickstart card in the SQL editor.
  *
  * @group Events
@@ -2052,6 +2104,8 @@ export type TelemetryEvent =
   | RealtimeInspectorFiltersAppliedEvent
   | RealtimeInspectorDatabaseRoleUpdatedEvent
   | RealtimeToggleTableClickedEvent
+  | TableRealtimeEnabledEvent
+  | TableRealtimeDisabledEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent

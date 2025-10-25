@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams, useFlag } from 'common'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
@@ -22,12 +23,12 @@ import {
   isView as isTableLikeView,
 } from 'data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { useTrack } from 'lib/telemetry/track'
 import { DOCS_URL } from 'lib/constants'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
@@ -55,6 +56,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const [showWarning, setShowWarning] = useQueryState(
     'showWarning',
@@ -70,6 +72,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isMaterializedView = isTableLikeMaterializedView(table)
 
   const triggersInsteadOfRealtime = useFlag<boolean>('triggersInsteadOfRealtime')
+  const hideRealtimeButton = usePHFlag<boolean>('hideRealtimeButton')
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
@@ -110,8 +113,17 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
   const { mutate: updatePublications, isLoading: isTogglingRealtime } =
     useDatabasePublicationUpdateMutation({
-      onSuccess: () => {
+      onSuccess: (_data, variables) => {
         setShowEnableRealtime(false)
+
+        const tableIdentifier = `${table.schema}.${table.name}`
+        const wasEnabled = variables.tables?.includes(tableIdentifier)
+
+        track(wasEnabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
+          method: 'ui',
+          schema_name: table.schema,
+          table_name: table.name,
+        })
       },
       onError: (error) => {
         toast.error(`Failed to toggle realtime for ${table.name}: ${error.message}`)
@@ -162,8 +174,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       table.schema
     )
 
-  const { mutate: sendEvent } = useSendEventMutation()
-
   const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
   const toggleRealtime = async () => {
@@ -179,16 +189,9 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           .filter((x: any) => x.id != table.id)
           .map((x: any) => `${x.schema}.${x.name}`)
 
-    sendEvent({
-      action: 'realtime_toggle_table_clicked',
-      properties: {
-        newState: exists ? 'disabled' : 'enabled',
-        origin: 'tableGridHeader',
-      },
-      groups: {
-        project: project?.ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
+    track('realtime_toggle_table_clicked', {
+      newState: exists ? 'disabled' : 'enabled',
+      origin: 'tableGridHeader',
     })
 
     updatePublications({
@@ -217,17 +220,10 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       payload: payload,
     })
 
-    sendEvent({
-      action: 'table_rls_enabled',
-      properties: {
-        method: 'table_editor',
-        schema_name: table.schema,
-        table_name: table.name,
-      },
-      groups: {
-        project: projectRef,
-        ...(org?.slug && { organization: org.slug }),
-      },
+    track('table_rls_enabled', {
+      method: 'table_editor',
+      schema_name: table.schema,
+      table_name: table.name,
     })
   }
 
@@ -367,6 +363,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               </Link>
             </Button>
           ) : (
+            !hideRealtimeButton &&
             realtimeEnabled && (
               <ButtonTooltip
                 type="default"
