@@ -461,6 +461,36 @@ export const actions: Actions = {
 
 </StepHikeCompact.Code>
 
+<StepHikeCompact.Details title="Handling OAuth Providers">
+
+If you're using OAuth providers such as GitHub or Google, you can redirect users to the provider’s authorization page by returning the `data.url` from the `signInWithOAuth` method.
+
+This can be added to the same `+page.server.ts` file as a separate action:
+
+```ts name=src/routes/auth/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+
+export const actions = {
+  oauth: async ({ locals: { supabase } }) => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+    })
+
+    if (error) {
+      console.error(error)
+      throw redirect(303, '/auth/error')
+    }
+
+    // Redirect the user to the OAuth provider's login page
+    throw redirect(303, data.url)
+  },
+}
+```
+
+</$CodeTabs>
+
+</StepHikeCompact.Code>
+
 </StepHikeCompact.Step>
 
 <StepHikeCompact.Step step={10}>
