@@ -64,6 +64,7 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function DiskManagementForm() {
   const { ref: projectRef } = useParams()
@@ -87,6 +88,8 @@ export function DiskManagementForm() {
         project_id: project?.id,
       },
     })
+
+  const { hasAccess, entitlementConfig } = useCheckEntitlements('instances.compute_update')
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
@@ -192,7 +195,7 @@ export function DiskManagementForm() {
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const isPlanUpgradeRequired = org?.plan.id === 'free'
+  const isPlanUpgradeRequired = !hasAccess
 
   const { formState } = form
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
@@ -200,8 +203,7 @@ export function DiskManagementForm() {
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
-    org?.plan.id !== 'free'
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) && !hasAccess
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -316,7 +318,7 @@ export function DiskManagementForm() {
         <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
           <NoticeBar
             type="default"
-            visible={isPlanUpgradeRequired}
+            visible={!hasAccess}
             title="Compute and Disk configuration is not available on the Free Plan"
             actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
