@@ -2017,7 +2017,7 @@ export interface CommandMenuCommandClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor (NewTab)
  */
-export interface TableQuickstartViewedEvent {
+export interface TableQuickstartOpenedEvent {
   action: 'table_quickstart_viewed'
   properties: {
     /**
@@ -2104,11 +2104,11 @@ export interface TableQuickstartQuickIdeaClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor (QuickstartTemplatesWidget)
  */
-export interface TableQuickstartCategorySelectedEvent {
-  action: 'table_quickstart_category_selected'
+export interface TableQuickstartCategoryClickedEvent {
+  action: 'table_quickstart_category_clicked'
   properties: {
     /**
-     * Name of the category selected
+     * Name of the category clicked
      */
     categoryName: string
   }
@@ -2122,11 +2122,11 @@ export interface TableQuickstartCategorySelectedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor (QuickstartAIWidget, QuickstartTemplatesWidget)
  */
-export interface TableQuickstartTemplateSelectedEvent {
-  action: 'table_quickstart_template_selected'
+export interface TableQuickstartTemplateClickedEvent {
+  action: 'table_quickstart_template_clicked'
   properties: {
     /**
-     * Name of the selected table
+     * Name of the table clicked
      */
     tableName: string
     /**
@@ -2134,7 +2134,7 @@ export interface TableQuickstartTemplateSelectedEvent {
      */
     columnCount: number
     /**
-     * Source of the template selection
+     * Source of the template clicked
      */
     source: 'ai' | 'templates'
     /**
@@ -2275,12 +2275,12 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRLSEnabledEvent
-  | TableQuickstartViewedEvent
+  | TableQuickstartOpenedEvent
   | TableQuickstartAIPromptSubmittedEvent
   | TableQuickstartAIGenerationCompletedEvent
   | TableQuickstartQuickIdeaClickedEvent
-  | TableQuickstartCategorySelectedEvent
-  | TableQuickstartTemplateSelectedEvent
+  | TableQuickstartCategoryClickedEvent
+  | TableQuickstartTemplateClickedEvent
   | TableQuickstartAssistantOpenedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent

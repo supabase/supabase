@@ -55,7 +55,7 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
 
   const handleSelectTemplate = useCallback(
     (template: TableSuggestion) => {
-      track('table_quickstart_template_selected', {
+      track('table_quickstart_template_clicked', {
         tableName: template.tableName,
         columnCount: template.fields.length,
         source: 'ai',

@@ -33,7 +33,7 @@ export const QuickstartTemplatesWidget = ({
   const handleCategorySelect = useCallback(
     (category: string) => {
       setActiveCategory(category)
-      track('table_quickstart_category_selected', {
+      track('table_quickstart_category_clicked', {
         categoryName: category,
       })
     },
@@ -42,7 +42,7 @@ export const QuickstartTemplatesWidget = ({
 
   const handleSelectTemplate = useCallback(
     (template: TableSuggestion) => {
-      track('table_quickstart_template_selected', {
+      track('table_quickstart_template_clicked', {
         tableName: template.tableName,
         columnCount: template.fields.length,
         source: 'templates',
