@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, Copy, File, Terminal } from 'lucide-react'
+import { Check, Copy, File, Terminal, WrapText } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
@@ -35,6 +35,8 @@ function CodeBlock(props: CodeBlockProps) {
   const isDarkTheme = resolvedTheme?.includes('dark') ?? false
   const [copied, setCopied] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isWrapped, setIsWrapped] = useState(false)
+
 
   const firstLine = props.children ? props.children.split('\n')[0] : ''
 
@@ -53,6 +55,9 @@ function CodeBlock(props: CodeBlockProps) {
       setCopied(false)
     }, 1000)
   }
+  const handleToggleWrap = () => {
+  setIsWrapped((prev) => !prev)
+}
 
   const isCodeHikeTheme = props.theme === 'code-hike'
 
@@ -131,17 +136,20 @@ function CodeBlock(props: CodeBlockProps) {
             'rounded-b-lg',
             props.className
           )}
-          customStyle={{
-            padding: props.showLineNumbers
-              ? large
-                ? '1.25rem 1rem'
-                : '1rem 0.8rem'
-              : large
-                ? '1.25rem 1.5rem'
-                : '1.25rem 1.5rem',
+           customStyle={{
+           padding: props.showLineNumbers
+           ? large
+           ? '1.25rem 1rem'
+            : '1rem 0.8rem'
+           : large
+           ? '1.25rem 1.5rem'
+           : '1.25rem 1.5rem',
             fontSize: large ? 18 : '0.775rem',
             lineHeight: large ? 1.6 : 1.4,
-          }}
+            whiteSpace: isWrapped ? 'pre-wrap' : 'pre',
+           overflowX: 'auto',
+         }}
+
           showLineNumbers={props.showLineNumbers}
           lineNumberStyle={{
             padding: '0px',
@@ -154,25 +162,35 @@ function CodeBlock(props: CodeBlockProps) {
           {content}
         </SyntaxHighlighter>
         {!props.hideCopy && props.children ? (
-          <div className="absolute right-2 top-2">
-            <CopyToClipboard text={props.children}>
-              <Button
-                type="text"
-                icon={
-                  copied ? (
-                    <span className="text-brand">
-                      <Check strokeWidth={3} />
-                    </span>
-                  ) : (
-                    <Copy />
-                  )
-                }
-                onClick={() => handleCopy()}
-                aria-label="Copy"
-                className="px-1.5 py-1.5 border border-transparent hover:border-strong"
-              />
-            </CopyToClipboard>
-          </div>
+          <div className="absolute right-2 top-2 flex gap-1">
+  {/* Word Wrap Toggle Button */}
+  <Button
+    type="text"
+    icon={<WrapText className={isWrapped ? 'text-brand' : ''} />}
+    onClick={handleToggleWrap}
+    aria-label="Toggle Word Wrap"
+    className="px-1.5 py-1.5 border border-transparent hover:border-strong"
+  />
+
+  {/* Copy Button */}
+  <CopyToClipboard text={props.children}>
+    <Button
+      type="text"
+      icon={
+        copied ? (
+          <span className="text-brand">
+            <Check strokeWidth={3} />
+          </span>
+        ) : (
+          <Copy />
+        )
+      }
+      onClick={() => handleCopy()}
+      aria-label="Copy"
+      className="px-1.5 py-1.5 border border-transparent hover:border-strong"
+    />
+  </CopyToClipboard>
+</div>
         ) : null}
       </div>
     </div>
