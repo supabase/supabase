@@ -16,7 +16,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
 
 import dayjs from 'dayjs'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import type { UpdateDateRange } from 'pages/project/[ref]/observability/database'
 import type { ChartData } from './Charts.types'
 import { MultiAttribute } from './ComposedChart.utils'
 

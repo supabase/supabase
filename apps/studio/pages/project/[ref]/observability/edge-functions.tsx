@@ -18,7 +18,7 @@ import {
 } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useChartHoverState } from 'components/ui/Charts/useChartHoverState'
 
@@ -45,7 +45,7 @@ const EdgeFunctionsReportV2: NextPageWithLayout = () => {
 
 EdgeFunctionsReportV2.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="Edge Functions">{page}</ReportsLayout>
+    <ObservabilityLayout title="Edge Functions">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

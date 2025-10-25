@@ -6,7 +6,6 @@ import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -22,6 +21,7 @@ import type { NextPageWithLayout } from 'types'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 
 const PostgRESTReport: NextPageWithLayout = () => {
   return (
@@ -33,7 +33,7 @@ const PostgRESTReport: NextPageWithLayout = () => {
 
 PostgRESTReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="PostgREST">{page}</ReportsLayout>
+    <ObservabilityLayout title="Data API">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
@@ -94,7 +94,7 @@ const PostgrestReport = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="PostgREST" />
+      <ReportHeader showDatabaseSelector={false} title="Data API" />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">
