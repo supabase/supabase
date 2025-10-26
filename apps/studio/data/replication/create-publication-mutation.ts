@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, post } from 'data/fetchers'
 
 export type CreatePublicationParams = {
   projectRef: string
@@ -49,7 +49,9 @@ export const useCreatePublicationMutation = ({
     mutationFn: (vars) => createPublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, sourceId } = variables
-      await queryClient.invalidateQueries(replicationKeys.publications(projectRef, sourceId))
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.publications(projectRef, sourceId),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

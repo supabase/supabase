@@ -274,15 +274,15 @@ const Reports = () => {
       (x) => x.provider === 'infra-monitoring' || x.provider === 'daily-stats'
     )
     monitoringCharts?.forEach((x) => {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
+      queryClient.invalidateQueries({
+        queryKey: analyticsKeys.infraMonitoring(ref, {
           attribute: x.attribute,
           startDate,
           endDate,
           interval: config?.interval,
           databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
+        }),
+      })
     })
     setTimeout(() => setIsRefreshing(false), 1000)
   }

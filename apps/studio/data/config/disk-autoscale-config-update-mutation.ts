@@ -57,7 +57,7 @@ export const useUpdateDiskAutoscaleConfigMutation = ({
     mutationFn: (vars) => updateDiskAutoscaleConfig(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(configKeys.diskAutoscaleConfig(projectRef))
+      await queryClient.invalidateQueries({ queryKey: configKeys.diskAutoscaleConfig(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

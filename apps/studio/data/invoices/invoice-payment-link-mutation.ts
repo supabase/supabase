@@ -48,7 +48,9 @@ export const useInvoicePaymentLinkGetMutation = ({
     mutationFn: (vars) => updateInvoicePaymentLink(vars),
     async onError(error, variables, context) {
       // In case of an error, there is a good chance that the invoice status has changed, so we invalidate the cache to reflect the updated status
-      await Promise.all([queryClient.invalidateQueries(invoicesKeys.listAndCount(variables.slug))])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: invoicesKeys.listAndCount(variables.slug) }),
+      ])
 
       if (onError === undefined) {
         toast.error(error.message)

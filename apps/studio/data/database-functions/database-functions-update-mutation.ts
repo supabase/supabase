@@ -49,7 +49,7 @@ export const useDatabaseFunctionUpdateMutation = ({
     mutationFn: (vars) => updateDatabaseFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseKeys.databaseFunctions(projectRef))
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.databaseFunctions(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

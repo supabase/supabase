@@ -41,7 +41,7 @@ export const useAuthConfigUpdateMutation = ({
     mutationFn: (vars) => updateAuthConfig(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(authKeys.authConfig(projectRef))
+      await queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

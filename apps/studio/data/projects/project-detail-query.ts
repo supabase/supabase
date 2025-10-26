@@ -73,7 +73,7 @@ export const useInvalidateProjectDetailsQuery = () => {
   const queryClient = useQueryClient()
 
   const invalidateProjectDetailsQuery = (ref: string) => {
-    return queryClient.invalidateQueries(projectKeys.detail(ref))
+    return queryClient.invalidateQueries({ queryKey: projectKeys.detail(ref) })
   }
 
   return { invalidateProjectDetailsQuery }

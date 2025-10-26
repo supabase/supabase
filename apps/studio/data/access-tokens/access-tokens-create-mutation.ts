@@ -35,7 +35,7 @@ export const useAccessTokenCreateMutation = ({
   return useMutation<AccessTokenCreateData, ResponseError, AccessTokenCreateVariables>({
     mutationFn: (vars) => createAccessToken(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(accessTokenKeys.list())
+      await queryClient.invalidateQueries({ queryKey: accessTokenKeys.list() })
 
       await onSuccess?.(data, variables, context)
     },

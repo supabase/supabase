@@ -69,7 +69,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
         if (previousRows) {
           queryClient.setQueriesData(queryKey, previousRows)
         }
-        queryClient.invalidateQueries(queryKey)
+        queryClient.invalidateQueries({ queryKey })
       })
 
       toast.error(error?.message ?? error)

@@ -269,21 +269,23 @@ const SidePanelEditor = ({
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(tableEditorKeys.tableEditor(project?.ref, selectedTable?.id)),
-        queryClient.invalidateQueries(
-          databaseKeys.foreignKeyConstraints(project?.ref, selectedTable?.schema)
-        ),
-        queryClient.invalidateQueries(
-          databaseKeys.tableDefinition(project?.ref, selectedTable?.id)
-        ),
-        queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+        queryClient.invalidateQueries({
+          queryKey: tableEditorKeys.tableEditor(project?.ref, selectedTable?.id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: databaseKeys.foreignKeyConstraints(project?.ref, selectedTable?.schema),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: databaseKeys.tableDefinition(project?.ref, selectedTable?.id),
+        }),
+        queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
       ])
 
       // We need to invalidate tableRowsAndCount after tableEditor
       // to ensure the query sent is correct
-      await queryClient.invalidateQueries(
-        tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id),
+      })
 
       setIsEdited(false)
       snap.closeSidePanel()
@@ -435,8 +437,10 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
-          queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+          queryClient.invalidateQueries({
+            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+          }),
+          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
         ])
 
         toast.success(
@@ -461,8 +465,10 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
-          queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+          queryClient.invalidateQueries({
+            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+          }),
+          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
         ])
 
         toast.success(`Table ${table.name} is good to go!`, { id: toastId })
@@ -574,9 +580,9 @@ const SidePanelEditor = ({
       }
     }
 
-    await queryClient.invalidateQueries(
-      tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
-    )
+    await queryClient.invalidateQueries({
+      queryKey: tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id),
+    })
     toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
     })

@@ -1,13 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import type { components } from 'api-types'
-import { organizationKeys } from 'data/organizations/keys'
-import { subscriptionKeys } from './keys'
-import { usageKeys } from 'data/usage/keys'
+import { handleError, post } from 'data/fetchers'
 import { invoicesKeys } from 'data/invoices/keys'
+import { organizationKeys } from 'data/organizations/keys'
+import { usageKeys } from 'data/usage/keys'
+import type { ResponseError } from 'types'
+import { subscriptionKeys } from './keys'
 
 export type PendingSubscriptionChangeVariables = {
   payment_intent_id: string
@@ -81,13 +81,13 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
       await Promise.all([
-        queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug)),
-        queryClient.invalidateQueries(subscriptionKeys.orgPlans(slug)),
-        queryClient.invalidateQueries(usageKeys.orgUsage(slug)),
-        queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
-        queryClient.invalidateQueries(organizationKeys.detail(slug)),
-        queryClient.invalidateQueries(organizationKeys.list()),
-        queryClient.invalidateQueries(organizationKeys.paymentMethods(slug)),
+        queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+        queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgPlans(slug) }),
+        queryClient.invalidateQueries({ queryKey: usageKeys.orgUsage(slug) }),
+        queryClient.invalidateQueries({ queryKey: invoicesKeys.orgUpcomingPreview(slug) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.detail(slug) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.paymentMethods(slug) }),
       ])
 
       await onSuccess?.(data, variables, context)

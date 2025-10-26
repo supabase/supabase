@@ -42,8 +42,8 @@ export const useReadReplicaRemoveMutation = ({
 
       if (invalidateReplicaQueries) {
         await Promise.all([
-          queryClient.invalidateQueries(replicaKeys.list(projectRef)),
-          queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
+          queryClient.invalidateQueries({ queryKey: replicaKeys.list(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: replicaKeys.loadBalancers(projectRef) }),
         ])
       }
 

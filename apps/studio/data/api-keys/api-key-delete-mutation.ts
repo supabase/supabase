@@ -40,7 +40,7 @@ export const useAPIKeyDeleteMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: apiKeysKeys.list(projectRef) })
 
       await onSuccess?.(data, variables, context)
     },

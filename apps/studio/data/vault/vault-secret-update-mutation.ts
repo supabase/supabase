@@ -50,7 +50,7 @@ export const useVaultSecretUpdateMutation = ({
       const { id, projectRef } = variables
       await Promise.all([
         queryClient.removeQueries(vaultSecretsKeys.getDecryptedValue(projectRef, id)),
-        queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
+        queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },

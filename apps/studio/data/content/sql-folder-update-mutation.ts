@@ -49,7 +49,7 @@ export const useSQLSnippetFolderCreateMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       if (invalidateQueriesOnSuccess) {
-        await queryClient.invalidateQueries(contentKeys.folders(projectRef))
+        await queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) })
       }
       await onSuccess?.(data, variables, context)
     },

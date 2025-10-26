@@ -98,8 +98,8 @@ export const useInvalidateProjectsInfiniteQuery = () => {
   const invalidateProjectsQuery = () => {
     // [Joshen] Temporarily for completeness while we still have UIs depending on the old endpoint (Org teams)
     // Can be removed once we completely deprecate projects-query (Old unpaginated endpoint)
-    queryClient.invalidateQueries(projectKeys.list())
-    return queryClient.invalidateQueries([INFINITE_PROJECTS_KEY_PREFIX])
+    queryClient.invalidateQueries({ queryKey: projectKeys.list() })
+    return queryClient.invalidateQueries({ queryKey: [INFINITE_PROJECTS_KEY_PREFIX] })
   }
   return { invalidateProjectsQuery }
 }

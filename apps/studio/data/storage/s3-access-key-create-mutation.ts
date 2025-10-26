@@ -41,7 +41,9 @@ export function useS3AccessKeyCreateMutation({
     mutationFn: (vars) => createS3AccessKeyCredential(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(storageCredentialsKeys.credentials(projectRef))
+      await queryClient.invalidateQueries({
+        queryKey: storageCredentialsKeys.credentials(projectRef),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
