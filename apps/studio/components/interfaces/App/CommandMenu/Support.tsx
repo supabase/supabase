@@ -32,8 +32,6 @@ const useSupportCommands = () => {
           route: 'https://www.supabase.com/support',
           icon: () => <LifeBuoy />,
         },
-
-
       ] as Array<ICommand>,
     []
   )
