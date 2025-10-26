@@ -33,177 +33,205 @@ const METRIC_KEYS = [
 
 type MetricKey = (typeof METRIC_KEYS)[number]
 
+function buildUsageAllSQL(
+  interval: AnalyticsInterval,
+  filters: AuthReportFilters | undefined,
+  startDate: string, // ISO 8601, e.g. "2025-10-09T00:00:00Z"
+  endDate: string
+) {
+  const granularity = analyticsIntervalToGranularity(interval)
+
+  const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
+
+  // Build provider clause for filtering in base CTE
+  const providerClause =
+    filters?.provider && filters.provider.length > 0
+      ? `AND COALESCE(JSON_VALUE(event_message, '$.provider'), 'unknown') IN (${filters.provider
+          .map((p) => `'${p.replace(/'/g, "\\'")}'`)
+          .join(', ')})`
+      : ''
+
+  return `
+    -- usage-all (single fetch, single scan of auth_logs) — NO bucket generation, FE fills gaps
+    WITH
+    params AS (
+      SELECT
+        COALESCE(
+          PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*S%Ez', '${startDate}'),
+          TIMESTAMP('${startDate}')
+        ) AS start_ts,
+        COALESCE(
+          PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*S%Ez', '${endDate}'),
+          TIMESTAMP('${endDate}')
+        ) AS end_ts
+    ),
+
+    -- single pass over auth_logs, parse JSON once
+    base AS (
+      SELECT
+        TIMESTAMP_TRUNC(timestamp, ${granularity}) AS ts,
+        COALESCE(JSON_VALUE(event_message, '$.auth_event.action'), JSON_VALUE(event_message, '$.action')) AS action,
+        COALESCE(JSON_VALUE(event_message, '$.auth_event.actor_id'), JSON_VALUE(event_message, '$.user_id')) AS actor_id,
+        COALESCE(JSON_VALUE(event_message, '$.provider'), 'unknown') AS provider,
+        JSON_VALUE(event_message, '$.login_method') AS login_method,
+        CASE
+          WHEN JSON_VALUE(event_message, '$.metering') IS NOT NULL THEN LOWER(JSON_VALUE(event_message, '$.metering'))
+          WHEN JSON_QUERY(event_message, '$.metering') = 'true' THEN 'true'
+          ELSE ''
+        END AS metering
+      FROM auth_logs, params
+      WHERE timestamp >= start_ts AND timestamp < end_ts
+      ${providerClause}
+    ),
+
+    -- aggregate usage metrics from the same base rows
+    agg_usage AS (
+      SELECT
+        ts
+        ${groupByProvider ? ', provider' : ''},
+        COUNT(DISTINCT IF(action IN ('login','user_signedup','token_refreshed','user_modified','user_recovery_requested','user_reauthenticate_requested'), actor_id, NULL)) AS active_users,
+        COUNTIF(action = 'user_signedup') AS total_signups,
+        COUNTIF(action = 'user_recovery_requested') AS password_reset_requests
+      FROM base
+      GROUP BY ts${groupByProvider ? ', provider' : ''}
+    ),
+
+    -- sign-in attempts by login_type_provider from the same base rows
+    agg_signin AS (
+      SELECT
+        ts
+        ${groupByProvider ? ', provider' : ''},
+        CASE
+          WHEN COALESCE(provider, '') != '' THEN CONCAT(login_method, ' (', provider, ')')
+          ELSE login_method
+        END AS login_type_provider,
+        COUNTIF(action = 'login' AND metering = 'true') AS count
+      FROM base
+      GROUP BY ts, login_type_provider${groupByProvider ? ', provider' : ''}
+    )
+
+    -- emit tall result; no LEFT JOIN to a bucket table
+    SELECT ts AS timestamp, 'ActiveUsers' AS metric, active_users AS count,
+           ${groupByProvider ? 'provider' : 'CAST(NULL AS STRING) AS provider'},
+           CAST(NULL AS STRING) AS login_type_provider
+    FROM agg_usage
+
+    UNION ALL
+    SELECT ts, 'TotalSignUps', total_signups,
+           ${groupByProvider ? 'provider' : 'CAST(NULL AS STRING) AS provider'},
+           CAST(NULL AS STRING)
+    FROM agg_usage
+
+    UNION ALL
+    SELECT ts, 'PasswordResetRequests', password_reset_requests,
+           ${groupByProvider ? 'provider' : 'CAST(NULL AS STRING) AS provider'},
+           CAST(NULL AS STRING)
+    FROM agg_usage
+
+    UNION ALL
+    SELECT ts, 'SignInAttempts', count,
+           ${groupByProvider ? 'provider' : 'CAST(NULL AS STRING) AS provider'},
+           login_type_provider
+    FROM agg_signin
+
+    ORDER BY timestamp DESC${groupByProvider ? ', provider' : ''}
+  `
+}
+
+function buildAuthLatencyAllSQL(
+  interval: AnalyticsInterval,
+  filters: AuthReportFilters | undefined,
+  startDate: string,
+  endDate: string
+) {
+  const granularity = analyticsIntervalToGranularity(interval)
+
+  return `
+    -- Auth latency (sign-in + sign-up), single scan, FE does zero-fill
+    WITH params AS (
+      SELECT
+        COALESCE(PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*S%Ez', '${startDate}'), TIMESTAMP('${startDate}')) AS start_ts,
+        COALESCE(PARSE_TIMESTAMP('%Y-%m-%dT%H:%M:%E*S%Ez', '${endDate}'),   TIMESTAMP('${endDate}'))   AS end_ts
+    ),
+    base AS (
+      SELECT
+        TIMESTAMP_TRUNC(timestamp, ${granularity}) AS ts,
+        -- normalize action; accept both signup spellings
+        CASE COALESCE(JSON_VALUE(event_message, '$.auth_event.action'), JSON_VALUE(event_message, '$.action'))
+          WHEN 'login' THEN 'SignInLatency'
+          WHEN 'user_signedup' THEN 'SignUpLatency'
+          WHEN 'user_signed_up' THEN 'SignUpLatency'
+          ELSE NULL
+        END AS metric,
+        -- normalize to milliseconds; prefer explicit *ms fields, then convert us/ns
+        COALESCE(
+          -- already in ms
+          SAFE_CAST(JSON_VALUE(event_message, '$.processing_time_ms') AS FLOAT64),
+          SAFE_CAST(JSON_VALUE(event_message, '$.auth_event.processing_time_ms') AS FLOAT64),
+          SAFE_CAST(JSON_VALUE(event_message, '$.duration_ms') AS FLOAT64),
+          SAFE_CAST(JSON_VALUE(event_message, '$.auth_event.duration_ms') AS FLOAT64),
+          -- microseconds -> ms
+          SAFE_CAST(JSON_VALUE(event_message, '$.processing_time_us') AS FLOAT64) / 1000.0,
+          SAFE_CAST(JSON_VALUE(event_message, '$.auth_event.processing_time_us') AS FLOAT64) / 1000.0,
+          SAFE_CAST(JSON_VALUE(event_message, '$.duration_us') AS FLOAT64) / 1000.0,
+          SAFE_CAST(JSON_VALUE(event_message, '$.auth_event.duration_us') AS FLOAT64) / 1000.0,
+          -- nanoseconds -> ms
+          SAFE_CAST(JSON_VALUE(event_message, '$.processing_time_ns') AS FLOAT64) / 1000000.0,
+          SAFE_CAST(JSON_VALUE(event_message, '$.auth_event.processing_time_ns') AS FLOAT64) / 1000000.0,
+          SAFE_CAST(JSON_VALUE(event_message, '$.duration_ns') AS FLOAT64) / 1000000.0,
+          SAFE_CAST(JSON_VALUE(event_message, '$.auth_event.duration_ns') AS FLOAT64) / 1000000.0,
+          -- unlabeled duration: assume ns -> ms to match observed magnitudes
+          SAFE_CAST(JSON_VALUE(event_message, '$.duration') AS FLOAT64) / 1000000.0,
+          SAFE_CAST(JSON_VALUE(event_message, '$.auth_event.duration') AS FLOAT64) / 1000000.0
+        ) AS latency_ms
+      FROM auth_logs, params
+      WHERE timestamp >= start_ts AND timestamp < end_ts
+    ),
+    filtered AS (
+      SELECT
+        ts,
+        metric,
+        latency_ms
+      FROM base
+      WHERE metric IS NOT NULL
+    ),
+    basic AS (
+      SELECT
+        ts,
+        metric,
+        MIN(latency_ms) AS min,
+        AVG(latency_ms) AS avg,
+        MAX(latency_ms) AS max
+      FROM filtered
+      GROUP BY ts, metric
+    ),
+    pct AS (
+      SELECT
+        ts,
+        metric,
+        APPROX_QUANTILES(latency_ms, 100) AS q
+      FROM filtered
+      GROUP BY ts, metric
+    )
+    SELECT
+      b.ts AS timestamp,
+      b.metric,
+      b.min  AS min_processing_time_ms,
+      b.avg  AS avg_processing_time_ms,
+      b.max  AS max_processing_time_ms,
+      q[OFFSET(50)] AS p50_processing_time_ms,
+      q[OFFSET(95)] AS p95_processing_time_ms,
+      q[OFFSET(99)] AS p99_processing_time_ms
+    FROM basic b
+    JOIN pct USING (ts, metric)
+    ORDER BY timestamp DESC, metric
+  `
+}
+
 const AUTH_REPORT_SQL: Record<
   MetricKey,
   (interval: AnalyticsInterval, filters?: AuthReportFilters) => string
 > = {
-  ActiveUsers: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
-    const whereClause = filterToWhereClause(filters)
-    const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-    return `
-        --active-users
-        select 
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${groupByProvider ? 'COALESCE(JSON_VALUE(f.event_message, "$.provider"), \'unknown\') as provider,' : ''}
-          count(distinct json_value(f.event_message, "$.auth_event.actor_id")) as count
-        from auth_logs f
-        where json_value(f.event_message, "$.auth_event.action") in (
-          'login', 'user_signedup', 'token_refreshed', 'user_modified',
-          'user_recovery_requested', 'user_reauthenticate_requested'
-        )
-        ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
-        group by timestamp${groupByProvider ? ', provider' : ''}
-        order by timestamp desc${groupByProvider ? ', provider' : ''}
-      `
-  },
-  SignInAttempts: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
-    const whereClause = filterToWhereClause(filters)
-    const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-    return `
-        --sign-in-attempts
-        SELECT
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${groupByProvider ? 'COALESCE(JSON_VALUE(event_message, "$.provider"), \'unknown\') as provider,' : ''}
-          CASE
-            WHEN JSON_VALUE(event_message, "$.provider") IS NOT NULL
-                AND JSON_VALUE(event_message, "$.provider") != ''
-            THEN CONCAT(
-              JSON_VALUE(event_message, "$.login_method"),
-              ' (',
-              JSON_VALUE(event_message, "$.provider"),
-              ')'
-            )
-            ELSE JSON_VALUE(event_message, "$.login_method")
-          END as login_type_provider,
-          COUNT(*) as count
-        FROM
-          auth_logs
-        WHERE
-          JSON_VALUE(event_message, "$.action") = 'login'
-          AND JSON_VALUE(event_message, "$.metering") = "true"
-          ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
-        GROUP BY
-          timestamp, login_type_provider${groupByProvider ? ', provider' : ''}
-        ORDER BY
-          timestamp desc, login_type_provider${groupByProvider ? ', provider' : ''}
-      `
-  },
-  PasswordResetRequests: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
-    const whereClause = filterToWhereClause(filters)
-    const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-    return `
-        --password-reset-requests
-        select 
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${groupByProvider ? 'COALESCE(JSON_VALUE(f.event_message, "$.provider"), \'unknown\') as provider,' : ''}
-          count(*) as count
-        from auth_logs f
-        where json_value(f.event_message, "$.auth_event.action") = 'user_recovery_requested'
-        ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
-        group by timestamp${groupByProvider ? ', provider' : ''}
-        order by timestamp desc${groupByProvider ? ', provider' : ''}
-      `
-  },
-  TotalSignUps: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
-    const whereClause = filterToWhereClause(filters)
-    const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-    return `
-        --total-signups
-        select 
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${groupByProvider ? 'COALESCE(JSON_VALUE(event_message, "$.provider"), \'unknown\') as provider,' : ''}
-          count(*) as count
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-        ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
-        group by timestamp${groupByProvider ? ', provider' : ''}
-        order by timestamp desc${groupByProvider ? ', provider' : ''}
-      `
-  },
-  SignInProcessingTimeBasic: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
-    const whereClause = filterToWhereClause(filters)
-    const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-    return `
-        --signin-processing-time-basic
-        select 
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${groupByProvider ? 'COALESCE(JSON_VALUE(event_message, "$.provider"), \'unknown\') as provider,' : ''}
-          count(*) as count,
-          round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_processing_time_ms,
-          round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_processing_time_ms,
-          round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_processing_time_ms
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'login'
-        ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
-        group by timestamp${groupByProvider ? ', provider' : ''}
-        order by timestamp desc${groupByProvider ? ', provider' : ''}
-      `
-  },
-  SignInProcessingTimePercentiles: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
-    const whereClause = filterToWhereClause(filters)
-    const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-    return `
-        --signin-processing-time-percentiles
-        select 
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${groupByProvider ? 'COALESCE(JSON_VALUE(event_message, "$.provider"), \'unknown\') as provider,' : ''}
-          count(*) as count,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_processing_time_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_processing_time_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_processing_time_ms
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'login'
-        ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
-        group by timestamp${groupByProvider ? ', provider' : ''}
-        order by timestamp desc${groupByProvider ? ', provider' : ''}
-      `
-  },
-  SignUpProcessingTimeBasic: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
-    const whereClause = filterToWhereClause(filters)
-    const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-    return `
-        --signup-processing-time-basic
-        select 
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${groupByProvider ? 'COALESCE(JSON_VALUE(event_message, "$.provider"), \'unknown\') as provider,' : ''}
-          count(*) as count,
-          round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_processing_time_ms,
-          round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_processing_time_ms,
-          round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_processing_time_ms
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-        ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
-        group by timestamp${groupByProvider ? ', provider' : ''}
-        order by timestamp desc${groupByProvider ? ', provider' : ''}
-      `
-  },
-  SignUpProcessingTimePercentiles: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
-    const whereClause = filterToWhereClause(filters)
-    const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-    return `
-        --signup-processing-time-percentiles
-        select 
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${groupByProvider ? 'COALESCE(JSON_VALUE(event_message, "$.provider"), \'unknown\') as provider,' : ''}
-          count(*) as count,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_processing_time_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_processing_time_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_processing_time_ms
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-        ${whereClause ? `AND ${whereClause.replace(/^WHERE\s+/, '')}` : ''}
-        group by timestamp${groupByProvider ? ', provider' : ''}
-        order by timestamp desc${groupByProvider ? ', provider' : ''}
-      `
-  },
   ErrorsByStatus: (interval, filters) => {
     const granularity = analyticsIntervalToGranularity(interval)
     const whereClause = edgeLogsFilterToWhereClause(filters)
@@ -282,92 +310,6 @@ function edgeLogsFilterToWhereClause(filters?: AuthReportFilters): string {
   return whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
 }
 
-export const AUTH_ERROR_CODE_VALUES: string[] = [
-  'anonymous_provider_disabled',
-  'bad_code_verifier',
-  'bad_json',
-  'bad_jwt',
-  'bad_oauth_callback',
-  'bad_oauth_state',
-  'captcha_failed',
-  'conflict',
-  'email_address_invalid',
-  'email_address_not_authorized',
-  'email_conflict_identity_not_deletable',
-  'email_exists',
-  'email_not_confirmed',
-  'email_provider_disabled',
-  'flow_state_expired',
-  'flow_state_not_found',
-  'hook_payload_invalid_content_type',
-  'hook_payload_over_size_limit',
-  'hook_timeout',
-  'hook_timeout_after_retry',
-  'identity_already_exists',
-  'identity_not_found',
-  'insufficient_aal',
-  'invalid_credentials',
-  'invite_not_found',
-  'manual_linking_disabled',
-  'mfa_challenge_expired',
-  'mfa_factor_name_conflict',
-  'mfa_factor_not_found',
-  'mfa_ip_address_mismatch',
-  'mfa_phone_enroll_not_enabled',
-  'mfa_phone_verify_not_enabled',
-  'mfa_totp_enroll_not_enabled',
-  'mfa_totp_verify_not_enabled',
-  'mfa_verification_failed',
-  'mfa_verification_rejected',
-  'mfa_verified_factor_exists',
-  'mfa_web_authn_enroll_not_enabled',
-  'mfa_web_authn_verify_not_enabled',
-  'no_authorization',
-  'not_admin',
-  'oauth_provider_not_supported',
-  'otp_disabled',
-  'otp_expired',
-  'over_email_send_rate_limit',
-  'over_request_rate_limit',
-  'over_sms_send_rate_limit',
-  'phone_exists',
-  'phone_not_confirmed',
-  'phone_provider_disabled',
-  'provider_disabled',
-  'provider_email_needs_verification',
-  'reauthentication_needed',
-  'reauthentication_not_valid',
-  'refresh_token_already_used',
-  'refresh_token_not_found',
-  'request_timeout',
-  'same_password',
-  'saml_assertion_no_email',
-  'saml_assertion_no_user_id',
-  'saml_entity_id_mismatch',
-  'saml_idp_already_exists',
-  'saml_idp_not_found',
-  'saml_metadata_fetch_failed',
-  'saml_provider_disabled',
-  'saml_relay_state_expired',
-  'saml_relay_state_not_found',
-  'session_expired',
-  'session_not_found',
-  'signup_disabled',
-  'single_identity_not_deletable',
-  'sms_send_failed',
-  'sso_domain_already_exists',
-  'sso_provider_not_found',
-  'too_many_enrolled_mfa_factors',
-  'unexpected_audience',
-  'unexpected_failure',
-  'user_already_exists',
-  'user_banned',
-  'user_not_found',
-  'user_sso_managed',
-  'validation_failed',
-  'weak_password',
-]
-
 /**
  * Transforms raw analytics data into a chart-ready format by ensuring data consistency and completeness.
  *
@@ -440,6 +382,10 @@ export function defaultAuthReportFormatter(
 
             if (p.provider !== provider) return
 
+            // Optional metric filter for panels that multiplex (e.g., latency SignIn vs SignUp)
+            const metricFilter = (attr as any).metricFilter as string | undefined
+            if (metricFilter && p.metric !== metricFilter) return
+
             const valueFromField =
               typeof p[baseAttribute] === 'number'
                 ? p[baseAttribute]
@@ -469,6 +415,9 @@ export function defaultAuthReportFormatter(
 
         matchingPoints.forEach((p: any) => {
           chartAttributes.forEach((attr) => {
+            // Optional metric filter for panels that multiplex (e.g., latency SignIn vs SignUp)
+            const metricFilter = (attr as any).metricFilter as string | undefined
+            if (metricFilter && p.metric !== metricFilter) return
             // Optional dimension filters used by some reports
             if ('login_type_provider' in (attr as any)) {
               if (p.login_type_provider !== (attr as any).login_type_provider) return
@@ -495,6 +444,12 @@ export function defaultAuthReportFormatter(
   }
 }
 
+export const AUTH_REPORT_QUERY_KEYS = {
+  usage: ['usage-all'],
+  monitoring: ['monitoring-all'],
+  performance: ['performance-all'],
+}
+
 export const createUsageReportConfig = ({
   projectRef,
   startDate,
@@ -510,6 +465,8 @@ export const createUsageReportConfig = ({
 }): ReportConfig<AuthReportFilters>[] => {
   const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
 
+  const usageSql = buildUsageAllSQL(interval, filters, startDate, endDate)
+
   return [
     {
       id: 'active-user',
@@ -524,21 +481,17 @@ export const createUsageReportConfig = ({
       titleTooltip:
         "Users who generated any Auth event in this period. This metric tracks authentication activity, not total product usage. Some active users won't appear here if their session stayed valid.",
       availableIn: ['free', 'pro', 'team', 'enterprise'],
+      queryKeys: AUTH_REPORT_QUERY_KEYS.usage,
       dataProvider: async () => {
         const attributes = [
           { attribute: 'ActiveUsers', provider: 'logs', label: 'Auth Activity', enabled: true },
         ]
-
-        const sql = AUTH_REPORT_SQL.ActiveUsers(interval, filters)
-
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-
+        const rawData = await fetchLogs(projectRef, usageSql, startDate, endDate)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
-
         return {
           data: transformedData.data,
           attributes: transformedData.chartAttributes,
-          query: sql,
+          query: usageSql,
         }
       },
     },
@@ -554,6 +507,7 @@ export const createUsageReportConfig = ({
       defaultChartStyle: 'line',
       titleTooltip: 'The total number of sign in attempts by type.',
       availableIn: ['free', 'pro', 'team', 'enterprise'],
+      queryKeys: AUTH_REPORT_QUERY_KEYS.usage,
       dataProvider: async () => {
         const attributes = [
           {
@@ -585,15 +539,12 @@ export const createUsageReportConfig = ({
             enabled: true,
           },
         ]
-
-        const sql = AUTH_REPORT_SQL.SignInAttempts(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+        const rawData = await fetchLogs(projectRef, usageSql, startDate, endDate)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
-
         return {
           data: transformedData.data,
           attributes: transformedData.chartAttributes,
-          query: sql,
+          query: usageSql,
         }
       },
     },
@@ -609,6 +560,7 @@ export const createUsageReportConfig = ({
       defaultChartStyle: 'line',
       titleTooltip: 'The total number of sign ups.',
       availableIn: ['free', 'pro', 'team', 'enterprise'],
+      queryKeys: AUTH_REPORT_QUERY_KEYS.usage,
       dataProvider: async () => {
         const attributes = [
           {
@@ -618,15 +570,12 @@ export const createUsageReportConfig = ({
             enabled: true,
           },
         ]
-
-        const sql = AUTH_REPORT_SQL.TotalSignUps(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+        const rawData = await fetchLogs(projectRef, usageSql, startDate, endDate)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
-
         return {
           data: transformedData.data,
           attributes: transformedData.chartAttributes,
-          query: sql,
+          query: usageSql,
         }
       },
     },
@@ -642,6 +591,7 @@ export const createUsageReportConfig = ({
       defaultChartStyle: 'line',
       titleTooltip: 'The total number of password reset requests.',
       availableIn: ['free', 'pro', 'team', 'enterprise'],
+      queryKeys: AUTH_REPORT_QUERY_KEYS.usage,
       dataProvider: async () => {
         const attributes = [
           {
@@ -651,15 +601,12 @@ export const createUsageReportConfig = ({
             enabled: true,
           },
         ]
-
-        const sql = AUTH_REPORT_SQL.PasswordResetRequests(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
+        const rawData = await fetchLogs(projectRef, usageSql, startDate, endDate)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
-
         return {
           data: transformedData.data,
           attributes: transformedData.chartAttributes,
-          query: sql,
+          query: usageSql,
         }
       },
     },
@@ -759,8 +706,6 @@ export const createLatencyReportConfig = ({
   interval: AnalyticsInterval
   filters: AuthReportFilters
 }): ReportConfig<AuthReportFilters>[] => {
-  const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-
   return [
     {
       id: 'sign-in-processing-time-basic',
@@ -781,20 +726,23 @@ export const createLatencyReportConfig = ({
           {
             attribute: 'avg_processing_time_ms',
             label: 'Avg. Processing Time (ms)',
+            metricFilter: 'SignInLatency',
           },
           {
             attribute: 'min_processing_time_ms',
             label: 'Min. Processing Time (ms)',
+            metricFilter: 'SignInLatency',
           },
           {
             attribute: 'max_processing_time_ms',
             label: 'Max. Processing Time (ms)',
+            metricFilter: 'SignInLatency',
           },
         ]
 
-        const sql = AUTH_REPORT_SQL.SignInProcessingTimeBasic(interval, filters)
+        const sql = buildAuthLatencyAllSQL(interval, filters, startDate, endDate)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-        const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
+        const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
         return {
           data: transformedData.data,
@@ -822,20 +770,23 @@ export const createLatencyReportConfig = ({
           {
             attribute: 'p50_processing_time_ms',
             label: 'P50 Processing Time (ms)',
+            metricFilter: 'SignInLatency',
           },
           {
             attribute: 'p95_processing_time_ms',
             label: 'P95 Processing Time (ms)',
+            metricFilter: 'SignInLatency',
           },
           {
             attribute: 'p99_processing_time_ms',
             label: 'P99 Processing Time (ms)',
+            metricFilter: 'SignInLatency',
           },
         ]
 
-        const sql = AUTH_REPORT_SQL.SignInProcessingTimePercentiles(interval, filters)
+        const sql = buildAuthLatencyAllSQL(interval, filters, startDate, endDate)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-        const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
+        const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
         return {
           data: transformedData.data,
@@ -863,20 +814,23 @@ export const createLatencyReportConfig = ({
           {
             attribute: 'avg_processing_time_ms',
             label: 'Avg. Processing Time (ms)',
+            metricFilter: 'SignUpLatency',
           },
           {
             attribute: 'min_processing_time_ms',
             label: 'Min. Processing Time (ms)',
+            metricFilter: 'SignUpLatency',
           },
           {
             attribute: 'max_processing_time_ms',
             label: 'Max. Processing Time (ms)',
+            metricFilter: 'SignUpLatency',
           },
         ]
 
-        const sql = AUTH_REPORT_SQL.SignUpProcessingTimeBasic(interval, filters)
+        const sql = buildAuthLatencyAllSQL(interval, filters, startDate, endDate)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-        const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
+        const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
         return {
           data: transformedData.data,
@@ -904,20 +858,23 @@ export const createLatencyReportConfig = ({
           {
             attribute: 'p50_processing_time_ms',
             label: 'P50 Processing Time (ms)',
+            metricFilter: 'SignUpLatency',
           },
           {
             attribute: 'p95_processing_time_ms',
             label: 'P95 Processing Time (ms)',
+            metricFilter: 'SignUpLatency',
           },
           {
             attribute: 'p99_processing_time_ms',
             label: 'P99 Processing Time (ms)',
+            metricFilter: 'SignUpLatency',
           },
         ]
 
-        const sql = AUTH_REPORT_SQL.SignUpProcessingTimePercentiles(interval, filters)
+        const sql = buildAuthLatencyAllSQL(interval, filters, startDate, endDate)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
-        const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
+        const transformedData = defaultAuthReportFormatter(rawData, attributes)
 
         return {
           data: transformedData.data,

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { ComposedChart } from 'components/ui/Charts/ComposedChart'
 import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
@@ -24,6 +24,7 @@ export interface ReportChartV2Props {
   syncId?: string
   filters?: any
   highlightActions?: ChartHighlightAction[]
+  queryKeys?: string[]
 }
 
 // Compute total across entire period over unique attribute keys.
@@ -63,6 +64,7 @@ export const ReportChartV2 = ({
   syncId,
   filters,
   highlightActions,
+  queryKeys,
 }: ReportChartV2Props) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { plan: orgPlan } = useCurrentOrgPlan()
@@ -83,7 +85,8 @@ export const ReportChartV2 = ({
       'projects',
       projectRef,
       'report-v2',
-      { reportId: report.id, startDate, endDate, interval, filters },
+      ...(queryKeys && queryKeys.length > 0 ? queryKeys : [report.id]),
+      { startDate, endDate, interval, filters },
     ],
     async () => {
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
@@ -91,7 +94,8 @@ export const ReportChartV2 = ({
     {
       enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
       refetchOnWindowFocus: false,
-      staleTime: 0,
+      refetchOnMount: false,
+      staleTime: 5_000, // Enough for multiple metrics with the same query to share the fetch request.
     }
   )
 
