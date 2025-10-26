@@ -65,9 +65,6 @@ export function useCheckEntitlements(
     ? isSuccessSelectedOrg && isSuccessEntitlements
     : isSuccessEntitlements
 
-  console.log('entitlementConfig', entitlementConfig)
-  console.log('isNumericConfig(entitlementConfig)', isNumericConfig(entitlementConfig))
-  console.log('isNumericConfig(entitlementConfig)', isNumericConfig(entitlementConfig))
   return {
     hasAccess,
     isLoading,
