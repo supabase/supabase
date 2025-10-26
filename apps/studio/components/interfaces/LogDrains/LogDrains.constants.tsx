@@ -1,5 +1,6 @@
-import { BracesIcon } from 'lucide-react'
+import { components } from 'api-types'
 import { Datadog, Grafana } from 'icons'
+import { BracesIcon } from 'lucide-react'
 
 const iconProps = {
   height: 24,
@@ -31,11 +32,13 @@ export const LOG_DRAIN_TYPES = [
 
 export const LOG_DRAIN_SOURCE_VALUES = LOG_DRAIN_TYPES.map((source) => source.value)
 
-export type LogDrainType =
-  | (typeof LOG_DRAIN_TYPES)[number]['value']
-  | 'postgres'
-  | 'bigquery'
-  | 'elastic'
+// export type LogDrainType =
+//   | (typeof LOG_DRAIN_TYPES)[number]['value']
+//   | 'postgres'
+//   | 'bigquery'
+//   | 'elastic'
+
+export type LogDrainType = components['schemas']['LFBackend']['type']
 
 export const DATADOG_REGIONS = [
   {

@@ -2,12 +2,20 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
-type CreatePolicyBody = components['schemas']['CreatePolicyBody']
+type CreatePolicyBody = {
+  name: string
+  table: string
+  schema?: string
+  definition?: string
+  check?: string
+  action?: 'PERMISSIVE' | 'RESTRICTIVE'
+  command?: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
+  roles?: string[]
+}
 
 export type DatabasePolicyCreateVariables = {
   projectRef: string

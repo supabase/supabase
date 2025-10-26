@@ -1,17 +1,21 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { components } from 'data/api'
 import type { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
-import pgMeta from '@supabase/pg-meta'
-import { executeSql } from 'data/sql/execute-sql-query'
 
-export type ColumnPrivilegesGrant = components['schemas']['GrantColumnPrivilegesBody']
+export type ColumnPrivilegesGrant = {
+  column_id: string
+  grantee: string
+  privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
+  is_grantable?: boolean
+}
 
 export type ColumnPrivilegesGrantVariables = {
   projectRef: string
   connectionString?: string | null
-  grants: ColumnPrivilegesGrant
+  grants: ColumnPrivilegesGrant[]
 }
 
 export async function grantColumnPrivileges({
