@@ -278,12 +278,12 @@ export function prefetchTableRows(
   client: QueryClient,
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
 ) {
-  return client.fetchQuery(
-    tableRowKeys.tableRows(projectRef, {
+  return client.fetchQuery({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
-      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal)
-  )
+    queryFn: ({ signal }) =>
+      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal),
+  })
 }

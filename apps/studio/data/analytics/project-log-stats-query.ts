@@ -71,7 +71,8 @@ export function prefetchProjectLogStats(
   client: QueryClient,
   { projectRef, interval }: ProjectLogStatsVariables
 ) {
-  return client.fetchQuery(analyticsKeys.usageApiCounts(projectRef, interval), ({ signal }) =>
-    getProjectLogStats({ projectRef, interval }, signal)
-  )
+  return client.fetchQuery({
+    queryKey: analyticsKeys.usageApiCounts(projectRef, interval),
+    queryFn: ({ signal }) => getProjectLogStats({ projectRef, interval }, signal),
+  })
 }

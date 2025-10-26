@@ -28,7 +28,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
 
-      await queryClient.cancelQueries(queryKey)
+      await queryClient.cancelQueries({ queryKey })
 
       const previousRowsQueries = queryClient.getQueriesData<TableRowsData>({ queryKey })
 
