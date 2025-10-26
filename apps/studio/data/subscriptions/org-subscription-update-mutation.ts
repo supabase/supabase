@@ -80,17 +80,20 @@ export const useOrgSubscriptionUpdateMutation = ({
         ])
 
         if (variables.paymentMethod) {
-          queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
-            if (!prev) return prev
-            return {
-              ...prev,
-              defaultPaymentMethodId: variables.paymentMethod,
-              data: prev.data.map((pm: any) => ({
-                ...pm,
-                is_default: pm.id === variables.paymentMethod,
-              })),
+          queryClient.setQueriesData(
+            { queryKey: organizationKeys.paymentMethods(slug) },
+            (prev: any) => {
+              if (!prev) return prev
+              return {
+                ...prev,
+                defaultPaymentMethodId: variables.paymentMethod,
+                data: prev.data.map((pm: any) => ({
+                  ...pm,
+                  is_default: pm.id === variables.paymentMethod,
+                })),
+              }
             }
-          })
+          )
         }
       }
 

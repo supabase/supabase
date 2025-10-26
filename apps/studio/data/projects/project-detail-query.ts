@@ -84,7 +84,7 @@ export const useSetProjectPostgrestStatus = () => {
 
   const setProjectPostgrestStatus = (ref: Project['ref'], status: Project['postgrestStatus']) => {
     return queryClient.setQueriesData<Project>(
-      projectKeys.detail(ref),
+      { queryKey: projectKeys.detail(ref) },
       (old) => {
         if (!old) return old
         return { ...old, postgrestStatus: status }
@@ -111,7 +111,7 @@ export const useSetProjectStatus = () => {
     // Org projects infinite query
     if (slug) {
       queryClient.setQueriesData<{ pageParams: any; pages: OrgProjectsResponse[] } | undefined>(
-        projectKeys.infiniteListByOrg(slug),
+        { queryKey: projectKeys.infiniteListByOrg(slug) },
         (old) => {
           if (!old) return old
           return {
@@ -132,7 +132,7 @@ export const useSetProjectStatus = () => {
 
     // Projects infinite query
     queryClient.setQueriesData<{ pageParams: any; pages: OrgProjectsResponse[] } | undefined>(
-      projectKeys.infiniteList(),
+      { queryKey: projectKeys.infiniteList() },
       (old) => {
         if (!old) return old
         return {
@@ -152,7 +152,7 @@ export const useSetProjectStatus = () => {
 
     // Project details query
     queryClient.setQueriesData<Project>(
-      projectKeys.detail(ref),
+      { queryKey: projectKeys.detail(ref) },
       (old) => {
         if (!old) return old
         return { ...old, status }
@@ -163,7 +163,7 @@ export const useSetProjectStatus = () => {
     // [Joshen] Temporarily for completeness while we still have UIs depending on the old endpoint (Org teams)
     // Can be removed once we completely deprecate projects-query (Old unpaginated endpoint)
     queryClient.setQueriesData<PaginatedProjectsResponse | undefined>(
-      projectKeys.list(),
+      { queryKey: projectKeys.list() },
       (old) => {
         if (!old) return old
 

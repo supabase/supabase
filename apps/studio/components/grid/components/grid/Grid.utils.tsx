@@ -30,9 +30,9 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       await queryClient.cancelQueries(queryKey)
 
-      const previousRowsQueries = queryClient.getQueriesData<TableRowsData>(queryKey)
+      const previousRowsQueries = queryClient.getQueriesData<TableRowsData>({ queryKey })
 
-      queryClient.setQueriesData<TableRowsData>(queryKey, (old) => {
+      queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
         return {
           rows:
             old?.rows.map((row) => {
@@ -67,7 +67,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       previousRowsQueries.forEach(([queryKey, previousRows]) => {
         if (previousRows) {
-          queryClient.setQueriesData(queryKey, previousRows)
+          queryClient.setQueriesData({ queryKey }, previousRows)
         }
         queryClient.invalidateQueries({ queryKey })
       })

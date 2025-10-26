@@ -79,7 +79,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
           })
 
           queryClient.setQueriesData(
-            organizationKeys.paymentMethods(selectedOrganization.slug),
+            { queryKey: organizationKeys.paymentMethods(selectedOrganization.slug) },
             (prev: any) => {
               if (!prev) return prev
               return {
