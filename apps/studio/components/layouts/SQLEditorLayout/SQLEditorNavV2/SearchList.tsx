@@ -52,8 +52,6 @@ export const SearchList = ({ search }: SearchListProps) => {
   )
   const totalNumber = count ? count.private + count.shared : 0
 
-  console.log({ totalNumber })
-
   const snippets = useMemo(
     // [Joshen] Set folder_id to null to ensure flat list
     () => data?.pages.flatMap((page) => page.content.map((x) => ({ ...x, folder_id: null }))),
