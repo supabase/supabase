@@ -41,7 +41,8 @@ export const useAuthConfigQuery = <TData = ProjectAuthConfigData>(
     authKeys.authConfig(projectRef),
     ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
     {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+      // Also enable on self-hosted so Studio can read auth settings via local proxy
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
