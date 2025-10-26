@@ -72,7 +72,7 @@ export const useExecuteSqlMutation = ({
       if (contextualInvalidation && projectRef && isMutationSQL) {
         const databaseRelatedKeys = queryClient
           .getQueryCache()
-          .findAll(['projects', projectRef])
+          .findAll({ queryKey: ['projects', projectRef] })
           .map((x) => x.queryKey)
           .filter((x) => !INVALIDATION_KEYS_IGNORE.some((a) => x.includes(a)))
         await Promise.all(
