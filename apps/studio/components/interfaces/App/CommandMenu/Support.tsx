@@ -1,5 +1,4 @@
 import { LifeBuoy, Activity } from 'lucide-react'
-import { IconDiscordOutline } from 'ui'
 import { useMemo } from 'react'
 
 import { IS_PLATFORM } from 'common'
