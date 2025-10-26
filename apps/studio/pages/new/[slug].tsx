@@ -43,7 +43,6 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -63,6 +62,7 @@ import {
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
+import { useTrack } from 'lib/telemetry/track'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -171,7 +171,7 @@ const Wizard: NextPageWithLayout = () => {
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
     if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -247,16 +247,16 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
-      sendEvent({
-        action: 'project_creation_simple_version_submitted',
-        properties: {
+      track(
+        'project_creation_simple_version_submitted',
+        {
           instanceSize: form.getValues('instanceSize'),
         },
-        groups: {
+        {
           project: res.ref,
           organization: res.organization_slug,
-        },
-      })
+        }
+      )
       router.push(isHomeNew ? `/project/${res.ref}` : `/project/${res.ref}/building`)
     },
   })
@@ -372,14 +372,8 @@ const Wizard: NextPageWithLayout = () => {
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
     if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
-      sendEvent({
-        action: 'project_creation_simple_version_confirm_modal_opened',
-        properties: {
-          instanceSize: values.instanceSize,
-        },
-        groups: {
-          organization: currentOrg?.slug ?? 'Unknown',
-        },
+      track('project_creation_simple_version_confirm_modal_opened', {
+        instanceSize: values.instanceSize,
       })
       setIsComputeCostsConfirmationModalVisible(true)
     } else {
@@ -778,18 +772,12 @@ const Wizard: NextPageWithLayout = () => {
                                     The size for your dedicated database. You can change this later.
                                     Learn more about{' '}
                                     <InlineLink
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-inherit hover:text-foreground transition-colors"
                                       href={`${DOCS_URL}/guides/platform/compute-add-ons`}
                                     >
                                       compute add-ons
                                     </InlineLink>{' '}
                                     and{' '}
                                     <InlineLink
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-inherit hover:text-foreground transition-colors"
                                       href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                                     >
                                       compute billing

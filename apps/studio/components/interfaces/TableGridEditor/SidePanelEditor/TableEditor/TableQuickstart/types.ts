@@ -37,6 +37,7 @@ export enum QuickstartVariant {
   CONTROL = 'control',
   AI = 'ai',
   TEMPLATES = 'templates',
+  ASSISTANT = 'assistant',
 }
 
 export type TableSuggestion = {
