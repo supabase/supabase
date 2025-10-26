@@ -2,7 +2,7 @@ import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { DatabaseZap, FunctionSquare, Plus, Search, Shield } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsString, useQueryState } from 'nuqs'
 
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -39,19 +39,25 @@ import Link from 'next/link'
 interface TriggersListProps {
   createTrigger: () => void
   editTrigger: (trigger: PostgresTrigger) => void
+  duplicateTrigger: (trigger: PostgresTrigger) => void
   deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
 const TriggersList = ({
   createTrigger = noop,
   editTrigger = noop,
+  duplicateTrigger = noop,
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [filterString, setFilterString] = useState<string>('')
+
+  const [filterString, setFilterString] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
+  )
 
   const { data: protectedSchemas } = useProtectedSchemas()
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -231,6 +237,7 @@ const TriggersList = ({
                   filterString={filterString}
                   isLocked={isSchemaLocked}
                   editTrigger={editTrigger}
+                  duplicateTrigger={duplicateTrigger}
                   deleteTrigger={deleteTrigger}
                 />
               </TableBody>

@@ -12,7 +12,14 @@ export function getAvailableRegions(cloudProvider: CloudProvider): Region {
     case 'AWS_K8S':
       return AWS_REGIONS
     case 'AWS_NIMBUS':
-      // Only allow US East for Nimbus
+      if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') {
+        // Only allow Southeast Asia for Nimbus (local/staging)
+        return {
+          SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA,
+        }
+      }
+
+      // Only allow US East for Nimbus (prod)
       return {
         EAST_US: AWS_REGIONS.EAST_US,
       }
