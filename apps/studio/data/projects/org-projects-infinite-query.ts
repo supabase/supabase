@@ -68,24 +68,21 @@ export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
   }: UseInfiniteQueryOptions<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData> = {}
 ) => {
   const { profile } = useProfile()
-  return useInfiniteQuery<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData>(
-    projectKeys.infiniteListByOrg(slug, { limit, sort, search, statuses }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData>({
+    queryKey: projectKeys.infiniteListByOrg(slug, { limit, sort, search, statuses }),
+    queryFn: ({ signal, pageParam }) =>
       getOrganizationProjects({ slug, limit, page: pageParam, sort, search, statuses }, signal),
-    {
-      enabled: enabled && profile !== undefined && typeof slug !== 'undefined',
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        const currentTotalCount = page * limit
-        const totalCount = lastPage.pagination.count
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      const currentTotalCount = page * limit
+      const totalCount = lastPage.pagination.count
 
-        if (currentTotalCount >= totalCount) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
+      if (currentTotalCount >= totalCount) return undefined
+      return page
+    },
+    ...options,
+  })
 }
 
 export const getComputeSize = (project: OrgProject) => {

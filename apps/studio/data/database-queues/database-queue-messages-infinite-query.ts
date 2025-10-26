@@ -81,9 +81,9 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
     ...options
   }: UseInfiniteQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
 ) =>
-  useInfiniteQuery<DatabaseQueueData, DatabaseQueueError, TData>(
-    databaseQueuesKeys.getMessagesInfinite(projectRef, queueName, { status }),
-    ({ pageParam }) => {
+  useInfiniteQuery<DatabaseQueueData, DatabaseQueueError, TData>({
+    queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName, { status }),
+    queryFn: ({ pageParam }) => {
       return getDatabaseQueue({
         projectRef,
         connectionString,
@@ -92,15 +92,13 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
         status,
       })
     },
-    {
-      staleTime: 0,
-      enabled: enabled && typeof projectRef !== 'undefined',
+    staleTime: 0,
+    enabled: enabled && typeof projectRef !== 'undefined',
 
-      getNextPageParam(lastPage) {
-        const hasNextPage = lastPage.length <= QUEUE_MESSAGES_PAGE_SIZE
-        if (!hasNextPage) return undefined
-        return last(lastPage)?.enqueued_at
-      },
-      ...options,
-    }
-  )
+    getNextPageParam(lastPage) {
+      const hasNextPage = lastPage.length <= QUEUE_MESSAGES_PAGE_SIZE
+      if (!hasNextPage) return undefined
+      return last(lastPage)?.enqueued_at
+    },
+    ...options,
+  })
