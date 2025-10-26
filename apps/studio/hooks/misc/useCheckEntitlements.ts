@@ -65,7 +65,11 @@ export function useCheckEntitlements(
 
     if (!entitlement) return { hasAccess: false, entitlementConfig, entitlementType: null }
 
-    return { hasAccess: entitlement.hasAccess, entitlementConfig, entitlementType: entitlement.type }
+    return {
+      hasAccess: entitlement.hasAccess,
+      entitlementConfig,
+      entitlementType: entitlement.type,
+    }
   }, [entitlementsData, featureKey, finalOrgSlug])
 
   const isLoading = shouldGetSelectedOrg ? isLoadingSelectedOrg : isLoadingEntitlements
@@ -78,9 +82,16 @@ export function useCheckEntitlements(
     isLoading,
     isSuccess,
     getEntitlementNumericValue: () =>
-      entitlementConfig && entitlementType && isNumericConfig(entitlementConfig, entitlementType) ? entitlementConfig.value : undefined,
+      entitlementConfig && entitlementType && isNumericConfig(entitlementConfig, entitlementType)
+        ? entitlementConfig.value
+        : undefined,
     isEntitlementUnlimited: () =>
-      entitlementConfig && entitlementType && isNumericConfig(entitlementConfig, entitlementType) ? entitlementConfig.unlimited : false,
-    getEntitlementSetValues: () => entitlementConfig && entitlementType && isSetConfig(entitlementConfig, entitlementType) ? entitlementConfig.set : [],
+      entitlementConfig && entitlementType && isNumericConfig(entitlementConfig, entitlementType)
+        ? entitlementConfig.unlimited
+        : false,
+    getEntitlementSetValues: () =>
+      entitlementConfig && entitlementType && isSetConfig(entitlementConfig, entitlementType)
+        ? entitlementConfig.set
+        : [],
   }
 }
