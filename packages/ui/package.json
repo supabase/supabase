@@ -89,7 +89,7 @@
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "catalog:",
     "@types/react-syntax-highlighter": "^15.5.6",
-    "@vitest/coverage-v8": "^3.0.9",
+    "@vitest/coverage-v8": "^3.2.0",
     "common": "workspace:*",
     "config": "workspace:*",
     "glob": "^8.1.0",
