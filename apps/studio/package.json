@@ -201,7 +201,7 @@
     "raw-loader": "^4.0.2",
     "require-in-the-middle": "^7.5.2",
     "tailwindcss": "catalog:",
-    "tsx": "^4.19.3",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",

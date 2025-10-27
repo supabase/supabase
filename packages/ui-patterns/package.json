@@ -541,7 +541,7 @@
     "@types/react-dom": "catalog:",
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
-    "tsx": "^4.19.3",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",
