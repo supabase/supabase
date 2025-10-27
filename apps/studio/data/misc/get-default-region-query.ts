@@ -76,16 +76,14 @@ export const useDefaultRegionQuery = <TData = DefaultRegionData>(
   const restrictedPoolFlag = useFlag('defaultRegionRestrictedPool')
   const restrictedPool = tryParseJson(restrictedPoolFlag)
 
-  return useQuery<DefaultRegionData, DefaultRegionError, TData>(
-    miscKeys.defaultRegion(cloudProvider, useRestrictedPool ?? true),
-    () => getDefaultRegionOption({ cloudProvider, restrictedPool, useRestrictedPool }),
-    {
-      enabled:
-        enabled && typeof cloudProvider !== 'undefined' && typeof restrictedPool !== 'undefined',
-      retry(failureCount) {
-        return failureCount < 1
-      },
-      ...options,
-    }
-  )
+  return useQuery<DefaultRegionData, DefaultRegionError, TData>({
+    queryKey: miscKeys.defaultRegion(cloudProvider, useRestrictedPool ?? true),
+    queryFn: () => getDefaultRegionOption({ cloudProvider, restrictedPool, useRestrictedPool }),
+    enabled:
+      enabled && typeof cloudProvider !== 'undefined' && typeof restrictedPool !== 'undefined',
+    retry(failureCount) {
+      return failureCount < 1
+    },
+    ...options,
+  })
 }

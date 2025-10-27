@@ -4679,6 +4679,7 @@ export interface components {
     CloudMarketplaceOnboardingInfoResponse: {
       aws_contract_auto_renewal: boolean
       aws_contract_end_date: string
+      aws_contract_is_private_offer: boolean
       aws_contract_settings_url: string
       aws_contract_start_date: string
       organization_linking_eligibility: {
@@ -7610,6 +7611,9 @@ export interface components {
         type: string
       }[]
       defaultPaymentMethodId: string | null
+    }
+    PendingConfirmationResponse: {
+      message: string
     }
     PgbouncerConfigResponse: {
       connection_string: string
@@ -13830,6 +13834,14 @@ export interface operations {
         }
         content?: never
       }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
+        }
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -16166,6 +16178,14 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['CreateOrganizationResponse']
+        }
+      }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
         }
       }
       /** @description Failed to confirm subscription changes */

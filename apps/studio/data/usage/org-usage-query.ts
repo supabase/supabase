@@ -39,12 +39,10 @@ export const useOrgUsageQuery = <TData = OrgUsageData>(
   { orgSlug, projectRef, start, end }: OrgUsageVariables,
   { enabled = true, ...options }: UseQueryOptions<OrgUsageData, OrgUsageError, TData> = {}
 ) =>
-  useQuery<OrgUsageData, OrgUsageError, TData>(
-    usageKeys.orgUsage(orgSlug, projectRef, start?.toISOString(), end?.toISOString()),
-    ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined',
-      staleTime: 1000 * 60 * 60, // 60 mins, underlying usage data only refreshes once an hour, so safe to cache for a while
-      ...options,
-    }
-  )
+  useQuery<OrgUsageData, OrgUsageError, TData>({
+    queryKey: usageKeys.orgUsage(orgSlug, projectRef, start?.toISOString(), end?.toISOString()),
+    queryFn: ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
+    enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined',
+    staleTime: 1000 * 60 * 60,
+    ...options,
+  })

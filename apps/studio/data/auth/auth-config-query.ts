@@ -37,14 +37,12 @@ export const useAuthConfigQuery = <TData = ProjectAuthConfigData>(
     ...options
   }: UseQueryOptions<ProjectAuthConfigData, ProjectAuthConfigError, TData> = {}
 ) =>
-  useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>(
-    authKeys.authConfig(projectRef),
-    ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>({
+    queryKey: authKeys.authConfig(projectRef),
+    queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export const useAuthConfigPrefetch = ({ projectRef }: AuthConfigVariables) => {
   const client = useQueryClient()

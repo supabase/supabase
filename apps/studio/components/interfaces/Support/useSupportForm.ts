@@ -24,6 +24,7 @@ const supportFormDefaultValues: DefaultValues<SupportFormValues> = {
   message: '',
   affectedServices: '',
   allowSupportAccess: true,
+  attachDashboardLogs: true,
   dashboardSentryIssueId: '',
 }
 
@@ -83,10 +84,7 @@ export function useSupportForm(dispatch: Dispatch<SupportFormActions>): UseSuppo
       urlParamsRef.current.orgSlug && urlParamsRef.current.orgSlug !== NO_ORG_MARKER
         ? urlParamsRef.current.orgSlug
         : null
-    const projectRefFromUrl =
-      urlParamsRef.current.projectRef && urlParamsRef.current.projectRef !== NO_PROJECT_MARKER
-        ? urlParamsRef.current.projectRef
-        : null
+    const projectRefFromUrl = urlParamsRef.current.projectRef ?? null
 
     selectInitialOrgAndProject({
       projectRef: projectRefFromUrl,
