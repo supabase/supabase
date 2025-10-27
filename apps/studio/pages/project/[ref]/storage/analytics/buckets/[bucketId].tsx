@@ -20,7 +20,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
   if (!project || !projectRef) return null
 
   return (
-    <div className="storage-container flex flex-grow p-4">
+    <div className="storage-container flex flex-grow">
       {isError && <StorageBucketsError error={error as any} />}
 
       {isSuccess ? (
