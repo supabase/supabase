@@ -27,12 +27,10 @@ export const useOrgIntegrationsQuery = <TData = IntegrationsData>(
   { orgSlug }: IntegrationsVariables,
   { enabled = true, ...options }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}
 ) =>
-  useQuery<IntegrationsData, IntegrationsError, TData>(
-    integrationKeys.integrationsListWithOrg(orgSlug),
-    ({ signal }) => getIntegrations({ orgSlug }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined',
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      ...options,
-    }
-  )
+  useQuery<IntegrationsData, IntegrationsError, TData>({
+    queryKey: integrationKeys.integrationsListWithOrg(orgSlug),
+    queryFn: ({ signal }) => getIntegrations({ orgSlug }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined',
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  })

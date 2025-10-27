@@ -39,22 +39,20 @@ export const useStartPipelineMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<StartPipelineData, ResponseError, StartPipelineParams>(
-    (vars) => startPipeline(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, pipelineId } = variables
-        await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to start pipeline: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<StartPipelineData, ResponseError, StartPipelineParams>({
+    mutationFn: (vars) => startPipeline(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, pipelineId } = variables
+      await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to start pipeline: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

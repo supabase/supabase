@@ -24,13 +24,11 @@ export const useOverdueInvoicesQuery = <TData = OverdueInvoicesData>({
   ...options
 }: UseQueryOptions<OverdueInvoicesData, OverdueInvoicesError, TData> = {}) => {
   const isLoggedIn = useIsLoggedIn()
-  return useQuery<OverdueInvoicesData, OverdueInvoicesError, TData>(
-    invoicesKeys.overdueInvoices(),
-    ({ signal }) => getOverdueInvoices(signal),
-    {
-      enabled: enabled && isLoggedIn && IS_PLATFORM,
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      ...options,
-    }
-  )
+  return useQuery<OverdueInvoicesData, OverdueInvoicesError, TData>({
+    queryKey: invoicesKeys.overdueInvoices(),
+    queryFn: ({ signal }) => getOverdueInvoices(signal),
+    enabled: enabled && isLoggedIn && IS_PLATFORM,
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  })
 }

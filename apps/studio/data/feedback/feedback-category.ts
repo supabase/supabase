@@ -49,11 +49,9 @@ export const useFeedbackCategoryQuery = <TData = FeedbackCategory>(
     ...options
   }: UseQueryOptions<FeedbackCategory, FeedbackCategoryError, TData> = {}
 ) =>
-  useQuery<FeedbackCategory, FeedbackCategoryError, TData>(
-    ['feedback-category', prompt],
-    ({ signal }) => getFeedbackCategory({ prompt }, signal),
-    {
-      enabled: enabled && !!prompt,
-      ...options,
-    }
-  )
+  useQuery<FeedbackCategory, FeedbackCategoryError, TData>({
+    queryKey: ['feedback-category', prompt],
+    queryFn: ({ signal }) => getFeedbackCategory({ prompt }, signal),
+    enabled: enabled && !!prompt,
+    ...options,
+  })

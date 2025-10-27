@@ -65,7 +65,8 @@ export const useCreateAndExposeAPISchemaMutation = ({
     CreateAndExposeAPISchemaData,
     ResponseError,
     CreateAndExposeAPISchemaVariables
-  >((vars) => createAndExposeApiSchema(vars), {
+  >({
+    mutationFn: (vars) => createAndExposeApiSchema(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([

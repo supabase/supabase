@@ -131,8 +131,8 @@ export const useUpdateDestinationPipelineMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<UpdateDestinationPipelineData, ResponseError, UpdateDestinationPipelineParams>(
-    (vars) => updateDestinationPipeline(vars),
     {
+      mutationFn: (vars) => updateDestinationPipeline(vars),
       async onSuccess(data, variables, context) {
         const { projectRef, destinationId, pipelineId } = variables
 

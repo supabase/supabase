@@ -47,8 +47,8 @@ export const useCreateThirdPartyAuthIntegrationMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
   return useMutation<ThirdPartyIntegrationCreateData, ResponseError, CreateThirdPartyAuthVariables>(
-    (vars) => createThirdPartyIntegration(vars),
     {
+      mutationFn: (vars) => createThirdPartyIntegration(vars),
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(keys.integrations(projectRef))

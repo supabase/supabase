@@ -1,4 +1,4 @@
-import { LifeBuoy } from 'lucide-react'
+import { LifeBuoy, Activity } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { IS_PLATFORM } from 'common'
@@ -11,25 +11,25 @@ const useSupportCommands = () => {
     () =>
       [
         {
-          id: 'support',
-          name: 'Support',
+          id: 'system-status',
+          name: 'View system status',
+          value: 'Support: View system status',
+          route: 'https://status.supabase.com',
+          icon: () => <Activity />,
+        },
+        {
+          id: 'discord-community',
+          name: 'Ask Discord community',
+          value: 'Support: Ask Discord community',
+          route: 'https://discord.supabase.com',
+          icon: () => <LifeBuoy />,
+        },
+        {
+          id: 'support-team',
+          name: 'Contact support',
+          value: 'Support: Contact support',
           route: 'https://www.supabase.com/support',
           icon: () => <LifeBuoy />,
-        },
-        {
-          id: 'system-status',
-          name: 'System Status',
-          value: 'Support: System Status',
-          route: 'https://status.supabase.com',
-          icon: () => <LifeBuoy />,
-        },
-        {
-          id: 'github-discussions',
-          name: 'GitHub Discussions',
-          value: 'Support: GitHub Discussions',
-          route: 'https://github.com/orgs/supabase/discussions',
-          icon: () => <LifeBuoy />,
-          defaultHidden: true,
         },
       ] as Array<ICommand>,
     []

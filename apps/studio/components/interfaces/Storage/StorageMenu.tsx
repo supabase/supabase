@@ -10,7 +10,7 @@ import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Menu } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn, Menu } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
   InnerSideBarEmptyPanel,
@@ -70,15 +70,12 @@ export const StorageMenu = () => {
     [sortedBuckets, searchText]
   )
   const tempNotSupported = error?.message.includes('Tenant config') && isBranch
+  const isVirtualized = buckets.length > 50
 
   return (
     <>
-      <Menu
-        type="pills"
-        className="pt-6 h-full flex flex-col"
-        ulClassName="flex flex-col flex-grow"
-      >
-        <div className="mb-6 mx-5 flex flex-col gap-y-1.5">
+      <Menu type="pills" className="h-full flex flex-col" ulClassName="flex flex-col flex-grow">
+        <div className="flex flex-col gap-y-1.5 px-5 pb-6 pt-6 sticky top-0 bg-sidebar">
           <CreateBucketModal />
 
           <InnerSideBarFilters className="px-0">
@@ -110,8 +107,17 @@ export const StorageMenu = () => {
           </InnerSideBarFilters>
         </div>
 
-        <div className="flex flex-col flex-grow">
-          <div className="flex-grow ml-3 flex flex-col">
+        <div className={cn('flex flex-col', isVirtualized && 'flex-grow')}>
+          <div
+            className={cn(
+              'flex flex-col mx-3',
+              isVirtualized
+                ? 'flex-grow'
+                : isSuccess && filteredBuckets.length > 0
+                  ? 'mb-3'
+                  : 'mb-5'
+            )}
+          >
             <Menu.Group title={<span className="uppercase font-mono">All buckets</span>} />
 
             {isLoading && (
@@ -165,27 +171,27 @@ export const StorageMenu = () => {
               </>
             )}
           </div>
+        </div>
 
-          <div className="w-full bg-dash-sidebar px-3 py-6 sticky bottom-0 border-t border-border">
-            <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
-            <Link href={`/project/${ref}/storage/policies`}>
-              <Menu.Item rounded active={page === 'policies'}>
-                <p className="truncate">Policies</p>
+        <div className="w-full bg-dash-sidebar px-3 py-6 sticky bottom-0 border-t border-border">
+          <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
+          <Link href={`/project/${ref}/storage/policies`}>
+            <Menu.Item rounded active={page === 'policies'}>
+              <p className="truncate">Policies</p>
+            </Menu.Item>
+          </Link>
+          {IS_PLATFORM && (
+            <Link href={`/project/${ref}/storage/settings`}>
+              <Menu.Item rounded active={page === 'settings'}>
+                <div className="flex items-center gap-x-2">
+                  <p className="truncate">Settings</p>
+                  {isListV2UpgradeAvailable && (
+                    <InfoTooltip side="right">Upgrade available</InfoTooltip>
+                  )}
+                </div>
               </Menu.Item>
             </Link>
-            {IS_PLATFORM && (
-              <Link href={`/project/${ref}/storage/settings`}>
-                <Menu.Item rounded active={page === 'settings'}>
-                  <div className="flex items-center gap-x-2">
-                    <p className="truncate">Settings</p>
-                    {isListV2UpgradeAvailable && (
-                      <InfoTooltip side="right">Upgrade available</InfoTooltip>
-                    )}
-                  </div>
-                </Menu.Item>
-              </Link>
-            )}
-          </div>
+          )}
         </div>
       </Menu>
     </>

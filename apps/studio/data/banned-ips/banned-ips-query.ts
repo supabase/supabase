@@ -30,11 +30,9 @@ export const useBannedIPsQuery = <TData = IPData>(
   { projectRef }: BannedIPVariables,
   { enabled = true, ...options }: UseQueryOptions<IPData, IPError, TData> = {}
 ) =>
-  useQuery<IPData, IPError, TData>(
-    BannedIPKeys.list(projectRef),
-    ({ signal }) => getBannedIPs({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<IPData, IPError, TData>({
+    queryKey: BannedIPKeys.list(projectRef),
+    queryFn: ({ signal }) => getBannedIPs({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

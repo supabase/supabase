@@ -247,7 +247,8 @@ export const useFDWCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<FDWCreateData, ResponseError, FDWCreateVariables>((vars) => createFDW(vars), {
+  return useMutation<FDWCreateData, ResponseError, FDWCreateVariables>({
+    mutationFn: (vars) => createFDW(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 

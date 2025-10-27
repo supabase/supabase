@@ -53,25 +53,23 @@ export const useDatabaseExtensionEnableMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseExtensionEnableData, ResponseError, DatabaseExtensionEnableVariables>(
-    (vars) => enableDatabaseExtension(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(databaseExtensionsKeys.list(projectRef)),
-          queryClient.invalidateQueries(configKeys.upgradeEligibility(projectRef)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to enable database extension: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseExtensionEnableData, ResponseError, DatabaseExtensionEnableVariables>({
+    mutationFn: (vars) => enableDatabaseExtension(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await Promise.all([
+        queryClient.invalidateQueries(databaseExtensionsKeys.list(projectRef)),
+        queryClient.invalidateQueries(configKeys.upgradeEligibility(projectRef)),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to enable database extension: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

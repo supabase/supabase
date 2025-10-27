@@ -46,22 +46,20 @@ export const useTableRowTruncateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowTruncateData, ResponseError, TableRowTruncateVariables>(
-    (vars) => truncateTableRow(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, table } = variables
-        await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to truncate table row: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<TableRowTruncateData, ResponseError, TableRowTruncateVariables>({
+    mutationFn: (vars) => truncateTableRow(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, table } = variables
+      await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to truncate table row: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

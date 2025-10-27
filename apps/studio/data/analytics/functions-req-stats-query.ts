@@ -56,15 +56,13 @@ export const useFunctionsReqStatsQuery = <TData = FunctionsReqStatsData>(
     ...options
   }: UseQueryOptions<FunctionsReqStatsData, FunctionsReqStatsError, TData> = {}
 ) =>
-  useQuery<FunctionsReqStatsData, FunctionsReqStatsError, TData>(
-    analyticsKeys.functionsReqStats(projectRef, { functionId, interval }),
-    ({ signal }) => getFunctionsReqStats({ projectRef, functionId, interval }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof functionId !== 'undefined' &&
-        typeof interval !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<FunctionsReqStatsData, FunctionsReqStatsError, TData>({
+    queryKey: analyticsKeys.functionsReqStats(projectRef, { functionId, interval }),
+    queryFn: ({ signal }) => getFunctionsReqStats({ projectRef, functionId, interval }, signal),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof functionId !== 'undefined' &&
+      typeof interval !== 'undefined',
+    ...options,
+  })
