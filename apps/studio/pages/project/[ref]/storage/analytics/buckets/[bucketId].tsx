@@ -20,6 +20,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
   const { bucket, error, isSuccess, isError } = useSelectedBucket()
 
   // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
+  // We can probably replace this with a better skeleton loader that's more representative of the page layout
   if (!project || !projectRef) return null
 
   return (
