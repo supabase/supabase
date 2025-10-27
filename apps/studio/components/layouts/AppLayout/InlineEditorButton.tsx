@@ -2,7 +2,13 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SqlEditor } from 'icons'
 import { KeyboardShortcut } from 'ui'
 
-export const InlineEditorButton = ({ onClick }: { onClick: () => void }) => {
+export const InlineEditorButton = ({
+  onClick,
+  showShortcut = true,
+}: {
+  onClick: () => void
+  showShortcut?: boolean
+}) => {
   return (
     <ButtonTooltip
       type="text"
@@ -15,7 +21,7 @@ export const InlineEditorButton = ({ onClick }: { onClick: () => void }) => {
           text: (
             <div className="flex items-center gap-4">
               <span>SQL Editor</span>
-              <KeyboardShortcut keys={['Meta', 'e']} />
+              {showShortcut && <KeyboardShortcut keys={['Meta', 'e']} />}
             </div>
           ),
         },

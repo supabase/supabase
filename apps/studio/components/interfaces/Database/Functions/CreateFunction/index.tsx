@@ -50,8 +50,9 @@ const FORM_ID = 'create-function-sidepanel'
 
 interface CreateFunctionProps {
   func?: DatabaseFunction
+  isDuplicating?: boolean
   visible: boolean
-  setVisible: (value: boolean) => void
+  onClose: () => void
 }
 
 const FormSchema = z.object({
@@ -68,15 +69,13 @@ const FormSchema = z.object({
     .optional(),
 })
 
-const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
+const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: CreateFunctionProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
-  // For now, there's no AI assistant for functions
-  const [assistantVisible, setAssistantVisible] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
-  const isEditing = !!func?.id
+  const isEditing = !isDuplicating && !!func?.id
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -89,7 +88,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     useDatabaseFunctionUpdateMutation()
 
   function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
+    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
@@ -111,7 +110,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully updated function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -125,7 +124,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully created function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -155,19 +154,11 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
       <SheetContent
         showClose={false}
-        size={assistantVisible ? 'lg' : 'default'}
-        className={cn(
-          // 'bg-surface-200',
-          'p-0 flex flex-row gap-0',
-          assistantVisible ? '!min-w-screen lg:!min-w-[1200px]' : '!min-w-screen lg:!min-w-[600px]'
-        )}
+        size={'default'}
+        className={'p-0 flex flex-row gap-0 !min-w-screen lg:!min-w-[600px]'}
       >
-        <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
-          <CreateFunctionHeader
-            selectedFunction={func?.name}
-            assistantVisible={assistantVisible}
-            setAssistantVisible={setAssistantVisible}
-          />
+        <div className="flex flex-col grow w-full">
+          <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
           <Separator />
           <Form_Shadcn_ {...form}>
             <form
@@ -405,11 +396,6 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
             </Button>
           </SheetFooter>
         </div>
-        {assistantVisible ? (
-          <div className="border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10 w-[50%] bg-studio">
-            {/* This is where the AI assistant would be added */}
-          </div>
-        ) : null}
         <ConfirmationModal
           visible={isClosingPanel}
           title="Discard changes"
@@ -417,7 +403,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
           onCancel={() => setIsClosingPanel(false)}
           onConfirm={() => {
             setIsClosingPanel(false)
-            setVisible(!visible)
+            onClose()
           }}
         >
           <p className="text-sm text-foreground-light">

@@ -118,12 +118,14 @@ export const AwsMarketplaceLinkExistingOrg = ({
 
   return (
     <>
-      {onboardingInfo && !onboardingInfo.aws_contract_auto_renewal && (
-        <AwsMarketplaceAutoRenewalWarning
-          awsContractEndDate={onboardingInfo.aws_contract_end_date}
-          awsContractSettingsUrl={onboardingInfo.aws_contract_settings_url}
-        />
-      )}
+      {onboardingInfo &&
+        !onboardingInfo.aws_contract_auto_renewal &&
+        !onboardingInfo.aws_contract_is_private_offer && (
+          <AwsMarketplaceAutoRenewalWarning
+            awsContractEndDate={onboardingInfo.aws_contract_end_date}
+            awsContractSettingsUrl={onboardingInfo.aws_contract_settings_url}
+          />
+        )}
       <ScaffoldSection>
         <ScaffoldSectionDetail className="text-base">
           <>
@@ -136,8 +138,11 @@ export const AwsMarketplaceLinkExistingOrg = ({
 
             <p>
               You can read more on billing through AWS in our {''}
-              {/*TODO(thomas): Update docs link once the new docs exist*/}
-              <Link href={`${DOCS_URL}/guides/platform`} target="_blank" className="underline">
+              <Link
+                href={`${DOCS_URL}/guides/platform/aws-marketplace`}
+                target="_blank"
+                className="underline"
+              >
                 Billing Docs.
               </Link>
             </p>

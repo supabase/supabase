@@ -16,6 +16,7 @@ import {
 } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -45,13 +46,12 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: permissions } = usePermissionsQuery()
-  const { data: members } = useOrganizationMembersQuery({ slug })
-
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const hasProjectScopedRoles = (allRoles?.project_scoped_roles ?? []).length > 0
+  const { data: members } = useOrganizationMembersQuery({ slug })
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   // [Joshen] We only need this data if the org has project scoped roles
-  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
+  const { data } = useProjectsQuery({ enabled: isOptedIntoProjectLevelPermissions })
   const allProjects = data?.projects ?? []
 
   const memberIsUser = member.gotrue_id == profile?.gotrue_id

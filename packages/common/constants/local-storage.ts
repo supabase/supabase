@@ -18,6 +18,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_NEW_STORAGE_UI: 'new-storage-ui',
+  UI_PREVIEW_SECURITY_NOTIFICATIONS: 'security-notifications',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
@@ -25,6 +26,10 @@ export const LOCAL_STORAGE_KEYS = {
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
+
+  AUTH_USERS_FILTER: (ref: string) => `auth-users-filter-${ref}`,
+  AUTH_USERS_SORT_BY_VALUE: (ref: string) => `auth-users-sort-by-value-${ref}`,
+  AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
@@ -60,7 +65,6 @@ export const LOCAL_STORAGE_KEYS = {
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   MIDDLEWARE_OUTAGE_BANNER: 'middleware-outage-banner-2025-05-16',
-  AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
 
   // api keys view switcher for new and legacy api keys
@@ -71,6 +75,10 @@ export const LOCAL_STORAGE_KEYS = {
   // user impersonation selector previous searches
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
     `user-impersonation-selector-previous-searches-${ref}`,
+
+  HOTKEY_INLINE_EDITOR: 'supabase-dashboard-hotkey-inline-editor',
+  HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
+  HOTKEY_AI_ASSISTANT: 'supabase-dashboard-hotkey-ai-assistant',
 
   /**
    * COMMON

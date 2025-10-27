@@ -24,6 +24,7 @@ export interface IApiEndPoint {
   }
   tags?: Array<string>
   security?: Array<ISecurityOption>
+  'x-oauth-scope'?: string
 }
 
 export type ISchema =
