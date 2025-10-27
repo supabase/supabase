@@ -53,19 +53,12 @@
     "prism-react-renderer": "^2.3.1",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "~0.34.0",
+    "sharp": "0.34.3",
     "tailwind-merge": "^1.13.2",
     "tsx": "^4.19.3",
     "typescript": "catalog:"
   },
   "externals": {
     "sharp": "commonjs sharp"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": ["sharp", "esbuild", "unrs-resolver"],
-    "supportedArchitectures": {
-      "os": ["linux", "darwin"],
-      "cpu": ["x64", "arm64"]
-    }
   }
 }
