@@ -41,13 +41,14 @@ export const ProjectClaimConfirm = ({
   const queryClient = useQueryClient()
 
   const { mutateAsync: approveRequest, isLoading: isApproving } =
-    useApiAuthorizationApproveMutation()
+    useApiAuthorizationApproveMutation({ onError: () => {} })
 
   const { mutateAsync: claimProject, isLoading: isClaiming } = useOrganizationProjectClaimMutation()
 
   const onClaimProject = async () => {
     try {
       const response = await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
+
       await claimProject({
         slug: selectedOrganization.slug,
         token: claimToken!,
