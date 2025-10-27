@@ -39,8 +39,8 @@ export const InlineEditorSettings = () => {
             render={({ field }) => (
               <FormItemLayout
                 layout="flex-row-reverse"
-                label="Directly edit database entities"
-                description="When enabled, edit policies, triggers, and functions directly in a side panel using SQL. When disabled, use the AI-assisted form editor."
+                label="Edit entities in SQL"
+                description="When enabled, view and edit policies, triggers, and functions directly in the SQL editor."
               >
                 <FormControl_Shadcn_>
                   <Switch
