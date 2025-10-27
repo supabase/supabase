@@ -35,6 +35,6 @@ export const useEntitlementsQuery = <TData = EntitlementsData>(
     queryFn: ({ signal }) => getEntitlements({ slug }, signal),
     enabled: enabled && typeof slug !== 'undefined',
     ...options,
-    staleTime: 1 * 60 * 1000,
+    staleTime: 30 * 60 * 1000,
   })
 }

@@ -76,6 +76,7 @@ export const useOrgSubscriptionUpdateMutation = ({
           queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
           queryClient.invalidateQueries(organizationKeys.detail(slug)),
           queryClient.invalidateQueries(organizationKeys.list()),
+          queryClient.invalidateQueries(organizationKeys.entitlements(slug)),
         ])
 
         if (variables.paymentMethod) {
