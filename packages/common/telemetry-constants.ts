@@ -701,17 +701,6 @@ export interface HomepageGitHubButtonClickedEvent {
 }
 
 /**
- * User clicked the GitHub Discussions button in the homepage community section.
- *
- * @group Events
- * @source www
- * @page /
- */
-export interface HomepageGitHubDiscussionsButtonClickedEvent {
-  action: 'homepage_github_discussions_button_clicked'
-}
-
-/**
  * User clicked the Discord button in the homepage community section.
  *
  * @group Events
