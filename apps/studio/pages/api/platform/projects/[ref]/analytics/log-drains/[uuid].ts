@@ -56,7 +56,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       // create the log drain
       const deleteUrl = new URL(PROJECT_ANALYTICS_URL)
       deleteUrl.pathname = `/api/backends/${uuid}`
-      console.log('deleteUrl', deleteUrl)
+
       await fetch(deleteUrl, {
         headers: {
           Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
