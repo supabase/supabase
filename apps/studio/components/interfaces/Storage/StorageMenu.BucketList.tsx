@@ -4,6 +4,7 @@ import type { ListChildComponentProps } from 'react-window'
 import { FixedSizeList as List, areEqual } from 'react-window'
 
 import type { Bucket } from 'data/storage/buckets-query'
+import { cn } from 'ui'
 import { BucketRow } from './BucketRow'
 
 type BucketListProps = {
@@ -25,7 +26,7 @@ const VirtualizedBucketRow = memo(
         isSelected={isSelected}
         projectRef={data.projectRef}
         style={style as CSSProperties}
-        className={BUCKET_ROW_HEIGHT}
+        className={cn(BUCKET_ROW_HEIGHT)}
       />
     )
   },
@@ -95,19 +96,15 @@ export const BucketList = ({ buckets, selectedBucketId, projectRef = '' }: Bucke
   const numBuckets = buckets.length
 
   if (numBuckets <= 50) {
-    return (
-      <div className="mr-3 mb-6">
-        {buckets.map((bucket) => (
-          <BucketRow
-            key={bucket.id}
-            bucket={bucket}
-            isSelected={selectedBucketId === bucket.id}
-            projectRef={projectRef}
-            className={BUCKET_ROW_HEIGHT}
-          />
-        ))}
-      </div>
-    )
+    return buckets.map((bucket) => (
+      <BucketRow
+        key={bucket.id}
+        bucket={bucket}
+        isSelected={selectedBucketId === bucket.id}
+        projectRef={projectRef}
+        className={BUCKET_ROW_HEIGHT}
+      />
+    ))
   }
 
   return (
