@@ -1,5 +1,6 @@
-import { useParams } from 'common'
+import Link from 'next/link'
 
+import { useParams } from 'common'
 import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticBucketDetails'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
@@ -11,7 +12,6 @@ import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
-import Link from 'next/link'
 
 const AnalyticsBucketPage: NextPageWithLayout = () => {
   const { bucketId } = useParams()

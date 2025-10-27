@@ -1,3 +1,7 @@
+import { ChevronRight, Code, Info, MoreVertical, Plus, Replace, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
@@ -5,9 +9,6 @@ import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-s
 import { FDW } from 'data/fdw/fdws-query'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { ChevronRight, Code, Info, MoreVertical, Plus, Replace, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
 import {
   Button,
   Card,
@@ -43,17 +44,15 @@ type NamespaceWithTablesProps = {
 
 // Component for individual table rows within a namespace
 const TableRowComponent = ({
+  index,
   tableName,
   isConnected,
-  schema,
   isLoading,
-  index,
 }: {
+  index: number
   tableName: string
   isConnected: boolean
-  schema?: string
   isLoading?: boolean
-  index: number
 }) => {
   const { data: project } = useSelectedProjectQuery()
 
@@ -121,24 +120,18 @@ const TableRowComponent = ({
               </DropdownMenuTrigger>
 
               <DropdownMenuContent side="bottom" align="end" className="w-fit min-w-[180px]">
-                <DropdownMenuItem
-                  className="flex items-center space-x-2"
-                  onClick={handleQueryTable}
-                >
+                <DropdownMenuItem className="flex items-center gap-x-2" onClick={handleQueryTable}>
                   <Code size={12} className="text-foreground-lighter" />
                   <p>Query in SQL Editor</p>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="flex items-center space-x-2">
+                <DropdownMenuItem asChild className="flex items-center gap-x-2">
                   <Link href={`/project/${project?.ref}/database/replication/${tableName}`}>
                     <Replace size={12} className="text-foreground-lighter" />
                     <p>View replication status</p>
                   </Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                  className="flex items-center space-x-2"
-                  onClick={handleDeleteTable}
-                >
+                <DropdownMenuItem className="flex items-center gap-x-2" onClick={handleDeleteTable}>
                   <Trash2 size={12} className="text-foreground-lighter" />
                   <p>Delete table</p>
                 </DropdownMenuItem>
@@ -255,32 +248,31 @@ export const NamespaceWithTables = ({
             </Tooltip>
           </TooltipProvider>
           {validSchema && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger
-                  asChild
-                  className={tables.length === 0 ? `flex flex-row items-center gap-x-1` : undefined}
+            <Tooltip>
+              <TooltipTrigger
+                asChild
+                className={tables.length === 0 ? `flex flex-row items-center gap-x-1` : undefined}
+              >
+                <span
+                  className={
+                    tables.length > 0
+                      ? `text-foreground`
+                      : `text-foreground-muted flex flex-row items-center gap-x-1`
+                  }
                 >
-                  <span
-                    className={
-                      tables.length > 0
-                        ? `text-foreground`
-                        : `text-foreground-muted flex flex-row items-center gap-x-1`
-                    }
-                  >
-                    {displaySchema}
-                    {tables.length === 0 && <Info size={12} />}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Postgres schema{tables.length === 0 && ' that will be created'}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                  {displaySchema}
+                  {tables.length === 0 && <Info size={12} />}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Postgres schema{tables.length === 0 && ' that will be created'}</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </CardTitle>
 
         <div className="flex flex-row gap-x-2">
+          {/* [Joshen] Temporarily commented out, will be introduced once language and UI details are finalized */}
           {/* {tables.length > 0 && <p className="text-sm text-foreground-muted">{scanTooltip}</p>} */}
           {/* {scanTooltip && <p className="text-sm text-foreground-muted">{scanTooltip}</p>} */}
           {missingTables.length > 0 && (
@@ -324,7 +316,6 @@ export const NamespaceWithTables = ({
                 key={name}
                 tableName={name}
                 isConnected={isConnected}
-                schema={schema}
                 isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
                 index={index}
               />
@@ -335,7 +326,6 @@ export const NamespaceWithTables = ({
       <ImportForeignSchemaDialog
         bucketName={bucketName}
         namespace={namespace}
-        circumstance="clash"
         wrapperMeta={wrapperMeta}
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}

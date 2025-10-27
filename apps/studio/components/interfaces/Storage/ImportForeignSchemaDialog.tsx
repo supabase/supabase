@@ -23,7 +23,7 @@ export interface ImportForeignSchemaDialogProps {
   bucketName: string
   namespace: string
   wrapperMeta: WrapperMeta
-  circumstance: 'fresh' | 'clash'
+  circumstance?: 'fresh' | 'clash'
   visible: boolean
   onClose: () => void
 }

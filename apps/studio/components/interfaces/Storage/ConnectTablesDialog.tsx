@@ -1,12 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Dialog,
@@ -23,7 +25,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import z from 'zod'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 
 const FormSchema = z
@@ -58,11 +59,9 @@ const FormSchema = z
 
 const formId = 'connect-tables-form'
 
-export type ConnectTablesForm = z.infer<typeof FormSchema>
+type ConnectTablesForm = z.infer<typeof FormSchema>
 
-interface ConnectTablesDialogProps {}
-
-export const ConnectTablesDialog = ({}: ConnectTablesDialogProps) => {
+export const ConnectTablesDialog = () => {
   // Temporary loading state before muteAsync is implemented
   const isConnecting = false
   const [visible, setVisible] = useState(false)
@@ -105,15 +104,13 @@ export const ConnectTablesDialog = ({}: ConnectTablesDialogProps) => {
       <DialogTrigger asChild>
         {/* Temporary disabled button in UI until the feature is implemented */}
         <ButtonTooltip
+          disabled
           size="tiny"
           type="primary"
           icon={<Plus size={14} />}
           // onClick={() => setVisible(true)}
-          disabled
           tooltip={{
-            content: {
-              text: 'Coming soon',
-            },
+            content: { side: 'bottom', text: 'Coming soon' },
           }}
         >
           Connect tables

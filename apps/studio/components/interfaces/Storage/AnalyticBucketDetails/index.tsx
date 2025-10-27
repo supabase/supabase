@@ -1,3 +1,8 @@
+import { snakeCase, uniq } from 'lodash'
+import { SquarePlus } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
@@ -29,10 +34,6 @@ import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-cr
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { snakeCase, uniq } from 'lodash'
-import { SquarePlus } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
 import {
   Button,
   Card,
