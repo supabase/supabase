@@ -20,6 +20,21 @@ export const generateSettingsMenu = (
     billing?: boolean
   }
 ): ProductMenuGroup[] => {
+  if (!IS_PLATFORM) {
+    return [
+      {
+        title: 'Project Settings',
+        items: [
+          {
+            name: `Log Drains`,
+            key: `log-drains`,
+            url: `/project/${ref}/settings/log-drains`,
+            items: [],
+          },
+        ],
+      },
+    ]
+  }
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
