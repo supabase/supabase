@@ -6,7 +6,7 @@ interface NotOrganizationOwnerWarningProps {
 }
 
 // [Joshen] This can just use NoPermission component i think
-const NotOrganizationOwnerWarning = ({ slug }: NotOrganizationOwnerWarningProps) => {
+export const NotOrganizationOwnerWarning = ({ slug }: NotOrganizationOwnerWarningProps) => {
   return (
     <div className="mt-4">
       <InformationBox
@@ -32,5 +32,3 @@ const NotOrganizationOwnerWarning = ({ slug }: NotOrganizationOwnerWarningProps)
     </div>
   )
 }
-
-export default NotOrganizationOwnerWarning

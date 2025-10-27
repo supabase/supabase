@@ -1,6 +1,7 @@
 import { Columns3, Layers, Table2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { TableField } from '../TableEditor.types'
 import { tableTemplates } from './templates'

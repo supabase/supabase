@@ -37,25 +37,23 @@ export const useGitHubConnectionUpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateContentData, ResponseError, GitHubConnectionUpdateVariables>(
-    (args) => updateConnection(args),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(
-            integrationKeys.githubConnectionsList(variables.organizationId)
-          ),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update GitHub connection: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UpdateContentData, ResponseError, GitHubConnectionUpdateVariables>({
+    mutationFn: (args) => updateConnection(args),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries(
+          integrationKeys.githubConnectionsList(variables.organizationId)
+        ),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update GitHub connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

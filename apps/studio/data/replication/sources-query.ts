@@ -29,8 +29,9 @@ export const useReplicationSourcesQuery = <TData = ReplicationSourcesData>(
   { projectRef }: ReplicationSourcesParams,
   { enabled = true, ...options }: UseQueryOptions<ReplicationSourcesData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationSourcesData, ResponseError, TData>(
-    replicationKeys.sources(projectRef),
-    ({ signal }) => fetchReplicationSources({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ReplicationSourcesData, ResponseError, TData>({
+    queryKey: replicationKeys.sources(projectRef),
+    queryFn: ({ signal }) => fetchReplicationSources({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

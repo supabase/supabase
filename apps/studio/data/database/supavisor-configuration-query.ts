@@ -33,11 +33,9 @@ export const useSupavisorConfigurationQuery = <TData = SupavisorConfigurationDat
     ...options
   }: UseQueryOptions<SupavisorConfigurationData, SupavisorConfigurationError, TData> = {}
 ) =>
-  useQuery<SupavisorConfigurationData, SupavisorConfigurationError, TData>(
-    databaseKeys.poolingConfiguration(projectRef),
-    ({ signal }) => getSupavisorConfiguration({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
-      ...options,
-    }
-  )
+  useQuery<SupavisorConfigurationData, SupavisorConfigurationError, TData>({
+    queryKey: databaseKeys.poolingConfiguration(projectRef),
+    queryFn: ({ signal }) => getSupavisorConfiguration({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
+    ...options,
+  })

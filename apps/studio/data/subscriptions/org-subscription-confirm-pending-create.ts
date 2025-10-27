@@ -54,7 +54,8 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
     PendingSubscriptionCreateData,
     ResponseError,
     PendingSubscriptionCreateVariables
-  >((vars) => confirmPendingSubscriptionCreate(vars), {
+  >({
+    mutationFn: (vars) => confirmPendingSubscriptionCreate(vars),
     async onSuccess(data, variables, context) {
       // Handle 202 Accepted - show toast and skip query updates
       if (data && 'message' in data && !('slug' in data)) {

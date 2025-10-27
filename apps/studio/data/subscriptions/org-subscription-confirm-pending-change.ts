@@ -60,7 +60,8 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
     PendingSubscriptionChangeData,
     ResponseError,
     PendingSubscriptionChangeVariables
-  >((vars) => confirmPendingSubscriptionChange(vars), {
+  >({
+    mutationFn: (vars) => confirmPendingSubscriptionChange(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
 

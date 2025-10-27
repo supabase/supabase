@@ -31,21 +31,19 @@ export const useUserSendOTPMutation = ({
   UseMutationOptions<UserSendOTPData, ResponseError, UserSendOTPVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<UserSendOTPData, ResponseError, UserSendOTPVariables>(
-    (vars) => sendOTP(vars),
-    {
-      async onSuccess(data, variables, context) {
-        // [Joshen] If we need to invalidate any queries
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to send magic link: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UserSendOTPData, ResponseError, UserSendOTPVariables>({
+    mutationFn: (vars) => sendOTP(vars),
+    async onSuccess(data, variables, context) {
+      // [Joshen] If we need to invalidate any queries
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to send magic link: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

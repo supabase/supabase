@@ -29,11 +29,9 @@ export const useOAuthAppsQuery = <TData = OAuthAppsData>(
   { slug }: OAuthAppsVariables,
   { enabled = true, ...options }: UseQueryOptions<OAuthAppsData, OAuthAppsError, TData> = {}
 ) =>
-  useQuery<OAuthAppsData, OAuthAppsError, TData>(
-    oauthAppKeys.oauthApps(slug),
-    ({ signal }) => getOAuthApps({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<OAuthAppsData, OAuthAppsError, TData>({
+    queryKey: oauthAppKeys.oauthApps(slug),
+    queryFn: ({ signal }) => getOAuthApps({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

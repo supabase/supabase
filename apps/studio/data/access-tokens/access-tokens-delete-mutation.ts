@@ -30,22 +30,20 @@ export const useAccessTokenDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>(
-    (vars) => deleteAccessToken(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(accessTokenKeys.list())
+  return useMutation<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>({
+    mutationFn: (vars) => deleteAccessToken(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries(accessTokenKeys.list())
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete access token: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete access token: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

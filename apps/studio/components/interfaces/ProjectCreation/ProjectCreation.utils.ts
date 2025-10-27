@@ -1,3 +1,4 @@
+import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import type { CloudProvider, Region } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
@@ -28,4 +29,18 @@ export function getAvailableRegions(cloudProvider: CloudProvider): Region {
     default:
       throw new Error('Invalid cloud provider')
   }
+}
+
+/**
+ * When launching new projects, they only get assigned a compute size once successfully launched,
+ * this might assume wrong compute size, but only for projects being rapidly launched after one another on non-default compute sizes.
+ *
+ * Needs to be in the API in the future [kevin]
+ */
+export const monthlyInstancePrice = (instance: string | undefined): number => {
+  return instanceSizeSpecs[instance as DesiredInstanceSize]?.priceMonthly || 10
+}
+
+export const instanceLabel = (instance: string | undefined): string => {
+  return instanceSizeSpecs[instance as DesiredInstanceSize]?.label || 'Micro'
 }
