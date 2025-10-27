@@ -11,11 +11,12 @@ import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { Card } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { Button, Card } from 'ui'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 
 const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
@@ -63,7 +64,16 @@ const RedirectToTemplates = () => {
   if (!template || !templateId || typeof templateId !== 'string') {
     return (
       <div className="flex h-full w-full items-center justify-center">
-        <p className="text-sm text-foreground-light">Template "{templateId}" cannot be found</p>
+        <Admonition
+          className="max-w-md"
+          type="default"
+          title="Unable to find template"
+          description={`${templateId ? `The template "${templateId}"` : 'This template'} doesn’t seem to exist.`}
+        >
+          <Button asChild type="default" className="mt-2">
+            <Link href={`/project/${ref}/auth/templates`}>Head back</Link>
+          </Button>
+        </Admonition>
       </div>
     )
   }
