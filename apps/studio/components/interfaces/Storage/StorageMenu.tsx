@@ -108,7 +108,16 @@ export const StorageMenu = () => {
         </div>
 
         <div className={cn('flex flex-col', isVirtualized && 'flex-grow')}>
-          <div className={cn('flex flex-col mx-3', isVirtualized ? 'flex-grow' : 'mb-3')}>
+          <div
+            className={cn(
+              'flex flex-col mx-3',
+              isVirtualized
+                ? 'flex-grow'
+                : isSuccess && filteredBuckets.length > 0
+                  ? 'mb-3'
+                  : 'mb-5'
+            )}
+          >
             <Menu.Group title={<span className="uppercase font-mono">All buckets</span>} />
 
             {isLoading && (
