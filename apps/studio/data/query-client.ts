@@ -12,7 +12,6 @@ if (!IS_PLATFORM) {
 }
 
 const SKIP_RETRY_PATHNAME_MATCHERS = [
-  '/system/projects/:ref/run-lints',
   '/platform/projects/:ref/run-lints',
   '/platform/organizations/:slug/usage',
   '/platform/pg-meta/:ref/query',
