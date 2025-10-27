@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button } from 'ui'
@@ -13,7 +12,6 @@ interface AdvisorsSidebarMenuProps {
 }
 
 export function AdvisorsSidebarMenu({ page }: AdvisorsSidebarMenuProps) {
-  const { ref } = useParams() as { ref: string }
   const { data: project } = useSelectedProjectQuery()
   const advisorRules = useIsAdvisorRulesEnabled()
   const { toggleSidebar } = useSidebarManagerSnapshot()
