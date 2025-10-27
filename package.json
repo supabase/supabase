@@ -69,6 +69,7 @@
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "pnpm@10.18.0",
   "pnpm": {
+    "onlyBuiltDependencies": ["sharp", "esbuild", "unrs-resolver"],
     "supportedArchitectures": {
       "os": ["linux", "darwin"],
       "cpu": ["x64", "arm64"]
