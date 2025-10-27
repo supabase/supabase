@@ -2058,7 +2058,6 @@ export type TelemetryEvent =
   | WwwPricingPlanCtaClickedEvent
   | EventPageCtaClickedEvent
   | HomepageGitHubButtonClickedEvent
-  | HomepageGitHubDiscussionsButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
