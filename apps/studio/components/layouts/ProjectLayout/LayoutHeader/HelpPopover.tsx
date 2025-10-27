@@ -15,7 +15,6 @@ import {
   Button,
   ButtonGroup,
   ButtonGroupItem,
-  IconDiscord,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -116,14 +115,23 @@ export const HelpPopover = () => {
                   Troubleshooting
                 </a>
               </ButtonGroupItem>
-              <ButtonGroupItem size="tiny" icon={<Activity strokeWidth={1.5} size={14} />} asChild>
-                <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
-                  Supabase status
-                </a>
-              </ButtonGroupItem>
-              <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
-                <SupportLink queryParams={{ projectRef }}>Contact support</SupportLink>
-              </ButtonGroupItem>
+              {IS_PLATFORM && (
+                <>
+                  <ButtonGroupItem
+                    size="tiny"
+                    icon={<Activity strokeWidth={1.5} size={14} />}
+                    asChild
+                  >
+                    <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+                      Supabase status
+                    </a>
+                  </ButtonGroupItem>
+
+                  <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
+                    <SupportLink queryParams={{ projectRef }}>Contact support</SupportLink>
+                  </ButtonGroupItem>
+                </>
+              )}
             </ButtonGroup>
           </div>
         </div>
@@ -132,8 +140,8 @@ export const HelpPopover = () => {
           <div className="px-5 flex flex-col gap-1">
             <h5 className="text-foreground">Community support</h5>
             <p className="text-sm text-foreground-lighter text-balance">
-              Our Discord community contains many experienced developers. They may be able to
-              provide guidance and support with code-related issues.
+              Our Discord community has many experienced developers. They may be able to provide
+              guidance and support with code-related issues.
             </p>
           </div>
           <div className="px-5">
