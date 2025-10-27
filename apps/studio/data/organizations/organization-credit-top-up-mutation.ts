@@ -67,20 +67,18 @@ export const useOrganizationCreditTopUpMutation = ({
   UseMutationOptions<OrganizationTaxIdUpdateData, ResponseError, OrganizationCreditTopUpVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationCreditTopUpVariables>(
-    (vars) => topUpCredits(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to top up credits: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationCreditTopUpVariables>({
+    mutationFn: (vars) => topUpCredits(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to top up credits: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

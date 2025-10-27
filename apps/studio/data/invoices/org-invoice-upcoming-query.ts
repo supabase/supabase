@@ -70,11 +70,9 @@ export const useOrgUpcomingInvoiceQuery = <TData = UpcomingInvoiceData>(
     ...options
   }: UseQueryOptions<UpcomingInvoiceData, UpcomingInvoiceError, TData> = {}
 ) =>
-  useQuery<UpcomingInvoiceData, UpcomingInvoiceError, TData>(
-    invoicesKeys.orgUpcomingPreview(orgSlug),
-    ({ signal }) => getUpcomingInvoice({ orgSlug }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<UpcomingInvoiceData, UpcomingInvoiceError, TData>({
+    queryKey: invoicesKeys.orgUpcomingPreview(orgSlug),
+    queryFn: ({ signal }) => getUpcomingInvoice({ orgSlug }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined',
+    ...options,
+  })

@@ -42,7 +42,8 @@ export const useLegacyJWTSigningKeyCreateMutation = ({
     LegacyJWTSigningKeyCreateData,
     ResponseError,
     LegacyJWTSigningKeyCreateVariables
-  >((vars) => createLegacyJWTSigningKey(vars), {
+  >({
+    mutationFn: (vars) => createLegacyJWTSigningKey(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 

@@ -45,7 +45,8 @@ export const useDeleteThirdPartyAuthIntegrationMutation = ({
     DeleteThirdPartyAuthIntegrationData,
     ResponseError,
     DeleteThirdPartyAuthIntegrationVariables
-  >((vars) => deleteThirdPartyIntegration(vars), {
+  >({
+    mutationFn: (vars) => deleteThirdPartyIntegration(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries(keys.integrations(projectRef))

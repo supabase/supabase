@@ -41,17 +41,15 @@ export const useSendDowngradeFeedbackMutation = ({
   UseMutationOptions<SendDowngradeFeedbackData, ResponseError, SendDowngradeFeedbackVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendDowngradeFeedbackData, ResponseError, SendDowngradeFeedbackVariables>(
-    (vars) => sendDowngradeFeedback(vars),
-    {
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit exit survey: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SendDowngradeFeedbackData, ResponseError, SendDowngradeFeedbackVariables>({
+    mutationFn: (vars) => sendDowngradeFeedback(vars),
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to submit exit survey: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }
