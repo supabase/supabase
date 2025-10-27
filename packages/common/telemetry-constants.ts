@@ -1950,6 +1950,23 @@ export interface AuthUsersSearchSubmittedEvent {
 }
 
 /**
+ * User toggled the inline editor setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface InlineEditorSettingToggledEvent {
+  action: 'inline_editor_setting_toggled'
+  properties: {
+    /**
+     * Whether the inline editor was enabled or disabled
+     */
+    enabled: boolean
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2063,3 +2080,4 @@ export type TelemetryEvent =
   | TableDataAddedEvent
   | TableRLSEnabledEvent
   | AuthUsersSearchSubmittedEvent
+  | InlineEditorSettingToggledEvent

@@ -2,10 +2,9 @@ import { toast } from 'sonner'
 import { useConsentState } from 'common'
 import Panel from 'components/ui/Panel'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
-import { Card, CardContent, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Switch } from 'ui'
+import { FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 
 const AnalyticsSchema = z.object({
@@ -19,7 +18,6 @@ export const AnalyticsSettings = () => {
   const { mutate: sendReset } = useSendResetMutation()
 
   const form = useForm<z.infer<typeof AnalyticsSchema>>({
-    resolver: zodResolver(AnalyticsSchema),
     values: {
       telemetryEnabled: hasAccepted,
     },

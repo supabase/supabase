@@ -1,11 +1,12 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import Panel from 'components/ui/Panel'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { Card, CardContent, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Switch } from 'ui'
+import { FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 const InlineEditorSchema = z.object({
   inlineEditorEnabled: z.boolean(),
@@ -17,6 +18,8 @@ export const InlineEditorSettings = () => {
     true
   )
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const form = useForm<z.infer<typeof InlineEditorSchema>>({
     resolver: zodResolver(InlineEditorSchema),
     values: {
@@ -27,6 +30,13 @@ export const InlineEditorSettings = () => {
   const handleToggle = (value: boolean) => {
     setInlineEditorEnabled(value)
     form.setValue('inlineEditorEnabled', value)
+
+    sendEvent({
+      action: 'inline_editor_setting_toggled',
+      properties: {
+        enabled: value,
+      },
+    })
   }
 
   return (

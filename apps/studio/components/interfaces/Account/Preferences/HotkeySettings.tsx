@@ -6,15 +6,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import Panel from 'components/ui/Panel'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import {
-  Card,
-  CardContent,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  KeyboardShortcut,
-  Switch,
-} from 'ui'
+import { FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, KeyboardShortcut, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const HotkeySchema = z.object({
