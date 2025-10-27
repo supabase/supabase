@@ -159,19 +159,6 @@ export const AdvisorPanel = () => {
 
   const hiddenItemsCount = itemsFilteredByTabOnly.length - filteredItems.length
 
-  useEffect(() => {
-    if (!isSidebarOpen) return
-
-    if (selectedItemId) {
-      const selectedExists = filteredItems.some((item) => item.id === selectedItemId)
-      if (!selectedExists) {
-        setSelectedItemId(undefined)
-      }
-    } else if (filteredItems.length === 0) {
-      setSelectedItemId(undefined)
-    }
-  }, [isSidebarOpen, filteredItems, selectedItemId])
-
   const selectedItem = filteredItems.find((item) => item.id === selectedItemId)
   const isDetailView = !!selectedItem
 
