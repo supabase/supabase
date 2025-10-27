@@ -41,12 +41,10 @@ export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
     'stripe.tax_ids'
   )
 
-  return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>(
-    organizationKeys.taxId(slug),
-    ({ signal }) => getOrganizationTaxId({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions,
-      ...options,
-    }
-  )
+  return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>({
+    queryKey: organizationKeys.taxId(slug),
+    queryFn: ({ signal }) => getOrganizationTaxId({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions,
+    ...options,
+  })
 }

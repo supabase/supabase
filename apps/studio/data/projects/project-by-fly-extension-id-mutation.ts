@@ -31,20 +31,18 @@ export const useProjectByFlyExtensionIdMutation = ({
   UseMutationOptions<ProjectByFlyExtensionIdData, ResponseError, ProjectByFlyExtensionIdVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectByFlyExtensionIdData, ResponseError, ProjectByFlyExtensionIdVariables>(
-    (vars) => getProjectByFlyExtensionId(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to get project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectByFlyExtensionIdData, ResponseError, ProjectByFlyExtensionIdVariables>({
+    mutationFn: (vars) => getProjectByFlyExtensionId(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to get project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

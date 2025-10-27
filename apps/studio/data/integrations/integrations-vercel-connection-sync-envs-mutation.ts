@@ -44,7 +44,8 @@ export const useIntegrationsVercelConnectionSyncEnvsMutation = ({
     IntegrationsVercelConnectionSyncEnvsData,
     ResponseError,
     IntegrationsVercelConnectionSyncEnvsVariables
-  >((vars) => syncEnvsIntegrationsVercelConnection(vars), {
+  >({
+    mutationFn: (vars) => syncEnvsIntegrationsVercelConnection(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

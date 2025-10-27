@@ -9,7 +9,7 @@
  * @module telemetry-frontend
  */
 
-type TelemetryGroups = {
+export type TelemetryGroups = {
   project: string
   organization: string
 }
@@ -698,17 +698,6 @@ export interface EventPageCtaClickedEvent {
  */
 export interface HomepageGitHubButtonClickedEvent {
   action: 'homepage_github_button_clicked'
-}
-
-/**
- * User clicked the GitHub Discussions button in the homepage community section.
- *
- * @group Events
- * @source www
- * @page /
- */
-export interface HomepageGitHubDiscussionsButtonClickedEvent {
-  action: 'homepage_github_discussions_button_clicked'
 }
 
 /**
@@ -1953,7 +1942,7 @@ export interface AuthUsersSearchSubmittedEvent {
  * User opened the command menu.
  *
  * @group Events
- * @source ui-patterns
+ * @source studio, docs, www
  * @page any
  */
 export interface CommandMenuOpenedEvent {
@@ -1979,7 +1968,7 @@ export interface CommandMenuOpenedEvent {
  * User typed a search term in the command menu input.
  *
  * @group Events
- * @source ui-patterns
+ * @source studio, docs, www
  * @page any
  */
 export interface CommandMenuSearchSubmittedEvent {
@@ -1998,17 +1987,17 @@ export interface CommandMenuSearchSubmittedEvent {
 }
 
 /**
- * User selected a command from the command menu.
+ * User clicked a command from the command menu.
  *
  * @group Events
- * @source ui-patterns
+ * @source studio, docs, www
  * @page any
  */
-export interface CommandMenuCommandSelectedEvent {
-  action: 'command_menu_command_selected'
+export interface CommandMenuCommandClickedEvent {
+  action: 'command_menu_command_clicked'
   properties: {
     /**
-     * The selected command
+     * The clicked command
      */
     command_name: string
     command_value?: string
@@ -2069,7 +2058,6 @@ export type TelemetryEvent =
   | WwwPricingPlanCtaClickedEvent
   | EventPageCtaClickedEvent
   | HomepageGitHubButtonClickedEvent
-  | HomepageGitHubDiscussionsButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
@@ -2137,4 +2125,4 @@ export type TelemetryEvent =
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuSearchSubmittedEvent
-  | CommandMenuCommandSelectedEvent
+  | CommandMenuCommandClickedEvent

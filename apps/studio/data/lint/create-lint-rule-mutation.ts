@@ -36,25 +36,23 @@ export const useLintRuleCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<LintRuleCreateData, ResponseError, LintRuleCreateVariables>(
-    (vars) => createLintRule(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(lintKeys.lintRules(projectRef)),
-          queryClient.invalidateQueries(lintKeys.lint(projectRef)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create lint rule: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<LintRuleCreateData, ResponseError, LintRuleCreateVariables>({
+    mutationFn: (vars) => createLintRule(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await Promise.all([
+        queryClient.invalidateQueries(lintKeys.lintRules(projectRef)),
+        queryClient.invalidateQueries(lintKeys.lint(projectRef)),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create lint rule: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -45,7 +45,8 @@ export const useSupavisorConfigurationUpdateMutation = ({
     SupavisorConfigurationUpdateData,
     ResponseError,
     SupavisorConfigurationUpdateVariables
-  >((vars) => updateSupavisorConfiguration(vars), {
+  >({
+    mutationFn: (vars) => updateSupavisorConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
       await queryClient.invalidateQueries(databaseKeys.poolingConfiguration(ref))

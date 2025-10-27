@@ -37,30 +37,28 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<DeleteContentData, ResponseError, DeleteVariables>(
-    (args) => deleteConnection(args),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(integrationKeys.integrationsList()),
-          queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-          queryClient.invalidateQueries(
-            integrationKeys.vercelProjectList(variables.organization_integration_id)
-          ),
-          queryClient.invalidateQueries(
-            integrationKeys.vercelConnectionsList(variables.organization_integration_id)
-          ),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete Vercel connection: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DeleteContentData, ResponseError, DeleteVariables>({
+    mutationFn: (args) => deleteConnection(args),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries(integrationKeys.integrationsList()),
+        queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
+        queryClient.invalidateQueries(
+          integrationKeys.vercelProjectList(variables.organization_integration_id)
+        ),
+        queryClient.invalidateQueries(
+          integrationKeys.vercelConnectionsList(variables.organization_integration_id)
+        ),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete Vercel connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -26,7 +26,8 @@ export const useProfileCreateMutation = ({
 }: Omit<UseMutationOptions<ProfileCreateData, ResponseError, void>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProfileCreateData, ResponseError, void>(() => createProfile(), {
+  return useMutation<ProfileCreateData, ResponseError, void>({
+    mutationFn: () => createProfile(),
     async onSuccess(data, variables, context) {
       await Promise.all([
         queryClient.invalidateQueries(profileKeys.profile()),

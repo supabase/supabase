@@ -38,14 +38,12 @@ export const useSchemasQuery = <TData = SchemasData>(
   { projectRef, connectionString }: SchemasVariables,
   { enabled = true, ...options }: UseQueryOptions<SchemasData, SchemasError, TData> = {}
 ) =>
-  useQuery<SchemasData, SchemasError, TData>(
-    databaseKeys.schemas(projectRef),
-    ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<SchemasData, SchemasError, TData>({
+    queryKey: databaseKeys.schemas(projectRef),
+    queryFn: ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
   return client.invalidateQueries(databaseKeys.schemas(projectRef))

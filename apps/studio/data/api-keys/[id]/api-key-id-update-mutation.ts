@@ -47,24 +47,22 @@ export const useResourceUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>(
-    (vars) => updateAPIKeysById(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, id } = variables
+  return useMutation<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>({
+    mutationFn: (vars) => updateAPIKeysById(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, id } = variables
 
-        await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

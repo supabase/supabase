@@ -35,26 +35,24 @@ export const useToggleLegacyAPIKeysMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>(
-    (vars) => toggleLegacyAPIKeys(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>({
+    mutationFn: (vars) => toggleLegacyAPIKeys(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(apiKeysKeys.status(projectRef))
+      await queryClient.invalidateQueries(apiKeysKeys.status(projectRef))
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(
-            `Failed to ${variables.enabled ? 're-enable' : 'disable'} JWT-based API keys: ${data.message}`
-          )
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(
+          `Failed to ${variables.enabled ? 're-enable' : 'disable'} JWT-based API keys: ${data.message}`
+        )
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

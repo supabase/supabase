@@ -70,34 +70,28 @@ export const useIcebergNamespaceCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>(
-    (vars) => createIcebergNamespace(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(
-          storageKeys.icebergNamespace(
-            variables.catalogUri,
-            variables.warehouse,
-            variables.namespace
-          )
-        )
-        await queryClient.invalidateQueries(
-          storageKeys.icebergNamespaces(variables.catalogUri, variables.warehouse)
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if ((data.message = 'Request failed with status code 409')) {
-          toast.error(`A namespace named ${variables.namespace} already exists in the catalog.`)
-          return
-        }
-        if (onError === undefined) {
-          toast.error(`Failed to create Iceberg namespace: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>({
+    mutationFn: (vars) => createIcebergNamespace(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries(
+        storageKeys.icebergNamespace(variables.catalogUri, variables.warehouse, variables.namespace)
+      )
+      await queryClient.invalidateQueries(
+        storageKeys.icebergNamespaces(variables.catalogUri, variables.warehouse)
+      )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if ((data.message = 'Request failed with status code 409')) {
+        toast.error(`A namespace named ${variables.namespace} already exists in the catalog.`)
+        return
+      }
+      if (onError === undefined) {
+        toast.error(`Failed to create Iceberg namespace: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -44,7 +44,8 @@ export const useOrganizationAcceptInvitationMutation = ({
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationAcceptInvitationVariables
-  >((vars) => acceptOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => acceptOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       await invalidateOrganizationsQuery(queryClient)
       await invalidateProjectsQuery()
