@@ -3,6 +3,7 @@ import Image from 'next/legacy/image'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
+import { IS_PLATFORM } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -30,8 +31,6 @@ export const HelpPopover = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
-
-  const IS_PLATFORM = true
 
   return (
     <Popover_Shadcn_>
