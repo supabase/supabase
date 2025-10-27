@@ -328,7 +328,7 @@ export const EditorPanel = () => {
         )}
 
         {results !== undefined && results.length > 0 && (
-          <div className={`max-h-72 shrink-0 flex flex-col ${showResults && 'h-full'}`}>
+          <div className={cn(`max-h-72 shrink-0 flex flex-col`, showResults && 'h-full')}>
             {showResults && (
               <div className="border-t flex-1 overflow-auto">
                 <Results rows={results} />
