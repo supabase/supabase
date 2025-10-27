@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Plus } from 'lucide-react'
@@ -102,14 +103,21 @@ export const ConnectTablesDialog = ({}: ConnectTablesDialogProps) => {
       }}
     >
       <DialogTrigger asChild>
-        <Button
+        {/* Temporary disabled button in UI until the feature is implemented */}
+        <ButtonTooltip
           size="tiny"
           type="primary"
           icon={<Plus size={14} />}
-          onClick={() => setVisible(true)}
+          // onClick={() => setVisible(true)}
+          disabled
+          tooltip={{
+            content: {
+              text: 'Coming soon',
+            },
+          }}
         >
           Connect tables
-        </Button>
+        </ButtonTooltip>
       </DialogTrigger>
 
       <DialogContent>
