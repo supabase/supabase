@@ -5,6 +5,7 @@ import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 // End of third-party imports
 
+import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import InformationBox from 'components/ui/InformationBox'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
@@ -66,6 +67,8 @@ interface ProjectSelectorProps {
 }
 
 function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
+  const { projectRef: urlProjectRef } = useParams()
+
   return (
     <FormField_Shadcn_
       name="projectRef"
@@ -81,7 +84,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
               slug={!orgSlug || orgSlug === NO_ORG_MARKER ? undefined : orgSlug}
               selectedRef={field.value}
               onInitialLoad={(projects) => {
-                if (!projectRef || projectRef === NO_PROJECT_MARKER)
+                if (!urlProjectRef && (!projectRef || projectRef === NO_PROJECT_MARKER))
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
               }}
               onSelect={(project) => field.onChange(project.ref)}

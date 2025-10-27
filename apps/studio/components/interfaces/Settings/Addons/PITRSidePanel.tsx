@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -258,7 +259,7 @@ const PITRSidePanel = () => {
               </AlertDescription_Shadcn_>
               <div className="mt-4">
                 <Button type="default" asChild>
-                  <Link href="/support/new">Contact support</Link>
+                  <SupportLink>Contact support</SupportLink>
                 </Button>
               </div>
             </Alert_Shadcn_>

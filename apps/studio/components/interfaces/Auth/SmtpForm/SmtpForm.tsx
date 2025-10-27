@@ -376,8 +376,8 @@ export const SmtpForm = () => {
                         name="SMTP_MAX_FREQUENCY"
                         render={({ field }) => (
                           <FormItemLayout
-                            label="Minimum interval between emails being sent"
-                            description="How long between each email can a new email be sent via your SMTP server."
+                            label="Minimum interval between emails being sent to same user"
+                            description="How long between each email can a new email be sent via your SMTP server to the same user."
                           >
                             <FormControl_Shadcn_>
                               <PrePostTab postTab="seconds">

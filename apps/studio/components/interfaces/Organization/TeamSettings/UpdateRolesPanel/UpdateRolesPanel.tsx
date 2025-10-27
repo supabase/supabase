@@ -63,12 +63,12 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
-  const hasProjectScopedRoles = (allRoles?.project_scoped_roles ?? []).length > 0
 
-  // [Joshen] We only need this data if the org has project scoped roles
-  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
+  // Only need to fetch projects for organizations with access to project scoped roles
+  // which will be Team or Enterprise (and when the panel is visible)
+  // We still need to use the old projects endpoint instead of org projects due to roles depending on project ID
+  const { data } = useProjectsQuery({ enabled: isOptedIntoProjectLevelPermissions && visible })
   const projects = data?.projects ?? []
-
   const { data: permissions } = usePermissionsQuery()
 
   // [Joshen] We use the org scoped roles as the source for available roles
