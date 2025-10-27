@@ -56,7 +56,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       }).then(async (r) => await r.json())
 
-      console.log('postResult', postResult)
       const sourcesGetUrl = new URL(PROJECT_ANALYTICS_URL)
       sourcesGetUrl.pathname = '/api/sources'
       const sources = await fetch(sourcesGetUrl, {
@@ -67,7 +66,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           Accept: 'application/json',
         },
       }).then((r) => r.json())
-      console.log('sources', sources)
 
       const params = sources
         .filter((source: { name: string; metadata: { type: string } }) =>
