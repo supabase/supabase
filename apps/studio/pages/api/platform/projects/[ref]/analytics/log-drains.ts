@@ -16,10 +16,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       .json({ error: { message: `${missingEnvVars.join(', ')} env variables are not set` } })
   }
 
+  const baseUrl = PROJECT_ANALYTICS_URL
+  if (!baseUrl) {
+    return res.status(500).json({ error: { message: `LOGFLARE_URL env variable is not set` } })
+  }
+
   switch (method) {
     case 'GET':
       // list log drains
-      const url = new URL(PROJECT_ANALYTICS_URL)
+      const url = new URL(baseUrl)
       url.pathname = '/api/backends'
       url.search = new URLSearchParams({
         'metadata[type]': 'log-drain',
@@ -38,7 +43,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json(resp)
     case 'POST':
       // create the log drain
-      const postUrl = new URL(PROJECT_ANALYTICS_URL)
+      const postUrl = new URL(baseUrl)
       postUrl.pathname = '/api/backends'
       const postResult = await fetch(postUrl, {
         body: JSON.stringify({
@@ -56,7 +61,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       }).then(async (r) => await r.json())
 
-      const sourcesGetUrl = new URL(PROJECT_ANALYTICS_URL)
+      const sourcesGetUrl = new URL(baseUrl)
       sourcesGetUrl.pathname = '/api/sources'
       const sources = await fetch(sourcesGetUrl, {
         method: 'GET',
@@ -84,7 +89,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         .map((source: { name: string; id: number }) => {
           return { backend_id: postResult.id, lql_string: `~".*?"`, source_id: source.id }
         })
-      const rulesPostUrl = new URL(PROJECT_ANALYTICS_URL)
+      const rulesPostUrl = new URL(baseUrl)
       rulesPostUrl.pathname = '/api/rules'
       await Promise.all(
         params.map((param: any) =>

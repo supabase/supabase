@@ -16,10 +16,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       .json({ error: { message: `${missingEnvVars.join(', ')} env variables are not set` } })
   }
 
+  const baseUrl = PROJECT_ANALYTICS_URL
+  if (!baseUrl) {
+    return res.status(500).json({ error: { message: `LOGFLARE_URL env variable is not set` } })
+  }
+
   switch (method) {
     case 'GET':
       // get log drain
-      const url = new URL(PROJECT_ANALYTICS_URL)
+      const url = new URL(baseUrl)
       url.pathname = `/api/backends/${uuid}`
       const result = await fetch(url, {
         method: 'GET',
@@ -33,7 +38,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json(result)
     case 'PUT':
       // create the log drain
-      const putUrl = new URL(PROJECT_ANALYTICS_URL)
+      const putUrl = new URL(baseUrl)
       putUrl.pathname = `/api/backends/${uuid}`
       delete req.body['metadata']
       const putResult = await fetch(putUrl, {
@@ -54,7 +59,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     case 'DELETE':
       // create the log drain
-      const deleteUrl = new URL(PROJECT_ANALYTICS_URL)
+      const deleteUrl = new URL(baseUrl)
       deleteUrl.pathname = `/api/backends/${uuid}`
 
       await fetch(deleteUrl, {
