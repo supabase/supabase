@@ -7,7 +7,6 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { AiIconAnimation, cn, KeyboardShortcut } from 'ui'
 
 export const AssistantButton = () => {
-  useAiAssistantStateSnapshot()
   const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
   const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
     LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
