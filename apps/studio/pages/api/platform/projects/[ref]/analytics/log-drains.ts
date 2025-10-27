@@ -16,8 +16,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       .json({ error: { message: `${missingEnvVars.join(', ')} env variables are not set` } })
   }
 
-  console.log(`request received: `, process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN)
-
   switch (method) {
     case 'GET':
       // list log drains
