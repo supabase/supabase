@@ -80,20 +80,18 @@ export const useSendSupportTicketMutation = ({
   UseMutationOptions<sendSupportTicketData, ResponseError, sendSupportTicketVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<sendSupportTicketData, ResponseError, sendSupportTicketVariables>(
-    (vars) => sendSupportTicket(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit support ticket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<sendSupportTicketData, ResponseError, sendSupportTicketVariables>({
+    mutationFn: (vars) => sendSupportTicket(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to submit support ticket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

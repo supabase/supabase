@@ -44,20 +44,18 @@ export const useSqlCronGenerateMutation = ({
   UseMutationOptions<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>(
-    (vars) => generateSqlCron(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to generate cron expression: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>({
+    mutationFn: (vars) => generateSqlCron(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to generate cron expression: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

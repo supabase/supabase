@@ -54,22 +54,20 @@ export const useUpdateDiskAttributesMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateDiskAttributesData, ResponseError, UpdateDiskAttributesVariables>(
-    (vars) => updateDiskAttributes(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { ref } = variables
-        await queryClient.invalidateQueries(configKeys.diskAttributes(ref))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update disk attributes: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UpdateDiskAttributesData, ResponseError, UpdateDiskAttributesVariables>({
+    mutationFn: (vars) => updateDiskAttributes(vars),
+    async onSuccess(data, variables, context) {
+      const { ref } = variables
+      await queryClient.invalidateQueries(configKeys.diskAttributes(ref))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update disk attributes: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -36,17 +36,15 @@ export const useApiAuthorizationApproveMutation = ({
   UseMutationOptions<ApiAuthorizationApproveData, ResponseError, ApiAuthorizationApproveVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ApiAuthorizationApproveData, ResponseError, ApiAuthorizationApproveVariables>(
-    (vars) => approveApiAuthorization(vars),
-    {
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to approve authorization request: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ApiAuthorizationApproveData, ResponseError, ApiAuthorizationApproveVariables>({
+    mutationFn: (vars) => approveApiAuthorization(vars),
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to approve authorization request: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

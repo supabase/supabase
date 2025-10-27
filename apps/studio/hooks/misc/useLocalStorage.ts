@@ -64,18 +64,21 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
     isSuccess,
     isLoading,
     isError,
-  } = useQuery(queryKey, () => {
-    if (typeof window === 'undefined') {
-      return initialValue
-    }
+  } = useQuery({
+    queryKey,
+    queryFn: () => {
+      if (typeof window === 'undefined') {
+        return initialValue
+      }
 
-    const item = window.localStorage.getItem(key)
+      const item = window.localStorage.getItem(key)
 
-    if (!item) {
-      return initialValue
-    }
+      if (!item) {
+        return initialValue
+      }
 
-    return JSON.parse(item) as T
+      return JSON.parse(item) as T
+    },
   })
 
   const setValue: Dispatch<SetStateAction<T>> = (value) => {

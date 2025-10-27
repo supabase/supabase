@@ -44,31 +44,27 @@ export const useUpdatePipelineVersionMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdatePipelineVersionData, ResponseError, UpdatePipelineVersionParams>(
-    (vars) => updatePipelineVersion(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, pipelineId } = variables
-        // Ensure the version dot updates promptly
+  return useMutation<UpdatePipelineVersionData, ResponseError, UpdatePipelineVersionParams>({
+    mutationFn: (vars) => updatePipelineVersion(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, pipelineId } = variables
+      // Ensure the version dot updates promptly
+      await queryClient.invalidateQueries(replicationKeys.pipelinesVersion(projectRef, pipelineId))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(error, variables, context) {
+      const { projectRef, pipelineId } = variables
+      if (error?.code === 404) {
+        // Default image changed meanwhile. Refresh version info so UI reflects latest state.
         await queryClient.invalidateQueries(
           replicationKeys.pipelinesVersion(projectRef, pipelineId)
         )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(error, variables, context) {
-        const { projectRef, pipelineId } = variables
-        if (error?.code === 404) {
-          // Default image changed meanwhile. Refresh version info so UI reflects latest state.
-          await queryClient.invalidateQueries(
-            replicationKeys.pipelinesVersion(projectRef, pipelineId)
-          )
-        } else if (onError === undefined) {
-          toast.error(`Failed to update pipeline version: ${error.message}`)
-        } else {
-          onError(error, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      } else if (onError === undefined) {
+        toast.error(`Failed to update pipeline version: ${error.message}`)
+      } else {
+        onError(error, variables, context)
+      }
+    },
+    ...options,
+  })
 }

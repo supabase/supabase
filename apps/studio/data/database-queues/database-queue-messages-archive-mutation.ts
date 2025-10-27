@@ -48,7 +48,8 @@ export const useDatabaseQueueMessageArchiveMutation = ({
     DatabaseQueueMessageArchiveData,
     ResponseError,
     DatabaseQueueMessageArchiveVariables
-  >((vars) => archiveDatabaseQueueMessage(vars), {
+  >({
+    mutationFn: (vars) => archiveDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queryName } = variables
       await queryClient.invalidateQueries(

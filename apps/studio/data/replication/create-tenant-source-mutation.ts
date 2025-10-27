@@ -35,22 +35,20 @@ export const useCreateTenantSourceMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateTenantSourceData, ResponseError, CreateTenantSourceParams>(
-    (vars) => createTenantSource(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(replicationKeys.sources(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create tenant or source: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<CreateTenantSourceData, ResponseError, CreateTenantSourceParams>({
+    mutationFn: (vars) => createTenantSource(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(replicationKeys.sources(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create tenant or source: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

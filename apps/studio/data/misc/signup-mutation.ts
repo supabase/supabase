@@ -37,7 +37,8 @@ export const useSignUpMutation = ({
   onError,
   ...options
 }: Omit<UseMutationOptions<SignUpData, ResponseError, SignUpVariables>, 'mutationFn'> = {}) => {
-  return useMutation<SignUpData, ResponseError, SignUpVariables>((vars) => signup(vars), {
+  return useMutation<SignUpData, ResponseError, SignUpVariables>({
+    mutationFn: (vars) => signup(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

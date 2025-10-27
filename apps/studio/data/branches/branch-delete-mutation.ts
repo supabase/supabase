@@ -31,33 +31,31 @@ export const useBranchDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchDeleteData, ResponseError, BranchDeleteVariables>(
-    (vars) => deleteBranch(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { branchRef, projectRef } = variables
-        setTimeout(() => {
-          queryClient.invalidateQueries(branchKeys.list(projectRef))
-        }, 5000)
+  return useMutation<BranchDeleteData, ResponseError, BranchDeleteVariables>({
+    mutationFn: (vars) => deleteBranch(vars),
+    async onSuccess(data, variables, context) {
+      const { branchRef, projectRef } = variables
+      setTimeout(() => {
+        queryClient.invalidateQueries(branchKeys.list(projectRef))
+      }, 5000)
 
-        const branches: BranchesData | undefined = queryClient.getQueryData(
-          branchKeys.list(projectRef)
-        )
-        if (branches) {
-          const updatedBranches = branches.filter((branch) => branch.project_ref !== branchRef)
-          queryClient.setQueryData(branchKeys.list(projectRef), updatedBranches)
-        }
+      const branches: BranchesData | undefined = queryClient.getQueryData(
+        branchKeys.list(projectRef)
+      )
+      if (branches) {
+        const updatedBranches = branches.filter((branch) => branch.project_ref !== branchRef)
+        queryClient.setQueryData(branchKeys.list(projectRef), updatedBranches)
+      }
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete branch: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete branch: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }
