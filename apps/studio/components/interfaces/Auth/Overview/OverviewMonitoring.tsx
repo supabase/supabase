@@ -184,9 +184,9 @@ export const OverviewMonitoring = () => {
                   {
                     key: 'actions',
                     header: '',
-                    className: 'text-right flex-shrink-0',
+                    className: 'w-6',
                     render: (row) => (
-                      <div>
+                      <div className="flex justify-end">
                         <LogsLink href={`/project/${ref}/logs/edge-logs?s=${row.path}`} />
                       </div>
                     ),

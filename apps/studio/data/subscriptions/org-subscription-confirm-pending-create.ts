@@ -3,10 +3,10 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import type { components } from 'api-types'
 import { organizationKeys } from 'data/organizations/keys'
 import { permissionKeys } from 'data/permissions/keys'
 import { castOrganizationResponseToOrganization } from 'data/organizations/organizations-query'
-import type { components } from 'api-types'
 
 export type PendingSubscriptionCreateVariables = {
   payment_intent_id: string
@@ -56,6 +56,16 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
     PendingSubscriptionCreateVariables
   >((vars) => confirmPendingSubscriptionCreate(vars), {
     async onSuccess(data, variables, context) {
+      // Handle 202 Accepted - show toast and skip query updates
+      if (data && 'message' in data && !('slug' in data)) {
+        const pendingResponse = data as components['schemas']['PendingConfirmationResponse']
+        toast.success(pendingResponse.message, {
+          dismissible: true,
+          duration: 10_000,
+        })
+        return
+      }
+
       // [Joshen] We're manually updating the query client here as the org's subscription is
       // created async, and the invalidation will happen too quick where the GET organizations
       // endpoint will error out with a 500 since the subscription isn't created yet.

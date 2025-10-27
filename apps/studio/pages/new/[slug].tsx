@@ -47,7 +47,6 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -61,17 +60,17 @@ import {
   PROVIDERS,
   useDefaultProvider,
 } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import { Button, Form_Shadcn_, FormField_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-// [Joshen] This page is getting rather big and complex, let's aim to break this down into smaller components
-
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
 const Wizard: NextPageWithLayout = () => {
+  const track = useTrack()
   const router = useRouter()
   const { slug, projectName } = useParams()
   const defaultProvider = useDefaultProvider()
@@ -111,8 +110,6 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
-
-  const { mutate: sendEvent } = useSendEventMutation()
 
   FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
     if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -248,16 +245,16 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
-      sendEvent({
-        action: 'project_creation_simple_version_submitted',
-        properties: {
+      track(
+        'project_creation_simple_version_submitted',
+        {
           instanceSize: form.getValues('instanceSize'),
         },
-        groups: {
+        {
           project: res.ref,
           organization: res.organization_slug,
-        },
-      })
+        }
+      )
       router.push(isHomeNew ? `/project/${res.ref}` : `/project/${res.ref}/building`)
     },
   })
@@ -268,14 +265,8 @@ const Wizard: NextPageWithLayout = () => {
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
     if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
-      sendEvent({
-        action: 'project_creation_simple_version_confirm_modal_opened',
-        properties: {
-          instanceSize: values.instanceSize,
-        },
-        groups: {
-          organization: currentOrg?.slug ?? 'Unknown',
-        },
+      track('project_creation_simple_version_confirm_modal_opened', {
+        instanceSize: values.instanceSize,
       })
       setIsComputeCostsConfirmationModalVisible(true)
     } else {

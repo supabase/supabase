@@ -9,7 +9,7 @@
  * @module telemetry-frontend
  */
 
-type TelemetryGroups = {
+export type TelemetryGroups = {
   project: string
   organization: string
 }
@@ -698,17 +698,6 @@ export interface EventPageCtaClickedEvent {
  */
 export interface HomepageGitHubButtonClickedEvent {
   action: 'homepage_github_button_clicked'
-}
-
-/**
- * User clicked the GitHub Discussions button in the homepage community section.
- *
- * @group Events
- * @source www
- * @page /
- */
-export interface HomepageGitHubDiscussionsButtonClickedEvent {
-  action: 'homepage_github_discussions_button_clicked'
 }
 
 /**
@@ -1950,6 +1939,78 @@ export interface AuthUsersSearchSubmittedEvent {
 }
 
 /**
+ * User opened the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuOpenedEvent {
+  action: 'command_menu_opened'
+  properties: {
+    /**
+     * The trigger that opened the command menu
+     */
+    trigger_type: 'keyboard_shortcut' | 'search_input'
+    /**
+     * The location where the command menu was opened
+     */
+    trigger_location?: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User typed a search term in the command menu input.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuSearchSubmittedEvent {
+  action: 'command_menu_search_submitted'
+  properties: {
+    /**
+     * Search term typed into the command menu input
+     */
+    value: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked a command from the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuCommandClickedEvent {
+  action: 'command_menu_command_clicked'
+  properties: {
+    /**
+     * The clicked command
+     */
+    command_name: string
+    command_value?: string
+    command_type: 'action' | 'route'
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1997,7 +2058,6 @@ export type TelemetryEvent =
   | WwwPricingPlanCtaClickedEvent
   | EventPageCtaClickedEvent
   | HomepageGitHubButtonClickedEvent
-  | HomepageGitHubDiscussionsButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
@@ -2063,3 +2123,6 @@ export type TelemetryEvent =
   | TableDataAddedEvent
   | TableRLSEnabledEvent
   | AuthUsersSearchSubmittedEvent
+  | CommandMenuOpenedEvent
+  | CommandMenuSearchSubmittedEvent
+  | CommandMenuCommandClickedEvent
