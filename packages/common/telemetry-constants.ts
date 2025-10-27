@@ -1950,6 +1950,24 @@ export interface AuthUsersSearchSubmittedEvent {
 }
 
 /**
+ * User opened a sidebar panel.
+ *
+ * @group Events
+ * @source studio
+ * @page Various pages with sidebar buttons
+ */
+export interface SidebarOpenedEvent {
+  action: 'sidebar_opened'
+  properties: {
+    /**
+     * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
+     */
+    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2063,3 +2081,4 @@ export type TelemetryEvent =
   | TableDataAddedEvent
   | TableRLSEnabledEvent
   | AuthUsersSearchSubmittedEvent
+  | SidebarOpenedEvent
