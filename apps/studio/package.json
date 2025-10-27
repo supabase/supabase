@@ -205,6 +205,6 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^3.0.5"
+    "vitest": "catalog:"
   }
 }

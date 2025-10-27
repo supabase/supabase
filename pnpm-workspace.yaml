@@ -20,6 +20,7 @@ catalog:
   typescript: ~5.9.0
   valtio: ^1.12.0
   vite: ^6.3.6
+  vitest: ^3.2.0
   zod: ^3.25.76
 
 ignoredBuiltDependencies:

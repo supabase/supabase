@@ -34,7 +34,7 @@
     "@vitest/ui": "^3.0.0",
     "tsconfig": "workspace:*",
     "typescript": "catalog:",
-    "vitest": "^3.0.5"
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "@supabase/auth-js": "catalog:",
