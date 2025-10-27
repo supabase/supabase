@@ -62,7 +62,8 @@ export const HelpPopover = () => {
           <div className="px-5 flex flex-col gap-1">
             <h5 className="text-foreground">Need help with your project?</h5>
             <p className="text-sm text-foreground-lighter text-balance">
-              Start with our docs or community. Most questions are answered there in minutes.
+              Start with our {projectRef ? 'Assistant, docs,' : 'docs'} or community. Most questions
+              are answered there in minutes.
             </p>
           </div>
 
