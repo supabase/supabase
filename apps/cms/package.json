@@ -60,5 +60,12 @@
   },
   "externals": {
     "sharp": "commonjs sharp"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["sharp", "esbuild", "unrs-resolver"],
+    "supportedArchitectures": {
+      "os": ["linux", "darwin"],
+      "cpu": ["x64", "arm64"]
+    }
   }
 }
