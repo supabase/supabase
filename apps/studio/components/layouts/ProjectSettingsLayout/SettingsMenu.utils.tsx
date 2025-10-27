@@ -55,55 +55,49 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Compute and Disk',
-                key: 'compute-and-disk',
-                url: `/project/${ref}/settings/compute-and-disk`,
-                items: [],
-              },
-            ]
-          : []),
+        {
+          name: 'Compute and Disk',
+          key: 'compute-and-disk',
+          url: `/project/${ref}/settings/compute-and-disk`,
+          items: [],
+        },
         {
           name: 'Infrastructure',
           key: 'infrastructure',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
           items: [],
         },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Integrations',
-                key: 'integrations',
-                url: `/project/${ref}/settings/integrations`,
-                items: [],
-              },
 
-              {
-                name: 'Data API',
-                key: 'api',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-                items: [],
-              },
-              {
-                name: 'API Keys',
-                key: 'api-keys',
-                url: `/project/${ref}/settings/api-keys`,
-                items: [],
-                label: 'NEW',
-              },
-              {
-                name: 'JWT Keys',
-                key: 'jwt',
-                url: legacyJwtKeysEnabled
-                  ? `/project/${ref}/settings/jwt`
-                  : `/project/${ref}/settings/jwt/signing-keys`,
-                items: [],
-                label: 'NEW',
-              },
-            ]
-          : []),
+        {
+          name: 'Integrations',
+          key: 'integrations',
+          url: `/project/${ref}/settings/integrations`,
+          items: [],
+        },
+
+        {
+          name: 'Data API',
+          key: 'api',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
+          items: [],
+        },
+        {
+          name: 'API Keys',
+          key: 'api-keys',
+          url: `/project/${ref}/settings/api-keys`,
+          items: [],
+          label: 'NEW',
+        },
+        {
+          name: 'JWT Keys',
+          key: 'jwt',
+          url: legacyJwtKeysEnabled
+            ? `/project/${ref}/settings/jwt`
+            : `/project/${ref}/settings/jwt/signing-keys`,
+          items: [],
+          label: 'NEW',
+        },
+
         {
           name: `Log Drains`,
           key: `log-drains`,
@@ -136,7 +130,7 @@ export const generateSettingsMenu = (
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
-        ...(IS_PLATFORM && authEnabled
+        ...(authEnabled
           ? [
               {
                 name: 'Authentication',
@@ -149,7 +143,7 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...(IS_PLATFORM && storageEnabled
+        ...(storageEnabled
           ? [
               {
                 name: 'Storage',
@@ -160,7 +154,7 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...(IS_PLATFORM && edgeFunctionsEnabled
+        ...(edgeFunctionsEnabled
           ? [
               {
                 name: 'Edge Functions',
