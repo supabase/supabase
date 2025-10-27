@@ -9,6 +9,9 @@ import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
+import Link from 'next/link'
 
 const AnalyticsBucketPage: NextPageWithLayout = () => {
   const { bucketId } = useParams()
@@ -26,7 +29,16 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
       {isSuccess ? (
         !bucket ? (
           <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
+            <Admonition
+              className="max-w-md"
+              type="default"
+              title="Unable to find bucket"
+              description={`${bucketId ? `The template "${bucketId}"` : 'This template'} doesn’t seem to exist.`}
+            >
+              <Button asChild type="default" className="mt-2">
+                <Link href={`/project/${projectRef}/storage/analytics`}>Head back</Link>
+              </Button>
+            </Admonition>
           </div>
         ) : (
           <AnalyticBucketDetails bucket={bucket as AnalyticsBucket} />
