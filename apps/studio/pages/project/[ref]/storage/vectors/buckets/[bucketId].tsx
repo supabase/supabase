@@ -4,9 +4,13 @@ import { VectorBucketDetails } from 'components/interfaces/Storage/VectorBuckets
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { useVectorBucketQuery } from 'data/storage/vector-bucket-query'
+import Link from 'next/link'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
 const VectorsBucketPage: NextPageWithLayout = () => {
   const { bucketId } = useParams()
@@ -24,12 +28,27 @@ const VectorsBucketPage: NextPageWithLayout = () => {
     <div className="storage-container flex flex-grow">
       {isError && <StorageBucketsError error={error as any} />}
 
-      {isLoading && <GenericSkeletonLoader className="w-full" />}
+      {isLoading && (
+        <ScaffoldContainer>
+          <ScaffoldSection isFullWidth>
+            <GenericSkeletonLoader />
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      )}
 
       {isSuccess ? (
         !vectorBucket ? (
           <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
+            <Admonition
+              className="max-w-md"
+              type="default"
+              title="Unable to find bucket"
+              description={`${bucketId ? `The template "${bucketId}"` : 'This template'} doesn’t seem to exist.`}
+            >
+              <Button asChild type="default" className="mt-2">
+                <Link href={`/project/${projectRef}/storage/vectors`}>Head back</Link>
+              </Button>
+            </Admonition>
           </div>
         ) : (
           <VectorBucketDetails bucket={vectorBucket} />
