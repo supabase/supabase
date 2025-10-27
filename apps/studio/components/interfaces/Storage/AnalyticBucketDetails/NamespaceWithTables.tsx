@@ -5,15 +5,7 @@ import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-s
 import { FDW } from 'data/fdw/fdws-query'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  ChevronRight,
-  ChevronsLeftRightEllipsis,
-  Code,
-  Info,
-  MoreVertical,
-  Replace,
-  Trash2,
-} from 'lucide-react'
+import { ChevronRight, Code, Info, MoreVertical, Plus, Replace, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import {
@@ -108,10 +100,10 @@ const TableRowComponent = ({
           </div>
           <span className="text-foreground-lighter">
             {isLoading && !isConnected
-              ? 'Pairing...'
+              ? 'Connecting...'
               : isConnected
-                ? 'Paired'
-                : 'Waiting to be paired'}
+                ? 'Connected'
+                : 'Not connected'}
           </span>
         </div>
       </TableCell>
@@ -295,11 +287,11 @@ export const NamespaceWithTables = ({
             <Button
               type={missingTables.length > 0 ? 'warning' : 'default'}
               size="tiny"
-              icon={<ChevronsLeftRightEllipsis size={14} />}
+              icon={<Plus size={14} />}
               onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
               loading={isImportingForeignSchema || isLoadingNamespaceTables}
             >
-              Pair new table{missingTables.length > 1 ? 's' : ''}
+              Connect to table{missingTables.length > 1 ? 's' : ''}
             </Button>
           )}
         </div>
