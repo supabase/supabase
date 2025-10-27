@@ -8,6 +8,7 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
 import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
@@ -108,9 +109,12 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     },
   })
 
+  const { mutateAsync: deleteFDW, isLoading: isDeletingWrapper } = useFDWDeleteMutation()
+
   const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
     useAnalyticsBucketDeleteMutation({
-      onSuccess: () => {
+      onSuccess: async () => {
+        // [Joshen] Iceberg FDW needs to be deleted as well to fully clean up
         toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
         if (isStorageV2) {
           router.push(`/project/${projectRef}/storage/analytics`)

@@ -1,5 +1,5 @@
 import { snakeCase, uniq } from 'lodash'
-import { Plus } from 'lucide-react'
+import { SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
@@ -47,11 +47,13 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ConnectTablesDialog } from '../ConnectTablesDialog'
 import { DeleteBucketModal } from '../DeleteBucketModal'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { NamespaceRow } from './NamespaceRow'
+import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
@@ -191,39 +193,47 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
             <>
               {isStorageV2 ? (
                 <ScaffoldSection isFullWidth>
-                  <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
+                  <ScaffoldHeader className="pt-0 flex flex-row justify-between items-end gap-x-8">
                     <div>
                       <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
                       <ScaffoldSectionDescription>
-                        Analytics tables connected to this bucket.
+                        Analytics tables stored in this bucket
                       </ScaffoldSectionDescription>
                     </div>
-                    <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
-                      New table
-                    </Button>
+                    {namespaces.length > 0 && <ConnectTablesDialog />}
                   </ScaffoldHeader>
 
-                  <Card>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-foreground-muted">Name</TableHead>
-                          <TableHead className="text-foreground-muted">Schema</TableHead>
-                          <TableHead className="text-foreground-muted">Created at</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell colSpan={4}>
-                            <p className="text-sm text-foreground">No tables yet</p>
-                            <p className="text-sm text-foreground-lighter">
-                              Create an analytics table to get started
-                            </p>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </Card>
+                  {isLoadingNamespaces || isFDWsLoading ? (
+                    <GenericSkeletonLoader />
+                  ) : namespaces.length === 0 ? (
+                    <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
+                      <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
+                      <div className="flex flex-col items-center text-center">
+                        <h3>Connect database tables</h3>
+                        <p className="text-foreground-light text-sm">
+                          Stream data from tables for archival, backups, or analytical queries.
+                        </p>
+                      </div>
+                      <ConnectTablesDialog />
+                    </aside>
+                  ) : (
+                    <div className="flex flex-col gap-y-10">
+                      {namespaces.map(({ namespace, schema, tables }) => (
+                        <NamespaceWithTables
+                          key={namespace}
+                          bucketName={bucket.id}
+                          namespace={namespace}
+                          sourceType="direct"
+                          schema={schema}
+                          tables={tables as any}
+                          token={token!}
+                          wrapperInstance={wrapperInstance}
+                          wrapperValues={wrapperValues}
+                          wrapperMeta={wrapperMeta}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </ScaffoldSection>
               ) : (
                 <ScaffoldSection isFullWidth>
@@ -296,9 +306,9 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
               <ScaffoldSection isFullWidth>
                 <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
                   <div>
-                    <ScaffoldSectionTitle>Configuration</ScaffoldSectionTitle>
+                    <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
                     <ScaffoldSectionDescription>
-                      Connect to this bucket from an Iceberg client.{' '}
+                      Connect an Iceberg client to this bucket.{' '}
                       <InlineLink
                         href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
                       >
