@@ -326,6 +326,7 @@ export const NamespaceWithTables = ({
       <ImportForeignSchemaDialog
         bucketName={bucketName}
         namespace={namespace}
+        circumstance="clash"
         wrapperMeta={wrapperMeta}
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}

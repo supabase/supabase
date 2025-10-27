@@ -34,7 +34,7 @@ export const ImportForeignSchemaDialog = ({
   wrapperMeta,
   visible,
   onClose,
-  circumstance = 'clash',
+  circumstance = 'fresh',
 }: ImportForeignSchemaDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { ref } = useParams()
