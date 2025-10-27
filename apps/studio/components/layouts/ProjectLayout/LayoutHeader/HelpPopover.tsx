@@ -1,6 +1,7 @@
 import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import SVG from 'react-inlinesvg'
 
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
@@ -15,12 +16,13 @@ import {
   Button,
   ButtonGroup,
   ButtonGroupItem,
+  cn,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 export const HelpPopover = () => {
@@ -28,34 +30,40 @@ export const HelpPopover = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
-  const { openSidebar } = useSidebarManagerSnapshot()
-
+  const { toggleSidebar } = useSidebarManagerSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
+  const [isOpen, setIsOpen] = useState(false)
 
   const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
 
   return (
-    <Popover_Shadcn_>
+    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <ButtonTooltip
           id="help-popover-button"
-          type="text"
-          className="rounded-none w-[32px] h-[30px] group"
-          icon={
-            <HelpCircle
-              size={18}
-              strokeWidth={1.5}
-              className="!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground"
-            />
-          }
-          tooltip={{ content: { side: 'bottom', text: 'Help' } }}
+          type="outline"
+          size="tiny"
+          className={cn(
+            'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
+            isOpen && 'bg-foreground text-background'
+          )}
           onClick={() => {
             sendEvent({
               action: 'help_button_clicked',
               groups: { project: project?.ref, organization: org?.slug },
             })
           }}
-        />
+          tooltip={{ content: { side: 'bottom', text: 'Help' } }}
+        >
+          <HelpCircle
+            size={16}
+            strokeWidth={1.5}
+            className={cn(
+              'text-foreground-light group-hover:text-foreground',
+              isOpen && 'text-background group-hover:text-background'
+            )}
+          />
+        </ButtonTooltip>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
         <div className="mb-5 px-5">
@@ -72,7 +80,8 @@ export const HelpPopover = () => {
                 size="tiny"
                 icon={<AiIconAnimation allowHoverEffect size={14} />}
                 onClick={() => {
-                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                  setIsOpen(false)
+                  toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                   snap.newChat({
                     name: 'Support',
                     initialInput: `I need help with my project`,

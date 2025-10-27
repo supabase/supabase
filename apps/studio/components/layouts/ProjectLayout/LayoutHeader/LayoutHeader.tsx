@@ -31,6 +31,7 @@ import MergeRequestButton from './MergeRequestButton'
 import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -74,10 +75,6 @@ const LayoutHeader = ({
   const { toggleSidebar } = useSidebarManagerSnapshot()
 
   const isAccountPage = router.pathname.startsWith('/account')
-  const [inlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_INLINE_EDITOR,
-    true
-  )
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -216,16 +213,14 @@ const LayoutHeader = ({
               <>
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="overflow-hidden flex items-center gap-2">
                   <HelpPopover />
                   <NotificationsPopoverV2 />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <InlineEditorButton />
+                        <AdvisorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -236,14 +231,11 @@ const LayoutHeader = ({
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="overflow-hidden flex items-center gap-2">
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}

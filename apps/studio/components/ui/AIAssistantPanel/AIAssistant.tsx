@@ -61,7 +61,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
-  const { closeSidebar, isSidebarOpen } = useSidebarManagerSnapshot()
+  const { closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
 
@@ -435,11 +435,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [snap.initialInput])
 
   useEffect(() => {
-    if (isSidebarOpen(SIDEBAR_KEYS.AI_ASSISTANT) && isInSQLEditor && !!snippetContent) {
+    const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
+    if (isOpen && isInSQLEditor && !!snippetContent) {
       snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSidebarOpen, isInSQLEditor, snippetContent])
+  }, [activeSidebar?.id, isInSQLEditor, snippetContent])
 
   return (
     <ErrorBoundary
