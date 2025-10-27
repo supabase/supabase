@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { get as _get, find } from 'lodash'
+import { get as _get, find, snakeCase } from 'lodash'
 import { useRouter } from 'next/router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -9,6 +9,7 @@ import { useParams } from 'common'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
 import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
@@ -31,6 +32,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
+import { getWrapperMetaForWrapper } from '../Integrations/Wrappers/Wrappers.utils'
 import { formatPoliciesForStorage } from './Storage.utils'
 
 export interface DeleteBucketModalProps {
@@ -46,6 +48,8 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const isStorageV2 = useIsNewStorageUIEnabled()
+
+  const isStandardBucketSelected = 'type' in bucket && bucket.type === 'STANDARD'
 
   const schema = z.object({
     confirm: z.literal(bucket.id, {
@@ -65,6 +69,17 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     connectionString: project?.connectionString,
     schema: 'storage',
   })
+
+  const { data: wrappers } = useFDWsQuery(
+    {
+      projectRef,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: !isStandardBucketSelected,
+    }
+  )
+
   const { mutateAsync: deletePolicy } = useDatabasePolicyDeleteMutation()
 
   const { mutate: deleteBucket, isLoading: isDeletingBucket } = useBucketDeleteMutation({
@@ -114,7 +129,24 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
     useAnalyticsBucketDeleteMutation({
       onSuccess: async () => {
-        // [Joshen] Iceberg FDW needs to be deleted as well to fully clean up
+        // [Joshen] Clean up Iceberg FDW when deleting analytics bucket
+        if (!isStandardBucketSelected) {
+          const wrapperName = `${snakeCase(bucket.id)}_fdw`
+          const icebergWrapper = wrappers?.find((wrapper) => wrapper.name === wrapperName)
+          const icebergWrapperMeta = getWrapperMetaForWrapper(icebergWrapper)
+
+          if (!!icebergWrapper && !!icebergWrapperMeta) {
+            await deleteFDW({
+              projectRef,
+              connectionString: project?.connectionString,
+              wrapper: icebergWrapper,
+              wrapperMeta: icebergWrapperMeta,
+            })
+          } else {
+            console.warn('Unable to find and delete iceberg wrapper for: ', bucket.id)
+          }
+        }
+
         toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
         if (isStorageV2) {
           router.push(`/project/${projectRef}/storage/analytics`)
@@ -130,14 +162,14 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     if (!bucket) return console.error('No bucket is selected')
 
     // [Joshen] We'll need a third case to figure out for vector buckets
-    if ('type' in bucket && bucket.type === 'STANDARD') {
+    if (isStandardBucketSelected) {
       deleteBucket({ projectRef, id: bucket.id })
     } else {
       deleteAnalyticsBucket({ projectRef, id: bucket.id })
     }
   }
 
-  const isDeleting = isDeletingBucket || isDeletingAnalyticsBucket
+  const isDeleting = isDeletingBucket || isDeletingAnalyticsBucket || isDeletingWrapper
 
   return (
     <Dialog
