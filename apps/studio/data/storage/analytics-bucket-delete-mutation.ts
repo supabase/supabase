@@ -18,6 +18,7 @@ async function deleteAnalyticsBucket({ projectRef, id }: AnalyticsBucketDeleteVa
   const { data, error } = await del('/platform/storage/{ref}/analytics-buckets/{id}', {
     params: { path: { ref: projectRef, id } },
   } as any)
+
   if (error) handleError(error)
   return data
 }
