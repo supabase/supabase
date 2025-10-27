@@ -34,7 +34,7 @@ export const advisorState = proxy({
   },
 })
 
-export const getadvisorStateSnapshot = () => snapshot(advisorState)
+export const getAdvisorStateSnapshot = () => snapshot(advisorState)
 
 export const useadvisorStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
   useSnapshot(advisorState, options)
