@@ -10,7 +10,7 @@ import { EmptyAdvisor } from './EmptyAdvisor'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { AdvisorTab, AdvisorSeverity, useadvisorStateSnapshot } from 'state/advisor-state'
+import { AdvisorTab, AdvisorSeverity, useAdvisorStateSnapshot } from 'state/advisor-state'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Badge, Button, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -81,7 +81,7 @@ export const AdvisorPanel = () => {
     setSeverityFilters,
     clearSeverityFilters,
     setSelectedItemId,
-  } = useadvisorStateSnapshot()
+  } = useAdvisorStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 

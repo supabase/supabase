@@ -9,7 +9,7 @@ import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useadvisorStateSnapshot } from 'state/advisor-state'
+import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
@@ -49,7 +49,7 @@ export const AdvisorWidget = () => {
   )
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { setSelectedItemId } = useadvisorStateSnapshot()
+  const { setSelectedItemId } = useAdvisorStateSnapshot()
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
