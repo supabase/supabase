@@ -258,7 +258,7 @@ export const NamespaceWithTables = ({
                 </span>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Source {sourceType === 'direct' ? 'namespace' : 'schema'}</p>
+                <p>{sourceType === 'direct' ? 'Analytics' : 'Postgres'} schema</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -281,7 +281,7 @@ export const NamespaceWithTables = ({
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Target schema{tables.length === 0 && ' that will be created'}</p>
+                  <p>Postgres schema{tables.length === 0 && ' that will be created'}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
