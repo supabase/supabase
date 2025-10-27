@@ -74,7 +74,6 @@ const SpendCapSidePanel = () => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isLoading, subscription, isSpendCapOn])
 
   const onConfirm = async () => {

@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight, Clipboard, Download, Edit, Move, Trash2 } from 'lucide-react'
+import { ChevronRight, Copy, Download, Edit, Move, Trash2 } from 'lucide-react'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
@@ -51,18 +51,18 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     <Menu id={id} animation="fade">
       {isPublic ? (
         <Item onClick={({ props }) => onHandleClick('copy', props.item)}>
-          <Clipboard size="14" strokeWidth={1} />
+          <Copy size={14} />
           <span className="ml-2 text-xs">Get URL</span>
         </Item>
       ) : (
         <Submenu
           label={
             <div className="flex items-center space-x-2">
-              <Clipboard size="14" />
+              <Copy size={14} />
               <span className="text-xs">Get URL</span>
             </div>
           }
-          arrow={<ChevronRight size="14" strokeWidth={1} />}
+          arrow={<ChevronRight size={14} />}
         >
           <Item
             onClick={({ props }) => onHandleClick('copy', props.item, URL_EXPIRY_DURATION.WEEK)}
@@ -86,20 +86,20 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
       )}
       {canUpdateFiles && [
         <Item key="rename-file" onClick={({ props }) => onHandleClick('rename', props.item)}>
-          <Edit size="14" strokeWidth={1} />
+          <Edit size={14} strokeWidth={1} />
           <span className="ml-2 text-xs">Rename</span>
         </Item>,
         <Item key="move-file" onClick={({ props }) => onHandleClick('move', props.item)}>
-          <Move size="14" strokeWidth={1} />
+          <Move size={14} strokeWidth={1} />
           <span className="ml-2 text-xs">Move</span>
         </Item>,
         <Item key="download-file" onClick={({ props }) => onHandleClick('download', props.item)}>
-          <Download size="14" strokeWidth={1} />
+          <Download size={14} strokeWidth={1} />
           <span className="ml-2 text-xs">Download</span>
         </Item>,
         <Separator key="file-separator" />,
         <Item key="delete-file" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
-          <Trash2 size="14" strokeWidth={1} stroke="red" />
+          <Trash2 size={14} strokeWidth={1} stroke="red" />
           <span className="ml-2 text-xs">Delete</span>
         </Item>,
       ]}

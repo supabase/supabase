@@ -13,8 +13,8 @@ export async function getGitHubBranches(
 ) {
   if (!connectionId) throw new Error('connectionId is required')
 
-  const { data, error } = await get(`/platform/integrations/github/branches/{connectionId}`, {
-    params: { path: { connectionId } },
+  const { data, error } = await get(`/platform/integrations/github/branches/{connection_id}`, {
+    params: { path: { connection_id: connectionId } },
     signal,
   })
 

@@ -59,7 +59,8 @@ export const InfrastructureActivity = () => {
   })
   const isFreePlan = organization?.plan?.id === 'free'
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })

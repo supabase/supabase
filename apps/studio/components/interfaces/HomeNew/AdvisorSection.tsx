@@ -2,6 +2,7 @@ import { BarChart, Shield } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import {
   createLintSummaryPrompt,
@@ -28,11 +29,17 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import LintDetail from 'components/interfaces/Linter/LintDetail'
 
-export const AdvisorSection = () => {
+export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery(
+    {
+      projectRef,
+    },
+    {
+      enabled: !showEmptyState,
+    }
+  )
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -92,6 +99,10 @@ export const AdvisorSection = () => {
     },
     [sendEvent, projectRef, organization]
   )
+
+  if (showEmptyState) {
+    return <EmptyState />
+  }
 
   return (
     <div>
@@ -199,15 +210,21 @@ export const AdvisorSection = () => {
           </Sheet>
         </>
       ) : (
-        <Card className="bg-transparent">
-          <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
-            <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
-            <p className="text-sm text-foreground-light text-center">
-              No security or performance errors found
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState />
       )}
     </div>
+  )
+}
+
+function EmptyState() {
+  return (
+    <Card className="bg-transparent">
+      <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
+        <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
+        <p className="text-sm text-foreground-light text-center">
+          No security or performance errors found
+        </p>
+      </CardContent>
+    </Card>
   )
 }

@@ -341,6 +341,18 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
             {endpointDetails.description}
           </ReactMarkdown>
         )}
+        {endpointDetails['x-oauth-scope'] && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">OAuth scopes</h3>
+            <ul>
+              <li key={endpointDetails['x-oauth-scope']} className="list-['-'] ml-2 pl-2">
+                <span className="font-mono text-sm font-medium text-foreground">
+                  {endpointDetails['x-oauth-scope']}
+                </span>
+              </li>
+            </ul>
+          </section>
+        )}
         {pathParameters.length > 0 && (
           <section>
             <h3 className="mb-3 text-base text-foreground">Path parameters</h3>

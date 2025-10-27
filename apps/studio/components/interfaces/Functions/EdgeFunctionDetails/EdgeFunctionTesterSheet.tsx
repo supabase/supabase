@@ -192,14 +192,14 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
     // Construct custom headers
     const customHeaders: Record<string, string> = {}
-    headerFields.forEach(({ key, value }) => {
+    values.headers.forEach(({ key, value }) => {
       if (key && value) {
         customHeaders[key] = value
       }
     })
 
     // Construct query parameters
-    const queryString = queryParamFields
+    const queryString = values.queryParams
       .filter(({ key, value }) => key && value)
       .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join('&')
