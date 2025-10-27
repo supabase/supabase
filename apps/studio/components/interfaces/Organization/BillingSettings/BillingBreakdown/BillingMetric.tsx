@@ -18,6 +18,7 @@ export interface BillingMetricProps {
   usage: OrgUsageResponse
   subscription: OrgSubscription
   relativeToSubscription: boolean
+  docsLink?: React.ReactNode
   className?: string
 }
 
@@ -27,6 +28,7 @@ export const BillingMetric = ({
   usage,
   subscription,
   relativeToSubscription,
+  docsLink,
   className,
 }: BillingMetricProps) => {
   const usageMeta = usage.usages.find((x) => x.metric === metric.key)
@@ -81,11 +83,14 @@ export const BillingMetric = ({
 
   return (
     <HoverCard openDelay={50} closeDelay={200}>
-      <HoverCardTrigger asChild>
-        <div className={cn('flex items-center justify-between', className)}>
-          {metric.anchor ? (
-            <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
-              <div className="group flex items-center gap-1">
+      <div className={cn('flex items-center justify-between', className)}>
+        {metric.anchor ? (
+          <div className="flex flex-col gap-1 w-full">
+            <div className="flex items-center gap-1">
+              <Link
+                href={`/org/${slug}/usage#${metric.anchor}`}
+                className="group inline-flex items-center gap-1"
+              >
                 <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                   {metric.name}
                 </p>
@@ -94,8 +99,14 @@ export const BillingMetric = ({
                     <ChevronRight strokeWidth={1.5} size={16} className="transition" />
                   </span>
                 )}
-              </div>
-              <span className="text-sm">{usageLabel}</span>&nbsp;
+              </Link>
+              {docsLink && docsLink}
+            </div>
+            <div>
+              <HoverCardTrigger asChild>
+                <span className="text-sm cursor-pointer">{usageLabel}</span>
+              </HoverCardTrigger>
+              &nbsp;
               {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
                 <span className="text-sm" translate="no">
                   ({formatCurrency(usageMeta.cost)})
@@ -103,11 +114,19 @@ export const BillingMetric = ({
               ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
                 <span className="text-sm">{percentageLabel}</span>
               ) : null}
-            </Link>
-          ) : (
-            <div className="block w-full">
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1 w-full">
+            <div className="flex items-center gap-2">
+              {docsLink && docsLink}
               <p className="text-sm text-foreground-light flex space-x-1">{metric.name}</p>
-              <span className="text-sm">{usageLabel}</span>&nbsp;
+            </div>
+            <div>
+              <HoverCardTrigger asChild>
+                <span className="text-sm cursor-pointer">{usageLabel}</span>
+              </HoverCardTrigger>
+              &nbsp;
               {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
                 <span className="text-sm" translate="no">
                   ({formatCurrency(usageMeta.cost)})
@@ -116,56 +135,56 @@ export const BillingMetric = ({
                 <span className="text-sm">{percentageLabel}</span>
               ) : null}
             </div>
-          )}
+          </div>
+        )}
 
-          {usageMeta.available_in_plan ? (
-            <div>
-              {relativeToSubscription && !usageMeta.unlimited ? (
-                <svg className="h-8 w-8 -rotate-90 transform">
-                  <circle
-                    cx={15}
-                    cy={15}
-                    r={12}
-                    fill="transparent"
-                    stroke="currentColor"
-                    strokeWidth={4}
-                    className="text-background-surface-300"
-                  />
-                  <circle
-                    cx={15}
-                    cy={15}
-                    r={12}
-                    fill="transparent"
-                    stroke="currentColor"
-                    strokeDasharray={75.398}
-                    strokeDashoffset={`calc(75.39822 - ${
-                      usageRatio < 1 ? usageRatio * 100 : 100
-                    } / 100 * 75.39822)`}
-                    strokeWidth={4}
-                    className={
-                      isUsageBillingEnabled
-                        ? 'text-gray-dark-800'
-                        : isExceededLimit
-                          ? 'text-red-900'
-                          : isApproachingLimit
-                            ? 'text-yellow-1000'
-                            : 'text-gray-dark-800'
-                    }
-                  />
-                </svg>
-              ) : null}
-            </div>
-          ) : (
-            <div>
-              <UpgradePlanButton source={`billingBreakdownUsage${metric.anchor}`}>
-                Upgrade
-              </UpgradePlanButton>
-            </div>
-          )}
-        </div>
-      </HoverCardTrigger>
+        {usageMeta.available_in_plan ? (
+          <div>
+            {relativeToSubscription && !usageMeta.unlimited ? (
+              <svg className="h-8 w-8 -rotate-90 transform">
+                <circle
+                  cx={15}
+                  cy={15}
+                  r={12}
+                  fill="transparent"
+                  stroke="currentColor"
+                  strokeWidth={4}
+                  className="text-background-surface-300"
+                />
+                <circle
+                  cx={15}
+                  cy={15}
+                  r={12}
+                  fill="transparent"
+                  stroke="currentColor"
+                  strokeDasharray={75.398}
+                  strokeDashoffset={`calc(75.39822 - ${
+                    usageRatio < 1 ? usageRatio * 100 : 100
+                  } / 100 * 75.39822)`}
+                  strokeWidth={4}
+                  className={
+                    isUsageBillingEnabled
+                      ? 'text-gray-dark-800'
+                      : isExceededLimit
+                        ? 'text-red-900'
+                        : isApproachingLimit
+                          ? 'text-yellow-1000'
+                          : 'text-gray-dark-800'
+                  }
+                />
+              </svg>
+            ) : null}
+          </div>
+        ) : (
+          <div>
+            <UpgradePlanButton source={`billingBreakdownUsage${metric.anchor}`}>
+              Upgrade
+            </UpgradePlanButton>
+          </div>
+        )}
+      </div>
       {usageMeta.available_in_plan && (
-        <HoverCardContent side="bottom" align="end" className="w-[500px]" animate="slide-in">
+        <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
           <div className="text-sm">
             <p className="font-medium" translate="no">
               {usageMeta.unit_price_desc}
