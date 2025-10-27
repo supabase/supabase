@@ -14,6 +14,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { z } from 'zod'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -39,6 +40,27 @@ const General = () => {
 
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
+  const SettingsFormSchema = z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, 'Please enter a project name.')
+      .min(3, 'Project name must be at least 3 characters long.')
+      .max(64, 'Project name must be no longer than 64 characters.'),
+    ref: z.string().optional(),
+  })
+
+  const validateForm = (values: any) => {
+    const result = SettingsFormSchema.safeParse(values)
+    if (result.success) return {}
+
+    const errors: Record<string, string> = {}
+    for (const issue of result.error.errors) {
+      const key = issue.path?.[0] ?? 'name'
+      errors[key] = issue.message
+    }
+    return errors
+  }
   const { can: canUpdateProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
@@ -83,7 +105,7 @@ const General = () => {
       {project === undefined ? (
         <GenericSkeletonLoader />
       ) : (
-        <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
+        <Form id={formId} initialValues={initialValues} onSubmit={onSubmit} validate={validateForm}>
           {({ handleReset, values, initialValues }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
             return (
@@ -112,6 +134,7 @@ const General = () => {
                       size="small"
                       label="Project name"
                       disabled={isBranch || !canUpdateProject}
+                      maxLength={64}
                     />
                     <Input copy disabled id="ref" size="small" label="Project ID" />
                   </FormSectionContent>
