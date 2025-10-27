@@ -119,7 +119,7 @@ export const AuditLogsForm = () => {
                   render={({ field }) => (
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Write audit logs to database"
+                      label="Write audit logs to the database"
                       description={
                         <p className="text-sm prose text-foreground-lighter max-w-full">
                           When enabled, audit logs are written to the{' '}
@@ -129,15 +129,17 @@ export const AuditLogsForm = () => {
                             href={`/project/${projectRef}/editor/${auditLogTable?.id}`}
                           >
                             <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">
-                              {AUDIT_LOG_ENTRIES_TABLE} table
+                              {AUDIT_LOG_ENTRIES_TABLE}
                             </code>
-                          </InlineLink>
-                          . You can disable this to reduce disk usage. Audit Logs will still be
-                          available through the Auth logs.{' '}
+                          </InlineLink>{' '}
+                          table.
+                          <br />
+                          You can disable this to reduce disk usage while still accessing logs
+                          through the{' '}
                           <InlineLink
                             href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
                           >
-                            Audit logs remain available in the Auth logs.
+                            Auth logs.
                           </InlineLink>
                         </p>
                       }
