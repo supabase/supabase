@@ -11,7 +11,7 @@ import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
@@ -49,7 +49,7 @@ const AuthReport: NextPageWithLayout = () => {
 
 AuthReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="Auth">{page}</ReportsLayout>
+    <ObservabilityLayout title="Auth">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

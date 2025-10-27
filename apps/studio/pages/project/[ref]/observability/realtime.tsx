@@ -7,7 +7,7 @@ import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -46,7 +46,7 @@ const RealtimeReport: NextPageWithLayout = () => {
 
 RealtimeReport.getLayout = (page) => (
   <DefaultLayout>
-    <ReportsLayout title="Realtime">{page}</ReportsLayout>
+    <ObservabilityLayout title="Realtime">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
