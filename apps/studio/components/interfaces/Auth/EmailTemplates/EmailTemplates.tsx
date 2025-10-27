@@ -16,6 +16,7 @@ import {
 } from 'ui'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
+import { slugifyTitle } from './EmailTemplates.utils'
 import TemplateEditor from './TemplateEditor'
 
 export const EmailTemplates = () => {
@@ -58,7 +59,7 @@ export const EmailTemplates = () => {
           {isSecurityNotificationsEnabled ? (
             <Card>
               {TEMPLATES_SCHEMAS.map((template) => {
-                const templateSlug = template.title.trim().replace(/\s+/g, '-').toLowerCase()
+                const templateSlug = slugifyTitle(template.title)
                 return (
                   <CardContent key={`${template.id}`} className="p-0">
                     <Link
@@ -82,13 +83,13 @@ export const EmailTemplates = () => {
             </Card>
           ) : (
             <Card>
-              <Tabs_Shadcn_ defaultValue={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}>
+              <Tabs_Shadcn_ defaultValue={slugifyTitle(TEMPLATES_SCHEMAS[0].title)}>
                 <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
                   {TEMPLATES_SCHEMAS.map((template) => {
                     return (
                       <TabsTrigger_Shadcn_
                         key={`${template.id}`}
-                        value={template.title.trim().replace(/\s+/g, '-')}
+                        value={slugifyTitle(template.title)}
                       >
                         {template.title}
                       </TabsTrigger_Shadcn_>
@@ -96,7 +97,7 @@ export const EmailTemplates = () => {
                   })}
                 </TabsList_Shadcn_>
                 {TEMPLATES_SCHEMAS.map((template) => {
-                  const panelId = template.title.trim().replace(/\s+/g, '-')
+                  const panelId = slugifyTitle(template.title)
                   return (
                     <TabsContent_Shadcn_ key={panelId} value={panelId} className="mt-0">
                       <TemplateEditor key={template.title} template={template} />

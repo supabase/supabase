@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TEMPLATES_SCHEMAS } from 'components/interfaces/Auth/AuthTemplatesValidation'
+import { slugifyTitle } from 'components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import TemplateEditor from 'components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -46,18 +47,10 @@ const RedirectToTemplates = () => {
     return null
   }
 
-  // Convert templateId slug back to template ID for lookup
-  const templateIdFromSlug = (slug: string) => {
-    const template = TEMPLATES_SCHEMAS.find((template) => {
-      const templateSlug = template.title.trim().replace(/\s+/g, '-').toLowerCase()
-      return templateSlug === slug
-    })
-    return template?.id
-  }
-
+  // Find template whose slug matches the URL slug
   const template =
     templateId && typeof templateId === 'string'
-      ? TEMPLATES_SCHEMAS.find((template) => template.id === templateIdFromSlug(templateId))
+      ? TEMPLATES_SCHEMAS.find((template) => slugifyTitle(template.title) === templateId)
       : null
 
   // Show error if templateId is invalid or template is not found
