@@ -115,7 +115,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
 OrganizationsPage.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Organizations">
-      <PageLayout title="Your Organizations" className="max-w-[1200px] px-6 mx-auto">
+      <PageLayout title="Your Organizations" className="max-w-[1200px] lg:px-6 mx-auto">
         {page}
       </PageLayout>
     </DefaultLayout>
