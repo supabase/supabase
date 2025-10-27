@@ -219,8 +219,8 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton />
                         <AdvisorButton />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -235,6 +235,7 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
+                        <AdvisorButton />
                         <InlineEditorButton />
                         <AssistantButton />
                       </>

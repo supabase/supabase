@@ -1,4 +1,4 @@
-import { ShieldAlert } from 'lucide-react'
+import { Lightbulb } from 'lucide-react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -37,7 +37,7 @@ export const AdvisorButton = () => {
           },
         }}
       >
-        <ShieldAlert
+        <Lightbulb
           size={16}
           strokeWidth={1.5}
           className={cn(

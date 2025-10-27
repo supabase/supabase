@@ -6,6 +6,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
+import { EmptyAdvisor } from './EmptyAdvisor'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -271,9 +272,11 @@ export const AdvisorPanel = () => {
                 <GenericSkeletonLoader className="w-full p-4" />
               </div>
             ) : filteredItems.length === 0 ? (
-              <p className="px-4 py-4 text-sm text-foreground-light">
-                No advisor items match your selection.
-              </p>
+              <EmptyAdvisor
+                activeTab={activeTab}
+                hasFilters={severityFilters.length > 0}
+                onClearFilters={clearSeverityFilters}
+              />
             ) : (
               <>
                 <div className="flex flex-col">
