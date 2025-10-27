@@ -55,12 +55,10 @@ export const useDatabaseExtensionsQuery = <TData = DatabaseExtensionsData>(
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useQuery<DatabaseExtensionsData, DatabaseExtensionsError, TData>(
-    databaseExtensionsKeys.list(projectRef),
-    ({ signal }) => getDatabaseExtensions({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-      ...options,
-    }
-  )
+  return useQuery<DatabaseExtensionsData, DatabaseExtensionsError, TData>({
+    queryKey: databaseExtensionsKeys.list(projectRef),
+    queryFn: ({ signal }) => getDatabaseExtensions({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    ...options,
+  })
 }

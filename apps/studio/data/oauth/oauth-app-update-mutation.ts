@@ -57,22 +57,20 @@ export const useOAuthAppUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>(
-    (vars) => updateOAuthApp(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
-        await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update application: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>({
+    mutationFn: (vars) => updateOAuthApp(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
+      await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update application: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

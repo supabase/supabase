@@ -33,22 +33,20 @@ export const useAuthHooksUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthHooksUpdateData, ResponseError, AuthHooksUpdateVariables>(
-    (vars) => updateAuthHooks(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(authKeys.authConfig(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update auth hooks: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<AuthHooksUpdateData, ResponseError, AuthHooksUpdateVariables>({
+    mutationFn: (vars) => updateAuthHooks(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(authKeys.authConfig(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update auth hooks: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -705,6 +705,11 @@ export const SQLEditor = () => {
                           padding: { top: 4 },
                           lineNumbersMinChars: 3,
                         }}
+                        // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
+                        // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
+                        // Error: TextModel got disposed before DiffEditorWidget model got reset
+                        keepCurrentModifiedModel={true}
+                        keepCurrentOriginalModel={true}
                       />
                       {showWidget && (
                         <ResizableAIWidget

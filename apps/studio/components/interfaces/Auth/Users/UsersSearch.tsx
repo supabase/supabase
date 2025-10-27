@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { SetStateAction } from 'react'
 
 import {
@@ -36,8 +36,8 @@ export const UsersSearch = ({
 }: UsersSearchProps) => {
   return (
     <div className="flex items-center">
-      <div className="text-xs h-[26px] flex items-center px-2 border border-strong rounded-l-md bg-surface-300">
-        Search
+      <div className="text-xs h-[26px] flex items-center px-1.5 border border-strong rounded-l-md bg-surface-300">
+        <Search size={14} />
       </div>
 
       <Select_Shadcn_
@@ -83,7 +83,7 @@ export const UsersSearch = ({
       <Input
         size="tiny"
         className={cn(
-          'w-64 bg-transparent rounded-l-none -ml-[1px]',
+          'w-[245px] bg-transparent rounded-l-none -ml-[1px]',
           searchInvalid ? 'text-red-900 dark:border-red-900' : '',
           search.length > 1 && 'pr-6'
         )}

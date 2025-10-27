@@ -228,8 +228,7 @@ limit ${limit}
 
       return `select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
 from postgres_logs
-  cross join unnest(metadata) as m
-  cross join unnest(m.parsed) as parsed
+${joins}
 ${pgCronWhere}
 ${orderBy}
 limit ${limit}
@@ -293,7 +292,13 @@ export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?:
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
-  const where = genWhereStatement(table, filters)
+  let where = genWhereStatement(table, filters)
+  // pg_cron logs are a subset of postgres logs
+  // to calculate the chart, we need to query postgres logs
+  if (table === LogsTableName.PG_CRON) {
+    table = LogsTableName.POSTGRES
+    where = basePgCronWhere
+  }
   const joins = genCrossJoinUnnests(table)
   return `SELECT count(*) as count FROM ${table} ${joins} ${where}`
 }
@@ -320,7 +325,10 @@ const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] =>
   return [its.add(-extendValue, trunc), trunc]
 }
 
-const basePgCronWhere = `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
+// TODO(qiao): workaround for self-hosted cron logs error until logflare is fixed
+const basePgCronWhere = IS_PLATFORM
+  ? `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
+  : `where ( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
 /**
  *
  * generates log event chart query

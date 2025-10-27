@@ -31,21 +31,19 @@ export const useUserSendMagicLinkMutation = ({
   UseMutationOptions<UserSendMagicLinkData, ResponseError, UserSendMagicLinkVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<UserSendMagicLinkData, ResponseError, UserSendMagicLinkVariables>(
-    (vars) => sendMagicLink(vars),
-    {
-      async onSuccess(data, variables, context) {
-        // [Joshen] If we need to invalidate any queries
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to send magic link: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UserSendMagicLinkData, ResponseError, UserSendMagicLinkVariables>({
+    mutationFn: (vars) => sendMagicLink(vars),
+    async onSuccess(data, variables, context) {
+      // [Joshen] If we need to invalidate any queries
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to send magic link: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

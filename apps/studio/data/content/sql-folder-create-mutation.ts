@@ -43,24 +43,22 @@ export const useSQLSnippetFolderCreateMutation = ({
 } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateSQLSnippetFolderData, ResponseError, CreateSQLSnippetFolderVariables>(
-    (args) => createSQLSnippetFolder(args),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        if (invalidateQueriesOnSuccess) {
-          await queryClient.invalidateQueries(contentKeys.folders(projectRef))
-        }
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create folder: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<CreateSQLSnippetFolderData, ResponseError, CreateSQLSnippetFolderVariables>({
+    mutationFn: (args) => createSQLSnippetFolder(args),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      if (invalidateQueriesOnSuccess) {
+        await queryClient.invalidateQueries(contentKeys.folders(projectRef))
+      }
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create folder: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -51,22 +51,20 @@ export const useDatabaseIndexCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseIndexCreateData, ResponseError, DatabaseIndexCreateVariables>(
-    (vars) => createDatabaseIndex(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseIndexesKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database index: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseIndexCreateData, ResponseError, DatabaseIndexCreateVariables>({
+    mutationFn: (vars) => createDatabaseIndex(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(databaseIndexesKeys.list(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database index: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

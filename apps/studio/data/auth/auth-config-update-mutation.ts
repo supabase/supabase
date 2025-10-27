@@ -37,22 +37,20 @@ export const useAuthConfigUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>(
-    (vars) => updateAuthConfig(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(authKeys.authConfig(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update auth configuration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>({
+    mutationFn: (vars) => updateAuthConfig(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(authKeys.authConfig(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update auth configuration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

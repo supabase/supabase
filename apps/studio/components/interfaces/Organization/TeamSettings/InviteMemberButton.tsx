@@ -256,6 +256,7 @@ export const InviteMemberButton = () => {
                     >
                       <FormControl_Shadcn_>
                         <OrganizationProjectSelector
+                          fetchOnMount
                           sameWidthAsTrigger
                           checkPosition="left"
                           selectedRef={projectRef}

@@ -31,6 +31,7 @@ export const HomeV2 = () => {
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
+  const isComingUp = project?.status === PROJECT_STATUS.COMING_UP
 
   const [sectionOrder, setSectionOrder] = useLocalStorage<string[]>(
     `home-section-order-${project?.ref || 'default'}`,
@@ -101,9 +102,11 @@ export const HomeV2 = () => {
                 {sectionOrder.map((id) => {
                   if (IS_PLATFORM && id === 'usage') {
                     return (
-                      <SortableSection key={id} id={id}>
-                        <ProjectUsageSection />
-                      </SortableSection>
+                      <div key={id} className={cn(isComingUp && 'opacity-60 pointer-events-none')}>
+                        <SortableSection id={id}>
+                          <ProjectUsageSection />
+                        </SortableSection>
+                      </div>
                     )
                   }
                   if (
@@ -123,16 +126,20 @@ export const HomeV2 = () => {
                   }
                   if (id === 'advisor') {
                     return (
-                      <SortableSection key={id} id={id}>
-                        <AdvisorSection />
-                      </SortableSection>
+                      <div key={id} className={cn(isComingUp && 'opacity-60 pointer-events-none')}>
+                        <SortableSection id={id}>
+                          <AdvisorSection showEmptyState={isComingUp} />
+                        </SortableSection>
+                      </div>
                     )
                   }
                   if (id === 'custom-report') {
                     return (
-                      <SortableSection key={id} id={id}>
-                        <CustomReportSection />
-                      </SortableSection>
+                      <div key={id} className={cn(isComingUp && 'opacity-60 pointer-events-none')}>
+                        <SortableSection id={id}>
+                          <CustomReportSection />
+                        </SortableSection>
+                      </div>
                     )
                   }
                 })}

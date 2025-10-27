@@ -33,14 +33,12 @@ export const useReadReplicasQuery = <TData = ReadReplicasData>(
   { projectRef }: ReadReplicasVariables,
   { enabled = true, ...options }: UseQueryOptions<ReadReplicasData, ReadReplicasError, TData> = {}
 ) => {
-  return useQuery<ReadReplicasData, ReadReplicasError, TData>(
-    replicaKeys.list(projectRef),
-    ({ signal }) => getReadReplicas({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<ReadReplicasData, ReadReplicasError, TData>({
+    queryKey: replicaKeys.list(projectRef),
+    queryFn: ({ signal }) => getReadReplicas({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }
 
 export const usePrimaryDatabase = ({ projectRef }: { projectRef?: string }) => {

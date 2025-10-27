@@ -127,8 +127,8 @@ export const useCreateDestinationPipelineMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<CreateDestinationPipelineData, ResponseError, CreateDestinationPipelineParams>(
-    (vars) => createDestinationPipeline(vars),
     {
+      mutationFn: (vars) => createDestinationPipeline(vars),
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 

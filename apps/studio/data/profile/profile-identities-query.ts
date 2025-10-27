@@ -5,11 +5,16 @@ import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
 
 export async function getProfileIdentities() {
-  const { error, data } = await auth.getUser()
+  // getSession() uses a cached user object, which is almost never stale as the
+  // session refresh logic keeps it fresh. If there are claims of data not being
+  // fresh, it's because it was modified on another device / browser and the
+  // session hasn't been refreshed yet.
+  const { error, data } = await auth.getSession()
 
   if (error) throw error
+  if (!data.session) throw new Error('Session not found with getSession()')
 
-  const { identities = [], new_email, email_change_sent_at } = data.user
+  const { identities = [], new_email, email_change_sent_at } = data.session.user
   return { identities, new_email, email_change_sent_at }
 }
 
@@ -24,9 +29,9 @@ export const useProfileIdentitiesQuery = <TData = ProfileIdentitiesData>({
   enabled = true,
   ...options
 }: UseQueryOptions<ProfileIdentitiesData, ProfileIdentitiesError, TData> = {}) => {
-  return useQuery<ProfileIdentitiesData, ProfileIdentitiesError, TData>(
-    profileKeys.identities(),
-    () => getProfileIdentities(),
-    { ...options }
-  )
+  return useQuery<ProfileIdentitiesData, ProfileIdentitiesError, TData>({
+    queryKey: profileKeys.identities(),
+    queryFn: () => getProfileIdentities(),
+    ...options,
+  })
 }
