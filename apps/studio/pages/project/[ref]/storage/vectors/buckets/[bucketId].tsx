@@ -21,7 +21,7 @@ const VectorsBucketPage: NextPageWithLayout = () => {
   } = useVectorBucketQuery({ projectRef, vectorBucketName: bucketId })
 
   return (
-    <div className="storage-container flex flex-grow p-4">
+    <div className="storage-container flex flex-grow">
       {isError && <StorageBucketsError error={error as any} />}
 
       {isLoading && <GenericSkeletonLoader className="w-full" />}
