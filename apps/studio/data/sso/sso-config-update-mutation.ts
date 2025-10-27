@@ -33,26 +33,24 @@ export const useSSOConfigUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>(
-    (vars) => updateSSOConfig(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
-        await queryClient.invalidateQueries(orgSSOKeys.orgSSOConfig(slug))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          if (data.message === '') {
-            toast.error(`Failed to update SSO configuration.`)
-          } else {
-            toast.error(`${data.message}`)
-          }
+  return useMutation<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>({
+    mutationFn: (vars) => updateSSOConfig(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
+      await queryClient.invalidateQueries(orgSSOKeys.orgSSOConfig(slug))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        if (data.message === '') {
+          toast.error(`Failed to update SSO configuration.`)
         } else {
-          onError(data, variables, context)
+          toast.error(`${data.message}`)
         }
-      },
-      ...options,
-    }
-  )
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

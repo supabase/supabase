@@ -28,22 +28,20 @@ export const useQueryAbortMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<QueryAbortData, ResponseError, QueryAbortVariables>(
-    (vars) => abortQuery(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(sqlKeys.ongoingQueries(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to abort query: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<QueryAbortData, ResponseError, QueryAbortVariables>({
+    mutationFn: (vars) => abortQuery(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(sqlKeys.ongoingQueries(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to abort query: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

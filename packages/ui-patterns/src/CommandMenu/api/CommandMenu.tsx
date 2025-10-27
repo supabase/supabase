@@ -1,5 +1,5 @@
 'use client'
-
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { AlertTriangle, ArrowLeft, Command, Search } from 'lucide-react'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo } from 'react'
@@ -7,14 +7,22 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import { useBreakpoint } from 'common'
 import useDragToClose from 'common/hooks/useDragToClose'
-import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
+import {
+  Button,
+  Command_Shadcn_,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  cn,
+} from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 import {
-  useCommandMenuSize,
   useCommandMenuOpen,
+  useCommandMenuSize,
   useSetCommandMenuOpen,
   useSetupCommandMenuTouchEvents,
 } from './hooks/viewHooks'
@@ -252,6 +260,10 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
           className: cn('overflow-hidden flex data-closed:delay-100'),
         }}
       >
+        <VisuallyHidden>
+          <DialogTitle>Command menu</DialogTitle>
+          <DialogDescription>Type a command or search</DialogDescription>
+        </VisuallyHidden>
         <ErrorBoundary FallbackComponent={CommandError}>
           <PageSwitch>{children}</PageSwitch>
         </ErrorBoundary>

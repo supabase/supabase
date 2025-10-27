@@ -32,11 +32,9 @@ export const useProjectServiceVersionsQuery = <TData = ProjectServiceVersionsDat
     ...options
   }: UseQueryOptions<ProjectServiceVersionsData, ProjectServiceVersionsError, TData> = {}
 ) =>
-  useQuery<ProjectServiceVersionsData, ProjectServiceVersionsError, TData>(
-    projectKeys.serviceVersions(projectRef),
-    ({ signal }) => getProjectServiceVersions({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectServiceVersionsData, ProjectServiceVersionsError, TData>({
+    queryKey: projectKeys.serviceVersions(projectRef),
+    queryFn: ({ signal }) => getProjectServiceVersions({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

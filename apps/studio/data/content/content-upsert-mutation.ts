@@ -46,27 +46,25 @@ export const useContentUpsertMutation = ({
 } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpsertContentData, ResponseError, UpsertContentVariables>(
-    (args) => upsertContent(args),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        if (invalidateQueriesOnSuccess) {
-          await Promise.all([
-            queryClient.invalidateQueries(contentKeys.allContentLists(projectRef)),
-            queryClient.invalidateQueries(contentKeys.infiniteList(projectRef)),
-          ])
-        }
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to insert content: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UpsertContentData, ResponseError, UpsertContentVariables>({
+    mutationFn: (args) => upsertContent(args),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      if (invalidateQueriesOnSuccess) {
+        await Promise.all([
+          queryClient.invalidateQueries(contentKeys.allContentLists(projectRef)),
+          queryClient.invalidateQueries(contentKeys.infiniteList(projectRef)),
+        ])
+      }
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to insert content: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -34,12 +34,10 @@ export const useBackupsQuery = <TData = BackupsData>(
   // [Joshen] Check for specifically false to account for project not loaded yet
   const isOrioleDbInAws = useIsOrioleDbInAws()
 
-  return useQuery<BackupsData, BackupsError, TData>(
-    databaseKeys.backups(projectRef),
-    ({ signal }) => getBackups({ projectRef }, signal),
-    {
-      enabled: enabled && !isOrioleDbInAws && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<BackupsData, BackupsError, TData>({
+    queryKey: databaseKeys.backups(projectRef),
+    queryFn: ({ signal }) => getBackups({ projectRef }, signal),
+    enabled: enabled && !isOrioleDbInAws && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }

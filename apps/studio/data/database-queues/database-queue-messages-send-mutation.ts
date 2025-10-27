@@ -50,7 +50,8 @@ export const useDatabaseQueueMessageSendMutation = ({
     DatabaseQueueMessageSendData,
     ResponseError,
     DatabaseQueueMessageSendVariables
-  >((vars) => sendDatabaseQueueMessage(vars), {
+  >({
+    mutationFn: (vars) => sendDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queueName } = variables
       await queryClient.invalidateQueries(

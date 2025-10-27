@@ -19,7 +19,8 @@ export const useSendResetMutation = ({
   onError,
   ...options
 }: Omit<UseMutationOptions<SendResetData, ResponseError>, 'mutationFn'> = {}) => {
-  return useMutation<SendResetData, ResponseError>(() => sendReset(), {
+  return useMutation<SendResetData, ResponseError>({
+    mutationFn: () => sendReset(),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

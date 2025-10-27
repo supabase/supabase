@@ -31,20 +31,18 @@ export const useBackupDownloadMutation = ({
   UseMutationOptions<BackupDownloadData, ResponseError, BackupDownloadVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupDownloadData, ResponseError, BackupDownloadVariables>(
-    (vars) => downloadBackup(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to download backup: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BackupDownloadData, ResponseError, BackupDownloadVariables>({
+    mutationFn: (vars) => downloadBackup(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to download backup: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

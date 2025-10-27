@@ -47,11 +47,9 @@ export const useBranchDiffQuery = (
     ...options
   }: Omit<UseQueryOptions<BranchDiffData, ResponseError>, 'queryKey' | 'queryFn'> = {}
 ) =>
-  useQuery<BranchDiffData, ResponseError>(
-    branchKeys.diff(projectRef, branchRef),
-    () => getBranchDiff({ branchRef, includedSchemas }),
-    {
-      enabled: IS_PLATFORM && enabled && Boolean(branchRef),
-      ...options,
-    }
-  )
+  useQuery<BranchDiffData, ResponseError>({
+    queryKey: branchKeys.diff(projectRef, branchRef),
+    queryFn: () => getBranchDiff({ branchRef, includedSchemas }),
+    enabled: IS_PLATFORM && enabled && Boolean(branchRef),
+    ...options,
+  })
