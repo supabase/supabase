@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
+    "build:vercel": "NODE_OPTIONS=--no-deprecation next build --turbopack",
     "ci": "pnpm migrate && pnpm build",
     "clean": "rimraf node_modules .next",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack --port 3030",
@@ -14,10 +15,11 @@
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "eslint .",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/migrate.ts",
+    "migrate:vercel": "NODE_OPTIONS=--no-deprecation tsx scripts/migrate.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "postinstall": "if [ \"$VERCEL\" = \"1\" ]; then pnpm rebuild sharp; fi",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "vercel-build": "pnpm migrate && pnpm build",
+    "vercel-build": "pnpm migrate:vercel && pnpm build:vercel",
     "typecheck_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
