@@ -1,5 +1,5 @@
 import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
@@ -40,22 +40,20 @@ export function useS3AccessKeyDeleteMutation({
 > = {}) {
   const queryClient = useQueryClient()
 
-  return useMutation<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>(
-    (vars) => deleteS3AccessKeyCredential(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageCredentialsKeys.credentials(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete S3 access key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>({
+    mutationFn: (vars) => deleteS3AccessKeyCredential(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(storageCredentialsKeys.credentials(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete S3 access key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

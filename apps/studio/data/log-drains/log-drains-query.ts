@@ -30,14 +30,12 @@ export type LogDrainsyError = ResponseError
 
 export const useLogDrainsQuery = <TData = LogDrainsData>(
   { ref }: LogDrainsVariables,
-  { enabled, ...options }: UseQueryOptions<LogDrainsData, LogDrainsyError, TData> = {}
+  { enabled = true, ...options }: UseQueryOptions<LogDrainsData, LogDrainsyError, TData> = {}
 ) =>
-  useQuery<LogDrainsData, LogDrainsyError, TData>(
-    logDrainsKeys.list(ref),
-    ({ signal }) => getLogDrains({ ref }, signal),
-    {
-      enabled: enabled && !!ref,
-      refetchOnMount: false,
-      ...options,
-    }
-  )
+  useQuery<LogDrainsData, LogDrainsyError, TData>({
+    queryKey: logDrainsKeys.list(ref),
+    queryFn: ({ signal }) => getLogDrains({ ref }, signal),
+    enabled: enabled && !!ref,
+    refetchOnMount: false,
+    ...options,
+  })

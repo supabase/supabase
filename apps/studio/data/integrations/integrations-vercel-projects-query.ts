@@ -22,7 +22,7 @@ export async function getVercelProjects(
         query: {
           // [Alaister]: setting a large limit here to avoid pagination
           // until we have merged the new shadcn listbox which will support it
-          limit: '1000',
+          limit: 1000,
         },
       },
       signal,
@@ -44,11 +44,9 @@ export const useVercelProjectsQuery = <TData = VercelProjectsData>(
     ...options
   }: UseQueryOptions<VercelProjectsData, VercelProjectsError, TData> = {}
 ) =>
-  useQuery<VercelProjectsData, VercelProjectsError, TData>(
-    integrationKeys.vercelProjectList(organization_integration_id),
-    ({ signal }) => getVercelProjects({ organization_integration_id }, signal),
-    {
-      enabled: enabled && typeof organization_integration_id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<VercelProjectsData, VercelProjectsError, TData>({
+    queryKey: integrationKeys.vercelProjectList(organization_integration_id),
+    queryFn: ({ signal }) => getVercelProjects({ organization_integration_id }, signal),
+    enabled: enabled && typeof organization_integration_id !== 'undefined',
+    ...options,
+  })

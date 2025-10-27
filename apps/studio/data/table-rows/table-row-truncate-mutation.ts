@@ -1,16 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
-import type { SupaTable } from 'components/grid/types'
+import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
+import { tableRowKeys } from './keys'
 
 export type TableRowTruncateVariables = {
   projectRef: string
-  connectionString?: string
-  table: SupaTable
+  connectionString?: string | null
+  table: { id: number; name: string; schema?: string }
 }
 
 export function getTableRowTruncateSql({ table }: Pick<TableRowTruncateVariables, 'table'>) {
@@ -47,22 +46,20 @@ export const useTableRowTruncateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowTruncateData, ResponseError, TableRowTruncateVariables>(
-    (vars) => truncateTableRow(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, table } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to truncate table row: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<TableRowTruncateData, ResponseError, TableRowTruncateVariables>({
+    mutationFn: (vars) => truncateTableRow(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, table } = variables
+      await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to truncate table row: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

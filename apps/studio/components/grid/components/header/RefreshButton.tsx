@@ -2,34 +2,36 @@ import { useQueryClient } from '@tanstack/react-query'
 import { RefreshCw } from 'lucide-react'
 
 import { useParams } from 'common'
-import type { SupaTable } from 'components/grid/types'
-import { sqlKeys } from 'data/sql/keys'
-import type { TableLike } from 'hooks/misc/useTable'
-import { Button } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { tableRowKeys } from 'data/table-rows/keys'
 
 export type RefreshButtonProps = {
-  table: TableLike | SupaTable
+  tableId?: number
   isRefetching?: boolean
 }
 
-const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
+export const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const queryKey = sqlKeys.query(ref, [table.schema, table.name])
+  const queryKey = tableRowKeys.tableRowsAndCount(ref, tableId)
 
   async function onClick() {
     await queryClient.invalidateQueries(queryKey)
   }
 
   return (
-    <Button
-      type="text"
+    <ButtonTooltip
+      type="outline"
       loading={isRefetching}
-      icon={<RefreshCw className="text-foreground-muted" strokeWidth={1.5} />}
+      icon={<RefreshCw />}
       onClick={() => onClick()}
-    >
-      Refresh
-    </Button>
+      className="w-7 h-7 p-0"
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: 'Refresh table data',
+        },
+      }}
+    />
   )
 }
-export default RefreshButton

@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode, forwardRef } from 'react'
-import { IconBook, IconLifeBuoy, IconX, LoadingLine, cn } from 'ui'
+import { LoadingLine, cn } from 'ui'
 
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { ScaffoldContainer } from '../Scaffold'
+import { Book, LifeBuoy, X } from 'lucide-react'
 
 export type IntegrationWindowLayoutProps = {
   title: string
@@ -33,7 +34,7 @@ const IntegrationWindowLayout = ({
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-xs text-foreground-light hover:text"
           >
-            <IconBook size={16} />
+            <Book size={16} />
             Docs
           </Link>
         )}
@@ -43,7 +44,7 @@ const IntegrationWindowLayout = ({
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-xs text-light hover:text"
         >
-          <IconLifeBuoy size={16} />
+          <LifeBuoy size={16} />
           Support
         </Link>
       </ScaffoldContainer>
@@ -71,7 +72,7 @@ const Header = ({ title, integrationIcon }: HeaderProps) => {
             <div className="bg-white shadow border rounded p-1 w-8 h-8 flex justify-center items-center">
               <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-4" />
             </div>
-            <IconX className="text-border-stronger" strokeWidth={2} size={16} />
+            <X className="text-border-stronger" strokeWidth={2} size={16} />
             {integrationIcon}
           </div>
           <span className="text-sm" title={title}>

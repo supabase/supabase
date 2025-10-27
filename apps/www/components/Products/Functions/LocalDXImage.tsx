@@ -1,7 +1,7 @@
+import { Check, Copy } from 'lucide-react'
 import Image from 'next/image'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
-import { IconCheck, IconCopy } from 'ui'
 
 const LocalDXImage = () => {
   const [copied, setCopied] = useState(false)
@@ -43,10 +43,10 @@ const LocalDXImage = () => {
           <div className="text-foreground rounded p-1.5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
             {copied ? (
               <span className="text-brand">
-                <IconCheck className="w-3.5 h-3.5" />
+                <Check className="w-3.5 h-3.5" />
               </span>
             ) : (
-              <IconCopy className="w-3.5 h-3.5" />
+              <Copy className="w-3.5 h-3.5" />
             )}
           </div>
         </button>

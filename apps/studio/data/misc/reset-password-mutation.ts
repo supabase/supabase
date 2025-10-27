@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -33,23 +33,21 @@ export const useResetPasswordMutation = ({
   UseMutationOptions<ResetPasswordData, ResponseError, ResetPasswordVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ResetPasswordData, ResponseError, ResetPasswordVariables>(
-    (vars) => resetPassword(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to reset password: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-          Sentry.captureMessage('[CRITICAL] Failed to send reset password email: ' + data.message)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ResetPasswordData, ResponseError, ResetPasswordVariables>({
+    mutationFn: (vars) => resetPassword(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to reset password: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+      if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+        Sentry.captureMessage('[CRITICAL] Failed to send reset password email: ' + data.message)
+      }
+    },
+    ...options,
+  })
 }

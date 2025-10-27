@@ -385,12 +385,30 @@ export const examples: Registry = [
     registryDependencies: ['context-menu'],
     files: ['example/context-menu-demo.tsx'],
   },
-  // {
-  //   name: 'data-table-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['data-table'],
-  //   files: ['example/data-table-demo.tsx'],
-  // },
+  {
+    name: 'data-input-demo',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-demo.tsx'],
+  },
+  {
+    name: 'data-input-with-copy',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-copy.tsx'],
+  },
+  {
+    name: 'data-input-with-copy-secret',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-copy-secret.tsx'],
+  },
+  {
+    name: 'data-input-with-reveal-copy',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy.tsx'],
+  },
   {
     name: 'date-picker-demo',
     type: 'components:example',
@@ -432,6 +450,12 @@ export const examples: Registry = [
     files: ['example/dialog-close-button.tsx'],
   },
   {
+    name: 'dialog-centered-off',
+    type: 'components:example',
+    registryDependencies: ['dialog', 'button'],
+    files: ['example/dialog-centered-off.tsx'],
+  },
+  {
     name: 'drawer-demo',
     type: 'components:example',
     registryDependencies: ['drawer'],
@@ -460,6 +484,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['dropdown-menu', 'radio-group'],
     files: ['example/dropdown-menu-radio-group.tsx'],
+  },
+  {
+    name: 'filter-bar-demo',
+    type: 'components:example',
+    registryDependencies: ['filter-bar'],
+    files: ['example/filter-bar-demo.tsx'],
   },
   {
     name: 'hover-card-demo',
@@ -562,6 +592,24 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['navigation-menu'],
     files: ['example/navigation-menu-responsive.tsx'],
+  },
+  {
+    name: 'nav-menu-demo',
+    type: 'components:example',
+    registryDependencies: ['nav-menu'],
+    files: ['example/nav-menu-demo.tsx'],
+  },
+  {
+    name: 'nav-menu-badges',
+    type: 'components:example',
+    registryDependencies: ['nav-menu'],
+    files: ['example/nav-menu-badges.tsx'],
+  },
+  {
+    name: 'nav-menu-icons',
+    type: 'components:example',
+    registryDependencies: ['nav-menu'],
+    files: ['example/nav-menu-icons.tsx'],
   },
   // {
   //   name: 'pagination-demo',
@@ -790,36 +838,6 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['textarea', 'label'],
     files: ['example/textarea-with-text.tsx'],
-  },
-  {
-    name: 'toast-demo',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-demo.tsx'],
-  },
-  {
-    name: 'toast-destructive',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-destructive.tsx'],
-  },
-  {
-    name: 'toast-simple',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-simple.tsx'],
-  },
-  {
-    name: 'toast-with-action',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-with-action.tsx'],
-  },
-  {
-    name: 'toast-with-title',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-with-title.tsx'],
   },
   {
     name: 'toggle-group-demo',
@@ -1061,14 +1079,84 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'inner-side-menu-demo',
+    type: 'components:example',
+    files: ['example/inner-side-menu-demo.tsx'],
+  },
+  {
+    name: 'inner-side-menu-static-titles',
+    type: 'components:example',
+    files: ['example/inner-side-menu-static-titles.tsx'],
+  },
+  {
+    name: 'inner-side-menu-loading',
+    type: 'components:example',
+    files: ['example/inner-side-menu-loading.tsx'],
+  },
+  {
+    name: 'inner-side-menu-multiple-sections',
+    type: 'components:example',
+    files: ['example/inner-side-menu-multiple-sections.tsx'],
+  },
+  {
+    name: 'inner-side-menu-empty',
+    type: 'components:example',
+    files: ['example/inner-side-menu-empty.tsx'],
+  },
+  {
+    name: 'inner-side-menu-with-search',
+    type: 'components:example',
+    files: ['example/inner-side-menu-with-search.tsx'],
+  },
+  {
+    name: 'toc-demo',
+    type: 'components:example',
+    files: ['example/toc-demo.tsx'],
+  },
+  {
+    name: 'toc-single-demo',
+    type: 'components:example',
+    files: ['example/toc-single-demo.tsx'],
+  },
+  {
     name: 'multi-select-demo',
     type: 'components:example',
     files: ['example/multi-select-demo.tsx'],
   },
   {
-    name: 'multi-select-form',
+    name: 'multi-select-disabled',
     type: 'components:example',
-    files: ['example/multi-select-form.tsx'],
+    files: ['example/multi-select-disabled.tsx'],
+  },
+  {
+    name: 'multi-select-badge-limit-wrap',
+    type: 'components:example',
+    files: ['example/multi-select-badge-limit-wrap.tsx'],
+  },
+  {
+    name: 'multi-select-badge-limit',
+    type: 'components:example',
+    files: ['example/multi-select-badge-limit.tsx'],
+  },
+  {
+    name: 'multi-select-combobox',
+    type: 'components:example',
+    files: ['example/multi-select-combobox.tsx'],
+  },
+  {
+    name: 'multi-select-combobox-creatable',
+    type: 'components:example',
+    files: ['example/multi-select-combobox-creatable.tsx'],
+  },
+  {
+    name: 'multi-select-deletable-badge',
+    type: 'components:example',
+    files: ['example/multi-select-deletable-badge.tsx'],
+  },
+  {
+    name: 'multi-select-inline-search-input',
+    type: 'components:example',
+    files: ['example/multi-select-inline-search-input.tsx'],
   },
   {
     name: 'tree-view-demo',
@@ -1136,8 +1224,43 @@ export const examples: Registry = [
     files: ['example/color-usage-surface-studio-frame.tsx'],
   },
   {
+    name: 'chart-bar-demo',
+    type: 'components:example',
+    files: ['example/chart-bar-demo.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-grid',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-grid.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-axis',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-axis.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-tooltip',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-tooltip.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-legend',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-legend.tsx'],
+  },
+  {
+    name: 'chart-tooltip-demo',
+    type: 'components:example',
+    files: ['example/chart-tooltip-demo.tsx'],
+  },
+  {
     name: 'expanding-textarea-demo',
     type: 'docs:example',
     files: ['example/expanding-textarea-demo.tsx'],
+  },
+  {
+    name: 'logs-bar-chart',
+    type: 'components:example',
+    files: ['example/logs-bar-chart.tsx'],
   },
 ]

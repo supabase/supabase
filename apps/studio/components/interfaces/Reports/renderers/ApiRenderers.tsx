@@ -19,6 +19,9 @@ import {
   Button,
   Collapsible,
   WarningIcon,
+  Collapsible_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  CollapsibleContent_Shadcn_,
 } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
@@ -62,7 +65,7 @@ export const NetworkTrafficRenderer = (
   }
 
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-12 w-full">
       <BarChart
         size="small"
         title="Ingress"
@@ -175,7 +178,7 @@ export const TopApiRoutesRenderer = (
         body={
           <>
             {props.data.map((datum, index) => (
-              <Fragment key={datum.method + datum.path + (datum.search || '')}>
+              <Fragment key={index + datum.method + datum.path + (datum.search || '')}>
                 <Table.tr
                   className={[
                     'p-0 transition transform cursor-pointer hover:bg-surface-200',
@@ -216,22 +219,6 @@ export const TopApiRoutesRenderer = (
             ].join(' ')}
           >
             {!showMore ? 'Show more' : 'Show less'}
-          </Button>
-          <Button
-            type="text"
-            className="text-foreground-lighter"
-            onClick={() => {
-              props.router.push({
-                pathname: `/project/${projectRef}/logs/explorer`,
-                query: {
-                  q: props.params?.sql,
-                  its: props.params!.iso_timestamp_start,
-                  ite: props.params!.iso_timestamp_end,
-                },
-              })
-            }}
-          >
-            Open in Logs Explorer
           </Button>
         </div>
       </Collapsible.Trigger>
@@ -346,8 +333,8 @@ interface RouteTdContentProps {
   search: string
 }
 const RouteTdContent = (datum: RouteTdContentProps) => (
-  <Collapsible>
-    <Collapsible.Trigger asChild>
+  <Collapsible_Shadcn_>
+    <CollapsibleTrigger_Shadcn_ asChild>
       <div className="flex gap-2 items-center">
         <Button asChild type="text" className=" !py-0 !p-1" title="Show more route details">
           <span>
@@ -381,8 +368,8 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           />
         </div>
       </div>
-    </Collapsible.Trigger>
-    <Collapsible.Content className="pt-2">
+    </CollapsibleTrigger_Shadcn_>
+    <CollapsibleContent_Shadcn_ className="pt-2">
       {datum.search ? (
         <pre className={`syntax-highlight overflow-auto rounded bg-surface-100 p-2 !text-xs`}>
           <div
@@ -395,6 +382,6 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
       ) : (
         <p className="text-xs text-foreground-lighter">No query parameters in this request</p>
       )}
-    </Collapsible.Content>
-  </Collapsible>
+    </CollapsibleContent_Shadcn_>
+  </Collapsible_Shadcn_>
 )

@@ -3,17 +3,18 @@ import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { ChevronRight, ExternalLink } from 'lucide-react'
 import { pricing } from 'shared-data/pricing'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel, cn } from 'ui'
+import { Alert, Button, Collapsible, SidePanel, cn } from 'ui'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -42,7 +43,7 @@ const SpendCapSidePanel = () => {
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const canUpdateSpendCap = useCheckPermissions(
+  const { can: canUpdateSpendCap } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -73,7 +74,6 @@ const SpendCapSidePanel = () => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isLoading, subscription, isSpendCapOn])
 
   const onConfirm = async () => {
@@ -105,9 +105,9 @@ const SpendCapSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Spend cap</h4>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/spend-cap"
+              href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
               target="_blank"
               rel="noreferrer"
             >
@@ -128,7 +128,7 @@ const SpendCapSidePanel = () => {
           <Collapsible open={showUsageCosts} onOpenChange={setShowUsageCosts}>
             <Collapsible.Trigger asChild>
               <div className="flex items-center space-x-2 cursor-pointer">
-                <IconChevronRight
+                <ChevronRight
                   strokeWidth={1.5}
                   size={16}
                   className={showUsageCosts ? 'rotate-90' : ''}
@@ -264,6 +264,10 @@ const SpendCapSidePanel = () => {
                 {selectedOption === 'on'
                   ? 'Upon clicking confirm, spend cap will be enabled for your organization and you will no longer be charged any extra for usage.'
                   : 'Upon clicking confirm, spend cap will be disabled for your organization and you will be charged for any usage beyond the included quota.'}
+              </p>
+              <p className="text-sm">
+                Toggling spend cap triggers an invoice and there might be prorated charges for any
+                usage beyond the Pro Plans quota during this billing cycle.
               </p>
             </>
           )}

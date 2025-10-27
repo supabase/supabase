@@ -75,7 +75,7 @@ For more details on vector columns, including how to generate embeddings and sto
 
 These operators are used directly in your SQL query to retrieve records that are most similar to the user's search query. Choosing the right operator depends on your needs. Inner product (also known as dot product) tends to be the fastest if your vectors are normalized.
 
-The easiest way to perform semantic search in Postgres in by creating a function:
+The easiest way to perform semantic search in Postgres is by creating a function:
 
 ```sql
 -- Match documents using cosine distance (<=>)

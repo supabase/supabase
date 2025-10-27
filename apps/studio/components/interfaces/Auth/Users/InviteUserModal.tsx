@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Mail } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, Form, Input, Modal } from 'ui'
 
 export type InviteUserModalProps = {
@@ -22,7 +22,10 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
       setVisible(false)
     },
   })
-  const canInviteUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
+  const { can: canInviteUsers } = useAsyncCheckPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'invite_user'
+  )
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -44,52 +47,49 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   }
 
   return (
-    <div>
-      <Modal
-        closable
-        hideFooter
-        size="small"
-        key="invite-user-modal"
-        visible={visible}
-        header="Invite a new user"
-        onCancel={handleToggle}
+    <Modal
+      hideFooter
+      size="small"
+      key="invite-user-modal"
+      visible={visible}
+      header="Invite a new user"
+      onCancel={handleToggle}
+    >
+      <Form
+        validateOnBlur={false}
+        initialValues={{ email: '' }}
+        validate={validate}
+        onSubmit={onInviteUser}
       >
-        <Form
-          validateOnBlur={false}
-          initialValues={{ email: '' }}
-          validate={validate}
-          onSubmit={onInviteUser}
-        >
-          {() => (
-            <>
-              <Modal.Content>
-                <Input
-                  id="email"
-                  className="w-full"
-                  label="User email"
-                  icon={<Mail />}
-                  type="email"
-                  name="email"
-                  placeholder="User email"
-                />
-              </Modal.Content>
+        {() => (
+          <>
+            <Modal.Content>
+              <Input
+                id="email"
+                className="w-full"
+                label="User email"
+                icon={<Mail />}
+                type="email"
+                name="email"
+                placeholder="User email"
+              />
+            </Modal.Content>
 
-              <Modal.Content>
-                <Button
-                  block
-                  size="small"
-                  htmlType="submit"
-                  loading={isInviting}
-                  disabled={!canInviteUsers || isInviting}
-                >
-                  Invite user
-                </Button>
-              </Modal.Content>
-            </>
-          )}
-        </Form>
-      </Modal>
-    </div>
+            <Modal.Content>
+              <Button
+                block
+                size="small"
+                htmlType="submit"
+                loading={isInviting}
+                disabled={!canInviteUsers || isInviting}
+              >
+                Invite user
+              </Button>
+            </Modal.Content>
+          </>
+        )}
+      </Form>
+    </Modal>
   )
 }
 

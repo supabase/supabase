@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, put } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { logDrainsKeys } from './keys'
-import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 export type LogDrainUpdateVariables = {
   projectRef: string
@@ -25,7 +25,8 @@ export async function updateLogDrain(payload: LogDrainUpdateVariables) {
     body: {
       name: payload.name,
       description: payload.description,
-      config: payload.config,
+      type: payload.type,
+      config: payload.config as any,
     },
   })
 
@@ -45,24 +46,22 @@ export const useUpdateLogDrainMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<LogDrainUpdateData, ResponseError, LogDrainUpdateVariables>(
-    (vars) => updateLogDrain(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<LogDrainUpdateData, ResponseError, LogDrainUpdateVariables>({
+    mutationFn: (vars) => updateLogDrain(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(logDrainsKeys.list(projectRef))
+      await queryClient.invalidateQueries(logDrainsKeys.list(projectRef))
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

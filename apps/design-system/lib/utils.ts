@@ -1,10 +1,6 @@
-import * as React from 'react'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { cn as uiCN } from 'ui'
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+export const cn = uiCN
 
 export function formatDate(input: string | number): string {
   const date = new Date(input)

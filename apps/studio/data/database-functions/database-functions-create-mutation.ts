@@ -1,15 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import pgMeta from '@supabase/pg-meta'
+import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
-import { sqlKeys } from 'data/sql/keys'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
 }
 
@@ -42,22 +42,20 @@ export const useDatabaseFunctionCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionCreateData, ResponseError, DatabaseFunctionCreateVariables>(
-    (vars) => createDatabaseFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['functions-list']))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseFunctionCreateData, ResponseError, DatabaseFunctionCreateVariables>({
+    mutationFn: (vars) => createDatabaseFunction(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(databaseKeys.databaseFunctions(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

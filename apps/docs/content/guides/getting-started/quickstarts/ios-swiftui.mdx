@@ -8,8 +8,8 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
-    <QuickstartDbSetup />
+
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -39,21 +39,22 @@ hideToc: true
 
     <StepHikeCompact.Details title="Initialize the Supabase client">
 
-      Create a new `Supabase.swift` file add a new supabase instance using your project URL and public API (anon) key:
+      Create a new `Supabase.swift` file add a new Supabase instance using your project URL and public API (anon) key:
 
       <ProjectConfigVariables variable="url" />
-      <ProjectConfigVariables variable="anonKey" />
+      <ProjectConfigVariables variable="publishable" />
+      <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```swift Supabase.swift
+      ```swift name=Supabase.swift
       import Supabase
 
       let supabase = SupabaseClient(
         supabaseURL: URL(string: "YOUR_SUPABASE_URL")!,
-        supabaseKey: "YOUR_SUPABASE_ANON_KEY"
+        supabaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
       )
       ```
 
@@ -63,18 +64,18 @@ hideToc: true
 
   <StepHikeCompact.Step step={5}>
 
-    <StepHikeCompact.Details title="Create a data model for countries">
+    <StepHikeCompact.Details title="Create a data model for instruments">
 
     Create a decodable struct to deserialize the data from the database.
 
-    Add the following code to a new file named `Country.swift`.
+    Add the following code to a new file named `Instrument.swift`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```swift Supabase.swift
-      struct Country: Decodable, Identifiable {
+      ```swift name=Supabase.swift
+      struct Instrument: Decodable, Identifiable {
         let id: Int
         let name: String
       }
@@ -96,23 +97,23 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```swift ContentView.swift
+      ```swift name=ContentView.swift
       struct ContentView: View {
 
-        @State var countries: [Country] = []
+        @State var instruments: [Instrument] = []
 
         var body: some View {
-          List(countries) { country in
-            Text(country.name)
+          List(instruments) { instrument in
+            Text(instrument.name)
           }
           .overlay {
-            if countries.isEmpty {
+            if instruments.isEmpty {
               ProgressView()
             }
           }
           .task {
             do {
-              countries = try await supabase.from("countries").select().execute().value
+              instruments = try await supabase.from("instruments").select().execute().value
             } catch {
               dump(error)
             }

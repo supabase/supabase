@@ -1,9 +1,16 @@
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import CardButton from 'components/ui/CardButton'
 import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
+import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -17,15 +24,9 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useState } from 'react'
-import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
-import AlertError from 'components/ui/AlertError'
-import toast from 'react-hot-toast'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import Link from 'next/link'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 
 export function LogDrains({
   onNewDrainClick,
@@ -34,7 +35,7 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
   const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
@@ -89,7 +90,7 @@ export function LogDrains({
 
   if (!isLoading && logDrains?.length === 0) {
     return (
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid lg:grid-cols-2 gap-3">
         {LOG_DRAIN_TYPES.map((src) => (
           <CardButton
             key={src.value}
@@ -126,8 +127,15 @@ export function LogDrains({
           <TableBody>
             {logDrains?.map((drain) => (
               <TableRow key={drain.id}>
-                <TableCell className="font-medium">{drain.name}</TableCell>
-                <TableCell>{drain.description}</TableCell>
+                <TableCell className="font-medium truncate max-w-72" title={drain.name}>
+                  {drain.name}
+                </TableCell>
+                <TableCell
+                  className="text-foreground-light truncate max-w-72"
+                  title={drain.description}
+                >
+                  {drain.description}
+                </TableCell>
                 <TableCell className="text-right font-mono">{drain.type}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -175,7 +183,7 @@ export function LogDrains({
             }}
             onCancel={() => setIsDeleteModalOpen(false)}
           >
-            <div className="text-foreground-light">
+            <div className="text-foreground-light text-sm">
               <p>
                 Are you sure you want to delete{' '}
                 <span className="text-foreground">{selectedLogDrain?.name}</span>?

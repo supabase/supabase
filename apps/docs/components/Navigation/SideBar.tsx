@@ -1,11 +1,11 @@
-import Link from 'next/link'
 import Image from 'next/legacy/image'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
 import { REFERENCES } from '~/content/navigation.references'
 
-import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 import * as Accordion from '@radix-ui/react-accordion'
+import { ArrowLeft, ChevronRight } from 'lucide-react'
+import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 
 const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
   const pathname = usePathname()
@@ -28,7 +28,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
     if (foundItem) return group
   })
 
-  const currentSubSection: NavMenuSection =
+  const currentSubSection: NavMenuSection | undefined =
     currentSection !== undefined
       ? currentSection.items.find((section) => {
           if (section.items.length === 0) {
@@ -50,7 +50,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
         <>
           <Link href="/reference">
             <div className="flex items-center space-x-4 opacity-75 hover:opacity-100 transition">
-              <IconArrowLeft size={16} strokeWidth={2} className="text-foreground" />
+              <ArrowLeft size={16} strokeWidth={2} className="text-foreground" />
               <span className="text-sm text-foreground">All Reference Docs</span>
             </div>
           </Link>
@@ -100,12 +100,12 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
           {menuItems.map((group: NavMenuGroup) => (
             <Accordion.Item key={group.label} value={group.label}>
               <Accordion.Trigger className="w-full flex items-center space-x-2 py-1.5">
-                <IconChevronRight
+                <ChevronRight
                   className="transition text-foreground-lighter data-open-parent:rotate-90"
                   size={14}
                   strokeWidth={2}
                 />
-                <span className="text-foreground text-sm group-hover:text-brand transition">
+                <span className="text-foreground text-sm group-hover:text-brand-link transition">
                   {group.label}
                 </span>
               </Accordion.Trigger>
@@ -113,13 +113,13 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                 {group.items.map((section: NavMenuSection) => {
                   if (section.items.length === 0) {
                     return (
-                      <Link href={section.url} key={section.name}>
+                      <Link href={section.url || '#'} key={section.name}>
                         <div
                           className={[
                             'py-1.5 px-5 rounded text-sm transition',
                             `${
                               section.url === pathname
-                                ? 'bg-background text-brand'
+                                ? 'bg-background text-brand-link'
                                 : 'text-foreground-light hover:text-foreground'
                             }`,
                           ].join(' ')}
@@ -139,25 +139,25 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                       >
                         <Accordion.Item value={section.name}>
                           <Accordion.Trigger className="flex items-center space-x-2 px-4 py-1.5">
-                            <IconChevronRight
+                            <ChevronRight
                               className="transition text-foreground-lighter data-open-parent:rotate-90"
                               size={14}
                               strokeWidth={2}
                             />
-                            <span className="text-foreground text-sm group-hover:text-brand transition">
+                            <span className="text-foreground text-sm group-hover:text-brand-link transition">
                               {section.name}
                             </span>
                           </Accordion.Trigger>
                           <Accordion.Content className="my-2 data-open:animate-slide-down data-closed:animate-slide-up">
                             {section.items.map((item: NavMenuSection) => (
-                              <Link key={item.name} href={item.url}>
+                              <Link key={item.name} href={item.url || '#'}>
                                 <div
                                   key={item.name}
                                   className={[
                                     'py-1.5 ml-4 px-5 rounded text-sm transition',
                                     `${
                                       item.url === pathname
-                                        ? 'bg-background text-brand'
+                                        ? 'bg-background text-brand-link'
                                         : 'text-foreground-light hover:text-foreground'
                                     }`,
                                   ].join(' ')}

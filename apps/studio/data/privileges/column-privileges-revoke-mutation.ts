@@ -1,17 +1,17 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
-
+import { toast } from 'sonner'
 import type { components } from 'data/api'
-import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import pgMeta from '@supabase/pg-meta'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { privilegeKeys } from './keys'
 
 export type ColumnPrivilegesRevoke = components['schemas']['RevokeColumnPrivilegesBody']
 
 export type ColumnPrivilegesRevokeVariables = {
   projectRef: string
-  connectionString?: string
-  revokes: ColumnPrivilegesRevoke[]
+  connectionString?: string | null
+  revokes: ColumnPrivilegesRevoke
 }
 
 export async function revokeColumnPrivileges({
@@ -19,21 +19,22 @@ export async function revokeColumnPrivileges({
   connectionString,
   revokes,
 }: ColumnPrivilegesRevokeVariables) {
-  const headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql } = pgMeta.columnPrivileges.revoke(
+    revokes.map((r) => ({
+      columnId: r.column_id,
+      grantee: r.grantee,
+      privilegeType: r.privilege_type,
+    }))
+  )
 
-  const { data, error } = await del('/platform/pg-meta/{ref}/column-privileges', {
-    params: {
-      path: { ref: projectRef },
-      // this is needed to satisfy the typescript, but it doesn't pass the actual header
-      header: { 'x-connection-encrypted': connectionString! },
-    },
-    body: revokes,
-    headers,
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['column-privileges', 'revoke'],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type ColumnPrivilegesRevokeData = Awaited<ReturnType<typeof revokeColumnPrivileges>>
@@ -48,26 +49,24 @@ export const useColumnPrivilegesRevokeMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ColumnPrivilegesRevokeData, ResponseError, ColumnPrivilegesRevokeVariables>(
-    (vars) => revokeColumnPrivileges(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<ColumnPrivilegesRevokeData, ResponseError, ColumnPrivilegesRevokeVariables>({
+    mutationFn: (vars) => revokeColumnPrivileges(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

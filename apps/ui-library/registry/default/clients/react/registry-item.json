@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "supabase-client-react",
+  "type": "registry:lib",
+  "title": "Supabase Client for React",
+  "description": "",
+  "registryDependencies": [],
+  "dependencies": ["@supabase/supabase-js@latest"],
+  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
+  "envVars": {
+    "VITE_SUPABASE_URL": "",
+    "VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY": ""
+  },
+  "files": [
+    {
+      "path": "registry/default/clients/react/lib/supabase/client.ts",
+      "type": "registry:lib"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -43,24 +43,22 @@ export const useProjectAddonRemoveMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectAddonRemoveData, ResponseError, ProjectAddonRemoveVariables>(
-    (vars) => removeSubscriptionAddon(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        // [Joshen] Only invalidate addons, not subscriptions, as AddOn section in
-        // subscription page is using AddOn react query
-        await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to remove addon: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectAddonRemoveData, ResponseError, ProjectAddonRemoveVariables>({
+    mutationFn: (vars) => removeSubscriptionAddon(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      // [Joshen] Only invalidate addons, not subscriptions, as AddOn section in
+      // subscription page is using AddOn react query
+      await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to remove addon: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

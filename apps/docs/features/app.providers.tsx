@@ -1,12 +1,11 @@
-import { CommandProvider } from '@ui-patterns/CommandMenu'
-import { ThemeProvider } from 'common'
-import { PortalToast } from 'ui'
-import { PromoToast } from 'ui-patterns'
-import { type PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
+import { FeatureFlagProvider, IS_PLATFORM, ThemeProvider } from 'common'
+import { SonnerToaster, TooltipProvider } from 'ui'
 import SiteLayout from '~/layouts/SiteLayout'
+import { API_URL } from '~/lib/constants'
 import { AuthContainer } from './auth/auth.client'
-import { DocsCommandMenu } from './command'
+import { DocsCommandMenu, DocsCommandProvider } from './command'
 import { QueryClientProvider } from './data/queryClient.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
@@ -19,21 +18,24 @@ function GlobalProviders({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider>
       <AuthContainer>
-        <PageTelemetry />
-        <ScrollRestoration />
-        <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-          <CommandProvider>
-            <div className="flex flex-col">
-              <SiteLayout>
-                <PortalToast />
-                <PromoToast />
-                {children}
-                <DocsCommandMenu />
-              </SiteLayout>
-              <ThemeSandbox />
-            </div>
-          </CommandProvider>
-        </ThemeProvider>
+        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
+          <PageTelemetry />
+          <ScrollRestoration />
+          <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+            <TooltipProvider delayDuration={0}>
+              <DocsCommandProvider>
+                <div className="flex flex-col">
+                  <SiteLayout>
+                    {children}
+                    <DocsCommandMenu />
+                  </SiteLayout>
+                  <ThemeSandbox />
+                </div>
+              </DocsCommandProvider>
+              <SonnerToaster position="top-right" />
+            </TooltipProvider>
+          </ThemeProvider>
+        </FeatureFlagProvider>
       </AuthContainer>
     </QueryClientProvider>
   )

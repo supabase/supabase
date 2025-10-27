@@ -13,7 +13,7 @@
     "@supabase/ssr": "^0.0.10",
     "@supabase/supabase-js": "^2.39.0",
     "@tanstack/react-query": "^5.12.2",
-    "next": "14.0.3",
+    "next": "14.2.10",
     "react": "^18",
     "react-dom": "^18"
   },

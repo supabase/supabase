@@ -1,14 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
-import { Button, IconLoader } from 'ui'
+import { Loader } from 'lucide-react'
+import { Button } from 'ui'
 
 // Removes some auto-generated Postgrest text
 // Ideally PostgREST wouldn't add this if there is already a comment
@@ -34,14 +35,17 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
   const contentText = temp_removePostgrestText(content || '').trim()
   const [value, setValue] = useState(contentText)
   const [isUpdating, setIsUpdating] = useState(false)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { table, column, rpc } = metadata
 
   const hasChanged = value != contentText
   const animateCss = `transition duration-150`
 
-  const canUpdateDescription = useCheckPermissions(PermissionAction.TENANT_SQL_QUERY, '*')
+  const { can: canUpdateDescription } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_QUERY,
+    '*'
+  )
 
   const updateDescription = async () => {
     if (isUpdating || !canUpdateDescription) return false
@@ -75,7 +79,9 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
 
   if (!canUpdateDescription) {
     return (
-      <span className={`block ${value ? 'text-foreground' : ''}`}>{value || 'No description'}</span>
+      <span className={`block text-sm ${value ? 'text-foreground' : ''}`}>
+        {value || 'No description'}
+      </span>
     )
   }
 
@@ -104,7 +110,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         </Button>
         <Button disabled={!hasChanged} onClick={updateDescription}>
           {isUpdating ? (
-            <IconLoader className="mx-auto animate-spin" size={14} strokeWidth={2} />
+            <Loader className="mx-auto animate-spin" size={14} strokeWidth={2} />
           ) : (
             <span>Save</span>
           )}

@@ -1,8 +1,9 @@
-import { Button, IconPlay } from 'ui'
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 import type { LogSqlSnippets } from 'types'
+import { Button } from 'ui'
 import SqlSnippetCode from './Logs.SqlSnippetCode'
+import { Play } from 'lucide-react'
 
 interface Props {
   item: LogSqlSnippets.Content
@@ -22,7 +23,7 @@ const RecentQueriesItem: React.FC<Props> = ({ item }) => {
       <Table.td className="text-right">
         <Button
           type="alternative"
-          iconRight={<IconPlay size={10} />}
+          iconRight={<Play size={10} />}
           onClick={() =>
             router.push(`/project/${ref}/logs/explorer?q=${encodeURIComponent(item.sql)}`)
           }

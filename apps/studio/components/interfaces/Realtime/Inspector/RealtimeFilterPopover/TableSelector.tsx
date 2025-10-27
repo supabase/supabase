@@ -10,18 +10,16 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconCheck,
-  IconCode,
-  IconLoader,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { debounce } from 'lodash'
+import { Check, Code, Loader } from 'lucide-react'
 
 interface TableSelectorProps {
   className?: string
@@ -42,14 +40,14 @@ const TableSelector = ({
 }: TableSelectorProps) => {
   const [open, setOpen] = useState(false)
   const [initiallyLoaded, setInitiallyLoaded] = useState(false)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [searchInput, setSearchInput] = useState('')
 
   const { data, isLoading, isSuccess, isError, error, refetch } = useEntityTypesQuery({
     projectRef: project?.ref,
     search: searchInput,
     connectionString: project?.connectionString,
-    schema: selectedSchemaName,
+    schemas: [selectedSchemaName],
   })
   useEffect(() => {
     if (!initiallyLoaded && isSuccess) {
@@ -78,9 +76,9 @@ const TableSelector = ({
             type="outline"
             disabled={isLoading}
             className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
-            icon={isLoading ? <IconLoader className="animate-spin" size={12} /> : null}
+            icon={isLoading ? <Loader className="animate-spin" size={12} /> : null}
             iconRight={
-              <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+              <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
             }
           >
             {initiallyLoaded ? (
@@ -104,7 +102,7 @@ const TableSelector = ({
             <CommandList_Shadcn_>
               {isLoading && (
                 <div className="flex items-center justify-center space-x-2 px-3 py-2">
-                  <IconLoader className="animate-spin" size={12} />
+                  <Loader className="animate-spin" size={12} />
                   <p className="flex text-xs text-light">Loading tables...</p>
                 </div>
               )}
@@ -143,7 +141,7 @@ const TableSelector = ({
                         >
                           <span>All tables</span>
                           {selectedSchemaName === '*' && (
-                            <IconCheck className="text-brand" strokeWidth={2} />
+                            <Check className="text-brand" strokeWidth={2} />
                           )}
                         </CommandItem_Shadcn_>
                       )}
@@ -162,7 +160,7 @@ const TableSelector = ({
                         >
                           <span>{table.name}</span>
                           {selectedSchemaName === table.name && (
-                            <IconCheck className="text-brand" strokeWidth={2} />
+                            <Check className="text-brand" strokeWidth={2} />
                           )}
                         </CommandItem_Shadcn_>
                       ))}

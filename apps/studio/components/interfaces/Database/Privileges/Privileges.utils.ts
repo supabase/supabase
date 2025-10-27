@@ -1,31 +1,28 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  ColumnPrivilegesGrant,
-  grantColumnPrivileges,
-} from 'data/privileges/column-privileges-grant-mutation'
+import { grantColumnPrivileges } from 'data/privileges/column-privileges-grant-mutation'
 import type { ColumnPrivilege } from 'data/privileges/column-privileges-query'
 import {
   ColumnPrivilegesRevoke,
   revokeColumnPrivileges,
 } from 'data/privileges/column-privileges-revoke-mutation'
+import { privilegeKeys } from 'data/privileges/keys'
 import {
   TablePrivilegesGrant,
   grantTablePrivileges,
 } from 'data/privileges/table-privileges-grant-mutation'
-import type { TablePrivilege } from 'data/privileges/table-privileges-query'
+import type { PgTablePrivileges } from 'data/privileges/table-privileges-query'
 import {
   TablePrivilegesRevoke,
   revokeTablePrivileges,
 } from 'data/privileges/table-privileges-revoke-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   ALL_PRIVILEGE_TYPES,
   COLUMN_PRIVILEGE_TYPES,
   ColumnPrivilegeType,
 } from './Privileges.constants'
-import { privilegeKeys } from 'data/privileges/keys'
 
 export interface PrivilegeOperation {
   object: 'table' | 'column'
@@ -35,7 +32,7 @@ export interface PrivilegeOperation {
   privilege_type: string
 }
 
-export function getDefaultTableCheckedStates(tablePrivilege: TablePrivilege) {
+export function getDefaultTableCheckedStates(tablePrivilege: PgTablePrivileges) {
   return Object.fromEntries(
     ALL_PRIVILEGE_TYPES.map((privilege) => [
       privilege,
@@ -269,7 +266,7 @@ export function usePrivilegesState({
 }
 
 export function useApplyPrivilegeOperations(callback?: () => void) {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
 
   const [isLoading, setIsLoading] = useState(false)
@@ -286,16 +283,16 @@ export function useApplyPrivilegeOperations(callback?: () => void) {
       const grantTableOperations = tableOperations
         .filter((op) => op.type === 'grant')
         .map((op) => ({
-          relation_id: Number(op.id),
+          relationId: Number(op.id),
           grantee: op.grantee,
-          privilege_type: op.privilege_type as TablePrivilegesGrant['privilege_type'],
+          privilegeType: op.privilege_type as TablePrivilegesGrant['privilegeType'],
         }))
       const revokeTableOperations = tableOperations
         .filter((op) => op.type === 'revoke')
         .map((op) => ({
-          relation_id: Number(op.id),
+          relationId: Number(op.id),
           grantee: op.grantee,
-          privilege_type: op.privilege_type as TablePrivilegesRevoke['privilege_type'],
+          privilegeType: op.privilege_type as TablePrivilegesRevoke['privilegeType'],
         }))
 
       const grantColumnOperations = columnOperations
@@ -303,14 +300,14 @@ export function useApplyPrivilegeOperations(callback?: () => void) {
         .map((op) => ({
           column_id: String(op.id),
           grantee: op.grantee,
-          privilege_type: op.privilege_type as ColumnPrivilegesGrant['privilege_type'],
+          privilege_type: op.privilege_type as ColumnPrivilegesRevoke[number]['privilege_type'],
         }))
       const revokeColumnOperations = columnOperations
         .filter((op) => op.type === 'revoke')
         .map((op) => ({
           column_id: String(op.id),
           grantee: op.grantee,
-          privilege_type: op.privilege_type as ColumnPrivilegesRevoke['privilege_type'],
+          privilege_type: op.privilege_type as ColumnPrivilegesRevoke[number]['privilege_type'],
         }))
 
       // annoyingly these can't be run all at once

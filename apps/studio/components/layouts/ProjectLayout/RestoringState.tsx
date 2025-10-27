@@ -1,50 +1,73 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import { useEffect, useRef, useState } from 'react'
-import { Button, IconCheckCircle, IconLoader } from 'ui'
+import { CheckCircle, Download, Loader } from 'lucide-react'
+import { useState } from 'react'
 
-import { projectKeys } from 'data/projects/keys'
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { getWithTimeout } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useProjectContext } from './ProjectContext'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from 'data/database/backup-query'
+import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
+import { Button } from 'ui'
 
 const RestoringState = () => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
-  const checkServerInterval = useRef<number>()
+  const { data: project } = useSelectedProjectQuery()
 
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
 
-  useEffect(() => {
-    checkServerInterval.current = window.setInterval(checkServer, 4000)
-    return () => clearInterval(checkServerInterval.current)
-  }, [])
+  const { data } = useDownloadableBackupQuery({ projectRef: ref })
+  const backups = data?.backups ?? []
+  const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
 
-  async function checkServer() {
-    if (!project) return
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
-    const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
-      timeout: 2000,
-    })
-    if (projectStatus && !projectStatus.error) {
-      const { status } = projectStatus
-      if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-        clearInterval(checkServerInterval.current)
-        setIsCompleted(true)
-      } else {
-        queryClient.invalidateQueries(projectKeys.detail(ref))
-      }
+  useProjectStatusQuery(
+    { projectRef: ref },
+    {
+      enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
+      refetchInterval: (res) => {
+        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
+      },
+      onSuccess: async (res) => {
+        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+          setIsCompleted(true)
+        } else {
+          if (ref) invalidateProjectDetailsQuery(ref)
+        }
+      },
     }
+  )
+
+  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+    onSuccess: (res) => {
+      const { fileUrl } = res
+
+      // Trigger browser download by create,trigger and remove tempLink
+      const tempLink = document.createElement('a')
+      tempLink.href = fileUrl
+      document.body.appendChild(tempLink)
+      tempLink.click()
+      document.body.removeChild(tempLink)
+    },
+  })
+
+  const onClickDownloadBackup = () => {
+    if (!ref) return console.error('Project ref is required')
+    if (logicalBackups.length === 0) return console.error('No available backups to download')
+
+    downloadBackup({ ref, backup: logicalBackups[0] })
   }
 
   const onConfirm = async () => {
     if (!project) return console.error('Project is required')
 
     setLoading(true)
-    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+    if (ref) await invalidateProjectDetailsQuery(ref)
   }
 
   return (
@@ -54,7 +77,7 @@ const RestoringState = () => {
           <div className="space-y-6 pt-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <IconCheckCircle className="text-brand" size={18} strokeWidth={2} />
+                <CheckCircle className="text-brand" size={18} strokeWidth={2} />
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>
@@ -70,20 +93,52 @@ const RestoringState = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 py-6">
-            <div className="flex px-8 space-x-8">
-              <div className="mt-1">
-                <IconLoader className="animate-spin" size={18} />
-              </div>
-              <div className="space-y-1">
-                <p>Restoration in progress</p>
-                <p className="text-sm text-foreground-light">
-                  Restoration can take from a few minutes up to several hours depending on the size
-                  of your database. Your project will be offline while the restoration is running.
-                </p>
+          <>
+            <div className="space-y-6 py-6">
+              <div className="flex px-8 space-x-8">
+                <div className="mt-1">
+                  <Loader className="animate-spin" size={18} />
+                </div>
+                <div className="space-y-1">
+                  <p>Restoration in progress</p>
+                  <p className="text-sm text-foreground-light">
+                    Restoration can take from a few minutes up to several hours depending on the
+                    size of your database. Your project will be offline while the restoration is
+                    running.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+            <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
+              <Button asChild type="default">
+                <SupportLink
+                  queryParams={{
+                    category: SupportCategories.DATABASE_UNRESPONSIVE,
+                    projectRef: project?.ref,
+                    subject: 'Ongoing restoration for project',
+                  }}
+                >
+                  Contact support
+                </SupportLink>
+              </Button>
+              <ButtonTooltip
+                type="default"
+                icon={<Download />}
+                loading={isDownloading}
+                disabled={logicalBackups.length === 0}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text:
+                      logicalBackups.length === 0 ? 'No available backups to download' : undefined,
+                  },
+                }}
+                onClick={onClickDownloadBackup}
+              >
+                Download latest backup
+              </ButtonTooltip>
+            </div>
+          </>
         )}
       </div>
     </div>

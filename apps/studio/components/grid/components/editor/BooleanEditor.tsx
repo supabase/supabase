@@ -1,4 +1,3 @@
-import { useTrackedState } from 'components/grid/store/Store'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { Select } from 'ui'
 
@@ -13,8 +12,6 @@ export const BooleanEditor = <TRow, TSummaryRow = unknown>({
   onRowChange,
   onClose,
 }: Props<TRow, TSummaryRow>) => {
-  const state = useTrackedState()
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const value = row[column.key as keyof TRow] as unknown as string
 
   const onBlur = () => onClose(false)
@@ -36,7 +33,7 @@ export const BooleanEditor = <TRow, TSummaryRow = unknown>({
       onBlur={onBlur}
       onChange={onChange}
       defaultValue={value === null ? 'null' : value.toString()}
-      style={{ width: `${gridColumn?.width || column.width}px` }}
+      style={{ width: `${column.width}px` }}
     >
       <Select.Option value="true">TRUE</Select.Option>
       <Select.Option value="false">FALSE</Select.Option>

@@ -1,14 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Lock, Mail } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { useParams } from 'common'
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -39,27 +38,23 @@ const CreateUserFormSchema = z.object({
 
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ref: projectRef } = useParams()
-
-  const { data, isLoading, isSuccess } = useProjectApiQuery({ projectRef }, { enabled: visible })
-
-  const canCreateUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
+  const { can: canCreateUsers } = useAsyncCheckPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'create_user'
+  )
 
   const { mutate: createUser, isLoading: isCreatingUser } = useUserCreateMutation({
-    async onSuccess(res) {
+    onSuccess(res) {
       toast.success(`Successfully created user: ${res.email}`)
+      form.reset({ email: '', password: '', autoConfirmUser: true })
       setVisible(false)
     },
   })
 
   const onCreateUser = async (values: any) => {
-    if (!isSuccess) {
-      return toast.error(`Failed to create user: Error loading project config`)
-    }
-    const { protocol, endpoint, serviceApiKey } = data.autoApiService
-    createUser({ projectRef, endpoint, protocol, serviceApiKey, user: values })
+    if (!projectRef) return console.error('Project ref is required')
 
-    //react-hook-form does not reset field values even after submit. Reset Field data so data does not persist
-    form.reset({ email: '', password: '', autoConfirmUser: true })
+    createUser({ projectRef, user: values })
   }
 
   const form = useForm<z.infer<typeof CreateUserFormSchema>>({
@@ -100,7 +95,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                         type="email"
                         name="email"
                         placeholder="user@example.com"
-                        disabled={isCreatingUser || isLoading}
+                        disabled={isCreatingUser}
                         className="pl-8"
                       />
                     </div>
@@ -124,15 +119,14 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                         strokeWidth={1.5}
                       />
                       <Input_Shadcn_
-                        autoFocus
                         {...field}
                         autoComplete="new-password"
                         type="password"
                         name="password"
                         placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                        disabled={isCreatingUser || isLoading}
+                        disabled={isCreatingUser}
                         className="pl-8"
-                      ></Input_Shadcn_>
+                      />
                     </div>
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
@@ -167,7 +161,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
               size="small"
               htmlType="submit"
               loading={isCreatingUser}
-              disabled={!canCreateUsers || isCreatingUser || isLoading}
+              disabled={!canCreateUsers || isCreatingUser}
             >
               Create user
             </Button>

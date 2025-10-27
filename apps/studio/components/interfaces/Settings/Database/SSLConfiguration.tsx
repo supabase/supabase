@@ -1,33 +1,32 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download, ExternalLink, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { template } from 'lodash'
+import { Download, Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  Alert,
-  Button,
-  Switch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const SSLConfiguration = () => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const [isEnforced, setIsEnforced] = useState(false)
 
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
   const {
     data: sslEnforcementConfiguration,
     isLoading,
@@ -47,22 +46,34 @@ const SSLConfiguration = () => {
     }
   )
 
-  const { project } = useProjectContext()
-  const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
   const initialIsEnforced = isSuccess
     ? sslEnforcementConfiguration.appliedSuccessfully &&
       sslEnforcementConfiguration.currentConfig.database
     : false
 
-  const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
+  const hasAccessToSSLEnforcement = !(
+    sslEnforcementConfiguration !== undefined &&
+    'isNotAllowed' in sslEnforcementConfiguration &&
+    sslEnforcementConfiguration.isNotAllowed
+  )
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
-    projectSettings?.project !== undefined &&
-    new Date(projectSettings.project.inserted_at) >= new Date('2021-04-30')
+    settings?.inserted_at !== undefined && new Date(settings.inserted_at) >= new Date('2021-04-30')
+
+  const { sslCertificateUrl: sslCertificateUrlTemplate } = useCustomContent(['ssl:certificate_url'])
+  const sslCertificateUrl = useMemo(
+    () => template(sslCertificateUrlTemplate ?? '')({ env }),
+    [sslCertificateUrlTemplate, env]
+  )
 
   useEffect(() => {
     if (!isLoading && sslEnforcementConfiguration) {
@@ -78,15 +89,9 @@ const SSLConfiguration = () => {
 
   return (
     <div id="ssl-configuration">
-      <div className="flex items-center justify-between">
-        <FormHeader title="SSL Configuration" description="" />
-        <div className="flex items-center space-x-2 mb-6">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement" target="_blank">
-              Documentation
-            </Link>
-          </Button>
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <FormHeader className="mb-0" title="SSL Configuration" description="" />
+        <DocsButton href={`${DOCS_URL}/guides/platform/ssl-enforcement`} />
       </div>
       <FormPanel>
         <FormSection
@@ -105,15 +110,8 @@ const SSLConfiguration = () => {
                       title="SSL enforcement was not updated successfully"
                     >
                       Please try updating again, or contact{' '}
-                      <Link
-                        href="/support/new"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline"
-                      >
-                        support
-                      </Link>{' '}
-                      if this error persists
+                      <SupportLink className={InlineLinkClassName}>support</SupportLink> if this
+                      error persists
                     </Alert>
                   )}
                 </div>
@@ -129,30 +127,33 @@ const SSLConfiguration = () => {
                 <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
               )}
               {isSuccess && (
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
-                    <Switch
-                      size="large"
-                      checked={isEnforced}
-                      disabled={
-                        isLoading ||
-                        isSubmitting ||
-                        !canUpdateSSLEnforcement ||
-                        !hasAccessToSSLEnforcement
-                      }
-                      onCheckedChange={toggleSSLEnforcement}
-                    />
-                  </TooltipTrigger_Shadcn_>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                    <div>
+                      <Switch
+                        size="large"
+                        checked={isEnforced}
+                        disabled={
+                          isLoading ||
+                          isSubmitting ||
+                          !canUpdateSSLEnforcement ||
+                          !hasAccessToSSLEnforcement
+                        }
+                        onCheckedChange={toggleSSLEnforcement}
+                      />
+                    </div>
+                  </TooltipTrigger>
                   {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                    <TooltipContent_Shadcn_ side="bottom" className="w-64 text-center">
+                    <TooltipContent side="bottom" className="w-64 text-center">
                       {!canUpdateSSLEnforcement
                         ? 'You need additional permissions to update SSL enforcement for your project'
                         : !hasAccessToSSLEnforcement
                           ? 'Your project does not have access to SSL enforcement'
-                          : ''}
-                    </TooltipContent_Shadcn_>
+                          : undefined}
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
+                </Tooltip>
               )}
             </div>
           </FormSectionContent>
@@ -185,11 +186,7 @@ const SSLConfiguration = () => {
               </ButtonTooltip>
             ) : (
               <Button type="default" icon={<Download />}>
-                <a
-                  href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
-                >
-                  Download certificate
-                </a>
+                <a href={sslCertificateUrl}>Download certificate</a>
               </Button>
             )}
           </div>

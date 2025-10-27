@@ -1,6 +1,6 @@
 import chalk from 'chalk'
+import type { Code } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import type { Code } from 'mdast-util-from-markdown/lib'
 import { format } from 'sql-formatter'
 
 declare global {
@@ -28,10 +28,11 @@ export async function collectStream<R extends BufferSource>(stream: ReadableStre
   let content = ''
 
   for await (const chunk of stream.pipeThrough(textDecoderStream)) {
-    content += chunk
+    const text = chunk.split('0:')[1]
+    content += text.slice(1, text.length - 2)
   }
 
-  return content
+  return content.replaceAll('\\n', '\n').replaceAll('\\"', '"')
 }
 
 /**

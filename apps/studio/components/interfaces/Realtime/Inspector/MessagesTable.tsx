@@ -1,14 +1,20 @@
-import { useParams, useTelemetryProps } from 'common'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isEqual } from 'lodash'
-import { ExternalLink, Loader2, MegaphoneIcon } from 'lucide-react'
+import { ExternalLink, Loader2, Megaphone } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
-import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 
+import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
+import NoPermission from 'components/ui/NoPermission'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
+import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import MessageSelection from './MessageSelection'
 import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
@@ -29,9 +35,18 @@ const NoResultAlert = ({
 }) => {
   const { ref } = useParams()
 
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'service_api_keys'
+  )
+
   return (
     <div className="w-full max-w-md flex items-center flex-col">
-      {!hasChannelSet ? (
+      {isLoadingPermissions ? (
+        <GenericSkeletonLoader className="w-80" />
+      ) : !canReadAPIKeys ? (
+        <NoPermission isFullPage resourceText="use the realtime inspector" />
+      ) : !hasChannelSet ? (
         <NoChannelEmptyState />
       ) : (
         <>
@@ -84,15 +99,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Not sure what to do?</p>
                 <p className="text-foreground-lighter text-xs">Browse our documentation</p>
               </div>
-              <Button type="default" iconRight={<ExternalLink />}>
-                <a
-                  href="https://supabase.com/docs/guides/realtime"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </a>
-              </Button>
+              <DocsButton href={`${DOCS_URL}/guides/realtime`} />
             </div>
           </div>
         </>
@@ -116,8 +123,10 @@ const MessagesTable = ({
 }: MessagesTableProps) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
+
+  const { ref } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {
     if (!data) return
@@ -152,7 +161,7 @@ const MessagesTable = ({
                 <Button
                   type="default"
                   onClick={showSendMessage}
-                  icon={<MegaphoneIcon size={14} strokeWidth={1.5} />}
+                  icon={<Megaphone strokeWidth={1.5} />}
                 >
                   <span>Broadcast a message</span>
                 </Button>
@@ -185,15 +194,13 @@ const MessagesTable = ({
                       isRowSelected={false}
                       selectedCellIdx={undefined}
                       onClick={() => {
-                        Telemetry.sendEvent(
-                          {
-                            category: 'realtime_inspector',
-                            action: 'focused-specific-message',
-                            label: 'realtime_inspector_results',
+                        sendEvent({
+                          action: 'realtime_inspector_message_clicked',
+                          groups: {
+                            project: ref ?? 'Unknown',
+                            organization: org?.slug ?? 'Unknown',
                           },
-                          telemetryProps,
-                          router
-                        )
+                        })
                         setFocusedLog(row)
                       }}
                     />

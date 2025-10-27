@@ -1,11 +1,6 @@
+import { XCircle } from 'lucide-react'
 import { type FC, type PropsWithChildren, useState } from 'react'
-import {
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  IconXCircle,
-  cn,
-} from 'ui'
+import { CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_, Collapsible_Shadcn_, cn } from 'ui'
 import ApiSchema from '~/components/ApiSchema'
 
 interface IOptions {
@@ -33,7 +28,7 @@ const ApiSchemaOptions: FC<PropsWithChildren<IOptions>> & OptionsSubComponents =
             open ? 'w-full py-1.5 rounded-tl-lg rounded-tr-lg' : 'py-1 border-b rounded-full'
           )}
         >
-          <IconXCircle size={14} className={open ? '' : 'rotate-45'} />
+          <XCircle size={14} className={open ? '' : 'rotate-45'} />
           {`${!open ? `Open` : `Close`} ${props.name ?? 'object schema'}`}
         </button>
       </CollapsibleTrigger_Shadcn_>

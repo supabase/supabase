@@ -1,16 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PropsWithChildren, useMemo } from 'react'
+import { PropsWithChildren } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
-import TableEditorMenu from './TableEditorMenu'
 
 const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
-
-  const tableEditorMenu = useMemo(() => <TableEditorMenu />, [])
+  const { can: canReadTables, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'tables'
+  )
 
   if (isPermissionsLoaded && !canReadTables) {
     return (
@@ -20,16 +19,7 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     )
   }
 
-  return (
-    <ProjectLayoutWithAuth
-      product="Table Editor"
-      productMenu={tableEditorMenu}
-      isBlocking={false}
-      resizableSidebar
-    >
-      {children}
-    </ProjectLayoutWithAuth>
-  )
+  return children
 }
 
 export default TableEditorLayout

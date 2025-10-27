@@ -11,6 +11,7 @@ interface Props {
   disabled?: boolean
 }
 
+/** @deprecated Use Card instead, refer to BasicAuthSettingsForm.tsx for reference */
 const FormPanel = ({ children, header, footer }: Props) => (
   <FormPanelContainer>
     {header && <FormPanelHeader>{header}</FormPanelHeader>}
@@ -24,7 +25,10 @@ const FormPanelContainer = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
     <div
       ref={ref}
       {...props}
-      className={cn('bg-surface-100 border overflow-hidden rounded-md shadow', props.className)}
+      className={cn(
+        'bg-surface-100 border overflow-hidden rounded-md shadow max-w-full',
+        props.className
+      )}
     >
       {children}
     </div>
@@ -63,4 +67,4 @@ const FormPanelFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement
 
 FormPanelFooter.displayName = FormPanelFooter.displayName
 
-export { FormPanel, FormPanelContainer, FormPanelContent, FormPanelHeader, FormPanelFooter }
+export { FormPanel, FormPanelContainer, FormPanelContent, FormPanelFooter, FormPanelHeader }

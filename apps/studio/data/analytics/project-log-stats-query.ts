@@ -1,11 +1,13 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { operations } from 'api-types'
+import { get, handleError } from 'data/fetchers'
 import { analyticsKeys } from './keys'
 
 export type ProjectLogStatsVariables = {
   projectRef?: string
-  interval?: string
+  interval?: NonNullable<
+    operations['UsageApiController_getApiCounts']['parameters']['query']
+  >['interval']
 }
 
 export type ProjectLogStatsResponse = {
@@ -30,17 +32,22 @@ export async function getProjectLogStats(
     throw new Error('interval is required')
   }
 
-  const response = await get<ProjectLogStatsResponse>(
-    `${API_URL}/projects/${projectRef}/analytics/endpoints/usage.api-counts?interval=${interval}`,
+  const { data, error } = await get(
+    '/platform/projects/{ref}/analytics/endpoints/usage.api-counts',
     {
+      params: {
+        path: { ref: projectRef },
+        query: {
+          interval,
+        },
+      },
       signal,
     }
   )
-  if (!isResponseOk(response)) {
-    throw response.error
-  }
 
-  return response
+  if (error) handleError(error)
+
+  return data as unknown as ProjectLogStatsResponse
 }
 
 export type ProjectLogStatsData = Awaited<ReturnType<typeof getProjectLogStats>>
@@ -53,11 +60,18 @@ export const useProjectLogStatsQuery = <TData = ProjectLogStatsData>(
     ...options
   }: UseQueryOptions<ProjectLogStatsData, ProjectLogStatsError, TData> = {}
 ) =>
-  useQuery<ProjectLogStatsData, ProjectLogStatsError, TData>(
-    analyticsKeys.usageApiCounts(projectRef, interval),
-    ({ signal }) => getProjectLogStats({ projectRef, interval }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof interval !== 'undefined',
-      ...options,
-    }
+  useQuery<ProjectLogStatsData, ProjectLogStatsError, TData>({
+    queryKey: analyticsKeys.usageApiCounts(projectRef, interval),
+    queryFn: ({ signal }) => getProjectLogStats({ projectRef, interval }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof interval !== 'undefined',
+    ...options,
+  })
+
+export function prefetchProjectLogStats(
+  client: QueryClient,
+  { projectRef, interval }: ProjectLogStatsVariables
+) {
+  return client.fetchQuery(analyticsKeys.usageApiCounts(projectRef, interval), ({ signal }) =>
+    getProjectLogStats({ projectRef, interval }, signal)
   )
+}

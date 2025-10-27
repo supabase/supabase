@@ -18,7 +18,7 @@ export async function getProjectServiceStatus(
     params: {
       path: { ref: projectRef },
       query: {
-        services: ['auth', 'realtime', 'rest', 'storage'],
+        services: ['auth', 'realtime', 'rest', 'storage', 'db'],
       },
     },
     signal,
@@ -29,6 +29,7 @@ export async function getProjectServiceStatus(
 }
 
 export type ProjectServiceStatusData = Awaited<ReturnType<typeof getProjectServiceStatus>>
+export type ProjectServiceStatus = ProjectServiceStatusData[0]['status']
 export type ProjectServiceStatusError = ResponseError
 
 export const useProjectServiceStatusQuery = <TData = ProjectServiceStatusData>(
@@ -38,11 +39,9 @@ export const useProjectServiceStatusQuery = <TData = ProjectServiceStatusData>(
     ...options
   }: UseQueryOptions<ProjectServiceStatusData, ProjectServiceStatusError, TData> = {}
 ) =>
-  useQuery<ProjectServiceStatusData, ProjectServiceStatusError, TData>(
-    serviceStatusKeys.serviceStatus(projectRef),
-    ({ signal }) => getProjectServiceStatus({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectServiceStatusData, ProjectServiceStatusError, TData>({
+    queryKey: serviceStatusKeys.serviceStatus(projectRef),
+    queryFn: ({ signal }) => getProjectServiceStatus({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

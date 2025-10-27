@@ -1,4 +1,3 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import SchemaSelector from 'components/ui/SchemaSelector'
 
 import {
@@ -15,7 +14,7 @@ export interface PrivilegesHeadProps {
   disabled: boolean
   selectedSchema: string
   selectedRole: string
-  selectedTable?: PostgresTable
+  selectedTable?: { name: string }
   tables: string[]
   roles: string[]
   onChangeSchema: (schema: string) => void
@@ -44,23 +43,15 @@ const PrivilegesHead = ({
 }: PrivilegesHeadProps) => {
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-x-2">
         <SchemaSelector
-          className="bg-control rounded-md w-[200px] [&>button]:py-[5px]"
+          className="bg-control rounded-md w-[180px] [&>button]:py-[5px]"
           selectedSchemaName={selectedSchema}
           onSelectSchema={onChangeSchema}
         />
-        <div className="w-[200px]">
-          <TablesSelect
-            selectedTable={selectedTable}
-            tables={tables}
-            onChangeTable={onChangeTable}
-          />
-        </div>
+        <TablesSelect selectedTable={selectedTable} tables={tables} onChangeTable={onChangeTable} />
         <div className="h-[20px] w-px border-r border-scale-600"></div>
-        <div className="w-[200px]">
-          <RolesSelect selectedRole={selectedRole} roles={roles} onChangeRole={onChangeRole} />
-        </div>
+        <RolesSelect selectedRole={selectedRole} roles={roles} onChangeRole={onChangeRole} />
       </div>
 
       <div className="flex items-center gap-2">
@@ -97,14 +88,14 @@ const RolesSelect = ({
 }) => {
   return (
     <Select_Shadcn_ value={selectedRole} onValueChange={onChangeRole}>
-      <SelectTrigger_Shadcn_>
+      <SelectTrigger_Shadcn_ size="tiny" className="w-40">
         <SelectValue_Shadcn_ placeholder="Select a role" />
       </SelectTrigger_Shadcn_>
       <SelectContent_Shadcn_>
         <SelectGroup_Shadcn_>
           {roles.map((role) => (
-            <SelectItem_Shadcn_ key={role} value={role}>
-              <span className="text-foreground-light">role</span> {role}
+            <SelectItem_Shadcn_ key={role} value={role} className="text-xs">
+              <span className="text-foreground-light mr-1">role</span> {role}
             </SelectItem_Shadcn_>
           ))}
         </SelectGroup_Shadcn_>
@@ -118,13 +109,15 @@ const TablesSelect = ({
   tables,
   onChangeTable,
 }: {
-  selectedTable?: PostgresTable
+  selectedTable?: {
+    name: string
+  }
   tables: string[]
   onChangeTable: (table: string) => void
 }) => {
   return (
     <Select_Shadcn_ value={selectedTable?.name} onValueChange={onChangeTable}>
-      <SelectTrigger_Shadcn_>
+      <SelectTrigger_Shadcn_ size="tiny" className="w-44">
         <SelectValue_Shadcn_ placeholder="Select a table" />
       </SelectTrigger_Shadcn_>
       <SelectContent_Shadcn_>
@@ -135,8 +128,8 @@ const TablesSelect = ({
             </div>
           ) : null}
           {tables.map((table) => (
-            <SelectItem_Shadcn_ key={table} value={table}>
-              <span className="text-foreground-light">table</span> {table}
+            <SelectItem_Shadcn_ key={table} value={table} className="text-xs">
+              <span className="text-foreground-light mr-1">table</span> {table}
             </SelectItem_Shadcn_>
           ))}
         </SelectGroup_Shadcn_>

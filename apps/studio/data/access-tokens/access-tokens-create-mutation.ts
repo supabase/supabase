@@ -1,29 +1,26 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
-import { isResponseOk, post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { toast } from 'sonner'
+
+import { components } from 'api-types'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { AccessToken } from './access-tokens-query'
 import { accessTokenKeys } from './keys'
 
-export type AccessTokenCreateVariables = {
-  name: string
-  scope: 'V0' | undefined
-}
+export type AccessTokenCreateVariables = components['schemas']['CreateAccessTokenBody']
 
-export type NewAccessToken = AccessToken & { token: string }
+export async function createAccessToken({ name, scope, expires_at }: AccessTokenCreateVariables) {
+  const { data, error } = await post('/platform/profile/access-tokens', {
+    body: { name, scope, expires_at },
+  })
 
-export async function createAccessToken({ name, scope }: AccessTokenCreateVariables) {
-  const response = await post<NewAccessToken>(`${API_URL}/profile/access-tokens`, { name, scope })
+  if (error) handleError(error)
 
-  if (!isResponseOk(response)) {
-    throw response.error
-  }
-
-  return response
+  return data
 }
 
 type AccessTokenCreateData = Awaited<ReturnType<typeof createAccessToken>>
+
+export type NewAccessToken = AccessTokenCreateData
 
 export const useAccessTokenCreateMutation = ({
   onSuccess,
@@ -35,22 +32,20 @@ export const useAccessTokenCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AccessTokenCreateData, ResponseError, AccessTokenCreateVariables>(
-    (vars) => createAccessToken(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(accessTokenKeys.list())
+  return useMutation<AccessTokenCreateData, ResponseError, AccessTokenCreateVariables>({
+    mutationFn: (vars) => createAccessToken(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries(accessTokenKeys.list())
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create access token: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create access token: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

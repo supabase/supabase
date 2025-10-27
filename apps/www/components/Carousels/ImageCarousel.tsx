@@ -1,6 +1,7 @@
-import { Button, IconCornerRightUp, Tabs } from 'ui'
+import { CornerRightUp } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
+import { Button, Tabs } from 'ui'
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -8,10 +9,10 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
 import 'swiper/css'
 
+import { useInView } from 'framer-motion'
 import Image from 'next/image'
 import TextLink from '../TextLink'
 import ImageCarouselStyles from './ImageCarousel.module.css'
-import { useInView } from 'framer-motion'
 
 interface Content {
   title: string
@@ -61,7 +62,7 @@ function ImageCarousel(props: ImageCarouselProps) {
         </p>
       </p>
       <p>
-        <Button type="outline" size="small" icon={<IconCornerRightUp />}>
+        <Button type="outline" size="small" icon={<CornerRightUp />}>
           View documentation
         </Button>
       </p>

@@ -1,10 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { GitHubConnectionCreateVariables } from './integrations.types'
 import { integrationKeys } from './keys'
+
+type GitHubConnectionCreateVariables = {
+  organizationId: number
+  connection: components['schemas']['CreateGitHubConnectionBody']
+}
 
 export async function createGitHubConnection({ connection }: GitHubConnectionCreateVariables) {
   const { data, error } = await post('/platform/integrations/github/connections', {
@@ -26,25 +31,23 @@ export const useGitHubConnectionCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<GitHubConnectionCreateData, ResponseError, GitHubConnectionCreateVariables>(
-    (vars) => createGitHubConnection(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(
-            integrationKeys.githubConnectionsList(variables.organizationId)
-          ),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create Github connection: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<GitHubConnectionCreateData, ResponseError, GitHubConnectionCreateVariables>({
+    mutationFn: (vars) => createGitHubConnection(vars),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries(
+          integrationKeys.githubConnectionsList(variables.organizationId)
+        ),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create GitHub connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

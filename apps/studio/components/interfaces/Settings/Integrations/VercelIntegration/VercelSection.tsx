@@ -1,15 +1,15 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
+import { IntegrationConnectionItem } from 'components/interfaces/Integrations/VercelGithub/IntegrationConnection'
 import {
   EmptyIntegrationConnection,
   IntegrationConnectionHeader,
   IntegrationInstallation,
-} from 'components/interfaces/Integrations/IntegrationPanels'
+} from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import {
   ScaffoldContainer,
@@ -18,6 +18,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
@@ -25,9 +26,9 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
@@ -36,25 +37,22 @@ import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
 
 const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
-  const project = useSelectedProject()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
+  const isBranch = project?.parent_project_ref !== undefined
 
-  const canReadVercelConnection = useCheckPermissions(
-    PermissionAction.READ,
-    'integrations.vercel_connections'
-  )
-  const canCreateVercelConnection = useCheckPermissions(
+  const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.vercel_connections')
+  const { can: canCreateVercelConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.vercel_connections'
   )
-  const canUpdateVercelConnection = useCheckPermissions(
+  const { can: canUpdateVercelConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )
-
-  const isBranch = project?.parent_project_ref !== undefined
 
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
     {
@@ -140,8 +138,8 @@ You can change the scope of the access for Supabase by configuring
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? 'https://vercel.com/integrations/supabase'
       : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-        ? `https://vercel.com/integrations/supabase-v2-staging`
-        : 'https://vercel.com/integrations/supabase-v2-local'
+        ? `https://vercel.com/integrations/supabase-staging`
+        : 'https://vercel.com/integrations/supabase-local'
 
   let connections =
     (isProjectScoped
@@ -163,7 +161,9 @@ You can change the scope of the access for Supabase by configuring
           <IntegrationImageHandler title="vercel" />
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadVercelConnection ? (
+          {isLoadingPermissions ? (
+            <GenericSkeletonLoader />
+          ) : !canReadVercelConnection ? (
             <NoPermission resourceText="view this organization's Vercel connections" />
           ) : (
             <>
@@ -187,7 +187,7 @@ You can change the scope of the access for Supabase by configuring
                           >
                             <IntegrationConnectionItem
                               connection={connection}
-                              disabled={!canUpdateVercelConnection}
+                              disabled={isBranch || !canUpdateVercelConnection}
                               type={'Vercel' as IntegrationName}
                               onDeleteConnection={onDeleteVercelConnection}
                               className={cn(isProjectScoped && '!rounded-b-none !mb-0')}
@@ -198,7 +198,7 @@ You can change the scope of the access for Supabase by configuring
                                   <VercelIntegrationConnectionForm
                                     connection={connection}
                                     integration={vercelIntegration}
-                                    disabled={!canUpdateVercelConnection}
+                                    disabled={isBranch || !canUpdateVercelConnection}
                                   />
                                 </div>
                               </div>
@@ -215,8 +215,7 @@ You can change the scope of the access for Supabase by configuring
                     />
                   )}
                   <EmptyIntegrationConnection
-                    orgSlug={org?.slug}
-                    disabled={!canCreateVercelConnection}
+                    disabled={isBranch || !canCreateVercelConnection}
                     onClick={() => onAddVercelConnection(vercelIntegration.id)}
                   >
                     Add new project connection

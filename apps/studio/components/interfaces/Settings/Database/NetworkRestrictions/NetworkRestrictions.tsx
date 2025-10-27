@@ -1,16 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertCircle, ChevronDown, ExternalLink, Globe, Lock } from 'lucide-react'
+import { AlertCircle, ChevronDown, Globe, Lock } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -18,9 +20,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import AddRestrictionModal from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
@@ -33,18 +35,18 @@ interface AccessButtonProps {
 }
 
 const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
-  <Tooltip_Shadcn_>
-    <TooltipTrigger_Shadcn_ asChild>
+  <Tooltip>
+    <TooltipTrigger asChild>
       <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
         Allow all access
       </Button>
-    </TooltipTrigger_Shadcn_>
+    </TooltipTrigger>
     {disabled && (
-      <TooltipContent_Shadcn_ side="bottom">
+      <TooltipContent side="bottom">
         You need additional permissions to update network restrictions
-      </TooltipContent_Shadcn_>
+      </TooltipContent>
     )}
-  </Tooltip_Shadcn_>
+  </Tooltip>
 )
 
 const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
@@ -55,7 +57,9 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
     tooltip={{
       content: {
         side: 'bottom',
-        text: 'You need additional permissions to update network restrictions',
+        text: disabled
+          ? 'You need additional permissions to update network restrictions'
+          : undefined,
       },
     }}
   >
@@ -63,20 +67,24 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   </ButtonTooltip>
 )
 
-const NetworkRestrictions = () => {
+export const NetworkRestrictions = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isAddingAddress, setIsAddingAddress] = useState<undefined | 'IPv4' | 'IPv6'>()
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
 
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
-  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
@@ -95,21 +103,14 @@ const NetworkRestrictions = () => {
   return (
     <>
       <section id="network-restrictions">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-6">
           <FormHeader
+            className="mb-0"
             title="Network Restrictions"
             description="Allow specific IP ranges to have access to your database."
           />
-          <div className="flex items-center space-x-2 mb-6">
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <a
-                href="https://supabase.com/docs/guides/platform/network-restrictions"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </a>
-            </Button>
+          <div className="flex items-center gap-x-2">
+            <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
             {!canUpdateNetworkRestrictions ? (
               <ButtonTooltip
                 disabled
@@ -299,5 +300,3 @@ const NetworkRestrictions = () => {
     </>
   )
 }
-
-export default NetworkRestrictions

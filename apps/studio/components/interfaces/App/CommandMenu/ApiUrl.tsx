@@ -1,25 +1,24 @@
 import { Link } from 'lucide-react'
 
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { copyToClipboard } from 'lib/helpers'
-import { Badge } from 'ui'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Badge, copyToClipboard } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
 
 export function useApiUrlCommand() {
   const setIsOpen = useSetCommandMenuOpen()
 
-  const project = useSelectedProject()
-  const { data: settings } = useProjectApiQuery(
+  const { data: project } = useSelectedProjectQuery()
+  const { data: settings } = useProjectSettingsV2Query(
     { projectRef: project?.ref },
     { enabled: !!project }
   )
 
-  const apiUrl = settings?.autoApiService.endpoint
-    ? `${settings.autoApiService.protocol ?? 'https'}://${settings.autoApiService.endpoint}`
-    : undefined
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = endpoint ? `${protocol}://${endpoint}` : undefined
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.ACTIONS,

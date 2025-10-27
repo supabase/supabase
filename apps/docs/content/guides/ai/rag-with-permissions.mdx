@@ -50,7 +50,7 @@ on document_sections for select to authenticated using (
 );
 ```
 
-<Admonition>
+<Admonition type="tip">
 
 In this example, the current user is determined using the built-in `auth.uid()` function when the query is executed through your project's auto-generated [REST API](/docs/guides/api). If you are connecting to your Supabase database through a direct Postgres connection, see [Direct Postgres Connection](#direct-postgres-connection) below for directions on how to achieve the same access control.
 
@@ -113,13 +113,13 @@ You may have an existing system that stores users, documents, and their permissi
 
 <Admonition type="caution">
 
-RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](https://supabase.com/docs/guides/platform/performance#optimizing-poor-performing-queries) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
+RLS is latency-sensitive, so extra caution should be taken before implementing this method. Use the [query plan analyzer](/docs/guides/platform/performance#optimizing-poor-performing-queries) to measure execution times for your queries to ensure they are within expected ranges. For enterprise applications, contact enterprise@supabase.io.
 
 </Admonition>
 
-<Admonition>
+<Admonition type="tip">
 
-For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, please contact [support](https://supabase.com/dashboard/support/new) and we'll be happy to discuss your use case.
+For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, contact [support](/dashboard/support/new) and we'll be happy to discuss your use case.
 
 </Admonition>
 
@@ -161,7 +161,7 @@ import foreign schema public limit to (users, documents)
   from server foreign_server into external;
 ```
 
-<Admonition>
+<Admonition type="tip">
 
 This example maps the `authenticated` role in Supabase to the `postgres` user in the external DB. In production, it's best to create a custom user on the external DB that has the minimum permissions necessary to access the information you need.
 
@@ -189,7 +189,7 @@ Since we're managing users and authentication outside of Supabase, we have two o
 
 #### Direct Postgres connection
 
-You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/settings/database) on your project's database settings page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
+You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/?showConnect=true) on a project page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
 
 ```sql
 -- enable row level security
@@ -224,7 +224,9 @@ where document_sections.embedding <#> embedding < -match_threshold
 order by document_sections.embedding <#> embedding;
 ```
 
-<Admonition>
+<Admonition type="caution">
+
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
 You might be tempted to discard RLS completely and simply filter by user within the `where` clause. Though this will work, we recommend RLS as a general best practice since RLS is always applied even as new queries and application logic is introduced in the future.
 
@@ -236,7 +238,7 @@ If you would like to use the auto-generated REST API to query your Supabase data
 
 See the [Clerk Supabase docs](https://clerk.com/docs/integrations/databases/supabase) for an example of how this can be done. Modify the instructions to work with your own auth provider as needed.
 
-Now we can simply use the same RLS policy from our first example:
+Now we can use the same RLS policy from our first example:
 
 ```sql
 -- enable row level security
@@ -269,4 +271,4 @@ order by document_sections.embedding <#> embedding;
 
 There are endless approaches to this problem based on the complexities of each system. Luckily Postgres comes with all the primitives needed to provide access control in the way that works best for your project.
 
-If the examples above didn't fit your use case or you need to adjust them slightly to better fit your existing system, feel free to reach out to [support](https://supabase.com/dashboard/support/new) and we'll be happy to assist you.
+If the examples above didn't fit your use case or you need to adjust them slightly to better fit your existing system, feel free to reach out to [support](/dashboard/support/new) and we'll be happy to assist you.

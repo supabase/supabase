@@ -1,23 +1,26 @@
-import { ExternalLink } from 'lucide-react'
-
 import { useParams } from 'common'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Tabs,
-  WarningIcon,
+  Card,
+  CardContent,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
 } from 'ui'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
+import { slugifyTitle } from './EmailTemplates.utils'
 import TemplateEditor from './TemplateEditor'
 
-const EmailTemplates = () => {
+export const EmailTemplates = () => {
+  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -33,63 +36,79 @@ const EmailTemplates = () => {
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
 
   return (
-    <div>
-      <div className="flex justify-between items-center">
-        <FormHeader
-          title="Email Templates"
-          description="Customize the emails that will be sent out to your users."
-        />
-        <div className="mb-6">
-          <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://supabase.com/docs/guides/auth/auth-email-templates"
-            >
-              Documentation
-            </a>
-          </Button>
-        </div>
-      </div>
+    <ScaffoldSection isFullWidth className="!pt-0">
       {isError && (
-        <Alert_Shadcn_ variant="destructive">
-          <WarningIcon />
-          <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+        <AlertError
+          className="mt-12"
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration"
+        />
       )}
-      {isLoading && <GenericSkeletonLoader />}
+      {isLoading && (
+        <div className="w-[854px] mt-12">
+          <GenericSkeletonLoader />
+        </div>
+      )}
       {isSuccess && (
-        <FormPanel>
-          <Tabs
-            scrollable
-            size="small"
-            type="underlined"
-            listClassNames="px-8 pt-4"
-            defaultActiveId={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}
-          >
-            {TEMPLATES_SCHEMAS.map((template) => {
-              const panelId = template.title.trim().replace(/\s+/g, '-')
-              return (
-                <Tabs.Panel id={panelId} label={template.title} key={panelId}>
-                  {builtInSMTP ? (
-                    <div className="mx-8">
-                      <EmailRateLimitsAlert />
-                    </div>
-                  ) : null}
-                  <TemplateEditor
-                    key={template.title}
-                    template={template}
-                    authConfig={authConfig as any}
-                  />
-                </Tabs.Panel>
-              )
-            })}
-          </Tabs>
-        </FormPanel>
+        <div className="my-12">
+          {builtInSMTP ? (
+            <div className="mb-4">
+              <EmailRateLimitsAlert />
+            </div>
+          ) : null}
+          {isSecurityNotificationsEnabled ? (
+            <Card>
+              {TEMPLATES_SCHEMAS.map((template) => {
+                const templateSlug = slugifyTitle(template.title)
+                return (
+                  <CardContent key={`${template.id}`} className="p-0">
+                    <Link
+                      href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                      className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
+                    >
+                      <div className="flex flex-col">
+                        <h3 className="text-sm text-foreground">{template.title}</h3>
+                        {template.purpose && (
+                          <p className="text-sm text-foreground-lighter">{template.purpose}</p>
+                        )}
+                      </div>
+                      <ChevronRight
+                        size={16}
+                        className="text-foreground-muted group-hover:text-foreground transition-colors"
+                      />
+                    </Link>
+                  </CardContent>
+                )
+              })}
+            </Card>
+          ) : (
+            <Card>
+              <Tabs_Shadcn_ defaultValue={slugifyTitle(TEMPLATES_SCHEMAS[0].title)}>
+                <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
+                  {TEMPLATES_SCHEMAS.map((template) => {
+                    return (
+                      <TabsTrigger_Shadcn_
+                        key={`${template.id}`}
+                        value={slugifyTitle(template.title)}
+                      >
+                        {template.title}
+                      </TabsTrigger_Shadcn_>
+                    )
+                  })}
+                </TabsList_Shadcn_>
+                {TEMPLATES_SCHEMAS.map((template) => {
+                  const panelId = slugifyTitle(template.title)
+                  return (
+                    <TabsContent_Shadcn_ key={panelId} value={panelId} className="mt-0">
+                      <TemplateEditor key={template.title} template={template} />
+                    </TabsContent_Shadcn_>
+                  )
+                })}
+              </Tabs_Shadcn_>
+            </Card>
+          )}
+        </div>
       )}
-    </div>
+    </ScaffoldSection>
   )
 }
-
-export default EmailTemplates

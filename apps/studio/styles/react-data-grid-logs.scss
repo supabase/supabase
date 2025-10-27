@@ -21,7 +21,7 @@
 
     &.rdg-row--focused .rdg-cell,
     &.rdg-row--focused .rdg-cell span {
-      @apply text-foreground font-semibold #{!important};
+      @apply text-foreground #{!important};
     }
   }
 }

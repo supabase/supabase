@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { useCallback } from 'react'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
@@ -36,14 +37,12 @@ export const useAuthConfigQuery = <TData = ProjectAuthConfigData>(
     ...options
   }: UseQueryOptions<ProjectAuthConfigData, ProjectAuthConfigError, TData> = {}
 ) =>
-  useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>(
-    authKeys.authConfig(projectRef),
-    ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>({
+    queryKey: authKeys.authConfig(projectRef),
+    queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export const useAuthConfigPrefetch = ({ projectRef }: AuthConfigVariables) => {
   const client = useQueryClient()

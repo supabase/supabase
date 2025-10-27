@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { usageKeys } from './keys'
 
@@ -13,7 +14,7 @@ export type OrgUsageVariables = {
 }
 
 export type OrgUsageResponse = components['schemas']['OrgUsageResponse']
-export type OrgMetricsUsage = components['schemas']['OrgMetricUsage']
+export type OrgMetricsUsage = components['schemas']['OrgUsageResponse']['usages'][0]
 
 export async function getOrgUsage(
   { orgSlug, projectRef, start, end }: OrgUsageVariables,
@@ -38,11 +39,10 @@ export const useOrgUsageQuery = <TData = OrgUsageData>(
   { orgSlug, projectRef, start, end }: OrgUsageVariables,
   { enabled = true, ...options }: UseQueryOptions<OrgUsageData, OrgUsageError, TData> = {}
 ) =>
-  useQuery<OrgUsageData, OrgUsageError, TData>(
-    usageKeys.orgUsage(orgSlug, projectRef, start?.toISOString(), end?.toISOString()),
-    ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<OrgUsageData, OrgUsageError, TData>({
+    queryKey: usageKeys.orgUsage(orgSlug, projectRef, start?.toISOString(), end?.toISOString()),
+    queryFn: ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
+    enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined',
+    staleTime: 1000 * 60 * 60,
+    ...options,
+  })

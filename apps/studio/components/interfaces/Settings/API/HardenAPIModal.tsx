@@ -1,18 +1,19 @@
-import { Check, ChevronDown, ExternalLink } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { Check, ChevronDown } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import { useCreateAndExposeAPISchemaMutation } from 'data/api-settings/create-and-expose-api-schema-mutation'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Button,
   CodeBlock,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -33,7 +34,7 @@ interface HardenAPIModalProps {
 }
 
 export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -119,15 +120,11 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
             <code className="text-xs text-foreground">public</code> schema to{' '}
             <span className="text-brand">prevent accidental exposure of data</span>.
           </p>
-          <Button asChild type="default" icon={<ExternalLink />} className="w-min mt-4">
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://supabase.com/docs/guides/database/hardening-data-api"
-            >
-              Documentation
-            </a>
-          </Button>
+          <DocsButton
+            abbrev={false}
+            className="w-min mt-4"
+            href={`${DOCS_URL}/guides/database/hardening-data-api`}
+          />
         </DialogSection>
 
         <DialogSectionSeparator />
@@ -184,7 +181,13 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
               disabled={hasAPISchema && isAPISchemaExposed}
               loading={isCreatingAPISchema}
               tooltip={{
-                content: { side: 'right', text: 'Schema has already been created and exposed' },
+                content: {
+                  side: 'right',
+                  text:
+                    hasAPISchema && isAPISchemaExposed
+                      ? 'Schema has already been created and exposed'
+                      : undefined,
+                },
               }}
             >
               Create and expose schema to Data API
@@ -249,7 +252,12 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 className="w-min"
                 disabled={!isPublicSchemaExposed}
                 loading={isUpdatingConfig}
-                tooltip={{ content: { side: 'right', text: 'Public schema no longer exposed' } }}
+                tooltip={{
+                  content: {
+                    side: 'right',
+                    text: !isPublicSchemaExposed ? 'Public schema no longer exposed' : undefined,
+                  },
+                }}
                 onClick={onSelectRemovePublicSchema}
               >
                 Remove public schema from exposed schemas

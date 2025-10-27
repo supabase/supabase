@@ -2,7 +2,24 @@
 title: 'Hardening the Data API'
 ---
 
-Your database's automatically generated Data API exposes the `public` schema by default. If your `public` schema is used by other tools as a default space, you might want to lock down this schema. This helps prevent accidental exposure of data that's automatically added to `public`.
+Your database's auto-generated Data API exposes the `public` schema by default. You can change this to any schema in your database, or even disable the Data API completely.
+
+Any tables that are accessible through the Data API _must_ have [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled. Row Level Security (RLS) is enabled by default when you create tables from the Supabase Dashboard. If you create a table using the SQL editor or your own SQL client or migration runner, you*must* enable RLS yourself.
+
+## Shared responsibility
+
+Your application's security is your responsibility as a developer. This includes RLS, falling under the [Shared Responsibility](/docs/guides/deployment/shared-responsibility-model) model. To help you:
+
+- Supabase sends daily emails warning of any tables that are exposed to the Data API which do not have RLS enabled.
+- Supabase provides a Security Advisor and other tools in the Supabase Dashboard to fix any issues.
+
+## Private schemas
+
+We highly recommend creating a `private` schema for storing tables that you do not want to expose via the Data API. These tables can be accessed via Supabase Edge Functions or any other serverside tool. In this model, you should implement your security model in your serverside code. Although it's not required, we _still_ recommend enabling RLS for private tables and then connecting to your database using a Postgres role with `bypassrls` privileges.
+
+## Managing the public schema
+
+If your `public` schema is used by other tools as a default space, you might want to lock down this schema. This helps prevent accidental exposure of data that's automatically added to `public`.
 
 There are two levels of security hardening for the Data API:
 

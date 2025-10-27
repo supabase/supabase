@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -35,29 +35,27 @@ export const useReadReplicaRemoveMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<ReadReplicaRemoveData, ResponseError, ReadReplicaRemoveVariables>(
-    (vars) => removeReadReplica(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, invalidateReplicaQueries } = variables
+  return useMutation<ReadReplicaRemoveData, ResponseError, ReadReplicaRemoveVariables>({
+    mutationFn: (vars) => removeReadReplica(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, invalidateReplicaQueries } = variables
 
-        if (invalidateReplicaQueries) {
-          await Promise.all([
-            queryClient.invalidateQueries(replicaKeys.list(projectRef)),
-            queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
-          ])
-        }
+      if (invalidateReplicaQueries) {
+        await Promise.all([
+          queryClient.invalidateQueries(replicaKeys.list(projectRef)),
+          queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
+        ])
+      }
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to remove read replica: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to remove read replica: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

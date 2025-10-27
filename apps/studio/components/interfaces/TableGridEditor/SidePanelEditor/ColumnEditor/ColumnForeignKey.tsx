@@ -2,9 +2,9 @@ import { useParams } from 'common'
 import { useState } from 'react'
 import { Button } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import useTable from 'hooks/misc/useTable'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
@@ -30,7 +30,7 @@ const ColumnForeignKey = ({
   const [open, setOpen] = useState(false)
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -38,7 +38,19 @@ const ColumnForeignKey = ({
   })
 
   const id = _id ? Number(_id) : undefined
-  const { data: table } = useTable(id)
+  const { data: table } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+  const formattedColumnsForFkSelector = (table?.columns ?? []).map((c) => {
+    return {
+      id: c.id,
+      name: c.name,
+      format: column.format || c.format,
+      isNewColumn: false,
+    }
+  })
 
   const getRelationStatus = (fk: ForeignKey) => {
     const existingRelation = (data ?? []).find((x) => x.id === fk.id)
@@ -101,7 +113,7 @@ const ColumnForeignKey = ({
         </Button>
       </div>
 
-      {table !== undefined && (
+      {table != undefined && (
         <ForeignKeySelector
           visible={open}
           column={column}
@@ -110,8 +122,8 @@ const ColumnForeignKey = ({
             name: table.name,
             columns:
               column.isNewColumn && column.name
-                ? (table.columns as any[]).concat(column)
-                : (table.columns as any[]).map((c) => {
+                ? formattedColumnsForFkSelector.concat(column)
+                : formattedColumnsForFkSelector.map((c) => {
                     if (c.id === column.id) return { ...c, name: column.name }
                     else return c
                   }),

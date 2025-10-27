@@ -1,8 +1,10 @@
-'use client'
-
 export * from './auth'
+export * from './configcat'
+export * from './consent-state'
 export * from './constants'
 export * from './database-types'
+export * from './enabled-features'
+export * from './feature-flags'
 export * from './gotrue'
 export * from './helpers'
 export * from './hooks'

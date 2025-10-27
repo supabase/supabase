@@ -4,23 +4,13 @@ title: 'pg_plan_filter: Restrict Total Cost'
 description: 'Block queries over a total cost limit'
 ---
 
-[`pg_plan_filter`](https://github.com/pgexperts/pg_plan_filter) is PostgreSQL extension to block execution of statements where query planner's estimate of the total cost exceeds a threshold. This is intended to give database administrators a way to restrict the contribution an individual query has on database load.
+[`pg_plan_filter`](https://github.com/pgexperts/pg_plan_filter) is Postgres extension to block execution of statements where query planner's estimate of the total cost exceeds a threshold. This is intended to give database administrators a way to restrict the contribution an individual query has on database load.
 
 ## Enable the extension
 
-`pg_plan_filter` can be enabled on a per connection basis:
+The extension is already enabled by default via `shared_preload_libraries` setting.
 
-{/* prettier-ignore */}
-```sql
-load 'plan_filter';
-```
-
-or for all connections:
-
-{/* prettier-ignore */}
-```sql
-alter database some_db set session_preload_libraries = 'plan_filter';
-```
+You can follow the instructions below.
 
 ## API
 
@@ -66,7 +56,6 @@ Now we can choose a `statement_cost_filter` value between the total cost for the
 
 {/* prettier-ignore */}
 ```sql
-load 'plan_filter';
 set plan_filter.statement_cost_limit = 50; -- between 2.49 and 135.0
 
 select * from book where id = 1;

@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules"
+  },
   "dependencies": {
     "@mertasan/tailwindcss-variables": "^2.2.3",
     "@radix-ui/colors": "^0.1.8",
@@ -13,7 +17,8 @@
     "tailwindcss-radix": "^2.0.0"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.1",
-    "tailwindcss-animate": "^1.0.6"
+    "tailwindcss": "catalog:",
+    "tailwindcss-animate": "^1.0.6",
+    "typescript": "catalog:"
   }
 }

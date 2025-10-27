@@ -1,13 +1,12 @@
 'use client'
 
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { type SupabaseClient } from '@supabase/supabase-js'
-import { useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
 
-import { useSetCommandMenuOpen } from '@ui-patterns/CommandMenu'
-import { GenericSkeletonLoader } from '@ui-patterns/ShimmeringLoader'
-import { type DocsSearchResult } from 'common'
+import { useDocsSearch, type DocsSearchResult } from 'common'
 import { Button, cn } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import ButtonCard from '~/components/ButtonCard'
 
@@ -21,46 +20,32 @@ function SearchButton() {
   )
 }
 
-async function getRecommendations(page: string, supabase: SupabaseClient) {
-  try {
-    const query = decodeURIComponent(page.replace(/^\/(?:guides|reference)\//, '')).replace(
+function Recommendations() {
+  const pathname = usePathname()
+
+  const { searchState: state, handleDocsSearch: handleSearch } = useDocsSearch()
+
+  const loading = state.status === 'initial' || state.status === 'loading'
+  const recommendations =
+    state.status === 'partialResults' || state.status === 'fullResults' ? state.results : []
+
+  useEffect(() => {
+    if (!pathname) return
+
+    const query = decodeURIComponent(pathname.replace(/^\/(?:guides|reference)\//, '')).replace(
       /[_\/-]/g,
       ' '
     )
-    if (!query) return []
 
-    const { data, error } = await supabase.rpc('docs_search_fts', { query })
-    if (error || !data?.length) return []
-    return data as Array<Omit<DocsSearchResult, 'sections'>>
-  } catch (err) {
-    console.error(err)
-    return []
-  }
-}
-
-function Recommendations({ page }: { page: string }) {
-  const supabase = useSupabaseClient()
-  const [recommendations, setRecommendations] = useState(
-    [] as Array<Omit<DocsSearchResult, 'sections'>>
-  )
-
-  const fetched = useRef(false)
-
-  useEffect(() => {
-    getRecommendations(page, supabase).then((data) => {
-      if (!fetched.current) {
-        setRecommendations(data)
-        fetched.current = true
-      }
-    })
-  }, [page, supabase])
+    handleSearch(query)
+  }, [handleSearch, pathname])
 
   return (
     <section aria-labelledby="empty-page-recommendations" className="min-h-96 mt-20">
       <h2 id="empty-page-recommendations">Are you looking for...?</h2>
-      {!fetched.current && <LoadingState />}
-      {fetched.current && recommendations.length === 0 && <NoResults />}
-      {fetched.current && recommendations.length > 0 && (
+      {loading && <LoadingState />}
+      {!loading && recommendations.length === 0 && <NoResults />}
+      {!loading && recommendations.length > 0 && (
         <RecommendationsList recommendations={recommendations} />
       )}
     </section>
@@ -97,4 +82,4 @@ function RecommendationsList({
   )
 }
 
-export { SearchButton, Recommendations }
+export { Recommendations, SearchButton }

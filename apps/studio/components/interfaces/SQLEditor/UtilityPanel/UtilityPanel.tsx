@@ -1,18 +1,16 @@
-import { useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { contentKeys } from 'data/content/keys'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { Snippet } from 'data/content/sql-folders-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 import { ChartConfig } from './ChartConfig'
-import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
 import UtilityTabResults from './UtilityTabResults'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useFlag } from 'hooks/ui/useFlag'
-import { Snippet } from 'data/content/sql-folders-query'
 
 export type UtilityPanelProps = {
   id: string
@@ -45,15 +43,13 @@ const UtilityPanel = ({
   onDebug,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
-
-  const snap = useSqlEditorStateSnapshot()
+  const { data: org } = useSelectedOrganizationQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
-  const snippet = snap.snippets[id]?.snippet
-  const queryKeys = contentKeys.list(ref)
-  const result = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
+  const snippet = snapV2.snippets[id]?.snippet
+  const result = snapV2.results[id]?.[0]
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -65,9 +61,6 @@ const UtilityPanel = ({
       if (payload.type !== 'sql') return
       if (!('chart' in payload.content)) return
 
-      // Cancel any existing queries so that the new content is fetched
-      await queryClient.cancelQueries(queryKeys)
-
       const newSnippet = {
         ...snippet,
         content: {
@@ -76,8 +69,7 @@ const UtilityPanel = ({
         },
       }
 
-      if (enableFolders) snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
-      else snap.updateSnippet(id, newSnippet)
+      snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
     },
     onError: async (err, newContent, context) => {
       toast.error(`Failed to update chart. Please try again.`)
@@ -89,7 +81,7 @@ const UtilityPanel = ({
       return DEFAULT_CHART_CONFIG
     }
 
-    if (!snippet.content.chart) {
+    if (!snippet.content?.chart) {
       return DEFAULT_CHART_CONFIG
     }
 
@@ -119,7 +111,7 @@ const UtilityPanel = ({
 
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
-      <TabsList_Shadcn_ className="flex justify-between gap-2 pl-6 pr-2">
+      <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-[1px]">Results</span>
@@ -127,7 +119,31 @@ const UtilityPanel = ({
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-[1px]">Chart</span>
           </TabsTrigger_Shadcn_>
-          {result?.rows && <ResultsDropdown id={id} />}
+          {result?.rows && (
+            <DownloadResultsButton
+              type="text"
+              results={result.rows as any[]}
+              fileName={`Supabase Snippet ${snippet.name}`}
+              onDownloadAsCSV={() =>
+                sendEvent({
+                  action: 'sql_editor_result_download_csv_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }
+              onCopyAsMarkdown={() => {
+                sendEvent({
+                  action: 'sql_editor_result_copy_markdown_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }}
+              onCopyAsJSON={() => {
+                sendEvent({
+                  action: 'sql_editor_result_copy_json_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }}
+            />
+          )}
         </div>
         <UtilityActions
           id={id}
@@ -138,7 +154,7 @@ const UtilityPanel = ({
           executeQuery={executeQuery}
         />
       </TabsList_Shadcn_>
-      <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
+      <TabsContent_Shadcn_ asChild value="results" className="mt-0 flex-grow">
         <UtilityTabResults
           id={id}
           isExecuting={isExecuting}
@@ -147,7 +163,8 @@ const UtilityPanel = ({
           isDebugging={isDebugging}
         />
       </TabsContent_Shadcn_>
-      <TabsContent_Shadcn_ className="mt-0 h-full" value="chart">
+
+      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
       </TabsContent_Shadcn_>
     </Tabs_Shadcn_>

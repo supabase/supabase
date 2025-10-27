@@ -1,11 +1,10 @@
-import React from 'react'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { IconChevronRight } from 'ui'
 
 import { data as DevelopersData } from 'data/Developers'
-import { allBlogPosts, BlogPost } from 'contentlayer/generated'
+import staticContent from '.generated/staticContent/_index.json'
 
-type Props = {
+type LinkProps = {
   text: string
   description?: string
   url?: string
@@ -13,37 +12,32 @@ type Props = {
   svg?: any
 }
 
-const DevelopersDropdown = () => {
-  const latestPosts = allBlogPosts
-    .sort((a: BlogPost, b: BlogPost) => {
-      const isPublishedAtBefore =
-        a.published_at && b.published_at && Date.parse(a.published_at) < Date.parse(b.published_at)
-      if (isPublishedAtBefore || new Date(a.date) < new Date(b.date)) {
-        return 1
-      } else {
-        return -1
-      }
-    })
-    .slice(0, 2)
+export const DevelopersDropdown = () => {
+  const { jobsCount, latestBlogPosts } = staticContent
 
   return (
     <div className="flex flex-col xl:flex-row">
-      <div className="w-[550px] xl:w-[500px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
+      <div className="w-[550px] xl:w-[470px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
         {DevelopersData['navigation'].map((column) => (
           <div key={column.label} className="p-0 flex flex-col gap-6">
             <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
               {column.label}
             </label>
             <ul className="flex flex-col gap-4">
-              {column.links.map(({ icon: Icon, ...link }: Props) => (
+              {column.links.map(({ icon: Icon, ...link }: LinkProps) => (
                 <li key={link.text}>
                   <Link
                     href={link.url!}
                     className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter"
                   >
-                    {Icon && <Icon size={16} strokeWidth={1.2} />}
+                    {Icon && <Icon size={16} strokeWidth={1.3} />}
                     <span>{link.text}</span>
-                    <IconChevronRight
+                    {link.text === 'Careers' && jobsCount > 0 && (
+                      <span className="text-xs flex items-center justify-center text-foreground-lighter -ml-1">
+                        ({jobsCount})
+                      </span>
+                    )}
+                    <ChevronRight
                       strokeWidth={2}
                       className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
                     />
@@ -61,10 +55,10 @@ const DevelopersDropdown = () => {
             className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
           >
             <span>Blog</span>
-            <IconChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
+            <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
           </Link>
           <ul className="flex flex-col gap-5">
-            {latestPosts.map((post: any) => (
+            {latestBlogPosts?.slice(0, 2).map((post) => (
               <li key={post.title}>
                 <Link
                   href={post.url}
@@ -85,5 +79,3 @@ const DevelopersDropdown = () => {
     </div>
   )
 }
-
-export default DevelopersDropdown

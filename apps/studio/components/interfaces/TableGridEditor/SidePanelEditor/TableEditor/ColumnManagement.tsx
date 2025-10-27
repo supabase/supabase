@@ -1,6 +1,5 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { isEmpty, noop, partition } from 'lodash'
-import { HelpCircle, Key } from 'lucide-react'
+import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
 import {
   DragDropContext,
@@ -10,18 +9,22 @@ import {
   DroppableProvided,
 } from 'react-beautiful-dnd'
 
+import { useParams } from 'common'
 import InformationBox from 'components/ui/InformationBox'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconEdit,
-  IconExternalLink,
-  IconTrash,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
@@ -55,9 +58,14 @@ const ColumnManagement = ({
   onClearImportContent = noop,
   onUpdateFkRelations,
 }: ColumnManagementProps) => {
+  const { ref: projectRef } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -135,9 +143,9 @@ const ColumnManagement = ({
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+            <Button asChild type="default" icon={<ExternalLink size={12} strokeWidth={2} />}>
               <a
-                href="https://supabase.com/docs/guides/database/tables#data-types"
+                href={`${DOCS_URL}/guides/database/tables#data-types`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -149,16 +157,29 @@ const ColumnManagement = ({
                 <div className="py-3 border-r" />
                 {hasImportContent ? (
                   <div className="flex items-center gap-x-2">
-                    <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
+                    <Button type="default" icon={<Edit />} onClick={onSelectImportData}>
                       Edit content
                     </Button>
-                    <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
+                    <Button type="danger" icon={<Trash />} onClick={onClearImportContent}>
                       Remove content
                     </Button>
                   </div>
                 ) : (
-                  <Button type="default" onClick={onSelectImportData}>
-                    Import data via spreadsheet
+                  <Button
+                    type="default"
+                    onClick={() => {
+                      onSelectImportData()
+                      sendEvent({
+                        action: 'import_data_button_clicked',
+                        properties: { tableType: 'New Table' },
+                        groups: {
+                          project: projectRef ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
+                      })
+                    }}
+                  >
+                    Import data from CSV
                   </Button>
                 )}
               </>
@@ -200,59 +221,30 @@ const ColumnManagement = ({
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%] flex items-center space-x-2">
               <h5 className="text-xs text-foreground-lighter">Name</h5>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <h5 className="text-xs text-foreground-lighter">
-                    <HelpCircle size={15} strokeWidth={1.5} />
-                  </h5>
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background w-[300px]', //border
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        Recommended to use lowercase and use an underscore to separate words e.g.
-                        column_name
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
+                  Recommended to use lowercase and use an underscore to separate words e.g.
+                  column_name
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div className="w-[25%]">
               <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
               <h5 className="text-xs text-foreground-lighter">Default Value</h5>
-
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <h5 className="text-xs text-foreground-lighter">
-                    <HelpCircle size={15} strokeWidth={1.5} />
-                  </h5>
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background w-[300px]', //border
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        Can either be a literal or an expression. When using an expression wrap your
-                        expression in brackets, e.g. (gen_random_uuid())
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
+                  Can either be a literal or an expression. When using an expression wrap your
+                  expression in brackets, e.g. (gen_random_uuid())
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div className="w-[10%]">
               <h5 className="text-xs text-foreground-lighter">Primary</h5>

@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -22,7 +22,8 @@ export const useNotificationsArchiveAllMutation = ({
   ...options
 }: Omit<UseMutationOptions<NotificationsArchiveAllData, ResponseError>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<NotificationsArchiveAllData, ResponseError>(() => archiveAllNotifications(), {
+  return useMutation<NotificationsArchiveAllData, ResponseError>({
+    mutationFn: () => archiveAllNotifications(),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries(notificationKeys.list())
       await onSuccess?.(data, variables, context)

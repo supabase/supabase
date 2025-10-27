@@ -6,7 +6,6 @@ import { integrationKeys } from './keys'
 
 export async function getIntegrations(signal?: AbortSignal) {
   const { data, error } = await get('/platform/integrations', {
-    params: { query: { integration_name: '' } },
     signal,
   })
 
@@ -22,8 +21,10 @@ export const useIntegrationsQuery = <TData = IntegrationsData>({
   enabled = true,
   ...options
 }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}) =>
-  useQuery<IntegrationsData, IntegrationsError, TData>(
-    integrationKeys.integrationsList(),
-    ({ signal }) => getIntegrations(signal),
-    { enabled: enabled, ...options }
-  )
+  useQuery<IntegrationsData, IntegrationsError, TData>({
+    queryKey: integrationKeys.integrationsList(),
+    queryFn: ({ signal }) => getIntegrations(signal),
+    enabled: enabled,
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  })

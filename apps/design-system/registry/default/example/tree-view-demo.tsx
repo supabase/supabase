@@ -1,5 +1,4 @@
-import { TreeView, TreeViewItem } from 'ui'
-import { flattenTree } from 'react-accessible-treeview'
+import { TreeView, TreeViewItem, flattenTree } from 'ui'
 
 export default function TreeViewDemo() {
   const data = {
@@ -27,7 +26,7 @@ export default function TreeViewDemo() {
     <TreeView
       data={flattenTree(data)}
       aria-label="directory tree"
-      className="w-[420px]"
+      className="w-[420px] border bg py-2"
       nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => (
         <TreeViewItem
           isExpanded={isExpanded}

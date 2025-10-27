@@ -1,6 +1,23 @@
-import { PRODUCT_NAMES } from 'shared-data/products'
+import { PRODUCT_MODULES_NAMES, PRODUCT_NAMES } from 'shared-data/products'
 
-export default [
+type ProductsArrayItem = PRODUCT_NAMES | PRODUCT_MODULES_NAMES
+
+export type Example = {
+  type: string
+  tags: string[]
+  products: ProductsArrayItem[]
+  title: string
+  description: string
+  author?: string
+  author_url?: string
+  author_img?: string
+  repo_name?: string
+  repo_url?: string
+  vercel_deploy_url?: string
+  demo_url?: string
+}
+
+const Examples: Example[] = [
   {
     type: 'example',
     tags: ['Next.js', 'Stripe', 'Vercel'],
@@ -36,7 +53,7 @@ export default [
   {
     type: 'example',
     tags: ['Next.js', 'OpenAI', 'Vercel'],
-    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION, PRODUCT_NAMES.VECTOR],
+    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION, PRODUCT_MODULES_NAMES.VECTOR],
     title: 'AI Chatbot',
     description:
       'An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Supabase.',
@@ -52,7 +69,7 @@ export default [
   {
     type: 'example',
     tags: ['LangChain', 'Next.js'],
-    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.VECTOR],
+    products: [PRODUCT_NAMES.DATABASE, PRODUCT_MODULES_NAMES.VECTOR],
     title: 'LangChain + Next.js Starter',
     description:
       'Starter template and example use-cases for LangChain projects in Next.js, including chat, agents, and retrieval.',
@@ -287,3 +304,5 @@ export default [
       'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/file-upload-storage',
   },
 ]
+
+export default Examples

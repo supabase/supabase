@@ -1,0 +1,44 @@
+## Project setup
+
+Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase and then creating a "schema" inside the database.
+
+### Create a project
+
+1. [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+1. Enter your project details.
+1. Wait for the new database to launch.
+
+### Set up the database schema
+
+Now we are going to set up the database schema. You can just copy/paste the SQL from below and run it yourself.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="database-method"
+>
+{/* <TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
+2. Click **Product Management**.
+3. Click **Run**.
+
+</TabPanel> */}
+<TabPanel id="sql" label="SQL">
+
+<$Partial path="product_management_sql_template.mdx" />
+
+</TabPanel>
+</Tabs>
+
+<$Partial path="api_settings.mdx" />
+
+### Set up Google authentication
+
+From the [Google Console](https://console.developers.google.com/apis/library), create a new project and add OAuth2 credentials.
+
+![Create Google OAuth credentials](/docs/img/guides/kotlin/google-cloud-oauth-credentials-create.png)
+
+In your [Supabase Auth settings](https://app.supabase.com/project/_/auth/providers) enable Google as a provider and set the required credentials as outlined in the [auth docs](/docs/guides/auth/social-login/auth-google).

@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
-import { useBreakpoint } from 'common'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
+import { useBreakpoint } from 'common'
+
 import { Button } from 'ui'
 import Panel from './Panel'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 function ExampleCard(props: any) {
   const isXs = useBreakpoint()
   const [mounted, setMounted] = useState(false)
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   useEffect(() => {
     setMounted(true)
@@ -16,8 +19,19 @@ function ExampleCard(props: any) {
   if (!mounted) return null
 
   return (
-    <Link href={props.repo_url} className="w-full h-full" target="_blank">
-      <Panel innerClassName="bg-surface-75 group/panel" hasActiveOnHover>
+    <Link
+      href={props.repo_url}
+      className="w-full h-full"
+      target="_blank"
+      onClick={() => {
+        if (props.inHomepage)
+          sendTelemetryEvent({
+            action: 'homepage_project_template_card_clicked',
+            properties: { templateTitle: props.title },
+          })
+      }}
+    >
+      <Panel outerClassName="h-full" innerClassName="bg-surface-75 group/panel" hasActiveOnHover>
         <div className="flex flex-col justify-between">
           {props.tags && (
             <div className="relative w-full aspect-[3/1] bg flex items-center justify-center gap-4 overflow-hidden">

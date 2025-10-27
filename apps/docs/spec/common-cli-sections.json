@@ -96,9 +96,9 @@
         "type": "cli-command"
       },
       {
-        "id": "supabase-gen-keys",
-        "title": "Generate keys (Preview branch)",
-        "slug": "supabase-gen-keys",
+        "id": "supabase-gen-signing-key",
+        "title": "Generate a JWT signing key",
+        "slug": "supabase-gen-signing-key",
         "type": "cli-command"
       },
       {
@@ -186,6 +186,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-migration-fetch",
+        "title": "Fetch migration files from history table",
+        "slug": "supabase-migration-fetch",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-migration-repair",
         "title": "Repair migration history table",
         "slug": "supabase-migration-repair",
@@ -199,7 +205,7 @@
       },
       {
         "id": "supabase-migration-up",
-        "title": "Apply pending migrations locally",
+        "title": "Apply pending migration files",
         "slug": "supabase-migration-up",
         "type": "cli-command"
       }
@@ -348,6 +354,36 @@
             "type": "cli-command"
           }
         ]
+      },
+      {
+        "id": "supabase-inspect-report",
+        "title": "Inspect all database statistics and save output",
+        "slug": "supabase-inspect-report",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Organizations",
+    "items": [
+      {
+        "id": "supabase-orgs",
+        "title": "Manage organizations",
+        "slug": "supabase-orgs",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-orgs-create",
+        "title": "Create an organization",
+        "slug": "supabase-orgs-create",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-orgs-list",
+        "title": "List all organizations",
+        "slug": "supabase-orgs-list",
+        "type": "cli-command"
       }
     ]
   },
@@ -389,6 +425,24 @@
   },
   {
     "type": "category",
+    "title": "Config",
+    "items": [
+      {
+        "id": "supabase-config",
+        "title": "Manage project configurations",
+        "slug": "supabase-config",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-config-push",
+        "title": "Push config from a local file",
+        "slug": "supabase-config-push",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Branches",
     "items": [
       {
@@ -422,6 +476,18 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-branches-pause",
+        "title": "Pause a preview branch",
+        "slug": "supabase-branches-pause",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-branches-unpause",
+        "title": "Unpause a preview branch",
+        "slug": "supabase-branches-unpause",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-branches-delete",
         "title": "Delete a preview branch",
         "slug": "supabase-branches-delete",
@@ -431,30 +497,6 @@
         "id": "supabase-branches-disable",
         "title": "Disable preview branching",
         "slug": "supabase-branches-disable",
-        "type": "cli-command"
-      }
-    ]
-  },
-  {
-    "type": "category",
-    "title": "Organizations",
-    "items": [
-      {
-        "id": "supabase-orgs",
-        "title": "Manage organizations",
-        "slug": "supabase-orgs",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-orgs-create",
-        "title": "Create an organization",
-        "slug": "supabase-orgs-create",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-orgs-list",
-        "title": "List all organizations",
-        "slug": "supabase-orgs-list",
         "type": "cli-command"
       }
     ]
@@ -569,30 +611,6 @@
         "id": "supabase-storage-rm",
         "title": "Delete objects from Storage",
         "slug": "supabase-storage-rm",
-        "type": "cli-command"
-      }
-    ]
-  },
-  {
-    "type": "category",
-    "title": "Encryption",
-    "items": [
-      {
-        "id": "supabase-encryption",
-        "title": "Manage encryption keys",
-        "slug": "supabase-encryption",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-encryption-get-root-key",
-        "title": "Retrieve the root encryption key",
-        "slug": "supabase-encryption-get-root-key",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-encryption-update-root-key",
-        "title": "Update root encryption key",
-        "slug": "supabase-encryption-update-root-key",
         "type": "cli-command"
       }
     ]
@@ -802,7 +820,7 @@
       {
         "id": "supabase-postgres-config",
         "title": "Manage Postgres configurations",
-        "slug": "supabase-ssl-enforcement",
+        "slug": "supabase-postgres-config",
         "type": "cli-command"
       },
       {
@@ -815,6 +833,12 @@
         "id": "supabase-postgres-config-update",
         "title": "Update Postgres configurations",
         "slug": "supabase-postgres-config-update",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-postgres-config-delete",
+        "title": "Delete Postgres configurations",
+        "slug": "supabase-postgres-config-delete",
         "type": "cli-command"
       }
     ]

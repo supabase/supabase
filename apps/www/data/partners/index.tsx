@@ -1,4 +1,4 @@
-import { IconAward, IconCompass, IconDollarSign, IconGlobe, IconTrendingUp } from 'ui'
+import { Compass, Globe, DollarSign, TrendingUp } from 'lucide-react'
 
 export default {
   metaTitle: 'Partner with Supabase',
@@ -67,22 +67,22 @@ export default {
     {
       title: 'Technical support',
       description: 'Access technical support to back your integrations and customer projects.',
-      icon: <IconCompass strokeWidth={1.5} />,
+      icon: <Compass strokeWidth={1.5} />,
     },
     {
       title: 'Expand your ecosystem',
       description: 'Offer your own products and services to Supabase customers.',
-      icon: <IconGlobe strokeWidth={1.5} />,
+      icon: <Globe strokeWidth={1.5} />,
     },
     {
       title: 'Business growth',
       description: 'Explore new revenue streams and growth potential.',
-      icon: <IconDollarSign strokeWidth={1.5} />,
+      icon: <DollarSign strokeWidth={1.5} />,
     },
     {
       title: 'Scale with us',
       description: 'Scale automatically with the power of open-source Postgres technology.',
-      icon: <IconTrendingUp strokeWidth={1.5} />,
+      icon: <TrendingUp strokeWidth={1.5} />,
     },
   ],
   featuredApps: [

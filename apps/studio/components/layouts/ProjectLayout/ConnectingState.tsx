@@ -1,13 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { ExternalLink, Loader, Monitor, Server } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { Badge, Button, IconExternalLink, IconLoader, IconMonitor, IconServer } from 'ui'
 
+import { useParams } from 'common'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import { setProjectPostgrestStatus } from 'data/projects/projects-query'
+import {
+  useInvalidateProjectDetailsQuery,
+  useSetProjectPostgrestStatus,
+  type Project,
+} from 'data/projects/project-detail-query'
+import { DOCS_URL } from 'lib/constants'
 import pingPostgrest from 'lib/pingPostgrest'
-import { invalidateProjectDetailsQuery, type Project } from 'data/projects/project-detail-query'
+import { Badge, Button } from 'ui'
 
 export interface ConnectingStateProps {
   project: Project
@@ -15,8 +19,10 @@ export interface ConnectingStateProps {
 
 const ConnectingState = ({ project }: ConnectingStateProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const checkProjectConnectionIntervalRef = useRef<number>()
+
+  const { setProjectPostgrestStatus } = useSetProjectPostgrestStatus()
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
   useEffect(() => {
     if (!project.restUrl) return
@@ -30,11 +36,11 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
   }, [project])
 
   const testProjectConnection = async () => {
-    const result = await pingPostgrest(project.ref, { kpsVersion: project.kpsVersion })
+    const result = await pingPostgrest(project.ref)
     if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
-      setProjectPostgrestStatus(queryClient, project.ref, 'ONLINE')
-      await invalidateProjectDetailsQuery(queryClient, project.ref)
+      setProjectPostgrestStatus(project.ref, 'ONLINE')
+      await invalidateProjectDetailsQuery(project.ref)
     }
   }
 
@@ -47,7 +53,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
             <div>
               <Badge variant="brand">
                 <div className="flex items-center gap-2">
-                  <IconLoader className="animate-spin" size={12} />
+                  <Loader className="animate-spin" size={12} />
                   <span>Connecting to project</span>
                 </div>
               </Badge>
@@ -58,13 +64,13 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               <div className="mx-auto flex max-w-[300px] items-center justify-center">
                 <div>
                   <div className="flex items-center justify-center w-12 h-12 rounded-md border">
-                    <IconMonitor className="text-foreground-light" size={30} strokeWidth={1.5} />
+                    <Monitor className="text-foreground-light" size={30} strokeWidth={1.5} />
                   </div>
                 </div>
                 <ShimmerLine active />
                 <div>
                   <div className="flex items-center justify-center w-12 h-12 rounded-md border">
-                    <IconServer className="text-foreground-light" size={30} strokeWidth={1.5} />
+                    <Server className="text-foreground-light" size={30} strokeWidth={1.5} />
                   </div>
                 </div>
               </div>
@@ -83,11 +89,9 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
                     Check database health
                   </Link>
                 </Button>
-                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <Link
-                    href={
-                      'https://supabase.com/docs/guides/platform/troubleshooting#unable-to-connect-to-your-supabase-project'
-                    }
+                    href={`${DOCS_URL}/guides/platform/troubleshooting#unable-to-connect-to-your-supabase-project`}
                     className="translate-y-[1px]"
                   >
                     Troubleshooting

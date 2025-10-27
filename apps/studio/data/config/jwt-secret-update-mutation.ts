@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
@@ -17,15 +16,19 @@ export async function updateJwtSecret({
   jwtSecret,
   changeTrackingId,
 }: JwtSecretUpdateVariables) {
-  const response = await patch(`${API_URL}/projects/${projectRef}/config/secrets`, {
-    jwt_secret: jwtSecret,
-    change_tracking_id: changeTrackingId,
+  const { data, error } = await patch('/platform/projects/{ref}/config/secrets', {
+    params: {
+      path: { ref: projectRef },
+    },
+    body: {
+      jwt_secret: jwtSecret,
+      change_tracking_id: changeTrackingId,
+    },
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response
+  if (error) handleError(error)
+
+  return data
 }
 
 type JwtSecretUpdateData = Awaited<ReturnType<typeof updateJwtSecret>>
@@ -40,22 +43,16 @@ export const useJwtSecretUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JwtSecretUpdateData, ResponseError, JwtSecretUpdateVariables>(
-    (vars) => updateJwtSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(configKeys.jwtSecretUpdatingStatus(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit JWT secret update request: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<JwtSecretUpdateData, ResponseError, JwtSecretUpdateVariables>({
+    mutationFn: (vars) => updateJwtSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(configKeys.jwtSecretUpdatingStatus(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      await onError?.(data, variables, context)
+    },
+    ...options,
+  })
 }

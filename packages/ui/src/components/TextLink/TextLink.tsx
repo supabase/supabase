@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { cn } from '../../lib/utils/cn'
-import IconChevronRight from '../Icon/icons/IconChevronRight/IconChevronRight'
+import { ChevronRight } from 'lucide-react'
 
 interface Props {
   label: string
   url?: string
   className?: string
+  counter?: number
   hasChevron?: boolean
   chevronAnimation?: 'translate' | 'fadeIn'
   target?: '_blank' | '_self'
@@ -17,6 +18,7 @@ function TextLink({
   url = '',
   label,
   className,
+  counter,
   hasChevron = true,
   chevronAnimation = 'translate',
   target = '_self',
@@ -26,7 +28,7 @@ function TextLink({
     <Link
       href={url}
       className={cn(
-        'text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-foreground-lighter focus-visible:text-foreground',
+        'group/text-link text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-foreground-lighter focus-visible:text-foreground',
         className
       )}
       target={target}
@@ -35,6 +37,11 @@ function TextLink({
       <div className="group flex items-center gap-1">
         <span className="sr-only">{`${label} about ${url}`}</span>
         <span>{label}</span>
+        {counter && (
+          <span className="text-xs flex items-center justify-center text-foreground-lighter group-hover/text-link:text-foreground">
+            ({counter})
+          </span>
+        )}
         {hasChevron && (
           <div
             className={cn(
@@ -42,7 +49,7 @@ function TextLink({
               chevronAnimation === 'fadeIn' && 'opacity-0 group-hover:opacity-100'
             )}
           >
-            <IconChevronRight size={14} strokeWidth={2} />
+            <ChevronRight size={14} strokeWidth={2} />
           </div>
         )}
       </div>

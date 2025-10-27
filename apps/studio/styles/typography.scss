@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-default;
+  }
+  h1 {
+    @apply heading-title;
+  }
+  h2 {
+    @apply heading-section;
+  }
+  h3 {
+    @apply heading-subSection;
+  }
+  h4 {
+    @apply heading-default;
+  }
+  h5 {
+    @apply heading-default;
+  }
+  h6 {
+    @apply heading-compact;
+  }
+  small {
+    @apply text-compact;
+  }
+  strong {
+    @apply font-medium;
+  }
+}
+
+@layer utilities {
+  /* Heading */
+  .heading-title {
+    @apply scroll-m-20 text-2xl tracking-tight;
+  }
+
+  .heading-section {
+    @apply scroll-m-20 text-xl;
+  }
+
+  .heading-subSection {
+    @apply scroll-m-20 text-base;
+  }
+
+  .heading-default {
+    @apply scroll-m-20 text-sm font-medium;
+  }
+
+  .heading-compact {
+    @apply scroll-m-20 text-xs font-medium;
+  }
+
+  .heading-meta {
+    @apply text-xs font-mono uppercase tracking-wider font-medium;
+  }
+
+  /* Text */
+  .text-default {
+    @apply text-base;
+  }
+
+  .text-subTitle {
+    @apply text-lg;
+  }
+
+  .text-compact {
+    @apply text-xs;
+  }
+
+  /* Link */
+  .text-link {
+    @apply text-foreground-light underline underline-offset-4 decoration-inherit hover:decoration-foreground transition-colors hover:text-foreground;
+  }
+}

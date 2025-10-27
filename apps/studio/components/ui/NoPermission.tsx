@@ -1,11 +1,11 @@
-import { IconAlertCircle } from 'ui'
+import { AlertCircle } from 'lucide-react'
 
 interface NoPermissionProps {
   resourceText: string
   isFullPage?: boolean
 }
 
-const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) => {
+export const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) => {
   const NoPermissionMessage = () => (
     <div
       className={[
@@ -15,7 +15,7 @@ const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) =
     >
       <div className="flex space-x-3">
         <div className="mt-1">
-          <IconAlertCircle size="large" />
+          <AlertCircle size={20} />
         </div>
         <div className="flex w-full items-center justify-between">
           <div className="space-y-1">

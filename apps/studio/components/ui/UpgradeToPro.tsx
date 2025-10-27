@@ -1,22 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
 import { ReactNode } from 'react'
 
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
-import { Button, cn } from 'ui'
+import { useFlag } from 'common'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { cn } from 'ui'
 import { ButtonTooltip } from './ButtonTooltip'
+import { UpgradePlanButton } from './UpgradePlanButton'
 
 interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
   secondaryText: string
-  addon?: 'pitr' | 'customDomain' | 'computeInstance'
+  addon?: 'pitr' | 'customDomain'
   buttonText?: string
+  source?: string
   disabled?: boolean
+  fullWidth?: boolean
 }
 
 const UpgradeToPro = ({
@@ -25,14 +26,15 @@ const UpgradeToPro = ({
   secondaryText,
   addon,
   buttonText,
+  source = 'upgrade',
   disabled = false,
+  fullWidth = false,
 }: UpgradeToProProps) => {
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan?.id
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const plan = organization?.plan?.id
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -41,14 +43,14 @@ const UpgradeToPro = ({
   return (
     <div
       className={cn(
-        'block w-full rounded border border-opacity-20 py-4 px-6',
-        'border-overlay bg-surface-200'
+        'block w-full py-4 px-6 bg-surface-200',
+        fullWidth ? 'border-b' : 'border border-opacity-20 border-overlay rounded'
       )}
     >
       <div className="flex gap-x-3">
         {icon && <div className="mt-1">{icon}</div>}
-        <div className="flex w-full items-center justify-between gap-x-32">
-          <div className="space-y-1">
+        <div className="flex flex-col md:flex-row w-full md:items-center justify-between gap-4 md:gap-x-8">
+          <div className="space-y-1 flex-1 max-w-2xl">
             <p className="text-sm">{primaryText}</p>
             <div>
               <p className="text-sm text-foreground-light">{secondaryText}</p>
@@ -69,24 +71,24 @@ const UpgradeToPro = ({
                 },
               }}
             >
-              Reset database password
+              {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
             </ButtonTooltip>
           ) : (
-            <Button
-              asChild
+            <UpgradePlanButton
               type="primary"
-              disabled={!canUpdateSubscription || projectUpdateDisabled || disabled}
+              plan="Pro"
+              source={source}
+              disabled={disabled}
+              href={
+                plan === 'free'
+                  ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
+                  : addon == null
+                    ? `/org/${organization?.slug ?? '_'}/billing?panel=costControl&source=${source}`
+                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
+              }
             >
-              <Link
-                href={
-                  plan === 'free'
-                    ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan`
-                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}`
-                }
-              >
-                {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
-              </Link>
-            </Button>
+              {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
+            </UpgradePlanButton>
           )}
         </div>
       </div>

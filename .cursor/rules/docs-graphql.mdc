@@ -1,0 +1,267 @@
+---
+description: Docs GraphQL Architecture
+globs: apps/docs/resources/**/*.ts
+alwaysApply: false
+---
+
+# Docs GraphQL Architecture
+
+## Overview
+
+The `/apps/docs/resources` folder contains the GraphQL endpoint architecture for the docs GraphQL endpoint at `/api/graphql`. It follows a modular pattern where each top-level query is organized into its own folder with consistent file structure.
+
+## Architecture Pattern
+
+Each GraphQL query follows this structure:
+
+```
+resources/
+├── queryObject/
+│   ├── queryObjectModel.ts      # Data models and business logic
+│   ├── queryObjectSchema.ts     # GraphQL type definitions
+│   ├── queryObjectResolver.ts   # Query resolver and arguments
+│   ├── queryObjectTypes.ts      # TypeScript interfaces (optional)
+│   └── queryObjectSync.ts       # Functions for syncing repo content to the database (optional)
+├── utils/
+│   ├── connections.ts         # GraphQL connection/pagination utilities
+│   └── fields.ts              # GraphQL field selection utilities
+├── rootSchema.ts              # Main GraphQL schema with all queries
+└── rootSync.ts                # Root sync script for syncing to database
+```
+
+## Example queries
+
+1. **searchDocs** (`globalSearch/`) - Vector-based search across all docs content
+2. **error** (`error/`) - Error code lookup for Supabase services  
+3. **schema** - GraphQL schema introspection
+
+## Key Files
+
+### `rootSchema.ts`
+- Main GraphQL schema definition
+- Imports all resolvers and combines them into the root query
+- Defines the `RootQueryType` with all top-level fields
+
+### `utils/connections.ts`
+- Provides `createCollectionType()` for paginated collections
+- `GraphQLCollectionBuilder` for building collection responses
+- Standard pagination arguments and edge/node patterns
+
+### `utils/fields.ts`
+- `graphQLFields()` utility to analyze requested fields in resolvers
+- Used for optimizing data fetching based on what fields are actually requested
+
+## Creating a New Top-Level Query
+
+To add a new GraphQL query, follow these steps:
+
+### 1. Create Query Folder Structure
+```bash
+mkdir resources/newQuery
+touch resources/newQuery/newQueryModel.ts
+touch resources/newQuery/newQuerySchema.ts  
+touch resources/newQuery/newQueryResolver.ts
+```
+
+### 2. Define GraphQL Schema (`newQuerySchema.ts`)
+```typescript
+import { GraphQLObjectType, GraphQLString } from 'graphql'
+
+export const GRAPHQL_FIELD_NEW_QUERY = 'newQuery' as const
+
+export const GraphQLObjectTypeNewQuery = new GraphQLObjectType({
+  name: 'NewQuery',
+  description: 'Description of what this query returns',
+  fields: {
+    id: {
+      type: GraphQLString,
+      description: 'Unique identifier',
+    },
+    // Add other fields...
+  },
+})
+```
+
+### 3. Create Data Model (`newQueryModel.ts`)
+
+> [!NOTE]
+> The data model should be agnostic to GraphQL. It may import argument types
+> from `~/__generated__/graphql`, but otherwise all functions and classes
+> should be unaware of whether they are called for GraphQL resolution.
+
+> [!TIP]
+> The types in `~/__generated__/graphql` for a new endpoint will not exist
+> until the code generation is run in the next step.
+
+```typescript
+import { type RootQueryTypeNewQueryArgs } from '~/__generated__/graphql'
+import { convertPostgrestToApiError, type ApiErrorGeneric } from '~/app/api/utils'
+import { Result } from '~/features/helpers.fn'
+import { supabase } from '~/lib/supabase'
+
+export class NewQueryModel {
+  constructor(public readonly data: {
+    id: string
+    // other properties...
+  }) {}
+
+  static async loadData(
+    args: RootQueryTypeNewQueryArgs,
+    requestedFields: Array<string>
+  ): Promise<Result<NewQueryModel[], ApiErrorGeneric>> {
+    // Implement data fetching logic
+    const result = new Result(
+      await supabase()
+        .from('your_table')
+        .select('*')
+        // Add filters based on args
+    )
+    .map((data) => data.map((item) => new NewQueryModel(item)))
+    .mapError(convertPostgrestToApiError)
+
+    return result
+  }
+}
+```
+
+### 4. Create Resolver (`newQueryResolver.ts`)
+```typescript
+import { GraphQLError, GraphQLNonNull, GraphQLString, type GraphQLResolveInfo } from 'graphql'
+import { type RootQueryTypeNewQueryArgs } from '~/__generated__/graphql'
+import { convertUnknownToApiError } from '~/app/api/utils'
+import { Result } from '~/features/helpers.fn'
+import { graphQLFields } from '../utils/fields'
+import { NewQueryModel } from './newQueryModel'
+import { GRAPHQL_FIELD_NEW_QUERY, GraphQLObjectTypeNewQuery } from './newQuerySchema'
+
+async function resolveNewQuery(
+  _parent: unknown,
+  args: RootQueryTypeNewQueryArgs,
+  _context: unknown,
+  info: GraphQLResolveInfo
+): Promise<NewQueryModel[] | GraphQLError> {
+  return (
+    await Result.tryCatchFlat(
+      resolveNewQueryImpl,
+      convertUnknownToApiError,
+      args,
+      info
+    )
+  ).match(
+    (data) => data,
+    (error) => {
+      console.error(`Error resolving ${GRAPHQL_FIELD_NEW_QUERY}:`, error)
+      return new GraphQLError(error.isPrivate() ? 'Internal Server Error' : error.message)
+    }
+  )
+}
+
+async function resolveNewQueryImpl(
+  args: RootQueryTypeNewQueryArgs,
+  info: GraphQLResolveInfo
+): Promise<Result<NewQueryModel[], ApiErrorGeneric>> {
+  const fieldsInfo = graphQLFields(info)
+  const requestedFields = Object.keys(fieldsInfo)
+  return await NewQueryModel.loadData(args, requestedFields)
+}
+
+export const newQueryRoot = {
+  [GRAPHQL_FIELD_NEW_QUERY]: {
+    description: 'Description of what this query does',
+    args: {
+      id: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'Required argument description',
+      },
+      // Add other arguments...
+    },
+    type: GraphQLObjectTypeNewQuery, // or createCollectionType() for lists
+    resolve: resolveNewQuery,
+  },
+}
+```
+
+### 5. Register in Root Schema
+In `rootSchema.ts`, add your resolver:
+
+```typescript
+// Import your resolver
+import { newQueryRoot } from './newQuery/newQueryResolver'
+
+// Add to the query fields
+export const rootGraphQLSchema = new GraphQLSchema({
+  query: new GraphQLObjectType({
+    name: 'RootQueryType',
+    fields: {
+      ...introspectRoot,
+      ...searchRoot,
+      ...errorRoot,
+      ...newQueryRoot, // Add this line
+    },
+  }),
+  types: [
+    GraphQLObjectTypeGuide,
+    GraphQLObjectTypeReferenceCLICommand,
+    GraphQLObjectTypeReferenceSDKFunction,
+    GraphQLObjectTypeTroubleshooting,
+  ],
+})
+```
+
+### 6. Update TypeScript Types
+Run the GraphQL codegen to update TypeScript types:
+```bash
+pnpm run -F docs codegen:graphql
+```
+
+## Best Practices
+
+1. **Error Handling**: Error handling always uses the Result class, defined in apps/docs/features/helpers.fn.ts
+2. **Field Optimization**: Use `graphQLFields()` to only fetch requested data
+3. **Collections**: Use `createCollectionType()` for paginated lists
+4. **Naming**: Use `GRAPHQL_FIELD_*` constants for field names
+5. **Documentation**: Add GraphQL descriptions to all fields and types
+6. **Database**: Use `supabase()` client for database operations with `convertPostgrestToApiError`
+
+## Testing
+
+Tests are located in apps/docs/app/api/graphql/tests. Each top-level query
+should have its own test file, located at <queryName>.test.ts.
+
+### Test data
+
+Test data uses a local database, seeded with the file at supabase/seed.sql. Add
+any data required for running your new query.
+
+### Integration tests
+
+Integration tests import the POST function defined in
+apps/docs/api/graphql/route.ts, then make a request to this function.
+
+For example:
+
+```ts
+import { POST } from '../route'
+
+it('test name', async () => {
+  const query = `
+    query {
+      ...
+    }
+  `
+  const request = new Request('http://localhost/api/graphql', {
+    method: 'POST',
+    body: JSON.stringify({ query }),
+  })
+
+  const result = await POST(request)
+})
+```
+
+Include at least the following tests:
+
+1. A test that requests all fields (including nested fields) on the new query
+   object, and asserts that there are no errors, and the requested fields are
+   properly returned.
+2. A test that triggers and error, and asserts that a GraphQL error is properly
+   returned.

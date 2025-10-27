@@ -9,16 +9,15 @@ import {
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
   Input,
-  Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   cn,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 import { useState } from 'react'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
@@ -72,7 +71,7 @@ const Column = ({
   onRemoveColumn,
   onEditForeignKey,
 }: ColumnProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
@@ -226,7 +225,6 @@ const Column = ({
           <ColumnType
             value={column.format}
             enumTypes={enumTypes}
-            size="small"
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
             disabled={hasForeignKeys}
@@ -269,91 +267,84 @@ const Column = ({
         <Checkbox
           label=""
           checked={column.isPrimaryKey}
-          onChange={() => onUpdateColumn({ isPrimaryKey: !column.isPrimaryKey })}
+          onChange={() => {
+            const updatedValue = !column.isPrimaryKey
+            onUpdateColumn({
+              isPrimaryKey: updatedValue,
+              isNullable: updatedValue ? false : column.isNullable,
+            })
+          }}
         />
       </div>
       <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
       <div className="flex w-[5%] justify-end">
         {(!column.isPrimaryKey || column.format.includes('int')) && (
-          <>
-            <Popover
-              size="xlarge"
-              className="pointer-events-auto"
-              align="end"
-              modal={true}
+          <Popover_Shadcn_>
+            <PopoverTrigger_Shadcn_
               data-testid={`${column.name}-extra-options`}
-              header={
-                <div className="flex items-center justify-center">
-                  <h5 className="text-sm text-foreground">Extra options</h5>
-                </div>
-              }
-              overlay={[
-                <div className="flex flex-col space-y-1" key={`${column.id}_configuration`}>
-                  {!column.isPrimaryKey && (
-                    <>
-                      <Checkbox
-                        label="Is Nullable"
-                        description="Specify if the column can assume a NULL value if no value is provided"
-                        checked={column.isNullable}
-                        className="p-4"
-                        onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
-                      />
-                      <Popover.Separator />
-                    </>
-                  )}
-                  <Checkbox
-                    label="Is Unique"
-                    description="Enforce if values in the column should be unique across rows"
-                    checked={column.isUnique}
-                    className="p-4"
-                    onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
-                  />
-                  <Popover.Separator />
-                  {column.format.includes('int') && (
-                    <>
-                      <Checkbox
-                        label="Is Identity"
-                        description="Automatically assign a sequential unique number to the column"
-                        checked={column.isIdentity}
-                        className="p-4"
-                        onChange={() => {
-                          const isIdentity = !column.isIdentity
-                          const isArray = isIdentity ? false : column.isArray
-                          onUpdateColumn({ isIdentity, isArray })
-                        }}
-                      />
-                      <Popover.Separator />
-                    </>
-                  )}
-
-                  {!column.isPrimaryKey && (
-                    <Checkbox
-                      label="Define as Array"
-                      description="Define your column as a variable-length multidimensional array"
-                      checked={column.isArray}
-                      className="p-4"
-                      onChange={() => {
-                        const isArray = !column.isArray
-                        const isIdentity = isArray ? false : column.isIdentity
-                        onUpdateColumn({ isArray, isIdentity })
-                      }}
-                    />
-                  )}
-                </div>,
-              ]}
+              className="group flex items-center -space-x-1"
             >
-              <div className="group flex items-center -space-x-1">
-                {settingsCount > 0 && (
-                  <div className="rounded-full bg-foreground h-4 w-4 flex items-center justify-center text-xs text-background">
-                    {settingsCount}
-                  </div>
-                )}
-                <div className="text-foreground-light transition-colors group-hover:text-foreground">
-                  <Settings size={16} strokeWidth={1} />
+              {settingsCount > 0 && (
+                <div className="rounded-full bg-foreground h-4 w-4 flex items-center justify-center text-xs text-background">
+                  {settingsCount}
                 </div>
+              )}
+              <div className="text-foreground-light transition-colors group-hover:text-foreground">
+                <Settings size={16} strokeWidth={1} />
               </div>
-            </Popover>
-          </>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_ align="end" className="w-96 p-0">
+              <div className="flex items-center justify-center bg-surface-200 space-y-1 py-1.5 px-3 border-b border-overlay">
+                <h5 className="text-foreground">Extra options</h5>
+              </div>
+
+              <div className="flex flex-col space-y-1" key={`${column.id}_configuration`}>
+                {!column.isPrimaryKey && (
+                  <Checkbox
+                    label="Is Nullable"
+                    description="Specify if the column can assume a NULL value if no value is provided"
+                    checked={column.isNullable}
+                    className="p-4"
+                    onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
+                  />
+                )}
+                <Checkbox
+                  label="Is Unique"
+                  description="Enforce if values in the column should be unique across rows"
+                  checked={column.isUnique}
+                  className="p-4"
+                  onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
+                />
+                {column.format.includes('int') && (
+                  <Checkbox
+                    label="Is Identity"
+                    description="Automatically assign a sequential unique number to the column"
+                    checked={column.isIdentity}
+                    className="p-4"
+                    onChange={() => {
+                      const isIdentity = !column.isIdentity
+                      const isArray = isIdentity ? false : column.isArray
+                      onUpdateColumn({ isIdentity, isArray })
+                    }}
+                  />
+                )}
+
+                {!column.isPrimaryKey && (
+                  <Checkbox
+                    label="Define as Array"
+                    description="Define your column as a variable-length multidimensional array"
+                    checked={column.isArray}
+                    className="p-4"
+                    onChange={() => {
+                      const isArray = !column.isArray
+                      const isIdentity = isArray ? false : column.isIdentity
+                      onUpdateColumn({ isArray, isIdentity })
+                    }}
+                  />
+                )}
+              </div>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
         )}
       </div>
       {!hasImportContent && (

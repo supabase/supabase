@@ -1,39 +1,31 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+
+import { components } from 'api-types'
+import { get, handleError } from 'data/fetchers'
 import { organizationKeys } from './keys'
 
-export type MemberWithFreeProjectLimit = {
-  free_project_limit: number
-  primary_email: string
-  username: string
-}
+export type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit']
 
 export type FreeProjectLimitCheckVariables = {
   slug?: string
 }
 
-export type FreeProjectLimitCheckResponse = MemberWithFreeProjectLimit[]
-
 export async function getFreeProjectLimitCheck(
   { slug }: FreeProjectLimitCheckVariables,
   signal?: AbortSignal
 ) {
-  if (!slug) {
-    throw new Error('slug is required')
-  }
+  if (!slug) throw new Error('slug is required')
 
-  const response = await get(
-    `${API_URL}/organizations/${slug}/members/reached-free-project-limit`,
+  const { data, error } = await get(
+    '/platform/organizations/{slug}/members/reached-free-project-limit',
     {
+      params: { path: { slug } },
       signal,
     }
   )
-  if (response.error) {
-    throw response.error
-  }
 
-  return response as FreeProjectLimitCheckResponse
+  if (error) handleError(error)
+  return data
 }
 
 export type FreeProjectLimitCheckData = Awaited<ReturnType<typeof getFreeProjectLimitCheck>>
@@ -46,11 +38,9 @@ export const useFreeProjectLimitCheckQuery = <TData = FreeProjectLimitCheckData>
     ...options
   }: UseQueryOptions<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData> = {}
 ) =>
-  useQuery<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData>(
-    organizationKeys.freeProjectLimitCheck(slug),
-    ({ signal }) => getFreeProjectLimitCheck({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<FreeProjectLimitCheckData, FreeProjectLimitCheckError, TData>({
+    queryKey: organizationKeys.freeProjectLimitCheck(slug),
+    queryFn: ({ signal }) => getFreeProjectLimitCheck({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

@@ -1,0 +1,35 @@
+---
+title: Supabase Client Libraries
+description: Supabase client for React Router
+---
+
+## Installation
+
+<BlockItem name="supabase-client-react-router" description="Supabase Client for React Router" />
+
+## Folder structure
+
+<RegistryBlock itemName="supabase-client-react-router" />
+
+## Usage
+
+This block installs Supabase clients for connecting your React Router project to Supabase. They're designed for use in both server-side loaders and actions, as well as client-side components.
+
+If you've already set up Supabase clients in your project, you can just continue using them.
+
+### Getting started
+
+After installing the block, you'll have the following environment variables in your `.env.local` file:
+
+```env
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY=
+```
+
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true) under App Frameworks or in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api).
+
+- If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
+
+## Further reading
+
+- [Generating TypeScript types for your client](https://supabase.com/docs/guides/api/rest/generating-types)

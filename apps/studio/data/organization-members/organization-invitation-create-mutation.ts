@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
@@ -52,7 +52,8 @@ export const useOrganizationCreateInvitationMutation = ({
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationCreateInvitationVariables
-  >((vars) => createOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => createOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
 

@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
 import { del, handleError } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
@@ -48,7 +48,8 @@ export const useOrganizationPaymentMethodDeleteMutation = ({
     OrganizationPaymentMethodDeleteData,
     ResponseError,
     OrganizationPaymentMethodDeleteVariables
-  >((vars) => deletePaymentMethod(vars), {
+  >({
+    mutationFn: (vars) => deletePaymentMethod(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
       await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))

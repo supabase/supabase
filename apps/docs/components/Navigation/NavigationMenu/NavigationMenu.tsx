@@ -1,8 +1,9 @@
 import { memo } from 'react'
 
+import type { NavMenuSection } from '../Navigation.types'
+import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
-import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 
 enum MenuId {
   GettingStarted = 'gettingstarted',
@@ -14,11 +15,17 @@ enum MenuId {
   Realtime = 'realtime',
   Storage = 'storage',
   Ai = 'ai',
+  Cron = 'cron',
+  Queues = 'queues',
   Platform = 'platform',
+  Deployment = 'deployment',
+  Telemetry = 'telemetry',
   Resources = 'resources',
+  Security = 'security',
   SelfHosting = 'self_hosting',
   Integrations = 'integrations',
-  Cli = 'supabase_cli',
+  LocalDevelopment = 'local_development',
+  Contributing = 'contributing',
   RefJavaScriptV1 = 'reference_javascript_v1',
   RefJavaScriptV2 = 'reference_javascript_v2',
   RefDartV1 = 'reference_dart_v1',
@@ -30,6 +37,7 @@ enum MenuId {
   RefSwiftV2 = 'reference_swift_v2',
   RefKotlinV1 = 'reference_kotlin_v1',
   RefKotlinV2 = 'reference_kotlin_v2',
+  RefKotlinV3 = 'reference_kotlin_v3',
   RefCli = 'reference_cli',
   RefApi = 'reference_api',
   SelfHostingAuth = 'reference_self_hosting_auth',
@@ -74,11 +82,19 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
+    id: MenuId.Queues,
+    type: 'guide',
+  },
+  {
     id: MenuId.Auth,
     type: 'guide',
   },
   {
     id: MenuId.Functions,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Telemetry,
     type: 'guide',
   },
   {
@@ -93,12 +109,17 @@ const menus: Menu[] = [
     id: MenuId.Ai,
     type: 'guide',
   },
+  { id: MenuId.Cron, type: 'guide' },
   {
     id: MenuId.Platform,
     type: 'guide',
   },
   {
     id: MenuId.Resources,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Security,
     type: 'guide',
   },
   {
@@ -110,7 +131,15 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
-    id: MenuId.Cli,
+    id: MenuId.LocalDevelopment,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Contributing,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Deployment,
     type: 'guide',
   },
   {
@@ -166,6 +195,11 @@ const menus: Menu[] = [
   {
     id: MenuId.RefKotlinV2,
     type: 'reference',
+    path: '/reference/kotlin/v2',
+  },
+  {
+    id: MenuId.RefKotlinV3,
+    type: 'reference',
     path: '/reference/kotlin',
   },
   {
@@ -216,17 +250,19 @@ function getMenuById(id: MenuId) {
   return menus.find((menu) => menu.id === id)
 }
 
-function getMenuElement(menu: Menu | undefined) {
+function getMenuElement(menu: Menu | undefined, props?: any) {
+  if (!menu) return null
+
   const menuType = menu?.type
   switch (menuType) {
     case 'guide':
-      return <NavigationMenuGuideList id={menu.id} />
+      return <NavigationMenuGuideList id={menu.id} {...props} />
     case 'reference':
       return (
         <NavigationMenuRefList
           id={menu.id}
           basePath={menu.path}
-          commonSectionsFile={menu.commonSectionsFile}
+          commonSectionsFile={menu.commonSectionsFile || ''}
         />
       )
     default:
@@ -234,14 +270,20 @@ function getMenuElement(menu: Menu | undefined) {
   }
 }
 
-const NavigationMenu = ({ menuId }: { menuId: MenuId }) => {
+const NavigationMenu = ({
+  menuId,
+  additionalNavItems,
+}: {
+  menuId: MenuId
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
+}) => {
   const level = menuId
   const menu = getMenuById(level)
 
   useCloseMenuOnRouteChange()
 
-  return getMenuElement(menu)
+  return getMenuElement(menu, { additionalNavItems })
 }
 
-export { MenuId, getMenuById }
+export { getMenuById, MenuId }
 export default memo(NavigationMenu)

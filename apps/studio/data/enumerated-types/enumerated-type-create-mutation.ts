@@ -1,14 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import type { ResponseError } from 'types'
-import { enumeratedTypesKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
+import type { ResponseError } from 'types'
+import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeCreateVariables = {
   projectRef: string
-  connectionString: string
+  connectionString: string | null
   schema: string
   name: string
   description?: string
@@ -45,22 +45,20 @@ export const useEnumeratedTypeCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EnumeratedTypeCreateData, ResponseError, EnumeratedTypeCreateVariables>(
-    (vars) => createEnumeratedType(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(enumeratedTypesKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create enumerated type: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<EnumeratedTypeCreateData, ResponseError, EnumeratedTypeCreateVariables>({
+    mutationFn: (vars) => createEnumeratedType(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(enumeratedTypesKeys.list(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create enumerated type: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

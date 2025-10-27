@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { LOGS_TABLES, genQueryParams } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type {
   LogData,
   Logs,
@@ -7,32 +7,36 @@ import type {
   QueryType,
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import { genSingleLogQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
 interface SingleLogHook {
-  logData: LogData | undefined
+  data: LogData | undefined
   error: string | Object | null
   isLoading: boolean
   refresh: () => void
 }
-function useSingleLog(
-  projectRef: string,
-  queryType?: QueryType,
-  paramsToMerge?: Partial<LogsEndpointParams>,
-  id?: string | null
-): SingleLogHook {
+
+type SingleLogParams = {
+  id?: string
+  projectRef: string
+  queryType?: QueryType
+  paramsToMerge?: Partial<LogsEndpointParams>
+}
+function useSingleLog({
+  projectRef,
+  id,
+  queryType,
+  paramsToMerge,
+}: SingleLogParams): SingleLogHook {
   const table = queryType ? LOGS_TABLES[queryType] : undefined
   const sql = id && table ? genSingleLogQuery(table, id) : ''
-  const params: LogsEndpointParams = { ...paramsToMerge, project: projectRef, sql }
 
-  const endpointUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
-    params as any
-  )}`
+  const params: LogsEndpointParams = { ...paramsToMerge, sql }
 
-  const isWarehouseQuery = queryType === 'warehouse'
-  // Warehouse queries are handled differently
-  const enabled = Boolean(id && table && !isWarehouseQuery)
+  const enabled = Boolean(id && table)
+
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
   const {
     data,
@@ -40,20 +44,35 @@ function useSingleLog(
     isLoading,
     isRefetching,
     refetch,
-  } = useQuery(
-    ['projects', projectRef, 'log', id],
-    ({ signal }) => get(endpointUrl, { signal }) as Promise<Logs>,
-    {
-      enabled,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-    }
-  )
+  } = useQuery({
+    queryKey: ['projects', projectRef, 'single-log', id, queryType],
+    queryFn: async ({ signal }) => {
+      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+        params: {
+          path: { ref: projectRef },
+          query: params,
+        },
+        signal,
+      })
+      if (error) {
+        throw error
+      }
+
+      return data as unknown as Logs
+    },
+    enabled,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  })
 
   let error: null | string | object = rcError ? (rcError as any).message : null
+  const result = data?.result ? data.result[0] : undefined
+
   return {
-    logData: data?.result ? data.result[0] : undefined,
+    data: !!result
+      ? { ...result, metadata: logsMetadata ? result?.metadata : undefined }
+      : undefined,
     isLoading: (enabled && isLoading) || isRefetching,
     error,
     refresh: () => refetch(),

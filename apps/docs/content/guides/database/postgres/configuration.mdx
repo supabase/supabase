@@ -20,8 +20,13 @@ This data can further be used in conjunction with the [`explain`](https://www.po
 
 ## Managing timezones
 
-Every Supabase database is set to UTC timezone by default. We strongly recommend keeping it this way, even if your users are in a different location.
-This is because it makes it much easier to calculate differences between timezones if you adopt the mental model that "everything in my database is in UTC time."
+Every hosted Supabase database is set to UTC timezone by default. We strongly recommend keeping it this way, even if your users are in a different location. This is because it makes it much easier to calculate differences between timezones if you adopt the mental model that everything in your database is in UTC time.
+
+<Admonition type="tip">
+
+On self-hosted databases, the timezone defaults to your local timezone. We recommend [changing this to UTC](/docs/guides/database/postgres/configuration#change-timezone) for the same reasons.
+
+</Admonition>
 
 ### Change timezone
 

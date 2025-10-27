@@ -1,31 +1,35 @@
-import Panel from 'components/ui/Panel'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
-import { CriticalIcon } from 'ui'
-import DeleteOrganizationButton from './DeleteOrganizationButton'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { Admonition } from 'ui-patterns'
+import { DeleteOrganizationButton } from './DeleteOrganizationButton'
 
-const OrganizationDeletePanel = () => {
+export const OrganizationDeletePanel = () => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
   return (
-    <Panel
-      title={
-        <p key="panel-title" className="uppercase">
-          Danger Zone
-        </p>
-      }
-    >
-      <Panel.Content>
-        <Alert_Shadcn_ variant="destructive">
-          <CriticalIcon />
-          <AlertTitle_Shadcn_>
-            Deleting this organization will also remove its projects
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            Make sure you have made a backup if you want to keep your data
-          </AlertDescription_Shadcn_>
+    <ScaffoldSection isFullWidth>
+      <ScaffoldSectionTitle className="mb-4">Danger Zone</ScaffoldSectionTitle>
+      {selectedOrganization?.managed_by !== 'vercel-marketplace' ? (
+        <Admonition
+          type="destructive"
+          title="Deleting this organization will also remove its projects"
+          description="Make sure you have made a backup of your projects if you want to keep your data"
+        >
           <DeleteOrganizationButton />
-        </Alert_Shadcn_>
-      </Panel.Content>
-    </Panel>
+        </Admonition>
+      ) : (
+        <PartnerManagedResource
+          managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
+          resource="Organizations"
+          cta={{
+            installationId: selectedOrganization?.partner_id,
+            path: '/settings',
+            message: 'Delete organization in Vercel Marketplace',
+          }}
+        />
+      )}
+    </ScaffoldSection>
   )
 }
-
-export default OrganizationDeletePanel

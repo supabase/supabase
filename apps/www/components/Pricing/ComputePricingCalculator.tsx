@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react'
 import { InformationCircleIcon } from '@heroicons/react/outline'
+import { ChevronDown, Plus, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
-  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconPlus,
-  IconTrash2,
   Slider_Shadcn_,
   cn,
 } from 'ui'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 
 const plans = [
@@ -31,8 +30,11 @@ const findIntanceValueByColumn = (instance: any, column: string) =>
 
 const parsePrice = (price: string) => parseInt(price?.toString().replace('$', '').replace(',', ''))
 
-const ComputePricingCalculator = () => {
-  const computeInstances = pricingAddOn.database.rows
+const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivity?: boolean }) => {
+  // Filter out rows with no specific pricing
+  const computeInstances = pricingAddOn.database.rows.filter((row) =>
+    row.columns.some((it) => it.key === 'pricing' && it.value !== 'Contact Us')
+  )
   const priceSteps = computeInstances.map((instance) =>
     parsePrice(findIntanceValueByColumn(instance, 'pricing'))
   )
@@ -105,7 +107,9 @@ const ComputePricingCalculator = () => {
     <div className="flex flex-col gap-1 text-lighter text-right leading-4 w-full border-b pb-1 mb-1">
       <div className="flex items-center justify-between">
         <span className="text-foreground-muted">Plan</span>
-        <span className="text-light font-mono">${activePlan.price}</span>
+        <span className="text-light font-mono" translate="no">
+          ${activePlan.price}
+        </span>
       </div>
       <div className="flex items-center justify-between">
         <span className="text-foreground-muted">Total Compute</span>
@@ -113,7 +117,9 @@ const ComputePricingCalculator = () => {
       </div>
       <div className="flex items-center justify-between">
         <span className="text-foreground-muted">Compute Credits</span>
-        <span className="text-light font-mono">- ${COMPUTE_CREDITS}</span>
+        <span className="text-light font-mono" translate="no">
+          - ${COMPUTE_CREDITS}
+        </span>
       </div>
     </div>
   )
@@ -128,7 +134,7 @@ const ComputePricingCalculator = () => {
                 <Button
                   size="tiny"
                   type="outline"
-                  iconRight={<IconChevronDown />}
+                  iconRight={<ChevronDown />}
                   icon={
                     activePlan.name === 'Pro' ? (
                       <svg
@@ -212,10 +218,10 @@ const ComputePricingCalculator = () => {
             <div className="flex items-center gap-1 w-full justify-between">
               <span>Total Estimate</span>
               <span className="text-foreground font-mono flex items-center gap-1">
-                <InformationCircleIcon
-                  data-tip="This estimate only includes Plan and Compute add-on monthly costs. Other resources might concur in the final invoice."
-                  className="w-3 h-3"
-                />{' '}
+                <InfoTooltip side="top" className="max-w-[250px]">
+                  This estimate only includes Plan and Compute add-on monthly costs. Other resources
+                  might concur in the final invoice.
+                </InfoTooltip>
                 ${activePrice}
               </span>
             </div>
@@ -236,22 +242,14 @@ const ComputePricingCalculator = () => {
             >
               <div className="w-full flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <Badge
-                    className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                    variant={
-                      findIntanceValueByColumn(activeInstance, 'plan') ===
-                      findIntanceValueByColumn(computeInstances[0], 'plan')
-                        ? 'default'
-                        : 'brand'
-                    }
-                  >
-                    {findIntanceValueByColumn(activeInstance, 'plan')}
-                  </Badge>
+                  <ComputeBadge
+                    infraComputeSize={findIntanceValueByColumn(activeInstance, 'plan')}
+                  />
                   <p className="text-xs text-foreground-lighter">
                     Project {activeInstance.position + 1}
                   </p>
                 </div>
-                <span className="leading-3 text-sm">
+                <span className="leading-3 text-sm" translate="no">
                   {findIntanceValueByColumn(activeInstance, 'pricing')}
                 </span>
               </div>
@@ -281,7 +279,7 @@ const ComputePricingCalculator = () => {
                       className="p-1 text-lighter hover:text-foreground rounded opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={() => removeInstance(activeInstance.position)}
                     >
-                      <IconTrash2 className="w-3 h-3" />
+                      <Trash2 className="w-3 h-3" />
                     </button>
                   )}
                 </div>
@@ -294,13 +292,14 @@ const ComputePricingCalculator = () => {
             size="tiny"
             type="outline"
             block
-            icon={<IconPlus />}
-            onClick={() =>
+            icon={<Plus />}
+            onClick={() => {
+              if (disableInteractivity) return
               setActiveInstances([
                 ...activeInstances,
                 { ...computeInstances[0], position: activeInstances.length },
               ])
-            }
+            }}
             className="w-full border-dashed text-foreground-light hover:text-foreground"
           >
             <span className="w-full text-left">Add Project</span>

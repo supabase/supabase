@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -47,8 +47,8 @@ export const useCreateThirdPartyAuthIntegrationMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
   return useMutation<ThirdPartyIntegrationCreateData, ResponseError, CreateThirdPartyAuthVariables>(
-    (vars) => createThirdPartyIntegration(vars),
     {
+      mutationFn: (vars) => createThirdPartyIntegration(vars),
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(keys.integrations(projectRef))

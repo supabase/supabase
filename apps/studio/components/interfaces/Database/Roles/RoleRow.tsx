@@ -1,24 +1,24 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   Button,
+  cn,
   Collapsible,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
-  IconChevronUp,
-  IconHelpCircle,
-  IconMoreVertical,
-  IconTrash,
   Toggle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { PgRole } from 'data/database-roles/database-roles-query'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
+import { PgRole } from 'data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ChevronUp, HelpCircle, MoreVertical, Trash } from 'lucide-react'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface RoleRowProps {
@@ -27,8 +27,8 @@ interface RoleRowProps {
   onSelectDelete: (role: PgRole) => void
 }
 
-const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
-  const { project } = useProjectContext()
+export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
 
   const { mutate: updateDatabaseRole, isLoading: isUpdating } = useDatabaseRoleUpdateMutation()
@@ -71,7 +71,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
         canBypassRls,
       }}
       onSubmit={onSaveChanges}
-      className={[
+      className={cn(
         'bg-surface-100',
         'hover:bg-overlay-hover',
         'data-open:bg-selection',
@@ -81,8 +81,8 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
         '-space-y-px overflow-hidden',
         'border border-t-0 first:border-t first:!mt-0 hover:border-t hover:-mt-[1px] shadow transition hover:z-50',
         'first:rounded-tl first:rounded-tr',
-        'last:rounded-bl last:rounded-br',
-      ].join(' ')}
+        'last:rounded-bl last:rounded-br'
+      )}
     >
       {({ values, initialValues, handleReset }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -93,13 +93,13 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
               <button
                 id="collapsible-trigger"
                 type="button"
-                className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
+                className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
                 onClick={(event: any) => {
                   if (event.target.id === 'collapsible-trigger') setIsExpanded(!isExpanded)
                 }}
               >
                 <div className="flex items-start space-x-3">
-                  <IconChevronUp
+                  <ChevronUp
                     id="collapsible-trigger"
                     className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
@@ -134,9 +134,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                   {!disabled && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button type="default" className="px-1">
-                          <IconMoreVertical />
-                        </Button>
+                        <Button type="default" className="px-1" icon={<MoreVertical />} />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="bottom" className="w-[120px]">
                         <DropdownMenuItem
@@ -146,7 +144,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                             onSelectDelete(role)
                           }}
                         >
-                          <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
+                          <Trash className="text-red-800" size="14" strokeWidth={2} />
                           <p>Delete</p>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -156,7 +154,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
               </button>
             </Collapsible.Trigger>
             <Collapsible.Content>
-              <div className="group border-t border-default bg-surface-100 py-6 px-20 text-foreground">
+              <div className="group border-t border-default bg-surface-100 py-6 px-5 md:px-20 text-foreground">
                 <div className="py-4 space-y-[9px]">
                   {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[]).map(
                     (permission) => (
@@ -169,36 +167,25 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                         disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
                         className={[
                           'roles-toggle',
-                          disabled || ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
+                          disabled || ROLE_PERMISSIONS[permission].disabled
+                            ? '[&>div>button]:opacity-30 [&>div>label]:text-foreground-lighter'
+                            : '',
                         ].join(' ')}
                         afterLabel={
-                          !disabled && ROLE_PERMISSIONS[permission].disabled ? (
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger type="button">
-                                <IconHelpCircle
-                                  size="tiny"
+                          !disabled &&
+                          ROLE_PERMISSIONS[permission].disabled && (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle
+                                  size="14"
                                   strokeWidth={2}
                                   className="ml-2 relative top-[3px]"
                                 />
-                              </Tooltip.Trigger>
-                              <Tooltip.Portal>
-                                <Tooltip.Content align="center" side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                      'border border-background space-y-1',
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs">
-                                      This privilege cannot be updated via the dashboard
-                                    </span>
-                                  </div>
-                                </Tooltip.Content>
-                              </Tooltip.Portal>
-                            </Tooltip.Root>
-                          ) : (
-                            <></>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                This privilege cannot be updated via the dashboard
+                              </TooltipContent>
+                            </Tooltip>
                           )
                         }
                       />
@@ -232,5 +219,3 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
     </Form>
   )
 }
-
-export default RoleRow

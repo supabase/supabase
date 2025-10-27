@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -40,17 +40,15 @@ export const useSendFeedbackMutation = ({
   UseMutationOptions<SendFeedbackData, ResponseError, SendFeedbackVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendFeedbackData, ResponseError, SendFeedbackVariables>(
-    (vars) => sendFeedback(vars),
-    {
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit feedback: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SendFeedbackData, ResponseError, SendFeedbackVariables>({
+    mutationFn: (vars) => sendFeedback(vars),
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to submit feedback: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -4,14 +4,7 @@ import { ReactNode } from 'react'
 
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
-import {
-  Button,
-  Loading,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  cn,
-} from 'ui'
+import { Button, Loading, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import type { LogsEndpointParams } from '../Settings/Logs/Logs.types'
 import type { BaseReportParams, ReportQueryType } from './Reports.types'
 
@@ -20,7 +13,7 @@ export interface ReportWidgetProps<T = any> {
   title: string
   description?: string
   error?: string | Object | null
-  tooltip?: string
+  tooltip?: string | ReactNode
   className?: string
   renderer: (props: ReportWidgetRendererProps) => ReactNode
   append?: (props: ReportWidgetRendererProps) => ReactNode
@@ -51,19 +44,19 @@ const ReportWidget = (props: ReportWidgetProps) => {
             <div className="flex flex-row gap-2">
               <h3 className="w-full h-6">{props.title}</h3>{' '}
               {props?.tooltip && (
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_>
+                <Tooltip>
+                  <TooltipTrigger>
                     <HelpCircle className="text-foreground-light" size={14} strokeWidth={1.5} />
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom">{props.tooltip}</TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">{props.tooltip}</TooltipContent>
+                </Tooltip>
               )}
             </div>
             <p className="text-sm text-foreground-light">{props.description}</p>
           </div>
           {props.params && (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <Button
                   type="default"
                   icon={<ExternalLink />}
@@ -81,18 +74,18 @@ const ReportWidget = (props: ReportWidgetProps) => {
                       query.content = props.resolvedSql
                     } else {
                       query.q = props.params?.sql
-                      query.its = props.params!.iso_timestamp_start
-                      query.ite = props.params!.iso_timestamp_end
+                      query.its = props.params?.iso_timestamp_start || ''
+                      query.ite = props.params?.iso_timestamp_end || ''
                     }
 
                     router.push({ pathname, query })
                   }}
                 />
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="left">
+              </TooltipTrigger>
+              <TooltipContent side="left">
                 {props.queryType === 'db' ? 'Open in SQL Editor' : 'Open in Logs Explorer'}
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
 

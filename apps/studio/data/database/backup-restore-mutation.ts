@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
@@ -11,7 +11,7 @@ export type BackupRestoreVariables = {
 }
 
 // [Joshen] Shift to backups RQ query once created
-export type Backup = components['schemas']['Backup']
+export type Backup = components['schemas']['BackupsResponse']['backups'][number]
 
 export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables) {
   if (backup.isPhysicalBackup) {
@@ -41,20 +41,18 @@ export const useBackupRestoreMutation = ({
   UseMutationOptions<BackupRestoreData, ResponseError, BackupRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupRestoreData, ResponseError, BackupRestoreVariables>(
-    (vars) => restoreFromBackup(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to restore from backup: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BackupRestoreData, ResponseError, BackupRestoreVariables>({
+    mutationFn: (vars) => restoreFromBackup(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to restore from backup: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

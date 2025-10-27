@@ -4,31 +4,38 @@ import { map as lodashMap, uniqBy } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from 'ui'
+import { Button, SidePanel } from 'ui'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 import SqlEditor from 'components/ui/SqlEditor'
-import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import {
+  useDatabaseFunctionsQuery,
+  type DatabaseFunction,
+} from 'data/database-functions/database-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { ChevronDown, HelpCircle, Terminal } from 'lucide-react'
 
 export interface ChooseFunctionFormProps {
-  triggerFunctions: DatabaseFunction[]
   visible: boolean
-  onChange: (id: number) => void
   setVisible: (value: boolean) => void
+  onChange: (fn: DatabaseFunction) => void
 }
 
-const ChooseFunctionForm = ({
-  triggerFunctions,
-  visible,
-  onChange,
-  setVisible,
-}: ChooseFunctionFormProps) => {
+const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFormProps) => {
+  const { data: project } = useSelectedProjectQuery()
+
+  const { data = [] } = useDatabaseFunctionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const triggerFunctions = data.filter((fn) => fn.return_type === 'trigger')
   const hasPublicSchemaFunctions = triggerFunctions.length >= 1
   const functionSchemas = lodashMap(uniqBy(triggerFunctions, 'schema'), 'schema')
 
-  function selectFunction(id: number) {
-    onChange(id)
+  const selectFunction = (id: number) => {
+    const fn = triggerFunctions.find((x) => x.id === id)
+    if (!!fn) onChange(fn)
     setVisible(!visible)
   }
 
@@ -69,7 +76,7 @@ const NoticeBox = () => {
   return (
     <div className="px-6">
       <InformationBox
-        icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
+        icon={<HelpCircle size="20" strokeWidth={1.5} />}
         title="Only functions that return a trigger will be displayed below"
         description={`You can make functions by using the Database Functions`}
         button={
@@ -144,7 +151,7 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
       <div className="flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
           <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
-            <IconTerminal strokeWidth={2} size={14} />
+            <Terminal strokeWidth={2} size={14} />
           </div>
           <p className="mb-0 text-sm">{name}</p>
         </div>
@@ -154,9 +161,7 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
             e.stopPropagation()
             setVisible(!visible)
           }}
-          icon={
-            <IconChevronDown className={visible ? 'rotate-180 transform' : 'rotate-0 transform'} />
-          }
+          icon={<ChevronDown className={visible ? 'rotate-180 transform' : 'rotate-0 transform'} />}
         >
           {visible ? 'Hide definition' : 'View definition'}
         </Button>

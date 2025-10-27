@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
+import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
-import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
 
 export type OrganizationMemberUnassignRoleVariables = {
   slug: string
@@ -25,7 +25,7 @@ export async function unassignOrganizationMemberRole({
         path: {
           slug,
           gotrue_id: gotrueId,
-          role_id: roleId.toString(),
+          role_id: roleId,
         },
       },
     }
@@ -55,7 +55,8 @@ export const useOrganizationMemberUnassignRoleMutation = ({
     OrganizationMemberUnassignRoleData,
     ResponseError,
     OrganizationMemberUnassignRoleVariables
-  >((vars) => unassignOrganizationMemberRole(vars), {
+  >({
+    mutationFn: (vars) => unassignOrganizationMemberRole(vars),
     async onSuccess(data, variables, context) {
       const { slug, skipInvalidation } = variables
 

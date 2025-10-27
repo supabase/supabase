@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -55,20 +55,18 @@ export const useProjectRestartServicesMutation = ({
   UseMutationOptions<ProjectRestartServicesData, ResponseError, ProjectRestartServicesVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectRestartServicesData, ResponseError, ProjectRestartServicesVariables>(
-    (vars) => restartProjectServices(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to restart project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectRestartServicesData, ResponseError, ProjectRestartServicesVariables>({
+    mutationFn: (vars) => restartProjectServices(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to restart project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

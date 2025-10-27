@@ -1,13 +1,14 @@
+import { Truck } from 'lucide-react'
+
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { IconTruck } from 'ui'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TransferProjectButton from './TransferProjectButton'
 
 const TransferProjectPanel = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
-  if (project === undefined) return <></>
+  if (project === undefined) return null
 
   return (
     <section id="transfer-project">
@@ -19,7 +20,7 @@ const TransferProjectPanel = () => {
         <Panel.Content>
           <div className="flex justify-between items-center gap-8">
             <div className="flex space-x-4">
-              <IconTruck className="mt-1" />
+              <Truck className="mt-1" />
               <div className="space-y-1 xl:max-w-lg">
                 <p className="text-sm">Transfer project to another organization</p>
                 <p className="text-sm text-foreground-light">

@@ -1,10 +1,14 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
+import { PropsWithChildren, createContext, useContext, useRef } from 'react'
+import { proxy, useSnapshot } from 'valtio'
+
 import type { SupaRow } from 'components/grid/types'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
-import { PropsWithChildren, createContext, useContext, useRef } from 'react'
+import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
 import type { Dictionary } from 'types'
-import { proxy, useSnapshot } from 'valtio'
+
+export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 
 type ForeignKeyState = {
   foreignKey: ForeignKey
@@ -16,14 +20,14 @@ export type SidePanel =
   | { type: 'cell'; value?: { column: string; row: Dictionary<any> } }
   | { type: 'row'; row?: Dictionary<any> }
   | { type: 'column'; column?: PostgresColumn }
-  | { type: 'table'; mode: 'new' | 'edit' | 'duplicate' }
+  | { type: 'table'; mode: 'new' | 'edit' | 'duplicate'; templateData?: Partial<TableField> }
   | { type: 'schema'; mode: 'new' | 'edit' }
   | { type: 'json'; jsonValue: EditValue }
   | {
       type: 'foreign-row-selector'
       foreignKey: ForeignKeyState
     }
-  | { type: 'csv-import' }
+  | { type: 'csv-import'; file?: File }
 
 export type ConfirmationDialog =
   | { type: 'table'; isDeleteWithCascade: boolean }
@@ -52,18 +56,13 @@ export type UIState =
       confirmationDialog: ConfirmationDialog
     }
 
+/**
+ * Global table editor state for the table editor across multiple tables.
+ * See ./table-editor-table.tsx for table specific state.
+ */
 export const createTableEditorState = () => {
   const state = proxy({
-    enforceExactCount: false,
-    setEnforceExactCount: (value: boolean) => {
-      state.enforceExactCount = value
-    },
-
-    page: 1,
-    setPage: (page: number) => {
-      state.page = page
-    },
-    rowsPerPage: 100,
+    rowsPerPage: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
     setRowsPerPage: (rowsPerPage: number) => {
       state.rowsPerPage = rowsPerPage
     },
@@ -91,10 +90,10 @@ export const createTableEditorState = () => {
     },
 
     /* Tables */
-    onAddTable: () => {
+    onAddTable: (templateData?: Partial<TableField>) => {
       state.ui = {
         open: 'side-panel',
-        sidePanel: { type: 'table', mode: 'new' },
+        sidePanel: { type: 'table', mode: 'new', templateData },
       }
     },
     onEditTable: () => {
@@ -183,10 +182,10 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'foreign-row-selector', foreignKey },
       }
     },
-    onImportData: () => {
+    onImportData: (file?: File) => {
       state.ui = {
         open: 'side-panel',
-        sidePanel: { type: 'csv-import' },
+        sidePanel: { type: 'csv-import', file },
       }
     },
 

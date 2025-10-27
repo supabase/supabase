@@ -1,16 +1,21 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, Webhook } from 'lucide-react'
-import { Badge, Input } from 'ui'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
+import { Badge, Input, copyToClipboard } from 'ui'
 import { Hook } from './hooks.constants'
 
 interface HookCardProps {
   hook: Hook
-  canUpdateConfig: boolean
-  onToggle: (enabled: boolean) => void
   onSelect: () => void
 }
 
-export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCardProps) => {
+export const HookCard = ({ hook, onSelect }: HookCardProps) => {
+  const { can: canUpdateAuthHook } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
+
   return (
     <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
       <div className="">
@@ -35,7 +40,9 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
                   disabled
                   className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
                   value={hook.method.schema}
-                  onCopy={() => {}}
+                  onCopy={() =>
+                    hook.method.type === 'postgres' && copyToClipboard(hook.method.schema)
+                  }
                 />
               </div>
               <div className="flex flex-row items-center">
@@ -47,7 +54,9 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
                   disabled
                   className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
                   value={hook.method.functionName}
-                  onCopy={() => {}}
+                  onCopy={() =>
+                    hook.method.type === 'postgres' && copyToClipboard(hook.method.functionName)
+                  }
                 />
               </div>
             </div>
@@ -66,7 +75,7 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
                   disabled
                   className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
                   value={hook.method.url}
-                  onCopy={() => {}}
+                  onCopy={() => hook.method.type === 'https' && copyToClipboard(hook.method.url)}
                 />
               </div>
               <div className="flex flex-row items-center">
@@ -87,17 +96,20 @@ export const HookCard = ({ hook, canUpdateConfig, onToggle, onSelect }: HookCard
         <div className="flex flex-row gap-2">
           <ButtonTooltip
             type="default"
-            disabled={!canUpdateConfig}
+            disabled={!canUpdateAuthHook}
             onClick={() => onSelect()}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to configure auth hooks',
+                text: !canUpdateAuthHook
+                  ? 'You need additional permissions to configure auth hooks'
+                  : undefined,
               },
             }}
           >
             Configure hook
           </ButtonTooltip>
+          <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </div>
       </div>
       <div className="flex-1">

@@ -2,9 +2,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Handle, NodeProps, Position } from 'reactflow'
 
 import { useParams } from 'common'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import SparkBar from 'components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
@@ -12,8 +14,11 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -22,9 +27,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import {
@@ -41,7 +46,7 @@ interface NodeData {
   id: string
   provider: string
   region: Region
-  computeSize: string
+  computeSize?: string
   status: string
   inserted_at: string
 }
@@ -85,7 +90,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
               </p>
             </div>
           </div>
-          <DropdownMenu modal={false}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button type="text" icon={<MoreVertical />} className="px-1" />
             </DropdownMenuTrigger>
@@ -105,6 +110,12 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
 export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
   const { provider, region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
+  const providerLabel = provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : provider
 
   return (
     <>
@@ -129,16 +140,20 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
                 <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-sm text-foreground-light">{provider}</span>
-                <span className="text-sm text-foreground-light">•</span>
-                <span className="text-sm text-foreground-light">{computeSize}</span>
+                <span className="text-sm text-foreground-light">{providerLabel}</span>
+                {projectHomepageShowInstanceSize && (
+                  <>
+                    <span className="text-sm text-foreground-light">•</span>
+                    <span className="text-sm text-foreground-light">{computeSize}</span>
+                  </>
+                )}
               </p>
             </div>
           </div>
           <img
             alt="region icon"
             className="w-8 rounded-sm mt-0.5"
-            src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+            src={`${BASE_PATH}/img/regions/${region.region}.svg`}
           />
         </div>
         {numReplicas > 0 && (
@@ -178,8 +193,13 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     onSelectDropReplica,
   } = data
   const { ref } = useParams()
-  const created = dayjs(inserted_at).format('DD MMM YYYY')
-  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const dbSelectorState = useDatabaseSelectorStateSnapshot()
+  const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
   const { replicaInitializationStatus } =
@@ -197,6 +217,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     error?: string
   }) ?? { status: undefined, progress: undefined, estimations: undefined, error: undefined }
 
+  const created = dayjs(inserted_at).format('DD MMM YYYY')
   const stage = progress !== undefined ? Number(progress.split('_')[0]) : 0
   const stagePercent = stage / (Object.keys(INIT_PROGRESS).length - 1)
 
@@ -207,9 +228,14 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
         REPLICA_STATUS.COMING_UP,
         REPLICA_STATUS.GOING_DOWN,
         REPLICA_STATUS.RESTORING,
+        REPLICA_STATUS.RESTARTING,
+        REPLICA_STATUS.RESIZING,
         REPLICA_STATUS.INIT_READ_REPLICA,
       ] as string[]
     ).includes(status) || initStatus === ReplicaInitializationStatus.InProgress
+
+  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
+  const providerLabel = provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : provider
 
   return (
     <>
@@ -248,26 +274,27 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED ? (
                 <>
                   <Badge variant="destructive">Init failed</Badge>
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_>
+                  <Tooltip>
+                    <TooltipTrigger>
                       <HelpCircle size={16} />
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_
+                    </TooltipTrigger>
+                    <TooltipContent
                       side="bottom"
                       align="end"
                       alignOffset={-70}
                       className="w-60 text-center"
                     >
                       Replica failed to initialize. Please drop this replica and spin up a new one.
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipContent>
+                  </Tooltip>
                 </>
               ) : status === REPLICA_STATUS.GOING_DOWN ? (
                 <Badge>Going down</Badge>
-              ) : status === REPLICA_STATUS.RESTORING ? (
+              ) : status === REPLICA_STATUS.RESTARTING ? (
                 <Badge>Restarting</Badge>
-              ) : initStatus === ReplicaInitializationStatus.Completed &&
-                status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
+              ) : status === REPLICA_STATUS.RESIZING ? (
+                <Badge>Resizing</Badge>
+              ) : status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
                 <Badge variant="brand">Healthy</Badge>
               ) : (
                 <Badge variant="warning">Unhealthy</Badge>
@@ -276,8 +303,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <div className="my-0.5">
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
-                <span>{provider}</span>
-                {!!computeSize && (
+                <span>{providerLabel}</span>
+                {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span>•</span>
                     <span>{computeSize}</span>
@@ -286,8 +313,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               </p>
             </div>
             {initStatus === ReplicaInitializationStatus.InProgress && progress !== undefined ? (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <div className="w-56">
                     <SparkBar
                       labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
@@ -298,9 +325,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                       barClass="bg-brand"
                     />
                   </div>
-                </TooltipTrigger_Shadcn_>
+                </TooltipTrigger>
                 {estimations !== undefined && (
-                  <TooltipContent_Shadcn_ asChild side="bottom">
+                  <TooltipContent asChild side="bottom">
                     <div className="w-56">
                       <p className="text-foreground-light mb-0.5">Duration estimates:</p>
                       {estimations.baseBackupDownloadEstimateSeconds !== undefined && (
@@ -316,9 +343,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                         </p>
                       )}
                     </div>
-                  </TooltipContent_Shadcn_>
+                  </TooltipContent>
                 )}
-              </Tooltip_Shadcn_>
+              </Tooltip>
             ) : error !== undefined ? (
               <p className="text-sm text-foreground-light">
                 Error: {ERROR_STATES[error as keyof typeof ERROR_STATES]}
@@ -328,7 +355,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             )}
           </div>
         </div>
-        <DropdownMenu modal={false}>
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="text" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
@@ -336,10 +363,12 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <DropdownMenuItem
               disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
+              onClick={() => {
+                setShowConnect(true)
+                dbSelectorState.setSelectedDatabaseId(id)
+              }}
             >
-              <Link href={`/project/${ref}/settings/database?connectionString=${id}`}>
-                View connection string
-              </Link>
+              View connection string
             </DropdownMenuItem>
             <DropdownMenuItem
               className="gap-x-2"
@@ -360,24 +389,18 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <DropdownMenuItem
-                  className="gap-x-2 !pointer-events-auto"
-                  disabled={!canManageReplicas}
-                  onClick={() => {
-                    if (canManageReplicas) onSelectDropReplica()
-                  }}
-                >
-                  Drop replica
-                </DropdownMenuItem>
-              </TooltipTrigger_Shadcn_>
-              {!canManageReplicas && (
-                <TooltipContent_Shadcn_ side="left">
-                  You need additional permissions to drop replicas
-                </TooltipContent_Shadcn_>
-              )}
-            </Tooltip_Shadcn_>
+            <DropdownMenuItemTooltip
+              className="gap-x-2 !pointer-events-auto"
+              disabled={!canManageReplicas}
+              onClick={() => {
+                if (canManageReplicas) onSelectDropReplica()
+              }}
+              tooltip={{
+                content: { side: 'left', text: 'You need additional permissions to drop replicas' },
+              }}
+            >
+              Drop replica
+            </DropdownMenuItemTooltip>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -399,7 +422,7 @@ export const RegionNode = ({ data }: any) => {
         <img
           alt="region icon"
           className="w-5 rounded-sm"
-          src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+          src={`${BASE_PATH}/img/regions/${region.region}.svg`}
         />
         <p className="text-sm">{region.name}</p>
       </div>

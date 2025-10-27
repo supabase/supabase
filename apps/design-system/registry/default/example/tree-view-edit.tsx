@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { TreeView, TreeViewItem } from 'ui'
-import { flattenTree } from 'react-accessible-treeview'
 import {
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  flattenTree,
+  TreeView,
+  TreeViewItem,
 } from 'ui'
 
 const data = {
@@ -79,6 +80,7 @@ export default function TreeViewDemo() {
   return (
     <TreeView
       data={flattenTree(data)}
+      className="w-[420px] border bg py-2"
       aria-label="directory tree"
       nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => {
         return (

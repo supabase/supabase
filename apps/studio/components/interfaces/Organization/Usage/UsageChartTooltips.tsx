@@ -1,5 +1,6 @@
-import clsx from 'clsx'
 import type { Payload, ValueType } from 'recharts/types/component/DefaultTooltipContent'
+
+import { cn } from 'ui'
 import { Attribute, COLOR_MAP } from './Usage.constants'
 
 export interface SingleAttributeTooltipContentProps {
@@ -59,7 +60,7 @@ const AttributeContent = ({
   return (
     <div key={attribute.name} className="flex items-center justify-between">
       <div className="flex items-center space-x-2 w-[175px]">
-        <div className={clsx('w-3 h-3 rounded-full border', COLOR_MAP[attribute.color].marker)} />
+        <div className={cn('w-3 h-3 rounded-full border', COLOR_MAP[attribute.color].marker)} />
         <p className="text-xs prose">
           {attribute.name} ({percentageContribution}%):{' '}
         </p>

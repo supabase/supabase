@@ -5,13 +5,13 @@ import {
 } from '@supabase/supabase-js/dist/main/lib/constants'
 import { merge, sortBy, take } from 'lodash'
 import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
-import type { LogData } from './Messages.types'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import type { LogData } from './Messages.types'
 
 function reducer(
   state: LogData[],
@@ -76,12 +76,12 @@ export const useRealtimeMessages = (
     enableBroadcast,
   } = config
 
-  const { data } = useProjectApiQuery({ projectRef: projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: projectRef })
 
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
   // the default host is prod until the correct one comes through an API call.
-  const host = data
-    ? `${data.autoApiService.protocol}://${data.autoApiService.endpoint}`
-    : `https://${projectRef}.supabase.co`
+  const host = settings ? `${protocol}://${endpoint}` : `https://${projectRef}.supabase.co`
 
   const realtimeUrl = `${host}/realtime/v1`.replace(/^http/i, 'ws')
 
@@ -101,15 +101,10 @@ export const useRealtimeMessages = (
       return
     }
 
-    const globalOptions = merge(DEFAULT_GLOBAL_OPTIONS, {
-      headers: {
-        'User-Agent': `supabase-api/${process.env.VERCEL_GIT_COMMIT_SHA || 'unknown-sha'}`,
-      },
-    })
     const realtimeOptions = merge(DEFAULT_REALTIME_OPTIONS, { params: { log_level: logLevel } })
 
     const options = {
-      headers: globalOptions.headers,
+      headers: DEFAULT_GLOBAL_OPTIONS.headers,
       ...realtimeOptions,
       params: { apikey: token, ...realtimeOptions.params },
     }
@@ -173,7 +168,7 @@ export const useRealtimeMessages = (
     }
 
     // Finally, subscribe to the Channel we just setup
-    newChannel.subscribe(async (status) => {
+    newChannel.subscribe(async (status, err) => {
       if (status === 'SUBSCRIBED') {
         // Let LiveView know we connected so we can update the button text
         // pushMessageTo('#conn_info', 'broadcast_subscribed', { host: host })
@@ -197,9 +192,11 @@ export const useRealtimeMessages = (
           })
         }
       } else if (status === 'CHANNEL_ERROR') {
-        toast.error(
-          `Failed to connect to the channel ${channelName}: This may be due to restrictive RLS policies. Check your role and try again.`
-        )
+        if (err?.message) {
+          toast.error(`Failed to connect with the following error: ${err.message}`)
+        } else {
+          toast.error(`Failed to connect. Please check your RLS policies and try again.`)
+        }
 
         newChannel.unsubscribe()
         setChannel(undefined)

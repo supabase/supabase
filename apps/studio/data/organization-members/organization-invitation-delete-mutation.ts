@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -44,7 +44,8 @@ export const useOrganizationDeleteInvitationMutation = ({
     OrganizationDeleteInvitationData,
     ResponseError,
     OrganizationDeleteInvitationVariables
-  >((vars) => deleteOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => deleteOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       const { slug, skipInvalidation } = variables
 

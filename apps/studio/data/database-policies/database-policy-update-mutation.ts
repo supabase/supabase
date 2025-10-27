@@ -1,14 +1,20 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
 export type DatabasePolicyUpdateVariables = {
   projectRef: string
-  connectionString?: string
-  id: number
+  connectionString?: string | null
+  originalPolicy: {
+    id: number
+    name: string
+    schema: string
+    table: string
+  }
   payload: {
     name?: string
     definition?: string
@@ -20,24 +26,21 @@ export type DatabasePolicyUpdateVariables = {
 export async function updateDatabasePolicy({
   projectRef,
   connectionString,
-  id,
+  originalPolicy,
   payload,
 }: DatabasePolicyUpdateVariables) {
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { data, error } = await patch('/platform/pg-meta/{ref}/policies', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    body: payload,
-    headers,
+  const { sql } = pgMeta.policies.update(originalPolicy, payload)
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['policy', 'update', originalPolicy.id],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type DatabasePolicyUpdateData = Awaited<ReturnType<typeof updateDatabasePolicy>>
@@ -52,22 +55,20 @@ export const useDatabasePolicyUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabasePolicyUpdateData, ResponseError, DatabasePolicyUpdateVariables>(
-    (vars) => updateDatabasePolicy(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databasePoliciesKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update database policy: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabasePolicyUpdateData, ResponseError, DatabasePolicyUpdateVariables>({
+    mutationFn: (vars) => updateDatabasePolicy(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(databasePoliciesKeys.list(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update database policy: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

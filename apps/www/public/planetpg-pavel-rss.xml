@@ -5,42 +5,42 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Pavel Borisov at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 01 May 2024 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 02 May 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-pavel-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/pgvector-0-7-0</guid>
   <title>What&apos;s new in pgvector v0.7.0</title>
   <link>https://supabase.com/blog/pgvector-0-7-0</link>
   <description>Exploring new features in pgvector v0.7.0</description>
-  <pubDate>Wed, 01 May 2024 22:00:00 GMT</pubDate>
+  <pubDate>Thu, 02 May 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgres-bloat</guid>
   <title>Postgres Bloat Minimization</title>
   <link>https://supabase.com/blog/postgres-bloat</link>
   <description>Understanding and minimizing Postgres table bloat</description>
-  <pubDate>Thu, 25 Apr 2024 22:00:00 GMT</pubDate>
+  <pubDate>Fri, 26 Apr 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/pgvector-performance</guid>
   <title>pgvector 0.4.0 performance</title>
   <link>https://supabase.com/blog/pgvector-performance</link>
   <description>There&apos;s been a lot of talk about pgvector performance lately, so we took some datasets and pushed pgvector to the limits to find out its strengths and limitations.</description>
-  <pubDate>Wed, 12 Jul 2023 22:00:00 GMT</pubDate>
+  <pubDate>Thu, 13 Jul 2023 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/new-in-postgres-15</guid>
   <title>What&apos;s new in Postgres 15?</title>
   <link>https://supabase.com/blog/new-in-postgres-15</link>
   <description>Describes the release of Postgres 15, new features and reasons to use it</description>
-  <pubDate>Thu, 15 Dec 2022 23:00:00 GMT</pubDate>
+  <pubDate>Fri, 16 Dec 2022 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgresql-commitfest</guid>
   <title>What is PostgreSQL commitfest and how to contribute</title>
   <link>https://supabase.com/blog/postgresql-commitfest</link>
   <description>A time-tested method for contributing to the core Postgres code</description>
-  <pubDate>Wed, 26 Oct 2022 22:00:00 GMT</pubDate>
+  <pubDate>Thu, 27 Oct 2022 00:00:00 -0700</pubDate>
 </item>
 
     </channel>

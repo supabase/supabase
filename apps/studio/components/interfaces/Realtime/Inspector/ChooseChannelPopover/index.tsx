@@ -1,13 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
+import { IS_PLATFORM, useParams } from 'common'
+import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { useFlag } from 'hooks/ui/useFlag'
-import Telemetry from 'lib/telemetry'
-import { ExternalLink } from 'lucide-react'
+import { DocsButton } from 'components/ui/DocsButton'
+import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -16,7 +18,6 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   Form_Shadcn_,
-  IconChevronDown,
   Input_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -34,8 +35,9 @@ const FormSchema = z.object({ channel: z.string(), isPrivate: z.boolean() })
 
 export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
   const [open, setOpen] = useState(false)
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
+  const { ref } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -52,19 +54,26 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
     setOpen(v)
   }
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     setOpen(false)
-    Telemetry.sendEvent(
-      {
-        category: 'realtime_inspector',
-        action: 'started_listening_to_channel_in_input_channel_popover',
-        label: 'realtime_inspector_config',
+    sendEvent({
+      action: 'realtime_inspector_listen_channel_clicked',
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
       },
-      telemetryProps,
-      router
-    )
+    })
+
+    let token = config.token
+
+    // [Joshen] Refresh if starting to listen + using temp API key, since it has a low refresh rate
+    if (token.startsWith('sb_temp') || !IS_PLATFORM) {
+      const data = await getTemporaryAPIKey({ projectRef: config.projectRef, expiry: 3600 })
+      token = data.api_key
+    }
     onChangeConfig({
       ...config,
+      token,
       channelName: form.getValues('channel'),
       isChannelPrivate: form.getValues('isPrivate'),
       enabled: true,
@@ -74,12 +83,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
   return (
     <Popover_Shadcn_ open={open} onOpenChange={onOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          className="rounded-r-none"
-          type="default"
-          size="tiny"
-          iconRight={<IconChevronDown />}
-        >
+        <Button className="rounded-r-none" type="default" size="tiny" iconRight={<ChevronDown />}>
           <p
             className="max-w-[120px] truncate"
             title={config.channelName.length > 0 ? config.channelName : ''}
@@ -88,7 +92,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
           </p>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[320px]" align="start">
+      <PopoverContent_Shadcn_ portal className="p-0 w-[320px]" align="start">
         <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
@@ -132,7 +136,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                             target="_blank"
                             rel="noreferrer"
                             className="underline hover:text-foreground transition"
-                            href="https://supabase.com/docs/guides/realtime/concepts#channels"
+                            href={`${DOCS_URL}/guides/realtime/concepts#channels`}
                           >
                             our docs
                           </a>
@@ -167,15 +171,11 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                     )}
                   />
 
-                  <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/realtime/authorization"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                  <DocsButton
+                    abbrev={false}
+                    className="w-min"
+                    href={`${DOCS_URL}/guides/realtime/authorization`}
+                  />
                 </form>
               </Form_Shadcn_>
             </>

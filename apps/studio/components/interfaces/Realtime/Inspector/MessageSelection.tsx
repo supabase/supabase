@@ -1,10 +1,11 @@
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
+import { X } from 'lucide-react'
 import { useMemo } from 'react'
-import { Button, IconX, cn } from 'ui'
 
+import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
-import Telemetry from 'lib/telemetry'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Button, cn } from 'ui'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
 
@@ -14,12 +15,13 @@ export interface MessageSelectionProps {
 }
 
 const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
-
   const selectionText = useMemo(() => {
     return JSON.stringify(log, null, 2)
   }, [log])
+
+  const { ref } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <div
@@ -75,15 +77,10 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
                 type="default"
                 title="Copy log to clipboard"
                 onClick={() => {
-                  Telemetry.sendEvent(
-                    {
-                      category: 'realtime_inspector',
-                      action: 'copied_message',
-                      label: 'realtime_inspector_results',
-                    },
-                    telemetryProps,
-                    router
-                  )
+                  sendEvent({
+                    action: 'realtime_inspector_copy_message_clicked',
+                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                  })
                 }}
               />
             </div>
@@ -92,7 +89,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
               className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <IconX size={14} strokeWidth={2} className="text-scale-900" />
+              <X size={14} strokeWidth={2} className="text-scale-900" />
             </Button>
           </div>
           <div className="h-px w-full bg-scale-600 rounded" />

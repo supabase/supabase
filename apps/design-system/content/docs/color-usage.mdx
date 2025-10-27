@@ -1,11 +1,15 @@
 ---
 title: Color usage
-description: Colors system breakdown with best practise
+description: Colors system breakdown with best practices.
 ---
 
-Colors available in the Supabase Design System
+The shorthand utility classes below simplify our full color palette by providing sensible, contrast-checked defaults. Use them whenever possible to ensure accessible text colors and balanced background fills.
 
-These are examples of using colors with shorthands.
+## Text
+
+Use accent text colors (e.g. text-destructive, text-warning) sparingly to avoid visual overload.
+
+<Colors definition={'text'} />
 
 ## Background
 
@@ -38,7 +42,7 @@ We use surfaces in 2 different ways. In the ./www and ./docs sites, we use a dar
 
 #### `./apps/studio`
 
-For the studio (dashbaord) we can use `bg-surface-100`, `bg-surface-200`, `bg-surface-300`
+For the studio (dashboard) we can use `bg-surface-100`, `bg-surface-200`, `bg-surface-300`
 
 <CodeFragment name="color-usage-surface-studio" />
 
@@ -49,7 +53,7 @@ The background of the empty space is the same background as used in `./apps/docs
 
 <CodeFragment name="color-usage-surface-studio-frame" />
 
-Dealing with large areas of emmpty space in data display should also be catered for. You can use the `bg-200` or `bg` class to fill the space.
+Dealing with large areas of empty space in data display should also be catered for. You can use the `bg-200` or `bg` class to fill the space.
 
 ### Overlays
 
@@ -60,15 +64,8 @@ This is not to be confused with `Dialogs`, they require to use the same app back
 
 <Colors definition={'border'} />
 
-## Text
-
-These can also be accessed with `foreground`. Like `text-foreground-light`.
-
-<Colors definition={'text'} />
-
 ## Other Colors
 
 These can also be accessed with `foreground`. Like `text-foreground-light`.
 
 <Colors definition={'colors'} />
-```

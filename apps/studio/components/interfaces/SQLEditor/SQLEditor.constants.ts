@@ -22,7 +22,9 @@ export const sqlAiDisclaimerComment = `
 
 export const untitledSnippetTitle = 'Untitled query'
 
-export const destructiveSqlRegex = [/^(.*;)?\s*(drop|delete|truncate)\s/is]
+export const destructiveSqlRegex = [
+  /^(.*;)?\s*(drop|delete|truncate|alter\s+table\s+.*\s+drop\s+column)\s/is,
+]
 
 export const ASSISTANT_TEMPLATES = [
   {
@@ -47,4 +49,11 @@ export const ASSISTANT_TEMPLATES = [
     prompt:
       'Create a table of countries and a table of cities, with each city belonging to a country',
   },
+]
+
+export const ROWS_PER_PAGE_OPTIONS = [
+  { value: -1, label: 'No limit' },
+  { value: 100, label: '100 rows' },
+  { value: 500, label: '500 rows' },
+  { value: 1000, label: '1,000 rows' },
 ]

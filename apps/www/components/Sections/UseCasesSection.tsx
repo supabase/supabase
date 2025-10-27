@@ -1,11 +1,12 @@
-import Link from 'next/link'
-import React, { ReactNode, useRef } from 'react'
-import { Button, IconArrowUpRight } from 'ui'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import Link from 'next/link'
+import { ReactNode, useRef } from 'react'
+import { Button } from 'ui'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
+import { ArrowUpRight } from 'lucide-react'
 
 interface UseCase {
   img?: string
@@ -86,7 +87,7 @@ const UseCase = ({
                 {useCase.cta.label ?? 'View example'}
               </Button>
             ) : (
-              <Button asChild size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+              <Button asChild size="tiny" type="default" iconRight={<ArrowUpRight />}>
                 <Link href={useCase.cta.link} target="_blank">
                   {useCase.cta.label ?? 'View example'}
                 </Link>
