@@ -71,7 +71,7 @@ export const DeleteVectorBucketModal = ({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm deletion of {bucket.name}</DialogTitle>
+          <DialogTitle>Confirm deletion of {bucketName}</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />

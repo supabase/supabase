@@ -75,8 +75,16 @@ export const VectorsBuckets = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Created at</TableHead>
+                    <TableHead
+                      className={filteredBuckets.length === 0 ? 'text-foreground-muted' : undefined}
+                    >
+                      Name
+                    </TableHead>
+                    <TableHead
+                      className={filteredBuckets.length === 0 ? 'text-foreground-muted' : undefined}
+                    >
+                      Created at
+                    </TableHead>
                     <TableHead />
                   </TableRow>
                 </TableHeader>
@@ -85,7 +93,7 @@ export const VectorsBuckets = () => {
                     <TableRow>
                       <TableCell colSpan={3}>
                         <p className="text-sm text-foreground">No results found</p>
-                        <p className="text-sm text-foreground-light">
+                        <p className="text-sm text-foreground-lighter">
                           Your search for "{filterString}" did not return any results
                         </p>
                       </TableCell>

@@ -132,14 +132,14 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                           {filterString.length > 0 ? (
                             <>
                               <p className="text-sm text-foreground">No results found</p>
-                              <p className="text-sm text-foreground-light">
+                              <p className="text-sm text-foreground-lighter">
                                 Your search for "{filterString}" did not return any results
                               </p>
                             </>
                           ) : (
                             <>
                               <p className="text-sm text-foreground">No tables yet</p>
-                              <p className="text-sm text-foreground-light">
+                              <p className="text-sm text-foreground-lighter">
                                 Create your first table to get started
                               </p>
                             </>
