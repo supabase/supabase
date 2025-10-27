@@ -57,78 +57,78 @@ export const HelpPopover = () => {
           }}
         />
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
-        <div className="mb-5 px-5">
-          <div className="mb-4 flex flex-col gap-1">
+      <PopoverContent_Shadcn_ className="w-[400px] space-y-5 p-0 py-5" align="end" side="bottom">
+        <div className="flex flex-col gap-4">
+          <div className="px-5 flex flex-col gap-1">
             <h5 className="text-foreground">Need help with your project?</h5>
             <p className="text-sm text-foreground-lighter text-balance">
               Start with our docs or community. Most questions are answered there in minutes.
             </p>
           </div>
-        </div>
 
-        <div className="px-5">
-          <ButtonGroup className="w-full">
-            {projectRef && (
-              <ButtonGroupItem
-                size="tiny"
-                icon={<AiIconAnimation allowHoverEffect size={14} />}
-                onClick={() => {
-                  snap.newChat({
-                    name: 'Support',
-                    open: true,
-                    initialInput: `I need help with my project`,
-                    suggestions: {
-                      title:
-                        'I can help you with your project, here are some example prompts to get you started:',
-                      prompts: [
-                        {
-                          label: 'Database Health',
-                          description: 'Summarise my database health and performance',
-                        },
-                        {
-                          label: 'Debug Logs',
-                          description: 'View and debug my edge function logs',
-                        },
-                        {
-                          label: 'RLS Setup',
-                          description: 'Implement row level security for my tables',
-                        },
-                      ],
-                    },
-                  })
-                }}
-              >
-                Supabase Assistant
+          <div className="px-5">
+            <ButtonGroup className="w-full">
+              {projectRef && (
+                <ButtonGroupItem
+                  size="tiny"
+                  icon={<AiIconAnimation allowHoverEffect size={14} />}
+                  onClick={() => {
+                    snap.newChat({
+                      name: 'Support',
+                      open: true,
+                      initialInput: `I need help with my project`,
+                      suggestions: {
+                        title:
+                          'I can help you with your project, here are some example prompts to get you started:',
+                        prompts: [
+                          {
+                            label: 'Database Health',
+                            description: 'Summarise my database health and performance',
+                          },
+                          {
+                            label: 'Debug Logs',
+                            description: 'View and debug my edge function logs',
+                          },
+                          {
+                            label: 'RLS Setup',
+                            description: 'Implement row level security for my tables',
+                          },
+                        ],
+                      },
+                    })
+                  }}
+                >
+                  Supabase Assistant
+                </ButtonGroupItem>
+              )}
+              <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
+                <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
+                  Docs
+                </a>
               </ButtonGroupItem>
-            )}
-            <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
-              <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
-                Docs
-              </a>
-            </ButtonGroupItem>
-            <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
-              <a
-                href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Troubleshooting
-              </a>
-            </ButtonGroupItem>
-            <ButtonGroupItem size="tiny" icon={<Activity strokeWidth={1.5} size={14} />} asChild>
-              <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
-                Supabase status
-              </a>
-            </ButtonGroupItem>
-            <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
-              <SupportLink queryParams={{ projectRef }}>Contact support</SupportLink>
-            </ButtonGroupItem>
-          </ButtonGroup>
+              <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
+                <a
+                  href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Troubleshooting
+                </a>
+              </ButtonGroupItem>
+              <ButtonGroupItem size="tiny" icon={<Activity strokeWidth={1.5} size={14} />} asChild>
+                <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+                  Supabase status
+                </a>
+              </ButtonGroupItem>
+              <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
+                <SupportLink queryParams={{ projectRef }}>Contact support</SupportLink>
+              </ButtonGroupItem>
+            </ButtonGroup>
+          </div>
         </div>
         <Popover.Separator />
-        <div className="mb-4 space-y-2">
-          <div className="mb-4 px-5 flex flex-col gap-1">
+        <div className="flex flex-col gap-4">
+          <div className="px-5 flex flex-col gap-1">
             <h5 className="text-foreground">Community support</h5>
             <p className="text-sm text-foreground-lighter text-balance">
               Our Discord community contains many experienced developers. They may be able to
