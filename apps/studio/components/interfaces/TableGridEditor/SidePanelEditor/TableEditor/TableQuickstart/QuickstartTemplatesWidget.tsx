@@ -46,7 +46,7 @@ export const QuickstartTemplatesWidget = ({
         tableName: template.tableName,
         columnCount: template.fields.length,
         source: 'templates',
-        categoryName: activeCategory || 'Unknown',
+        categoryName: activeCategory ?? 'Unknown',
       })
 
       const tableField = convertTableSuggestionToTableField(template)

@@ -71,7 +71,7 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
   )
 
   const handleGenerateTables = useCallback(
-    async (promptOverride?: string, wasQuickIdea = false) => {
+    async ({ promptOverride, wasQuickIdea = false }: { promptOverride?: string; wasQuickIdea?: boolean } = {}) => {
       const promptToUse = promptOverride ?? aiPrompt
       if (!promptToUse.trim() || isGenerating) return
 
@@ -109,7 +109,7 @@ export const QuickstartAIWidget = ({ onSelectTable, disabled }: QuickstartAIWidg
       })
 
       setAiPrompt(idea)
-      handleGenerateTables(idea, true)
+      handleGenerateTables({ promptOverride: idea, wasQuickIdea: true })
     },
     [handleGenerateTables, setAiPrompt, track]
   )
