@@ -257,7 +257,7 @@ services:
           message: "Access is forbidden."
       # Enable local access (danger zone!)
       # 1. Comment out the 'request-termination' section above
-      # 2. Uncomment the entire section below, incl. 'deny'
+      # 2. Uncomment the entire section below, including 'deny'
       # 3. Add your local IPs to the 'allow' list
       #- name: cors
       #- name: ip-restriction
