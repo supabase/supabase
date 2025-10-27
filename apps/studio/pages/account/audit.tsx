@@ -27,7 +27,7 @@ const Audit: NextPageWithLayout = () => {
 
 Audit.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
         <AccountLayout title="Audit Logs">{page}</AccountLayout>
       </OrganizationLayout>

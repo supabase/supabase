@@ -13,12 +13,10 @@ import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
-const MobileNavigationBar = () => {
+const MobileNavigationBar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
   const router = useRouter()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
-
-  const hideMobileMenu = router.pathname === '/organizations'
 
   return (
     <div className="h-14 w-full flex flex-row md:hidden">

@@ -2,9 +2,9 @@ import { AccountConnections } from 'components/interfaces/Account/Preferences/Ac
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
 import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
+import { HotkeySettings } from 'components/interfaces/Account/Preferences/HotkeySettings'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
-import { HotkeySettings } from 'components/interfaces/Account/Preferences/HotkeySettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -27,7 +27,7 @@ const User: NextPageWithLayout = () => {
 
 User.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
         <AccountLayout title="Account Settings">{page}</AccountLayout>
       </OrganizationLayout>
