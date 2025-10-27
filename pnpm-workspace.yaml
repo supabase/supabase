@@ -48,11 +48,12 @@ onlyBuiltDependencies:
   - supabase
 
 overrides:
+  '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4
   '@supabase/supabase-js>@supabase/auth-js': 'catalog:'
   '@tanstack/directive-functions-plugin>vite': 'catalog:'
   '@tanstack/react-start-plugin>vite': 'catalog:'
   'vinxi>vite': 'catalog:'
-  '@react-router/dev>vite-node': 3.2.4
+  'refractor>prismjs': ^1.30.0 
   esbuild: ^0.25.2
   tmp: ^0.2.4

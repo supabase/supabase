@@ -512,7 +512,7 @@
     "react-hook-form": "^7.45.0",
     "react-intersection-observer": "^9.8.2",
     "react-markdown": "^9.0.1",
-    "react-syntax-highlighter": "^15.5.0",
+    "react-syntax-highlighter": "^15.6.6",
     "react-tooltip": "*",
     "react-use": "^17.5.0",
     "recharts": "^2.8.0",

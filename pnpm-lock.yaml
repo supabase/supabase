@@ -59,12 +59,13 @@ catalogs:
       version: 3.25.76
 
 overrides:
+  '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4
   '@supabase/supabase-js>@supabase/auth-js': 2.75.1
   '@tanstack/directive-functions-plugin>vite': ^7.1.11
   '@tanstack/react-start-plugin>vite': ^7.1.11
   vinxi>vite: ^7.1.11
-  '@react-router/dev>vite-node': 3.2.4
+  refractor>prismjs: ^1.30.0
   esbuild: ^0.25.2
   tmp: ^0.2.4
 
@@ -1703,8 +1704,8 @@ importers:
         specifier: ^8.0.3
         version: 8.0.7(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
       react-syntax-highlighter:
-        specifier: ^15.5.0
-        version: 15.5.0(react@18.3.1)
+        specifier: ^15.6.6
+        version: 15.6.6(react@18.3.1)
       react-transition-group:
         specifier: ^4.4.1
         version: 4.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1785,8 +1786,8 @@ importers:
         specifier: 'catalog:'
         version: 18.3.0
       '@types/react-syntax-highlighter':
-        specifier: ^15.5.6
-        version: 15.5.7
+        specifier: ^15.5.13
+        version: 15.5.13
       '@types/three':
         specifier: ^0.169.0
         version: 0.169.0
@@ -2332,8 +2333,8 @@ importers:
         specifier: ^2.1.4
         version: 2.1.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-syntax-highlighter:
-        specifier: ^15.5.0
-        version: 15.5.0(react@18.3.1)
+        specifier: ^15.6.6
+        version: 15.6.6(react@18.3.1)
       recharts:
         specifier: ^2.12.7
         version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2375,8 +2376,8 @@ importers:
         specifier: 'catalog:'
         version: 18.3.0
       '@types/react-syntax-highlighter':
-        specifier: ^15.5.6
-        version: 15.5.7
+        specifier: ^15.5.13
+        version: 15.5.13
       '@vitest/coverage-v8':
         specifier: ^3.2.0
         version: 3.2.4(supports-color@8.1.1)(vitest@3.2.4)
@@ -2495,8 +2496,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
       react-syntax-highlighter:
-        specifier: ^15.5.0
-        version: 15.5.0(react@18.3.1)
+        specifier: ^15.6.6
+        version: 15.6.6(react@18.3.1)
       react-tooltip:
         specifier: '*'
         version: 4.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -9598,8 +9599,8 @@ packages:
   '@types/react-simple-maps@3.0.4':
     resolution: {integrity: sha512-U9qnX0wVhxldrTpsase44fIoLpyO1OT/hgNMRoJTixj1qjpMRdSRIfih93mR3D/Tss/8CmM7dPwKMjtaGkDpmw==}
 
-  '@types/react-syntax-highlighter@15.5.7':
-    resolution: {integrity: sha512-bo5fEO5toQeyCp0zVHBeggclqf5SQ/Z5blfFmjwO5dkMVGPgmiwZsJh9nu/Bo5L7IHTuGWrja6LxJVE2uB5ZrQ==}
+  '@types/react-syntax-highlighter@15.5.13':
+    resolution: {integrity: sha512-uLGJ87j6Sz8UaBAooU0T6lWJ0dBmjZgN1PZTrj05TNql2/XpC6+4HhMT5syIdFUUt+FASfCeLLv4kBygNU+8qA==}
 
   '@types/react-transition-group@4.4.12':
     resolution: {integrity: sha512-8TV6R3h2j7a91c+1DXdJi3Syo69zzIZbz7Lg5tORM5LEJG7X/E6a1V3drRyBRZq7/utz7A+c4OgYLiLcYGHG6w==}
@@ -13370,6 +13371,9 @@ packages:
   highlightjs-curl@1.3.0:
     resolution: {integrity: sha512-50UEfZq1KR0Lfk2Tr6xb/MUIZH3h10oNC0OTy9g7WELcs5Fgy/mKN1vEhuKTkKbdo8vr5F9GXstu2eLhApfQ3A==}
 
+  highlightjs-vue@1.0.0:
+    resolution: {integrity: sha512-PDEfEF102G23vHmPhLyPboFCD+BkMGu+GuJe2d9/eH4FsCwvgBpnc9n0pGE+ffKdph38s6foEZiEjdgHdzp+IA==}
+
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
@@ -16595,14 +16599,6 @@ packages:
     peerDependencies:
       react: '>=16.0.0'
 
-  prismjs@1.27.0:
-    resolution: {integrity: sha512-t13BGPUlFDR7wRB5kQDG4jjl7XeuH6jbJGt11JHPL96qwsEHNX2+68tFXqc1/k+/jALsbSWJKUOT/hcYAZ5LkA==}
-    engines: {node: '>=6'}
-
-  prismjs@1.29.0:
-    resolution: {integrity: sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==}
-    engines: {node: '>=6'}
-
   prismjs@1.30.0:
     resolution: {integrity: sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==}
     engines: {node: '>=6'}
@@ -17086,8 +17082,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-syntax-highlighter@15.5.0:
-    resolution: {integrity: sha512-+zq2myprEnQmH5yw6Gqc8lD55QHnpKaU8TOcFeC/Lg/MQSs8UknEA0JC4nTZGFAXC2J2Hyj/ijJ7NlabyPi2gg==}
+  react-syntax-highlighter@15.6.6:
+    resolution: {integrity: sha512-DgXrc+AZF47+HvAPEmn7Ua/1p10jNoVZVI/LoPiYdtY+OM+/nG5yefLHKJwdKqY1adMuHFbeyBaG9j64ML7vTw==}
     peerDependencies:
       react: '>= 0.14.0'
 
@@ -29730,7 +29726,7 @@ snapshots:
       '@types/geojson': 7946.0.12
       '@types/react': 18.3.3
 
-  '@types/react-syntax-highlighter@15.5.7':
+  '@types/react-syntax-highlighter@15.5.13':
     dependencies:
       '@types/react': 18.3.3
 
@@ -34156,6 +34152,8 @@ snapshots:
 
   highlightjs-curl@1.3.0: {}
 
+  highlightjs-vue@1.0.0: {}
+
   hoist-non-react-statics@3.3.2:
     dependencies:
       react-is: 16.13.1
@@ -38435,10 +38433,6 @@ snapshots:
       clsx: 2.1.1
       react: 18.3.1
 
-  prismjs@1.27.0: {}
-
-  prismjs@1.29.0: {}
-
   prismjs@1.30.0: {}
 
   proc-log@3.0.0: {}
@@ -38982,12 +38976,13 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.3
 
-  react-syntax-highlighter@15.5.0(react@18.3.1):
+  react-syntax-highlighter@15.6.6(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.26.10
       highlight.js: 10.7.3
+      highlightjs-vue: 1.0.0
       lowlight: 1.20.0
-      prismjs: 1.29.0
+      prismjs: 1.30.0
       react: 18.3.1
       refractor: 3.6.0
 
@@ -39216,7 +39211,7 @@ snapshots:
     dependencies:
       hastscript: 6.0.0
       parse-entities: 2.0.0
-      prismjs: 1.27.0
+      prismjs: 1.30.0
 
   reftools@1.1.9: {}
 
