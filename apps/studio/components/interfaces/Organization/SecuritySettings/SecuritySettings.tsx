@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -12,11 +11,12 @@ import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
@@ -48,9 +48,11 @@ export const SecuritySettings = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
 
-  const { can: canReadMfaConfig, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'organizations')
-  const { can: canUpdateMfaConfig } = useAsyncCheckProjectPermissions(
+  const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'organizations'
+  )
+  const { can: canUpdateMfaConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
   )
@@ -126,11 +128,9 @@ export const SecuritySettings = () => {
               </div>
 
               <div className="flex items-center">
-                <Button type="primary" asChild>
-                  <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=mfa`}>
-                    Upgrade subscription
-                  </Link>
-                </Button>
+                <UpgradePlanButton type="primary" source="mfa" plan="Pro">
+                  Upgrade subscription
+                </UpgradePlanButton>
               </div>
             </div>
           </Alert_Shadcn_>

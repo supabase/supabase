@@ -72,20 +72,18 @@ export const useGetUnifiedLogsMutation = ({
   UseMutationOptions<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>(
-    (vars) => retrieveUnifiedLogs(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to retrieve logs: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>({
+    mutationFn: (vars) => retrieveUnifiedLogs(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to retrieve logs: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

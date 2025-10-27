@@ -1,6 +1,7 @@
 import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useMemo } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -8,7 +9,9 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -38,6 +41,16 @@ export const FunctionsEmptyState = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
+
+  const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
+  const templates = useMemo(() => {
+    if (showStripeExample) {
+      return EDGE_FUNCTION_TEMPLATES
+    }
+
+    // Filter out Stripe template
+    return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
+  }, [showStripeExample])
 
   return (
     <>
@@ -157,7 +170,7 @@ export const FunctionsEmptyState = () => {
         Start with a template
       </ScaffoldSectionTitle>
       <ResourceList>
-        {EDGE_FUNCTION_TEMPLATES.map((template) => (
+        {templates.map((template) => (
           <ResourceItem
             key={template.name}
             media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
@@ -181,6 +194,16 @@ export const FunctionsEmptyState = () => {
 }
 
 export const FunctionsEmptyStateLocal = () => {
+  const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
+  const templates = useMemo(() => {
+    if (showStripeExample) {
+      return EDGE_FUNCTION_TEMPLATES
+    }
+
+    // Filter out Stripe template
+    return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
+  }, [showStripeExample])
+
   return (
     <>
       <div className="flex flex-col gap-y-4">
@@ -214,7 +237,9 @@ export const FunctionsEmptyStateLocal = () => {
                   value="supabase functions new hello-world"
                 />
               </div>
-              <DocsButton href="https://supabase.com/docs/guides/functions/local-quickstart#create-an-edge-function" />
+              <DocsButton
+                href={`${DOCS_URL}/guides/functions/local-quickstart#create-an-edge-function`}
+              />
             </div>
 
             <div className="p-8">
@@ -237,7 +262,9 @@ supabase start # start the supabase stack
 supabase functions serve # start the Functions watcher`.trim()}
                 />
               </div>
-              <DocsButton href="https://supabase.com/docs/guides/functions/local-quickstart#running-edge-functions-locally" />
+              <DocsButton
+                href={`${DOCS_URL}/guides/functions/local-quickstart#running-edge-functions-locally`}
+              />
             </div>
 
             <div className="p-8">
@@ -263,7 +290,9 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
   --data '{ "name":"Functions" }'`.trim()}
                 />
               </div>
-              <DocsButton href="https://supabase.com/docs/guides/functions/local-quickstart#invoking-edge-functions-locally" />
+              <DocsButton
+                href={`${DOCS_URL}/guides/functions/local-quickstart#invoking-edge-functions-locally`}
+              />
             </div>
           </CardContent>
         </Card>
@@ -284,7 +313,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
                 on providers like Fly.io, Digital Ocean, or AWS.
               </p>
               <div className="flex items-center gap-x-2">
-                <DocsButton href="https://supabase.com/docs/reference/self-hosting-functions/introduction" />
+                <DocsButton href={`${DOCS_URL}/reference/self-hosting-functions/introduction`} />
                 <Button asChild type="default" icon={<Github />}>
                   <a href="https://github.com/supabase/edge-runtime/">GitHub</a>
                 </Button>
@@ -295,7 +324,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
 
         <ScaffoldSectionTitle className="text-xl mt-12">Explore our templates</ScaffoldSectionTitle>
         <ResourceList>
-          {EDGE_FUNCTION_TEMPLATES.map((template) => (
+          {templates.map((template) => (
             <Dialog>
               <DialogTrigger asChild>
                 <ResourceItem
@@ -361,7 +390,7 @@ export const FunctionsSecretsEmptyStateLocal = () => {
               </li>
             </ul>
           </div>
-          <DocsButton href="https://supabase.com/docs/guides/functions/secrets#using-the-cli" />
+          <DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />
         </div>
       </CardContent>
     </Card>

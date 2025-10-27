@@ -34,12 +34,10 @@ export const useLoadBalancersQuery = <TData = LoadBalancersData>(
   { projectRef }: LoadBalancersVariables,
   { enabled = true, ...options }: UseQueryOptions<LoadBalancersData, LoadBalancersError, TData> = {}
 ) => {
-  return useQuery<LoadBalancersData, LoadBalancersError, TData>(
-    replicaKeys.loadBalancers(projectRef),
-    ({ signal }) => getLoadBalancers({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
-      ...options,
-    }
-  )
+  return useQuery<LoadBalancersData, LoadBalancersError, TData>({
+    queryKey: replicaKeys.loadBalancers(projectRef),
+    queryFn: ({ signal }) => getLoadBalancers({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
+    ...options,
+  })
 }

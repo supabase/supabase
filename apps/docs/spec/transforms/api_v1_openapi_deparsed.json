@@ -238,6 +238,11 @@
                   },
                   "request_review": {
                     "type": "boolean"
+                  },
+                  "notify_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "HTTP endpoint to receive branch status updates."
                   }
                 }
               }
@@ -308,6 +313,10 @@
                     },
                     "with_data": {
                       "type": "boolean"
+                    },
+                    "notify_url": {
+                      "type": "string",
+                      "format": "uri"
                     }
                   },
                   "required": [
@@ -821,7 +830,8 @@
                   },
                   "region": {
                     "type": "string",
-                    "description": "Region you want your server to reside in",
+                    "description": "Region you want your server to reside in. Use region_selection instead.",
+                    "deprecated": true,
                     "enum": [
                       "us-east-1",
                       "us-east-2",
@@ -842,6 +852,66 @@
                       "ap-south-1",
                       "sa-east-1"
                     ]
+                  },
+                  "region_selection": {
+                    "discriminator": {
+                      "propertyName": "type"
+                    },
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["specific"]
+                          },
+                          "code": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                            "enum": [
+                              "us-east-1",
+                              "us-east-2",
+                              "us-west-1",
+                              "us-west-2",
+                              "ap-east-1",
+                              "ap-southeast-1",
+                              "ap-northeast-1",
+                              "ap-northeast-2",
+                              "ap-southeast-2",
+                              "eu-west-1",
+                              "eu-west-2",
+                              "eu-west-3",
+                              "eu-north-1",
+                              "eu-central-1",
+                              "eu-central-2",
+                              "ca-central-1",
+                              "ap-south-1",
+                              "sa-east-1"
+                            ]
+                          }
+                        },
+                        "required": ["type", "code"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["smartGroup"]
+                          },
+                          "code": {
+                            "type": "string",
+                            "enum": ["americas", "emea", "apac"],
+                            "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                            "example": "apac"
+                          }
+                        },
+                        "required": ["type", "code"]
+                      }
+                    ],
+                    "description": "Region selection. Only one of region or region_selection can be specified.",
+                    "example": "{ type: 'smartGroup', code: 'americas' }"
                   },
                   "kps_enabled": {
                     "type": "boolean",
@@ -878,9 +948,21 @@
                     "format": "uri",
                     "description": "Template URL used to create the project from the CLI.",
                     "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
+                  },
+                  "release_channel": {
+                    "type": "string",
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+                    "description": "Release channel. If not provided, GA will be used.",
+                    "deprecated": true
+                  },
+                  "postgres_engine": {
+                    "type": "string",
+                    "enum": ["15", "17", "17-oriole"],
+                    "description": "Postgres engine version. If not provided, the latest version will be used.",
+                    "deprecated": true
                   }
                 },
-                "required": ["db_pass", "name", "organization_id", "region"],
+                "required": ["db_pass", "name", "organization_id"],
                 "additionalProperties": false,
                 "hideDefinitions": ["release_channel", "postgres_engine"]
               }
@@ -950,6 +1032,158 @@
           }
         ],
         "summary": "Create a project",
+        "tags": ["Projects"]
+      }
+    },
+    "/v1/projects/available-regions": {
+      "get": {
+        "operationId": "v1-get-available-regions",
+        "parameters": [
+          {
+            "name": "organization_slug",
+            "required": true,
+            "in": "query",
+            "description": "Slug of your organization",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "continent",
+            "required": false,
+            "in": "query",
+            "description": "Continent code to determine regional recommendations: NA (North America), SA (South America), EU (Europe), AF (Africa), AS (Asia), OC (Oceania), AN (Antarctica)",
+            "schema": {
+              "example": "NA",
+              "type": "string",
+              "enum": ["NA", "SA", "EU", "AF", "AS", "OC", "AN"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recommendations": {
+                      "type": "object",
+                      "properties": {
+                        "smartGroup": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "code": {
+                              "type": "string",
+                              "enum": ["americas", "emea", "apac"]
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": ["smartGroup"]
+                            }
+                          },
+                          "required": ["name", "code", "type"]
+                        },
+                        "specific": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "code": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": ["specific"]
+                              },
+                              "provider": {
+                                "type": "string",
+                                "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": ["capacity", "other"]
+                              }
+                            },
+                            "required": ["name", "code", "type", "provider"]
+                          }
+                        }
+                      },
+                      "required": ["smartGroup", "specific"]
+                    },
+                    "all": {
+                      "type": "object",
+                      "properties": {
+                        "smartGroup": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "code": {
+                                "type": "string",
+                                "enum": ["americas", "emea", "apac"]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": ["smartGroup"]
+                              }
+                            },
+                            "required": ["name", "code", "type"]
+                          }
+                        },
+                        "specific": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "code": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": ["specific"]
+                              },
+                              "provider": {
+                                "type": "string",
+                                "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": ["capacity", "other"]
+                              }
+                            },
+                            "required": ["name", "code", "type", "provider"]
+                          }
+                        }
+                      },
+                      "required": ["smartGroup", "specific"]
+                    }
+                  },
+                  "required": ["recommendations", "all"]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Gets the list of available regions that can be used for a new project",
         "tags": ["Projects"]
       }
     },
@@ -1133,8 +1367,8 @@
             "in": "query",
             "description": "Resource indicator for MCP (Model Context Protocol) clients",
             "schema": {
-              "type": "string",
-              "enum": ["https://api.supabase.io/mcp"]
+              "format": "uri",
+              "type": "string"
             }
           }
         ],
@@ -1188,8 +1422,11 @@
                   },
                   "resource": {
                     "type": "string",
-                    "enum": ["https://api.supabase.io/mcp"],
+                    "format": "uri",
                     "description": "Resource indicator for MCP (Model Context Protocol) clients"
+                  },
+                  "scope": {
+                    "type": "string"
                   }
                 },
                 "additionalProperties": false
@@ -1365,8 +1602,7 @@
           }
         ],
         "summary": "Authorize user through oauth and claim a project",
-        "tags": ["OAuth"],
-        "x-internal": true
+        "tags": ["OAuth"]
       }
     },
     "/v1/snippets": {
@@ -1494,6 +1730,9 @@
                               }
                             },
                             "required": ["id", "username"]
+                          },
+                          "favorite": {
+                            "type": "boolean"
                           }
                         },
                         "required": [
@@ -1506,7 +1745,8 @@
                           "description",
                           "project",
                           "owner",
-                          "updated_by"
+                          "updated_by",
+                          "favorite"
                         ]
                       }
                     },
@@ -1614,11 +1854,16 @@
                       },
                       "required": ["id", "username"]
                     },
+                    "favorite": {
+                      "type": "boolean"
+                    },
                     "content": {
                       "type": "object",
                       "properties": {
                         "favorite": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "deprecated": true,
+                          "description": "Deprecated: Rely on root-level favorite property instead."
                         },
                         "schema_version": {
                           "type": "string"
@@ -1627,7 +1872,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["favorite", "schema_version", "sql"]
+                      "required": ["schema_version", "sql"]
                     }
                   },
                   "required": [
@@ -1641,6 +1886,7 @@
                     "project",
                     "owner",
                     "updated_by",
+                    "favorite",
                     "content"
                   ]
                 }
@@ -1658,6 +1904,559 @@
         ],
         "summary": "Gets a specific SQL snippet",
         "tags": ["Database"]
+      }
+    },
+    "/v1/projects/{ref}/actions": {
+      "get": {
+        "description": "Returns a paginated list of action runs of the specified project.",
+        "operationId": "v1-list-action-runs",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "branch_id": {
+                        "type": "string"
+                      },
+                      "run_steps": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "enum": [
+                                "clone",
+                                "pull",
+                                "health",
+                                "configure",
+                                "migrate",
+                                "seed",
+                                "deploy"
+                              ]
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": [
+                                "CREATED",
+                                "DEAD",
+                                "EXITED",
+                                "PAUSED",
+                                "REMOVING",
+                                "RESTARTING",
+                                "RUNNING"
+                              ]
+                            },
+                            "created_at": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["name", "status", "created_at", "updated_at"]
+                        }
+                      },
+                      "git_config": {
+                        "nullable": true
+                      },
+                      "workdir": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "check_run_id": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "created_at": {
+                        "type": "string"
+                      },
+                      "updated_at": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "branch_id",
+                      "run_steps",
+                      "workdir",
+                      "check_run_id",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to list action runs"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all action runs",
+        "tags": ["Environments"]
+      },
+      "head": {
+        "description": "Returns the total number of action runs of the specified project.",
+        "operationId": "v1-count-action-runs",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "headers": {
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0
+                },
+                "description": "total count value"
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to count action runs"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Count the number of action runs",
+        "tags": ["Environments"]
+      }
+    },
+    "/v1/projects/{ref}/actions/{run_id}": {
+      "get": {
+        "description": "Returns the current status of the specified action run.",
+        "operationId": "v1-get-action-run",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "run_id",
+            "required": true,
+            "in": "path",
+            "description": "Action Run ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "branch_id": {
+                      "type": "string"
+                    },
+                    "run_steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "enum": [
+                              "clone",
+                              "pull",
+                              "health",
+                              "configure",
+                              "migrate",
+                              "seed",
+                              "deploy"
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "CREATED",
+                              "DEAD",
+                              "EXITED",
+                              "PAUSED",
+                              "REMOVING",
+                              "RESTARTING",
+                              "RUNNING"
+                            ]
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["name", "status", "created_at", "updated_at"]
+                      }
+                    },
+                    "git_config": {
+                      "nullable": true
+                    },
+                    "workdir": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "check_run_id": {
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "branch_id",
+                    "run_steps",
+                    "workdir",
+                    "check_run_id",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to get action run status"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the status of an action run",
+        "tags": ["Environments"]
+      }
+    },
+    "/v1/projects/{ref}/actions/{run_id}/status": {
+      "patch": {
+        "description": "Updates the status of an ongoing action run.",
+        "operationId": "v1-update-action-run-status",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "run_id",
+            "required": true,
+            "in": "path",
+            "description": "Action Run ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clone": {
+                    "type": "string",
+                    "enum": [
+                      "CREATED",
+                      "DEAD",
+                      "EXITED",
+                      "PAUSED",
+                      "REMOVING",
+                      "RESTARTING",
+                      "RUNNING"
+                    ]
+                  },
+                  "pull": {
+                    "type": "string",
+                    "enum": [
+                      "CREATED",
+                      "DEAD",
+                      "EXITED",
+                      "PAUSED",
+                      "REMOVING",
+                      "RESTARTING",
+                      "RUNNING"
+                    ]
+                  },
+                  "health": {
+                    "type": "string",
+                    "enum": [
+                      "CREATED",
+                      "DEAD",
+                      "EXITED",
+                      "PAUSED",
+                      "REMOVING",
+                      "RESTARTING",
+                      "RUNNING"
+                    ]
+                  },
+                  "configure": {
+                    "type": "string",
+                    "enum": [
+                      "CREATED",
+                      "DEAD",
+                      "EXITED",
+                      "PAUSED",
+                      "REMOVING",
+                      "RESTARTING",
+                      "RUNNING"
+                    ]
+                  },
+                  "migrate": {
+                    "type": "string",
+                    "enum": [
+                      "CREATED",
+                      "DEAD",
+                      "EXITED",
+                      "PAUSED",
+                      "REMOVING",
+                      "RESTARTING",
+                      "RUNNING"
+                    ]
+                  },
+                  "seed": {
+                    "type": "string",
+                    "enum": [
+                      "CREATED",
+                      "DEAD",
+                      "EXITED",
+                      "PAUSED",
+                      "REMOVING",
+                      "RESTARTING",
+                      "RUNNING"
+                    ]
+                  },
+                  "deploy": {
+                    "type": "string",
+                    "enum": [
+                      "CREATED",
+                      "DEAD",
+                      "EXITED",
+                      "PAUSED",
+                      "REMOVING",
+                      "RESTARTING",
+                      "RUNNING"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "enum": ["ok"]
+                    }
+                  },
+                  "required": ["message"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to update action run status"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update the status of an action run",
+        "tags": ["Environments"]
+      }
+    },
+    "/v1/projects/{ref}/actions/{run_id}/logs": {
+      "get": {
+        "description": "Returns the logs from the specified action run.",
+        "operationId": "v1-get-action-run-logs",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "run_id",
+            "required": true,
+            "in": "path",
+            "description": "Action Run ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to get action run logs"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the logs of an action run",
+        "tags": ["Environments"]
       }
     },
     "/v1/projects/{ref}/api-keys": {
@@ -1746,8 +2545,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -1872,8 +2677,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -1919,8 +2730,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -1973,8 +2790,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -2105,8 +2928,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -2208,8 +3037,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -2328,8 +3163,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -2425,6 +3266,10 @@
                       },
                       "with_data": {
                         "type": "boolean"
+                      },
+                      "notify_url": {
+                        "type": "string",
+                        "format": "uri"
                       }
                     },
                     "required": [
@@ -2444,8 +3289,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve database branches"
@@ -2542,6 +3393,11 @@
                   },
                   "with_data": {
                     "type": "boolean"
+                  },
+                  "notify_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "HTTP endpoint to receive branch status updates."
                   }
                 },
                 "required": ["branch_name"]
@@ -2613,6 +3469,10 @@
                     },
                     "with_data": {
                       "type": "boolean"
+                    },
+                    "notify_url": {
+                      "type": "string",
+                      "format": "uri"
                     }
                   },
                   "required": [
@@ -2631,8 +3491,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to create database branch"
@@ -2667,8 +3533,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to disable preview branching"
@@ -2773,6 +3645,10 @@
                     },
                     "with_data": {
                       "type": "boolean"
+                    },
+                    "notify_url": {
+                      "type": "string",
+                      "format": "uri"
                     }
                   },
                   "required": [
@@ -2791,8 +3667,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to fetch database branch"
@@ -2954,8 +3836,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's custom hostname config"
@@ -2989,8 +3877,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to delete project custom hostname configuration"
@@ -3169,8 +4063,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project custom hostname configuration"
@@ -3332,8 +4232,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to verify project custom hostname configuration"
@@ -3495,8 +4401,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to activate project custom hostname configuration"
@@ -3548,8 +4460,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's network bans"
@@ -3613,8 +4531,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's enriched network bans"
@@ -3678,8 +4602,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to remove network bans."
@@ -3777,8 +4707,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's network restrictions"
@@ -3928,8 +4864,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project network restrictions"
@@ -4051,8 +4993,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project network restrictions"
@@ -4101,8 +5049,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's pgsodium config"
@@ -4165,8 +5119,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project's pgsodium config"
@@ -4229,8 +5189,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's postgrest config"
@@ -4316,8 +5282,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project's postgrest config"
@@ -4435,8 +5407,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project"
@@ -4489,8 +5467,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -4546,8 +5530,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's secrets"
@@ -4609,8 +5599,14 @@
           "201": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to create project's secrets"
@@ -4658,8 +5654,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to delete secrets with given names"
@@ -4717,8 +5719,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's SSL enforcement config"
@@ -4796,8 +5804,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project's SSL enforcement configuration."
@@ -4856,8 +5870,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to generate TypeScript types"
@@ -4911,8 +5931,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to get project vanity subdomain configuration"
@@ -4946,8 +5972,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to delete project vanity subdomain configuration"
@@ -5012,8 +6044,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to check project vanity subdomain configuration"
@@ -5078,8 +6116,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to activate project vanity subdomain configuration"
@@ -5148,8 +6192,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to initiate project upgrade"
@@ -5266,8 +6316,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to determine project upgrade eligibility"
@@ -5370,8 +6426,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project upgrade status"
@@ -5426,8 +6488,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to get project readonly mode status"
@@ -5463,8 +6531,14 @@
           "201": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to disable project's readonly mode"
@@ -5538,8 +6612,14 @@
           "201": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to set up read replica"
@@ -5591,8 +6671,14 @@
           "201": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to remove read replica"
@@ -5730,8 +6816,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's service health status"
@@ -5801,8 +6893,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -5867,8 +6965,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -5920,9 +7024,34 @@
                       {
                         "type": "object",
                         "properties": {
+                          "kid": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "use": {
+                            "type": "string",
+                            "enum": ["sig"]
+                          },
+                          "key_ops": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": ["sign", "verify"]
+                            },
+                            "minItems": 2,
+                            "maxItems": 2
+                          },
+                          "ext": {
+                            "type": "boolean",
+                            "enum": [true]
+                          },
                           "kty": {
                             "type": "string",
                             "enum": ["RSA"]
+                          },
+                          "alg": {
+                            "type": "string",
+                            "enum": ["RS256"]
                           },
                           "n": {
                             "type": "string"
@@ -5956,9 +7085,34 @@
                       {
                         "type": "object",
                         "properties": {
+                          "kid": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "use": {
+                            "type": "string",
+                            "enum": ["sig"]
+                          },
+                          "key_ops": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": ["sign", "verify"]
+                            },
+                            "minItems": 2,
+                            "maxItems": 2
+                          },
+                          "ext": {
+                            "type": "boolean",
+                            "enum": [true]
+                          },
                           "kty": {
                             "type": "string",
                             "enum": ["EC"]
+                          },
+                          "alg": {
+                            "type": "string",
+                            "enum": ["ES256"]
                           },
                           "crv": {
                             "type": "string",
@@ -5980,9 +7134,34 @@
                       {
                         "type": "object",
                         "properties": {
+                          "kid": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "use": {
+                            "type": "string",
+                            "enum": ["sig"]
+                          },
+                          "key_ops": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": ["sign", "verify"]
+                            },
+                            "minItems": 2,
+                            "maxItems": 2
+                          },
+                          "ext": {
+                            "type": "boolean",
+                            "enum": [true]
+                          },
                           "kty": {
                             "type": "string",
                             "enum": ["OKP"]
+                          },
+                          "alg": {
+                            "type": "string",
+                            "enum": ["EdDSA"]
                           },
                           "crv": {
                             "type": "string",
@@ -6001,9 +7180,34 @@
                       {
                         "type": "object",
                         "properties": {
+                          "kid": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "use": {
+                            "type": "string",
+                            "enum": ["sig"]
+                          },
+                          "key_ops": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": ["sign", "verify"]
+                            },
+                            "minItems": 2,
+                            "maxItems": 2
+                          },
+                          "ext": {
+                            "type": "boolean",
+                            "enum": [true]
+                          },
                           "kty": {
                             "type": "string",
                             "enum": ["oct"]
+                          },
+                          "alg": {
+                            "type": "string",
+                            "enum": ["HS256"]
                           },
                           "k": {
                             "type": "string",
@@ -6060,8 +7264,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -6136,8 +7346,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -6213,8 +7429,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -6288,8 +7510,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -6381,8 +7609,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -6484,8 +7718,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's storage config"
@@ -6581,8 +7821,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project's storage config"
@@ -6709,8 +7955,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's Postgres config"
@@ -6933,8 +8185,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project's Postgres config"
@@ -7007,8 +8265,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's pgbouncer config"
@@ -7106,8 +8370,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's supavisor config"
@@ -7181,8 +8451,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project's supavisor config"
@@ -7246,6 +8522,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_apple_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_apple_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7256,6 +8536,10 @@
                     },
                     "external_azure_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_azure_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_azure_enabled": {
@@ -7274,6 +8558,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_bitbucket_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_bitbucket_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7284,6 +8572,10 @@
                     },
                     "external_discord_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_discord_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_discord_enabled": {
@@ -7302,6 +8594,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_facebook_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_facebook_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7312,6 +8608,10 @@
                     },
                     "external_figma_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_figma_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_figma_enabled": {
@@ -7326,6 +8626,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_github_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_github_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7336,6 +8640,10 @@
                     },
                     "external_gitlab_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_gitlab_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_gitlab_enabled": {
@@ -7358,6 +8666,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_google_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_google_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7374,6 +8686,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_kakao_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_kakao_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7384,6 +8700,10 @@
                     },
                     "external_keycloak_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_keycloak_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_keycloak_enabled": {
@@ -7402,6 +8722,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_linkedin_oidc_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_linkedin_oidc_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7414,6 +8738,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_slack_oidc_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_slack_oidc_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7424,6 +8752,10 @@
                     },
                     "external_notion_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_notion_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_notion_enabled": {
@@ -7442,6 +8774,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_slack_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_slack_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7452,6 +8788,10 @@
                     },
                     "external_spotify_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_spotify_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_spotify_enabled": {
@@ -7466,6 +8806,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_twitch_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_twitch_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -7476,6 +8820,10 @@
                     },
                     "external_twitter_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_twitter_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_twitter_enabled": {
@@ -7512,6 +8860,10 @@
                     },
                     "external_zoom_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_zoom_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_zoom_enabled": {
@@ -7594,6 +8946,18 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "hook_after_user_created_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "hook_after_user_created_uri": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "hook_after_user_created_secrets": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "jwt_exp": {
                       "type": "integer",
                       "nullable": true
@@ -7641,6 +9005,34 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "mailer_subjects_password_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_email_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_phone_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_mfa_factor_enrolled_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_mfa_factor_unenrolled_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_identity_linked_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_identity_unlinked_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "mailer_templates_confirmation_content": {
                       "type": "string",
                       "nullable": true
@@ -7663,6 +9055,62 @@
                     },
                     "mailer_templates_recovery_content": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_password_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_email_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_phone_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_mfa_factor_enrolled_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_mfa_factor_unenrolled_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_identity_linked_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_identity_unlinked_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_notifications_password_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_email_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_phone_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_mfa_factor_enrolled_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_mfa_factor_unenrolled_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_identity_linked_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_identity_unlinked_enabled": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "mfa_max_enrolled_factors": {
@@ -7706,6 +9154,10 @@
                     },
                     "nimbus_oauth_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "nimbus_oauth_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "nimbus_oauth_client_secret": {
@@ -7949,64 +9401,82 @@
                     "external_anonymous_users_enabled",
                     "external_apple_additional_client_ids",
                     "external_apple_client_id",
+                    "external_apple_email_optional",
                     "external_apple_enabled",
                     "external_apple_secret",
                     "external_azure_client_id",
+                    "external_azure_email_optional",
                     "external_azure_enabled",
                     "external_azure_secret",
                     "external_azure_url",
                     "external_bitbucket_client_id",
+                    "external_bitbucket_email_optional",
                     "external_bitbucket_enabled",
                     "external_bitbucket_secret",
                     "external_discord_client_id",
+                    "external_discord_email_optional",
                     "external_discord_enabled",
                     "external_discord_secret",
                     "external_email_enabled",
                     "external_facebook_client_id",
+                    "external_facebook_email_optional",
                     "external_facebook_enabled",
                     "external_facebook_secret",
                     "external_figma_client_id",
+                    "external_figma_email_optional",
                     "external_figma_enabled",
                     "external_figma_secret",
                     "external_github_client_id",
+                    "external_github_email_optional",
                     "external_github_enabled",
                     "external_github_secret",
                     "external_gitlab_client_id",
+                    "external_gitlab_email_optional",
                     "external_gitlab_enabled",
                     "external_gitlab_secret",
                     "external_gitlab_url",
                     "external_google_additional_client_ids",
                     "external_google_client_id",
+                    "external_google_email_optional",
                     "external_google_enabled",
                     "external_google_secret",
                     "external_google_skip_nonce_check",
                     "external_kakao_client_id",
+                    "external_kakao_email_optional",
                     "external_kakao_enabled",
                     "external_kakao_secret",
                     "external_keycloak_client_id",
+                    "external_keycloak_email_optional",
                     "external_keycloak_enabled",
                     "external_keycloak_secret",
                     "external_keycloak_url",
                     "external_linkedin_oidc_client_id",
+                    "external_linkedin_oidc_email_optional",
                     "external_linkedin_oidc_enabled",
                     "external_linkedin_oidc_secret",
                     "external_slack_oidc_client_id",
+                    "external_slack_oidc_email_optional",
                     "external_slack_oidc_enabled",
                     "external_slack_oidc_secret",
                     "external_notion_client_id",
+                    "external_notion_email_optional",
                     "external_notion_enabled",
                     "external_notion_secret",
                     "external_phone_enabled",
                     "external_slack_client_id",
+                    "external_slack_email_optional",
                     "external_slack_enabled",
                     "external_slack_secret",
                     "external_spotify_client_id",
+                    "external_spotify_email_optional",
                     "external_spotify_enabled",
                     "external_spotify_secret",
                     "external_twitch_client_id",
+                    "external_twitch_email_optional",
                     "external_twitch_enabled",
                     "external_twitch_secret",
                     "external_twitter_client_id",
+                    "external_twitter_email_optional",
                     "external_twitter_enabled",
                     "external_twitter_secret",
                     "external_workos_client_id",
@@ -8016,6 +9486,7 @@
                     "external_web3_solana_enabled",
                     "external_web3_ethereum_enabled",
                     "external_zoom_client_id",
+                    "external_zoom_email_optional",
                     "external_zoom_enabled",
                     "external_zoom_secret",
                     "hook_custom_access_token_enabled",
@@ -8036,6 +9507,9 @@
                     "hook_before_user_created_enabled",
                     "hook_before_user_created_uri",
                     "hook_before_user_created_secrets",
+                    "hook_after_user_created_enabled",
+                    "hook_after_user_created_uri",
+                    "hook_after_user_created_secrets",
                     "jwt_exp",
                     "mailer_allow_unverified_email_sign_ins",
                     "mailer_autoconfirm",
@@ -8048,12 +9522,33 @@
                     "mailer_subjects_magic_link",
                     "mailer_subjects_reauthentication",
                     "mailer_subjects_recovery",
+                    "mailer_subjects_password_changed_notification",
+                    "mailer_subjects_email_changed_notification",
+                    "mailer_subjects_phone_changed_notification",
+                    "mailer_subjects_mfa_factor_enrolled_notification",
+                    "mailer_subjects_mfa_factor_unenrolled_notification",
+                    "mailer_subjects_identity_linked_notification",
+                    "mailer_subjects_identity_unlinked_notification",
                     "mailer_templates_confirmation_content",
                     "mailer_templates_email_change_content",
                     "mailer_templates_invite_content",
                     "mailer_templates_magic_link_content",
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
+                    "mailer_templates_password_changed_notification_content",
+                    "mailer_templates_email_changed_notification_content",
+                    "mailer_templates_phone_changed_notification_content",
+                    "mailer_templates_mfa_factor_enrolled_notification_content",
+                    "mailer_templates_mfa_factor_unenrolled_notification_content",
+                    "mailer_templates_identity_linked_notification_content",
+                    "mailer_templates_identity_unlinked_notification_content",
+                    "mailer_notifications_password_changed_enabled",
+                    "mailer_notifications_email_changed_enabled",
+                    "mailer_notifications_phone_changed_enabled",
+                    "mailer_notifications_mfa_factor_enrolled_enabled",
+                    "mailer_notifications_mfa_factor_unenrolled_enabled",
+                    "mailer_notifications_identity_linked_enabled",
+                    "mailer_notifications_identity_unlinked_enabled",
                     "mfa_max_enrolled_factors",
                     "mfa_totp_enroll_enabled",
                     "mfa_totp_verify_enabled",
@@ -8065,6 +9560,7 @@
                     "mfa_phone_template",
                     "mfa_phone_max_frequency",
                     "nimbus_oauth_client_id",
+                    "nimbus_oauth_email_optional",
                     "nimbus_oauth_client_secret",
                     "password_hibp_enabled",
                     "password_min_length",
@@ -8126,8 +9622,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's auth config"
@@ -8242,6 +9744,34 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "mailer_subjects_password_changed_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_email_changed_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_phone_changed_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_mfa_factor_enrolled_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_mfa_factor_unenrolled_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_identity_linked_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_subjects_identity_unlinked_notification": {
+                    "type": "string",
+                    "nullable": true
+                  },
                   "mailer_templates_invite_content": {
                     "type": "string",
                     "nullable": true
@@ -8264,6 +9794,62 @@
                   },
                   "mailer_templates_reauthentication_content": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_password_changed_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_email_changed_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_phone_changed_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_mfa_factor_enrolled_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_mfa_factor_unenrolled_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_identity_linked_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_templates_identity_unlinked_notification_content": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "mailer_notifications_password_changed_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_email_changed_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_phone_changed_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_mfa_factor_enrolled_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_mfa_factor_unenrolled_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_identity_linked_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "mailer_notifications_identity_unlinked_enabled": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "mfa_max_enrolled_factors": {
@@ -8592,12 +10178,28 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "hook_after_user_created_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "hook_after_user_created_uri": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "hook_after_user_created_secrets": {
+                    "type": "string",
+                    "nullable": true
+                  },
                   "external_apple_enabled": {
                     "type": "boolean",
                     "nullable": true
                   },
                   "external_apple_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_apple_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_apple_secret": {
@@ -8616,6 +10218,10 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_azure_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "external_azure_secret": {
                     "type": "string",
                     "nullable": true
@@ -8632,6 +10238,10 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_bitbucket_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "external_bitbucket_secret": {
                     "type": "string",
                     "nullable": true
@@ -8642,6 +10252,10 @@
                   },
                   "external_discord_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_discord_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_discord_secret": {
@@ -8656,6 +10270,10 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_facebook_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "external_facebook_secret": {
                     "type": "string",
                     "nullable": true
@@ -8666,6 +10284,10 @@
                   },
                   "external_figma_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_figma_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_figma_secret": {
@@ -8680,6 +10302,10 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_github_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "external_github_secret": {
                     "type": "string",
                     "nullable": true
@@ -8690,6 +10316,10 @@
                   },
                   "external_gitlab_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_gitlab_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_gitlab_secret": {
@@ -8706,6 +10336,10 @@
                   },
                   "external_google_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_google_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_google_secret": {
@@ -8728,6 +10362,10 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_kakao_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "external_kakao_secret": {
                     "type": "string",
                     "nullable": true
@@ -8738,6 +10376,10 @@
                   },
                   "external_keycloak_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_keycloak_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_keycloak_secret": {
@@ -8756,6 +10398,10 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_linkedin_oidc_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "external_linkedin_oidc_secret": {
                     "type": "string",
                     "nullable": true
@@ -8766,6 +10412,10 @@
                   },
                   "external_slack_oidc_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_slack_oidc_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_slack_oidc_secret": {
@@ -8780,6 +10430,10 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_notion_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "external_notion_secret": {
                     "type": "string",
                     "nullable": true
@@ -8790,6 +10444,10 @@
                   },
                   "external_slack_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_slack_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_slack_secret": {
@@ -8804,6 +10462,10 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_spotify_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "external_spotify_secret": {
                     "type": "string",
                     "nullable": true
@@ -8816,6 +10478,10 @@
                     "type": "string",
                     "nullable": true
                   },
+                  "external_twitch_email_optional": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "external_twitch_secret": {
                     "type": "string",
                     "nullable": true
@@ -8826,6 +10492,10 @@
                   },
                   "external_twitter_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_twitter_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_twitter_secret": {
@@ -8862,6 +10532,10 @@
                   },
                   "external_zoom_client_id": {
                     "type": "string",
+                    "nullable": true
+                  },
+                  "external_zoom_email_optional": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "external_zoom_secret": {
@@ -8961,6 +10635,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_apple_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_apple_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -8971,6 +10649,10 @@
                     },
                     "external_azure_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_azure_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_azure_enabled": {
@@ -8989,6 +10671,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_bitbucket_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_bitbucket_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -8999,6 +10685,10 @@
                     },
                     "external_discord_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_discord_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_discord_enabled": {
@@ -9017,6 +10707,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_facebook_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_facebook_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -9027,6 +10721,10 @@
                     },
                     "external_figma_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_figma_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_figma_enabled": {
@@ -9041,6 +10739,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_github_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_github_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -9051,6 +10753,10 @@
                     },
                     "external_gitlab_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_gitlab_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_gitlab_enabled": {
@@ -9073,6 +10779,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_google_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_google_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -9089,6 +10799,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_kakao_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_kakao_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -9099,6 +10813,10 @@
                     },
                     "external_keycloak_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_keycloak_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_keycloak_enabled": {
@@ -9117,6 +10835,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_linkedin_oidc_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_linkedin_oidc_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -9129,6 +10851,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_slack_oidc_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_slack_oidc_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -9139,6 +10865,10 @@
                     },
                     "external_notion_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_notion_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_notion_enabled": {
@@ -9157,6 +10887,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_slack_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_slack_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -9167,6 +10901,10 @@
                     },
                     "external_spotify_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_spotify_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_spotify_enabled": {
@@ -9181,6 +10919,10 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "external_twitch_email_optional": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "external_twitch_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -9191,6 +10933,10 @@
                     },
                     "external_twitter_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_twitter_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_twitter_enabled": {
@@ -9227,6 +10973,10 @@
                     },
                     "external_zoom_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "external_zoom_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "external_zoom_enabled": {
@@ -9309,6 +11059,18 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "hook_after_user_created_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "hook_after_user_created_uri": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "hook_after_user_created_secrets": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "jwt_exp": {
                       "type": "integer",
                       "nullable": true
@@ -9356,6 +11118,34 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "mailer_subjects_password_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_email_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_phone_changed_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_mfa_factor_enrolled_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_mfa_factor_unenrolled_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_identity_linked_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_subjects_identity_unlinked_notification": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "mailer_templates_confirmation_content": {
                       "type": "string",
                       "nullable": true
@@ -9378,6 +11168,62 @@
                     },
                     "mailer_templates_recovery_content": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_password_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_email_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_phone_changed_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_mfa_factor_enrolled_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_mfa_factor_unenrolled_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_identity_linked_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_templates_identity_unlinked_notification_content": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "mailer_notifications_password_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_email_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_phone_changed_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_mfa_factor_enrolled_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_mfa_factor_unenrolled_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_identity_linked_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "mailer_notifications_identity_unlinked_enabled": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "mfa_max_enrolled_factors": {
@@ -9421,6 +11267,10 @@
                     },
                     "nimbus_oauth_client_id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "nimbus_oauth_email_optional": {
+                      "type": "boolean",
                       "nullable": true
                     },
                     "nimbus_oauth_client_secret": {
@@ -9664,64 +11514,82 @@
                     "external_anonymous_users_enabled",
                     "external_apple_additional_client_ids",
                     "external_apple_client_id",
+                    "external_apple_email_optional",
                     "external_apple_enabled",
                     "external_apple_secret",
                     "external_azure_client_id",
+                    "external_azure_email_optional",
                     "external_azure_enabled",
                     "external_azure_secret",
                     "external_azure_url",
                     "external_bitbucket_client_id",
+                    "external_bitbucket_email_optional",
                     "external_bitbucket_enabled",
                     "external_bitbucket_secret",
                     "external_discord_client_id",
+                    "external_discord_email_optional",
                     "external_discord_enabled",
                     "external_discord_secret",
                     "external_email_enabled",
                     "external_facebook_client_id",
+                    "external_facebook_email_optional",
                     "external_facebook_enabled",
                     "external_facebook_secret",
                     "external_figma_client_id",
+                    "external_figma_email_optional",
                     "external_figma_enabled",
                     "external_figma_secret",
                     "external_github_client_id",
+                    "external_github_email_optional",
                     "external_github_enabled",
                     "external_github_secret",
                     "external_gitlab_client_id",
+                    "external_gitlab_email_optional",
                     "external_gitlab_enabled",
                     "external_gitlab_secret",
                     "external_gitlab_url",
                     "external_google_additional_client_ids",
                     "external_google_client_id",
+                    "external_google_email_optional",
                     "external_google_enabled",
                     "external_google_secret",
                     "external_google_skip_nonce_check",
                     "external_kakao_client_id",
+                    "external_kakao_email_optional",
                     "external_kakao_enabled",
                     "external_kakao_secret",
                     "external_keycloak_client_id",
+                    "external_keycloak_email_optional",
                     "external_keycloak_enabled",
                     "external_keycloak_secret",
                     "external_keycloak_url",
                     "external_linkedin_oidc_client_id",
+                    "external_linkedin_oidc_email_optional",
                     "external_linkedin_oidc_enabled",
                     "external_linkedin_oidc_secret",
                     "external_slack_oidc_client_id",
+                    "external_slack_oidc_email_optional",
                     "external_slack_oidc_enabled",
                     "external_slack_oidc_secret",
                     "external_notion_client_id",
+                    "external_notion_email_optional",
                     "external_notion_enabled",
                     "external_notion_secret",
                     "external_phone_enabled",
                     "external_slack_client_id",
+                    "external_slack_email_optional",
                     "external_slack_enabled",
                     "external_slack_secret",
                     "external_spotify_client_id",
+                    "external_spotify_email_optional",
                     "external_spotify_enabled",
                     "external_spotify_secret",
                     "external_twitch_client_id",
+                    "external_twitch_email_optional",
                     "external_twitch_enabled",
                     "external_twitch_secret",
                     "external_twitter_client_id",
+                    "external_twitter_email_optional",
                     "external_twitter_enabled",
                     "external_twitter_secret",
                     "external_workos_client_id",
@@ -9731,6 +11599,7 @@
                     "external_web3_solana_enabled",
                     "external_web3_ethereum_enabled",
                     "external_zoom_client_id",
+                    "external_zoom_email_optional",
                     "external_zoom_enabled",
                     "external_zoom_secret",
                     "hook_custom_access_token_enabled",
@@ -9751,6 +11620,9 @@
                     "hook_before_user_created_enabled",
                     "hook_before_user_created_uri",
                     "hook_before_user_created_secrets",
+                    "hook_after_user_created_enabled",
+                    "hook_after_user_created_uri",
+                    "hook_after_user_created_secrets",
                     "jwt_exp",
                     "mailer_allow_unverified_email_sign_ins",
                     "mailer_autoconfirm",
@@ -9763,12 +11635,33 @@
                     "mailer_subjects_magic_link",
                     "mailer_subjects_reauthentication",
                     "mailer_subjects_recovery",
+                    "mailer_subjects_password_changed_notification",
+                    "mailer_subjects_email_changed_notification",
+                    "mailer_subjects_phone_changed_notification",
+                    "mailer_subjects_mfa_factor_enrolled_notification",
+                    "mailer_subjects_mfa_factor_unenrolled_notification",
+                    "mailer_subjects_identity_linked_notification",
+                    "mailer_subjects_identity_unlinked_notification",
                     "mailer_templates_confirmation_content",
                     "mailer_templates_email_change_content",
                     "mailer_templates_invite_content",
                     "mailer_templates_magic_link_content",
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
+                    "mailer_templates_password_changed_notification_content",
+                    "mailer_templates_email_changed_notification_content",
+                    "mailer_templates_phone_changed_notification_content",
+                    "mailer_templates_mfa_factor_enrolled_notification_content",
+                    "mailer_templates_mfa_factor_unenrolled_notification_content",
+                    "mailer_templates_identity_linked_notification_content",
+                    "mailer_templates_identity_unlinked_notification_content",
+                    "mailer_notifications_password_changed_enabled",
+                    "mailer_notifications_email_changed_enabled",
+                    "mailer_notifications_phone_changed_enabled",
+                    "mailer_notifications_mfa_factor_enrolled_enabled",
+                    "mailer_notifications_mfa_factor_unenrolled_enabled",
+                    "mailer_notifications_identity_linked_enabled",
+                    "mailer_notifications_identity_unlinked_enabled",
                     "mfa_max_enrolled_factors",
                     "mfa_totp_enroll_enabled",
                     "mfa_totp_verify_enabled",
@@ -9780,6 +11673,7 @@
                     "mfa_phone_template",
                     "mfa_phone_max_frequency",
                     "nimbus_oauth_client_id",
+                    "nimbus_oauth_email_optional",
                     "nimbus_oauth_client_secret",
                     "password_hibp_enabled",
                     "password_min_length",
@@ -9841,8 +11735,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update project's auth config"
@@ -9938,8 +11838,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10014,8 +11920,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10098,8 +12010,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10180,8 +12098,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10214,8 +12138,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10278,8 +12208,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10310,8 +12246,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10344,8 +12286,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10359,6 +12307,7 @@
     },
     "/v1/projects/{ref}/billing/addons": {
       "get": {
+        "description": "Returns the billing addons that are currently applied, including the active compute instance size, and lists every addon option that can be provisioned with pricing metadata.",
         "operationId": "v1-list-project-addons",
         "parameters": [
           {
@@ -10602,8 +12551,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to list project addons"
@@ -10614,10 +12569,11 @@
             "bearer": []
           }
         ],
-        "summary": "Lists project addons",
+        "summary": "List billing addons and compute instance selections",
         "tags": ["Billing"]
       },
       "patch": {
+        "description": "Selects an addon variant, for example scaling the project’s compute instance up or down, and applies it to the project.",
         "operationId": "v1-apply-project-addon",
         "parameters": [
           {
@@ -10701,8 +12657,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to apply project addon"
@@ -10713,12 +12675,13 @@
             "bearer": []
           }
         ],
-        "summary": "Applies project addon",
+        "summary": "Apply or update billing addons, including compute instance size",
         "tags": ["Billing"]
       }
     },
     "/v1/projects/{ref}/billing/addons/{addon_variant}": {
       "delete": {
+        "description": "Disables the selected addon variant, including rolling the compute instance back to its previous size.",
         "operationId": "v1-remove-project-addon",
         "parameters": [
           {
@@ -10782,8 +12745,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to remove project addon"
@@ -10794,7 +12763,7 @@
             "bearer": []
           }
         ],
-        "summary": "Removes project addon",
+        "summary": "Remove billing addons or revert compute instance sizing",
         "tags": ["Billing"]
       }
     },
@@ -10842,8 +12811,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10901,8 +12876,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -10934,8 +12915,14 @@
           "204": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -11098,8 +13085,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -11270,8 +13263,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -11396,8 +13395,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -11531,8 +13536,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to get project's usage api counts"
@@ -11641,8 +13652,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to get project's usage api requests count"
@@ -11760,8 +13777,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to get project's function combined statistics"
@@ -11836,8 +13859,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to create login role"
@@ -11885,8 +13914,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to delete login roles"
@@ -11943,8 +13978,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to list database migrations"
@@ -12008,8 +14049,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to apply database migration"
@@ -12073,8 +14120,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to upsert database migration"
@@ -12130,8 +14183,14 @@
           "201": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to run sql query"
@@ -12167,8 +14226,14 @@
           "201": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to enable Database Webhooks on the project"
@@ -12242,8 +14307,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -12336,8 +14407,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to list database jit access"
@@ -12449,8 +14526,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to authorize database jit access"
@@ -12607,8 +14690,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to upsert database migration"
@@ -12713,8 +14802,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to list database jit access"
@@ -12760,8 +14855,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to remove JIT access"
@@ -12858,8 +14959,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve project's functions"
@@ -13043,11 +15150,17 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "402": {
             "description": "Maximum number of functions reached for Plan"
           },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to create project's function"
@@ -13200,11 +15313,17 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "402": {
             "description": "Maximum number of functions reached for Plan"
           },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update functions"
@@ -13352,11 +15471,17 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "402": {
             "description": "Maximum number of functions reached for Plan"
           },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to deploy function"
@@ -13460,8 +15585,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve function with given slug"
@@ -13649,8 +15780,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to update function with given slug"
@@ -13695,8 +15832,14 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to delete function with given slug"
@@ -13751,8 +15894,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve function body with given slug"
@@ -13819,8 +15968,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to get list of buckets"
@@ -14048,11 +16203,17 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
           },
           "404": {
             "description": "SAML 2.0 support is not enabled for this project"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -14202,11 +16363,17 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
           },
           "404": {
             "description": "SAML 2.0 support is not enabled for this project"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -14358,11 +16525,17 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
           },
           "404": {
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -14588,11 +16761,17 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
           },
           "404": {
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -14742,11 +16921,17 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
           },
           "404": {
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -14841,8 +17026,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to get backups"
@@ -14896,8 +17087,14 @@
           "201": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -14964,8 +17161,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -15023,8 +17226,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to get requested restore points"
@@ -15078,8 +17287,14 @@
           "201": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -15139,8 +17354,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -15209,8 +17430,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -15331,14 +17558,6 @@
                             "required": ["name", "limit"]
                           }
                         },
-                        "target_organization_eligible": {
-                          "type": "boolean",
-                          "nullable": true
-                        },
-                        "target_organization_has_free_project_slots": {
-                          "type": "boolean",
-                          "nullable": true
-                        },
                         "source_subscription_plan": {
                           "type": "string",
                           "enum": ["free", "pro", "team", "enterprise"]
@@ -15355,8 +17574,6 @@
                         "errors",
                         "info",
                         "members_exceeding_free_project_limit",
-                        "target_organization_eligible",
-                        "target_organization_has_free_project_slots",
                         "source_subscription_plan",
                         "target_subscription_plan"
                       ]
@@ -15377,8 +17594,14 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -15416,8 +17639,14 @@
           "204": {
             "description": ""
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "403": {
-            "description": ""
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -15533,6 +17762,11 @@
           },
           "request_review": {
             "type": "boolean"
+          },
+          "notify_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTP endpoint to receive branch status updates."
           }
         }
       },
@@ -15595,6 +17829,10 @@
           },
           "with_data": {
             "type": "boolean"
+          },
+          "notify_url": {
+            "type": "string",
+            "format": "uri"
           }
         },
         "required": [
@@ -15735,7 +17973,8 @@
           },
           "region": {
             "type": "string",
-            "description": "Region you want your server to reside in",
+            "description": "Region you want your server to reside in. Use region_selection instead.",
+            "deprecated": true,
             "enum": [
               "us-east-1",
               "us-east-2",
@@ -15756,6 +17995,66 @@
               "ap-south-1",
               "sa-east-1"
             ]
+          },
+          "region_selection": {
+            "discriminator": {
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["specific"]
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                    "enum": [
+                      "us-east-1",
+                      "us-east-2",
+                      "us-west-1",
+                      "us-west-2",
+                      "ap-east-1",
+                      "ap-southeast-1",
+                      "ap-northeast-1",
+                      "ap-northeast-2",
+                      "ap-southeast-2",
+                      "eu-west-1",
+                      "eu-west-2",
+                      "eu-west-3",
+                      "eu-north-1",
+                      "eu-central-1",
+                      "eu-central-2",
+                      "ca-central-1",
+                      "ap-south-1",
+                      "sa-east-1"
+                    ]
+                  }
+                },
+                "required": ["type", "code"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["smartGroup"]
+                  },
+                  "code": {
+                    "type": "string",
+                    "enum": ["americas", "emea", "apac"],
+                    "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                    "example": "apac"
+                  }
+                },
+                "required": ["type", "code"]
+              }
+            ],
+            "description": "Region selection. Only one of region or region_selection can be specified.",
+            "example": "{ type: 'smartGroup', code: 'americas' }"
           },
           "kps_enabled": {
             "type": "boolean",
@@ -15792,9 +18091,21 @@
             "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
+          },
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+            "description": "Release channel. If not provided, GA will be used.",
+            "deprecated": true
+          },
+          "postgres_engine": {
+            "type": "string",
+            "enum": ["15", "17", "17-oriole"],
+            "description": "Postgres engine version. If not provided, the latest version will be used.",
+            "deprecated": true
           }
         },
-        "required": ["db_pass", "name", "organization_id", "region"],
+        "required": ["db_pass", "name", "organization_id"],
         "additionalProperties": false,
         "hideDefinitions": ["release_channel", "postgres_engine"]
       },
@@ -15846,6 +18157,115 @@
         },
         "required": ["id", "organization_id", "name", "region", "created_at", "status"]
       },
+      "RegionsInfo": {
+        "type": "object",
+        "properties": {
+          "recommendations": {
+            "type": "object",
+            "properties": {
+              "smartGroup": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string",
+                    "enum": ["americas", "emea", "apac"]
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["smartGroup"]
+                  }
+                },
+                "required": ["name", "code", "type"]
+              },
+              "specific": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["specific"]
+                    },
+                    "provider": {
+                      "type": "string",
+                      "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["capacity", "other"]
+                    }
+                  },
+                  "required": ["name", "code", "type", "provider"]
+                }
+              }
+            },
+            "required": ["smartGroup", "specific"]
+          },
+          "all": {
+            "type": "object",
+            "properties": {
+              "smartGroup": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": ["americas", "emea", "apac"]
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["smartGroup"]
+                    }
+                  },
+                  "required": ["name", "code", "type"]
+                }
+              },
+              "specific": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["specific"]
+                    },
+                    "provider": {
+                      "type": "string",
+                      "enum": ["AWS", "FLY", "AWS_K8S", "AWS_NIMBUS"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["capacity", "other"]
+                    }
+                  },
+                  "required": ["name", "code", "type", "provider"]
+                }
+              }
+            },
+            "required": ["smartGroup", "specific"]
+          }
+        },
+        "required": ["recommendations", "all"]
+      },
       "OrganizationResponseV1": {
         "type": "object",
         "properties": {
@@ -15896,8 +18316,11 @@
           },
           "resource": {
             "type": "string",
-            "enum": ["https://api.supabase.io/mcp"],
+            "format": "uri",
             "description": "Resource indicator for MCP (Model Context Protocol) clients"
+          },
+          "scope": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -16006,6 +18429,9 @@
                     }
                   },
                   "required": ["id", "username"]
+                },
+                "favorite": {
+                  "type": "boolean"
                 }
               },
               "required": [
@@ -16018,7 +18444,8 @@
                 "description",
                 "project",
                 "owner",
-                "updated_by"
+                "updated_by",
+                "favorite"
               ]
             }
           },
@@ -16091,11 +18518,16 @@
             },
             "required": ["id", "username"]
           },
+          "favorite": {
+            "type": "boolean"
+          },
           "content": {
             "type": "object",
             "properties": {
               "favorite": {
-                "type": "boolean"
+                "type": "boolean",
+                "deprecated": true,
+                "description": "Deprecated: Rely on root-level favorite property instead."
               },
               "schema_version": {
                 "type": "string"
@@ -16104,7 +18536,7 @@
                 "type": "string"
               }
             },
-            "required": ["favorite", "schema_version", "sql"]
+            "required": ["schema_version", "sql"]
           }
         },
         "required": [
@@ -16118,8 +18550,191 @@
           "project",
           "owner",
           "updated_by",
+          "favorite",
           "content"
         ]
+      },
+      "ListActionRunResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "branch_id": {
+              "type": "string"
+            },
+            "run_steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": ["clone", "pull", "health", "configure", "migrate", "seed", "deploy"]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "CREATED",
+                      "DEAD",
+                      "EXITED",
+                      "PAUSED",
+                      "REMOVING",
+                      "RESTARTING",
+                      "RUNNING"
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string"
+                  },
+                  "updated_at": {
+                    "type": "string"
+                  }
+                },
+                "required": ["name", "status", "created_at", "updated_at"]
+              }
+            },
+            "git_config": {
+              "nullable": true
+            },
+            "workdir": {
+              "type": "string",
+              "nullable": true
+            },
+            "check_run_id": {
+              "type": "number",
+              "nullable": true
+            },
+            "created_at": {
+              "type": "string"
+            },
+            "updated_at": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "branch_id",
+            "run_steps",
+            "workdir",
+            "check_run_id",
+            "created_at",
+            "updated_at"
+          ]
+        }
+      },
+      "ActionRunResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "branch_id": {
+            "type": "string"
+          },
+          "run_steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "enum": ["clone", "pull", "health", "configure", "migrate", "seed", "deploy"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "CREATED",
+                    "DEAD",
+                    "EXITED",
+                    "PAUSED",
+                    "REMOVING",
+                    "RESTARTING",
+                    "RUNNING"
+                  ]
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "updated_at": {
+                  "type": "string"
+                }
+              },
+              "required": ["name", "status", "created_at", "updated_at"]
+            }
+          },
+          "git_config": {
+            "nullable": true
+          },
+          "workdir": {
+            "type": "string",
+            "nullable": true
+          },
+          "check_run_id": {
+            "type": "number",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "branch_id",
+          "run_steps",
+          "workdir",
+          "check_run_id",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "UpdateRunStatusBody": {
+        "type": "object",
+        "properties": {
+          "clone": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "pull": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "health": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "configure": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "migrate": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "seed": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          },
+          "deploy": {
+            "type": "string",
+            "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
+          }
+        }
+      },
+      "UpdateRunStatusResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": ["ok"]
+          }
+        },
+        "required": ["message"]
       },
       "ApiKeyResponse": {
         "type": "object",
@@ -16286,6 +18901,11 @@
           },
           "with_data": {
             "type": "boolean"
+          },
+          "notify_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTP endpoint to receive branch status updates."
           }
         },
         "required": ["branch_name"]
@@ -17196,9 +19816,34 @@
               {
                 "type": "object",
                 "properties": {
+                  "kid": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "use": {
+                    "type": "string",
+                    "enum": ["sig"]
+                  },
+                  "key_ops": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["sign", "verify"]
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "ext": {
+                    "type": "boolean",
+                    "enum": [true]
+                  },
                   "kty": {
                     "type": "string",
                     "enum": ["RSA"]
+                  },
+                  "alg": {
+                    "type": "string",
+                    "enum": ["RS256"]
                   },
                   "n": {
                     "type": "string"
@@ -17232,9 +19877,34 @@
               {
                 "type": "object",
                 "properties": {
+                  "kid": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "use": {
+                    "type": "string",
+                    "enum": ["sig"]
+                  },
+                  "key_ops": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["sign", "verify"]
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "ext": {
+                    "type": "boolean",
+                    "enum": [true]
+                  },
                   "kty": {
                     "type": "string",
                     "enum": ["EC"]
+                  },
+                  "alg": {
+                    "type": "string",
+                    "enum": ["ES256"]
                   },
                   "crv": {
                     "type": "string",
@@ -17256,9 +19926,34 @@
               {
                 "type": "object",
                 "properties": {
+                  "kid": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "use": {
+                    "type": "string",
+                    "enum": ["sig"]
+                  },
+                  "key_ops": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["sign", "verify"]
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "ext": {
+                    "type": "boolean",
+                    "enum": [true]
+                  },
                   "kty": {
                     "type": "string",
                     "enum": ["OKP"]
+                  },
+                  "alg": {
+                    "type": "string",
+                    "enum": ["EdDSA"]
                   },
                   "crv": {
                     "type": "string",
@@ -17277,9 +19972,34 @@
               {
                 "type": "object",
                 "properties": {
+                  "kid": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "use": {
+                    "type": "string",
+                    "enum": ["sig"]
+                  },
+                  "key_ops": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["sign", "verify"]
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "ext": {
+                    "type": "boolean",
+                    "enum": [true]
+                  },
                   "kty": {
                     "type": "string",
                     "enum": ["oct"]
+                  },
+                  "alg": {
+                    "type": "string",
+                    "enum": ["HS256"]
                   },
                   "k": {
                     "type": "string",
@@ -17793,6 +20513,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_apple_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_apple_enabled": {
             "type": "boolean",
             "nullable": true
@@ -17803,6 +20527,10 @@
           },
           "external_azure_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_azure_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_azure_enabled": {
@@ -17821,6 +20549,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_bitbucket_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_bitbucket_enabled": {
             "type": "boolean",
             "nullable": true
@@ -17831,6 +20563,10 @@
           },
           "external_discord_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_discord_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_discord_enabled": {
@@ -17849,6 +20585,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_facebook_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_facebook_enabled": {
             "type": "boolean",
             "nullable": true
@@ -17859,6 +20599,10 @@
           },
           "external_figma_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_figma_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_figma_enabled": {
@@ -17873,6 +20617,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_github_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_github_enabled": {
             "type": "boolean",
             "nullable": true
@@ -17883,6 +20631,10 @@
           },
           "external_gitlab_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_gitlab_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_gitlab_enabled": {
@@ -17905,6 +20657,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_google_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_google_enabled": {
             "type": "boolean",
             "nullable": true
@@ -17921,6 +20677,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_kakao_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_kakao_enabled": {
             "type": "boolean",
             "nullable": true
@@ -17931,6 +20691,10 @@
           },
           "external_keycloak_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_keycloak_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_keycloak_enabled": {
@@ -17949,6 +20713,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_linkedin_oidc_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_linkedin_oidc_enabled": {
             "type": "boolean",
             "nullable": true
@@ -17961,6 +20729,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_slack_oidc_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_slack_oidc_enabled": {
             "type": "boolean",
             "nullable": true
@@ -17971,6 +20743,10 @@
           },
           "external_notion_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_notion_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_notion_enabled": {
@@ -17989,6 +20765,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_slack_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_slack_enabled": {
             "type": "boolean",
             "nullable": true
@@ -17999,6 +20779,10 @@
           },
           "external_spotify_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_spotify_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_spotify_enabled": {
@@ -18013,6 +20797,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_twitch_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_twitch_enabled": {
             "type": "boolean",
             "nullable": true
@@ -18023,6 +20811,10 @@
           },
           "external_twitter_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_twitter_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_twitter_enabled": {
@@ -18059,6 +20851,10 @@
           },
           "external_zoom_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_zoom_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_zoom_enabled": {
@@ -18141,6 +20937,18 @@
             "type": "string",
             "nullable": true
           },
+          "hook_after_user_created_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "hook_after_user_created_uri": {
+            "type": "string",
+            "nullable": true
+          },
+          "hook_after_user_created_secrets": {
+            "type": "string",
+            "nullable": true
+          },
           "jwt_exp": {
             "type": "integer",
             "nullable": true
@@ -18188,6 +20996,34 @@
             "type": "string",
             "nullable": true
           },
+          "mailer_subjects_password_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_email_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_phone_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_enrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_unenrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_linked_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_unlinked_notification": {
+            "type": "string",
+            "nullable": true
+          },
           "mailer_templates_confirmation_content": {
             "type": "string",
             "nullable": true
@@ -18210,6 +21046,62 @@
           },
           "mailer_templates_recovery_content": {
             "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_password_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_email_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_phone_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_enrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_unenrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_linked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_unlinked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_notifications_password_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_email_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_phone_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_enrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_unenrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_linked_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_unlinked_enabled": {
+            "type": "boolean",
             "nullable": true
           },
           "mfa_max_enrolled_factors": {
@@ -18253,6 +21145,10 @@
           },
           "nimbus_oauth_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "nimbus_oauth_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "nimbus_oauth_client_secret": {
@@ -18496,64 +21392,82 @@
           "external_anonymous_users_enabled",
           "external_apple_additional_client_ids",
           "external_apple_client_id",
+          "external_apple_email_optional",
           "external_apple_enabled",
           "external_apple_secret",
           "external_azure_client_id",
+          "external_azure_email_optional",
           "external_azure_enabled",
           "external_azure_secret",
           "external_azure_url",
           "external_bitbucket_client_id",
+          "external_bitbucket_email_optional",
           "external_bitbucket_enabled",
           "external_bitbucket_secret",
           "external_discord_client_id",
+          "external_discord_email_optional",
           "external_discord_enabled",
           "external_discord_secret",
           "external_email_enabled",
           "external_facebook_client_id",
+          "external_facebook_email_optional",
           "external_facebook_enabled",
           "external_facebook_secret",
           "external_figma_client_id",
+          "external_figma_email_optional",
           "external_figma_enabled",
           "external_figma_secret",
           "external_github_client_id",
+          "external_github_email_optional",
           "external_github_enabled",
           "external_github_secret",
           "external_gitlab_client_id",
+          "external_gitlab_email_optional",
           "external_gitlab_enabled",
           "external_gitlab_secret",
           "external_gitlab_url",
           "external_google_additional_client_ids",
           "external_google_client_id",
+          "external_google_email_optional",
           "external_google_enabled",
           "external_google_secret",
           "external_google_skip_nonce_check",
           "external_kakao_client_id",
+          "external_kakao_email_optional",
           "external_kakao_enabled",
           "external_kakao_secret",
           "external_keycloak_client_id",
+          "external_keycloak_email_optional",
           "external_keycloak_enabled",
           "external_keycloak_secret",
           "external_keycloak_url",
           "external_linkedin_oidc_client_id",
+          "external_linkedin_oidc_email_optional",
           "external_linkedin_oidc_enabled",
           "external_linkedin_oidc_secret",
           "external_slack_oidc_client_id",
+          "external_slack_oidc_email_optional",
           "external_slack_oidc_enabled",
           "external_slack_oidc_secret",
           "external_notion_client_id",
+          "external_notion_email_optional",
           "external_notion_enabled",
           "external_notion_secret",
           "external_phone_enabled",
           "external_slack_client_id",
+          "external_slack_email_optional",
           "external_slack_enabled",
           "external_slack_secret",
           "external_spotify_client_id",
+          "external_spotify_email_optional",
           "external_spotify_enabled",
           "external_spotify_secret",
           "external_twitch_client_id",
+          "external_twitch_email_optional",
           "external_twitch_enabled",
           "external_twitch_secret",
           "external_twitter_client_id",
+          "external_twitter_email_optional",
           "external_twitter_enabled",
           "external_twitter_secret",
           "external_workos_client_id",
@@ -18563,6 +21477,7 @@
           "external_web3_solana_enabled",
           "external_web3_ethereum_enabled",
           "external_zoom_client_id",
+          "external_zoom_email_optional",
           "external_zoom_enabled",
           "external_zoom_secret",
           "hook_custom_access_token_enabled",
@@ -18583,6 +21498,9 @@
           "hook_before_user_created_enabled",
           "hook_before_user_created_uri",
           "hook_before_user_created_secrets",
+          "hook_after_user_created_enabled",
+          "hook_after_user_created_uri",
+          "hook_after_user_created_secrets",
           "jwt_exp",
           "mailer_allow_unverified_email_sign_ins",
           "mailer_autoconfirm",
@@ -18595,12 +21513,33 @@
           "mailer_subjects_magic_link",
           "mailer_subjects_reauthentication",
           "mailer_subjects_recovery",
+          "mailer_subjects_password_changed_notification",
+          "mailer_subjects_email_changed_notification",
+          "mailer_subjects_phone_changed_notification",
+          "mailer_subjects_mfa_factor_enrolled_notification",
+          "mailer_subjects_mfa_factor_unenrolled_notification",
+          "mailer_subjects_identity_linked_notification",
+          "mailer_subjects_identity_unlinked_notification",
           "mailer_templates_confirmation_content",
           "mailer_templates_email_change_content",
           "mailer_templates_invite_content",
           "mailer_templates_magic_link_content",
           "mailer_templates_reauthentication_content",
           "mailer_templates_recovery_content",
+          "mailer_templates_password_changed_notification_content",
+          "mailer_templates_email_changed_notification_content",
+          "mailer_templates_phone_changed_notification_content",
+          "mailer_templates_mfa_factor_enrolled_notification_content",
+          "mailer_templates_mfa_factor_unenrolled_notification_content",
+          "mailer_templates_identity_linked_notification_content",
+          "mailer_templates_identity_unlinked_notification_content",
+          "mailer_notifications_password_changed_enabled",
+          "mailer_notifications_email_changed_enabled",
+          "mailer_notifications_phone_changed_enabled",
+          "mailer_notifications_mfa_factor_enrolled_enabled",
+          "mailer_notifications_mfa_factor_unenrolled_enabled",
+          "mailer_notifications_identity_linked_enabled",
+          "mailer_notifications_identity_unlinked_enabled",
           "mfa_max_enrolled_factors",
           "mfa_totp_enroll_enabled",
           "mfa_totp_verify_enabled",
@@ -18612,6 +21551,7 @@
           "mfa_phone_template",
           "mfa_phone_max_frequency",
           "nimbus_oauth_client_id",
+          "nimbus_oauth_email_optional",
           "nimbus_oauth_client_secret",
           "password_hibp_enabled",
           "password_min_length",
@@ -18751,6 +21691,34 @@
             "type": "string",
             "nullable": true
           },
+          "mailer_subjects_password_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_email_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_phone_changed_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_enrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_mfa_factor_unenrolled_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_linked_notification": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_subjects_identity_unlinked_notification": {
+            "type": "string",
+            "nullable": true
+          },
           "mailer_templates_invite_content": {
             "type": "string",
             "nullable": true
@@ -18773,6 +21741,62 @@
           },
           "mailer_templates_reauthentication_content": {
             "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_password_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_email_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_phone_changed_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_enrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_mfa_factor_unenrolled_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_linked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_templates_identity_unlinked_notification_content": {
+            "type": "string",
+            "nullable": true
+          },
+          "mailer_notifications_password_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_email_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_phone_changed_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_enrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_mfa_factor_unenrolled_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_linked_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "mailer_notifications_identity_unlinked_enabled": {
+            "type": "boolean",
             "nullable": true
           },
           "mfa_max_enrolled_factors": {
@@ -19101,12 +22125,28 @@
             "type": "string",
             "nullable": true
           },
+          "hook_after_user_created_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "hook_after_user_created_uri": {
+            "type": "string",
+            "nullable": true
+          },
+          "hook_after_user_created_secrets": {
+            "type": "string",
+            "nullable": true
+          },
           "external_apple_enabled": {
             "type": "boolean",
             "nullable": true
           },
           "external_apple_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_apple_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_apple_secret": {
@@ -19125,6 +22165,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_azure_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_azure_secret": {
             "type": "string",
             "nullable": true
@@ -19141,6 +22185,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_bitbucket_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_bitbucket_secret": {
             "type": "string",
             "nullable": true
@@ -19151,6 +22199,10 @@
           },
           "external_discord_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_discord_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_discord_secret": {
@@ -19165,6 +22217,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_facebook_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_facebook_secret": {
             "type": "string",
             "nullable": true
@@ -19175,6 +22231,10 @@
           },
           "external_figma_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_figma_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_figma_secret": {
@@ -19189,6 +22249,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_github_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_github_secret": {
             "type": "string",
             "nullable": true
@@ -19199,6 +22263,10 @@
           },
           "external_gitlab_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_gitlab_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_gitlab_secret": {
@@ -19215,6 +22283,10 @@
           },
           "external_google_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_google_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_google_secret": {
@@ -19237,6 +22309,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_kakao_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_kakao_secret": {
             "type": "string",
             "nullable": true
@@ -19247,6 +22323,10 @@
           },
           "external_keycloak_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_keycloak_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_keycloak_secret": {
@@ -19265,6 +22345,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_linkedin_oidc_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_linkedin_oidc_secret": {
             "type": "string",
             "nullable": true
@@ -19275,6 +22359,10 @@
           },
           "external_slack_oidc_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_slack_oidc_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_slack_oidc_secret": {
@@ -19289,6 +22377,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_notion_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_notion_secret": {
             "type": "string",
             "nullable": true
@@ -19299,6 +22391,10 @@
           },
           "external_slack_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_slack_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_slack_secret": {
@@ -19313,6 +22409,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_spotify_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_spotify_secret": {
             "type": "string",
             "nullable": true
@@ -19325,6 +22425,10 @@
             "type": "string",
             "nullable": true
           },
+          "external_twitch_email_optional": {
+            "type": "boolean",
+            "nullable": true
+          },
           "external_twitch_secret": {
             "type": "string",
             "nullable": true
@@ -19335,6 +22439,10 @@
           },
           "external_twitter_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_twitter_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_twitter_secret": {
@@ -19371,6 +22479,10 @@
           },
           "external_zoom_client_id": {
             "type": "string",
+            "nullable": true
+          },
+          "external_zoom_email_optional": {
+            "type": "boolean",
             "nullable": true
           },
           "external_zoom_secret": {
@@ -21750,14 +24862,6 @@
                   "required": ["name", "limit"]
                 }
               },
-              "target_organization_eligible": {
-                "type": "boolean",
-                "nullable": true
-              },
-              "target_organization_has_free_project_slots": {
-                "type": "boolean",
-                "nullable": true
-              },
               "source_subscription_plan": {
                 "type": "string",
                 "enum": ["free", "pro", "team", "enterprise"]
@@ -21774,8 +24878,6 @@
               "errors",
               "info",
               "members_exceeding_free_project_limit",
-              "target_organization_eligible",
-              "target_organization_has_free_project_slots",
               "source_subscription_plan",
               "target_subscription_plan"
             ]

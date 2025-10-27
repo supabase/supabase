@@ -6,18 +6,18 @@ import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchDiffVariables = {
-  branchId: string
+  branchRef: string
   projectRef: string
   includedSchemas?: string
 }
 
 export async function getBranchDiff({
-  branchId,
+  branchRef,
   includedSchemas,
-}: Pick<BranchDiffVariables, 'branchId' | 'includedSchemas'>) {
+}: Pick<BranchDiffVariables, 'branchRef' | 'includedSchemas'>) {
   const { data: diffData, error } = await get('/v1/branches/{branch_id_or_ref}/diff', {
     params: {
-      path: { branch_id_or_ref: branchId },
+      path: { branch_id_or_ref: branchRef },
       query: includedSchemas ? { included_schemas: includedSchemas } : undefined,
     },
     headers: {
@@ -41,17 +41,15 @@ export async function getBranchDiff({
 type BranchDiffData = Awaited<ReturnType<typeof getBranchDiff>>
 
 export const useBranchDiffQuery = (
-  { branchId, projectRef, includedSchemas }: BranchDiffVariables,
+  { branchRef, projectRef, includedSchemas }: BranchDiffVariables,
   {
     enabled = true,
     ...options
   }: Omit<UseQueryOptions<BranchDiffData, ResponseError>, 'queryKey' | 'queryFn'> = {}
 ) =>
-  useQuery<BranchDiffData, ResponseError>(
-    branchKeys.diff(projectRef, branchId),
-    () => getBranchDiff({ branchId, includedSchemas }),
-    {
-      enabled: IS_PLATFORM && enabled && typeof branchId !== 'undefined' && branchId !== '',
-      ...options,
-    }
-  )
+  useQuery<BranchDiffData, ResponseError>({
+    queryKey: branchKeys.diff(projectRef, branchRef),
+    queryFn: () => getBranchDiff({ branchRef, includedSchemas }),
+    enabled: IS_PLATFORM && enabled && Boolean(branchRef),
+    ...options,
+  })

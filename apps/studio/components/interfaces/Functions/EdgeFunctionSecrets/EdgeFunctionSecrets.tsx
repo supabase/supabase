@@ -9,7 +9,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -21,14 +21,11 @@ const EdgeFunctionSecrets = () => {
   const [searchString, setSearchString] = useState('')
   const [selectedSecret, setSelectedSecret] = useState<ProjectSecret>()
 
-  const { can: canReadSecrets, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+  const { can: canReadSecrets, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.SECRETS_READ,
     '*'
   )
-  const { can: canUpdateSecrets } = useAsyncCheckProjectPermissions(
-    PermissionAction.SECRETS_WRITE,
-    '*'
-  )
+  const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
 
   const { data, error, isLoading, isSuccess, isError } = useSecretsQuery({
     projectRef: projectRef,

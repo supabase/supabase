@@ -1,6 +1,12 @@
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { YAxisProps } from 'recharts'
 
+export type ReportDataProviderAttribute = {
+  attribute: string
+  label: string
+  color?: { light: string; dark: string }
+}
+
 export interface ReportDataProvider<FiltersType> {
   (
     projectRef: string,
@@ -10,13 +16,9 @@ export interface ReportDataProvider<FiltersType> {
     filters?: FiltersType
   ): Promise<{
     data: any
-    attributes?: {
-      attribute: string
-      label: string
-      color?: { light: string; dark: string }
-    }[]
+    attributes?: ReportDataProviderAttribute[]
     query?: string // The SQL used to fetch the data if any
-  }> // [jordi] would be cool to have a type that forces data keys to match the attributes
+  }>
 }
 
 export interface ReportConfig<FiltersType = any> {
@@ -25,6 +27,7 @@ export interface ReportConfig<FiltersType = any> {
   dataProvider: ReportDataProvider<FiltersType>
   valuePrecision: number
   hide: boolean
+  hideHighlightedValue?: boolean
   showTooltip: boolean
   showLegend: boolean
   showMaxValue: boolean

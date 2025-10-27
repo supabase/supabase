@@ -3,6 +3,7 @@ import { Badge, Button, Checkbox, Modal } from 'ui'
 
 import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
 import SqlEditor from 'components/ui/SqlEditor'
+import { DOCS_URL } from 'lib/constants'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
 
@@ -35,7 +36,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         <p className="text-sm text-foreground-lighter">
           Based on the operations you have selected, you can use the highlighted functions in the{' '}
           <a
-            href="https://supabase.com/docs/reference/javascript/storage-from-list"
+            href={`${DOCS_URL}/reference/javascript/storage-from-list`}
             target="_blank"
             rel="noreferrer"
             className="underline"

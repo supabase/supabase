@@ -35,12 +35,10 @@ export const useOrganizationInvitationTokenQuery = <TData = OrganizationInviteTo
     ...options
   }: UseQueryOptions<OrganizationInviteTokenData, OrganizationInviteTokenError, TData> = {}
 ) => {
-  return useQuery<OrganizationInviteTokenData, OrganizationInviteTokenError, TData>(
-    organizationKeys.token(slug, token),
-    ({ signal }) => getOrganizationInviteByToken({ slug, token }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined' && typeof token !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<OrganizationInviteTokenData, OrganizationInviteTokenError, TData>({
+    queryKey: organizationKeys.token(slug, token),
+    queryFn: ({ signal }) => getOrganizationInviteByToken({ slug, token }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && typeof token !== 'undefined',
+    ...options,
+  })
 }

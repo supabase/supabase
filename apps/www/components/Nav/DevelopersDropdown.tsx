@@ -12,7 +12,7 @@ type LinkProps = {
   svg?: any
 }
 
-const DevelopersDropdown = () => {
+export const DevelopersDropdown = () => {
   const { jobsCount, latestBlogPosts } = staticContent
 
   return (
@@ -79,5 +79,3 @@ const DevelopersDropdown = () => {
     </div>
   )
 }
-
-export default DevelopersDropdown

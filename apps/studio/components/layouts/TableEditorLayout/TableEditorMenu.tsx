@@ -16,7 +16,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -85,7 +85,7 @@ export const TableEditorMenu = () => {
     [data?.pages]
   )
 
-  const { can: canCreateTables } = useAsyncCheckProjectPermissions(
+  const { can: canCreateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
@@ -133,6 +133,7 @@ export const TableEditorMenu = () => {
               setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
+            portal={!isMobile}
           />
 
           <div className="grid gap-3 mx-4">
@@ -146,7 +147,7 @@ export const TableEditorMenu = () => {
                 icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
                 type="default"
                 className="justify-start"
-                onClick={snap.onAddTable}
+                onClick={() => snap.onAddTable()}
                 tooltip={{
                   content: {
                     side: 'bottom',

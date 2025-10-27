@@ -1,13 +1,14 @@
 import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
 import Image from 'next/legacy/image'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -28,8 +29,7 @@ export const HelpPopover = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const projectRef = project?.parent_project_ref ?? router.query.ref
-  const supportUrl = `/support/new${projectRef ? `?projectRef=${projectRef}` : ''}`
+  const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
 
   return (
     <Popover_Shadcn_>
@@ -99,7 +99,7 @@ export const HelpPopover = () => {
             )}
             <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
               <a
-                href="https://supabase.com/docs/guides/platform/troubleshooting"
+                href={`${DOCS_URL}/guides/platform/troubleshooting`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -107,7 +107,7 @@ export const HelpPopover = () => {
               </a>
             </ButtonGroupItem>
             <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
-              <a href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
+              <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
                 Docs
               </a>
             </ButtonGroupItem>
@@ -117,7 +117,7 @@ export const HelpPopover = () => {
               </a>
             </ButtonGroupItem>
             <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
-              <Link href={supportUrl}>Contact Support</Link>
+              <SupportLink queryParams={{ projectRef }}>Contact Support</SupportLink>
             </ButtonGroupItem>
           </ButtonGroup>
         </div>

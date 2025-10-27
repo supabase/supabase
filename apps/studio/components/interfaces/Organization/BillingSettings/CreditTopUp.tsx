@@ -6,7 +6,6 @@ import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/
 import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -14,10 +13,12 @@ import { z } from 'zod'
 
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import { NO_PROJECT_MARKER } from 'components/interfaces/Support/SupportForm.utils'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationCreditTopUpMutation } from 'data/organizations/organization-credit-top-up-mutation'
 import { subscriptionKeys } from 'data/subscriptions/keys'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import {
   Alert_Shadcn_,
@@ -63,7 +64,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
   }>(null)
 
-  const { can: canTopUpCredits, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+  const { can: canTopUpCredits, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -237,17 +238,22 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
             <DialogDescription className="space-y-2">
               <p className="prose text-sm">
                 On successful payment, an invoice will be issued and you'll be granted credits.
-                Credits will be applied to outstanding and future invoices and are not refundable.
-                The topped up credits do not expire.
+                Credits will be applied to future invoices only and are not refundable. The topped
+                up credits do not expire.
               </p>
               <p className="prose text-sm">
-                For larger discounted credit packages, please{' '}
-                <Link
-                  href={`/support/new?slug=${slug}&subject=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.SALES_ENQUIRY}`}
-                  target="_blank"
+                For larger discounted credit packages, please reach out to us via{' '}
+                <SupportLink
+                  queryParams={{
+                    orgSlug: slug,
+                    projectRef: NO_PROJECT_MARKER,
+                    subject: 'I would like to inquire about larger credit packages',
+                    category: SupportCategories.SALES_ENQUIRY,
+                  }}
                 >
-                  reach out.
-                </Link>
+                  support
+                </SupportLink>
+                .
               </p>
             </DialogDescription>
           </DialogHeader>

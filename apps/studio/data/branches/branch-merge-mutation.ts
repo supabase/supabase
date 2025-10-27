@@ -8,19 +8,14 @@ import { getBranchDiff } from './branch-diff-query'
 import { upsertMigration } from '../database/migration-upsert-mutation'
 
 export type BranchMergeVariables = {
-  id: string
   branchProjectRef: string
   baseProjectRef: string
   migration_version?: string
 }
 
-export async function mergeBranch({
-  id,
-  branchProjectRef,
-  migration_version,
-}: BranchMergeVariables) {
+export async function mergeBranch({ branchProjectRef, migration_version }: BranchMergeVariables) {
   // Step 1: Get the diff output from the branch
-  const diffContent = await getBranchDiff({ branchId: id })
+  const diffContent = await getBranchDiff({ branchRef: branchProjectRef })
 
   let migrationCreated = false
 
@@ -41,7 +36,7 @@ export async function mergeBranch({
 
   // Step 3: Call POST /v1/branches/id/merge to merge the branch
   const { data, error } = await post('/v1/branches/{branch_id_or_ref}/merge', {
-    params: { path: { branch_id_or_ref: id } },
+    params: { path: { branch_id_or_ref: branchProjectRef } },
     body: { migration_version },
   })
 
@@ -68,24 +63,22 @@ export const useBranchMergeMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchMergeData, ResponseError, BranchMergeVariables>(
-    (vars) => mergeBranch(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { baseProjectRef } = variables
-        await queryClient.invalidateQueries(branchKeys.list(baseProjectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          let errorMessage = data.message || 'Unknown error occurred'
+  return useMutation<BranchMergeData, ResponseError, BranchMergeVariables>({
+    mutationFn: (vars) => mergeBranch(vars),
+    async onSuccess(data, variables, context) {
+      const { baseProjectRef } = variables
+      await queryClient.invalidateQueries(branchKeys.list(baseProjectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        let errorMessage = data.message || 'Unknown error occurred'
 
-          toast.error(`Failed to merge branch: ${errorMessage}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+        toast.error(`Failed to merge branch: ${errorMessage}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

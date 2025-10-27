@@ -49,20 +49,18 @@ export const useGetSignBucketObjectMutation = ({
   UseMutationOptions<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>(
-    (vars) => listBucketObjects(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to list bucket objects: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>({
+    mutationFn: (vars) => listBucketObjects(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to list bucket objects: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

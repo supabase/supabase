@@ -13,8 +13,8 @@ export async function getGitHubBranches(
 ) {
   if (!connectionId) throw new Error('connectionId is required')
 
-  const { data, error } = await get(`/platform/integrations/github/branches/{connectionId}`, {
-    params: { path: { connectionId } },
+  const { data, error } = await get(`/platform/integrations/github/branches/{connection_id}`, {
+    params: { path: { connection_id: connectionId } },
     signal,
   })
 
@@ -32,11 +32,9 @@ export const useGitHubBranchesQuery = <TData = GitHubBranchesData>(
     ...options
   }: UseQueryOptions<GitHubBranchesData, GitHubBranchesError, TData> = {}
 ) =>
-  useQuery<GitHubBranchesData, GitHubBranchesError, TData>(
-    integrationKeys.githubBranchesList(connectionId),
-    ({ signal }) => getGitHubBranches({ connectionId }, signal),
-    {
-      enabled: enabled && typeof connectionId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<GitHubBranchesData, GitHubBranchesError, TData>({
+    queryKey: integrationKeys.githubBranchesList(connectionId),
+    queryFn: ({ signal }) => getGitHubBranches({ connectionId }, signal),
+    enabled: enabled && typeof connectionId !== 'undefined',
+    ...options,
+  })

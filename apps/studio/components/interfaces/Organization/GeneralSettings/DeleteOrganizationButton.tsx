@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Form, Input, Modal } from 'ui'
@@ -24,7 +24,7 @@ export const DeleteOrganizationButton = () => {
     ''
   )
 
-  const { can: canDeleteOrganization } = useAsyncCheckProjectPermissions(
+  const { can: canDeleteOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
   )

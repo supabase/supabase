@@ -22,10 +22,7 @@ function getManagedBy(org: OrganizationBase): ManagedBy {
   switch (org.billing_partner) {
     case 'vercel_marketplace':
       return MANAGED_BY.VERCEL_MARKETPLACE
-    // TODO(ignacio): Uncomment this when we've deployed the AWS Marketplace new slug
-    // case 'aws_marketplace':
-    // return MANAGED_BY.AWS_MARKETPLACE
-    case 'aws':
+    case 'aws_marketplace':
       return MANAGED_BY.AWS_MARKETPLACE
     default:
       return MANAGED_BY.SUPABASE
@@ -57,11 +54,13 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   ...options
 }: UseQueryOptions<OrganizationsData, OrganizationsError, TData> = {}) => {
   const { profile } = useProfile()
-  return useQuery<OrganizationsData, OrganizationsError, TData>(
-    organizationKeys.list(),
-    ({ signal }) => getOrganizations({ signal }),
-    { enabled: enabled && profile !== undefined, ...options, staleTime: 30 * 60 * 1000 }
-  )
+  return useQuery<OrganizationsData, OrganizationsError, TData>({
+    queryKey: organizationKeys.list(),
+    queryFn: ({ signal }) => getOrganizations({ signal }),
+    enabled: enabled && profile !== undefined,
+    ...options,
+    staleTime: 30 * 60 * 1000,
+  })
 }
 
 export function invalidateOrganizationsQuery(client: QueryClient) {

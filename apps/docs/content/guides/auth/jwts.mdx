@@ -165,6 +165,16 @@ val supabase = createSupabaseClient(
 </TabPanel>
 </$Show>
 
+<TabPanel id="bash" label="cURL">
+
+```bash
+curl 'https://<supabase-project>.supabase.co/rest/v1/my_table?select=id' \
+  -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+  -H "Authorization: Bearer <your JWT here>"
+```
+
+</TabPanel>
+
 </Tabs>
 
 In the past there was a recommendation to set custom headers on the Supabase client with the `Authorization` header including your custom JWT. This is no longer recommended as it's less flexible and causes confusion when combined with a user session from Supabase Auth.

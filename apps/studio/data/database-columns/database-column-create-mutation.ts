@@ -58,20 +58,18 @@ export const useDatabaseColumnCreateMutation = ({
   UseMutationOptions<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>(
-    (vars) => createDatabaseColumn(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database column: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>({
+    mutationFn: (vars) => createDatabaseColumn(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database column: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

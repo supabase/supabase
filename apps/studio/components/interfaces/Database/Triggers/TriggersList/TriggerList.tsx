@@ -1,11 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
-import { Check, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 
-import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
@@ -14,21 +13,24 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  TableRow,
-  TableCell,
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
+import { PostgresTrigger } from '@supabase/postgres-meta'
 
 interface TriggerListProps {
   schema: string
   filterString: string
   isLocked: boolean
-  editTrigger: (trigger: any) => void
-  deleteTrigger: (trigger: any) => void
+  editTrigger: (trigger: PostgresTrigger) => void
+  duplicateTrigger: (trigger: PostgresTrigger) => void
+  deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
 const TriggerList = ({
@@ -36,6 +38,7 @@ const TriggerList = ({
   filterString,
   isLocked,
   editTrigger,
+  duplicateTrigger,
   deleteTrigger,
 }: TriggerListProps) => {
   const { data: project } = useSelectedProjectQuery()
@@ -45,15 +48,17 @@ const TriggerList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter((x) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
+  const filteredTriggers = (triggers ?? []).filter(
+    (x) =>
+      includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
+      (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase()))
   )
 
   const _triggers = sortBy(
     filteredTriggers.filter((x) => x.schema == schema),
     (trigger) => trigger.name.toLocaleLowerCase()
   )
-  const { can: canUpdateTriggers } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateTriggers } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'triggers'
   )
@@ -196,6 +201,11 @@ const TriggerList = ({
                         <Edit size={14} />
                         <p>Edit with Assistant</p>
                       </DropdownMenuItem>
+                      <DropdownMenuItem className="space-x-2" onClick={() => duplicateTrigger(x)}>
+                        <Copy size={14} />
+                        <p>Duplicate trigger</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
                         <Trash stroke="red" size={14} />
                         <p>Delete trigger</p>

@@ -12,7 +12,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
@@ -34,7 +34,7 @@ const ReportsMenu = () => {
   const storageSupported = useIsFeatureEnabled('project_storage:all')
   const storageEnabled = storageReportEnabled && storageSupported
 
-  const { can: canCreateCustomReport } = useAsyncCheckProjectPermissions(
+  const { can: canCreateCustomReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
     {
@@ -146,6 +146,11 @@ const ReportsMenu = () => {
               },
             ]
           : []),
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/reports/query-performance${preservedQueryParams}`,
+        },
         ...(postgrestReportEnabled
           ? [
               {
@@ -250,8 +255,11 @@ const ReportsMenu = () => {
                             : 'hover:bg-surface-200'
                         )}
                       >
-                        <Link href={subItem.url} className="flex-grow h-7 flex items-center pl-3">
-                          {subItem.name}
+                        <Link
+                          href={subItem.url}
+                          className="flex-grow h-7 flex justify-between items-center pl-3"
+                        >
+                          <span>{subItem.name}</span>
                         </Link>
                       </li>
                     ))}

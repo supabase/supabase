@@ -820,7 +820,7 @@
       {
         "id": "supabase-postgres-config",
         "title": "Manage Postgres configurations",
-        "slug": "supabase-ssl-enforcement",
+        "slug": "supabase-postgres-config",
         "type": "cli-command"
       },
       {

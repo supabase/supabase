@@ -11,6 +11,7 @@ import {
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
@@ -125,7 +126,7 @@ export const TotalUsage = ({
             ? [
                 {
                   name: 'How billing works',
-                  url: 'https://supabase.com/docs/guides/platform/billing-on-supabase',
+                  url: `${DOCS_URL}/guides/platform/billing-on-supabase`,
                 },
                 {
                   name: 'Supabase Plans',

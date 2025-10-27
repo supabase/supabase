@@ -20,7 +20,7 @@ You can read about Unified egress, included quota, and how to check the egress u
 While pointing out the exact cause for egress may not be straightforward, there are various steps you can take to determine the source of these issues:
 
 - Picking the "Top Paths" from the [log explorer](https://app.supabase.com/project/_/logs/explorer/templates) will help you identify heavily queried paths
-- By finding the most requested queries from Query performance report: https://app.supabase.com/project/_/reports/query-performance
+- By finding the most requested queries from Query performance report: https://app.supabase.com/project/_/advisors/query-performance
 - Supavisor Egress is independent of client. There is no direct relation between a single query and Supavisor egress, it is harder to debug and identify. But you can make use of frequent queries from the link in above step that also displays average number of rows which will help to identify queries with a large number of rows returned. While this does not display Supavisor queries specifically, it will give an overview of queries with lots of rows that can help.
 - For Storage Egress, all outgoing traffic for storage-related requests to download/view your Storage items are considered as Storage egress. We have a "Storage Egress Requests" template in logs explorer that you can use to get the number of requests for each Storage object
 - If you pull 1mb of data out of the database using the Supavisor connection in your edge function, but only sends 100kb back to the user, you will have the Egress from the Supavisor to your Edge function plus from the edge function to your user

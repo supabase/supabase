@@ -45,22 +45,20 @@ export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
     ...options
   }: UseQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
 ) =>
-  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>(
-    databaseTriggerKeys.list(projectRef),
-    ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
-    {
-      select: (data) => {
-        return data.filter((trigger) => {
-          return (
-            trigger.function_schema === 'supabase_functions' &&
-            (trigger.schema !== 'net' || trigger.function_args.length === 0)
-          )
-        }) as any
-      },
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
+    queryKey: databaseTriggerKeys.list(projectRef),
+    queryFn: ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
+    select: (data) => {
+      return data.filter((trigger) => {
+        return (
+          trigger.function_schema === 'supabase_functions' &&
+          (trigger.schema !== 'net' || trigger.function_args.length === 0)
+        )
+      }) as any
+    },
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export const useDatabaseTriggersQuery = <TData = DatabaseTriggersData>(
   { projectRef, connectionString }: DatabaseTriggersVariables,
@@ -69,11 +67,9 @@ export const useDatabaseTriggersQuery = <TData = DatabaseTriggersData>(
     ...options
   }: UseQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
 ) =>
-  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>(
-    databaseTriggerKeys.list(projectRef),
-    ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
+    queryKey: databaseTriggerKeys.list(projectRef),
+    queryFn: ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.40.7
+  version: 2.48.3
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2253,6 +2253,7 @@ commands:
       - local-dev
     links: []
     subcommands:
+      - supabase-gen-bearer-jwt
       - supabase-gen-signing-key
       - supabase-gen-types
     flags: []
@@ -2346,6 +2347,35 @@ commands:
         name: --append
         description: Append new key to existing keys file instead of overwriting.
         default_value: 'false'
+  - id: supabase-gen-bearer-jwt
+    title: supabase gen bearer-jwt
+    summary: Generate a Bearer Auth JWT for accessing Data API
+    tags: []
+    links: []
+    usage: supabase gen bearer-jwt [flags]
+    subcommands: []
+    flags:
+      - id: exp
+        name: --exp <time>
+        description: Expiry timestamp for this token.
+        default_value: ''
+      - id: payload
+        name: --payload <string>
+        description: Custom claims in JSON format.
+        default_value: '{}'
+      - id: role
+        name: --role <string>
+        description: Postgres role to use.
+        required: true
+        default_value: ''
+      - id: sub
+        name: --sub <string>
+        description: User ID to impersonate.
+        default_value: anonymous
+      - id: valid-for
+        name: --valid-for <duration>
+        description: Validity duration for this token.
+        default_value: 30m0s
   - id: supabase-functions
     title: supabase functions
     summary: Manage Supabase Edge functions

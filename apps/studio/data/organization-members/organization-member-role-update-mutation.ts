@@ -54,7 +54,8 @@ export const useOrganizationMemberUpdateRoleMutation = ({
     OrganizationMemberAssignData,
     ResponseError,
     OrganizationMemberUpdateRoleVariables
-  >((vars) => assignOrganizationMemberRole(vars), {
+  >({
+    mutationFn: (vars) => assignOrganizationMemberRole(vars),
     async onSuccess(data, variables, context) {
       const { slug, skipInvalidation } = variables
 

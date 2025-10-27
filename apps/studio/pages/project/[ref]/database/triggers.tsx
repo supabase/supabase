@@ -13,13 +13,16 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const [selectedTrigger, setSelectedTrigger] = useState<PostgresTrigger>()
+  const [isDuplicatingTrigger, setIsDuplicatingTrigger] = useState<boolean>(false)
+
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
@@ -27,7 +30,7 @@ const TriggersPage: NextPageWithLayout = () => {
   const [editorPanelOpen, setEditorPanelOpen] = useState(false)
   const [selectedTriggerForEditor, setSelectedTriggerForEditor] = useState<PostgresTrigger>()
 
-  const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckProjectPermissions(
+  const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'triggers'
   )
@@ -52,9 +55,32 @@ const TriggersPage: NextPageWithLayout = () => {
     }
   }
 
+  const duplicateTrigger = (trigger: PostgresTrigger) => {
+    setIsDuplicatingTrigger(true)
+
+    const dupTrigger = {
+      ...trigger,
+      name: `${trigger.name}_duplicate`,
+    }
+
+    if (isInlineEditorEnabled) {
+      setSelectedTriggerForEditor(dupTrigger)
+      setEditorPanelOpen(true)
+    } else {
+      setSelectedTrigger(dupTrigger)
+      setShowCreateTriggerForm(true)
+    }
+  }
+
   const deleteTrigger = (trigger: PostgresTrigger) => {
     setSelectedTrigger(trigger)
     setShowDeleteTriggerForm(true)
+  }
+
+  const resetEditorPanel = () => {
+    setIsDuplicatingTrigger(false)
+    setEditorPanelOpen(false)
+    setSelectedTriggerForEditor(undefined)
   }
 
   if (isPermissionsLoaded && !canReadTriggers) {
@@ -69,11 +95,12 @@ const TriggersPage: NextPageWithLayout = () => {
             <FormHeader
               title="Database Triggers"
               description="Execute a set of actions automatically on specified table events"
-              docsUrl="https://supabase.com/docs/guides/database/postgres/triggers"
+              docsUrl={`${DOCS_URL}/guides/database/postgres/triggers`}
             />
             <TriggersList
               createTrigger={createTrigger}
               editTrigger={editTrigger}
+              duplicateTrigger={duplicateTrigger}
               deleteTrigger={deleteTrigger}
             />
           </div>
@@ -82,7 +109,11 @@ const TriggersPage: NextPageWithLayout = () => {
       <TriggerSheet
         selectedTrigger={selectedTrigger}
         open={showCreateTriggerForm}
-        setOpen={setShowCreateTriggerForm}
+        onClose={() => {
+          setIsDuplicatingTrigger(false)
+          setShowCreateTriggerForm(false)
+        }}
+        isDuplicatingTrigger={isDuplicatingTrigger}
       />
       <DeleteTrigger
         trigger={selectedTrigger}
@@ -92,14 +123,8 @@ const TriggersPage: NextPageWithLayout = () => {
 
       <EditorPanel
         open={editorPanelOpen}
-        onRunSuccess={() => {
-          setEditorPanelOpen(false)
-          setSelectedTriggerForEditor(undefined)
-        }}
-        onClose={() => {
-          setEditorPanelOpen(false)
-          setSelectedTriggerForEditor(undefined)
-        }}
+        onRunSuccess={resetEditorPanel}
+        onClose={resetEditorPanel}
         initialValue={
           selectedTriggerForEditor
             ? generateTriggerCreateSQL(selectedTriggerForEditor)
@@ -110,12 +135,16 @@ execute function function_name();`
         }
         label={
           selectedTriggerForEditor
-            ? `Edit trigger "${selectedTriggerForEditor.name}"`
+            ? isDuplicatingTrigger
+              ? `Duplicate trigger "${selectedTriggerForEditor.name}"`
+              : `Edit trigger "${selectedTriggerForEditor.name}"`
             : 'Create new database trigger'
         }
         initialPrompt={
           selectedTriggerForEditor
-            ? `Update the database trigger "${selectedTriggerForEditor.name}" to...`
+            ? isDuplicatingTrigger
+              ? `Duplicate the database trigger "${selectedTriggerForEditor.name}" to...`
+              : `Update the database trigger "${selectedTriggerForEditor.name}" to...`
             : 'Create a new database trigger that...'
         }
       />

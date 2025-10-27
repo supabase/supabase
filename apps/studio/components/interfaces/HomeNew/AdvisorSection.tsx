@@ -2,6 +2,7 @@ import { BarChart, Shield } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import {
   createLintSummaryPrompt,
@@ -10,6 +11,8 @@ import {
 } from 'components/interfaces/Linter/Linter.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -26,12 +29,20 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import LintDetail from 'components/interfaces/Linter/LintDetail'
 
-export const AdvisorSection = () => {
+export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery(
+    {
+      projectRef,
+    },
+    {
+      enabled: !showEmptyState,
+    }
+  )
   const snap = useAiAssistantStateSnapshot()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
@@ -54,11 +65,44 @@ export const AdvisorSection = () => {
 
   const handleAskAssistant = useCallback(() => {
     snap.toggleAssistant()
-  }, [snap])
+    if (projectRef && organization?.slug) {
+      sendEvent({
+        action: 'home_advisor_ask_assistant_clicked',
+        properties: {
+          issues_count: totalErrors,
+        },
+        groups: {
+          project: projectRef,
+          organization: organization.slug,
+        },
+      })
+    }
+  }, [snap, sendEvent, projectRef, organization, totalErrors])
 
-  const handleCardClick = useCallback((lint: Lint) => {
-    setSelectedLint(lint)
-  }, [])
+  const handleCardClick = useCallback(
+    (lint: Lint) => {
+      setSelectedLint(lint)
+      if (projectRef && organization?.slug) {
+        sendEvent({
+          action: 'home_advisor_issue_card_clicked',
+          properties: {
+            issue_category: lint.categories[0] || 'UNKNOWN',
+            issue_name: lint.name,
+            issues_count: totalErrors,
+          },
+          groups: {
+            project: projectRef,
+            organization: organization.slug,
+          },
+        })
+      }
+    },
+    [sendEvent, projectRef, organization]
+  )
+
+  if (showEmptyState) {
+    return <EmptyState />
+  }
 
   return (
     <div>
@@ -85,7 +129,7 @@ export const AdvisorSection = () => {
               return (
                 <Card
                   key={lint.cache_key}
-                  className="h-full flex flex-col items-stretch cursor-pointer"
+                  className="min-h-full flex flex-col items-stretch cursor-pointer h-64"
                   onClick={() => {
                     handleCardClick(lint)
                   }}
@@ -111,6 +155,19 @@ export const AdvisorSection = () => {
                           open: true,
                           initialInput: createLintSummaryPrompt(lint),
                         })
+                        if (projectRef && organization?.slug) {
+                          sendEvent({
+                            action: 'home_advisor_fix_issue_clicked',
+                            properties: {
+                              issue_category: lint.categories[0] || 'UNKNOWN',
+                              issue_name: lint.name,
+                            },
+                            groups: {
+                              project: projectRef,
+                              organization: organization.slug,
+                            },
+                          })
+                        }
                       }}
                       tooltip={{
                         content: { side: 'bottom', text: 'Help me fix this issue' },
@@ -153,15 +210,21 @@ export const AdvisorSection = () => {
           </Sheet>
         </>
       ) : (
-        <Card className="bg-transparent">
-          <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
-            <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
-            <p className="text-sm text-foreground-light text-center">
-              No security or performance errors found
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState />
       )}
     </div>
+  )
+}
+
+function EmptyState() {
+  return (
+    <Card className="bg-transparent">
+      <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
+        <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
+        <p className="text-sm text-foreground-light text-center">
+          No security or performance errors found
+        </p>
+      </CardContent>
+    </Card>
   )
 }

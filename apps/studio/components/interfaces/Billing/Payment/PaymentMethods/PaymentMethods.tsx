@@ -1,11 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { CreditCardIcon, Plus } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -19,7 +19,7 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { getURL } from 'lib/helpers'
@@ -44,9 +44,11 @@ const PaymentMethods = () => {
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug })
 
-  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.payment_methods')
-  const { can: canUpdatePaymentMethods } = useAsyncCheckProjectPermissions(
+  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.payment_methods'
+  )
+  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
   )
@@ -97,14 +99,15 @@ const PaymentMethods = () => {
                       title="Payment is currently by invoice"
                       actions={[
                         <Button key="payment-method-support" asChild type="default">
-                          <Link
-                            href={`/support/new?category=billing&subject=Request%20to%20change%20payment%20method`}
-                            target="_blank"
-                            rel="noreferrer"
+                          <SupportLink
                             className="ml-3"
+                            queryParams={{
+                              category: SupportCategories.BILLING,
+                              subject: 'Request to change payment method',
+                            }}
                           >
                             Contact support
-                          </Link>
+                          </SupportLink>
                         </Button>,
                       ]}
                     >

@@ -6,16 +6,16 @@ import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   cn,
   EyeOffIcon,
   Input_Shadcn_,
   Skeleton,
-  WarningIcon,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  WarningIcon,
 } from 'ui'
 
 // to add in later with follow up PR
@@ -36,7 +36,7 @@ export const PublishableAPIKeys = () => {
     [apiKeysData]
   )
 
-  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     '*'
   )
@@ -106,7 +106,7 @@ const ApiKeyInput = () => {
     [apiKeysData]
   )
 
-  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckProjectPermissions(
+  const { can: canReadAPIKeys, isLoading: isPermissionsLoading } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     '*'
   )
