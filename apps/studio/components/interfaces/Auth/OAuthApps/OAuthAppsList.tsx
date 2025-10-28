@@ -1,6 +1,6 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import dayjs from 'dayjs'
-import { Edit, MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
+import { MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -30,9 +30,9 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { CreateOrUpdateOAuthAppModal } from './CreateOrUpdateOAuthAppModal'
+import { CreateOAuthAppSheet } from './CreateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
-import OAuthAppCredentialsModal from './OAuthAppCredentialsModal'
+import { NewOAuthAppBanner } from './NewOAuthAppBanner'
 
 export const OAUTH_APP_SCOPE_OPTIONS = [
   { name: 'email', value: 'email' },
@@ -49,23 +49,18 @@ export const OAuthAppsList = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
+  const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
 
   // State for OAuth apps
-  const [showCreateOrUpdateModal, setShowCreateOrUpdateModal] = useState(false)
-  const [showCredentialsModal, setShowCredentialsModal] = useState(false)
+  const [showCreateSheet, setShowCreateSheet] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
-  const [generatedCredentials, setGeneratedCredentials] = useState<{
-    clientId: string
-    clientSecret: string
-  } | null>(null)
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
-  const error = { message: 'Failed to retrieve oauth apps' }
 
   const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
-  const { data, isLoading, isError } = useOAuthServerAppsQuery(
+  const { data, isLoading, isError, error } = useOAuthServerAppsQuery(
     {
       projectRef,
       supabaseClient: supabaseClientData?.supabaseClient,
@@ -77,11 +72,6 @@ export const OAuthAppsList = () => {
   const { mutateAsync: regenerateSecret } = useOAuthServerAppRegenerateSecretMutation()
 
   const oAuthApps = data?.clients || []
-
-  const handleEditClick = (app: OAuthClient) => {
-    setSelectedApp(app)
-    setShowCreateOrUpdateModal(true)
-  }
 
   const handleDeleteClick = (app: OAuthClient) => {
     setSelectedApp(app)
@@ -96,21 +86,12 @@ export const OAuthAppsList = () => {
         clientId: app.client_id,
       })
 
-      if (result?.client_secret) {
-        setGeneratedCredentials({
-          clientId: app.client_id,
-          clientSecret: result.client_secret,
-        })
-        setShowCredentialsModal(true)
+      if (result?.client_id && result?.client_secret) {
+        setNewOAuthApp(result)
       }
     } catch (error) {
       console.error('Error regenerating secret:', error)
     }
-  }
-
-  const handleCredentialsModalClose = () => {
-    setShowCredentialsModal(false)
-    setGeneratedCredentials(null)
   }
 
   const [filterString, setFilterString] = useState<string>('')
@@ -126,6 +107,9 @@ export const OAuthAppsList = () => {
   return (
     <>
       <div className="space-y-4">
+        {newOAuthApp && (
+          <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
+        )}
         {!isOAuthServerEnabled && (
           <div className="space-y-4">
             <Card>
@@ -185,7 +169,7 @@ export const OAuthAppsList = () => {
             <ButtonTooltip
               disabled={!isOAuthServerEnabled}
               icon={<Plus />}
-              onClick={() => setShowCreateOrUpdateModal(true)}
+              onClick={() => setShowCreateSheet(true)}
               className="flex-grow"
               tooltip={{
                 content: {
@@ -206,12 +190,12 @@ export const OAuthAppsList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="name">Name</TableHead>
-                  <TableHead key="table">Client ID</TableHead>
-                  <TableHead key="function">Type</TableHead>
-                  <TableHead key="function">Scope</TableHead>
-                  <TableHead key="function">Created</TableHead>
-                  <TableHead key="buttons" className="w-8"></TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Client ID</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Scope</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="w-8"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -225,20 +209,16 @@ export const OAuthAppsList = () => {
                 {oAuthApps.length > 0 &&
                   oAuthApps.map((app) => (
                     <TableRow key={app.client_id} className="w-full">
-                      <TableCell className="w-52 max-w-52 truncate">
-                        <button type="button" onClick={() => handleEditClick(app)}>
-                          {app.client_name}
-                        </button>
+                      <TableCell className="w-100 max-w-64 truncate" title={app.client_name}>
+                        {app.client_name}
                       </TableCell>
-                      <TableCell className="w-100 max-w-64 truncate" title={app.client_id}>
-                        {app.client_id}
+                      <TableCell className="max-w-40" title={app.client_id}>
+                        <Badge>{app.client_id}</Badge>
                       </TableCell>
-                      <TableCell className="max-w-40">
-                        <Badge>{app.registration_type}</Badge>
-                      </TableCell>
+                      <TableCell className="max-w-40">test</TableCell>
                       <TableCell className="max-w-40">
                         {app.scope ? (
-                          <Badge key={`${app.client_id}-${app.scope}-badge`}>{app.scope}</Badge>
+                          <Badge>{app.scope}</Badge>
                         ) : (
                           <span className="text-xs text-foreground-light">N/A</span>
                         )}
@@ -247,21 +227,12 @@ export const OAuthAppsList = () => {
                         {dayjs(app.created_at).format('D MMM, YYYY')}
                       </TableCell>
                       <TableCell>
-                        <div className="flex justify-end items-center space-x-2">
+                        <div className="flex justify-end items-center">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button type="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-52">
-                              <DropdownMenuItem
-                                className="space-x-2"
-                                onClick={() => {
-                                  handleEditClick(app)
-                                }}
-                              >
-                                <Edit size={14} />
-                                <p>Edit</p>
-                              </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => handleRegenerateSecret(app)}
@@ -288,21 +259,19 @@ export const OAuthAppsList = () => {
         </div>
       </div>
 
-      <CreateOrUpdateOAuthAppModal
-        visible={showCreateOrUpdateModal}
-        onClose={() => {
-          setShowCreateOrUpdateModal(false)
+      <CreateOAuthAppSheet
+        visible={showCreateSheet}
+        onSuccess={(app) => {
+          setShowCreateSheet(false)
+          setSelectedApp(undefined)
+          setNewOAuthApp(app)
+        }}
+        onCancel={() => {
+          setShowCreateSheet(false)
           setSelectedApp(undefined)
         }}
-        selectedApp={selectedApp}
-        onDeleteClick={handleDeleteClick}
       />
-      <OAuthAppCredentialsModal
-        visible={showCredentialsModal}
-        onClose={handleCredentialsModalClose}
-        clientId={generatedCredentials?.clientId}
-        clientSecret={generatedCredentials?.clientSecret}
-      />
+
       <DeleteOAuthAppModal
         visible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

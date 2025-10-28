@@ -22,9 +22,9 @@ export async function deleteOAuthServerApp({
   if (!supabaseClient) throw new Error('Supabase client is required')
   if (!clientId) throw new Error('Client ID is required')
 
-  const { error } = await supabaseClient.auth.admin.oauth.deleteClient(clientId)
-
-  if (error) handleError(error)
+  const { data, error } = await supabaseClient.auth.admin.oauth.deleteClient(clientId)
+  console.log(data, error)
+  if (error) return handleError(error)
   return null
 }
 

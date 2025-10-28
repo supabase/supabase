@@ -22,7 +22,7 @@ export async function createOAuthServerApp({
 
   const { data, error } = await supabaseClient.auth.admin.oauth.createClient(params)
 
-  if (error) handleError(error)
+  if (error) return handleError(error)
   return data
 }
 
