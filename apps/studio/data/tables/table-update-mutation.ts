@@ -2,14 +2,20 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { lintKeys } from 'data/lint/keys'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
+import { CreateTableBody } from './table-create-mutation'
 
-export type UpdateTableBody = components['schemas']['UpdateTableBody']
+export type UpdateTableBody = Partial<CreateTableBody> & {
+  id?: number
+  rls_enabled?: boolean
+  rls_forced?: boolean
+  replica_identity?: 'DEFAULT' | 'INDEX' | 'FULL' | 'NOTHING'
+  replica_identity_index?: string
+}
 
 export type TableUpdateVariables = {
   projectRef: string
