@@ -54,9 +54,8 @@ export const Usage = () => {
 
   const { data: selectedProject } = useProjectDetailQuery(
     {
-      ref: selectedProjectRef!,
-    },
-    { enabled: selectedProjectRef != null }
+      ref: selectedProjectRef ?? undefined,
+    }
   )
 
   const billingCycleStart = useMemo(() => {
