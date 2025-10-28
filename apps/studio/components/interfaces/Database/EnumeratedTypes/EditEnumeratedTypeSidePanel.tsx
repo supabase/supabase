@@ -27,6 +27,7 @@ import {
   cn,
 } from 'ui'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
+import { useNestedRoute } from '../../../../hooks/misc/useNestedRoute'
 
 interface EditEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -37,7 +38,7 @@ interface EditEnumeratedTypeSidePanelProps {
 const EditEnumeratedTypeSidePanel = ({
   visible,
   selectedEnumeratedType,
-  onClose,
+  onClose: onCloseParent,
 }: EditEnumeratedTypeSidePanelProps) => {
   const submitRef = useRef<HTMLButtonElement>(null)
   const { data: project } = useSelectedProjectQuery()
@@ -47,6 +48,16 @@ const EditEnumeratedTypeSidePanel = ({
       onClose()
     },
   })
+
+  const { onClose: onCloseNestedRoute } = useNestedRoute({
+    nestedRoute: selectedEnumeratedType?.id ? `${selectedEnumeratedType?.id}/edit` : '',
+    isOpen: visible,
+  })
+
+  const onClose = () => {
+    onCloseParent()
+    onCloseNestedRoute()
+  }
 
   const FormSchema = z.object({
     name: z.string().min(1, 'Please provide a name for your enumerated type').default(''),

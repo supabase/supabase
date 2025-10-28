@@ -45,6 +45,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'
+import { useNestedRoute } from '../../../../../hooks/misc/useNestedRoute'
 
 const FORM_ID = 'create-function-sidepanel'
 
@@ -75,6 +76,11 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
+  const { onClose: onCloseNestedRoute } = useNestedRoute({
+    nestedRoute: 'new',
+    isOpen: visible,
+  })
+
   const isEditing = !isDuplicating && !!func?.id
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -87,8 +93,13 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
   const { mutate: updateDatabaseFunction, isLoading: isUpdating } =
     useDatabaseFunctionUpdateMutation()
 
+  const onClosePanel = () => {
+    onClose()
+    onCloseNestedRoute()
+  }
+
   function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
+    form.formState.isDirty ? setIsClosingPanel(true) : onClosePanel()
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
@@ -110,7 +121,7 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
         {
           onSuccess: () => {
             toast.success(`Successfully updated function ${data.name}`)
-            onClose()
+            onClosePanel()
           },
         }
       )
@@ -124,7 +135,7 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
         {
           onSuccess: () => {
             toast.success(`Successfully created function ${data.name}`)
-            onClose()
+            onClosePanel()
           },
         }
       )
@@ -403,7 +414,7 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
           onCancel={() => setIsClosingPanel(false)}
           onConfirm={() => {
             setIsClosingPanel(false)
-            onClose()
+            onClosePanel()
           }}
         >
           <p className="text-sm text-foreground-light">

@@ -27,6 +27,7 @@ import {
 } from 'ui'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 import { NATIVE_POSTGRES_TYPES } from './EnumeratedTypes.constants'
+import { useNestedRoute } from '../../../../hooks/misc/useNestedRoute'
 
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -36,7 +37,7 @@ interface CreateEnumeratedTypeSidePanelProps {
 
 const CreateEnumeratedTypeSidePanel = ({
   visible,
-  onClose,
+  onClose: onCloseParent,
   schema,
 }: CreateEnumeratedTypeSidePanelProps) => {
   const initialValues = { name: '', description: '', values: [{ value: '' }] }
@@ -48,6 +49,16 @@ const CreateEnumeratedTypeSidePanel = ({
       closePanel()
     },
   })
+
+  const { onClose: onCloseNestedRoute } = useNestedRoute({
+    nestedRoute: 'new',
+    isOpen: visible,
+  })
+
+  const onClose = () => {
+    onCloseParent()
+    onCloseNestedRoute()
+  }
 
   useEffect(() => {
     form.reset(initialValues)
