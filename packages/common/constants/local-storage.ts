@@ -76,7 +76,6 @@ export const LOCAL_STORAGE_KEYS = {
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
     `user-impersonation-selector-previous-searches-${ref}`,
 
-  HOTKEY_INLINE_EDITOR: 'supabase-dashboard-hotkey-inline-editor',
   HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
 
   // Project sidebar hotkeys
