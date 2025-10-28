@@ -1,19 +1,17 @@
-import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, Gauge, Inbox, Shield, X } from 'lucide-react'
-import { useEffect, useMemo } from 'react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Gauge, Inbox, Shield, X } from 'lucide-react'
+import { useMemo } from 'react'
 
-import { Markdown } from 'components/interfaces/Markdown'
 import LintDetail from 'components/interfaces/Linter/LintDetail'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
-import { EmptyAdvisor } from './EmptyAdvisor'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { AdvisorTab, AdvisorSeverity, useAdvisorStateSnapshot } from 'state/advisor-state'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Badge, Button, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { EmptyAdvisor } from './EmptyAdvisor'
 
 type AdvisorItem = {
   id: string
@@ -98,16 +96,11 @@ export const AdvisorPanel = () => {
     return lintData
       .map((lint): AdvisorItem | null => {
         const categories = lint.categories || []
-        const tab =
-          categories.includes('SECURITY') && !categories.includes('PERFORMANCE')
-            ? ('security' as const)
-            : categories.includes('PERFORMANCE') && !categories.includes('SECURITY')
-              ? ('performance' as const)
-              : categories.includes('SECURITY')
-                ? ('security' as const)
-                : categories.includes('PERFORMANCE')
-                  ? ('performance' as const)
-                  : undefined
+        const tab = categories.includes('SECURITY')
+          ? ('security' as const)
+          : categories.includes('PERFORMANCE')
+            ? ('performance' as const)
+            : undefined
 
         if (!tab) return null
 
@@ -300,7 +293,7 @@ export const AdvisorPanel = () => {
                 </div>
                 {severityFilters.length > 0 && hiddenItemsCount > 0 && (
                   <div className="px-4 py-3">
-                    <Button type="text" className="w-full" onClick={() => clearSeverityFilters()}>
+                    <Button type="text" className="w-full" onClick={clearSeverityFilters}>
                       Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? 's' : ''}
                     </Button>
                   </div>
