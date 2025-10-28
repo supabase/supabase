@@ -2018,7 +2018,7 @@ export interface CommandMenuCommandClickedEvent {
  * @page /dashboard/project/{ref}/editor (NewTab)
  */
 export interface TableQuickstartOpenedEvent {
-  action: 'table_quickstart_viewed'
+  action: 'table_quickstart_opened'
   properties: {
     /**
      * Which variation the user was shown: ai, templates, assistant, or control

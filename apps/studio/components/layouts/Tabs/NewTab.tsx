@@ -28,12 +28,12 @@ import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   AiIconAnimation,
   Button,
-  cn,
   SQL_ICON,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
 } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
@@ -103,7 +103,7 @@ export function NewTab() {
   useEffect(() => {
     if (activeQuickstartVariant && !hasTrackedExposure.current) {
       hasTrackedExposure.current = true
-      track('table_quickstart_viewed', {
+      track('table_quickstart_opened', {
         variant: activeQuickstartVariant,
       })
     }
