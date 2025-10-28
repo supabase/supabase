@@ -93,7 +93,9 @@ export const useTableRowCreateMutation = ({
         console.error('Failed to track table data insertion event:', error)
       }
 
-      await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

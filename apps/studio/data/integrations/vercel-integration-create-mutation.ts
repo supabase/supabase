@@ -56,9 +56,11 @@ export const useVercelIntegrationCreateMutation = ({
     mutationFn: (vars) => createVercelIntegration(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(integrationKeys.integrationsList()),
-        queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-        queryClient.invalidateQueries(integrationKeys.vercelProjectList(data.id)),
+        queryClient.invalidateQueries({ queryKey: integrationKeys.integrationsList() }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.integrationsListWithOrg(variables.orgSlug),
+        }),
+        queryClient.invalidateQueries({ queryKey: integrationKeys.vercelProjectList(data.id) }),
       ])
       await onSuccess?.(data, variables, context)
     },

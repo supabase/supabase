@@ -35,9 +35,9 @@ export const useGitHubConnectionDeleteMutation = ({
     mutationFn: (args) => deleteConnection(args),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(
-          integrationKeys.githubConnectionsList(variables.organizationId)
-        ),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.githubConnectionsList(variables.organizationId),
+        }),
       ])
       await onSuccess?.(data, variables, context)
     },

@@ -46,9 +46,15 @@ export const useDatabaseCronJobCreateMutation = ({
       const { projectRef, searchTerm, identifier } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(databaseCronJobsKeys.listInfinite(projectRef, searchTerm)),
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
+        }),
         ...(!!identifier
-          ? [queryClient.invalidateQueries(databaseCronJobsKeys.job(projectRef, identifier))]
+          ? [
+              queryClient.invalidateQueries({
+                queryKey: databaseCronJobsKeys.job(projectRef, identifier),
+              }),
+            ]
           : []),
       ])
 

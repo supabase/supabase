@@ -8,7 +8,7 @@ import { usageKeys } from './keys'
 
 export type OrgUsageVariables = {
   orgSlug?: string
-  projectRef?: string
+  projectRef?: string | null
   start?: Date
   end?: Date
 }
@@ -24,7 +24,11 @@ export async function getOrgUsage(
   const { data, error } = await get(`/platform/organizations/{slug}/usage`, {
     params: {
       path: { slug: orgSlug },
-      query: { project_ref: projectRef, start: start?.toISOString(), end: end?.toISOString() },
+      query: {
+        project_ref: projectRef ?? undefined,
+        start: start?.toISOString(),
+        end: end?.toISOString(),
+      },
     },
     signal,
   })
@@ -40,7 +44,12 @@ export const useOrgUsageQuery = <TData = OrgUsageData>(
   { enabled = true, ...options }: UseQueryOptions<OrgUsageData, OrgUsageError, TData> = {}
 ) =>
   useQuery<OrgUsageData, OrgUsageError, TData>({
-    queryKey: usageKeys.orgUsage(orgSlug, projectRef, start?.toISOString(), end?.toISOString()),
+    queryKey: usageKeys.orgUsage(
+      orgSlug,
+      projectRef ?? undefined,
+      start?.toISOString(),
+      end?.toISOString()
+    ),
     queryFn: ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
     enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined',
     staleTime: 1000 * 60 * 60,

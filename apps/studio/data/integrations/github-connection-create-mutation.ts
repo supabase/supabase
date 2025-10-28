@@ -35,9 +35,9 @@ export const useGitHubConnectionCreateMutation = ({
     mutationFn: (vars) => createGitHubConnection(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(
-          integrationKeys.githubConnectionsList(variables.organizationId)
-        ),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.githubConnectionsList(variables.organizationId),
+        }),
       ])
       await onSuccess?.(data, variables, context)
     },

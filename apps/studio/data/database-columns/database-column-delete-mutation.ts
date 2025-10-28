@@ -53,22 +53,28 @@ export const useDatabaseColumnDeleteMutation = ({
       const { projectRef, column } = variables
       await Promise.all([
         // refetch all entities in the sidebar because deleting a column may regenerate a view (and change its id)
-        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        queryClient.invalidateQueries(
-          databaseKeys.foreignKeyConstraints(projectRef, column.schema)
-        ),
-        queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, column.table_id)),
-        queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, column.table_id)),
+        queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
+        queryClient.invalidateQueries({
+          queryKey: databaseKeys.foreignKeyConstraints(projectRef, column.schema),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: tableEditorKeys.tableEditor(projectRef, column.table_id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: databaseKeys.tableDefinition(projectRef, column.table_id),
+        }),
         // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
         // which has a view dependent on it
-        queryClient.invalidateQueries(viewKeys.listBySchema(projectRef, column.schema)),
+        queryClient.invalidateQueries({
+          queryKey: viewKeys.listBySchema(projectRef, column.schema),
+        }),
       ])
 
       // We need to invalidate tableRowsAndCount after tableEditor
       // to ensure the query sent is correct
-      await queryClient.invalidateQueries(
-        tableRowKeys.tableRowsAndCount(projectRef, column.table_id)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(projectRef, column.table_id),
+      })
 
       await onSuccess?.(data, variables, context)
     },

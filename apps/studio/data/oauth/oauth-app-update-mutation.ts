@@ -2,9 +2,9 @@ import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { handleError, put } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
-import { handleError, put } from 'data/fetchers'
 
 export type OAuthAppUpdateVariables = {
   id: string
@@ -61,7 +61,7 @@ export const useOAuthAppUpdateMutation = ({
     mutationFn: (vars) => updateOAuthApp(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
-      await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
+      await queryClient.invalidateQueries({ queryKey: oauthAppKeys.oauthApps(slug) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

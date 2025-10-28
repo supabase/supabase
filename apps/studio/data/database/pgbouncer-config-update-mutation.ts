@@ -58,7 +58,7 @@ export const usePgbouncerConfigurationUpdateMutation = ({
     mutationFn: (vars) => updatePgbouncerConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
-      await queryClient.invalidateQueries(databaseKeys.pgbouncerConfig(ref))
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.pgbouncerConfig(ref) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

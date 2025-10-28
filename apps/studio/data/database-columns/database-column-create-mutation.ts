@@ -2,13 +2,23 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 
-export type CreateColumnBody = Omit<components['schemas']['CreateColumnBody'], 'tableId'> & {
+export type CreateColumnBody = {
   schema: string
   table: string
+  name: string
+  type: string
+  check?: string
+  comment?: string
+  defaultValue?: any
+  defaultValueFormat?: 'expression' | 'literal'
+  identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
+  isIdentity?: boolean
+  isNullable?: boolean
+  isPrimaryKey?: boolean
+  isUnique?: boolean
 }
 
 export type DatabaseColumnCreateVariables = {

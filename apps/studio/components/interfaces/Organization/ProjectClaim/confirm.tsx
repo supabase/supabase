@@ -61,7 +61,7 @@ export const ProjectClaimConfirm = ({
         window.location.href = url.toString()
       } catch {
         // invalidate the org projects to force them to be refetched
-        queryClient.invalidateQueries(projectKeys.list())
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() })
         router.push(`/org/${selectedOrganization.slug}`)
       }
     } catch (error: any) {

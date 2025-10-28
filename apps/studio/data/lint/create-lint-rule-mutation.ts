@@ -41,8 +41,8 @@ export const useLintRuleCreateMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries(lintKeys.lintRules(projectRef)),
-        queryClient.invalidateQueries(lintKeys.lint(projectRef)),
+        queryClient.invalidateQueries({ queryKey: lintKeys.lintRules(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },

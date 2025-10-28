@@ -44,7 +44,7 @@ export const useJWTSigningKeyUpdateMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: jwtSigningKeysKeys.list(projectRef) })
 
       await onSuccess?.(data, variables, context)
     },

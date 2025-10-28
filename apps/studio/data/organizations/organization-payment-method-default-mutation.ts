@@ -52,14 +52,17 @@ export const useOrganizationPaymentMethodMarkAsDefaultMutation = ({
     async onSuccess(data, variables, context) {
       const { slug, paymentMethodId } = variables
       // We do not invalidate payment methods here as endpoint data is stale for 1-2 seconds, so we handle state manually
-      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          defaultPaymentMethodId: paymentMethodId,
-          data: prev.data.map((pm: any) => ({ ...pm, is_default: pm.id === paymentMethodId })),
+      queryClient.setQueriesData(
+        { queryKey: organizationKeys.paymentMethods(slug) },
+        (prev: any) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            defaultPaymentMethodId: paymentMethodId,
+            data: prev.data.map((pm: any) => ({ ...pm, is_default: pm.id === paymentMethodId })),
+          }
         }
-      })
+      )
 
       await onSuccess?.(data, variables, context)
     },

@@ -73,12 +73,16 @@ export const useIcebergNamespaceCreateMutation = ({
   return useMutation<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>({
     mutationFn: (vars) => createIcebergNamespace(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(
-        storageKeys.icebergNamespace(variables.catalogUri, variables.warehouse, variables.namespace)
-      )
-      await queryClient.invalidateQueries(
-        storageKeys.icebergNamespaces(variables.catalogUri, variables.warehouse)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.icebergNamespace(
+          variables.catalogUri,
+          variables.warehouse,
+          variables.namespace
+        ),
+      })
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.icebergNamespaces(variables.catalogUri, variables.warehouse),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

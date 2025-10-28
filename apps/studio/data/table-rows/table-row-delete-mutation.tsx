@@ -76,7 +76,9 @@ export const useTableRowDeleteMutation = ({
     mutationFn: (vars) => deleteTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables
-      await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -19,7 +19,7 @@ import { CategoryAttribute } from '../Usage.constants'
 
 export interface DatabaseSizeUsageProps {
   slug: string
-  projectRef?: string
+  projectRef?: string | null
   attribute: CategoryAttribute
   subscription?: OrgSubscription
   usage?: OrgUsageResponse
