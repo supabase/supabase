@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { PixelGame } from './components/PixelGame'
 import { SurvivalShooter } from 'survival-shooter'
 import { Cuboid, Target } from 'lucide-react'
 
@@ -12,16 +11,6 @@ type ActiveGame = 'pixel' | 'survival' | null
 
 export const AdvisorEmpty = ({ availableResources = 10 }: AdvisorEmptyProps) => {
   const [activeGame, setActiveGame] = useState<ActiveGame>(null)
-
-  // if (activeGame === 'pixel') {
-  //   return (
-  //     <Card className="bg-transparent">
-  //       <CardContent className="relative p-0 h-[256px] overflow-hidden">
-  //         <PixelGame availableResources={availableResources} onExit={() => setActiveGame(null)} />
-  //       </CardContent>
-  //     </Card>
-  //   )
-  // }
 
   if (activeGame === 'survival') {
     return (
@@ -40,13 +29,6 @@ export const AdvisorEmpty = ({ availableResources = 10 }: AdvisorEmptyProps) => 
     <Card className="bg-transparent">
       <CardContent className="relative p-0 h-[256px] overflow-hidden flex flex-col items-center justify-center">
         <div className="absolute top-3 left-3 z-10 flex gap-2">
-          <Button
-            onClick={() => setActiveGame('pixel')}
-            type="text"
-            size="tiny"
-            className="w-6 h-6"
-            icon={<Cuboid strokeWidth={1} size={16} />}
-          />
           <Button
             onClick={() => setActiveGame('survival')}
             type="text"
