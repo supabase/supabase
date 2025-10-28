@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { DOCS_URL } from 'lib/constants'
@@ -149,6 +149,8 @@ export function LogDrainDestinationSheetForm({
     'Content-Type': 'application/json',
   }
   const DEFAULT_HEADERS = mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultConfig?.headers || {}
+
+  const sentryEnabled = useFlag('SentryLogDrain')
 
   const { ref } = useParams()
   const { data: logDrains } = useLogDrainsQuery({
@@ -327,16 +329,18 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.map((type) => (
-                          <SelectItem_Shadcn_
-                            value={type.value}
-                            key={type.value}
-                            id={type.value}
-                            className="text-left"
-                          >
-                            {type.name}
-                          </SelectItem_Shadcn_>
-                        ))}
+                        {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map(
+                          (type) => (
+                            <SelectItem_Shadcn_
+                              value={type.value}
+                              key={type.value}
+                              id={type.value}
+                              className="text-left"
+                            >
+                              {type.name}
+                            </SelectItem_Shadcn_>
+                          )
+                        )}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                   </FormItemLayout>
