@@ -22,7 +22,7 @@ Do not allow connections to the self-hosted MCP server from the Internet. Only a
 
 ### Step 1: Determine the local IP address that will be used to access the MCP server
 
-When connecting via an SSH tunnel to the Studio Docker container, the source IP will be that of the Docker bridge gateway. You need to whitelist this IP address.
+When connecting via an SSH tunnel to the Studio Docker container, the source IP will be that of the Docker bridge gateway. You need to allow connections from this IP address.
 
 Determine the Docker bridge gateway IP on the host running your Supabase containers:
 
@@ -33,12 +33,12 @@ docker inspect supabase-kong \
 
 This command will output a private range IP address, e.g., `172.18.0.1`.
 
-### Step 2: Whitelist the Docker bridge gateway IP
+### Step 2: Allow connections from the gateway IP
 
-Add the IP address you discovered to the API gateway configuration by editing the following section in `./volumes/api/kong.yml`:
+Add the IP address you discovered to the Kong configuration by editing the following section in `./volumes/api/kong.yml`:
 
 1. Comment out the 'request-termination' section
-2. Uncomment the entire section starting with `- name: cors`, including `deny: []`
+2. Remove #'s from the entire section starting with `- name: cors`, including `deny: []`
 3. Add your local IPs to the 'allow' list as shown in the example below
 
 ```yaml
@@ -73,7 +73,7 @@ Add the IP address you discovered to the API gateway configuration by editing th
         deny: []
 ```
 
-### Step 3: Restart Kong API gateway
+### Step 3: Restart API gateway
 
 After you've added the local IP address as above, restart the Kong container:
 
@@ -133,7 +133,7 @@ curl http://localhost:8080/mcp \
   }'
 ```
 
-Start your MCP client (Claude Code, Cursor, etc.) and verify access to the MCP tools. For example, you can ask: "What is my Supabase anon key? Use the Supabase MCP server tools."
+Start your MCP client (Claude Code, Cursor, etc.) and verify access to the MCP tools. For example, you can ask: "What is Supabase anon key? Use the Supabase MCP server tools."
 
 ## Troubleshooting
 
@@ -141,4 +141,4 @@ If you're unable to connect to the MCP server:
 
 1. Make sure your SSH tunnel is active
 2. Check Kong's logs: `docker compose logs kong`
-3. Confirm the Docker bridge gateway IP is correctly whitelisted in `./volumes/api/kong.yml`
+3. Confirm the Docker bridge gateway IP is correctly added in `./volumes/api/kong.yml`
