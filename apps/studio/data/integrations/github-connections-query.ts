@@ -39,13 +39,11 @@ export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
     ...options
   }: UseQueryOptions<GitHubConnectionsData, GitHubConnectionsError, TData> = {}
 ) => {
-  return useQuery<GitHubConnectionsData, GitHubConnectionsError, TData>(
-    integrationKeys.githubConnectionsList(organizationId),
-    ({ signal }) => getGitHubConnections({ organizationId }, signal),
-    {
-      enabled: enabled && typeof organizationId !== 'undefined',
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      ...options,
-    }
-  )
+  return useQuery<GitHubConnectionsData, GitHubConnectionsError, TData>({
+    queryKey: integrationKeys.githubConnectionsList(organizationId),
+    queryFn: ({ signal }) => getGitHubConnections({ organizationId }, signal),
+    enabled: enabled && typeof organizationId !== 'undefined',
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  })
 }

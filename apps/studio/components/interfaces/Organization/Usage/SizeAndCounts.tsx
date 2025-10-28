@@ -10,7 +10,7 @@ import { dailyUsageToDataPoints } from './Usage.utils'
 
 export interface SizeAndCountsProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
   orgDailyStats: OrgDailyUsageResponse | undefined

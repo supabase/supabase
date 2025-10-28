@@ -24,6 +24,8 @@ import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import type { AssistantModel } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -59,6 +61,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
+  const { closeSidebar, isSidebarOpen } = useSidebarManagerSnapshot()
 
   const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
 
@@ -432,11 +435,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [snap.initialInput])
 
   useEffect(() => {
-    if (snap.open && isInSQLEditor && !!snippetContent) {
+    if (isSidebarOpen(SIDEBAR_KEYS.AI_ASSISTANT) && isInSQLEditor && !!snippetContent) {
       snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snap.open, isInSQLEditor, snippetContent])
+  }, [isSidebarOpen, isInSQLEditor, snippetContent])
 
   return (
     <ErrorBoundary
@@ -457,11 +460,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       ]}
     >
-      <div className={cn('flex flex-col h-full', className)}>
+      <div className={cn('flex flex-col h-full w-full md:h-full max-h-[100dvh]', className)}>
         <AIAssistantHeader
           isChatLoading={isChatLoading}
           onNewChat={snap.newChat}
-          onCloseAssistant={snap.closeAssistant}
+          onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
           showMetadataWarning={showMetadataWarning}
           updatedOptInSinceMCP={updatedOptInSinceMCP}
           isHipaaProjectDisallowed={isHipaaProjectDisallowed as boolean}

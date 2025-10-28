@@ -4,8 +4,8 @@ import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
-import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import { privilegeKeys } from './keys'
+import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 
 export type TablePrivilegesGrant = Parameters<
   typeof pgMeta.tablePrivileges.grant
@@ -46,27 +46,25 @@ export const useTablePrivilegesGrantMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TablePrivilegesGrantData, ResponseError, TablePrivilegesGrantVariables>(
-    (vars) => grantTablePrivileges(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<TablePrivilegesGrantData, ResponseError, TablePrivilegesGrantVariables>({
+    mutationFn: (vars) => grantTablePrivileges(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([
-          invalidateTablePrivilegesQuery(queryClient, projectRef),
-          queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
-        ])
+      await Promise.all([
+        invalidateTablePrivilegesQuery(queryClient, projectRef),
+        queryClient.invalidateQueries({ queryKey: privilegeKeys.columnPrivilegesList(projectRef) }),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

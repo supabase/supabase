@@ -68,15 +68,13 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
 ) => {
   const { slug, iso_timestamp_start, iso_timestamp_end } = vars
 
-  return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>(
-    organizationKeys.auditLogs(slug, {
+  return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>({
+    queryKey: organizationKeys.auditLogs(slug, {
       date_start: iso_timestamp_start,
       date_end: iso_timestamp_end,
     }),
-    ({ signal }) => getOrganizationAuditLogs(vars, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) => getOrganizationAuditLogs(vars, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })
 }

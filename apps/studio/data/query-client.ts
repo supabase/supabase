@@ -1,6 +1,8 @@
 import { QueryClient, onlineManager } from '@tanstack/react-query'
-import { IS_PLATFORM } from 'lib/constants'
+import { match } from 'path-to-regexp'
 import { useState } from 'react'
+
+import { IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 
 // When running locally we don't need the internet
@@ -8,6 +10,13 @@ import { ResponseError } from 'types'
 if (!IS_PLATFORM) {
   onlineManager.setOnline(true)
 }
+
+const SKIP_RETRY_PATHNAME_MATCHERS = [
+  '/platform/projects/:ref/run-lints',
+  '/platform/organizations/:slug/usage',
+  '/platform/pg-meta/:ref/query',
+  '/v1/projects/:ref/analytics/endpoints/logs.all',
+].map((pathname) => match(pathname))
 
 let queryClient: QueryClient | undefined
 
@@ -26,6 +35,16 @@ export function getQueryClient() {
               error.code >= 400 &&
               error.code < 500 &&
               // Still retry on 429s (rate limit)
+              error.code !== 429
+            ) {
+              return false
+            }
+
+            if (
+              error instanceof ResponseError &&
+              error.requestPathname &&
+              SKIP_RETRY_PATHNAME_MATCHERS.some((matchFn) => matchFn(error.requestPathname!)) &&
+              // Still retry on 429s (rate limit) so that retry after is respected
               error.code !== 429
             ) {
               return false
