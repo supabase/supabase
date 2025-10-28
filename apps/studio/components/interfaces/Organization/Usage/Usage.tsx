@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import {
@@ -16,7 +16,6 @@ import NoPermission from 'components/ui/NoPermission'
 import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
-import { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -30,34 +29,20 @@ import Compute from './Compute'
 import Egress from './Egress'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
-
-// [Joshen] JFYI this component could use nuqs to handle `projectRef` state which will help
-// simplify some of the implementation here.
+import { useQueryState } from 'nuqs'
 
 export const Usage = () => {
   const { slug, projectRef } = useParams()
 
   const [dateRange, setDateRange] = useState<any>()
-  const [selectedProject, setSelectedProject] = useState<OrgProject>()
 
-  const [selectedProjectRefInputValue, setSelectedProjectRefInputValue] = useState<
-    string | undefined
-  >('all-projects')
+  const [selectedProjectRef, setSelectedProjectRef] = useQueryState('projectRef')
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
-
-  // [Alaister] 'all-projects' is not a valid project ref, it's just used as an extra
-  // state for the select input. As such we need to remove it for the selected project ref
-  const selectedProjectRef =
-    selectedProjectRefInputValue === 'all-projects' ? undefined : selectedProjectRefInputValue
 
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
-
-  const { isSuccess: isSuccessProjectDetail } = useProjectDetailQuery({
-    ref: selectedProjectRef,
-  })
 
   const {
     data: subscription,
@@ -66,6 +51,10 @@ export const Usage = () => {
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  const { data: selectedProject } = useProjectDetailQuery({
+    ref: selectedProjectRef ?? undefined,
+  })
 
   const billingCycleStart = useMemo(() => {
     return dayjs.unix(subscription?.current_period_start ?? 0).utc()
@@ -122,13 +111,6 @@ export const Usage = () => {
     endDate,
   })
 
-  useEffect(() => {
-    if (projectRef && isSuccessProjectDetail) {
-      setSelectedProjectRefInputValue(projectRef)
-    }
-    // [Joshen] Since we're already looking at isSuccess
-  }, [projectRef, isSuccessProjectDetail])
-
   return (
     <>
       <ScaffoldContainer>
@@ -175,10 +157,9 @@ export const Usage = () => {
                   <OrganizationProjectSelector
                     open={openProjectSelector}
                     setOpen={setOpenProjectSelector}
-                    selectedRef={selectedProjectRefInputValue}
+                    selectedRef={selectedProjectRef}
                     onSelect={(project) => {
-                      setSelectedProject(project)
-                      setSelectedProjectRefInputValue(project.ref)
+                      setSelectedProjectRef(project.ref)
                     }}
                     renderTrigger={() => {
                       return (
@@ -190,14 +171,12 @@ export const Usage = () => {
                           className="justify-between w-[180px]"
                           iconRight={<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
                         >
-                          {!selectedProject || selectedProjectRefInputValue === 'all-projects'
-                            ? 'All projects'
-                            : selectedProject?.name}
+                          {!selectedProject ? 'All projects' : selectedProject?.name}
                         </Button>
                       )
                     }}
                     renderRow={(project) => {
-                      const isSelected = selectedProjectRefInputValue === project.ref
+                      const isSelected = selectedProjectRef === project.ref
                       return (
                         <div className="w-full flex items-center justify-between">
                           <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
@@ -213,15 +192,15 @@ export const Usage = () => {
                           className="cursor-pointer flex items-center justify-between w-full"
                           onSelect={() => {
                             setOpenProjectSelector(false)
-                            setSelectedProjectRefInputValue('all-projects')
+                            setSelectedProjectRef(null)
                           }}
                           onClick={() => {
                             setOpenProjectSelector(false)
-                            setSelectedProjectRefInputValue('all-projects')
+                            setSelectedProjectRef(null)
                           }}
                         >
                           All projects
-                          {selectedProjectRefInputValue === 'all-projects' && <Check size={16} />}
+                          {!selectedProjectRef && <Check size={16} />}
                         </CommandItem_Shadcn_>
                       </CommandGroup_Shadcn_>
                     )}
@@ -270,7 +249,7 @@ export const Usage = () => {
         </ScaffoldContainer>
       )}
 
-      {selectedProjectRef ? (
+      {selectedProject ? (
         <ScaffoldContainer className="mt-5">
           <Admonition
             type="default"
