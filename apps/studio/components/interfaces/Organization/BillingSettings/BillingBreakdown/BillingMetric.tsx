@@ -15,6 +15,7 @@ export interface BillingMetricProps {
   idx: number
   slug?: string
   metric: Metric
+  name: string
   usage: OrgUsageResponse
   subscription: OrgSubscription
   relativeToSubscription: boolean
@@ -25,6 +26,7 @@ export interface BillingMetricProps {
 export const BillingMetric = ({
   slug,
   metric,
+  name,
   usage,
   subscription,
   relativeToSubscription,
@@ -92,7 +94,7 @@ export const BillingMetric = ({
                 className="group inline-flex items-center gap-1"
               >
                 <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                  {metric.name}
+                  {name}
                 </p>
                 {usageMeta.available_in_plan && (
                   <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
@@ -120,7 +122,7 @@ export const BillingMetric = ({
           <div className="flex flex-col gap-1 w-full">
             <div className="flex items-center gap-2">
               {docsLink && docsLink}
-              <p className="text-sm text-foreground-light flex space-x-1">{metric.name}</p>
+              <p className="text-sm text-foreground-light flex space-x-1">{name}</p>
             </div>
             <div>
               <HoverCardTrigger asChild>

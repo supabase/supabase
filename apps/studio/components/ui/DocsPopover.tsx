@@ -1,38 +1,35 @@
-import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import { BASE_PATH } from 'lib/constants'
-import { useState } from 'react'
+import { InfoIcon } from 'lucide-react'
 
 interface DocsPopoverProps {
   href: string
+  label: string
   className?: string
 }
 
-export const DocsPopover = ({ href, className }: DocsPopoverProps) => {
+export const DocsPopover = ({ href, label, className }: DocsPopoverProps) => {
   const { resolvedTheme } = useTheme()
-  const [hasBeenHovered, setHasBeenHovered] = useState(false)
+
+  const buttonClassName = cn(
+    'text-sm text-foreground-light',
+    'relative px-1 py-0 -my-px',
+    'rounded bg-surface-200 border border-dashed',
+    'transition-colors hover:border-strong group/inline-popup'
+  )
 
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>
-        {/* <Button
-          type="text"
-          size="tiny"
-          className="w-5 h-5"
-          icon={<BookOpen size={12} strokeWidth={1.5} />}
-          onClick={(e) => e.stopPropagation()}
-        /> */}
-        <span
-          className={cn(
-            'transition inline-block group-hover:transform group-hover:translate-x-0.5',
-            hasBeenHovered ? 'text-foreground-muted' : 'text-brand animate-pulse'
-          )}
-          onMouseEnter={() => setHasBeenHovered(true)}
-        >
-          <BookOpen strokeWidth={1.5} size={16} className="transition" />
+        <span role="button" tabIndex={0} className={cn(buttonClassName)}>
+          {label}
+          <InfoIcon
+            aria-hidden={true}
+            className="absolute p-[1px] bg-background rounded-full -left-1.5 -top-1.5 w-3 h-3 text-foreground-lighter group-hover/inline-popup:text-foreground-light transition-colors"
+          />
         </span>
       </HoverCardTrigger>
 
@@ -46,7 +43,6 @@ export const DocsPopover = ({ href, className }: DocsPopoverProps) => {
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-1.5">
               <svg
-                // className={className}
                 viewBox="0 0 16 16"
                 width={20}
                 height={20}
@@ -87,7 +83,6 @@ export const DocsPopover = ({ href, className }: DocsPopoverProps) => {
               regardless of how many times they authenticate. These users are referred to as
               "Third-Party MAUs".
             </p>
-            {/* <div className="absolute bottom-0 left-0 right-0 w-full h-24 bg-gradient-to-b from-transparent to-background-surface-75/80 z-10" /> */}
           </div>
           <div className="border-t border-border pt-3 mt-2 flex items-center justify-between">
             <div className="flex items-center gap-1 text-xs">

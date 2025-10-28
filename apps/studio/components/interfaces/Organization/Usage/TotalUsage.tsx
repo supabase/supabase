@@ -200,12 +200,14 @@ export const TotalUsage = ({
                         idx={i}
                         slug={orgSlug}
                         metric={metric}
+                        name={''}
                         usage={usage}
                         subscription={subscription!}
                         relativeToSubscription={showRelationToSubscription}
                         docsLink={
                           <DocsPopover
                             href={`${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`}
+                            label="Monthly Active Third-Party Users"
                           />
                         }
                         className={cn(i % 2 === 0 ? 'md:pr-4' : 'md:pl-4')}
@@ -223,6 +225,7 @@ export const TotalUsage = ({
                       idx={i}
                       slug={orgSlug}
                       metric={metric}
+                      name={metric.name}
                       usage={usage}
                       subscription={subscription!}
                       relativeToSubscription={showRelationToSubscription}
