@@ -36,19 +36,25 @@ export const useProjectDeleteMutation = ({
     mutationFn: (vars) => deleteProject(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(projectKeys.list()),
-        queryClient.invalidateQueries(projectKeys.detail(data.ref)),
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: projectKeys.detail(data.ref) }),
       ])
 
       if (variables.organizationSlug) {
         await Promise.all([
-          queryClient.invalidateQueries(projectKeys.infiniteListByOrg(variables.organizationSlug)),
-          queryClient.invalidateQueries(organizationKeys.detail(variables.organizationSlug)),
-          queryClient.invalidateQueries(projectKeys.orgProjects(variables.organizationSlug)),
+          queryClient.invalidateQueries({
+            queryKey: projectKeys.infiniteListByOrg(variables.organizationSlug),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: organizationKeys.detail(variables.organizationSlug),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: projectKeys.orgProjects(variables.organizationSlug),
+          }),
 
-          queryClient.invalidateQueries(
-            organizationKeys.freeProjectLimitCheck(variables.organizationSlug)
-          ),
+          queryClient.invalidateQueries({
+            queryKey: organizationKeys.freeProjectLimitCheck(variables.organizationSlug),
+          }),
         ])
       }
 

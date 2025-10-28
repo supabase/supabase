@@ -63,9 +63,9 @@ export const useTableUpdateMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, schema, id } = variables
       await Promise.all([
-        queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, id)),
-        queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
-        queryClient.invalidateQueries(lintKeys.lint(projectRef)),
+        queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, id) }),
+        queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, schema) }),
+        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },

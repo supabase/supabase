@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, post } from 'data/fetchers'
 
 export type StopPipelineParams = {
   projectRef: string
@@ -40,7 +40,9 @@ export const useStopPipelineMutation = ({
     mutationFn: (vars) => stopPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
-      await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -343,8 +343,10 @@ export function useApplyPrivilegeOperations(callback?: () => void) {
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(privilegeKeys.tablePrivilegesList(project.ref)),
-        queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(project.ref)),
+        queryClient.invalidateQueries({ queryKey: privilegeKeys.tablePrivilegesList(project.ref) }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.columnPrivilegesList(project.ref),
+        }),
       ])
 
       setIsLoading(false)

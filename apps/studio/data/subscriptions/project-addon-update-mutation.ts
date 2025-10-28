@@ -54,7 +54,7 @@ export const useProjectAddonUpdateMutation = ({
     mutationFn: (vars) => updateSubscriptionAddon(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
+      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

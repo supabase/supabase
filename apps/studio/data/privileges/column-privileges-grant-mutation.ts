@@ -60,7 +60,7 @@ export const useColumnPrivilegesGrantMutation = ({
       const { projectRef } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
+        queryClient.invalidateQueries({ queryKey: privilegeKeys.columnPrivilegesList(projectRef) }),
       ])
 
       await onSuccess?.(data, variables, context)

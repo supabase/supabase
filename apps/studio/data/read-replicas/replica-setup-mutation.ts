@@ -55,7 +55,7 @@ export const useReadReplicaSetUpMutation = ({
     mutationFn: (vars) => setUpReadReplica(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(replicaKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: replicaKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

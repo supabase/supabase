@@ -76,7 +76,7 @@ export const useOrganizationCreateMutation = ({
           }
         )
 
-        await queryClient.invalidateQueries(permissionKeys.list())
+        await queryClient.invalidateQueries({ queryKey: permissionKeys.list() })
       }
 
       await onSuccess?.(data, variables, context)
@@ -156,7 +156,7 @@ export const useAwsManagedOrganizationCreateMutation = ({
           }
         )
 
-        await queryClient.invalidateQueries(permissionKeys.list())
+        await queryClient.invalidateQueries({ queryKey: permissionKeys.list() })
       }
 
       await onSuccess?.(data, variables, context)

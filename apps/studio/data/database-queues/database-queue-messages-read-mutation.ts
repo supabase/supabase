@@ -54,9 +54,9 @@ export const useDatabaseQueueMessageReadMutation = ({
     mutationFn: (vars) => readDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queryName } = variables
-      await queryClient.invalidateQueries(
-        databaseQueuesKeys.getMessagesInfinite(projectRef, queryName)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queryName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

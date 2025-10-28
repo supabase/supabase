@@ -62,10 +62,12 @@ export const useRollbackTableMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
       await Promise.all([
-        queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId)),
-        queryClient.invalidateQueries(
-          replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
-        ),
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
+        }),
       ])
 
       await onSuccess?.(data, variables, context)

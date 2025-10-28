@@ -37,7 +37,9 @@ export const useUserDeleteMutation = ({
       const { projectRef, skipInvalidation = false } = variables
 
       if (!skipInvalidation) {
-        await Promise.all([queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))])
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: authKeys.usersInfinite(projectRef) }),
+        ])
       }
 
       await onSuccess?.(data, variables, context)

@@ -37,7 +37,7 @@ export const useSSOConfigUpdateMutation = ({
     mutationFn: (vars) => updateSSOConfig(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
-      await queryClient.invalidateQueries(orgSSOKeys.orgSSOConfig(slug))
+      await queryClient.invalidateQueries({ queryKey: orgSSOKeys.orgSSOConfig(slug) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
