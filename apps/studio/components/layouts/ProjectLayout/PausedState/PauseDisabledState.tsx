@@ -151,7 +151,7 @@ export const PauseDisabledState = () => {
               Download backups
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end">
+          <DropdownMenuContent className="w-60" align="end">
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!latestBackup}
