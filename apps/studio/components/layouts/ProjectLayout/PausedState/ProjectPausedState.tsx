@@ -33,13 +33,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
+  DialogSection,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PauseDisabledState } from './PauseDisabledState'
-import { Pause, PauseCircle } from 'lucide-react'
+import { PauseCircle } from 'lucide-react'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -292,29 +292,29 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         onOpenChange={() => setShowFreeProjectLimitWarning(false)}
       >
         <DialogContent size="medium" className="gap-0 pb-0">
-          <DialogHeader>
-            <DialogTitle>
+          <DialogHeader className="border-b">
+            <DialogTitle className="leading-normal">
               Your organization has members who have exceeded their free project limits
             </DialogTitle>
-            <DialogDescription className="space-y-2 mt-4">
-              <p className="text-sm text-foreground-light">
-                The following members have reached their maximum limits for the number of active
-                free plan projects within organizations where they are an administrator or owner:
-              </p>
-              <ul className="pl-5 text-sm list-disc text-foreground-light">
-                {(membersExceededLimit || []).map((member, idx: number) => (
-                  <li key={`member-${idx}`}>
-                    {member.username || member.primary_email} (Limit: {member.free_project_limit}{' '}
-                    free projects)
-                  </li>
-                ))}
-              </ul>
-              <p className="text-sm text-foreground-light">
-                These members will need to either delete, pause, or upgrade one or more of these
-                projects before you're able to unpause this project.
-              </p>
-            </DialogDescription>
           </DialogHeader>
+          <DialogSection className="text-sm">
+            <p className="text-foreground-light">
+              The following members have reached their maximum limits for the number of active free
+              plan projects within organizations where they are an administrator or owner:
+            </p>
+            <ul className="my-4 list-disc list-inside">
+              {(membersExceededLimit || []).map((member, idx: number) => (
+                <li key={`member-${idx}`}>
+                  {member.username || member.primary_email} (Limit: {member.free_project_limit} free
+                  projects)
+                </li>
+              ))}
+            </ul>
+            <p className="text-foreground-light">
+              These members will need to either delete, pause, or upgrade one or more of these
+              projects before you're able to unpause this project.
+            </p>
+          </DialogSection>
           <DialogFooter>
             <Button
               htmlType="button"
