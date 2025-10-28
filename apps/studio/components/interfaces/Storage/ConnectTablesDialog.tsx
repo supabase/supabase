@@ -122,14 +122,15 @@ export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => 
         }),
       })
 
+      const keysToDecrypt = Object.entries(wrapperValues)
+        .filter(([name]) =>
+          ['vault_aws_access_key_id', 'vault_aws_secret_access_key'].includes(name)
+        )
+        .map(([_, keyId]) => keyId)
       const decryptedValues = await getDecryptedValues({
         projectRef,
         connectionString: project?.connectionString,
-        ids: Object.entries(wrapperValues)
-          .filter(([k, v]) => {
-            if (['vault_aws_access_key_id', 'vault_aws_secret_access_key'].includes(k)) return v
-          })
-          .map((x) => x[1]),
+        ids: keysToDecrypt,
       })
 
       const warehouseName = bucket.id

@@ -56,7 +56,7 @@ import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperIn
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) => {
-  const config = BUCKET_TYPES['analytics']
+  const config = BUCKET_TYPES.analytics
   const [modal, setModal] = useState<'delete' | null>(null)
   const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
