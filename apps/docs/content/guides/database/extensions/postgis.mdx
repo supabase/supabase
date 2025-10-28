@@ -99,9 +99,9 @@ You can insert geographical data through SQL or through our API.
 insert into public.restaurants
   (name, location)
 values
-  ('Supa Burger', gis.st_point(-73.946823, 40.807416)),
-  ('Supa Pizza', gis.st_point(-73.94581, 40.807475)),
-  ('Supa Taco', gis.st_point(-73.945826, 40.80629));
+  ('Supa Burger', extensions.st_point(-73.946823, 40.807416)),
+  ('Supa Pizza', extensions.st_point(-73.94581, 40.807475)),
+  ('Supa Taco', extensions.st_point(-73.945826, 40.80629));
 ```
 
 </TabPanel>
@@ -213,16 +213,10 @@ returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE,
 set search_path = ''
 language sql
 as $$
-  select id, name, gis.st_y(location::extensions.geometry) as lat, gis.st_x(location::extensions.geometry) as long, gis.st_distance(location, gis.st_point(long, lat)::extensions.geography) as dist_meters
+  select id, name, extensions.st_y(location::extensions.geometry) as lat, extensions.st_x(location::extensions.geometry) as long, extensions.st_distance(location, extensions.st_point(long, lat)::extensions.geography) as dist_meters
   from public.restaurants
-  order by location operator(gis.<->) gis.st_point(long, lat)::extensions.geography;
+  order by location operator(extensions.<->) extensions.st_point(long, lat)::extensions.geography;
 $$;
-```
-
-Before being able to call this function from our client we need to grant access to our `gis` schema:
-
-```sql
-grant usage on schema gis to anon, authenticated;
 ```
 
 Now you can call this function from your client using `rpc()` like this:
@@ -344,9 +338,9 @@ returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE,
 set search_path to ''
 language sql
 as $$
-	select id, name, gis.st_y(location::extensions.geometry) as lat, gis.st_x(location::extensions.geometry) as long
+	select id, name, extensions.st_y(location::extensions.geometry) as lat, extensions.st_x(location::extensions.geometry) as long
 	from public.restaurants
-	where location operator(gis.&&) gis.ST_SetSRID(gis.ST_MakeBox2D(gis.ST_Point(min_long, min_lat), gis.ST_Point(max_long, max_lat)), 4326)
+	where location operator(extensions.&&) extensions.ST_SetSRID(extensions.ST_MakeBox2D(extensions.ST_Point(min_long, min_lat), extensions.ST_Point(max_long, max_lat)), 4326)
 $$;
 ```
 
