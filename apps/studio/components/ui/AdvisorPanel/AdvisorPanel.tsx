@@ -264,9 +264,8 @@ export const AdvisorPanel = () => {
                     const SeverityIcon = tabIconMap[item.tab]
                     const severityClass = severityColorClasses[item.severity]
                     return (
-                      <div className="border-b">
+                      <div key={item.id} className="border-b">
                         <Button
-                          key={item.id}
                           type="text"
                           className="justify-start w-full block rounded-none h-auto py-3 px-4 text-foreground-light hover:text-foreground"
                           onClick={() => setSelectedItemId(item.id)}
