@@ -7008,6 +7008,7 @@ export interface components {
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
+        unit: string
         hasAccess: boolean
         /** @enum {string} */
         type: 'boolean' | 'numeric' | 'set'
