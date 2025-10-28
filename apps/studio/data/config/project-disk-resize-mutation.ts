@@ -44,7 +44,7 @@ export const useProjectDiskResizeMutation = ({
     mutationFn: (vars) => resizeProjectDisk(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      queryClient.setQueriesData(usageKeys.usage(projectRef), (prev: any) => {
+      queryClient.setQueriesData({ queryKey: usageKeys.usage(projectRef) }, (prev: any) => {
         if (!prev) return prev
         return { ...prev, disk_volume_size_gb: variables.volumeSize }
       })

@@ -39,7 +39,8 @@ export const useEdgeFunctionDeleteMutation = ({
     mutationFn: (vars) => deleteEdgeFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef), {
+      await queryClient.invalidateQueries({
+        queryKey: edgeFunctionsKeys.list(projectRef),
         refetchType: 'all',
       })
       await onSuccess?.(data, variables, context)

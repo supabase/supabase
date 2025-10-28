@@ -63,15 +63,13 @@ export const useSqlSnippetsQuery = <TData = SqlSnippetsData>(
     ...options
   }: UseInfiniteQueryOptions<SqlSnippetsData, SqlSnippetsError, TData> = {}
 ) =>
-  useInfiniteQuery<SqlSnippetsData, SqlSnippetsError, TData>(
-    contentKeys.sqlSnippets(projectRef, { sort, name, visibility, favorite }),
-    ({ signal, pageParam: cursor }) =>
+  useInfiniteQuery<SqlSnippetsData, SqlSnippetsError, TData>({
+    queryKey: contentKeys.sqlSnippets(projectRef, { sort, name, visibility, favorite }),
+    queryFn: ({ signal, pageParam: cursor }) =>
       getSqlSnippets({ projectRef, cursor, sort, name, visibility, favorite }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam(lastPage) {
-        return lastPage.cursor
-      },
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    getNextPageParam(lastPage) {
+      return lastPage.cursor
+    },
+    ...options,
+  })

@@ -68,18 +68,16 @@ export const useNotificationsV2Query = <TData = NotificationsData>(
     ...options
   }: UseInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
 ) => {
-  return useInfiniteQuery<NotificationsData, NotificationsError, TData>(
-    notificationKeys.listV2({ status, filters, limit }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery<NotificationsData, NotificationsError, TData>({
+    queryKey: notificationKeys.listV2({ status, filters, limit }),
+    queryFn: ({ signal, pageParam }) =>
       getNotifications({ status, filters, limit, page: pageParam }, signal),
-    {
-      enabled: enabled,
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        if ((lastPage ?? []).length < limit) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
+    enabled: enabled,
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      if ((lastPage ?? []).length < limit) return undefined
+      return page
+    },
+    ...options,
+  })
 }

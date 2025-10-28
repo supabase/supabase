@@ -24,6 +24,7 @@ import { useTrack } from 'lib/telemetry/track'
 import { AssistantMessageType, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   AiIconAnimation,
@@ -38,6 +39,7 @@ import {
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
+import { SIDEBAR_KEYS } from '../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 const NEW_PROJECT_THRESHOLD_DAYS = 7
 const TABLE_QUICKSTART_FLAG = 'tableQuickstart'
@@ -60,7 +62,7 @@ export function NewTab() {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabs = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
-
+  const { openSidebar } = useSidebarManagerSnapshot()
   const [isCreatingChat, setIsCreatingChat] = useState(false)
   const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
@@ -115,9 +117,9 @@ export function NewTab() {
     setIsCreatingChat(true)
 
     try {
+      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       const chatId = aiSnap.newChat({
         name: 'Create a database table',
-        open: true,
       })
 
       if (!chatId) {

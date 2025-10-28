@@ -105,9 +105,14 @@ client.use(
 
         // add code field to body
         body.code = response.status
+
         body.requestId = request.headers.get('X-Request-Id')
+
         const retryAfterHeader = response.headers.get('Retry-After')
         body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
+
+        const requestUrl = new URL(request.url)
+        body.requestPathname = requestUrl.pathname
 
         return new Response(JSON.stringify(body), {
           headers: response.headers,
@@ -156,9 +161,13 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
       'requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined
     const retryAfter =
       'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
+    const requestPathname =
+      'requestPathname' in error && typeof error.requestPathname === 'string'
+        ? error.requestPathname
+        : undefined
 
     if (errorMessage) {
-      throw new ResponseError(errorMessage, errorCode, requestId, retryAfter)
+      throw new ResponseError(errorMessage, errorCode, requestId, retryAfter, requestPathname)
     }
   }
 

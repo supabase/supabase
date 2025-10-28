@@ -34,8 +34,8 @@ export const useOrganizationDeleteMutation = ({
     mutationFn: (vars) => deleteOrganization(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.list()),
-        queryClient.invalidateQueries(permissionKeys.list()),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: permissionKeys.list() }),
       ])
       await onSuccess?.(data, variables, context)
     },

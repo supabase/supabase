@@ -100,9 +100,9 @@ function useLogsPreview({
     fetchNextPage,
     isFetchingNextPage,
     refetch,
-  } = useInfiniteQuery(
+  } = useInfiniteQuery({
     queryKey,
-    async ({ signal, pageParam }) => {
+    queryFn: async ({ signal, pageParam }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -119,19 +119,17 @@ function useLogsPreview({
 
       return data as unknown as Logs
     },
-    {
-      refetchOnWindowFocus: false,
-      getNextPageParam(lastPage) {
-        if ((lastPage.result?.length ?? 0) === 0) {
-          return undefined
-        }
-        const len = lastPage.result.length
-        const { timestamp: tsLimit }: LogData = lastPage.result[len - 1]
-        const isoTsLimit = dayjs.utc(Number(tsLimit / 1000)).toISOString()
-        return isoTsLimit
-      },
-    }
-  )
+    refetchOnWindowFocus: false,
+    getNextPageParam(lastPage) {
+      if ((lastPage.result?.length ?? 0) === 0) {
+        return undefined
+      }
+      const len = lastPage.result.length
+      const { timestamp: tsLimit }: LogData = lastPage.result[len - 1]
+      const isoTsLimit = dayjs.utc(Number(tsLimit / 1000)).toISOString()
+      return isoTsLimit
+    },
+  })
 
   const { logData, error, oldestTimestamp } = useMemo(() => {
     let logData: LogData[] = []

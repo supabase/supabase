@@ -58,9 +58,10 @@ export const useResourcePrefetch = ({ projectRef, id }: ResourceVariables) => {
 
   return useCallback(() => {
     if (projectRef && id) {
-      client.prefetchQuery(resourceKeys.resource(projectRef, id), ({ signal }) =>
-        getResource({ projectRef, id }, signal)
-      )
+      client.prefetchQuery({
+        queryKey: resourceKeys.resource(projectRef, id),
+        queryFn: ({ signal }) => getResource({ projectRef, id }, signal),
+      })
     }
   }, [projectRef, id])
 }

@@ -27,6 +27,8 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 interface SlowQuery {
   rolname: string
@@ -45,6 +47,7 @@ export const AdvisorWidget = () => {
     }
   )
   const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
@@ -147,9 +150,9 @@ export const AdvisorWidget = () => {
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
+                        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                         snap.newChat({
                           name: 'Summarize lint',
-                          open: true,
                           initialInput: `Summarize the issue and suggest fixes for the following lint item:
   Title: ${lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title}
   Entity: ${(lint.metadata && (lint.metadata.entity || (lint.metadata.schema && lint.metadata.name && `${lint.metadata.schema}.${lint.metadata.name}`))) ?? 'N/A'}

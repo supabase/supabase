@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, post } from 'data/fetchers'
 
 export type CreateTenantSourceParams = {
   projectRef: string
@@ -39,7 +39,7 @@ export const useCreateTenantSourceMutation = ({
     mutationFn: (vars) => createTenantSource(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(replicationKeys.sources(projectRef))
+      await queryClient.invalidateQueries({ queryKey: replicationKeys.sources(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

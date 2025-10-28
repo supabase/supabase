@@ -59,8 +59,8 @@ export const useDatabaseExtensionDisableMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries(databaseExtensionsKeys.list(projectRef)),
-        queryClient.invalidateQueries(configKeys.upgradeEligibility(projectRef)),
+        queryClient.invalidateQueries({ queryKey: databaseExtensionsKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.upgradeEligibility(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },
