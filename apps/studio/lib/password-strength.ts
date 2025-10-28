@@ -1,10 +1,8 @@
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
 
-// [Alaister]: Lazy load zxcvbn to avoid bundling it with the main app (it's pretty chunky)
-const zxcvbnImport = import('zxcvbn').then((module) => module.default)
-
 export async function passwordStrength(value: string) {
-  const zxcvbn = await zxcvbnImport
+  // [Alaister]: Lazy load zxcvbn to avoid bundling it with the main app (it's pretty chunky)
+  const zxcvbn = await import('zxcvbn').then((module) => module.default)
 
   let message: string = ''
   let warning: string = ''
