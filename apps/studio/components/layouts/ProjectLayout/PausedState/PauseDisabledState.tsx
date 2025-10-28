@@ -116,7 +116,7 @@ export const PauseDisabledState = () => {
   }
 
   return (
-    <Alert_Shadcn_ variant="warning">
+    <Alert_Shadcn_ variant="warning" className="rounded-none border-0">
       <WarningIcon />
       <AlertTitle_Shadcn_>Project cannot be restored through the dashboard</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
