@@ -36,26 +36,24 @@ export const useAnalyticsBucketDeleteMutation = ({
   const queryClient = useQueryClient()
   const isStorageV2 = useIsNewStorageUIEnabled()
 
-  return useMutation<AnalyticsBucketDeleteData, ResponseError, AnalyticsBucketDeleteVariables>(
-    (vars) => deleteAnalyticsBucket(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        if (isStorageV2) {
-          await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
-        } else {
-          await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
-        }
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete analytics bucket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<AnalyticsBucketDeleteData, ResponseError, AnalyticsBucketDeleteVariables>({
+    mutationFn: (vars) => deleteAnalyticsBucket(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      if (isStorageV2) {
+        await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
+      } else {
+        await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
+      }
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete analytics bucket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

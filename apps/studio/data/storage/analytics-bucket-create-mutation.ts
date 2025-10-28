@@ -22,7 +22,7 @@ async function createAnalyticsBucket({ projectRef, bucketName }: AnalyticsBucket
   })
 
   if (error) handleError(error)
-  return data as { name: string }
+  return data
 }
 
 type AnalyticsBucketCreateData = Awaited<ReturnType<typeof createAnalyticsBucket>>
@@ -37,22 +37,20 @@ export const useAnalyticsBucketCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AnalyticsBucketCreateData, ResponseError, AnalyticsBucketCreateVariables>(
-    (vars) => createAnalyticsBucket(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create analytics bucket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<AnalyticsBucketCreateData, ResponseError, AnalyticsBucketCreateVariables>({
+    mutationFn: (vars) => createAnalyticsBucket(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create analytics bucket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

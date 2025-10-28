@@ -9,6 +9,7 @@ import { storageKeys } from './keys'
 
 export type AnalyticsBucketsVariables = { projectRef?: string }
 export type AnalyticsBucket = components['schemas']['StorageAnalyticsBucketResponse']
+export type AnalyticsBuckets = components['schemas'][]
 
 export async function getAnalyticsBuckets(
   { projectRef }: AnalyticsBucketsVariables,
@@ -22,7 +23,7 @@ export async function getAnalyticsBuckets(
   })
 
   if (error) handleError(error)
-  return data as AnalyticsBucket[]
+  return data.data
 }
 
 export type AnalyticsBucketsData = Awaited<ReturnType<typeof getAnalyticsBuckets>>
