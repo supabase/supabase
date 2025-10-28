@@ -182,9 +182,11 @@ export const AdvisorPanel = () => {
             <Button
               type="text"
               className="px-2"
-              icon={<ChevronLeft size={16} strokeWidth={1.5} />}
+              icon={<ChevronLeft size={16} strokeWidth={1.5} aria-hidden={true} />}
               onClick={handleBackToList}
-            />
+            >
+              <span className="sr-only">Back to list</span>
+            </Button>
             <div className="flex items-center gap-2 overflow-hidden flex-1">
               <div className="flex-1">
                 <span className="heading-default">{selectedItem?.title}</span>
