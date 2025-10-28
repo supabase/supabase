@@ -50,7 +50,9 @@ const General = () => {
     ref: z.string().optional(),
   })
 
-  const validateForm = (values: any) => {
+  type SettingsFormValues = z.infer<typeof SettingsFormSchema>
+
+  const validateForm = (values: SettingsFormValues) => {
     const result = SettingsFormSchema.safeParse(values)
     if (result.success) return {}
 
