@@ -56,7 +56,7 @@ const FormSchema = z.object({
 })
 
 const formId = 'connect-tables-form'
-const isEnabled = true // Kill switch if we wanna hold off supporting connecting tables
+const isEnabled = false // Kill switch if we wanna hold off supporting connecting tables
 
 type ConnectTablesForm = z.infer<typeof FormSchema>
 
