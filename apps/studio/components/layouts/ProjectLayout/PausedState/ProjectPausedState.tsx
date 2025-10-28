@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
+import { PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -8,11 +9,13 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useFlag, useParams } from 'common'
-import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import {
+  extractPostgresVersionDetails,
+  PostgresVersionSelector,
+} from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
 import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
@@ -27,32 +30,21 @@ import {
   Card,
   CardContent,
   CardFooter,
-  FormField_Shadcn_,
-  Form_Shadcn_,
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogFooter,
+  DialogHeader,
   DialogSection,
+  DialogTitle,
+  Form_Shadcn_,
+  FormField_Shadcn_,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { PauseDisabledState } from './PauseDisabledState'
-import { PauseCircle } from 'lucide-react'
 
 export interface ProjectPausedStateProps {
   product?: string
-}
-
-interface PostgresVersionDetails {
-  postgresEngine: Exclude<PostgresEngine, '13' | '14'>
-  releaseChannel: ReleaseChannel
-}
-
-export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {
-  const [postgresEngine, releaseChannel] = value.split('|')
-  return { postgresEngine, releaseChannel } as PostgresVersionDetails
 }
 
 export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
@@ -143,7 +135,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   return (
     <>
-      <Card className="max-w-2xl mx-auto">
+      <Card className="w-[36rem] max-w-xl mx-auto">
         <CardContent>
           <PauseCircle
             size={48}
@@ -153,17 +145,17 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
           <div className="flex-1">
             <div>
               <h3 className="heading-subSection mb-2">
-                {`The project "${project?.name ?? ''}" is currently paused`}
+                The project "{project?.name}" is currently paused
               </h3>
               <div className="body-default text-foreground-light max-w-4xl">
-                {isLoading && <GenericSkeletonLoader />}
+                {isLoading && <GenericSkeletonLoader className="mt-3" />}
 
                 {isSuccess && !isRestoreDisabled ? (
                   isFreePlan ? (
                     <>
-                      <p>
-                        All data, including backups and storage objects, are safe and you can
-                        restore your project from the dashboard within{' '}
+                      <p className="text-sm">
+                        All data, including backups and storage objects, are safe and you can resume
+                        your project from the dashboard within{' '}
                         <span className="text-foreground">
                           {finalDaysRemainingBeforeRestoreDisabled} day
                           {finalDaysRemainingBeforeRestoreDisabled > 1 ? 's' : ''}
@@ -177,38 +169,47 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         </span>
                         ), after which you'll need to contact support.{' '}
                       </p>
-                      <p className="text-foreground-lighter mt-4">
+                      <p className="text-sm text-foreground-lighter mt-4">
                         {enableProBenefitWording === 'variant-a'
                           ? 'Upgrade to Pro to prevent pauses and unlock features like branching, compute upgrades, and daily backups.'
                           : 'To prevent future pauses, consider upgrading to Pro.'}
                       </p>
                     </>
                   ) : (
-                    <p>
-                      Your project data is safe but inaccessible while paused. Once restored, usage
+                    <p className="text-sm">
+                      Your project data is safe but inaccessible while paused. Once resumed, usage
                       will be billed by compute size and hours active.
                     </p>
                   )
-                ) : (
-                  <>
+                ) : !isLoading ? (
+                  <p className="text-sm">
                     All of your project's data is still intact, but your project is inaccessible
                     while paused.{' '}
                     {product !== undefined ? (
                       <>
-                        Restore this project to access the{' '}
+                        Resume this project to access the{' '}
                         <span className="text-brand">{product}</span> page.
                       </>
-                    ) : (
-                      'Restore this project and get back to building!'
-                    )}
-                  </>
-                )}
+                    ) : !isRestoreDisabled ? (
+                      'Resume this project and get back to building!'
+                    ) : null}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>
         </CardContent>
+
+        {isError && (
+          <AlertError
+            className="rounded-none border-0"
+            error={pauseStatusError}
+            subject="Failed to retrieve pause status"
+          />
+        )}
+
         {isSuccess && !isRestoreDisabled && (
-          <CardFooter className="flex items-center gap-4">
+          <CardFooter className="flex justify-end items-center gap-x-2">
             <ButtonTooltip
               size="tiny"
               type="default"
@@ -223,8 +224,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                 },
               }}
             >
-              Restore project
+              Resume project
             </ButtonTooltip>
+
             {isFreePlan ? (
               <Button asChild type="primary">
                 <Link
@@ -240,16 +242,14 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
             )}
           </CardFooter>
         )}
+
         {isSuccess && isRestoreDisabled && <PauseDisabledState />}
-        {isError && (
-          <AlertError error={pauseStatusError} subject="Failed to retrieve pause status" />
-        )}
       </Card>
 
       <ConfirmationModal
         visible={showConfirmRestore}
-        size="small"
-        title="Restore this project"
+        size="medium"
+        title="Resume this project"
         description={
           isFreePlan
             ? "Your project's data will be restored to when it was initially paused."
@@ -258,7 +258,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         onCancel={() => setShowConfirmRestore(false)}
         onConfirm={() => form.handleSubmit(onConfirmRestore)()}
         loading={isRestoring}
-        confirmLabel="Confirm restore"
+        confirmLabel="Confirm resume"
         cancelLabel="Cancel"
       >
         <Form_Shadcn_ {...form}>
@@ -273,7 +273,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                       field={field}
                       form={form}
                       type="unpause"
-                      label="Select the version of Postgres to restore to"
+                      label="Select the version of Postgres to resume to"
                       layout="vertical"
                       dbRegion={region?.displayName ?? ''}
                       cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
@@ -312,7 +312,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
             </ul>
             <p className="text-foreground-light">
               These members will need to either delete, pause, or upgrade one or more of these
-              projects before you're able to unpause this project.
+              projects before you're able to resume this project.
             </p>
           </DialogSection>
           <DialogFooter>
