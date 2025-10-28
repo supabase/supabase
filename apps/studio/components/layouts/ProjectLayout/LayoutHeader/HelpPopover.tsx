@@ -20,12 +20,15 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 export const HelpPopover = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -69,9 +72,9 @@ export const HelpPopover = () => {
                 size="tiny"
                 icon={<AiIconAnimation allowHoverEffect size={14} />}
                 onClick={() => {
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                   snap.newChat({
                     name: 'Support',
-                    open: true,
                     initialInput: `I need help with my project`,
                     suggestions: {
                       title:
