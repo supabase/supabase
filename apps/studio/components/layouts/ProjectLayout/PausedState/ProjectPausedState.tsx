@@ -153,7 +153,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
           <div className="flex-1">
             <div>
               <h3 className="heading-subSection mb-2">
-                {`The project "${project?.name ?? ''}" is currently paused and innaccessible`}
+                {`The project "${project?.name ?? ''}" is currently paused`}
               </h3>
               <div className="body-default text-foreground-light max-w-4xl">
                 {isLoading && <GenericSkeletonLoader />}
