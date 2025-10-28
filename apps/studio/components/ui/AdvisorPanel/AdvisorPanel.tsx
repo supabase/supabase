@@ -85,7 +85,11 @@ export const AdvisorPanel = () => {
 
   const isSidebarOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
 
-  const { data: lintData, isLoading: isLintsLoading } = useProjectLintsQuery(
+  const {
+    data: lintData,
+    isLoading: isLintsLoading,
+    isError: isLintsError,
+  } = useProjectLintsQuery(
     { projectRef: project?.ref },
     { enabled: isSidebarOpen && !!project?.ref }
   )
@@ -156,6 +160,7 @@ export const AdvisorPanel = () => {
   const isDetailView = !!selectedItem
 
   const isLoading = isLintsLoading
+  const isError = isLintsError
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as AdvisorTab)
@@ -250,6 +255,12 @@ export const AdvisorPanel = () => {
             {isLoading ? (
               <div>
                 <GenericSkeletonLoader className="w-full p-4" />
+              </div>
+            ) : isError ? (
+              <div className="my-8 mx-4 flex flex-col items-center gap-2">
+                <AlertTriangle className="text-destructive" />
+                <h2 className="text-base text-foreground-light">Error loading advisories</h2>
+                <p className="text-sm text-foreground-lighter">Please try again later.</p>
               </div>
             ) : filteredItems.length === 0 ? (
               <EmptyAdvisor
