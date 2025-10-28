@@ -10,6 +10,7 @@ import {
   type SelectedCard,
   type Vector2,
   type Weapon,
+  type Particle,
   WeaponType,
 } from '../types'
 import type { GameItem } from '../items/base'
@@ -70,6 +71,7 @@ export class GameRuntime {
   private enemyIdCounter = 0
   private projectileIdCounter = 0
   private experienceDropIdCounter = 0
+  private particleIdCounter = 0
   private readonly baseStats: PlayerStats
   config: GameConfig // made public for behavior functions
   private itemSubscriptions: Array<() => void> = []
@@ -86,6 +88,7 @@ export class GameRuntime {
     this.enemyIdCounter = 0
     this.projectileIdCounter = 0
     this.experienceDropIdCounter = 0
+    this.particleIdCounter = 0
     this.selectedCards = selectedCards
     this.events.clear()
     this.teardownItemHandlers()
@@ -132,6 +135,8 @@ export class GameRuntime {
     this.handleWeapons(currentTime)
     this.updateProjectiles(deltaTime, currentTime)
     this.updateEnemies(deltaTime, currentTime)
+    this.updateParticles(deltaTime, currentTime)
+    this.updateExperienceDrops(deltaTime)
     this.collectExperienceDrops()
     this.spawnEnemiesIfNeeded(currentTime)
     this.updateWaveFromScore(this.state.score)
@@ -139,6 +144,41 @@ export class GameRuntime {
     if (this.state.player.stats.currentHp <= 0) {
       this.state.player.stats.currentHp = 0
       this.state.status = GameStatus.GAME_OVER
+    }
+  }
+
+  private updateExperienceDrops(deltaTime: number) {
+    const player = this.state.player
+    const playerRadius = this.getPlayerRadius()
+    const magnetRadius = 60 // Magnetic attraction range - need to be quite close
+
+    for (const drop of this.state.experienceDrops) {
+      const dx = player.position.x - drop.position.x
+      const dy = player.position.y - drop.position.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+
+      if (distance < magnetRadius && distance > 0) {
+        // Simple linear attraction that gets stronger when closer
+        // Base speed increases as we get closer
+        const baseSpeed = 120 // pixels per second at edge
+        const closeBoost = (magnetRadius - distance) / magnetRadius // 0 at edge, 1 at center
+        const speed = baseSpeed + (closeBoost * 330) // Up to 450 pixels/sec when very close
+
+        // Direct velocity toward player
+        const dirX = dx / distance
+        const dirY = dy / distance
+
+        drop.velocity.x = dirX * speed
+        drop.velocity.y = dirY * speed
+      } else {
+        // Apply friction when not in magnetic range
+        drop.velocity.x *= 0.8
+        drop.velocity.y *= 0.8
+      }
+
+      // Update position
+      drop.position.x += drop.velocity.x * deltaTime
+      drop.position.y += drop.velocity.y * deltaTime
     }
   }
 
@@ -300,6 +340,7 @@ export class GameRuntime {
       enemies: [],
       projectiles: [],
       experienceDrops: [],
+      particles: [],
       wave: {
         waveNumber: 1,
         enemiesRemaining: 0,
@@ -694,6 +735,9 @@ export class GameRuntime {
       this.state.enemies.splice(index, 1)
       this.state.enemiesKilled++
 
+      // Spawn death particles
+      this.spawnDeathParticles(enemy, currentTime)
+
       // Spawn experience drop at enemy position - amount based on enemy type
       const enemyDef = getEnemyByType(enemy.type)
       this.spawnExperienceDrop(enemy.position, enemyDef.experienceValue)
@@ -704,9 +748,78 @@ export class GameRuntime {
     const drop: ExperienceDrop = {
       id: `exp_${this.experienceDropIdCounter++}`,
       position: { ...position },
+      velocity: { x: 0, y: 0 },
       value,
     }
     this.state.experienceDrops.push(drop)
+  }
+
+  private spawnParticle(
+    position: Vector2,
+    velocity: Vector2,
+    color: string,
+    size: number,
+    lifetime: number,
+    currentTime: number
+  ) {
+    const particle: Particle = {
+      id: `particle_${this.particleIdCounter++}`,
+      position: { ...position },
+      velocity: { ...velocity },
+      color,
+      size,
+      lifetime,
+      createdAt: currentTime,
+    }
+    this.state.particles.push(particle)
+  }
+
+  private spawnDeathParticles(enemy: RuntimeEnemy, currentTime: number) {
+    const particleCount = 8
+    const speed = 100
+
+    // Get color based on enemy type
+    let color = '#ef4444' // red for normal
+    if (enemy.type === 'elite') color = '#f97316' // orange for elite
+    if (enemy.type === 'boss') color = '#a855f7' // purple for boss
+
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (Math.PI * 2 * i) / particleCount
+      const velocity = {
+        x: Math.cos(angle) * speed,
+        y: Math.sin(angle) * speed,
+      }
+      this.spawnParticle(
+        enemy.position,
+        velocity,
+        color,
+        enemy.size / 4, // Particle size based on enemy size
+        0.5, // 0.5 second lifetime
+        currentTime
+      )
+    }
+  }
+
+  private updateParticles(deltaTime: number, currentTime: number) {
+    const particles = this.state.particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const particle = particles[i]
+      const age = (currentTime - particle.createdAt) / 1000
+
+      // Remove if too old
+      if (age > particle.lifetime) {
+        particles.splice(i, 1)
+        continue
+      }
+
+      // Update position
+      particle.position.x += particle.velocity.x * deltaTime
+      particle.position.y += particle.velocity.y * deltaTime
+
+      // Apply friction
+      particle.velocity.x *= 0.95
+      particle.velocity.y *= 0.95
+    }
   }
 
   private updateWaveFromScore(score: number) {

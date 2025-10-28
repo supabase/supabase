@@ -121,7 +121,18 @@ export interface Wave {
 export interface ExperienceDrop {
   id: string
   position: Vector2
+  velocity: Vector2 // for magnetic attraction
   value: number // experience points
+}
+
+export interface Particle {
+  id: string
+  position: Vector2
+  velocity: Vector2
+  color: string
+  size: number
+  lifetime: number // seconds
+  createdAt: number
 }
 
 export interface GameState {
@@ -130,6 +141,7 @@ export interface GameState {
   enemies: Enemy[]
   projectiles: Projectile[]
   experienceDrops: ExperienceDrop[]
+  particles: Particle[]
   wave: Wave
   score: number // survival time in seconds
   enemiesKilled: number // total enemies killed

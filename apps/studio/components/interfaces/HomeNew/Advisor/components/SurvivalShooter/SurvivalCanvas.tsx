@@ -33,7 +33,7 @@ export const SurvivalCanvas = ({ gameStateRef, config, onMouseMove, onResize }: 
 
     const gameState = gameStateRef.current
     if (gameState) {
-      const { player, enemies, projectiles, experienceDrops } = gameState
+      const { player, enemies, projectiles, experienceDrops, particles } = gameState
 
       // Draw player (circle) - scale size with HP
       const baseRadius = 8
@@ -109,6 +109,23 @@ export const SurvivalCanvas = ({ gameStateRef, config, onMouseMove, onResize }: 
             isDark,
           })
         }
+      })
+
+      // Draw particles
+      particles.forEach((particle: any) => {
+        const age = (performance.now() - particle.createdAt) / 1000
+        const lifePercent = Math.max(0, Math.min(1, 1 - age / particle.lifetime))
+
+        if (lifePercent <= 0) return // Skip if particle is expired
+
+        const radius = Math.max(0.5, particle.size * lifePercent) // Ensure minimum radius
+
+        ctx.fillStyle = particle.color
+        ctx.globalAlpha = lifePercent * 0.8 // Fade out as particle ages
+        ctx.beginPath()
+        ctx.arc(particle.position.x, particle.position.y, radius, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.globalAlpha = 1
       })
     }
 
