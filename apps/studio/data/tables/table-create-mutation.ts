@@ -2,12 +2,15 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
-export type CreateTableBody = components['schemas']['CreateTableBody']
+export type CreateTableBody = {
+  name: string
+  schema?: string
+  comment?: string
+}
 
 export type TableCreateVariables = {
   projectRef: string
