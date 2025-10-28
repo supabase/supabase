@@ -72,6 +72,7 @@ export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
     queryKey: projectKeys.infiniteListByOrg(slug, { limit, sort, search, statuses }),
     queryFn: ({ signal, pageParam }) =>
       getOrganizationProjects({ slug, limit, page: pageParam, sort, search, statuses }, signal),
+    enabled: enabled && profile !== undefined && typeof slug !== 'undefined',
     staleTime: 30 * 60 * 1000, // 30 minutes
     getNextPageParam(lastPage, pages) {
       const page = pages.length
