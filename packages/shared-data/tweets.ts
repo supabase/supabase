@@ -338,4 +338,7 @@ export const getWeightedTweets = (count: number): typeof tweets => {
   return selectedTweets
 }
 
+// Sort by weight (highest first), then take first 18 for static pages
+export const topTweets = [...tweets].sort((a, b) => (b.weight ?? 1) - (a.weight ?? 1)).slice(0, 18)
+
 export default tweets

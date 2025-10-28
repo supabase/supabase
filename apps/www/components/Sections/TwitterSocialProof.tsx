@@ -6,15 +6,13 @@ import { TweetCard } from 'ui-patterns/TweetCard'
 
 import { useBreakpoint } from 'common'
 import React from 'react'
-import tweets from 'shared-data/tweets'
+import { topTweets } from 'shared-data/tweets'
 
 interface Props {
   className?: string
 }
 
-// Sort by weight (highest first), then take first 18
-const sortedTweets = [...tweets].sort((a, b) => (b.weight ?? 1) - (a.weight ?? 1))
-const tweetsData = sortedTweets.slice(0, 18)
+const tweetsData = topTweets
 
 const TwitterSocialProof: React.FC<Props> = ({ className }) => {
   const { basePath } = useRouter()
