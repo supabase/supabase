@@ -104,8 +104,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     if (isSuccessOrganizations && organizations.length > 0) {
       if (organization_slug) {
         setSelectedOrgSlug(organizations.find(({ slug }) => slug === organization_slug)?.slug)
-      } else {
-        setSelectedOrgSlug(organizations[0].slug)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -267,7 +265,8 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             >
               <SelectTrigger_Shadcn_ size="small">
                 <SelectValue_Shadcn_>
-                  {organizations?.find((x) => x.slug === selectedOrgSlug)?.name}
+                  {organizations?.find((x) => x.slug === selectedOrgSlug)?.name ??
+                    'Select an organization'}
                 </SelectValue_Shadcn_>
               </SelectTrigger_Shadcn_>
               <SelectContent_Shadcn_>
@@ -289,7 +288,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         <Button
           type="default"
           loading={isDeclining}
-          disabled={isApproving || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)}
+          disabled={isApproving || isExpired || !selectedOrgSlug}
           onClick={onDeclineRequest}
         >
           Decline
@@ -303,7 +302,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         ) : (
           <Button
             loading={isApproving}
-            disabled={isDeclining || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)}
+            disabled={isDeclining || isExpired || !selectedOrgSlug}
             onClick={onApproveRequest}
           >
             Authorize {requester?.name}
