@@ -51,6 +51,7 @@ export const EditorPanel = () => {
     templates,
     results,
     error,
+    initialPrompt,
     onChange,
     setValue,
     setTemplates,
@@ -279,7 +280,7 @@ export const EditorPanel = () => {
               connectionString: project?.connectionString,
               orgSlug: org?.slug,
             }}
-            initialPrompt=""
+            initialPrompt={initialPrompt}
             options={{
               tabSize: 2,
               fontSize: 13,

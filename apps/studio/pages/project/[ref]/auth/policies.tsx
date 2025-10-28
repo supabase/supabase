@@ -1,7 +1,7 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
@@ -89,11 +89,11 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
-  const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const {
-    templates: editorPanelTemplates,
     setValue: setEditorPanelValue,
     setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
   } = useEditorPanelStateSnapshot()
 
   const [selectedTable, setSelectedTable] = useState<string>()
@@ -153,6 +153,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   using (
     true  -- Write your policy condition here
 );`
+
+        setEditorPanelInitialPrompt('Create a new RLS policy that...')
         setEditorPanelValue(defaultSql)
         setEditorPanelTemplates([])
         openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
@@ -169,6 +171,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
       setSelectedTable(undefined)
 
       if (isInlineEditorEnabled) {
+        setEditorPanelInitialPrompt(`Update the RLS policy with name "${policy.name}" that...`)
         setEditorPanelValue(generatePolicyUpdateSQL(policy))
         const templates = getGeneralPolicyTemplates(policy.schema, policy.table).map(
           (template) => ({
@@ -185,19 +188,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     },
     [isInlineEditorEnabled, openSidebar]
   )
-
-  const isEditorPanelActive = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
-
-  useEffect(() => {
-    if (isEditorPanelActive) return
-
-    setSelectedPolicyToEdit(undefined)
-    setSelectedTable(undefined)
-
-    if (editorPanelTemplates.length > 0) {
-      setEditorPanelTemplates([])
-    }
-  }, [editorPanelTemplates.length, isEditorPanelActive, setEditorPanelTemplates])
 
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
 
