@@ -190,7 +190,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.57.2
+    image: supabase/realtime:v2.57.3
     restart: unless-stopped
     depends_on:
       db:
@@ -343,7 +343,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.22.6
+    image: supabase/logflare:1.23.2
     restart: unless-stopped
     ports:
       - 4000:4000
