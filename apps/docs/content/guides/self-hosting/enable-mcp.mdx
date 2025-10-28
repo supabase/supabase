@@ -138,8 +138,9 @@ Start your MCP client (Claude Code, Cursor, etc.) and verify access to the MCP t
 
 ## Troubleshooting
 
-If you're unable to connect to the MCP server:
+If you are unable to connect to the MCP server:
 
-1. Make sure your SSH tunnel is active
-2. Check Kong's logs: `docker compose logs kong`
-3. Confirm the Docker bridge gateway IP is correctly added in `./volumes/api/kong.yml`
+1. Update Kong configuration file to the [latest version](https://github.com/supabase/supabase/blob/master/docker/volumes/api/kong.yml) and edit carefully
+2. Confirm the Docker bridge gateway IP is correctly added in `./volumes/api/kong.yml`
+3. Check Kong's logs for errors: `docker compose logs kong`
+4. Make sure your SSH tunnel is active
