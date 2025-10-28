@@ -34,9 +34,10 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import { convertKVStringArrayToJson } from '../Integrations/Wrappers/Wrappers.utils'
-import { useAnalyticsBucketWrapperInstance } from './AnalyticBucketDetails/useAnalyticsBucketWrapperInstance'
-import { getCatalogURI } from './StorageSettings/StorageSettings.utils'
+import { convertKVStringArrayToJson } from '../../Integrations/Wrappers/Wrappers.utils'
+import { getCatalogURI } from '../StorageSettings/StorageSettings.utils'
+import { getAnalyticsBucketPublicationName } from './AnalyticBucketDetails.utils'
+import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 
 /**
  * [Joshen] So far this is purely just setting up a "Connect from empty state" flow
@@ -70,7 +71,7 @@ export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => 
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: wrapperInstance } = useAnalyticsBucketWrapperInstance(bucket.id)
+  const { data: wrapperInstance } = useAnalyticsBucketWrapperInstance({ bucketId: bucket.id })
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
@@ -111,7 +112,7 @@ export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => 
     if (!sourceId) return toast.error('Source ID is required')
 
     try {
-      const publicationName = `${bucket.id}_publication`
+      const publicationName = getAnalyticsBucketPublicationName(bucket.id)
       await createPublication({
         projectRef,
         sourceId,

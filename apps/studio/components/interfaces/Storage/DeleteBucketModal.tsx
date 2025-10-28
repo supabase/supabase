@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { get as _get, find, snakeCase } from 'lodash'
+import { get as _get, find } from 'lodash'
 import { useRouter } from 'next/router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -9,15 +8,10 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
 import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
-import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
-import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -36,7 +30,10 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
-import { getWrapperMetaForWrapper } from '../Integrations/Wrappers/Wrappers.utils'
+import {
+  useAnalyticsBucketAssociatedEntities,
+  useAnalyticsBucketDeleteCleanUp,
+} from './AnalyticBucketDetails/useAnalyticsBucketAssociatedEntities'
 import { formatPoliciesForStorage } from './Storage.utils'
 
 export interface DeleteBucketModalProps {
@@ -52,10 +49,6 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const isStorageV2 = useIsNewStorageUIEnabled()
-  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_READ,
-    '*'
-  )
 
   const isStandardBucketSelected = 'type' in bucket && bucket.type === 'STANDARD'
 
@@ -78,15 +71,11 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     schema: 'storage',
   })
 
-  const { data: wrappers = [] } = useFDWsQuery(
-    { projectRef, connectionString: project?.connectionString },
-    { enabled: !isStandardBucketSelected }
-  )
-
-  const { data: s3AccessKeys } = useStorageCredentialsQuery(
-    { projectRef },
-    { enabled: canReadS3Credentials }
-  )
+  const { icebergWrapper, icebergWrapperMeta, s3AccessKey, publication } =
+    useAnalyticsBucketAssociatedEntities(
+      { projectRef, bucketId: bucket.id },
+      { enabled: !isStandardBucketSelected }
+    )
 
   const { mutateAsync: deletePolicy } = useDatabasePolicyDeleteMutation()
 
@@ -132,38 +121,20 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     },
   })
 
-  const { mutateAsync: deleteFDW, isLoading: isDeletingWrapper } = useFDWDeleteMutation()
-
-  const { mutateAsync: deleteS3AccessKey, isLoading: isDeletingKey } =
-    useS3AccessKeyDeleteMutation()
+  const { mutateAsync: deleteAnalyticsBucketCleanUp, isLoading: isCleaningUpAnalyticsBucket } =
+    useAnalyticsBucketDeleteCleanUp()
 
   const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
     useAnalyticsBucketDeleteMutation({
       onSuccess: async () => {
-        // [Joshen] Clean up Iceberg FDW and S3 access keys when deleting analytics bucket
-        if (!isStandardBucketSelected) {
-          const wrapperName = `${snakeCase(bucket.id)}_fdw`
-          const icebergWrapper = wrappers.find((wrapper) => wrapper.name === wrapperName)
-          const icebergWrapperMeta = getWrapperMetaForWrapper(icebergWrapper)
-
-          if (!!icebergWrapper && !!icebergWrapperMeta) {
-            await deleteFDW({
-              projectRef,
-              connectionString: project?.connectionString,
-              wrapper: icebergWrapper,
-              wrapperMeta: icebergWrapperMeta,
-            })
-          } else {
-            console.warn('Unable to find and delete iceberg wrapper for: ', bucket.id)
-          }
-
-          const s3AccessKey = (s3AccessKeys?.data ?? []).find(
-            (x) => x.description === `${snakeCase(bucket.id)}_keys`
-          )
-          if (!!s3AccessKey) {
-            await deleteS3AccessKey({ projectRef, id: s3AccessKey.id })
-          }
-        }
+        await deleteAnalyticsBucketCleanUp({
+          projectRef,
+          bucketId: bucket.id,
+          icebergWrapper,
+          icebergWrapperMeta,
+          s3AccessKey,
+          publication,
+        })
 
         toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
         if (isStorageV2) {
@@ -187,7 +158,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     }
   }
 
-  const isDeleting = isDeletingBucket || isDeletingAnalyticsBucket || isDeletingWrapper
+  const isDeleting = isDeletingBucket || isDeletingAnalyticsBucket || isCleaningUpAnalyticsBucket
 
   return (
     <Dialog

@@ -44,8 +44,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { ConnectTablesDialog } from '../ConnectTablesDialog'
 import { DeleteBucketModal } from '../DeleteBucketModal'
+import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
@@ -63,7 +63,9 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
   const { state: extensionState } = useIcebergWrapperExtension()
 
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
-  const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance(bucket.id)
+  const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance({
+    bucketId: bucket.id,
+  })
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
   const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta

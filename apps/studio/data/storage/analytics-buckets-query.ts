@@ -38,28 +38,26 @@ export const useAnalyticsBucketsQuery = <TData = AnalyticsBucketsData>(
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useQuery<AnalyticsBucketsData, AnalyticsBucketsError, TData>(
-    storageKeys.analyticsBuckets(projectRef),
-    ({ signal }) => getAnalyticsBuckets({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-      ...options,
-      retry: (failureCount, error) => {
-        if (
-          typeof error === 'object' &&
-          error !== null &&
-          error.message.startsWith('Tenant config') &&
-          error.message.endsWith('not found')
-        ) {
-          return false
-        }
-
-        if (failureCount < 3) {
-          return true
-        }
-
+  return useQuery<AnalyticsBucketsData, AnalyticsBucketsError, TData>({
+    queryKey: storageKeys.analyticsBuckets(projectRef),
+    queryFn: ({ signal }) => getAnalyticsBuckets({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    ...options,
+    retry: (failureCount, error) => {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        error.message.startsWith('Tenant config') &&
+        error.message.endsWith('not found')
+      ) {
         return false
-      },
-    }
-  )
+      }
+
+      if (failureCount < 3) {
+        return true
+      }
+
+      return false
+    },
+  })
 }
