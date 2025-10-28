@@ -52,11 +52,9 @@ export const Usage = () => {
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
 
-  const { data: selectedProject } = useProjectDetailQuery(
-    {
-      ref: selectedProjectRef ?? undefined,
-    }
-  )
+  const { data: selectedProject } = useProjectDetailQuery({
+    ref: selectedProjectRef ?? undefined,
+  })
 
   const billingCycleStart = useMemo(() => {
     return dayjs.unix(subscription?.current_period_start ?? 0).utc()
