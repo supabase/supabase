@@ -45,22 +45,20 @@ export const useCreatePublicationMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreatePublicationData, ResponseError, CreatePublicationParams>(
-    (vars) => createPublication(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, sourceId } = variables
-        await queryClient.invalidateQueries(replicationKeys.publications(projectRef, sourceId))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create publication: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<CreatePublicationData, ResponseError, CreatePublicationParams>({
+    mutationFn: (vars) => createPublication(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, sourceId } = variables
+      await queryClient.invalidateQueries(replicationKeys.publications(projectRef, sourceId))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create publication: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

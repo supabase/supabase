@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
@@ -16,6 +16,7 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -48,6 +49,7 @@ import {
 export interface TableEditorProps {
   table?: PostgresTable
   isDuplicating: boolean
+  templateData?: Partial<TableField>
   visible: boolean
   closePanel: () => void
   saveChanges: (
@@ -76,6 +78,7 @@ export interface TableEditorProps {
 export const TableEditor = ({
   table,
   isDuplicating,
+  templateData,
   visible = false,
   closePanel = noop,
   saveChanges = noop,
@@ -88,6 +91,8 @@ export const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -142,8 +147,12 @@ export const TableEditor = ({
       connectionString: project?.connectionString,
       schema: table?.schema,
     })
-  const foreignKeys = (foreignKeyMeta ?? []).filter(
-    (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
+  const foreignKeys = useMemo(
+    () =>
+      (foreignKeyMeta ?? []).filter(
+        (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
+      ),
+    [foreignKeyMeta, table]
   )
 
   const onUpdateField = (changes: Partial<TableField>) => {
@@ -231,23 +240,27 @@ export const TableEditor = ({
       setIsDuplicateRows(false)
       if (isNewRecord) {
         const tableFields = generateTableField()
-        setTableFields(tableFields)
+        if (templateData) {
+          setTableFields({ ...tableFields, ...templateData })
+        } else {
+          setTableFields(tableFields)
+        }
         setFkRelations([])
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
           table,
-          foreignKeyMeta || [],
+          foreignKeyMeta ?? [],
           isDuplicating,
           isRealtimeEnabled
         )
         setTableFields(tableFields)
       }
     }
-  }, [visible])
+  }, [visible, templateData])
 
   useEffect(() => {
     if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
-  }, [isSuccessForeignKeyMeta])
+  }, [isSuccessForeignKeyMeta, foreignKeys])
 
   useEffect(() => {
     if (importContent && !isEmpty(importContent)) {
@@ -335,7 +348,7 @@ export const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href={`${DOCS_URL}/guides/auth/row-level-security`}
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         ) : (
@@ -353,7 +366,7 @@ export const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href={`${DOCS_URL}/guides/auth/row-level-security`}
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         )}

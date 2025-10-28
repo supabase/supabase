@@ -57,28 +57,26 @@ export const useRollbackTableMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<RollbackTableData, ResponseError, RollbackTableParams>(
-    (vars) => rollbackTableState(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, pipelineId } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId)),
-          queryClient.invalidateQueries(
-            replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
-          ),
-        ])
+  return useMutation<RollbackTableData, ResponseError, RollbackTableParams>({
+    mutationFn: (vars) => rollbackTableState(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, pipelineId } = variables
+      await Promise.all([
+        queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId)),
+        queryClient.invalidateQueries(
+          replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId)
+        ),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to rollback table: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to rollback table: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -127,7 +127,6 @@ export const Usage = () => {
       setSelectedProjectRefInputValue(projectRef)
     }
     // [Joshen] Since we're already looking at isSuccess
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectRef, isSuccessProjectDetail])
 
   return (

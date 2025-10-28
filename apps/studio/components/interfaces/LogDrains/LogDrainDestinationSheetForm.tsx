@@ -56,6 +56,14 @@ const formUnion = z.discriminatedUnion('type', [
     region: z.string().min(1, { message: 'Region is required' }),
   }),
   z.object({
+    type: z.literal('loki'),
+    url: z.string().min(1, { message: 'Loki URL is required' }),
+    headers: z.record(z.string(), z.string()),
+    username: z.string().optional(),
+    password: z.string().optional(),
+  }),
+  // [Joshen] To fix API types, not supported in the UI
+  z.object({
     type: z.literal('elastic'),
   }),
   z.object({
@@ -65,11 +73,13 @@ const formUnion = z.discriminatedUnion('type', [
     type: z.literal('bigquery'),
   }),
   z.object({
-    type: z.literal('loki'),
-    url: z.string().min(1, { message: 'Loki URL is required' }),
-    headers: z.record(z.string(), z.string()),
-    username: z.string().optional(),
-    password: z.string().optional(),
+    type: z.literal('clickhouse'),
+  }),
+  z.object({
+    type: z.literal('s3'),
+  }),
+  z.object({
+    type: z.literal('sentry'),
   }),
 ])
 

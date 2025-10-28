@@ -3,7 +3,7 @@ import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useMemo, useState } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
@@ -16,6 +16,7 @@ import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import EditorPanel from 'components/ui/EditorPanel/EditorPanel'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useHotKey } from 'hooks/ui/useHotKey'
@@ -24,7 +25,7 @@ import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import { BreadcrumbsView } from './BreadcrumbsView'
-import { FeedbackDropdown } from './FeedbackDropdown'
+import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
@@ -74,12 +75,19 @@ const LayoutHeader = ({
   const isAccountPage = router.pathname.startsWith('/account')
 
   const [showEditorPanel, setShowEditorPanel] = useState(false)
+
+  const [inlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
+    LOCAL_STORAGE_KEYS.HOTKEY_INLINE_EDITOR,
+    true
+  )
+
   useHotKey(
     () => {
       if (projectRef) setShowEditorPanel(!showEditorPanel)
     },
     'e',
-    [showEditorPanel, projectRef]
+    [showEditorPanel, projectRef],
+    { enabled: inlineEditorHotkeyEnabled }
   )
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
@@ -225,7 +233,10 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <InlineEditorButton
+                          onClick={() => setShowEditorPanel(true)}
+                          showShortcut={inlineEditorHotkeyEnabled}
+                        />
                         <AssistantButton />
                       </>
                     )}
@@ -240,7 +251,10 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <InlineEditorButton
+                          onClick={() => setShowEditorPanel(true)}
+                          showShortcut={inlineEditorHotkeyEnabled}
+                        />
                         <AssistantButton />
                       </>
                     )}
@@ -252,7 +266,11 @@ const LayoutHeader = ({
           </div>
         </div>
       </header>
-      <EditorPanel open={showEditorPanel} onClose={() => setShowEditorPanel(false)} />
+      <EditorPanel
+        open={showEditorPanel}
+        onClose={() => setShowEditorPanel(false)}
+        isInlineEditorHotkeyEnabled={inlineEditorHotkeyEnabled}
+      />
     </>
   )
 }

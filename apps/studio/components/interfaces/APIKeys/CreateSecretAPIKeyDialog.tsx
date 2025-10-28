@@ -1,7 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -12,18 +16,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
-  Alert,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
@@ -85,7 +84,7 @@ const CreateSecretAPIKeyDialog = () => {
     <Dialog open={visible} onOpenChange={onClose}>
       <DialogTrigger asChild>
         <Button type="default" className="mt-2" icon={<Plus />}>
-          Add new secret key
+          New secret key
         </Button>
       </DialogTrigger>
       <DialogContent>

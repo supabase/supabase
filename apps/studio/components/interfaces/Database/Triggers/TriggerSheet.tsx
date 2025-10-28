@@ -40,6 +40,7 @@ import {
   TRIGGER_ORIENTATIONS,
   TRIGGER_TYPES,
 } from './Triggers.constants'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const formId = 'create-trigger'
 
@@ -75,20 +76,27 @@ const defaultValues: z.infer<typeof FormSchema> = {
 
 interface TriggerSheetProps {
   selectedTrigger?: PostgresTrigger
+  isDuplicatingTrigger?: boolean
   open: boolean
-  setOpen: (val: boolean) => void
+  onClose: () => void
 }
 
-export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetProps) => {
+export const TriggerSheet = ({
+  selectedTrigger,
+  isDuplicatingTrigger,
+  open,
+  onClose,
+}: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
 
+  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
   const { mutate: createDatabaseTrigger, isLoading: isCreating } = useDatabaseTriggerCreateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully created trigger ${res.name}`)
-        setOpen(false)
+      onSuccess: () => {
+        toast.success(`Successfully created trigger`)
+        onClose()
       },
       onError: (error) => {
         toast.error(`Failed to create trigger: ${error.message}`)
@@ -97,9 +105,9 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
   )
   const { mutate: updateDatabaseTrigger, isLoading: isUpdating } = useDatabaseTriggerUpdateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully updated trigger ${res.name}`)
-        setOpen(false)
+      onSuccess: () => {
+        toast.success(`Successfully updated trigger`)
+        onClose()
       },
       onError: (error) => {
         toast.error(`Failed to update trigger: ${error.message}`)
@@ -117,7 +125,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
   const tables = data
     .sort((a, b) => a.schema.localeCompare(b.schema))
     .filter((a) => !protectedSchemas.find((s) => s.name === a.schema))
-  const isEditing = !!selectedTrigger
+  const isEditing = !isDuplicatingTrigger && !!selectedTrigger
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -126,6 +134,10 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     defaultValues,
   })
   const { function_name, function_schema } = form.watch()
+
+  function isClosingSidePanel() {
+    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
+  }
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
@@ -151,7 +163,16 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     if (open && isSuccess) {
       form.clearErrors()
 
-      if (isEditing) {
+      if (isDuplicatingTrigger && selectedTrigger) {
+        const initalSelectedTable = tables.find((t) => t.name === selectedTrigger.table)
+
+        form.reset({
+          ...selectedTrigger,
+          tableId: initalSelectedTable?.id.toString(),
+          table: initalSelectedTable?.name,
+          schema: initalSelectedTable?.schema,
+        })
+      } else if (isEditing) {
         form.reset(selectedTrigger)
       } else if (tables.length > 0) {
         form.reset({
@@ -167,13 +188,15 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
   return (
     <>
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet open={open} onOpenChange={isClosingSidePanel}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
-              {isEditing
-                ? `Edit database trigger: ${selectedTrigger.name}`
-                : 'Create a new database trigger'}
+              {isDuplicatingTrigger
+                ? 'Duplicate trigger'
+                : isEditing
+                  ? `Edit database trigger: ${selectedTrigger.name}`
+                  : 'Create a new database trigger'}
             </SheetTitle>
           </SheetHeader>
 
@@ -250,10 +273,12 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
                           <Select_Shadcn_
                             defaultValue={field.value}
                             onValueChange={(val) => {
+                              // mark table ID as dirty to trigger validation
+                              field.onChange(val)
                               const table = tables.find((x) => x.id.toString() === val)
                               if (table) {
-                                form.setValue('table', table.name)
-                                form.setValue('schema', table.schema)
+                                form.setValue('table', table.name, { shouldDirty: true })
+                                form.setValue('schema', table.schema, { shouldDirty: true })
                               }
                             }}
                           >
@@ -446,7 +471,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
               type="default"
               htmlType="reset"
               disabled={isCreating || isUpdating}
-              onClick={() => setOpen(false)}
+              onClick={onClose}
             >
               Cancel
             </Button>
@@ -454,6 +479,22 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
               {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>
+
+          <ConfirmationModal
+            visible={isClosingPanel}
+            title="Discard changes"
+            confirmLabel="Discard"
+            onCancel={() => setIsClosingPanel(false)}
+            onConfirm={() => {
+              setIsClosingPanel(false)
+              onClose()
+            }}
+          >
+            <p className="text-sm text-foreground-light">
+              There are unsaved changes. Are you sure you want to close the panel? Your changes will
+              be lost.
+            </p>
+          </ConfirmationModal>
         </SheetContent>
       </Sheet>
 

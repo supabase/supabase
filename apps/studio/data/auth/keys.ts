@@ -8,6 +8,14 @@ export const authKeys = {
     }
   ) => ['projects', projectRef, 'users', ...(params ? [params] : [])] as const,
 
+  usersQuery: (
+    projectRef: string | undefined,
+    params?: {
+      query: string
+      startAt: string
+    }
+  ) => ['projects', projectRef, 'users-query', ...(params ? [params] : [])] as const,
+
   usersInfinite: (
     projectRef: string | undefined,
     params?: {

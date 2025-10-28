@@ -54,21 +54,23 @@ export const APIKeyRow = ({
         </div>
       </TableCell>
 
-      <TableCell className="flex justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="px-1 focus-visible:outline-none" asChild>
-            <Button
-              type="text"
-              size="tiny"
-              icon={
-                <MoreVertical size="14" className="text-foreground-light hover:text-foreground" />
-              }
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="max-w-40" align="end">
-            <APIKeyDeleteDialog apiKey={apiKey} lastSeen={lastSeen} />
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <TableCell className="py-2">
+        <div className="flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="px-1 focus-visible:outline-none" asChild>
+              <Button
+                type="text"
+                size="tiny"
+                icon={
+                  <MoreVertical size="14" className="text-foreground-light hover:text-foreground" />
+                }
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-w-40" align="end">
+              <APIKeyDeleteDialog apiKey={apiKey} lastSeen={lastSeen} />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </TableCell>
     </MotionTableRow>
   )

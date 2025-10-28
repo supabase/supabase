@@ -1,15 +1,16 @@
+import { CubeIcon } from '@heroicons/react/outline'
+import { Check, Sparkles, Timer } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { Check, Sparkles, Timer } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
-import { Button, cn, Image } from 'ui'
+import { Button, cn, IconDiscord, Image } from 'ui'
 
-import MainProducts from '../MainProducts'
 import { frameworks } from 'components/Hero/HeroFrameworks'
+import MainProducts from '../MainProducts'
 
-import type { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
+import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
 import type { TwitterSocialSectionProps } from 'components/TwitterSocialSection'
+import type { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
 import {
   FrameworkLink,
   getEditors,
@@ -17,12 +18,11 @@ import {
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { tweets } from 'shared-data'
 import { useBreakpoint } from 'common'
 import { useSendTelemetryEvent } from 'lib/telemetry'
+import { tweets } from 'shared-data'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const ComputePricingCalculator = dynamic(
@@ -480,22 +480,20 @@ const data: () => {
       heading: 'Fun projects built with Supabase',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
-        <>
-          <Button asChild size="small" type="default">
-            <Link
-              href="https://github.com/supabase/supabase/discussions"
-              target="_blank"
-              tabIndex={-1}
-            >
-              GitHub discussions
-            </Link>
-          </Button>
-          <Button asChild type="default" size="small">
-            <Link href={'https://discord.supabase.com/'} target="_blank" tabIndex={-1}>
-              Discord
-            </Link>
-          </Button>
-        </>
+        <Button asChild type="default" size="small" icon={<IconDiscord />}>
+          <Link
+            href={'https://discord.supabase.com/'}
+            target="_blank"
+            tabIndex={-1}
+            onClick={() =>
+              sendTelemetryEvent({
+                action: 'homepage_discord_button_clicked',
+              })
+            }
+          >
+            Join us on Discord
+          </Link>
+        </Button>
       ),
       tweets: tweets.slice(0, 18),
     },

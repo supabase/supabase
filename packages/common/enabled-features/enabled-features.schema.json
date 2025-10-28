@@ -120,6 +120,10 @@
       "type": "boolean",
       "description": "Enable the testimonial on the sign in/up page"
     },
+    "dashboard_auth:show_tos": {
+      "type": "boolean",
+      "description": "Enable the terms of service link on the sign in/up page"
+    },
 
     "database:replication": {
       "type": "boolean",
@@ -271,6 +275,10 @@
     "organization:show_security_settings": {
       "type": "boolean",
       "description": "Show the security settings tab in the organization settings page"
+    },
+    "organization:show_legal_documents": {
+      "type": "boolean",
+      "description": "Show the legal documents tab in the organization settings page"
     },
 
     "profile:show_email": {
@@ -430,6 +438,7 @@
     "dashboard_auth:sign_in_with_github",
     "dashboard_auth:sign_in_with_sso",
     "dashboard_auth:sign_in_with_email",
+    "dashboard_auth:show_tos",
     "database:replication",
     "database:roles",
     "database:restore_to_new_project",
@@ -467,6 +476,8 @@
     "logs:metadata",
     "logs:show_metadata_ip_template",
     "organization:show_sso_settings",
+    "organization:show_security_settings",
+    "organization:show_legal_documents",
     "project_creation:show_advanced_config",
     "project_homepage:show_instance_size",
     "project_homepage:show_examples",

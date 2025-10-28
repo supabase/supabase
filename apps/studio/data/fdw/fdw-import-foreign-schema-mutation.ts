@@ -50,29 +50,27 @@ export const useFDWImportForeignSchemaMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ImportForeignSchemaData, ResponseError, FDWImportForeignSchemaVariables>(
-    (vars) => importForeignSchema(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<ImportForeignSchemaData, ResponseError, FDWImportForeignSchemaVariables>({
+    mutationFn: (vars) => importForeignSchema(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(fdwKeys.list(projectRef), { refetchType: 'all' }),
-          queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-          queryClient.invalidateQueries(foreignTableKeys.list(projectRef)),
-          queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries(fdwKeys.list(projectRef), { refetchType: 'all' }),
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+        queryClient.invalidateQueries(foreignTableKeys.list(projectRef)),
+        queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to import schema for foreign data wrapper: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to import schema for foreign data wrapper: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }
