@@ -37,7 +37,7 @@ export const useSecretsDeleteMutation = ({
     mutationFn: (vars) => deleteSecrets(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(secretsKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: secretsKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

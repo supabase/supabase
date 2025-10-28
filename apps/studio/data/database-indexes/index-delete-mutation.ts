@@ -46,7 +46,7 @@ export const useDatabaseIndexDeleteMutation = ({
     mutationFn: (vars) => deleteDatabaseIndex(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseIndexesKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: databaseIndexesKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

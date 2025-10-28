@@ -56,7 +56,7 @@ export const useBranchCreateMutation = ({
     mutationFn: (vars) => createBranch(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(branchKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

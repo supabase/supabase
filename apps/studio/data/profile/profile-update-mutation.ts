@@ -46,7 +46,7 @@ export const useProfileUpdateMutation = ({
   return useMutation<ProfileUpdateData, ResponseError, ProfileUpdateVariables>({
     mutationFn: (vars) => updateProfile(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(profileKeys.profile())
+      await queryClient.invalidateQueries({ queryKey: profileKeys.profile() })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

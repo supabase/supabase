@@ -40,7 +40,7 @@ export const useCustomDomainDeleteMutation = ({
       // we manually setQueriesData here instead of using
       // the standard invalidateQueries is the custom domains
       // endpoint doesn't immediately return the new state
-      queryClient.setQueriesData(customDomainKeys.list(projectRef), () => {
+      queryClient.setQueriesData({ queryKey: customDomainKeys.list(projectRef) }, () => {
         return {
           customDomain: null,
           status: '0_no_hostname_configured',

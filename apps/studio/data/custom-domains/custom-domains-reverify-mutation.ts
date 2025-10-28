@@ -34,7 +34,7 @@ export const useCustomDomainReverifyMutation = ({
     mutationFn: (vars) => reverifyCustomDomain(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(customDomainKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: customDomainKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -148,27 +148,27 @@ const DatabaseUsage = () => {
     const { period_start, period_end, interval } = selectedDateRange
     REPORT_ATTRIBUTES.forEach((chart: any) => {
       chart.attributes.forEach((attr: any) => {
-        queryClient.invalidateQueries(
-          analyticsKeys.infraMonitoring(ref, {
+        queryClient.invalidateQueries({
+          queryKey: analyticsKeys.infraMonitoring(ref, {
             attribute: attr.attribute,
             startDate: period_start.date,
             endDate: period_end.date,
             interval,
             databaseIdentifier: state.selectedDatabaseId,
-          })
-        )
+          }),
+        })
       })
     })
     if (isReplicaSelected) {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
+      queryClient.invalidateQueries({
+        queryKey: analyticsKeys.infraMonitoring(ref, {
           attribute: 'physical_replication_lag_physical_replica_lag_seconds',
           startDate: period_start.date,
           endDate: period_end.date,
           interval,
           databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
+        }),
+      })
     }
     setTimeout(() => setIsRefreshing(false), 1000)
   }

@@ -29,7 +29,7 @@ export const useUnlinkIdentityMutation = ({
     async onSuccess(data, variables, context) {
       await Promise.all([
         auth.refreshSession(),
-        queryClient.invalidateQueries(profileKeys.identities()),
+        queryClient.invalidateQueries({ queryKey: profileKeys.identities() }),
       ])
       await onSuccess?.(data, variables, context)
     },

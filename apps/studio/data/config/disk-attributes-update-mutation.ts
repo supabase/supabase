@@ -58,7 +58,7 @@ export const useUpdateDiskAttributesMutation = ({
     mutationFn: (vars) => updateDiskAttributes(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
-      await queryClient.invalidateQueries(configKeys.diskAttributes(ref))
+      await queryClient.invalidateQueries({ queryKey: configKeys.diskAttributes(ref) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

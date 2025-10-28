@@ -41,8 +41,10 @@ export const useMfaChallengeAndVerifyMutation = ({
       const refreshFactors = variables.refreshFactors ?? true
 
       await Promise.all([
-        ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.mfaFactors())] : []),
-        queryClient.invalidateQueries(profileKeys.aaLevel()),
+        ...(refreshFactors
+          ? [queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors() })]
+          : []),
+        queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() }),
       ])
 
       await onSuccess?.(data, variables, context)

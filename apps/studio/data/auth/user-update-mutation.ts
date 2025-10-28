@@ -38,7 +38,7 @@ export const useUserUpdateMutation = ({
     mutationFn: (vars) => updateUser(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))
+      await queryClient.invalidateQueries({ queryKey: authKeys.usersInfinite(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

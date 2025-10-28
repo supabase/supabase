@@ -1,11 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import minify from 'pg-minify'
+import { toast } from 'sonner'
 
+import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
-import { databaseKeys } from 'data/database/keys'
 
 export type DatabaseQueueExposePostgrestVariables = {
   projectRef: string
@@ -258,9 +258,11 @@ export const useDatabaseQueueToggleExposeMutation = ({
     mutationFn: (vars) => toggleQueuesExposurePostgrest(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseQueuesKeys.exposePostgrestStatus(projectRef))
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.exposePostgrestStatus(projectRef),
+      })
       // [Joshen] Schemas can be invalidated without waiting
-      queryClient.invalidateQueries(databaseKeys.schemas(projectRef))
+      queryClient.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

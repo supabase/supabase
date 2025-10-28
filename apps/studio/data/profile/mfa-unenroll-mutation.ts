@@ -29,8 +29,8 @@ export const useMfaUnenrollMutation = ({
     async onSuccess(data, variables, context) {
       // when a factor is unenrolled, the aaLevel is bumped down if it's the last factor
       await Promise.all([
-        queryClient.invalidateQueries(profileKeys.mfaFactors()),
-        queryClient.invalidateQueries(profileKeys.aaLevel()),
+        queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors() }),
+        queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() }),
       ])
 
       await onSuccess?.(data, variables, context)

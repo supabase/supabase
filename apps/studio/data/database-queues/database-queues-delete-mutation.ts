@@ -42,7 +42,7 @@ export const useDatabaseQueueDeleteMutation = ({
     mutationFn: (vars) => deleteDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
