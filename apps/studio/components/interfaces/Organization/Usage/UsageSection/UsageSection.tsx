@@ -15,7 +15,7 @@ export interface ChartMeta {
 
 export interface UsageSectionProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   categoryKey: CategoryMetaKey
   subscription?: OrgSubscription
   chartMeta: ChartMeta

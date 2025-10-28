@@ -25,7 +25,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 interface OrganizationProjectSelectorSelectorProps {
   slug?: string
   open?: boolean
-  selectedRef: string | null
+  selectedRef?: string | null
   searchPlaceholder?: string
   sameWidthAsTrigger?: boolean
   checkPosition?: 'right' | 'left'
