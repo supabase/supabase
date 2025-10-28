@@ -28,6 +28,9 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { getAvailableRegions } from './ProjectCreation.utils'
 
+import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
+
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
   instanceSize?: DesiredInstanceSize
@@ -112,7 +115,10 @@ export const RegionSelector = ({
               label="Region"
               description={
                 <>
-                  <p>Select the region closest to your users for the best performance.</p>
+                  <p>
+                    Select the region closest to your users for the best performance.{' '}
+                    <InlineLink href={`${DOCS_URL}/guides/platform/regions`}>Learn more</InlineLink>
+                  </p>
                   {showNonProdFields && (
                     <div className="mt-2 text-warning">
                       <p>Only these regions are supported for local/staging projects:</p>
