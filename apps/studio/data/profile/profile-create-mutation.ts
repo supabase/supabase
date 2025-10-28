@@ -30,9 +30,9 @@ export const useProfileCreateMutation = ({
     mutationFn: () => createProfile(),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(profileKeys.profile()),
-        queryClient.invalidateQueries(organizationKeys.list()),
-        queryClient.invalidateQueries(permissionKeys.list()),
+        queryClient.invalidateQueries({ queryKey: profileKeys.profile() }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: permissionKeys.list() }),
       ])
       await onSuccess?.(data, variables, context)
     },

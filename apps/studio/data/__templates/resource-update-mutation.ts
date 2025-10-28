@@ -40,8 +40,8 @@ export const useResourceUpdateMutation = ({
       const { projectRef, id } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(resourceKeys.list(projectRef)),
-        queryClient.invalidateQueries(resourceKeys.resource(projectRef, id)),
+        queryClient.invalidateQueries({ queryKey: resourceKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: resourceKeys.resource(projectRef, id) }),
       ])
 
       await onSuccess?.(data, variables, context)

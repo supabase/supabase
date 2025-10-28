@@ -1,13 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { handleError, put } from 'data/fetchers'
 import { invoicesKeys } from 'data/invoices/keys'
+import { organizationKeys } from 'data/organizations/keys'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 import { usageKeys } from 'data/usage/keys'
 import { toast } from 'sonner'
 import type { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
 import type { SubscriptionTier } from './types'
-import { organizationKeys } from 'data/organizations/keys'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string
@@ -70,27 +70,30 @@ export const useOrgSubscriptionUpdateMutation = ({
         await new Promise((resolve) => setTimeout(resolve, 2000))
 
         await Promise.all([
-          queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug)),
-          queryClient.invalidateQueries(subscriptionKeys.orgPlans(slug)),
-          queryClient.invalidateQueries(usageKeys.orgUsage(slug)),
-          queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
-          queryClient.invalidateQueries(organizationKeys.detail(slug)),
-          queryClient.invalidateQueries(organizationKeys.list()),
-          queryClient.invalidateQueries(organizationKeys.entitlements(slug)),
+          queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+          queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgPlans(slug) }),
+          queryClient.invalidateQueries({ queryKey: usageKeys.orgUsage(slug) }),
+          queryClient.invalidateQueries({ queryKey: invoicesKeys.orgUpcomingPreview(slug) }),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.detail(slug) }),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.entitlements(slug) }),
         ])
 
         if (variables.paymentMethod) {
-          queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
-            if (!prev) return prev
-            return {
-              ...prev,
-              defaultPaymentMethodId: variables.paymentMethod,
-              data: prev.data.map((pm: any) => ({
-                ...pm,
-                is_default: pm.id === variables.paymentMethod,
-              })),
+          queryClient.setQueriesData(
+            { queryKey: organizationKeys.paymentMethods(slug) },
+            (prev: any) => {
+              if (!prev) return prev
+              return {
+                ...prev,
+                defaultPaymentMethodId: variables.paymentMethod,
+                data: prev.data.map((pm: any) => ({
+                  ...pm,
+                  is_default: pm.id === variables.paymentMethod,
+                })),
+              }
             }
-          })
+          )
         }
       }
 

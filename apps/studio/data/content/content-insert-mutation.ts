@@ -56,7 +56,7 @@ export const useContentInsertMutation = ({
     mutationFn: (args) => insertContent(args),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
+      await queryClient.invalidateQueries({ queryKey: contentKeys.allContentLists(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

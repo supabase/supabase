@@ -43,7 +43,9 @@ export const useDatabaseCronJobDeleteMutation = ({
     mutationFn: (vars) => deleteDatabaseCronJob(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, searchTerm } = variables
-      await queryClient.invalidateQueries(databaseCronJobsKeys.listInfinite(projectRef, searchTerm))
+      await queryClient.invalidateQueries({
+        queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

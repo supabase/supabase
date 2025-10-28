@@ -78,9 +78,9 @@ export const useTableRowUpdateMutation = ({
     mutationFn: (vars) => updateTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables
-      await queryClient.invalidateQueries(
-        tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
-      )
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRows(projectRef, { table: { id: table.id } }),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

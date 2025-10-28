@@ -58,14 +58,16 @@ export function prefetchTableEditor(
   client: QueryClient,
   { projectRef, connectionString, id }: TableEditorVariables
 ) {
-  return client.fetchQuery(tableEditorKeys.tableEditor(projectRef, id), ({ signal }) =>
-    getTableEditor(
-      {
-        projectRef,
-        connectionString,
-        id,
-      },
-      signal
-    )
-  )
+  return client.fetchQuery({
+    queryKey: tableEditorKeys.tableEditor(projectRef, id),
+    queryFn: ({ signal }) =>
+      getTableEditor(
+        {
+          projectRef,
+          connectionString,
+          id,
+        },
+        signal
+      ),
+  })
 }

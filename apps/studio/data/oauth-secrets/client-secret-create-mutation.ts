@@ -32,7 +32,7 @@ export const useClientSecretCreateMutation = ({
     mutationFn: (vars) => createClientSecret(vars),
     async onSuccess(data, variables, context) {
       const { slug, appId } = variables
-      await queryClient.invalidateQueries(clientSecretKeys.list(slug, appId))
+      await queryClient.invalidateQueries({ queryKey: clientSecretKeys.list(slug, appId) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

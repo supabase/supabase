@@ -53,7 +53,7 @@ export const useMigrationUpsertMutation = ({
     mutationFn: (vars) => upsertMigration(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseKeys.migrations(projectRef))
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.migrations(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

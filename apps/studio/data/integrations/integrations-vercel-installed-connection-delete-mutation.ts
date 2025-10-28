@@ -41,14 +41,16 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
     mutationFn: (args) => deleteConnection(args),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(integrationKeys.integrationsList()),
-        queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-        queryClient.invalidateQueries(
-          integrationKeys.vercelProjectList(variables.organization_integration_id)
-        ),
-        queryClient.invalidateQueries(
-          integrationKeys.vercelConnectionsList(variables.organization_integration_id)
-        ),
+        queryClient.invalidateQueries({ queryKey: integrationKeys.integrationsList() }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.integrationsListWithOrg(variables.orgSlug),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.vercelProjectList(variables.organization_integration_id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.vercelConnectionsList(variables.organization_integration_id),
+        }),
       ])
       await onSuccess?.(data, variables, context)
     },

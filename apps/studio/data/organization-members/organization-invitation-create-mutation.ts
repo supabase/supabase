@@ -58,8 +58,8 @@ export const useOrganizationCreateInvitationMutation = ({
       const { slug } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.rolesV2(slug)),
-        queryClient.invalidateQueries(organizationKeysV1.members(slug)),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
       ])
 
       await onSuccess?.(data, variables, context)

@@ -58,7 +58,7 @@ export const useDatabasePolicyCreateMutation = ({
     mutationFn: (vars) => createDatabasePolicy(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databasePoliciesKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -99,8 +99,10 @@ export const useProjectCreateMutation = ({
     mutationFn: (vars) => createProject(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(projectKeys.list()),
-        queryClient.invalidateQueries(projectKeys.infiniteListByOrg(variables.organizationSlug)),
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
+        queryClient.invalidateQueries({
+          queryKey: projectKeys.infiniteListByOrg(variables.organizationSlug),
+        }),
       ])
       await onSuccess?.(data, variables, context)
     },

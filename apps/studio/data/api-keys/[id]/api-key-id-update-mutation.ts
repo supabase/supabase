@@ -52,7 +52,7 @@ export const useResourceUpdateMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, id } = variables
 
-      await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: apiKeysKeys.list(projectRef) })
 
       await onSuccess?.(data, variables, context)
     },
