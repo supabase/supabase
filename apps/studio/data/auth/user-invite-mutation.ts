@@ -36,7 +36,9 @@ export const useUserInviteMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await Promise.all([queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: authKeys.usersInfinite(projectRef) }),
+      ])
 
       await onSuccess?.(data, variables, context)
     },

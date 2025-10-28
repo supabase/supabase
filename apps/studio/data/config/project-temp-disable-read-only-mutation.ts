@@ -32,7 +32,10 @@ export const useDisableReadOnlyModeMutation = ({
   return useMutation<DisableReadOnlyModeData, ResponseError, TempDisableReadOnlyModeVariables>({
     mutationFn: (vars) => tempDisableReadOnlyMode(vars),
     async onSuccess(data, variables, context) {
-      setTimeout(() => queryClient.invalidateQueries(usageKeys.resourceWarnings()), 2000)
+      setTimeout(
+        () => queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings() }),
+        2000
+      )
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

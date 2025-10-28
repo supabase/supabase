@@ -4,8 +4,8 @@ import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
-import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import { privilegeKeys } from './keys'
+import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 
 export type TablePrivilegesGrant = Parameters<
   typeof pgMeta.tablePrivileges.grant
@@ -53,7 +53,7 @@ export const useTablePrivilegesGrantMutation = ({
 
       await Promise.all([
         invalidateTablePrivilegesQuery(queryClient, projectRef),
-        queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
+        queryClient.invalidateQueries({ queryKey: privilegeKeys.columnPrivilegesList(projectRef) }),
       ])
 
       await onSuccess?.(data, variables, context)

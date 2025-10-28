@@ -47,9 +47,9 @@ export const useVercelConnectionUpdateMutation = ({
   return useMutation<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>({
     mutationFn: (vars) => updateVercelConnection(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(
-        integrationKeys.vercelConnectionsList(variables.organizationIntegrationId)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: integrationKeys.vercelConnectionsList(variables.organizationIntegrationId),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

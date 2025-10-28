@@ -75,7 +75,7 @@ export const useEnumeratedTypeUpdateMutation = ({
     mutationFn: (vars) => updateEnumeratedType(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(enumeratedTypesKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: enumeratedTypesKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

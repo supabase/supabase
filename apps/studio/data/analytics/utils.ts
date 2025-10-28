@@ -20,15 +20,15 @@ export const useInvalidateAnalyticsQuery = () => {
       databaseIdentifier?: string
     }
   ) => {
-    queryClient.invalidateQueries(
-      analyticsKeys.infraMonitoring(ref, {
+    queryClient.invalidateQueries({
+      queryKey: analyticsKeys.infraMonitoring(ref, {
         attribute,
         startDate,
         endDate,
         interval,
         databaseIdentifier,
-      })
-    )
+      }),
+    })
   }
 
   return { invalidateInfraMonitoringQuery }

@@ -36,7 +36,7 @@ export function useStorageArchiveCreateMutation({
     mutationFn: (vars) => createStorageArchive(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(storageKeys.archive(projectRef))
+      await queryClient.invalidateQueries({ queryKey: storageKeys.archive(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

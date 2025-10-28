@@ -45,7 +45,7 @@ export const useVaultSecretCreateMutation = ({
     mutationFn: (vars) => createVaultSecret(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -49,9 +49,10 @@ export const useAuthConfigPrefetch = ({ projectRef }: AuthConfigVariables) => {
 
   return useCallback(() => {
     if (projectRef) {
-      client.prefetchQuery(authKeys.authConfig(projectRef), ({ signal }) =>
-        getProjectAuthConfig({ projectRef }, signal)
-      )
+      client.prefetchQuery({
+        queryKey: authKeys.authConfig(projectRef),
+        queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
+      })
     }
   }, [client, projectRef])
 }

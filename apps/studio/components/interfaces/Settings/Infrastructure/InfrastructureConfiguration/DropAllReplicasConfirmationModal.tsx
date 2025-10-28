@@ -42,8 +42,8 @@ const DropAllReplicasConfirmationModal = ({
       toast.success(`Tearing down all read replicas`)
 
       await Promise.all([
-        queryClient.invalidateQueries(replicaKeys.list(projectRef)),
-        queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
+        queryClient.invalidateQueries({ queryKey: replicaKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: replicaKeys.loadBalancers(projectRef) }),
       ])
 
       onSuccess()

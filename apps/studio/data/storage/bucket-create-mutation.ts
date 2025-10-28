@@ -55,7 +55,7 @@ export const useBucketCreateMutation = ({
     mutationFn: (vars) => createBucket(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
+      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

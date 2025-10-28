@@ -46,11 +46,11 @@ export const useProjectTransferMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, targetOrganizationSlug } = variables
       await Promise.all([
-        queryClient.invalidateQueries(
-          projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug)
-        ),
-        queryClient.invalidateQueries(projectKeys.detail(projectRef)),
-        queryClient.invalidateQueries(projectKeys.list()),
+        queryClient.invalidateQueries({
+          queryKey: projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug),
+        }),
+        queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
       ])
       await onSuccess?.(data, variables, context)
     },

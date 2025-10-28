@@ -42,9 +42,9 @@ export const useDatabaseQueuePurgeMutation = ({
     mutationFn: (vars) => purgeDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queueName } = variables
-      await queryClient.invalidateQueries(
-        databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

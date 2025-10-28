@@ -146,7 +146,9 @@ export function prefetchForeignKeyConstraints(
   client: QueryClient,
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables
 ) {
-  return client.fetchQuery(databaseKeys.foreignKeyConstraints(projectRef, schema), ({ signal }) =>
-    getForeignKeyConstraints({ projectRef, connectionString, schema }, signal)
-  )
+  return client.fetchQuery({
+    queryKey: databaseKeys.foreignKeyConstraints(projectRef, schema),
+    queryFn: ({ signal }) =>
+      getForeignKeyConstraints({ projectRef, connectionString, schema }, signal),
+  })
 }
