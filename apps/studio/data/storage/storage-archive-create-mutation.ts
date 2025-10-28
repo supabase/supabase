@@ -32,22 +32,20 @@ export function useStorageArchiveCreateMutation({
 > = {}) {
   const queryClient = useQueryClient()
 
-  return useMutation<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>(
-    (vars) => createStorageArchive(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.archive(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create storage archive: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>({
+    mutationFn: (vars) => createStorageArchive(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(storageKeys.archive(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create storage archive: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

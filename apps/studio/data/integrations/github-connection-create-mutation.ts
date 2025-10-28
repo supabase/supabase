@@ -31,25 +31,23 @@ export const useGitHubConnectionCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<GitHubConnectionCreateData, ResponseError, GitHubConnectionCreateVariables>(
-    (vars) => createGitHubConnection(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(
-            integrationKeys.githubConnectionsList(variables.organizationId)
-          ),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create GitHub connection: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<GitHubConnectionCreateData, ResponseError, GitHubConnectionCreateVariables>({
+    mutationFn: (vars) => createGitHubConnection(vars),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries(
+          integrationKeys.githubConnectionsList(variables.organizationId)
+        ),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create GitHub connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

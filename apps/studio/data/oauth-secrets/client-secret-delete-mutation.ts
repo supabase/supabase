@@ -29,22 +29,20 @@ export const useClientSecretDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<boolean, ResponseError, ClientSecretDeleteVariables>(
-    (vars) => deleteClientSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug, appId } = variables
-        await queryClient.invalidateQueries(clientSecretKeys.list(slug, appId))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete client secret: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<boolean, ResponseError, ClientSecretDeleteVariables>({
+    mutationFn: (vars) => deleteClientSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { slug, appId } = variables
+      await queryClient.invalidateQueries(clientSecretKeys.list(slug, appId))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete client secret: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

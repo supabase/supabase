@@ -50,29 +50,27 @@ export const useTableDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableDeleteData, ResponseError, TableDeleteVariables>(
-    (vars) => deleteTable(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { id, projectRef, schema } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, id)),
-          queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
-          queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-          // invalidate all views from this schema
-          queryClient.invalidateQueries(viewKeys.listBySchema(projectRef, schema)),
-        ])
+  return useMutation<TableDeleteData, ResponseError, TableDeleteVariables>({
+    mutationFn: (vars) => deleteTable(vars),
+    async onSuccess(data, variables, context) {
+      const { id, projectRef, schema } = variables
+      await Promise.all([
+        queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, id)),
+        queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+        // invalidate all views from this schema
+        queryClient.invalidateQueries(viewKeys.listBySchema(projectRef, schema)),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete database table: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete database table: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

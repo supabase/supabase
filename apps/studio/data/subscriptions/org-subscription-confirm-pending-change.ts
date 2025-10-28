@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import type { components } from 'api-types'
 import { organizationKeys } from 'data/organizations/keys'
 import { subscriptionKeys } from './keys'
 import { usageKeys } from 'data/usage/keys'
@@ -59,9 +60,21 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
     PendingSubscriptionChangeData,
     ResponseError,
     PendingSubscriptionChangeVariables
-  >((vars) => confirmPendingSubscriptionChange(vars), {
+  >({
+    mutationFn: (vars) => confirmPendingSubscriptionChange(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
+
+      // Handle 202 Accepted - show toast and skip query invalidation
+      // The 200 success response returns void, so if data exists it must be 202
+      if (data && 'message' in data) {
+        const pendingResponse = data as components['schemas']['PendingConfirmationResponse']
+        toast.success(pendingResponse.message, {
+          dismissible: true,
+          duration: 10_000,
+        })
+        return
+      }
 
       // [Kevin] Backend can return stale data as it's waiting for the Stripe-sync to complete. Until that's solved in the backend
       // we are going back to monkey here and delay the invalidation

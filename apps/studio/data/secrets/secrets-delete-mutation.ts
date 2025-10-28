@@ -33,22 +33,20 @@ export const useSecretsDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<SecretsDeleteData, ResponseError, SecretsDeleteVariables>(
-    (vars) => deleteSecrets(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(secretsKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete secrets: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SecretsDeleteData, ResponseError, SecretsDeleteVariables>({
+    mutationFn: (vars) => deleteSecrets(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries(secretsKeys.list(projectRef))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete secrets: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

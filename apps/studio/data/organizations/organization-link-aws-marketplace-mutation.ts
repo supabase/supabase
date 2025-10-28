@@ -32,20 +32,18 @@ export const useOrganizationLinkAwsMarketplaceMutation = ({
   UseMutationOptions<LinkOrganizationData, ResponseError, OrganizationLinkAwsMarketplaceVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<LinkOrganizationData, ResponseError, OrganizationLinkAwsMarketplaceVariables>(
-    (vars) => linkOrganization(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to link organization to AWS Marketplace: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<LinkOrganizationData, ResponseError, OrganizationLinkAwsMarketplaceVariables>({
+    mutationFn: (vars) => linkOrganization(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to link organization to AWS Marketplace: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

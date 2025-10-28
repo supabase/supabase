@@ -43,24 +43,22 @@ export const useJWTSigningKeyCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JWTSigningKeyCreateData, ResponseError, JWTSigningKeyCreateVariables>(
-    (vars) => createJWTSigningKey(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<JWTSigningKeyCreateData, ResponseError, JWTSigningKeyCreateVariables>({
+    mutationFn: (vars) => createJWTSigningKey(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create new JWT signing key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create new JWT signing key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

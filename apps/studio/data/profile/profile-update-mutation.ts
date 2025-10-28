@@ -43,21 +43,19 @@ export const useProfileUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProfileUpdateData, ResponseError, ProfileUpdateVariables>(
-    (vars) => updateProfile(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(profileKeys.profile())
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create profile: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProfileUpdateData, ResponseError, ProfileUpdateVariables>({
+    mutationFn: (vars) => updateProfile(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries(profileKeys.profile())
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create profile: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -47,7 +47,8 @@ export const useOrganizationPaymentMethodMarkAsDefaultMutation = ({
     OrganizationPaymentMethodDefaultData,
     ResponseError,
     OrganizationPaymentMethodDefaultVariables
-  >((vars) => markPaymentMethodAsDefault(vars), {
+  >({
+    mutationFn: (vars) => markPaymentMethodAsDefault(vars),
     async onSuccess(data, variables, context) {
       const { slug, paymentMethodId } = variables
       // We do not invalidate payment methods here as endpoint data is stale for 1-2 seconds, so we handle state manually

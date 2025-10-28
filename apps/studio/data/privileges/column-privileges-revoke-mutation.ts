@@ -49,26 +49,24 @@ export const useColumnPrivilegesRevokeMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ColumnPrivilegesRevokeData, ResponseError, ColumnPrivilegesRevokeVariables>(
-    (vars) => revokeColumnPrivileges(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<ColumnPrivilegesRevokeData, ResponseError, ColumnPrivilegesRevokeVariables>({
+    mutationFn: (vars) => revokeColumnPrivileges(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

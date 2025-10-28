@@ -41,9 +41,10 @@ export const useTablesQuery = <TData = RetrieveTableResult>(
     ...options
   }: UseQueryOptions<RetrieveTableResult, RetrieveTableError, TData> = {}
 ) => {
-  return useQuery<RetrieveTableResult, RetrieveTableError, TData>(
-    tableKeys.retrieve(projectRef, name, schema),
-    ({ signal }) => getTable({ projectRef, connectionString, name, schema }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  return useQuery<RetrieveTableResult, RetrieveTableError, TData>({
+    queryKey: tableKeys.retrieve(projectRef, name, schema),
+    queryFn: ({ signal }) => getTable({ projectRef, connectionString, name, schema }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }

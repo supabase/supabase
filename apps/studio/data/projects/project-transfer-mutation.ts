@@ -41,28 +41,26 @@ export const useProjectTransferMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectTransferData, ResponseError, ProjectTransferVariables>(
-    (vars) => transferProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, targetOrganizationSlug } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(
-            projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug)
-          ),
-          queryClient.invalidateQueries(projectKeys.detail(projectRef)),
-          queryClient.invalidateQueries(projectKeys.list()),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to transfer project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectTransferData, ResponseError, ProjectTransferVariables>({
+    mutationFn: (vars) => transferProject(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, targetOrganizationSlug } = variables
+      await Promise.all([
+        queryClient.invalidateQueries(
+          projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug)
+        ),
+        queryClient.invalidateQueries(projectKeys.detail(projectRef)),
+        queryClient.invalidateQueries(projectKeys.list()),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to transfer project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

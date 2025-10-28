@@ -56,12 +56,10 @@ export const useDatabasePoliciesQuery = <TData = DatabasePoliciesData>(
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useQuery<DatabasePoliciesData, DatabasePoliciesError, TData>(
-    databasePoliciesKeys.list(projectRef, schema),
-    ({ signal }) => getDatabasePolicies({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-      ...options,
-    }
-  )
+  return useQuery<DatabasePoliciesData, DatabasePoliciesError, TData>({
+    queryKey: databasePoliciesKeys.list(projectRef, schema),
+    queryFn: ({ signal }) => getDatabasePolicies({ projectRef, connectionString, schema }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    ...options,
+  })
 }

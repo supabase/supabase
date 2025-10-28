@@ -70,41 +70,39 @@ export const useTableRowCreateMutation = ({
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
 
-  return useMutation<TableRowCreateData, ResponseError, TableRowCreateVariables>(
-    (vars) => createTableRow(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, table } = variables
+  return useMutation<TableRowCreateData, ResponseError, TableRowCreateVariables>({
+    mutationFn: (vars) => createTableRow(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, table } = variables
 
-        // Track data insertion event
-        try {
-          sendEvent({
-            action: 'table_data_added',
-            properties: {
-              method: 'table_editor',
-              schema_name: table.schema,
-              table_name: table.name,
-            },
-            groups: {
-              project: projectRef,
-              ...(org?.slug && { organization: org.slug }),
-            },
-          })
-        } catch (error) {
-          console.error('Failed to track table data insertion event:', error)
-        }
+      // Track data insertion event
+      try {
+        sendEvent({
+          action: 'table_data_added',
+          properties: {
+            method: 'table_editor',
+            schema_name: table.schema,
+            table_name: table.name,
+          },
+          groups: {
+            project: projectRef,
+            ...(org?.slug && { organization: org.slug }),
+          },
+        })
+      } catch (error) {
+        console.error('Failed to track table data insertion event:', error)
+      }
 
-        await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(data.message)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(data.message)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

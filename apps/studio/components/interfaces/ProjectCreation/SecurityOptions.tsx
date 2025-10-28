@@ -2,7 +2,6 @@ import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 
 import Panel from 'components/ui/Panel'
-import { CreateProjectForm } from 'pages/new/[slug]'
 import {
   Badge,
   cn,
@@ -17,6 +16,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { CreateProjectForm } from './ProjectCreation.schema'
 
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>
