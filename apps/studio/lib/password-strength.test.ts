@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import passwordStrength from './password-strength'
+import { passwordStrength } from './password-strength'
 import { toast } from 'sonner'
 
 // Hoist the post_ mock so it's available before the module is loaded

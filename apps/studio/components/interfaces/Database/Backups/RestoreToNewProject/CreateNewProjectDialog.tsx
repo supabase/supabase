@@ -9,7 +9,7 @@ import { useProjectCloneMutation } from 'data/projects/clone-mutation'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { passwordStrength } from 'lib/helpers'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import {
   Button,
