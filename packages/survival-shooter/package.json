@@ -1,0 +1,46 @@
+{
+  "name": "survival-shooter",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "sideEffects": false,
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./index.tsx",
+      "types": "./index.tsx"
+    },
+    "./SurvivalShooter": {
+      "import": "./src/SurvivalShooter.tsx",
+      "types": "./src/SurvivalShooter.tsx"
+    },
+    "./types": {
+      "import": "./src/types.ts",
+      "types": "./src/types.ts"
+    }
+  },
+  "dependencies": {
+    "common": "workspace:*",
+    "icons": "workspace:*",
+    "lucide-react": "*",
+    "next-themes": "*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsconfig": "workspace:*",
+    "ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "next": "catalog:"
+  }
+}

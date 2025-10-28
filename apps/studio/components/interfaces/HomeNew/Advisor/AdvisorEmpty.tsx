@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { PixelGame } from './components/PixelGame'
-import { SurvivalShooter } from './components/SurvivalShooter'
+import { SurvivalShooter } from 'survival-shooter'
 import { Cuboid, Target } from 'lucide-react'
 
 interface AdvisorEmptyProps {
