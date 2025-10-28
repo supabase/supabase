@@ -264,7 +264,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
               onValueChange={setSelectedOrgSlug}
             >
               <SelectTrigger_Shadcn_ size="small">
-                <SelectValue_Shadcn_>
+                <SelectValue_Shadcn_ placeholder="Select an organization">
                   {organizations?.find((x) => x.slug === selectedOrgSlug)?.name ??
                     'Select an organization'}
                 </SelectValue_Shadcn_>
