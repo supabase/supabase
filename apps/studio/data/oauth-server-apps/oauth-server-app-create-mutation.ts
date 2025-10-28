@@ -38,22 +38,22 @@ export const useOAuthServerAppCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>(
-    (vars) => createOAuthServerApp(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, temporaryApiKey } = variables
-        await queryClient.invalidateQueries(oauthServerAppKeys.list(projectRef, temporaryApiKey))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create OAuth Server application: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>({
+    mutationFn: (vars) => createOAuthServerApp(vars),
+    onSuccess: async (data, variables, context) => {
+      const { projectRef, temporaryApiKey } = variables
+      await queryClient.invalidateQueries({
+        queryKey: oauthServerAppKeys.list(projectRef, temporaryApiKey),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    onError: async (data, variables, context) => {
+      if (onError === undefined) {
+        toast.error(`Failed to create OAuth Server application: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

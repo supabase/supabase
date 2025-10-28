@@ -48,13 +48,16 @@ export const useOAuthServerAppRegenerateSecretMutation = ({
     OAuthAppRegenerateSecretData,
     ResponseError,
     OAuthServerAppRegenerateSecretVariables
-  >((vars) => regenerateSecret(vars), {
-    async onSuccess(data, variables, context) {
+  >({
+    mutationFn: (vars) => regenerateSecret(vars),
+    onSuccess: async (data, variables, context) => {
       const { projectRef, temporaryApiKey } = variables
-      await queryClient.invalidateQueries(oauthServerAppKeys.list(projectRef, temporaryApiKey))
+      await queryClient.invalidateQueries({
+        queryKey: oauthServerAppKeys.list(projectRef, temporaryApiKey),
+      })
       await onSuccess?.(data, variables, context)
     },
-    async onError(data, variables, context) {
+    onError: async (data, variables, context) => {
       if (onError === undefined) {
         toast.error(`Failed to regenerate OAuth Server application secret: ${data.message}`)
       } else {

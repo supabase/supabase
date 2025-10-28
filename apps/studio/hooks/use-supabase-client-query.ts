@@ -1,41 +1,32 @@
 import { createClient } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
 
-import {
-  useTemporaryAPIKeyQuery,
-  type TemporaryAPIKeyData,
-} from 'data/api-keys/temp-api-keys-query'
-import {
-  useProjectSettingsV2Query,
-  type ProjectSettings,
-} from 'data/config/project-settings-v2-query'
+import { useTemporaryAPIKeyQuery } from 'data/api-keys/temp-api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 
 const getSupabaseClient = ({
   projectRef,
-  settings,
+  endpoint,
   temporaryApiKey,
 }: {
   projectRef?: string
-  settings?: ProjectSettings
-  temporaryApiKey?: TemporaryAPIKeyData
+  endpoint?: string
+  temporaryApiKey?: string
 }) => {
   if (!projectRef) {
     return undefined
   }
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint
-
-  const clientEndpoint = `${protocol}://${endpoint}`
-
-  const apiKey = temporaryApiKey?.api_key
-
-  if (apiKey === undefined) {
+  if (!endpoint) {
     return undefined
   }
 
-  const supabaseClient = createClient(clientEndpoint, apiKey)
+  if (temporaryApiKey === undefined) {
+    return undefined
+  }
 
-  return { supabaseClient, temporaryApiKey: apiKey }
+  const supabaseClient = createClient(endpoint, temporaryApiKey)
+
+  return { supabaseClient, temporaryApiKey }
 }
 
 export const useSupabaseClientQuery = (
@@ -43,14 +34,17 @@ export const useSupabaseClientQuery = (
   { enabled = true, ...options } = {}
 ) => {
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: temporaryApiKey } = useTemporaryAPIKeyQuery({ projectRef })
+  const { data: temporaryApiKeyData } = useTemporaryAPIKeyQuery({ projectRef })
 
-  return useQuery(
-    [projectRef, 'supabase-client', temporaryApiKey?.api_key],
-    () => getSupabaseClient({ projectRef, settings, temporaryApiKey }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && !!settings && !!temporaryApiKey,
-      ...options,
-    }
-  )
+  const endpoint = settings
+    ? `${settings?.app_config?.protocol ?? 'https'}://${settings?.app_config?.endpoint}`
+    : undefined
+  const temporaryApiKey = temporaryApiKeyData?.api_key
+
+  return useQuery({
+    queryKey: [projectRef, 'supabase-client', endpoint, temporaryApiKey],
+    queryFn: () => getSupabaseClient({ projectRef, endpoint, temporaryApiKey }),
+    enabled: enabled && typeof projectRef !== 'undefined' && !!endpoint && !!temporaryApiKey,
+    ...options,
+  })
 }

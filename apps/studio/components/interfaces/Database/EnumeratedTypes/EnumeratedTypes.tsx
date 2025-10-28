@@ -44,7 +44,6 @@ const EnumeratedTypes = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
   const filteredEnumeratedTypes =
     search.length > 0

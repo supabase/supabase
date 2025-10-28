@@ -10,17 +10,24 @@ export type OAuthServerAppsVariables = {
   projectRef?: string
   supabaseClient?: SupabaseClient<any>
   temporaryApiKey?: string
+  page?: number
 }
+
+const APPS_PER_PAGE = 100
 
 export type OAuthApp = components['schemas']['OAuthAppResponse']
 
-export async function getOAuthServerApps({ projectRef, supabaseClient }: OAuthServerAppsVariables) {
+export async function getOAuthServerApps({
+  projectRef,
+  supabaseClient,
+  page = 1,
+}: OAuthServerAppsVariables) {
   if (!projectRef) throw new Error('Project reference is required')
   if (!supabaseClient) throw new Error('Supabase client is required')
 
   const { data, error } = await supabaseClient.auth.admin.oauth.listClients({
-    page: 1,
-    perPage: 100,
+    page,
+    perPage: APPS_PER_PAGE,
   })
 
   if (error) handleError(error)

@@ -1,4 +1,4 @@
-import OAuthAppsList from 'components/interfaces/Auth/OAuthApps/OAuthAppsList'
+import { OAuthAppsList } from 'components/interfaces/Auth/OAuthApps/OAuthAppsList'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'

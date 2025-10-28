@@ -10,8 +10,8 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
+import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import {
   Badge,
@@ -45,7 +45,7 @@ export const OAUTH_APP_TYPE_OPTIONS = [
   { name: 'Dynamic', value: 'dynamic' },
 ]
 
-const OAuthAppsList = () => {
+export const OAuthAppsList = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
@@ -311,5 +311,3 @@ const OAuthAppsList = () => {
     </>
   )
 }
-
-export default OAuthAppsList

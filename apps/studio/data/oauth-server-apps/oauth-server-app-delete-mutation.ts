@@ -40,22 +40,22 @@ export const useOAuthServerAppDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppDeleteData, ResponseError, OAuthServerAppDeleteVariables>(
-    (vars) => deleteOAuthServerApp(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, temporaryApiKey } = variables
-        await queryClient.invalidateQueries(oauthServerAppKeys.list(projectRef, temporaryApiKey))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete OAuth Server application: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<OAuthAppDeleteData, ResponseError, OAuthServerAppDeleteVariables>({
+    mutationFn: (vars) => deleteOAuthServerApp(vars),
+    onSuccess: async (data, variables, context) => {
+      const { projectRef, temporaryApiKey } = variables
+      await queryClient.invalidateQueries({
+        queryKey: oauthServerAppKeys.list(projectRef, temporaryApiKey),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    onError: async (data, variables, context) => {
+      if (onError === undefined) {
+        toast.error(`Failed to delete OAuth Server application: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

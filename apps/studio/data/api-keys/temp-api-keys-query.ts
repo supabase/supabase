@@ -10,8 +10,7 @@ interface getTemporaryAPIKeyVariables {
   expiry?: number
 }
 
-// [Joshen] This one specifically shouldn't need a useQuery hook since the expiry is meant to be short lived
-// Used in storage explorer and realtime inspector.
+// Used in storage explorer, realtime inspector and OAuth Server apps.
 export async function getTemporaryAPIKey(
   { projectRef, expiry = 300 }: getTemporaryAPIKeyVariables,
   signal?: AbortSignal
@@ -39,13 +38,11 @@ export const useTemporaryAPIKeyQuery = <TData = TemporaryAPIKeyData>(
   { projectRef, expiry = 300 }: getTemporaryAPIKeyVariables,
   { enabled = true, ...options }: UseQueryOptions<TemporaryAPIKeyData, ResponseError, TData> = {}
 ) => {
-  return useQuery<TemporaryAPIKeyData, ResponseError, TData>(
-    apiKeysKeys.temporary(projectRef),
-    ({ signal }) => getTemporaryAPIKey({ projectRef, expiry }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      refetchInterval: expiry * 1000, // convert to ms
-      ...options,
-    }
-  )
+  return useQuery<TemporaryAPIKeyData, ResponseError, TData>({
+    queryKey: apiKeysKeys.temporary(projectRef),
+    queryFn: ({ signal }) => getTemporaryAPIKey({ projectRef, expiry }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    refetchInterval: expiry * 1000, // convert to ms
+    ...options,
+  })
 }
