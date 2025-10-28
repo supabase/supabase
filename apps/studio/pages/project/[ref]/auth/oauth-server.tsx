@@ -1,4 +1,4 @@
-import OAuthServerSettingsForm from 'components/interfaces/Auth/OAuthApps/OAuthServerSettingsForm'
+import { OAuthServerSettingsForm } from 'components/interfaces/Auth/OAuthApps/OAuthServerSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'

@@ -10,39 +10,41 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import {
   ScaffoldSection,
-  ScaffoldSectionTitle,
   ScaffoldSectionContent,
+  ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
+  Badge,
   Button,
   Card,
   CardContent,
-  CardHeader,
   CardDescription,
-  CardTitle,
   CardFooter,
+  CardHeader,
+  CardTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
-  Switch,
   Input,
-  Badge,
-  Table,
-  TableHeader,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
+  Input_Shadcn_,
   Separator,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OAUTH_APP_SCOPE_OPTIONS } from './OAuthAppsList'
-import { Admonition } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 
 const configUrlSchema = z.object({
   id: z.string(),
@@ -51,13 +53,23 @@ const configUrlSchema = z.object({
   description: z.string().optional(),
 })
 
-const schema = z.object({
-  OAUTH_SERVER_ENABLED: z.boolean().nullish().default(false),
-  OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: z.boolean().nullish().default(false),
-  OAUTH_SERVER_AUTHORIZATION_PATH: z.string().nullish().optional().or(z.literal('')),
-  availableScopes: z.array(z.string()).default(['openid', 'email', 'profile']),
-  config_urls: z.array(configUrlSchema).optional(),
-})
+const schema = z
+  .object({
+    OAUTH_SERVER_ENABLED: z.boolean().default(false),
+    OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: z.boolean().default(false),
+    OAUTH_SERVER_AUTHORIZATION_PATH: z.string().default(''),
+    availableScopes: z.array(z.string()).default(['openid', 'email', 'profile']),
+    config_urls: z.array(configUrlSchema).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.OAUTH_SERVER_ENABLED && data.OAUTH_SERVER_AUTHORIZATION_PATH.trim() === '') {
+      ctx.addIssue({
+        path: ['OAUTH_SERVER_AUTHORIZATION_PATH'],
+        code: z.ZodIssueCode.custom,
+        message: 'Authorization Path is required when OAuth Server is enabled.',
+      })
+    }
+  })
 
 interface ConfigUrl {
   id: string
@@ -74,12 +86,18 @@ interface OAuthServerSettings {
   config_urls?: ConfigUrl[]
 }
 
-const OAuthServerSettingsForm = () => {
+export const OAuthServerSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
-  const [isSaving, setIsSaving] = useState(false)
-  const [oAuthAppsCount, setOAuthAppsCount] = useState(0)
+  const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig, isLoading } = useAuthConfigUpdateMutation({
+    onSuccess: () => {
+      toast.success('OAuth server settings updated successfully')
+    },
+    onError: (error) => {
+      toast.error(`Failed to update OAuth server settings: ${error?.message}`)
+    },
+  })
+
   const [showDynamicAppsConfirmation, setShowDynamicAppsConfirmation] = useState(false)
   const [showDisableOAuthServerConfirmation, setShowDisableOAuthServerConfirmation] =
     useState(false)
@@ -88,6 +106,11 @@ const OAuthServerSettingsForm = () => {
     PermissionAction.READ,
     'custom_config_gotrue'
   )
+
+  const { data: oAuthAppsData } = useOAuthServerAppsQuery({ projectRef })
+
+  const oauthApps = oAuthAppsData?.clients || []
+
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
@@ -96,89 +119,37 @@ const OAuthServerSettingsForm = () => {
   const form = useForm<OAuthServerSettings>({
     resolver: zodResolver(schema),
     defaultValues: {
-      OAUTH_SERVER_ENABLED: false,
+      OAUTH_SERVER_ENABLED: true,
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: false,
-      OAUTH_SERVER_AUTHORIZATION_PATH: undefined,
+      OAUTH_SERVER_AUTHORIZATION_PATH: '/oauth/consent',
       availableScopes: ['openid', 'email', 'profile'],
     },
   })
 
-  // Load settings from auth config
+  // Reset the values when the authConfig is loaded
   useEffect(() => {
-    if (authConfig) {
+    if (isSuccess && authConfig) {
       form.reset({
         OAUTH_SERVER_ENABLED: authConfig.OAUTH_SERVER_ENABLED ?? false,
         OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION:
           authConfig.OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION ?? false,
-        OAUTH_SERVER_AUTHORIZATION_PATH: authConfig.OAUTH_SERVER_AUTHORIZATION_PATH ?? '',
+        OAUTH_SERVER_AUTHORIZATION_PATH:
+          authConfig.OAUTH_SERVER_AUTHORIZATION_PATH ?? '/oauth/consent',
         availableScopes: ['openid', 'email', 'profile'], // Keep default scopes
       })
     }
-  }, [authConfig])
-
-  // Load OAuth apps count from localStorage
-  useEffect(() => {
-    const loadOAuthAppsCount = () => {
-      try {
-        const stored = localStorage.getItem('oauth_apps')
-        if (stored) {
-          const parsedApps = JSON.parse(stored)
-          setOAuthAppsCount(parsedApps.length)
-        }
-      } catch (error) {
-        console.error('Error loading OAuth apps count from localStorage:', error)
-      }
-    }
-
-    loadOAuthAppsCount()
-
-    // Listen for changes to OAuth apps in localStorage
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'oauth_apps') {
-        loadOAuthAppsCount()
-      }
-    }
-
-    // Listen for custom events when OAuth apps are modified in the same tab
-    const handleOAuthAppsChange = () => {
-      loadOAuthAppsCount()
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('oauth-apps-changed', handleOAuthAppsChange)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('oauth-apps-changed', handleOAuthAppsChange)
-    }
-  }, [])
+  }, [isSuccess])
 
   const onSubmit = async (values: OAuthServerSettings) => {
     if (!projectRef) return console.error('Project ref is required')
 
-    setIsSaving(true)
-
     const config = {
       OAUTH_SERVER_ENABLED: values.OAUTH_SERVER_ENABLED,
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: values.OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION,
-      OAUTH_SERVER_AUTHORIZATION_PATH: values.OAUTH_SERVER_AUTHORIZATION_PATH || null,
+      OAUTH_SERVER_AUTHORIZATION_PATH: values.OAUTH_SERVER_AUTHORIZATION_PATH,
     }
 
-    updateAuthConfig(
-      { projectRef, config },
-      {
-        onError: (error) => {
-          toast.error(`Failed to update OAuth server settings: ${error?.message}`)
-          setIsSaving(false)
-        },
-        onSuccess: () => {
-          toast.success('OAuth server settings updated successfully')
-          setIsSaving(false)
-          // Dispatch custom event to notify other components
-          window.dispatchEvent(new CustomEvent('oauth-server-settings-changed'))
-        },
-      }
-    )
+    updateAuthConfig({ projectRef, config })
   }
 
   const removeScope = (scopeToRemove: string) => {
@@ -205,7 +176,7 @@ const OAuthServerSettingsForm = () => {
   }
 
   const handleOAuthServerToggle = (checked: boolean) => {
-    if (!checked && oAuthAppsCount > 0) {
+    if (!checked && oauthApps.length > 0) {
       setShowDisableOAuthServerConfirmation(true)
     } else {
       form.setValue('OAUTH_SERVER_ENABLED', checked, { shouldDirty: true })
@@ -255,7 +226,6 @@ const OAuthServerSettingsForm = () => {
         <ScaffoldSectionContent>
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="pb-10">
-              {/* Enable OAuth Server Section */}
               <Card>
                 <CardContent className="flex flex-col py-6 gap-y-4">
                   <FormField_Shadcn_
@@ -311,11 +281,10 @@ const OAuthServerSettingsForm = () => {
                           </>
                         }
                       >
-                        <Input
-                          value={authConfig?.SITE_URL || ''}
+                        <Input_Shadcn_
+                          value={authConfig?.SITE_URL}
                           disabled
                           placeholder="https://example.com"
-                          layout="vertical"
                         />
                       </FormItemLayout>
 
@@ -328,7 +297,7 @@ const OAuthServerSettingsForm = () => {
                             description="Path where you'll implement the OAuth authorization UI (consent screens)."
                           >
                             <FormControl_Shadcn_>
-                              <Input {...field} placeholder="/auth/authorize" layout="vertical" />
+                              <Input_Shadcn_ {...field} placeholder="/auth/authorize" />
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         )}
@@ -336,59 +305,55 @@ const OAuthServerSettingsForm = () => {
                       <Admonition
                         type="tip"
                         title="Make sure this path is implemented in your application."
-                        description={`Preview Authorization URL: ${authConfig?.SITE_URL || 'https://myapp.com'}${form.watch('OAUTH_SERVER_AUTHORIZATION_PATH') || '/oauth/consent'}`}
+                        description={`Preview Authorization URL: ${authConfig?.SITE_URL}${form.watch('OAUTH_SERVER_AUTHORIZATION_PATH') || '/oauth/consent'}`}
                       />
                     </CardContent>
                     <CardContent className="py-6">
-                      <div className="space-y-6">
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              layout="flex-row-reverse"
-                              label="Allow Dynamic OAuth Apps"
-                              description={
-                                <>
-                                  Enable dynamic OAuth app registration. Apps can be registered
-                                  programmatically via apis.{' '}
-                                  <Link
-                                    href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#dynamic-oauth-apps"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-foreground-light underline hover:text-foreground transition"
-                                  >
-                                    Learn more
-                                  </Link>
-                                </>
-                              }
-                            >
-                              <FormControl_Shadcn_>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={handleDynamicAppsToggle}
-                                  disabled={!canUpdateConfig}
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </div>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="flex-row-reverse"
+                            label="Allow Dynamic OAuth Apps"
+                            description={
+                              <>
+                                Enable dynamic OAuth app registration. Apps can be registered
+                                programmatically via apis.{' '}
+                                <Link
+                                  href="https://supabase.com/docs/guides/auth/oauth/oauth-apps#dynamic-oauth-apps"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-foreground-light underline hover:text-foreground transition"
+                                >
+                                  Learn more
+                                </Link>
+                              </>
+                            }
+                          >
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={handleDynamicAppsToggle}
+                                disabled={!canUpdateConfig}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
                     </CardContent>
                   </>
                 )}
 
                 <CardFooter className="justify-end space-x-2">
-                  {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset()}>
-                      Cancel
-                    </Button>
-                  )}
+                  <Button type="default" onClick={() => form.reset()} disabled={isLoading}>
+                    Cancel
+                  </Button>
                   <Button
                     type="primary"
                     htmlType="submit"
-                    disabled={!canUpdateConfig || isSaving || !form.formState.isDirty}
-                    loading={isSaving}
+                    disabled={!canUpdateConfig || !form.formState.isDirty}
+                    loading={isLoading}
                   >
                     Save changes
                   </Button>
@@ -527,7 +492,7 @@ const OAuthServerSettingsForm = () => {
         onConfirm={confirmDisableOAuthServer}
         onCancel={cancelDisableOAuthServer}
         alert={{
-          title: `You have ${oAuthAppsCount} active OAuth app${oAuthAppsCount > 1 ? 's' : ''} that will be deactivated.`,
+          title: `You have ${oauthApps.length} active OAuth app${oauthApps.length > 1 ? 's' : ''} that will be deactivated.`,
         }}
       >
         <p className="text-sm text-foreground-lighter pb-4">
@@ -551,5 +516,3 @@ const OAuthServerSettingsForm = () => {
     </>
   )
 }
-
-export default OAuthServerSettingsForm
