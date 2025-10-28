@@ -6992,6 +6992,7 @@ export interface components {
             }
           | {
               enabled: boolean
+              unit: string
               unlimited: boolean
               value: number
             }
