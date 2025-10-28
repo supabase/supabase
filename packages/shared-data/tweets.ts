@@ -192,12 +192,6 @@ const tweets = [
     img_url: '/images/twitter-profiles/1PH2mt6v_400x400.jpg',
   },
   {
-    text: 'Check out this amazing product @supabase. A must give try #newidea #opportunity',
-    url: 'https://twitter.com/digitaldaswani/status/1364447219642814464',
-    handle: 'digitaldaswani',
-    img_url: '/images/twitter-profiles/w8HLdlC7_400x400.jpg',
-  },
-  {
     text: "I gave @supabase a try this weekend and I was able to create a quick dashboard to visualize the data from the PostgreSQL instance. It's super easy to use Supabase's API or the direct DB connection. Check out the tutorial 📖",
     url: 'https://twitter.com/razvanilin/status/1363770020581412867',
     handle: 'razvanilin',
@@ -214,12 +208,6 @@ const tweets = [
     url: 'https://twitter.com/razvanilin/status/1363002398738800640',
     handle: 'razvanilin',
     img_url: '/images/twitter-profiles/AiaH9vJ2_400x400.jpg',
-  },
-  {
-    text: "Wait. Is it so easy to write queries for @supabase ? It's like simple SQL stuff!",
-    url: 'https://twitter.com/T0ny_Boy/status/1362911838908911617',
-    handle: 'T0ny_Boy',
-    img_url: '/images/twitter-profiles/UCBhUBZl_400x400.jpg',
   },
   {
     text: 'Jeez, and @supabase have native support for magic link login?! I was going to use http://magic.link for this But if I can get my whole DB + auth + magic link support in one... Awesome',
@@ -287,6 +275,66 @@ const tweets = [
     handle: '0xBanana',
     img_url: '/images/twitter-profiles/pgHIGqZ0_400x400.jpg',
   },
+  {
+    text: `Very impressed by @supabase's growth. For new startups, they seem to have gone from "promising" to "standard" in remarkably short order.`,
+    url: 'https://x.com/patrickc/status/1979157875600617913',
+    handle: 'patrickc',
+    img_url: '/images/twitter-profiles/_iAaSUQf_400x400.jpg',
+    weight: 10,
+  },
+  {
+    text: `Okay, I finally tried Supabase today and wow... why did I wait so long? 😅 Went from 'how do I even start' to having auth + database + real-time updates working in like 20 minutes. Sometimes the hype is actually justified! #Supabase`,
+    url: 'https://x.com/Aliahsan_sfv/status/1967167095894098210',
+    handle: 'Aliahsan_sfv',
+    img_url: '/images/twitter-profiles/2SQwtv8c_400x400.jpg',
+    weight: 9,
+  },
+  {
+    text: `Supabase is the best product experience I've had in years.\nNot just tech - taste.\nFrom docs to latency to the URL structure that makes you think "oh, that's obvious"\nFeels like every other platform should study how they built it\n@supabase I love you`,
+    url: 'https://x.com/yatsiv_yuriy/status/1979182362480071162',
+    handle: 'yatsiv_yuriy',
+    img_url: '/images/twitter-profiles/Y1swF6ef_400x400.jpg',
+    weight: 9,
+  },
 ]
+
+export const getWeightedTweets = (count: number): typeof tweets => {
+  const fallbackWeight = 1
+  const availableTweets = [...tweets]
+  const selectedTweets: typeof tweets = []
+  let remainingWeight = availableTweets.reduce(
+    (sum, tweet) => sum + (tweet.weight ?? fallbackWeight),
+    0
+  )
+
+  for (let i = 0; i < count && availableTweets.length > 0; i++) {
+    // Generate random number between 0 and remainingWeight
+    const random = Math.random() * remainingWeight
+
+    // Find the selected tweet based on cumulative weights
+    let accumulatedWeight = 0
+    let selectedIndex = -1
+
+    for (let j = 0; j < availableTweets.length; j++) {
+      const tweet = availableTweets[j]
+      const weight = tweet.weight ?? fallbackWeight
+      accumulatedWeight += weight
+      if (random <= accumulatedWeight) {
+        selectedTweets.push(tweet)
+        selectedIndex = j
+        break
+      }
+    }
+
+    // Remove the selected tweet and update remaining weight
+    if (selectedIndex !== -1) {
+      const removedWeight = availableTweets[selectedIndex].weight ?? fallbackWeight
+      remainingWeight -= removedWeight
+      availableTweets.splice(selectedIndex, 1)
+    }
+  }
+
+  return selectedTweets
+}
 
 export default tweets
