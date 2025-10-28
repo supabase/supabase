@@ -43,7 +43,9 @@ export function getQueryClient() {
             if (
               error instanceof ResponseError &&
               error.requestPathname &&
-              SKIP_RETRY_PATHNAME_MATCHERS.some((matchFn) => matchFn(error.requestPathname!))
+              SKIP_RETRY_PATHNAME_MATCHERS.some((matchFn) => matchFn(error.requestPathname!)) &&
+              // Still retry on 429s (rate limit) so that retry after is respected
+              error.code !== 429
             ) {
               return false
             }
