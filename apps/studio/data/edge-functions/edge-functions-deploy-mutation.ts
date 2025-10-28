@@ -58,25 +58,24 @@ export const useEdgeFunctionDeployMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>(
-    (vars) => deployEdgeFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, slug } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(edgeFunctionsKeys.detail(projectRef, slug)),
-          queryClient.invalidateQueries(edgeFunctionsKeys.body(projectRef, slug)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to deploy edge function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>({
+    mutationFn: (vars) => deployEdgeFunction(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, slug } = variables
+      await Promise.all([
+        queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef)),
+        queryClient.invalidateQueries(edgeFunctionsKeys.detail(projectRef, slug)),
+        queryClient.invalidateQueries(edgeFunctionsKeys.body(projectRef, slug)),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to deploy edge function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

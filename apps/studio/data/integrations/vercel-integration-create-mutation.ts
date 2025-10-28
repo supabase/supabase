@@ -52,25 +52,23 @@ export const useVercelIntegrationCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>(
-    (vars) => createVercelIntegration(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(integrationKeys.integrationsList()),
-          queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-          queryClient.invalidateQueries(integrationKeys.vercelProjectList(data.id)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create Vercel integration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>({
+    mutationFn: (vars) => createVercelIntegration(vars),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries(integrationKeys.integrationsList()),
+        queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
+        queryClient.invalidateQueries(integrationKeys.vercelProjectList(data.id)),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create Vercel integration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

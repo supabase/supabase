@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
-import { Check, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -15,6 +15,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   TableCell,
   TableRow,
@@ -23,13 +24,15 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
+import { PostgresTrigger } from '@supabase/postgres-meta'
 
 interface TriggerListProps {
   schema: string
   filterString: string
   isLocked: boolean
-  editTrigger: (trigger: any) => void
-  deleteTrigger: (trigger: any) => void
+  editTrigger: (trigger: PostgresTrigger) => void
+  duplicateTrigger: (trigger: PostgresTrigger) => void
+  deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
 const TriggerList = ({
@@ -37,6 +40,7 @@ const TriggerList = ({
   filterString,
   isLocked,
   editTrigger,
+  duplicateTrigger,
   deleteTrigger,
 }: TriggerListProps) => {
   const { data: project } = useSelectedProjectQuery()
@@ -47,8 +51,10 @@ const TriggerList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter((x) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
+  const filteredTriggers = (triggers ?? []).filter(
+    (x) =>
+      includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
+      (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase()))
   )
 
   const _triggers = sortBy(
@@ -198,6 +204,11 @@ const TriggerList = ({
                         <Edit size={14} />
                         <p>Edit with Assistant</p>
                       </DropdownMenuItem>
+                      <DropdownMenuItem className="space-x-2" onClick={() => duplicateTrigger(x)}>
+                        <Copy size={14} />
+                        <p>Duplicate trigger</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
                         <Trash stroke="red" size={14} />
                         <p>Delete trigger</p>

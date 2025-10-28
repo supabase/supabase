@@ -33,22 +33,20 @@ export const useSSOConfigCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSOConfigCreateData, ResponseError, SSOConfigCreateVariables>(
-    (vars) => createSSOConfig(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
-        await queryClient.invalidateQueries(orgSSOKeys.orgSSOConfig(slug))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create SSO configuration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SSOConfigCreateData, ResponseError, SSOConfigCreateVariables>({
+    mutationFn: (vars) => createSSOConfig(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
+      await queryClient.invalidateQueries(orgSSOKeys.orgSSOConfig(slug))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create SSO configuration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

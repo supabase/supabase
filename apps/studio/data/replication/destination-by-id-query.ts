@@ -33,11 +33,9 @@ export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinatio
     ...options
   }: UseQueryOptions<ReplicationDestinationByIdData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationDestinationByIdData, ResponseError, TData>(
-    replicationKeys.destinationById(projectRef, destinationId),
-    ({ signal }) => fetchReplicationDestinationById({ projectRef, destinationId }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof destinationId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ReplicationDestinationByIdData, ResponseError, TData>({
+    queryKey: replicationKeys.destinationById(projectRef, destinationId),
+    queryFn: ({ signal }) => fetchReplicationDestinationById({ projectRef, destinationId }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof destinationId !== 'undefined',
+    ...options,
+  })

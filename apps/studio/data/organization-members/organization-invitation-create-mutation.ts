@@ -52,7 +52,8 @@ export const useOrganizationCreateInvitationMutation = ({
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationCreateInvitationVariables
-  >((vars) => createOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => createOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
 

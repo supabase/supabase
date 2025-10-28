@@ -31,24 +31,22 @@ export const useUserInviteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UserInviteData, ResponseError, UserInviteVariables>(
-    (vars) => inviteUser(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<UserInviteData, ResponseError, UserInviteVariables>({
+    mutationFn: (vars) => inviteUser(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))])
+      await Promise.all([queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to invite user: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to invite user: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -1,6 +1,6 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
@@ -21,19 +21,19 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 const TriggersPage: NextPageWithLayout = () => {
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
-  const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const {
     templates: editorPanelTemplates,
     setValue: setEditorPanelValue,
     setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
   } = useEditorPanelStateSnapshot()
 
   const [selectedTrigger, setSelectedTrigger] = useState<PostgresTrigger>()
+  const [isDuplicatingTrigger, setIsDuplicatingTrigger] = useState<boolean>(false)
+
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
-
-  // Track selection when using inline editor
-  const [selectedTriggerForEditor, setSelectedTriggerForEditor] = useState<PostgresTrigger>()
 
   const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
@@ -41,8 +41,9 @@ const TriggersPage: NextPageWithLayout = () => {
   )
 
   const createTrigger = () => {
+    setIsDuplicatingTrigger(false)
     if (isInlineEditorEnabled) {
-      setSelectedTriggerForEditor(undefined)
+      setEditorPanelInitialPrompt('Create a new database trigger that...')
       setEditorPanelValue(`create trigger trigger_name
 after insert or update or delete on table_name
 for each row
@@ -58,15 +59,31 @@ execute function function_name();`)
   }
 
   const editTrigger = (trigger: PostgresTrigger) => {
+    setIsDuplicatingTrigger(false)
     if (isInlineEditorEnabled) {
-      setSelectedTriggerForEditor(trigger)
       setEditorPanelValue(generateTriggerCreateSQL(trigger))
-      if (editorPanelTemplates.length > 0) {
-        setEditorPanelTemplates([])
-      }
+      setEditorPanelTemplates([])
       openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedTrigger(trigger)
+      setShowCreateTriggerForm(true)
+    }
+  }
+
+  const duplicateTrigger = (trigger: PostgresTrigger) => {
+    setIsDuplicatingTrigger(true)
+
+    const dupTrigger = {
+      ...trigger,
+      name: `${trigger.name}_duplicate`,
+    }
+
+    if (isInlineEditorEnabled) {
+      setEditorPanelValue(generateTriggerCreateSQL(dupTrigger))
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setSelectedTrigger(dupTrigger)
       setShowCreateTriggerForm(true)
     }
   }
@@ -75,17 +92,6 @@ execute function function_name();`)
     setSelectedTrigger(trigger)
     setShowDeleteTriggerForm(true)
   }
-
-  const isEditorPanelActive = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
-
-  useEffect(() => {
-    if (isEditorPanelActive) return
-
-    setSelectedTriggerForEditor(undefined)
-    if (editorPanelTemplates.length > 0) {
-      setEditorPanelTemplates([])
-    }
-  }, [editorPanelTemplates.length, isEditorPanelActive, setEditorPanelTemplates])
 
   if (isPermissionsLoaded && !canReadTriggers) {
     return <NoPermission isFullPage resourceText="view database triggers" />
@@ -104,6 +110,7 @@ execute function function_name();`)
             <TriggersList
               createTrigger={createTrigger}
               editTrigger={editTrigger}
+              duplicateTrigger={duplicateTrigger}
               deleteTrigger={deleteTrigger}
             />
           </div>
@@ -112,7 +119,11 @@ execute function function_name();`)
       <TriggerSheet
         selectedTrigger={selectedTrigger}
         open={showCreateTriggerForm}
-        setOpen={setShowCreateTriggerForm}
+        onClose={() => {
+          setIsDuplicatingTrigger(false)
+          setShowCreateTriggerForm(false)
+        }}
+        isDuplicatingTrigger={isDuplicatingTrigger}
       />
       <DeleteTrigger
         trigger={selectedTrigger}

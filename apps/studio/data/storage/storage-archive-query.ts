@@ -29,8 +29,9 @@ export const useStorageArchiveQuery = <TData = StorageArchiveData>(
   { projectRef }: StorageArchiveVariables,
   { enabled = true, ...options }: UseQueryOptions<StorageArchiveData, ResponseError, TData> = {}
 ) =>
-  useQuery<StorageArchiveData, ResponseError, TData>(
-    storageKeys.archive(projectRef),
-    ({ signal }) => fetchStorageArchive({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<StorageArchiveData, ResponseError, TData>({
+    queryKey: storageKeys.archive(projectRef),
+    queryFn: ({ signal }) => fetchStorageArchive({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

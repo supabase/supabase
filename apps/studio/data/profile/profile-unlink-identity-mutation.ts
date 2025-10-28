@@ -24,7 +24,8 @@ export const useUnlinkIdentityMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation((vars) => unlinkIdentity(vars), {
+  return useMutation({
+    mutationFn: (vars) => unlinkIdentity(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
         auth.refreshSession(),

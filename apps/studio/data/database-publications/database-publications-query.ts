@@ -46,11 +46,9 @@ export const useDatabasePublicationsQuery = <TData = DatabasePublicationsData>(
     ...options
   }: UseQueryOptions<DatabasePublicationsData, DatabasePublicationsError, TData> = {}
 ) =>
-  useQuery<DatabasePublicationsData, DatabasePublicationsError, TData>(
-    databasePublicationsKeys.list(projectRef),
-    ({ signal }) => getDatabasePublications({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabasePublicationsData, DatabasePublicationsError, TData>({
+    queryKey: databasePublicationsKeys.list(projectRef),
+    queryFn: ({ signal }) => getDatabasePublications({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

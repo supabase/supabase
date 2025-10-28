@@ -78,22 +78,20 @@ export const ReportChartV2 = ({
     isLoading: isLoadingChart,
     error,
     isFetching,
-  } = useQuery(
-    [
+  } = useQuery({
+    queryKey: [
       'projects',
       projectRef,
       'report-v2',
       { reportId: report.id, startDate, endDate, interval, filters },
     ],
-    async () => {
+    queryFn: async () => {
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
-    {
-      enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
-      refetchOnWindowFocus: false,
-      staleTime: 0,
-    }
-  )
+    enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  })
 
   const chartData = queryResult?.data || []
   const dynamicAttributes = queryResult?.attributes || []
