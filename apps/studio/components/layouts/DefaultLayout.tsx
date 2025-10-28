@@ -15,6 +15,7 @@ import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
+  hideMobileMenu?: boolean
 }
 
 /**
@@ -27,7 +28,11 @@ export interface DefaultLayoutProps {
  * - Mobile navigation bar
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  */
-const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
+const DefaultLayout = ({
+  children,
+  headerTitle,
+  hideMobileMenu,
+}: PropsWithChildren<DefaultLayoutProps>) => {
   const { ref } = useParams()
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
@@ -55,7 +60,7 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
             {/* Top Banner */}
             <AppBannerWrapper />
             <div className="flex-shrink-0">
-              <MobileNavigationBar />
+              <MobileNavigationBar hideMobileMenu={hideMobileMenu} />
               <LayoutHeader
                 showProductMenu={showProductMenu}
                 headerTitle={headerTitle}
