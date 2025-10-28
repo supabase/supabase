@@ -244,6 +244,7 @@ const tweets = [
     url: 'https://twitter.com/nerdburn/status/1356857261495214085',
     handle: 'nerdburn',
     img_url: '/images/twitter-profiles/66VSV9Mm_400x400.png',
+    weight: 10,
   },
   {
     text: 'Now things are starting to get interesting! Firebase has long been the obvious choice for many #flutter devs for the ease of use. But their databases are NoSQL, which has its downsides... Seems like @supabase is working on something interesting here!',

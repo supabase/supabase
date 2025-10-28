@@ -8,6 +8,10 @@ import MainProducts from 'data/MainProducts'
 import tweets from 'shared-data/tweets'
 import { IconDiscord } from 'ui'
 
+// Sort tweets by weight (highest first), then take first 18
+const sortedTweets = [...tweets].sort((a, b) => (b.weight ?? 1) - (a.weight ?? 1))
+const topTweets = sortedTweets.slice(0, 18)
+
 export default () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -188,7 +192,7 @@ export default () => {
           </Link>
         </Button>
       ),
-      tweets: tweets.slice(0, 18),
+      tweets: topTweets,
     },
   }
 }

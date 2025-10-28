@@ -24,6 +24,10 @@ import { useSendTelemetryEvent } from 'lib/telemetry'
 import { tweets } from 'shared-data'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 
+// Sort tweets by weight (highest first), then take first 18
+const sortedTweets = [...tweets].sort((a, b) => (b.weight ?? 1) - (a.weight ?? 1))
+const topTweets = sortedTweets.slice(0, 18)
+
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const ComputePricingCalculator = dynamic(
   () => import('components/Pricing/ComputePricingCalculator')
@@ -495,7 +499,7 @@ const data: () => {
           </Link>
         </Button>
       ),
-      tweets: tweets.slice(0, 18),
+      tweets: topTweets,
     },
     platformStarterSection: {
       id: 'platform-starter',
