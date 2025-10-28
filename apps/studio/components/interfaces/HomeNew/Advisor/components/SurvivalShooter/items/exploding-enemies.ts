@@ -72,18 +72,16 @@ const APPLICABLE_WEAPONS = [WeaponType.NORMAL, WeaponType.RING, WeaponType.SHOTG
 export const explodingEnemies = defineItem({
   id: 'exploding_enemies',
   name: 'Exploding Enemies',
-  description: 'Enemies explode on death',
-  requiresWeaponSelection: false, // Self-checks weapon type
+  description: 'Enemies explode on death (choose a weapon)',
+  requiresWeaponSelection: true,
   applicableWeaponTypes: APPLICABLE_WEAPONS,
   stackable: true,
   eventHandlers: {
     onEnemyDeath: (context: OnEnemyDeathContext): OnEnemyDeathResult => {
       const { enemy, weaponType, currentTime, spawnProjectile } = context
 
-      // Check if this item applies to the weapon that killed the enemy
-      if (!APPLICABLE_WEAPONS.includes(weaponType)) {
-        return {}
-      }
+      // This handler is only called for the specific weapon type assigned during selection
+      // The event bus system handles the weapon type filtering
 
       // Spawn explosion at enemy death location
       spawnProjectile({

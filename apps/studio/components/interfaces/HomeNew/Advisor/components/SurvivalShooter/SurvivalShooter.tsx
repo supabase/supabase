@@ -47,8 +47,15 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
   const keyboardInputRef = useRef<KeyboardInput | null>(null)
   const lastProcessedLevelRef = useRef(1)
 
-  const { gameStateRef, config, startGame, pauseGame, resumeGame, updateMousePosition, updateInputVector } =
-    useGameLoop(selectedCards, canvasSize, maxCards)
+  const {
+    gameStateRef,
+    config,
+    startGame,
+    pauseGame,
+    resumeGame,
+    updateMousePosition,
+    updateInputVector,
+  } = useGameLoop(selectedCards, canvasSize, maxCards)
 
   const remainingSelections = Math.max(0, maxCards - selectedCards.length)
 
@@ -360,21 +367,23 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
                 onClick={() => handleItemSelect(item)}
                 disabled={isDisabled}
                 className={`flex-1 flex flex-col items-center justify-center border-r border-overlay last:border-r-0 transition-all ${
-                  isDisabled
-                    ? 'opacity-40 cursor-not-allowed'
-                    : 'hover:bg-brand/10 cursor-pointer'
+                  isDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-brand/10 cursor-pointer'
                 }`}
               >
                 <div className="text-center px-8">
-                  <div className="text-2xl font-medium mb-3">{item.name}</div>
-                  <div className="text-base text-foreground-light">{item.description}</div>
+                  <div className="text-lg font-mono font-medium mb-3">{item.name}</div>
+                  <div className="text-base font-mono text-foreground-light">
+                    {item.description}
+                  </div>
                   {alreadySelected && (
-                    <div className="text-sm text-foreground-muted mt-4">Already unlocked</div>
+                    <div className="text-sm font-mono text-foreground-muted mt-4">
+                      Already unlocked
+                    </div>
                   )}
                   {!alreadySelected &&
                     item.requiresWeaponSelection &&
                     weaponOptions.length === 0 && (
-                      <div className="text-sm text-foreground-muted mt-4">
+                      <div className="text-sm font-mono text-foreground-muted mt-4">
                         Unlock a compatible weapon to use this item
                       </div>
                     )}
@@ -383,7 +392,7 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
             )
           })}
           {currentOptions.length === 0 && (
-            <div className="flex-1 flex items-center justify-center text-foreground-muted">
+            <div className="flex-1 flex items-center justify-center font-mono text-foreground-muted">
               Generating items...
             </div>
           )}
@@ -398,7 +407,7 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
               className="flex-1 flex flex-col items-center justify-center border-r border-overlay last:border-r-0 hover:bg-brand/10 transition-all cursor-pointer"
             >
               <div className="text-center px-8">
-                <div className="text-2xl font-medium">{weaponTypeLabels[option]}</div>
+                <div className="text-2xl font-mono font-medium">{weaponTypeLabels[option]}</div>
               </div>
             </button>
           ))}
@@ -422,10 +431,8 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
         <div className="w-full h-full flex flex-col items-center justify-center gap-4">
           <div className="text-center">
             <h2 className="text-xl font-medium mb-2">Game Over</h2>
-            <div className="text-3xl font-mono font-bold text-brand mb-1">
-              {formatTime(currentScore)}
-            </div>
-            <p className="text-sm text-foreground-light">Time Survived</p>
+            <div className="text-3xl font-mono font-bold text-brand mb-1">{enemiesKilled}</div>
+            <p className="text-sm text-foreground-light">Enemies Killed</p>
           </div>
 
           <div className="flex gap-3">
@@ -456,8 +463,8 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
       <div className="absolute top-4 left-4 z-10 flex items-center gap-4 font-mono text-sm text-foreground">
         {/* HP */}
         <div className="flex items-center gap-1.5">
-          <Heart strokeWidth={1.5} size={16} className="text-red-500" />
-          <span>
+          <Heart strokeWidth={1.5} size={16} className="text-destructive" />
+          <span className="text-sm">
             {Math.max(0, Math.floor(gameStateRef.current?.player.stats.currentHp || 0))} /{' '}
             {gameStateRef.current?.player.stats.maxHp || 100}
           </span>
@@ -465,20 +472,20 @@ export const SurvivalShooter = ({ availableResources = 0, onExit }: SurvivalShoo
 
         {/* Enemy Kill Count */}
         <div className="flex items-center gap-1.5">
-          <Zap strokeWidth={1.5} size={16} className="text-yellow-500" />
-          <span>{enemiesKilled}</span>
+          <Zap strokeWidth={1.5} size={16} className="text-brand" />
+          <span className="text-sm">{enemiesKilled}</span>
         </div>
 
         {/* Experience Bar */}
         <div className="flex items-center gap-2">
-          <span className="text-xs">Lv.{currentLevel}</span>
+          <span className="text-sm">Lv.{currentLevel}</span>
           <div className="w-32 h-2 bg-overlay rounded-full overflow-hidden">
             <div
               className="h-full bg-blue-500 transition-all duration-300"
               style={{ width: `${getExperienceProgress().percentage}%` }}
             />
           </div>
-          <span className="text-xs text-foreground-light">
+          <span className="text-sm text-foreground-light">
             {getExperienceProgress().current}/{getExperienceProgress().needed}
           </span>
         </div>

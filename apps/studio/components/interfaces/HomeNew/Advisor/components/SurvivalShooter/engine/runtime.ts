@@ -23,6 +23,8 @@ import {
 } from '../events'
 import { getAllWeapons, getWeaponByType } from '../weapons'
 import { defaultPlayer } from '../player/default'
+import { getEnemyByType, getRandomEnemyType } from '../enemies/registry'
+import type { EnemyBehavior as GameEnemyBehavior, EnemyRenderFunction } from '../enemies/base'
 
 interface ProjectileUpdateContext {
   deltaTime: number
@@ -38,7 +40,8 @@ type RuntimeProjectile = Projectile & {
 }
 
 type RuntimeEnemy = Enemy & {
-  behavior: EnemyBehavior
+  behavior: GameEnemyBehavior
+  render: EnemyRenderFunction
 }
 
 type RuntimeGameState = GameState & {
@@ -52,7 +55,7 @@ interface EnemyUpdateContext {
   runtime: GameRuntime
 }
 
-type EnemyBehavior = (enemy: RuntimeEnemy, ctx: EnemyUpdateContext) => boolean
+type EnemyBehavior = GameEnemyBehavior
 
 interface ItemBuckets {
   global: GameItem[]
@@ -388,21 +391,21 @@ export class GameRuntime {
         if (bucket) {
           bucket.push(item)
         }
-        // Don't return - also add to global for event handlers
+        // Note: weapon-specific items are NOT added to global bucket
+        // Their handlers will be registered with weapon-specific scope
+      } else {
+        // Only non-weapon-specific items go to global bucket
+        global.push(item)
       }
-
-      // All items go to global bucket for event handler registration
-      global.push(item)
     })
 
     return { global, perWeapon, unlockedWeapons: unlocked }
   }
 
-  private registerItemHandlers({ global }: ItemBuckets) {
+  private registerItemHandlers({ global, perWeapon }: ItemBuckets) {
     this.teardownItemHandlers()
 
-    // Register all item event handlers globally
-    // Items check applicableWeaponTypes themselves in their handlers
+    // Register global item event handlers
     if (global.length > 0) {
       const handlers = aggregateEventHandlers(global)
       if (handlers.onDamage) {
@@ -424,6 +427,23 @@ export class GameRuntime {
         this.itemSubscriptions.push(this.events.onPlayerDamaged(handlers.onPlayerDamaged))
       }
     }
+
+    // Register per-weapon item event handlers
+    perWeapon.forEach((items, weaponType) => {
+      if (items.length === 0) return
+
+      const handlers = aggregateEventHandlers(items)
+      if (handlers.onDamage) {
+        this.itemSubscriptions.push(this.events.onDamage(handlers.onDamage, weaponType))
+      }
+      if (handlers.onEnemyDeath) {
+        this.itemSubscriptions.push(this.events.onEnemyDeath(handlers.onEnemyDeath, weaponType))
+      }
+      if (handlers.onShoot) {
+        this.itemSubscriptions.push(this.events.onShoot(handlers.onShoot, weaponType))
+      }
+      // Player events (onPlayerUpdate, onPlayerMove, onPlayerDamaged) are always global
+    })
   }
 
   private updatePlayerStats(selectedCards: SelectedCard[]) {
@@ -600,17 +620,24 @@ export class GameRuntime {
     if (currentTime - wave.lastSpawnTime <= spawnInterval) return
 
     wave.lastSpawnTime = currentTime
-    this.state.enemies.push(this.createEnemy(wave.waveNumber))
+
+    // Spawn boss every 5 waves
+    const shouldSpawnBoss = wave.waveNumber % 5 === 0 && wave.waveNumber > 0
+    const enemyType = shouldSpawnBoss && Math.random() < 0.1 // 10% chance per spawn during boss waves
+      ? 'boss' as const
+      : getRandomEnemyType()
+
+    this.state.enemies.push(this.createEnemy(wave.waveNumber, enemyType))
   }
 
-  private createEnemy(waveNumber: number): RuntimeEnemy {
+  private createEnemy(waveNumber: number, enemyType: ReturnType<typeof getRandomEnemyType> | 'boss'): RuntimeEnemy {
     const { canvasWidth, canvasHeight } = this.config
     const id = `enemy_${this.enemyIdCounter++}`
     const angle = Math.random() * Math.PI * 2
-    const baseHp = 20
-    const baseSpeed = 40
-    const speed = baseSpeed + waveNumber * 2
-    const hp = baseHp + waveNumber * 5
+
+    // Get enemy definition and stats
+    const enemyDef = getEnemyByType(enemyType)
+    const stats = enemyDef.getStats(waveNumber)
 
     const centerX = canvasWidth / 2
     const centerY = canvasHeight / 2
@@ -626,19 +653,22 @@ export class GameRuntime {
     const velocity: Vector2 = distance === 0
       ? { x: 0, y: 0 }
       : {
-          x: (dx / distance) * speed,
-          y: (dy / distance) * speed,
+          x: (dx / distance) * stats.speed,
+          y: (dy / distance) * stats.speed,
         }
 
     const enemy: RuntimeEnemy = {
       id,
+      type: enemyType,
       position: { x: spawnX, y: spawnY },
       velocity,
-      hp,
-      maxHp: hp,
-      speed,
-      damage: 10 + waveNumber * 2,
-      behavior: createEnemyBehavior(),
+      hp: stats.hp,
+      maxHp: stats.hp,
+      speed: stats.speed,
+      damage: stats.damage,
+      size: stats.size,
+      behavior: enemyDef.createBehavior(),
+      render: enemyDef.createRenderer(),
     }
 
     return enemy
@@ -664,8 +694,9 @@ export class GameRuntime {
       this.state.enemies.splice(index, 1)
       this.state.enemiesKilled++
 
-      // Spawn experience drop at enemy position
-      this.spawnExperienceDrop(enemy.position, 1)
+      // Spawn experience drop at enemy position - amount based on enemy type
+      const enemyDef = getEnemyByType(enemy.type)
+      this.spawnExperienceDrop(enemy.position, enemyDef.experienceValue)
     }
   }
 
@@ -695,28 +726,5 @@ export class GameRuntime {
 
   private nextProjectileId(): string {
     return `projectile_${this.projectileIdCounter++}`
-  }
-}
-
-const createEnemyBehavior = (): EnemyBehavior => {
-  return (enemy, { deltaTime, runtime, currentTime }) => {
-    const player = runtime.state.player
-    const dx = player.position.x - enemy.position.x
-    const dy = player.position.y - enemy.position.y
-    const distance = Math.sqrt(dx * dx + dy * dy) || 1
-
-    enemy.velocity.x = (dx / distance) * enemy.speed
-    enemy.velocity.y = (dy / distance) * enemy.speed
-
-    enemy.position.x += enemy.velocity.x * deltaTime
-    enemy.position.y += enemy.velocity.y * deltaTime
-
-    const playerRadius = runtime.getPlayerRadius()
-    if (distance < playerRadius + runtime.config.enemySize / 2) {
-      runtime.damagePlayer(enemy.damage, enemy, currentTime)
-      return false
-    }
-
-    return enemy.hp > 0
   }
 }

@@ -85,33 +85,18 @@ export const SurvivalCanvas = ({ gameStateRef, config, onMouseMove, onResize }: 
         ctx.restore()
       })
 
-      // Draw enemies (squares)
-      enemies.forEach((enemy) => {
-        const size = config.enemySize
-        const x = enemy.position.x - size / 2
-        const y = enemy.position.y - size / 2
-
-        // Enemy body
-        ctx.fillStyle = isDark ? '#ef4444' : '#dc2626'
-        ctx.fillRect(x, y, size, size)
-
-        // Enemy HP bar
-        const enemyHpBarWidth = size
-        const enemyHpBarHeight = 2
-        const enemyHpBarX = x
-        const enemyHpBarY = y - 4
-
-        ctx.fillStyle = isDark ? '#333' : '#ddd'
-        ctx.fillRect(enemyHpBarX, enemyHpBarY, enemyHpBarWidth, enemyHpBarHeight)
-
-        const enemyHpPercentage = enemy.hp / enemy.maxHp
-        ctx.fillStyle = '#22c55e'
-        ctx.fillRect(
-          enemyHpBarX,
-          enemyHpBarY,
-          enemyHpBarWidth * enemyHpPercentage,
-          enemyHpBarHeight
-        )
+      // Draw enemies using their custom render functions
+      enemies.forEach((enemy: any) => {
+        if (enemy.render) {
+          enemy.render(enemy, {
+            ctx,
+            playerPosition: player.position,
+            isDark,
+            config: {
+              enemySize: config.enemySize,
+            },
+          })
+        }
       })
 
       // Draw projectiles using their own render functions

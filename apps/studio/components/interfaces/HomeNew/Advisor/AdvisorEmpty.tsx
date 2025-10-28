@@ -13,15 +13,15 @@ type ActiveGame = 'pixel' | 'survival' | null
 export const AdvisorEmpty = ({ availableResources = 10 }: AdvisorEmptyProps) => {
   const [activeGame, setActiveGame] = useState<ActiveGame>(null)
 
-  if (activeGame === 'pixel') {
-    return (
-      <Card className="bg-transparent">
-        <CardContent className="relative p-0 h-[256px] overflow-hidden">
-          <PixelGame availableResources={availableResources} onExit={() => setActiveGame(null)} />
-        </CardContent>
-      </Card>
-    )
-  }
+  // if (activeGame === 'pixel') {
+  //   return (
+  //     <Card className="bg-transparent">
+  //       <CardContent className="relative p-0 h-[256px] overflow-hidden">
+  //         <PixelGame availableResources={availableResources} onExit={() => setActiveGame(null)} />
+  //       </CardContent>
+  //     </Card>
+  //   )
+  // }
 
   if (activeGame === 'survival') {
     return (

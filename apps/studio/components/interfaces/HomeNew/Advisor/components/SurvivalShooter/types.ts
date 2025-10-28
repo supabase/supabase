@@ -10,6 +10,12 @@ export enum WeaponType {
   FLAMETHROWER = 'flamethrower',
 }
 
+export enum EnemyType {
+  NORMAL = 'normal',
+  ELITE = 'elite',
+  BOSS = 'boss',
+}
+
 export interface WeaponVisuals {
   color: string
   size: number // size multiplier
@@ -60,12 +66,14 @@ export interface Player {
 
 export interface Enemy {
   id: string
+  type: EnemyType
   position: Vector2
   velocity: Vector2
   hp: number
   maxHp: number
   speed: number
   damage: number
+  size: number // visual size for rendering
 }
 
 export interface Projectile {
