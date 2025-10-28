@@ -116,8 +116,11 @@ export const RegionSelector = ({
               description={
                 <>
                   <p>
-                    Select the region closest to your users for the best performance.{' '}
-                    <InlineLink href={`${DOCS_URL}/guides/platform/regions`}>Learn more</InlineLink>
+                    Select the area closest to your users for the best performance, or choose a
+                    <InlineLink href={`${DOCS_URL}/guides/platform/regions`}>
+                      smart region
+                    </InlineLink>{' '}
+                    for an intelligent selection on your behalf.
                   </p>
                   {showNonProdFields && (
                     <div className="mt-2 text-warning">
