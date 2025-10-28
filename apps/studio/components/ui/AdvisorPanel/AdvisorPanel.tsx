@@ -156,7 +156,7 @@ export const AdvisorPanel = () => {
 
   const hiddenItemsCount = itemsFilteredByTabOnly.length - filteredItems.length
 
-  const selectedItem = filteredItems.find((item) => item.id === selectedItemId)
+  const selectedItem = combinedItems.find((item) => item.id === selectedItemId)
   const isDetailView = !!selectedItem
 
   const isLoading = isLintsLoading
