@@ -9,6 +9,8 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Badge, CardTitle } from 'ui'
 import type { PolicyTable } from './PolicyTableRow.types'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 interface PolicyTableRowHeaderProps {
   table: PolicyTable
@@ -25,6 +27,7 @@ export const PolicyTableRowHeader = ({
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { can: canCreatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -101,9 +104,9 @@ export const PolicyTableRowHeader = ({
               type="default"
               className="px-1"
               onClick={() => {
+                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                 aiSnap.newChat({
                   name: 'Create new policy',
-                  open: true,
                   initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                 })
               }}
