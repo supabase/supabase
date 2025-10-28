@@ -40,11 +40,16 @@ export function getQueryClient() {
               return false
             }
 
+            // Skip retries for specific pathnames to avoid unnecessary load
+            // CRITICAL: We must still retry 429 (rate limit) errors even on these pathnames.
+            // Without this exception, queries fail immediately on rate limits, causing the
+            // frontend to issue fresh requests (via refetch/user actions), which amplifies
+            // the rate limiting problem. By retrying 429s with proper backoff (using the
+            // retryAfter header below), we respect rate limits and prevent request storms.
             if (
               error instanceof ResponseError &&
               error.requestPathname &&
               SKIP_RETRY_PATHNAME_MATCHERS.some((matchFn) => matchFn(error.requestPathname!)) &&
-              // Still retry on 429s (rate limit) so that retry after is respected
               error.code !== 429
             ) {
               return false
