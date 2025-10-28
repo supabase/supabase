@@ -297,6 +297,13 @@ const tweets = [
     img_url: '/images/twitter-profiles/Y1swF6ef_400x400.jpg',
     weight: 9,
   },
+  {
+    text: "@supabase shout out, their MCP is awesome. It's helping me create better row securities and telling me best practises for setting up a supabase app",
+    url: 'https://x.com/adeelibr/status/1981356783818985774',
+    handle: 'adeelibr',
+    img_url: '/images/twitter-profiles/k0aPYRHF_400x400.jpg',
+    weight: 6,
+  },
 ]
 
 export const getWeightedTweets = (count: number): typeof tweets => {
