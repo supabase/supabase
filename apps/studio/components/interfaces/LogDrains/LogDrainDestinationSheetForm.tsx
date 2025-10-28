@@ -80,9 +80,6 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('sentry'),
-  }),
-  z.object({
-    type: z.literal('sentry'),
     dsn: z.string().min(1, { message: 'Sentry DSN is required' }),
   }),
 ])
@@ -175,56 +172,22 @@ export function LogDrainDestinationSheetForm({
     description: defaultValues?.description || '',
   }
 
-  const initialValues: z.infer<typeof formSchema> =
-    defaultType === 'webhook'
-      ? {
-          ...baseValues,
-          type: 'webhook',
-          http: defaultConfig?.http || 'http2',
-          gzip: mode === 'create' ? true : defaultConfig?.gzip || false,
-          headers: DEFAULT_HEADERS,
-          url: defaultConfig?.url || '',
-        }
-      : defaultType === 'datadog'
-        ? {
-            ...baseValues,
-            type: 'datadog',
-            api_key: defaultConfig?.api_key || '',
-            region: defaultConfig?.region || '',
-          }
-        : defaultType === 'elastic'
-          ? {
-              ...baseValues,
-              type: 'elastic',
-            }
-          : defaultType === 'postgres'
-            ? {
-                ...baseValues,
-                type: 'postgres',
-              }
-            : defaultType === 'bigquery'
-              ? {
-                  ...baseValues,
-                  type: 'bigquery',
-                }
-              : defaultType === 'loki'
-                ? {
-                    ...baseValues,
-                    type: 'loki',
-                    url: defaultConfig?.url || '',
-                    headers: DEFAULT_HEADERS,
-                    username: defaultConfig?.username || '',
-                    password: defaultConfig?.password || '',
-                  }
-                : {
-                    ...baseValues,
-                    type: 'sentry',
-                    dsn: defaultConfig?.dsn || '',
-                  }
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    values: initialValues,
+    values: {
+      name: defaultValues?.name || '',
+      description: defaultValues?.description || '',
+      type: defaultType,
+      http: defaultConfig?.http || 'http2',
+      gzip: mode === 'create' ? true : defaultConfig?.gzip || false,
+      headers: DEFAULT_HEADERS,
+      url: defaultConfig?.url || '',
+      api_key: defaultConfig?.api_key || '',
+      region: defaultConfig?.region || '',
+      username: defaultConfig?.username || '',
+      password: defaultConfig?.password || '',
+      dsn: defaultConfig?.dsn || '',
+    },
   })
 
   const headers = form.watch('headers')
