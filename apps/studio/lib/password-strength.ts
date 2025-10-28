@@ -17,7 +17,7 @@ export async function passwordStrength(value: string) {
       const resultScore = result?.score ?? 0
 
       const score = (PASSWORD_STRENGTH as any)[resultScore]
-      const suggestions = result.feedback?.suggestions ? result.feedback.suggestions.join(' ') : ''
+      const suggestions = result.feedback?.suggestions?.join(' ') ?? ''
 
       message = `${score} ${suggestions}`
       strength = resultScore
