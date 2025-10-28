@@ -39,11 +39,9 @@ export const useProjectServiceStatusQuery = <TData = ProjectServiceStatusData>(
     ...options
   }: UseQueryOptions<ProjectServiceStatusData, ProjectServiceStatusError, TData> = {}
 ) =>
-  useQuery<ProjectServiceStatusData, ProjectServiceStatusError, TData>(
-    serviceStatusKeys.serviceStatus(projectRef),
-    ({ signal }) => getProjectServiceStatus({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectServiceStatusData, ProjectServiceStatusError, TData>({
+    queryKey: serviceStatusKeys.serviceStatus(projectRef),
+    queryFn: ({ signal }) => getProjectServiceStatus({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -2,6 +2,7 @@ import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types/base'
 import type { components } from 'api-types'
+import { organizationKeys } from 'data/organizations/keys'
 
 export type EntitlementsVariables = {
   slug: string
@@ -30,9 +31,11 @@ export const useEntitlementsQuery = <TData = EntitlementsData>(
   { slug }: EntitlementsVariables,
   { enabled = true, ...options }: UseQueryOptions<EntitlementsData, EntitlementsError, TData> = {}
 ) => {
-  return useQuery<EntitlementsData, EntitlementsError, TData>(
-    ['entitlements', slug],
-    ({ signal }) => getEntitlements({ slug }, signal),
-    { enabled: enabled && typeof slug !== 'undefined', ...options, staleTime: 1 * 60 * 1000 }
-  )
+  return useQuery<EntitlementsData, EntitlementsError, TData>({
+    queryKey: [organizationKeys.entitlements(slug)],
+    queryFn: ({ signal }) => getEntitlements({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+    staleTime: 30 * 60 * 1000,
+  })
 }

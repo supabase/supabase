@@ -33,11 +33,9 @@ export const usePgbouncerConfigQuery = <TData = PgbouncerConfigData>(
     ...options
   }: UseQueryOptions<PgbouncerConfigData, PgbouncerConfigError, TData> = {}
 ) =>
-  useQuery<PgbouncerConfigData, PgbouncerConfigError, TData>(
-    databaseKeys.pgbouncerConfig(projectRef),
-    ({ signal }) => getPgbouncerConfig({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
-      ...options,
-    }
-  )
+  useQuery<PgbouncerConfigData, PgbouncerConfigError, TData>({
+    queryKey: databaseKeys.pgbouncerConfig(projectRef),
+    queryFn: ({ signal }) => getPgbouncerConfig({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
+    ...options,
+  })

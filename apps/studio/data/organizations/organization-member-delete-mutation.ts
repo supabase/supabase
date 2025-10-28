@@ -41,13 +41,14 @@ export const useOrganizationMemberDeleteMutation = ({
     OrganizationMemberDeleteData,
     ResponseError,
     OrganizationMemberDeleteVariables
-  >((vars) => deleteOrganizationMember(vars), {
+  >({
+    mutationFn: (vars) => deleteOrganizationMember(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.members(slug)),
-        queryClient.invalidateQueries(organizationKeys.roles(slug)),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.members(slug) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.roles(slug) }),
       ])
 
       await onSuccess?.(data, variables, context)

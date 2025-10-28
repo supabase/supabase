@@ -58,11 +58,9 @@ export const useOpenAPISpecQuery = <TData = OpenAPISpecData>(
   { projectRef }: OpenAPISpecVariables,
   { enabled = true, ...options }: UseQueryOptions<OpenAPISpecData, OpenAPISpecError, TData> = {}
 ) =>
-  useQuery<OpenAPISpecData, OpenAPISpecError, TData>(
-    openApiKeys.apiSpec(projectRef),
-    ({ signal }) => getOpenAPISpec({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<OpenAPISpecData, OpenAPISpecError, TData>({
+    queryKey: openApiKeys.apiSpec(projectRef),
+    queryFn: ({ signal }) => getOpenAPISpec({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

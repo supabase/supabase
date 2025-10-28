@@ -65,14 +65,14 @@ export const useUsersCountQuery = <TData = UsersCountData>(
   }: UsersCountVariables,
   { enabled = true, ...options }: UseQueryOptions<UsersCountData, UsersCountError, TData> = {}
 ) =>
-  useQuery<UsersCountData, UsersCountError, TData>(
-    authKeys.usersCount(projectRef, {
+  useQuery<UsersCountData, UsersCountError, TData>({
+    queryKey: authKeys.usersCount(projectRef, {
       keywords,
       filter,
       providers,
       forceExactCount,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       getUsersCount(
         {
           projectRef,
@@ -84,8 +84,6 @@ export const useUsersCountQuery = <TData = UsersCountData>(
         },
         signal
       ),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

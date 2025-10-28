@@ -127,14 +127,14 @@ export const useCreateDestinationPipelineMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<CreateDestinationPipelineData, ResponseError, CreateDestinationPipelineParams>(
-    (vars) => createDestinationPipeline(vars),
     {
+      mutationFn: (vars) => createDestinationPipeline(vars),
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
         await Promise.all([
-          queryClient.invalidateQueries(replicationKeys.destinations(projectRef)),
-          queryClient.invalidateQueries(replicationKeys.pipelines(projectRef)),
+          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
         ])
 
         await onSuccess?.(data, variables, context)

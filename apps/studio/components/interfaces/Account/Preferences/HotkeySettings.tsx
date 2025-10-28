@@ -1,4 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import Panel from 'components/ui/Panel'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { KeyboardShortcut, Toggle } from 'ui'
@@ -13,7 +14,7 @@ export const HotkeySettings = () => {
     true
   )
   const [aiAssistantEnabled, setAiAssistantEnabled] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.HOTKEY_AI_ASSISTANT,
+    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
     true
   )
 

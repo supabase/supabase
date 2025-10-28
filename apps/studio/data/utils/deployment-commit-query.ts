@@ -14,10 +14,8 @@ export const useDeploymentCommitQuery = <TData = DeploymentCommitData>({
   enabled = true,
   ...options
 }: UseQueryOptions<DeploymentCommitData, ResponseError, TData> = {}) =>
-  useQuery<DeploymentCommitData, ResponseError, TData>(
-    ['deployment-commit'],
-    ({ signal }) => getDeploymentCommit(signal),
-    {
-      ...options,
-    }
-  )
+  useQuery<DeploymentCommitData, ResponseError, TData>({
+    queryKey: ['deployment-commit'],
+    queryFn: ({ signal }) => getDeploymentCommit(signal),
+    ...options,
+  })

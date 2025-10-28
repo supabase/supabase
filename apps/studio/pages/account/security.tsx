@@ -81,7 +81,7 @@ const Security: NextPageWithLayout = () => {
 
 Security.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
         <AccountLayout title="Security">{page}</AccountLayout>
       </OrganizationLayout>

@@ -2,21 +2,16 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams, useFlag } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { PROJECT_STATUS } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
@@ -34,6 +29,8 @@ import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { LayoutSidebar } from './LayoutSidebar'
+import { LayoutSidebarProvider } from './LayoutSidebar/LayoutSidebarProvider'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -93,18 +90,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
-    const aiSnap = useAiAssistantStateSnapshot()
-    const [isAiAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
-      LOCAL_STORAGE_KEYS.HOTKEY_AI_ASSISTANT,
-      true
-    )
 
     const { appTitle } = useCustomContent(['app:title'])
     const titleSuffix = appTitle || 'Supabase'
-
-    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap], {
-      enabled: isAiAssistantHotkeyEnabled,
-    })
 
     const editor = useEditorType()
     const forceShowProductMenu = editor === undefined
@@ -227,25 +215,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                     )}
                   </main>
                 </ResizablePanel>
-                {isClient && aiSnap.open && (
-                  <>
-                    <ResizableHandle withHandle />
-                    <ResizablePanel
-                      id="panel-assistant"
-                      defaultSize={30}
-                      minSize={30}
-                      maxSize={50}
-                      className={cn(
-                        'border-l bg fixed z-40 right-0 top-0 bottom-0',
-                        'w-screen h-[100dvh]',
-                        'md:absolute md:h-auto md:w-3/4',
-                        'xl:relative xl:border-l-0'
-                      )}
-                    >
-                      <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
-                    </ResizablePanel>
-                  </>
-                )}
+                <LayoutSidebarProvider>
+                  <LayoutSidebar />
+                </LayoutSidebarProvider>
               </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -318,11 +290,13 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
+  const isHomeNewFlag = useFlag('homeNew')
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
+  const isHomePage = router.pathname === '/project/[ref]'
 
   const requiresDbConnection: boolean =
     (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
@@ -342,6 +316,20 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
+
+  // handle redirect to home for building state
+  const shouldRedirectToHomeForBuilding =
+    isHomeNewFlag && requiresDbConnection && isProjectBuilding && !isBranchesPage && !isHomePage
+
+  // We won't be showing the building state with the new home page
+  const shouldShowBuildingState =
+    requiresDbConnection && isProjectBuilding && !isBranchesPage && !(isHomeNewFlag && isHomePage)
+
+  useEffect(() => {
+    if (shouldRedirectToHomeForBuilding && ref) {
+      router.replace(`/project/${ref}`)
+    }
+  }, [shouldRedirectToHomeForBuilding, ref, router])
 
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
@@ -383,7 +371,11 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoreFailedState />
   }
 
-  if (requiresDbConnection && isProjectBuilding && !isBranchesPage) {
+  if (shouldRedirectToHomeForBuilding) {
+    return <Loading />
+  }
+
+  if (shouldShowBuildingState) {
     return <BuildingState />
   }
 
