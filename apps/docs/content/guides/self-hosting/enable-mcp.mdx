@@ -1,7 +1,7 @@
 ---
-title: "Enabling MCP Server Access"
-description: "Configure secure access to the MCP server in your self-hosted Supabase instance."
-subtitle: "Configure secure access to the MCP server in your self-hosted Supabase instance."
+title: 'Enabling MCP Server Access'
+description: 'Configure secure access to the MCP server in your self-hosted Supabase instance.'
+subtitle: 'Configure secure access to the MCP server in your self-hosted Supabase instance.'
 ---
 
 The MCP (Model Context Protocol) server in [self-hosted Supabase](/docs/guides/self-hosting/docker) runs behind the Studio API. Currently, it does not offer OAuth 2.1 authentication, and is not intended to be exposed to the Internet. The corresponding API route has to be protected by restricting network connections from the outside. By default, all connections to the MCP server are denied.
@@ -13,6 +13,7 @@ This guide explains how to securely enable access to your self-hosted MCP server
 <Admonition type="caution">
 
 Do not allow connections to the self-hosted MCP server from the Internet. Only access it via:
+
 - A VPN connection to the server running the Studio container
 - An SSH tunnel from your local machine
 
