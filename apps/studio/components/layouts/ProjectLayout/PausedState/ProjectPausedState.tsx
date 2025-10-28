@@ -15,6 +15,7 @@ import {
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
@@ -30,6 +31,7 @@ import {
   Card,
   CardContent,
   CardFooter,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -38,7 +40,11 @@ import {
   DialogTitle,
   Form_Shadcn_,
   FormField_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { PauseDisabledState } from './PauseDisabledState'
@@ -154,20 +160,32 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   isFreePlan ? (
                     <>
                       <p className="text-sm">
-                        All data, including backups and storage objects, are safe and you can resume
-                        your project from the dashboard within{' '}
-                        <span className="text-foreground">
-                          {finalDaysRemainingBeforeRestoreDisabled} day
-                          {finalDaysRemainingBeforeRestoreDisabled > 1 ? 's' : ''}
-                        </span>{' '}
+                        All data, including backups and storage objects, remains safe. You can
+                        resume this project from the dashboard within{' '}
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span className={cn(InlineLinkClassName, 'text-foreground')}>
+                              {finalDaysRemainingBeforeRestoreDisabled} day
+                              {finalDaysRemainingBeforeRestoreDisabled > 1 ? 's' : ''}
+                            </span>{' '}
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="w-80 text-center">
+                            Free projects cannot be restored through the dashboard if they are
+                            paused for more than {pauseStatus.max_days_till_restore_disabled} days
+                          </TooltipContent>
+                        </Tooltip>{' '}
                         (until{' '}
-                        <span className="text-foreground">
-                          {dayjs()
+                        <TimestampInfo
+                          displayAs="local"
+                          utcTimestamp={dayjs()
                             .utc()
                             .add(pauseStatus.remaining_days_till_restore_disabled ?? 0, 'day')
-                            .format('DD MMM YYYY')}
-                        </span>
-                        ), after which you'll need to contact support.{' '}
+                            .toISOString()}
+                          className="text-sm text-foreground"
+                          labelFormat="DD MMM YYYY"
+                        />
+                        ). After that, this project will not be resumable, but data will still be
+                        available for download.
                       </p>
                       <p className="text-sm text-foreground-lighter mt-4">
                         {enableProBenefitWording === 'variant-a'
