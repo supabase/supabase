@@ -10,24 +10,16 @@ export const LogDrainsEmpty = () => {
       step: 1,
       title: 'Log drain pricing',
       description:
-        'Log Drains are available as a project Add-On for all Team and Enterprise users. Each Log Drain costs $0.0822 per hour ($60 per month).',
+        'Log Drains are available as a project Add-On for all Team and Enterprise users. Each Log Drain costs $60 per month.',
       label: 'See our pricing',
       link: 'https://supabase.com/docs/guides/platform/manage-your-usage/log-drains',
     },
     {
       step: 2,
-      title: 'Read our support guide',
-      description:
-        'Log drains will send all logs of the Supabase stack to one or more desired destinations.',
-      label: 'Read our documentation',
-      link: 'https://supabase.com/docs/guides/telemetry/log-drains',
-    },
-    {
-      step: 3,
       title: 'Connect to your drain',
       description:
-        'Log drains will send all logs of the Supabase stack to one or more desired destinations.',
-      label: 'Connect to your destination',
+        'We offer support for multiple destinations including HTTPS, Datadog, Loki and Sentry.',
+      label: 'Read our documentation',
       link: 'https://supabase.com/docs/guides/telemetry/log-drains',
     },
   ]
@@ -45,7 +37,7 @@ export const LogDrainsEmpty = () => {
             Upgrade plan
           </Button>
         </div>
-        <Card className="grid grid-cols-1 @xl:grid-cols-3 bg divide-x mb-8">
+        <Card className="grid grid-cols-1 @xl:grid-cols-2 bg divide-x mb-8">
           {items.map((item, i) => (
             <div className="flex flex-col h-full p-6" key={i}>
               <div className="flex items-center gap-3 mb-2">
@@ -60,7 +52,9 @@ export const LogDrainsEmpty = () => {
               </div>
               <p className="text-foreground-light text-sm mb-4 flex-1">{item.description}</p>
               <Button type="default" className="w-full">
-                <Link href={item.link}>{item.label}</Link>
+                <Link href={item.link} target="_blank">
+                  {item.label}
+                </Link>
               </Button>
             </div>
           ))}
@@ -79,7 +73,7 @@ export const LogDrainsEmpty = () => {
               href="https://github.com/orgs/supabase/discussions/28324?sort=top"
               className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
             >
-              Click here
+              Vote here
             </Link>
           </p>
         </div>
