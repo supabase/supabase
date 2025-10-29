@@ -154,7 +154,11 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     if (isStandardBucketSelected) {
       deleteBucket({ projectRef, id: bucket.id })
     } else {
-      deleteAnalyticsBucket({ projectRef, id: bucket.id })
+      if (isStorageV2) {
+        deleteAnalyticsBucket({ projectRef, id: bucket.id })
+      } else {
+        deleteBucket({ projectRef, id: bucket.id })
+      }
     }
   }
 
