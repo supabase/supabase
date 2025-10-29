@@ -120,6 +120,7 @@ allow_list = [
     "[Ss]ubfolders?",
     "[Ss]ubmodules?",
     "[Ss]wappiness",
+    "TerminationRequested",
     "[Tt]imebox(ed)?",
     "[Tt]odos?",
     "[Tt]radeoffs?",
