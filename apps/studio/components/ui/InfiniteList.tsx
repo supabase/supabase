@@ -131,14 +131,14 @@ type VirtualizerContextValue = {
 
 const VirtualizerContext = createContext<VirtualizerContextValue | null>(null)
 
-const VirtualizerProvider = ({
+export const VirtualizerProvider = ({
   children,
   value,
 }: PropsWithChildren<{ value: VirtualizerContextValue }>) => {
   return <VirtualizerContext.Provider value={value}>{children}</VirtualizerContext.Provider>
 }
 
-const useVirtualizerContext = () => {
+export const useVirtualizerContext = () => {
   const context = useContext(VirtualizerContext)
   if (!context) {
     throw new Error('useVirtualizerContext must be used within a VirtualizerProvider')

@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import InfiniteList from 'components/ui/InfiniteList'
+import { InfiniteListDefault } from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
 import { useNotificationsV2Query } from 'data/notifications/notifications-v2-query'
@@ -33,11 +33,6 @@ export const NotificationsPopoverV2 = () => {
 
   // Storing in ref as no re-rendering required
   const markedRead = useRef<string[]>([])
-
-  // [Joshen] Just FYI this variable row heights logic should ideally live in InfiniteList
-  // but I ran into some infinite loops issues when I was trying to implement it there
-  // so opting to simplify and implement it here for now
-  const rowHeights = useRef<{ [key: number]: number }>({})
 
   const { data: organizations } = useOrganizationsQuery({ enabled: open })
   const {
@@ -197,20 +192,16 @@ export const NotificationsPopoverV2 = () => {
             <div className="flex flex-1 h-[400px] bg-background">
               {notifications.length > 0 &&
               !(activeTab === 'archived' && snap.filterStatuses.includes('unread')) ? (
-                <InfiniteList
+                <InfiniteListDefault
+                  className="w-full"
                   items={notifications}
                   ItemComponent={NotificationRow}
-                  LoaderComponent={
-                    <div className="p-4">
+                  LoaderComponent={({ style }) => (
+                    <div style={style} className="p-4">
                       <ShimmeringLoader />
                     </div>
-                  }
+                  )}
                   itemProps={{
-                    setRowHeight: (idx: number, height: number) => {
-                      if (rowHeights.current) {
-                        rowHeights.current = { ...rowHeights.current, [idx]: height }
-                      }
-                    },
                     getOrganizationById: (id: number) =>
                       organizations?.find((org) => org.id === id)!,
                     getOrganizationBySlug: (slug: string) =>
@@ -224,7 +215,7 @@ export const NotificationsPopoverV2 = () => {
                       }
                     },
                   }}
-                  getItemSize={(idx: number) => rowHeights?.current?.[idx] ?? 56}
+                  getItemSize={() => 56}
                   hasNextPage={hasNextPage}
                   isLoadingNextPage={isFetchingNextPage}
                   onLoadNextPage={() => fetchNextPage()}
