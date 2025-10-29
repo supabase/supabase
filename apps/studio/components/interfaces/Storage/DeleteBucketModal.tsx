@@ -127,15 +127,17 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
     useAnalyticsBucketDeleteMutation({
       onSuccess: async () => {
-        await deleteAnalyticsBucketCleanUp({
-          projectRef,
-          bucketId: bucket.id,
-          icebergWrapper,
-          icebergWrapperMeta,
-          s3AccessKey,
-          publication,
-        })
-
+        if (project?.connectionString) {
+          await deleteAnalyticsBucketCleanUp({
+            projectRef,
+            connectionString: project.connectionString,
+            bucketId: bucket.id,
+            icebergWrapper,
+            icebergWrapperMeta,
+            s3AccessKey,
+            publication,
+          })
+        }
         toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
         if (isStorageV2) {
           router.push(`/project/${projectRef}/storage/analytics`)
@@ -171,7 +173,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
         if (!open) onClose()
       }}
     >
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Confirm deletion of {bucket.id}</DialogTitle>
         </DialogHeader>

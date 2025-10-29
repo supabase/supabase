@@ -227,7 +227,7 @@ export const CreateSpecializedBucketModal = ({
         </ButtonTooltip>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create {config.singularName} bucket</DialogTitle>
         </DialogHeader>

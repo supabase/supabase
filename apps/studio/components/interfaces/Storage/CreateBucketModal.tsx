@@ -265,7 +265,7 @@ export const CreateBucketModal = ({
         </ButtonTooltip>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create a {isStorageV2 ? config.singularName : 'storage'} bucket</DialogTitle>
         </DialogHeader>
