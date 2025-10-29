@@ -63,8 +63,7 @@ export const HelpPopover = () => {
           <div className="px-5 flex flex-col gap-1">
             <h5 className="text-foreground">Need help with your project?</h5>
             <p className="text-sm text-foreground-lighter text-balance">
-              Start with our {projectRef ? 'Assistant, docs,' : 'docs'} or community. Most questions
-              are answered there in minutes.
+              Start with our {projectRef ? 'Assistant, docs,' : 'docs'} or community.
             </p>
           </div>
 
@@ -142,8 +141,8 @@ export const HelpPopover = () => {
           <div className="px-5 flex flex-col gap-1">
             <h5 className="text-foreground">Community support</h5>
             <p className="text-sm text-foreground-lighter text-balance">
-              Our Discord community has many experienced developers. They may be able to provide
-              guidance and support with code-related issues.
+              Our Discord community can help with code-related issues. Many questions are answered
+              in minutes.
             </p>
           </div>
           <div className="px-5">
