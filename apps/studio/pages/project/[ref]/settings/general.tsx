@@ -1,11 +1,9 @@
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import {
-  ComplianceConfig,
-  CustomDomainConfig,
-  General,
-  TransferProjectPanel,
-} from 'components/interfaces/Settings/General'
+import { ComplianceConfig } from 'components/interfaces/Settings/General/ComplianceConfig/ProjectComplianceMode'
+import { CustomDomainConfig } from 'components/interfaces/Settings/General/CustomDomainConfig/CustomDomainConfig'
 import { DeleteProjectPanel } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectPanel'
+import { General } from 'components/interfaces/Settings/General/General'
+import { TransferProjectPanel } from 'components/interfaces/Settings/General/TransferProjectPanel/TransferProjectPanel'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'

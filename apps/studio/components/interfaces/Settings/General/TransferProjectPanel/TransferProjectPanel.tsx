@@ -3,9 +3,9 @@ import { Truck } from 'lucide-react'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import TransferProjectButton from './TransferProjectButton'
+import { TransferProjectButton } from './TransferProjectButton'
 
-const TransferProjectPanel = () => {
+export const TransferProjectPanel = () => {
   const { data: project } = useSelectedProjectQuery()
 
   if (project === undefined) return null
@@ -38,5 +38,3 @@ const TransferProjectPanel = () => {
     </section>
   )
 }
-
-export default TransferProjectPanel
