@@ -48,9 +48,10 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
     PermissionAction.BILLING_READ,
     'stripe.payment_methods'
   )
-  return useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>(
-    organizationKeys.paymentMethods(slug),
-    ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
-    { enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions, ...options }
-  )
+  return useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>({
+    queryKey: organizationKeys.paymentMethods(slug),
+    queryFn: ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions,
+    ...options,
+  })
 }

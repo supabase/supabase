@@ -47,20 +47,18 @@ export const useDatabaseCronJobRunCommandMutation = ({
   UseMutationOptions<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>(
-    (vars) => runDatabaseCronJobCommand(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to run cron job command: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>({
+    mutationFn: (vars) => runDatabaseCronJobCommand(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to run cron job command: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

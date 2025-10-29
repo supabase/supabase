@@ -40,17 +40,15 @@ export const useSendFeedbackMutation = ({
   UseMutationOptions<SendFeedbackData, ResponseError, SendFeedbackVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendFeedbackData, ResponseError, SendFeedbackVariables>(
-    (vars) => sendFeedback(vars),
-    {
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit feedback: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SendFeedbackData, ResponseError, SendFeedbackVariables>({
+    mutationFn: (vars) => sendFeedback(vars),
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to submit feedback: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

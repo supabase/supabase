@@ -1,4 +1,3 @@
-export { default as passwordStrength } from './password-strength'
 export { default as uuidv4 } from './uuid'
 import { UIEvent } from 'react'
 import type { TablesData } from '../data/tables/tables-query'

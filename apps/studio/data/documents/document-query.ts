@@ -47,11 +47,9 @@ export const useDocumentQuery = <TData = DocumentData>(
   { orgSlug, docType }: DocumentVariables,
   { enabled = true, ...options }: UseQueryOptions<DocumentData, DocumentError, TData> = {}
 ) =>
-  useQuery<DocumentData, DocumentError, TData>(
-    documentKeys.resource(orgSlug, docType),
-    ({ signal }) => getDocument({ orgSlug, docType }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined' && typeof docType !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DocumentData, DocumentError, TData>({
+    queryKey: documentKeys.resource(orgSlug, docType),
+    queryFn: ({ signal }) => getDocument({ orgSlug, docType }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined' && typeof docType !== 'undefined',
+    ...options,
+  })

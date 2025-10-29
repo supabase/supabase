@@ -45,11 +45,9 @@ export const useReplicationLagQuery = <TData = ReplicationLagData>(
     ...options
   }: UseQueryOptions<ReplicationLagData, ReplicationLagError, TData> = {}
 ) =>
-  useQuery<ReplicationLagData, ReplicationLagError, TData>(
-    replicaKeys.replicaLag(projectRef, id),
-    ({ signal }) => getReplicationLag({ projectRef, connectionString, id }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ReplicationLagData, ReplicationLagError, TData>({
+    queryKey: replicaKeys.replicaLag(projectRef, id),
+    queryFn: ({ signal }) => getReplicationLag({ projectRef, connectionString, id }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    ...options,
+  })

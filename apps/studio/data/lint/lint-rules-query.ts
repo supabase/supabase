@@ -42,12 +42,10 @@ export const useProjectLintRulesQuery = <TData = ProjectLintRulesData>(
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useQuery<ProjectLintRulesData, ProjectLintRulesError, TData>(
-    lintKeys.lintRules(projectRef),
-    ({ signal }) => getProjectLintRules({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-      ...options,
-    }
-  )
+  return useQuery<ProjectLintRulesData, ProjectLintRulesError, TData>({
+    queryKey: lintKeys.lintRules(projectRef),
+    queryFn: ({ signal }) => getProjectLintRules({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    ...options,
+  })
 }

@@ -1,40 +1,33 @@
-import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
-import { useParams } from 'common'
+import { useEffect, useState } from 'react'
 
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import {
+  DatePickerValue,
+  LogsDatePicker,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import {
-  LogsDatePicker,
-  DatePickerValue,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import {
-  ResponseSpeedChartRenderer,
-  TopApiRoutesRenderer,
-  TotalRequestsChartRenderer,
-} from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
-import { analyticsKeys } from 'data/analytics/keys'
-import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
-import { useApiReport } from 'data/reports/api-report-query'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import { analyticsKeys } from 'data/analytics/keys'
+import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 
-import type { NextPageWithLayout } from 'types'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import type { NextPageWithLayout } from 'types'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -100,15 +93,15 @@ const RealtimeUsage = () => {
 
     const { period_start, period_end, interval } = selectedDateRange
     REALTIME_REPORT_ATTRIBUTES.forEach((attr) => {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
+      queryClient.invalidateQueries({
+        queryKey: analyticsKeys.infraMonitoring(ref, {
           attribute: attr?.id,
           startDate: period_start.date,
           endDate: period_end.date,
           interval,
           databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
+        }),
+      })
     })
 
     refetch()

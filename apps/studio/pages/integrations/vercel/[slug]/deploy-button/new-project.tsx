@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-import { debounce } from 'lodash'
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
@@ -18,7 +17,7 @@ import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import passwordStrength from 'lib/password-strength'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
@@ -63,9 +62,11 @@ const CreateProject = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value: string) => checkPasswordStrength(value), 300)
-  ).current
+  async function checkPasswordStrength(value: string) {
+    const { message, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthMessage(message)
+  }
 
   const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
@@ -105,19 +106,13 @@ const CreateProject = () => {
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
-  }
-
-  async function checkPasswordStrength(value: string) {
-    const { message, strength } = await passwordStrength(value)
-    setPasswordStrengthScore(strength)
-    setPasswordStrengthMessage(message)
+    } else checkPasswordStrength(value)
   }
 
   function generatePassword() {
     const password = generateStrongPassword()
     setDbPass(password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)

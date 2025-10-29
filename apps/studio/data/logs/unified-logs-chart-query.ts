@@ -150,13 +150,11 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
     ...options
   }: UseQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) =>
-  useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>(
-    logsKeys.unifiedLogsChart(projectRef, search),
-    ({ signal }) => getUnifiedLogsChart({ projectRef, search }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      keepPreviousData: true,
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+  useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
+    queryKey: logsKeys.unifiedLogsChart(projectRef, search),
+    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    keepPreviousData: true,
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })

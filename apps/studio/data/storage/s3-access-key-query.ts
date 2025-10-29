@@ -37,8 +37,9 @@ export const useStorageCredentialsQuery = <TData = StorageCredentialsData>(
   { projectRef }: StorageCredentialsVariables,
   { enabled = true, ...options }: UseQueryOptions<StorageCredentialsData, ResponseError, TData> = {}
 ) =>
-  useQuery<StorageCredentialsData, ResponseError, TData>(
-    storageCredentialsKeys.credentials(projectRef),
-    ({ signal }) => fetchStorageCredentials({ projectRef }, signal),
-    { enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<StorageCredentialsData, ResponseError, TData>({
+    queryKey: storageCredentialsKeys.credentials(projectRef),
+    queryFn: ({ signal }) => fetchStorageCredentials({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    ...options,
+  })
