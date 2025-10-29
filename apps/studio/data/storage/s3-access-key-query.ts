@@ -1,11 +1,16 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 import { storageCredentialsKeys } from './s3-access-key-keys'
-import { IS_PLATFORM } from 'lib/constants'
 
 type StorageCredentialsVariables = { projectRef?: string }
+
+export type S3AccessKey = components['schemas']['GetStorageCredentialsResponse']['data'][number] & {
+  access_key: string
+}
 
 async function fetchStorageCredentials(
   { projectRef }: StorageCredentialsVariables,
@@ -19,16 +24,7 @@ async function fetchStorageCredentials(
   })
 
   if (error) handleError(error)
-
-  // Generated types by openapi are wrong so we need to cast it.
-  return data as unknown as {
-    data: {
-      id: string
-      created_at: string
-      access_key: string
-      description: string
-    }[]
-  }
+  return data as { data: S3AccessKey[] }
 }
 
 export type StorageCredentialsData = Awaited<ReturnType<typeof fetchStorageCredentials>>
