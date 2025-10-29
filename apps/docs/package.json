@@ -119,7 +119,7 @@
     "unist-util-visit": "^4.1.2",
     "uuid": "^9.0.1",
     "valtio": "catalog:",
-    "yaml": "^2.4.5",
+    "yaml": "^2.8.1",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -159,12 +159,12 @@
     "slugify": "^1.6.6",
     "smol-toml": "^1.3.1",
     "tsconfig": "workspace:*",
-    "tsx": "^4.19.3",
+    "tsx": "catalog:",
     "twoslash": "^0.3.1",
     "typescript": "catalog:",
     "unist-util-visit-parents": "5.1.3",
     "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^3.0.5"
+    "vitest": "catalog:"
   }
 }
