@@ -6838,6 +6838,7 @@ export interface components {
             }
           | {
               enabled: boolean
+              unit: string
               unlimited: boolean
               value: number
             }
@@ -6851,6 +6852,8 @@ export interface components {
           type: 'boolean' | 'numeric' | 'set'
         }
         hasAccess: boolean
+        /** @enum {string} */
+        type: 'boolean' | 'numeric' | 'set'
       }[]
     }
     ListGitHubConnectionsResponse: {
