@@ -340,7 +340,7 @@ export const UnifiedLogs = () => {
           <ResizablePanel
             order={2}
             id="panel-right"
-            className="flex max-w-full flex-1 flex-col overflow-hidden"
+            className="flex max-w-full flex-1 flex-col overflow-auto"
           >
             <DataTableHeaderLayout setTopBarHeight={setTopBarHeight}>
               <DataTableFilterCommand
