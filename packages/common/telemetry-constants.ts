@@ -2025,6 +2025,7 @@ export interface SidebarOpenedEvent {
      */
     sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
   }
+  groups: TelemetryGroups
 }
 
 /**
