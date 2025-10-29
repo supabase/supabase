@@ -318,7 +318,7 @@ export const DatabaseConnectionString = () => {
                 <ConnectionStringMethodSelectItem
                   key={method}
                   method={method as ConnectionStringMethod}
-                  poolerBadge={poolerBadge}
+                  poolerBadge={method === 'transaction' ? poolerBadge : undefined}
                 />
               ))}
             </SelectContent_Shadcn_>
@@ -587,11 +587,18 @@ const ConnectionStringMethodSelectItem = ({
   poolerBadge,
 }: {
   method: ConnectionStringMethod
-  poolerBadge: string
+  poolerBadge?: string
 }) => (
   <SelectItem_Shadcn_ value={method} className="[&>span:first-child]:top-3.5">
     <div className="flex flex-col w-full py-1">
-      <div>{connectionStringMethodOptions[method].label}</div>
+      <div className="flex gap-x-2 items-center">
+        {connectionStringMethodOptions[method].label}
+        {method === 'session' ? (
+          <Badge variant="outline">Shared Pooler</Badge>
+        ) : (
+          poolerBadge && <Badge variant="outline">{poolerBadge}</Badge>
+        )}
+      </div>
       <div className="text-foreground-lighter text-xs">
         {connectionStringMethodOptions[method].description}
       </div>
