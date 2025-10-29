@@ -1843,6 +1843,51 @@ export const storage: NavMenuConstant = {
       ],
     },
     {
+      name: 'Bucket types',
+      items: [
+        {
+          name: 'Analytics Buckets',
+          url: '/guides/storage/analytics',
+          items: [
+            { name: 'Introduction', url: '/guides/storage/analytics/introduction' },
+            {
+              name: 'Creating Analytics Buckets',
+              url: '/guides/storage/analytics/creating-analytics-buckets' as `/${string}`,
+            },
+            {
+              name: 'Connecting to Analytics Buckets',
+              url: '/guides/storage/analytics/connecting-to-analytics-bucket' as `/${string}`,
+            },
+            {
+              name: 'Limits',
+              url: '/guides/storage/analytics/limits' as `/${string}`,
+              enabled: billingEnabled,
+            },
+          ],
+        },
+        {
+          name: 'Vector Buckets',
+          url: '/guides/storage/vector',
+          items: [
+            { name: 'Introduction', url: '/guides/storage/vector/introduction' },
+            {
+              name: 'Creating Vector Buckets',
+              url: '/guides/storage/vector/creating-analytics-buckets' as `/${string}`,
+            },
+            {
+              name: 'Connecting to Vector Buckets',
+              url: '/guides/storage/vector/connecting-to-vector-bucket' as `/${string}`,
+            },
+            {
+              name: 'Limits',
+              url: '/guides/storage/vector/limits' as `/${string}`,
+              enabled: billingEnabled,
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 'Security',
       url: undefined,
       items: [
@@ -1912,26 +1957,7 @@ export const storage: NavMenuConstant = {
         { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
       ],
     },
-    {
-      name: 'Analytics Buckets',
-      url: undefined,
-      items: [
-        { name: 'Introduction', url: '/guides/storage/analytics/introduction' },
-        {
-          name: 'Creating Analytics Buckets',
-          url: '/guides/storage/analytics/creating-analytics-buckets' as `/${string}`,
-        },
-        {
-          name: 'Connecting to Analytics Buckets',
-          url: '/guides/storage/analytics/connecting-to-analytics-bucket' as `/${string}`,
-        },
-        {
-          name: 'Limits',
-          url: '/guides/storage/analytics/limits' as `/${string}`,
-          enabled: billingEnabled,
-        },
-      ],
-    },
+
     {
       name: 'CDN',
       url: undefined,
