@@ -51,6 +51,7 @@ export const AnimatedLogos = () => {
       y: '-50%',
       scale: 0.6,
       opacity: 0,
+      filter: 'blur(1px)',
     },
     right: {
       x: 'calc(-50% + 80px)',
@@ -66,6 +67,7 @@ export const AnimatedLogos = () => {
       scale: 1,
       opacity: 1,
       zIndex: 3,
+      filter: 'blur(0px)',
     },
     left: {
       x: 'calc(-50% - 80px)',
@@ -80,6 +82,7 @@ export const AnimatedLogos = () => {
       y: '-50%',
       scale: 0.6,
       opacity: 0,
+      filter: 'blur(0px)',
     },
   }
 
