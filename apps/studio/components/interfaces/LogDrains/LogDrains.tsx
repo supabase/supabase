@@ -27,6 +27,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { LogDrainsEmpty } from './LogDrainsEmpty'
 
 export function LogDrains({
   onNewDrainClick,
@@ -71,14 +72,15 @@ export function LogDrains({
 
   if (!orgPlanLoading && !logDrainsEnabled) {
     return (
-      <CardButton
-        title="Upgrade to a Team Plan"
-        description="Upgrade to a Team or Enterprise Plan to use Log Drains"
-      >
-        <Button className="mt-2" asChild>
-          <Link href={`/org/${org?.slug}/billing`}>Upgrade to Team</Link>
-        </Button>
-      </CardButton>
+      // <CardButton
+      //   title="Upgrade to a Team Plan"
+      //   description="Upgrade to a Team or Enterprise Plan to use Log Drains"
+      // >
+      //   <Button className="mt-2" asChild>
+      //     <Link href={`/org/${org?.slug}/billing`}>Upgrade to Team</Link>
+      //   </Button>
+      // </CardButton>
+      <LogDrainsEmpty />
     )
   }
 
