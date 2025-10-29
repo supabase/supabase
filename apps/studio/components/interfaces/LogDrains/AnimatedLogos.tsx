@@ -6,7 +6,7 @@ import { BracesIcon } from 'lucide-react'
 
 export const AnimatedLogos = () => {
   const [currIndex, setCurrIndex] = useState(0)
-  const timer = 3000
+  const timer = 2500
   const iconSize = 36
 
   const logos = [
@@ -58,6 +58,7 @@ export const AnimatedLogos = () => {
       scale: 0.8,
       opacity: 0.5,
       zIndex: 2,
+      filter: 'blur(1px)',
     },
     center: {
       x: '-50%',
@@ -72,6 +73,7 @@ export const AnimatedLogos = () => {
       scale: 0.8,
       opacity: 0.5,
       zIndex: 2,
+      filter: 'blur(1px)',
     },
     exit: {
       x: 'calc(-50% - 120px)',
@@ -103,14 +105,14 @@ export const AnimatedLogos = () => {
               initial="hidden"
               animate={position}
               exit="exit"
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              transition={{ duration: 0.5, ease: 'easeInOut' }}
             >
               <span>{logo.icon}</span>
             </motion.div>
           )
         })}
       </AnimatePresence>
-      <div className="absolute -inset-6 bg-gradient-to-r from-background-surface-75 via-transparent to-background-surface-75 z-40" />
+      <div className="absolute -inset-4 bg-gradient-to-r from-background-surface-75 via-transparent to-background-surface-75 z-40" />
     </div>
   )
 }
