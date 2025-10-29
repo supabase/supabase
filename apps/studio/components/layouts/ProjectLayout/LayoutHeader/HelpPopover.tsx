@@ -11,6 +11,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -23,7 +24,6 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 export const HelpPopover = () => {
   const router = useRouter()
@@ -111,7 +111,7 @@ export const HelpPopover = () => {
             )}
             <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
               <a
-                href={`${DOCS_URL}/guides/platform/troubleshooting`}
+                href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
                 target="_blank"
                 rel="noreferrer"
               >
