@@ -6,7 +6,7 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { DatePicker } from 'components/ui/DatePicker/DatePicker'
+import { DatePicker } from 'components/ui/DatePicker'
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Button,

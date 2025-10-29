@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { UnifiedLogs } from 'components/interfaces/UnifiedLogs/UnifiedLogs'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ProjectLayout } from 'components/layouts/ProjectLayout/ProjectLayout'
+import { ProjectLayout } from 'components/layouts/ProjectLayout'
 import { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {

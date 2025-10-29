@@ -11,7 +11,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { RealtimeConfig } from '../useRealtimeMessages'
+import { RealtimeConfig } from './useRealtimeMessages'
 
 interface RealtimeTokensPopoverProps {
   config: RealtimeConfig

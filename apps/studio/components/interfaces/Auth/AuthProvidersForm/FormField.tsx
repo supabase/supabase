@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { DatePicker } from 'components/ui/DatePicker/DatePicker'
+import { DatePicker } from 'components/ui/DatePicker'
 import { BASE_PATH } from 'lib/constants'
 import { Button, Input, InputNumber, Listbox, Toggle } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
