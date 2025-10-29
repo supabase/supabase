@@ -1,4 +1,4 @@
-import { ChevronDown, Download } from 'lucide-react'
+import { ChevronDown, Download, ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -121,7 +121,7 @@ export const PauseDisabledState = () => {
         className="mb-0 rounded-none border-0 px-6"
         title="Project can no longer be restored through the dashboard"
       >
-        <p className="!leading-normal">
+        <p className="!leading-normal !mb-3">
           This project has been paused for over{' '}
           <span className="text-foreground">
             {pauseStatus?.max_days_till_restore_disabled ?? 90} days
@@ -130,21 +130,33 @@ export const PauseDisabledState = () => {
           downloaded as a backup.
         </p>
 
-        <p className="!leading-normal">
-          You may also opt to{' '}
-          <InlineLink
-            href={`${DOCS_URL}/guides/platform/migrating-within-supabase/dashboard-restore`}
-          >
-            restore the backup to a new Supabase project
-          </InlineLink>
-          , or{' '}
-          <InlineLink href={`${DOCS_URL}/guides/local-development/restoring-downloaded-backup`}>
-            restore the backup on your local machine
-          </InlineLink>
-          .
-        </p>
+        <div>
+          <p className="!leading-normal !mb-1">Recovery options:</p>
+          <ul className="flex flex-col gap-y-0.5">
+            <li className="flex items-center gap-x-2">
+              <ExternalLink size={14} />
+              <InlineLink
+                href={`${DOCS_URL}/guides/platform/migrating-within-supabase/dashboard-restore`}
+              >
+                Restore the backup to a new Supabase project
+              </InlineLink>
+            </li>
+            <li className="flex items-center gap-x-2">
+              <ExternalLink size={14} />
+              <InlineLink href={`${DOCS_URL}/guides/local-development/restoring-downloaded-backup`}>
+                Restore the backup on your local machine
+              </InlineLink>
+            </li>
+          </ul>
+        </div>
       </Admonition>
-      <div className="border-t flex justify-end p-4 bg-alternative">
+      <div className="border-t flex justify-between items-center px-6 py-4 bg-alternative">
+        <div>
+          <p className="text-sm">Export your data</p>
+          <p className="text-sm text-foreground-lighter">
+            Download backups for your database and storage objects
+          </p>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="default" icon={<Download />} iconRight={<ChevronDown />}>

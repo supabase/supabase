@@ -69,7 +69,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     data: pauseStatus,
     error: pauseStatusError,
     isError,
-    isSuccess,
+    isSuccess: isPauseStatusSuccess,
     isLoading,
   } = useProjectPauseStatusQuery({ ref }, { enabled: project?.status === PROJECT_STATUS.INACTIVE })
 
@@ -79,7 +79,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     0
 
   const isFreePlan = selectedOrganization?.plan?.id === 'free'
-  const isRestoreDisabled = isSuccess && !pauseStatus.can_restore
+  const isRestoreDisabled = isPauseStatusSuccess && !pauseStatus.can_restore
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
@@ -141,7 +141,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   return (
     <>
-      <Card className="w-[36rem] max-w-xl mx-auto">
+      <Card className="w-[40rem] mx-auto">
         <CardContent>
           <PauseCircle
             size={48}
@@ -150,13 +150,11 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
           />
           <div className="flex-1">
             <div>
-              <h3 className="heading-subSection mb-2">
-                The project "{project?.name}" is currently paused
-              </h3>
-              <div className="body-default text-foreground-light max-w-4xl">
+              <h2 className="mb-4">The project "{project?.name}" is currently paused</h2>
+              <div className="text-foreground-light max-w-4xl">
                 {isLoading && <GenericSkeletonLoader className="mt-3" />}
 
-                {isSuccess && !isRestoreDisabled ? (
+                {isPauseStatusSuccess && !isRestoreDisabled ? (
                   isFreePlan ? (
                     <>
                       <p className="text-sm">
@@ -226,7 +224,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
           />
         )}
 
-        {isSuccess && !isRestoreDisabled && (
+        {isPauseStatusSuccess && !isRestoreDisabled && (
           <CardFooter className="flex justify-end items-center gap-x-2">
             <ButtonTooltip
               size="tiny"
@@ -261,7 +259,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
           </CardFooter>
         )}
 
-        {isSuccess && isRestoreDisabled && <PauseDisabledState />}
+        {isPauseStatusSuccess && isRestoreDisabled && <PauseDisabledState />}
       </Card>
 
       <ConfirmationModal
