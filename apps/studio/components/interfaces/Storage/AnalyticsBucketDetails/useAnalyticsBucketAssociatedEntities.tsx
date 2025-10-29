@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { FDW } from 'data/fdw/fdws-query'
@@ -14,7 +15,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   getAnalyticsBucketPublicationName,
   getAnalyticsBucketS3KeyName,
-} from './AnalyticBucketDetails.utils'
+} from './AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 
 /**
@@ -25,6 +26,10 @@ export const useAnalyticsBucketAssociatedEntities = (
   { projectRef, bucketId }: { projectRef?: string; bucketId: string },
   options: { enabled: boolean } = { enabled: true }
 ) => {
+  // [Joshen] Opting to skip cleaning up ETL related entities within old UI
+  // Also to prevent an unnecessary call to /sources for existing UI
+  const isStorageV2 = useIsNewStorageUIEnabled()
+
   const { can: canReadS3Credentials } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_READ,
     '*'
@@ -45,11 +50,14 @@ export const useAnalyticsBucketAssociatedEntities = (
 
   const { data: sourcesData } = useReplicationSourcesQuery(
     { projectRef },
-    { enabled: options.enabled }
+    { enabled: isStorageV2 && options.enabled }
   )
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
-  const { data: publications = [] } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  const { data: publications = [] } = useReplicationPublicationsQuery(
+    { projectRef, sourceId },
+    { enabled: options.enabled }
+  )
   const publication = publications.find(
     (p) => p.name === getAnalyticsBucketPublicationName(bucketId)
   )

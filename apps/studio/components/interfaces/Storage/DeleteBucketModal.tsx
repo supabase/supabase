@@ -33,7 +33,7 @@ import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewCo
 import {
   useAnalyticsBucketAssociatedEntities,
   useAnalyticsBucketDeleteCleanUp,
-} from './AnalyticBucketDetails/useAnalyticsBucketAssociatedEntities'
+} from './AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 import { formatPoliciesForStorage } from './Storage.utils'
 
 export interface DeleteBucketModalProps {

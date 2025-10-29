@@ -37,7 +37,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useIcebergWrapperExtension } from './AnalyticBucketDetails/useIcebergWrapper'
+import { useIcebergWrapperExtension } from './AnalyticsBucketDetails/useIcebergWrapper'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { BUCKET_TYPES } from './Storage.constants'
 

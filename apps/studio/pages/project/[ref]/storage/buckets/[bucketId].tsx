@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 
-import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticBucketDetails'
+import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBucketDetails'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
 import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'

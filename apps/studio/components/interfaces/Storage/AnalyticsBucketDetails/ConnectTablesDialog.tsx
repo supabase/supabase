@@ -37,7 +37,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { convertKVStringArrayToJson } from '../../Integrations/Wrappers/Wrappers.utils'
 import { getCatalogURI } from '../StorageSettings/StorageSettings.utils'
-import { getAnalyticsBucketPublicationName } from './AnalyticBucketDetails.utils'
+import { getAnalyticsBucketPublicationName } from './AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 
 /**
