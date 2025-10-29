@@ -162,7 +162,7 @@ Avoid loading entire files or responses into memory. Stream data to reduce memor
 ```typescript
 // Stream responses instead of buffering
 return new Response(readableStream, {
-  headers: { 'Content-Type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' },
 })
 ```
 
@@ -237,11 +237,11 @@ addEventListener('unload', () => {
 
 Use this quick reference when investigating shutdown issues:
 
-| Shutdown Reason | Primary Action |
-|----------------|----------------|
-| Many `Memory` shutdowns | Switch to streaming; process data in chunks; investigate heap vs external allocations |
-| Many `CPUTime` shutdowns | Optimize algorithms; cache results; move heavy compute to background workers |
-| Many `WallClockTime` shutdowns | Reduce I/O waits; use async operations; break into smaller functions |
+| Shutdown Reason                                | Primary Action                                                                          |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Many `Memory` shutdowns                        | Switch to streaming; process data in chunks; investigate heap vs external allocations   |
+| Many `CPUTime` shutdowns                       | Optimize algorithms; cache results; move heavy compute to background workers            |
+| Many `WallClockTime` shutdowns                 | Reduce I/O waits; use async operations; break into smaller functions                    |
 | Frequent `EarlyDrop` or `TerminationRequested` | Check platform scaling policies; review deployment logs; implement better checkpointing |
 
 ## Additional resources
