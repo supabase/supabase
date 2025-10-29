@@ -1842,7 +1842,6 @@ export const storage: NavMenuConstant = {
         },
       ],
     },
-    { name: 'Vector', url: '/guides/storage/vector' },
     {
       name: 'Bucket types',
       items: [
