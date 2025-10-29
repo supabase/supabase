@@ -125,6 +125,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       if (organization_slug) {
         const preselected = organizations.find(({ slug }) => slug === organization_slug)?.slug
         if (preselected) form.setValue('selectedOrgSlug', preselected)
+      } else if (!form.getValues('selectedOrgSlug') && organizations.length === 1) {
+        // If user only has one organization and none pre-selected via URL, default to it
+        form.setValue('selectedOrgSlug', organizations[0].slug)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
