@@ -1,7 +1,7 @@
 ---
 title: 'Connecting to Analytics Buckets'
 ---
-
+{/* Is this still the case? */}
 <Admonition type="caution">
 
 This feature is in **Private Alpha**. API stability and backward compatibility are not guaranteed at this stage. Reach out from this [Form](https://forms.supabase.com/analytics-buckets) to request access
@@ -20,10 +20,10 @@ The **Iceberg REST Catalog** acts as the central management system for Iceberg t
 The REST Catalog itself does not store the actual data. Instead, it stores metadata describing the structure, schema, and partitioning strategy of Iceberg tables.
 
 Actual data storage and retrieval operations occur through the separate S3-compatible endpoint, optimized for reading and writing large analytical datasets stored in Parquet files.
-
+{/* Anything changed here? */}
 ## Authentication
 
-To connect to an Analytics Bucket, you will need
+To connect to an Analytics Bucket, you need
 
 - An Iceberg client (Spark, PyIceberg, etc) which supports the REST Catalog interface.
 - S3 credentials to authenticate your Iceberg client with the underlying S3 Bucket.
@@ -32,19 +32,19 @@ To connect to an Analytics Bucket, you will need
 - The project reference and Service key for your Supabase project.
   You can find your Service key in the Supabase Dashboard under [**Project Settings > API**.](/dashboard/project/_/settings/api-keys)
 
-You will now have an **Access Key** and a **Secret Key** that you can use to authenticate your Iceberg client.
+You now have an **Access Key** and a **Secret Key** that you can use to authenticate your Iceberg client.
 
 ## Connecting via PyIceberg
 
 PyIceberg is a Python client for Apache Iceberg, facilitating interaction with Iceberg Buckets.
 
-**Installation**
+### Installation
 
 ```bash
 pip install pyiceberg pyarrow
 ```
 
-Here's a comprehensive example using PyIceberg with clearly separated configuration:
+Here's a comprehensive example using PyIceberg with separated configuration:
 
 ```python
 from pyiceberg.catalog import load_catalog
