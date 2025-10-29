@@ -1,5 +1,4 @@
 import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -10,7 +9,6 @@ import Panel from 'components/ui/Panel'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -36,8 +34,6 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
-  const { data: org } = useSelectedOrganizationQuery()
-
   const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
   const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
 
@@ -71,17 +67,7 @@ export function LogDrains({
   })
 
   if (!orgPlanLoading && !logDrainsEnabled) {
-    return (
-      // <CardButton
-      //   title="Upgrade to a Team Plan"
-      //   description="Upgrade to a Team or Enterprise Plan to use Log Drains"
-      // >
-      //   <Button className="mt-2" asChild>
-      //     <Link href={`/org/${org?.slug}/billing`}>Upgrade to Team</Link>
-      //   </Button>
-      // </CardButton>
-      <LogDrainsEmpty />
-    )
+    return <LogDrainsEmpty />
   }
 
   if (isLoading || orgPlanLoading) {
