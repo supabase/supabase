@@ -18,6 +18,7 @@ import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespac
 import { useTablesQuery } from 'data/tables/tables-query'
 import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { snakeCase } from 'lodash'
 import {
   Button,
   Dialog,
@@ -161,7 +162,7 @@ export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => 
         s3SecretAccessKey,
         s3Region,
       }
-      const destinationName = `${bucket.id}_destination`
+      const destinationName = `${snakeCase(bucket.id)}_destination`
 
       const { pipeline_id: pipelineId } = await createDestinationPipeline({
         projectRef,
