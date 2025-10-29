@@ -60,7 +60,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/ukFtCkww_400x400.jpg',
   },
   {
-    text: 'Lately been using Supabase over AWS/ GCP for products to save on costs and rapid builds(Vibe Code) that do not need all the Infra and the hefty costs that come with AWS/ GCP out the door. Great solution overall. Love the new Feature stack thats implemented',
+    text: 'Lately been using Supabase over AWS/ GCP for products to save on costs and rapid builds(Vibe Code) that do not need all the Infra and the hefty costs that come with AWS/ GCP out the door. Great solution overall.',
     url: 'https://x.com/xthemadgeniusx/status/1960049950110384250',
     handle: 'xthemadgeniusx',
     img_url: '/images/twitter-profiles/XE8Oyngj_400x400.jpg',
@@ -78,7 +78,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/GtrVV2dD_400x400.jpg',
   },
   {
-    text: '@supabase is just 🤯 Now I see why a lot of people love using it as a backend for their applications. I am really impressed with how easy it is to set up an Auth and then just code it together for the frontend. @IngoKpp now I see your joy with Supabase #coding #fullstackwebdev',
+    text: '@supabase is just 🤯 Now I see why a lot of people love using it as a backend for their applications. I am really impressed with how easy it is to set up an Auth and then just code it together for the frontend.',
     url: 'https://twitter.com/IxoyeDesign/status/1497473731777728512',
     handle: 'IxoyeDesign',
     img_url: '/images/twitter-profiles/C8opIL-g_400x400.jpg',
@@ -138,7 +138,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/rWX8Jzp5_400x400.jpg',
   },
   {
-    text: 'There are a lot of indie hackers building in public, but it’s rare to see a startup shipping as consistently and transparently as Supabase. Their upcoming March releases look to be 🔥 Def worth a follow! also opened my eyes as to how to value add in open source.',
+    text: 'There are a lot of indie hackers building in public, but it’s rare to see a startup shipping as consistently and transparently as Supabase. Their upcoming March releases look to be 🔥 Def worth a follow!',
     url: 'https://twitter.com/swyx/status/1366685025047994373',
     handle: 'swyx',
     img_url: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
@@ -162,7 +162,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/7NITI8Z3_400x400.jpg',
   },
   {
-    text: 'This community is STRONG and will continue to be the reason why developers flock to @supabase over an alternative. Keep up the good work! ⚡️',
+    text: 'This community is STRONG and will continue to be the reason why developers flock to @supabase over an alternative.',
     url: 'https://twitter.com/_wilhelm__/status/1524074865107488769',
     handle: '_wilhelm__',
     img_url: '/images/twitter-profiles/CvqDy6YF_400x400.jpg',
@@ -174,7 +174,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/bJlKtSxz_400x400.jpg',
   },
   {
-    text: '@supabase Putting a ton of well-explained example API queries in a self-building documentation is just a classy move all around. I also love having GraphQL-style nested queries with traditional SQL filtering. This is pure DX delight. A+++. #backend',
+    text: '@supabase Putting a ton of well-explained example API queries in a self-building documentation is just a classy move all around. I also love having GraphQL-style nested queries with traditional SQL filtering. This is pure DX delight. A+++.',
     url: 'https://twitter.com/CodiferousCoder/status/1522233113207836675',
     handle: 'CodiferousCoder',
     img_url: '/images/twitter-profiles/t37cVLwy_400x400.jpg',
