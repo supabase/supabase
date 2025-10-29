@@ -1,0 +1,85 @@
+export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
+  {
+    id: 'client-to-realtime-connections',
+    label: 'Realtime connections',
+    valuePrecision: 2,
+    hide: false,
+    showTooltip: false,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    titleTooltip: '',
+    attributes: [
+      {
+        attribute: 'realtime_connections_connected',
+        provider: 'infra-monitoring',
+        label: 'Connections',
+      },
+    ],
+  },
+  {
+    id: 'channel-events',
+    label: 'Channel Events',
+    valuePrecision: 2,
+    hide: false,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    attributes: [
+      {
+        attribute: 'realtime_channel_events',
+        provider: 'infra-monitoring',
+        label: 'Broadcast',
+      },
+      {
+        attribute: 'realtime_channel_db_events',
+        provider: 'infra-monitoring',
+        label: 'Postgres Changes',
+      },
+      {
+        attribute: 'realtime_channel_presence_events',
+        provider: 'infra-monitoring',
+        label: 'Presence',
+      },
+    ],
+  },
+  // {
+  //   id: 'channel-presence-events',
+  //   label: 'Channel Presence Events',
+  //   valuePrecision: 2,
+  //   hide: false,
+  //   showTooltip: false,
+  //   showLegend: false,
+  //   showMaxValue: false,
+  //   hideChartType: false,
+  //   defaultChartStyle: 'bar',
+  //   attributes: [
+  //     {
+  //       attribute: 'realtime_channel_presence_events',
+  //       provider: 'infra-monitoring',
+  //       label: 'Presence',
+  //     },
+  //   ],
+  // },
+  {
+    id: 'realtime_rate_of_channel_joins',
+    label: 'Rate of Channel Joins',
+    valuePrecision: 2,
+    hide: false,
+    showTooltip: false,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    attributes: [
+      {
+        attribute: 'realtime_channel_joins',
+        provider: 'infra-monitoring',
+        label: 'Presence',
+      },
+    ],
+  },
+]

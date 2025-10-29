@@ -7,13 +7,17 @@ subtitle: 'Set up redirect urls with Supabase Auth.'
 
 ## Overview
 
+Supabase Auth allows your application to receive a [user session](/docs/guides/auth/sessions) on web pages or in mobile apps that only you allow.
+
 When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library methods provide a `redirectTo` parameter to specify where to redirect the user to after authentication. By default, the user will be redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls) but you can modify the `SITE_URL` or add additional redirect URLs to the allow list. Once you've added necessary URLs to the allow list, you can specify the URL you want the user to be redirected to in the `redirectTo` parameter.
+
+When using [Sign in with Web3](/docs/guides/auth/auth-web3) the message signed by the user in the Web3 wallet application will indicate the URL on which the signature took place. Supabase Auth will reject messages that are signed for URLs that have not been allowed.
 
 To edit the allow list, go to the [URL Configuration](/dashboard/project/_/auth/url-configuration) page. In local development or self-hosted projects, use the [configuration file](/docs/guides/cli/config#auth.additional_redirect_urls).
 
 ## Use wildcards in redirect URLs
 
-Supabase allows you to specify wildcards when adding redirect URLs to the [allow list](https://supabase.com/dashboard/project/_/auth/url-configuration). You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel.
+Supabase allows you to specify wildcards when adding redirect URLs to the [allow list](/dashboard/project/_/auth/url-configuration). You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel.
 
 | Wildcard                 | Description                                                                                                                                |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |

@@ -1,10 +1,10 @@
-import { useState } from 'react'
 import { PostgresTable } from '@supabase/postgres-meta'
+import { useState } from 'react'
 
 import { useParams } from 'common'
-import { TableList } from 'components/interfaces/Database'
-import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
+import { TableList } from 'components/interfaces/Database/Tables/TableList'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'

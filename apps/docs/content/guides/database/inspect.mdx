@@ -108,7 +108,7 @@ Following commands require `pg_stat_statements` to be enabled: calls, locks, cac
 
 When using `pg_stat_statements` also take note that it only stores the latest 5,000 statements. Moreover, consider resetting the analysis after optimizing any queries by running `select pg_stat_statements_reset();`
 
-Learn more about pg_stats [here](https://supabase.com/docs/guides/database/extensions/pg_stat_statements).
+Learn more about pg_stats [here](/docs/guides/database/extensions/pg_stat_statements).
 
 ## Using SQL
 
@@ -240,7 +240,7 @@ from pg_statio_user_tables;
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
 
-If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](https://supabase.com/dashboard/project/_/settings/compute-and-disk).
+If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](/dashboard/project/_/settings/compute-and-disk).
 
 ### Optimizing poor performing queries
 

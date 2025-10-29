@@ -1,0 +1,65 @@
+---
+title: 'OrioleDB Patent: now freely available to the Postgres community'
+description: 'Supabase is explicitly making available a non-exclusive license of the OrioleDB patent to all OrioleDB users in accordance with the OrioleDB license.'
+author: paul_copplestone
+image: 2025-09-orioledb-patent/og.png
+thumb: 2025-09-orioledb-patent/thumb.png
+categories:
+  - postgres
+tags:
+  - postgres
+  - orioledb
+date: '2025-09-09:08:00'
+toc_depth: 2
+---
+
+We [announced](/blog/supabase-acquires-oriole) the acquisition of OrioleDB over a year ago. Since then, we have been working on cleaning up the legal structure and finalizing the asset transfers. We have now wrapped up all legal activities, and we fully own US Patent [10,325,030](https://patents.google.com/patent/US10325030B2/) (“Durable multiversion B+-tree”).
+
+**Today, Supabase is explicitly making available a non-exclusive license of U.S. Patent No. 10,325,030 to all OrioleDB users (including proprietary forks) in accordance with the OrioleDB license.**
+
+## Background: what is OrioleDB?
+
+[OrioleDB](https://www.orioledb.com) is a storage extension for Postgres which uses PostgreSQL's pluggable storage system. It is designed to be a drop-in replacement for PostgreSQL's existing storage engine. OrioleDB is built to take advantage of modern hardware and cloud infrastructure, providing better performance and scalability for Postgres workloads.
+
+OrioleDB [benchmarks](https://www.orioledb.com/blog/orioledb-beta12-benchmarks) show that it is around 5.5x faster than Heap (TPC-C, 500 warehouses):
+
+<Img
+  alt="OrioleDB Benchmarks"
+  src={{
+    dark: '/images/blog/2025-09-orioledb-patent/orioledb-benchmark-dark.png',
+    light: '/images/blog/2025-09-orioledb-patent/orioledb-benchmark-light.png',
+  }}
+/>
+
+Supabase are working with the OrioleDB team to develop a high-performance storage engine for Postgres and push the state of the art with a Postgres-first mindset.
+
+## Open Source, Open Contribution
+
+OrioleDB will continue as an [open source project](https://github.com/orioledb/orioledb) with an open contribution model. Whether you’re running Postgres in production, building tools on top of it, or just curious about storage engines, you’re invited to contribute issues, tests, docs, and code. Our goals are:
+
+- Develop OrioleDB as a drop-in storage engine for Postgres via the Table Access Method APIs.
+- Collaborate with the Postgres community to minimize and upstream [the changes](https://www.orioledb.com/docs#patch-set) needed so OrioleDB can run as a Postgres extension.
+
+## License compatibility with Postgres
+
+[OrioleDB License](https://github.com/orioledb/orioledb?tab=Apache-2.0-1-ov-file#readme) is now Apache 2.0. This license is quite similar to [PostgreSQL License](https://github.com/postgres/postgres?tab=License-1-ov-file), but explicitly grants patent usage. With this change, Supabase is making available a non-exclusive license of U.S. Patent (“Durable multiversion B+-tree”) to all OrioleDB users, including proprietary forks. The patent is intended as a shield, not a sword, to protect Open Source from hostile IP claims.
+
+## **Aligned with Postgres**
+
+The intention of OrioleDB is not to compete with Postgres, but to make Postgres better. We believe the right long-term home for OrioleDB is inside Postgres itself. Our north star is to upstream what’s necessary so that OrioleDB can eventually be part of the Postgres source tree, developed and maintained in the open alongside the rest of Postgres.
+
+## What’s next
+
+- **Upstreaming & standardization.** Continue collaborating on the patches required for storage-engine flexibility, with an eye toward running on stock Postgres.
+- **Performance & stability.** A steady cadence of benchmarks, fixes, and features aimed at production workloads.
+- **Docs & onboarding.** Clearer docs and guides so teams can evaluate and adopt OrioleDB quickly.
+
+## How to get involved
+
+- Share [benchmarks](https://www.orioledb.com/blog/orioledb-beta12-benchmarks), migration notes, and production feedback.
+- Join technical discussions around pluggable storage and Postgres patching efforts in the Postgres mailing lists.
+- [Try OrioleDB](https://www.orioledb.com/docs/usage/getting-started), kick the tires, and [open issues or PRs](https://github.com/orioledb/orioledb)
+
+```bash
+docker run -d --name orioledb -p 5432:5432 orioledb/orioledb
+```

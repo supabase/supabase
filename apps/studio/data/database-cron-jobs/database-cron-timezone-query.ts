@@ -5,7 +5,7 @@ import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabaseCronTimezone({
@@ -28,11 +28,9 @@ export const useCronTimezoneQuery = <TData = string>(
   { projectRef, connectionString }: DatabaseCronJobsVariables,
   { enabled = true, ...options }: UseQueryOptions<string, DatabaseCronJobError, TData> = {}
 ) =>
-  useQuery<string, DatabaseCronJobError, TData>(
-    databaseCronJobsKeys.timezone(projectRef),
-    () => getDatabaseCronTimezone({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<string, DatabaseCronJobError, TData>({
+    queryKey: databaseCronJobsKeys.timezone(projectRef),
+    queryFn: () => getDatabaseCronTimezone({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

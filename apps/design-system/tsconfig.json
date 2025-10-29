@@ -12,7 +12,7 @@
     "incremental": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -20,7 +20,8 @@
     "paths": {
       "@/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"], // handle ui package paths
-      "contentlayer/generated": ["./.contentlayer/generated"]
+      "contentlayer/generated": ["./.contentlayer/generated"],
+      "icons/*": ["./../../packages/icons/*"]
     },
     "plugins": [
       {

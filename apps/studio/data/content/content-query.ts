@@ -5,7 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import type { Dashboards, LogSqlSnippets, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
 
-export type ContentBase = components['schemas']['GetUserContentObject']
+export type ContentBase = components['schemas']['GetUserContentResponse']['data'][number]
 
 export type Content = Omit<ContentBase, 'content' | 'type'> &
   (
@@ -61,8 +61,9 @@ export const useContentQuery = <TData = ContentData>(
   { projectRef, type, name, limit }: GetContentVariables,
   { enabled = true, ...options }: UseQueryOptions<ContentData, ContentError, TData> = {}
 ) =>
-  useQuery<ContentData, ContentError, TData>(
-    contentKeys.list(projectRef, { type, name, limit }),
-    ({ signal }) => getContent({ projectRef, type, name, limit }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ContentData, ContentError, TData>({
+    queryKey: contentKeys.list(projectRef, { type, name, limit }),
+    queryFn: ({ signal }) => getContent({ projectRef, type, name, limit }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -2,47 +2,119 @@
 id: 'functions-status-codes'
 title: 'Status codes'
 description: 'Edge Functions can return following status codes.'
-subtitle: 'Edge Functions can return following status codes.'
+subtitle: 'Understand HTTP status codes returned by Edge Functions to properly debug issues and handle responses.'
 ---
 
 {/* supa-mdx-lint-disable Rule001HeadingCase */}
 
-## 2XX Success
+## Success Responses
 
-A successful Edge Function Response
+### 2XX Success
 
-## 3XX Redirect
+Your Edge Function executed successfully and returned a valid response. This includes any status code in the 200-299 range that your function explicitly returns.
 
-The Edge Function has responded with a `Response.redirect` [API docs](https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static)
+### 3XX Redirect
 
-## 4XX Client Errors
+Your Edge Function used the `Response.redirect()` API to redirect the client to a different URL. This is a normal response when implementing authentication flows or URL forwarding.
+
+---
+
+## Client Errors
+
+These errors indicate issues with the request itself, which typically require changing how the function is called.
 
 ### 401 Unauthorized
 
-If the Edge Function has `Verify JWT` option enabled, but the request was made with an invalid JWT.
+**Cause:** The Edge Function has JWT verification enabled, but the request was made with an invalid or missing JWT token.
+
+**Solution:**
+
+- Ensure you're passing a valid JWT token in the `Authorization` header
+- Check that your token hasn't expired
+- For webhooks or public endpoints, consider disabling JWT verification
 
 ### 404 Not Found
 
-Requested Edge Function was not found.
+**Cause:** The requested Edge Function doesn't exist or the URL path is incorrect.
+
+**Solution:**
+
+- Verify the function name and project reference in your request URL
+- Check that the function has been deployed successfully
 
 ### 405 Method Not Allowed
 
-Edge Functions only support these HTTP methods: 'POST', 'GET', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'
+**Cause:** You're using an unsupported HTTP method. Edge Functions only support: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`.
 
-## 5XX Server Errors
+**Solution:** Update your request to use a supported HTTP method.
+
+---
+
+## Server Errors
+
+These errors indicate issues with the function execution or underlying platform.
 
 ### 500 Internal Server Error
 
-Edge Function threw an uncaught exception (`WORKER_ERROR`). Check Edge Function logs to find the cause.
+**Cause:** Your Edge Function threw an uncaught exception (`WORKER_ERROR`).
+
+**Common causes:**
+
+- Unhandled JavaScript errors in your function code
+- Missing error handling for async operations
+- Invalid JSON parsing
+
+**Solution:** Check your Edge Function logs to identify the specific error and add proper error handling to your code.
+
+```tsx
+// ✅ Good error handling
+try {
+  const result = await someAsyncOperation()
+  return new Response(JSON.stringify(result))
+} catch (error) {
+  console.error('Function error:', error)
+  return new Response('Internal error', { status: 500 })
+}
+```
+
+You can see the output in the [Edge Function Logs](/docs/guides/functions/logging).
 
 ### 503 Service Unavailable
 
-Edge Function failed to start (`BOOT_ERROR`). Check Edge Function logs to find the cause.
+**Cause:** Your Edge Function failed to start (`BOOT_ERROR`).
+
+**Common causes:**
+
+- Syntax errors preventing the function from loading
+- Import errors or missing dependencies
+- Invalid function configuration
+
+**Solution:** Check your Edge Function logs and verify your function code can be executed locally with `supabase functions serve`.
 
 ### 504 Gateway Timeout
 
-Edge Function didn't respond before the [request idle timeout](/docs/guides/functions/limits).
+**Cause:** Your Edge Function didn't respond within the [request timeout limit](/docs/guides/functions/limits).
+
+**Common causes:**
+
+- Long-running database queries
+- Slow external API calls
+- Infinite loops or blocking operations
+
+**Solution:**
+
+- Optimize slow operations
+- Add timeout handling to external requests
+- Consider breaking large operations into smaller chunks
 
 ### 546 Resource Limit (Custom Error Code)
 
-Edge Function execution was stopped due to a resource limit (`WORKER_LIMIT`). Edge Function logs should provide which [resource limit](/docs/guides/functions/limits) was exceeded.
+**Cause:** Your Edge Function execution was stopped due to exceeding resource limits (`WORKER_LIMIT`). Edge Function logs should provide which [resource limit](/docs/guides/functions/limits) was exceeded.
+
+**Common causes:**
+
+- Memory usage exceeded available limits
+- CPU time exceeded execution quotas
+- Too many concurrent operations
+
+**Solution:** Check your Edge Function logs to see which resource limit was exceeded, then optimize your function accordingly.

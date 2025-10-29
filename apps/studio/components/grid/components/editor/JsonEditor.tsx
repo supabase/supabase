@@ -4,13 +4,12 @@ import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
@@ -52,18 +51,15 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   onRowChange,
   onExpandEditor,
 }: JsonEditorProps<TRow, TSummaryRow>) => {
-  const snap = useTableEditorTableStateSnapshot()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-
-  const gridColumn = snap.gridColumns.find((x) => x.name == column.key)
 
   const rawInitialValue = row[column.key as keyof TRow] as unknown
   const initialValue =
@@ -73,19 +69,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
 
   const jsonString = prettifyJSON(initialValue ? tryFormatInitialValue(initialValue) : '')
 
-  const isTruncated =
-    (typeof initialValue === 'string' &&
-      initialValue.endsWith('...') &&
-      initialValue.length > MAX_CHARACTERS) ||
-    // if the value is an array which total representation is > MAX_CHARACTERS
-    // we'll select the first MAX_ARRAY_SIZE elements and add a "..." last element at the end of it
-    (typeof initialValue === 'string' &&
-      // If the string represent an array finishing with "..." element
-      initialValue.startsWith('["') &&
-      initialValue.endsWith(',"..."]') &&
-      // If the array have MAX_ARRAY_SIZE elements in it
-      // its a large truncated array
-      (initialValue.match(/","/g) || []).length === MAX_ARRAY_SIZE)
+  const isTruncated = isValueTruncated(initialValue)
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(jsonString)
 
@@ -173,13 +157,13 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       overlay={
         isTruncated && !isSuccess ? (
           <div
-            style={{ width: `${gridColumn?.width || column.width}px` }}
+            style={{ width: `${column.width}px` }}
             className="flex items-center justify-center flex-col relative"
           >
             <MonacoEditor
               readOnly
               onChange={() => {}}
-              width={`${gridColumn?.width || column.width}px`}
+              width={`${column.width}px`}
               value={value ?? ''}
               language="markdown"
             />
@@ -188,7 +172,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
             <MonacoEditor
-              width={`${gridColumn?.width || column.width}px`}
+              width={`${column.width}px`}
               value={value ?? ''}
               language="json"
               readOnly={!isEditable}

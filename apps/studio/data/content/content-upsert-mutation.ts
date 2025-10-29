@@ -7,10 +7,7 @@ import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type UpsertContentPayload = Omit<
-  components['schemas']['UpsertContentBodyDto'],
-  'content'
-> & {
+export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
   content: Partial<Content['content']>
 }
 
@@ -49,24 +46,25 @@ export const useContentUpsertMutation = ({
 } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpsertContentData, ResponseError, UpsertContentVariables>(
-    (args) => upsertContent(args),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        if (invalidateQueriesOnSuccess) {
-          await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
-        }
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to insert content: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UpsertContentData, ResponseError, UpsertContentVariables>({
+    mutationFn: (args) => upsertContent(args),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      if (invalidateQueriesOnSuccess) {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: contentKeys.allContentLists(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: contentKeys.infiniteList(projectRef) }),
+        ])
+      }
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to insert content: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

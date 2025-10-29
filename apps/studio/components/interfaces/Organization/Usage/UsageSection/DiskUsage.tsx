@@ -1,28 +1,29 @@
-import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import SectionContent from '../SectionContent'
-import { CategoryAttribute } from '../Usage.constants'
-import { useOrgProjectsQuery } from 'data/projects/org-projects'
-import { PROJECT_STATUS } from 'lib/constants'
-import {
-  Button,
-  Alert_Shadcn_,
-  CriticalIcon,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
-} from 'ui'
 import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+
+import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import { OrgUsageResponse } from 'data/usage/org-usage-query'
+import { PROJECT_STATUS } from 'lib/constants'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  CriticalIcon,
+} from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { SectionContent } from '../SectionContent'
+import { CategoryAttribute } from '../Usage.constants'
 
 export interface DiskUsageProps {
   slug: string
-  projectRef?: string
+  projectRef?: string | null
   attribute: CategoryAttribute
   subscription?: OrgSubscription
   usage?: OrgUsageResponse
@@ -30,7 +31,7 @@ export interface DiskUsageProps {
   currentBillingCycleSelected: boolean
 }
 
-const DiskUsage = ({
+export const DiskUsage = ({
   slug,
   projectRef,
   attribute,
@@ -38,24 +39,15 @@ const DiskUsage = ({
   usage,
   currentBillingCycleSelected,
 }: DiskUsageProps) => {
-  const {
-    data: diskUsage,
-    isError,
-    isLoading,
-    isSuccess,
-    error,
-  } = useOrgProjectsQuery(
-    {
-      orgSlug: slug,
-    },
-    {
-      enabled: currentBillingCycleSelected,
-    }
+  const { data, isError, isLoading, isSuccess, error } = useOrgProjectsInfiniteQuery(
+    { slug },
+    { enabled: currentBillingCycleSelected }
   )
+  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
 
   const relevantProjects = useMemo(() => {
-    return diskUsage
-      ? diskUsage.projects
+    return isSuccess
+      ? projects
           .filter((project) => {
             // We do want to show branches that are exceeding the 8 GB limit, as people could have persistent or very long-living branches
             const isBranchExceedingFreeQuota =
@@ -71,7 +63,8 @@ const DiskUsage = ({
           })
           .filter((it) => it.ref === projectRef || !projectRef)
       : []
-  }, [diskUsage, projectRef])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, projects, projectRef])
 
   const hasProjectsExceedingDiskSize = useMemo(() => {
     return relevantProjects.some((it) =>
@@ -241,5 +234,3 @@ const DiskUsage = ({
     </div>
   )
 }
-
-export default DiskUsage

@@ -21,8 +21,8 @@ import {
 } from 'data/database-queues/database-queues-toggle-postgrest-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Form_Shadcn_,
@@ -38,8 +38,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
 export const QueuesSettings = () => {
-  const project = useSelectedProject()
-  const canUpdatePostgrestConfig = useCheckPermissions(
+  const { data: project } = useSelectedProjectQuery()
+  const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
@@ -138,6 +138,7 @@ export const QueuesSettings = () => {
             projectRef: project?.ref,
             connectionString: project?.connectionString,
             id: x.id,
+            name: x.name,
             schema: x.schema,
             payload: { id: x.id, rls_enabled: true },
           })

@@ -1,38 +1,36 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-
-import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggerDeleteVariables = {
-  id: number
+  trigger: {
+    id: number
+    name: string
+    schema: string
+    table: string
+  }
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
-type DeleteDatabaseTriggerResponse = PostgresTrigger & { error?: any }
-
 export async function deleteDatabaseTrigger({
-  id,
+  trigger,
   projectRef,
   connectionString,
 }: DatabaseTriggerDeleteVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql } = pgMeta.triggers.remove(trigger)
 
-  const { data, error } = await del('/platform/pg-meta/{ref}/triggers', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    headers,
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['trigger', 'delete', trigger.id],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type DatabaseTriggerDeleteData = Awaited<ReturnType<typeof deleteDatabaseTrigger>>
@@ -47,22 +45,20 @@ export const useDatabaseTriggerDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerDeleteData, ResponseError, DatabaseTriggerDeleteVariables>(
-    (vars) => deleteDatabaseTrigger(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete database trigger: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseTriggerDeleteData, ResponseError, DatabaseTriggerDeleteVariables>({
+    mutationFn: (vars) => deleteDatabaseTrigger(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseTriggerKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete database trigger: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

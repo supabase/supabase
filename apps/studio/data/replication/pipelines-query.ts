@@ -24,6 +24,7 @@ async function fetchReplicationPipelines(
 }
 
 export type ReplicationPipelinesData = Awaited<ReturnType<typeof fetchReplicationPipelines>>
+export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
 export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
   { projectRef }: ReplicationPipelinesParams,
@@ -32,8 +33,9 @@ export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
     ...options
   }: UseQueryOptions<ReplicationPipelinesData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelinesData, ResponseError, TData>(
-    replicationKeys.pipelines(projectRef),
-    ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ReplicationPipelinesData, ResponseError, TData>({
+    queryKey: replicationKeys.pipelines(projectRef),
+    queryFn: ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -16,7 +16,7 @@ export type OrganizationBillingSubscriptionPreviewResponse = {
     unit_price_desc?: string
     quantity?: number
     total_price: number
-    breakdown: {
+    breakdown?: {
       project_name: string
       project_ref: string
       usage: number
@@ -83,29 +83,26 @@ export const useOrganizationBillingSubscriptionPreview = <
     ...options
   }: UseQueryOptions<OrganizationBillingSubscriptionPreviewData, ResponseError, TData> = {}
 ) =>
-  useQuery<OrganizationBillingSubscriptionPreviewData, ResponseError, TData>(
-    organizationKeys.subscriptionPreview(organizationSlug, tier),
-    () => previewOrganizationBillingSubscription({ organizationSlug, tier }),
-    {
-      enabled: enabled && typeof organizationSlug !== 'undefined' && typeof tier !== 'undefined',
-      ...options,
-
-      retry: (failureCount, error) => {
-        // Don't retry on 400s
-        if (
-          typeof error === 'object' &&
-          error !== null &&
-          'code' in error &&
-          (error as any).code === 400
-        ) {
-          return false
-        }
-
-        if (failureCount < 3) {
-          return true
-        }
-
+  useQuery<OrganizationBillingSubscriptionPreviewData, ResponseError, TData>({
+    queryKey: organizationKeys.subscriptionPreview(organizationSlug, tier),
+    queryFn: () => previewOrganizationBillingSubscription({ organizationSlug, tier }),
+    enabled: enabled && typeof organizationSlug !== 'undefined' && typeof tier !== 'undefined',
+    ...options,
+    retry: (failureCount, error) => {
+      // Don't retry on 400s
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as any).code === 400
+      ) {
         return false
-      },
-    }
-  )
+      }
+
+      if (failureCount < 3) {
+        return true
+      }
+
+      return false
+    },
+  })

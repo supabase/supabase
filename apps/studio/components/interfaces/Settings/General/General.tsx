@@ -1,27 +1,25 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertCircle, BarChart2, ChevronRight } from 'lucide-react'
+import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   Form,
   Input,
   WarningIcon,
@@ -30,15 +28,22 @@ import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
 const General = () => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
-  const parentProject = useProjectByRef(project?.parent_project_ref)
+  // [Joshen] Need to refactor to use RHF so we don't need manual error handlers like this
+  const [nameError, setNameError] = useState<string>()
+
+  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
   const isBranch = parentProject !== undefined
+
+  const { projectSettingsRestartProject } = useIsFeatureEnabled([
+    'project_settings:restart_project',
+  ])
 
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+  const { can: canUpdateProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
     },
@@ -48,6 +53,11 @@ const General = () => {
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!project?.ref) return console.error('Ref is required')
+
+    if (values.name.length < 3) {
+      setNameError('Project name must be at least 3 characters long')
+      return
+    }
 
     updateProject(
       { ref: project.ref, name: values.name.trim() },
@@ -94,7 +104,10 @@ const General = () => {
                       form={formId}
                       isSubmitting={isUpdating}
                       hasChanges={hasChanges}
-                      handleReset={handleReset}
+                      handleReset={() => {
+                        handleReset()
+                        setNameError(undefined)
+                      }}
                       helper={
                         !canUpdateProject
                           ? "You need additional permissions to manage this project's settings"
@@ -111,6 +124,8 @@ const General = () => {
                       size="small"
                       label="Project name"
                       disabled={isBranch || !canUpdateProject}
+                      onChange={() => setNameError(undefined)}
+                      error={nameError}
                     />
                     <Input copy disabled id="ref" size="small" label="Project ID" />
                   </FormSectionContent>
@@ -125,9 +140,11 @@ const General = () => {
           <div className="mt-6" id="restart-project">
             <FormPanel>
               <div className="flex flex-col px-8 py-4">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm">Restart project</p>
+                    <p className="text-sm">
+                      {projectSettingsRestartProject ? 'Restart project' : 'Restart database'}
+                    </p>
                     <div className="max-w-[420px]">
                       <p className="text-sm text-foreground-light">
                         Your project will not be available for a few minutes.

@@ -1,6 +1,7 @@
+'use client'
+
 import React from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { ChevronRight, Sparkles } from 'lucide-react'
 
@@ -9,14 +10,12 @@ import { TextLink } from 'ui'
 import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
 import MenuItem from './MenuItem'
 
-import ComparisonsData from '~/data/Comparisons'
-import SolutionsData from '~/data/Solutions'
-import CustomersData from '~/data/CustomerStories'
-import MainProductsData from '~/data/MainProducts'
-import ProductModulesData from '~/data/ProductModules'
+import ComparisonsData from 'data/Comparisons'
+import CustomersData from 'data/CustomerStories'
+import MainProductsData from 'data/MainProducts'
+import ProductModulesData from 'data/ProductModules'
 
-const ProductDropdown = () => {
-  const { basePath } = useRouter()
+export const ProductDropdown = () => {
   const isTablet = useBreakpoint(1279)
 
   return (
@@ -143,7 +142,7 @@ const ProductDropdown = () => {
                   >
                     <div className="relative rounded-md bg-background border group-hover:border-foreground-muted/50 h-14 w-28 xl:h-14 xl:w-20 flex-shrink-0 overflow-auto">
                       <Image
-                        src={`${basePath}/${customer.imgUrl}`}
+                        src={`/${customer.imgUrl}`}
                         alt={customer.title}
                         fill
                         className="!p-3 object-contain brightness-70 contrast-[.35] filter"
@@ -178,27 +177,8 @@ const ProductDropdown = () => {
               ))}
             </ul>
           </div>
-          <div className="col-span-2">
-            <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-3">
-              {SolutionsData.label}
-            </p>
-            <ul className="flex flex-col gap-2">
-              {SolutionsData.solutions.map((link) => (
-                <li key={link.text}>
-                  <TextLink
-                    chevronAnimation="fadeIn"
-                    url={link.url}
-                    label={link.text}
-                    className="mt-0 hover:text-foreground focus-visible:text-foreground focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
     </div>
   )
 }
-
-export default ProductDropdown

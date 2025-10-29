@@ -3,6 +3,8 @@ import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import CodeSnippet from '../CodeSnippet'
 import Snippets from '../Snippets'
@@ -14,10 +16,14 @@ interface UserManagementProps {
   showApiKey: string
 }
 
-export default function UserManagement({ selectedLang, showApiKey }: UserManagementProps) {
+export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const keyToShow = showApiKey ? showApiKey : 'SUPABASE_KEY'
+
+  const { authenticationSignInProviders } = useIsFeatureEnabled([
+    'authentication:sign_in_providers',
+  ])
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const protocol = settings?.app_config?.protocol ?? 'https'
@@ -157,72 +163,76 @@ export default function UserManagement({ selectedLang, showApiKey }: UserManagem
         </article>
       </div>
 
-      <h2 className="doc-heading">Log in with Third Party OAuth</h2>
-      <div className="doc-section ">
-        <article className="code-column text-foreground">
-          <p>
-            Users can log in with Third Party OAuth like Google, Facebook, GitHub, and more. You
-            must first enable each of these in the Auth Providers settings{' '}
-            <span className="text-green-500">
-              <Link key={'AUTH'} href={`/project/${router.query.ref}/auth/providers`}>
-                here
-              </Link>
-            </span>{' '}
-            .
-          </p>
-          <p>
-            View all the available{' '}
-            <a
-              href="https://supabase.com/docs/guides/auth#providers"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Third Party OAuth providers
-            </a>
-          </p>
-          <p>
-            After they have logged in, all interactions using the Supabase JS client will be
-            performed as "that user".
-          </p>
-          <p>
-            Generate your Client ID and secret from:{` `}
-            <a
-              href="https://console.developers.google.com/apis/credentials"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Google
-            </a>
-            ,{` `}
-            <a href="https://github.com/settings/applications/new" target="_blank" rel="noreferrer">
-              GitHub
-            </a>
-            ,{` `}
-            <a href="https://gitlab.com/oauth/applications" target="_blank" rel="noreferrer">
-              GitLab
-            </a>
-            ,{` `}
-            <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">
-              Facebook
-            </a>
-            ,{` `}
-            <a
-              href="https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Bitbucket
-            </a>
-            .
-          </p>
-        </article>
-        <article className="code">
-          <CodeSnippet
-            selectedLang={selectedLang}
-            snippet={Snippets.authThirdPartyLogin(endpoint, keyToShow)}
-          />
-        </article>
-      </div>
+      {authenticationSignInProviders && (
+        <>
+          <h2 className="doc-heading">Log in with Third Party OAuth</h2>
+          <div className="doc-section ">
+            <article className="code-column text-foreground">
+              <p>
+                Users can log in with Third Party OAuth like Google, Facebook, GitHub, and more. You
+                must first enable each of these in the Auth Providers settings{' '}
+                <span className="text-green-500">
+                  <Link key={'AUTH'} href={`/project/${router.query.ref}/auth/providers`}>
+                    here
+                  </Link>
+                </span>{' '}
+                .
+              </p>
+              <p>
+                View all the available{' '}
+                <a href={`${DOCS_URL}/guides/auth#providers`} target="_blank" rel="noreferrer">
+                  Third Party OAuth providers
+                </a>
+              </p>
+              <p>
+                After they have logged in, all interactions using the Supabase JS client will be
+                performed as "that user".
+              </p>
+              <p>
+                Generate your Client ID and secret from:{` `}
+                <a
+                  href="https://console.developers.google.com/apis/credentials"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Google
+                </a>
+                ,{` `}
+                <a
+                  href="https://github.com/settings/applications/new"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  GitHub
+                </a>
+                ,{` `}
+                <a href="https://gitlab.com/oauth/applications" target="_blank" rel="noreferrer">
+                  GitLab
+                </a>
+                ,{` `}
+                <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">
+                  Facebook
+                </a>
+                ,{` `}
+                <a
+                  href="https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Bitbucket
+                </a>
+                .
+              </p>
+            </article>
+            <article className="code">
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.authThirdPartyLogin(endpoint, keyToShow)}
+              />
+            </article>
+          </div>
+        </>
+      )}
 
       <h2 className="doc-heading">User</h2>
       <div className="doc-section ">

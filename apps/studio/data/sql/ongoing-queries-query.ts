@@ -18,7 +18,7 @@ select pid, query, query_start from pg_stat_activity where state = 'active' and 
 
 export type OngoingQueriesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getOngoingQueries(
@@ -45,11 +45,9 @@ export const useOngoingQueriesQuery = <TData = OngoingQueriesData>(
     ...options
   }: UseQueryOptions<OngoingQueriesData, OngoingQueriesError, TData> = {}
 ) =>
-  useQuery<OngoingQueriesData, OngoingQueriesError, TData>(
-    sqlKeys.ongoingQueries(projectRef),
-    ({ signal }) => getOngoingQueries({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<OngoingQueriesData, OngoingQueriesError, TData>({
+    queryKey: sqlKeys.ongoingQueries(projectRef),
+    queryFn: ({ signal }) => getOngoingQueries({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

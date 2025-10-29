@@ -8,8 +8,10 @@ import { accessTokenKeys } from './keys'
 
 export type AccessTokenCreateVariables = components['schemas']['CreateAccessTokenBody']
 
-export async function createAccessToken({ name, scope }: AccessTokenCreateVariables) {
-  const { data, error } = await post('/platform/profile/access-tokens', { body: { name, scope } })
+export async function createAccessToken({ name, scope, expires_at }: AccessTokenCreateVariables) {
+  const { data, error } = await post('/platform/profile/access-tokens', {
+    body: { name, scope, expires_at },
+  })
 
   if (error) handleError(error)
 
@@ -30,22 +32,20 @@ export const useAccessTokenCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AccessTokenCreateData, ResponseError, AccessTokenCreateVariables>(
-    (vars) => createAccessToken(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(accessTokenKeys.list())
+  return useMutation<AccessTokenCreateData, ResponseError, AccessTokenCreateVariables>({
+    mutationFn: (vars) => createAccessToken(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({ queryKey: accessTokenKeys.list() })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create access token: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create access token: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

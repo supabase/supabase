@@ -3,14 +3,11 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { components } from 'api-types'
-
-export type ReleaseChannel = components['schemas']['ReleaseChannel']
-export type PostgresEngine = components['schemas']['PostgresEngine']
+import { PostgresEngine, ReleaseChannel } from './new-project.constants'
 
 export type ProjectRestoreVariables = {
   ref: string
-  postgresEngine?: PostgresEngine
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
   releaseChannel?: ReleaseChannel
 }
 
@@ -40,20 +37,18 @@ export const useProjectRestoreMutation = ({
   UseMutationOptions<ProjectRestoreData, ResponseError, ProjectRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectRestoreData, ResponseError, ProjectRestoreVariables>(
-    (vars) => restoreProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to restore project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectRestoreData, ResponseError, ProjectRestoreVariables>({
+    mutationFn: (vars) => restoreProject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to restore project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -1,5 +1,4 @@
 import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import {
   AlertCircle,
@@ -11,25 +10,28 @@ import {
   Minimize2,
   Settings,
 } from 'lucide-react'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 
 const UpgradingState = () => {
   const { ref } = useParams()
   const queryParams = useSearchParams()
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [loading, setLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
+
   const { data } = useProjectUpgradingStatusQuery(
     {
       projectRef: ref,
@@ -61,7 +63,7 @@ const UpgradingState = () => {
   const refetchProjectDetails = async () => {
     setLoading(true)
 
-    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+    if (ref) await invalidateProjectDetailsQuery(ref)
   }
 
   const subject = 'Upgrade%20failed%20for%20project'
@@ -107,13 +109,16 @@ const UpgradingState = () => {
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
                   <Button asChild type="default">
-                    <Link
-                      href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                      target="_blank"
-                      rel="noreferrer"
+                    <SupportLink
+                      queryParams={{
+                        category: SupportCategories.DATABASE_UNRESPONSIVE,
+                        projectRef: ref,
+                        subject,
+                        message,
+                      }}
                     >
                       Contact support
-                    </Link>
+                    </SupportLink>
                   </Button>
                   <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
                     Return to project

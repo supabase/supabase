@@ -9,7 +9,7 @@ database_id = "2ebc2849-0cf7-4c94-ac13-22167a196a92"
 
 When you register a user, you can create meta-data about them.
 
-Creating meta-data with the JS-Client's [signUp function](https://supabase.com/docs/reference/javascript/auth-signup?example=sign-up-with-additional-user-metadata)
+Creating meta-data with the JS-Client's [signUp function](/docs/reference/javascript/auth-signup?example=sign-up-with-additional-user-metadata)
 
 ```javascript
 const { data, error } = await supabase.auth.signUp({
@@ -25,13 +25,13 @@ const { data, error } = await supabase.auth.signUp({
 })
 ```
 
-The above example creates a user entry that includes information about their name and age. The data is stored in the auth.users table in the `auth.raw_user_meta_data` column. You can view it in the auth schema with the [SQL Editor](https://supabase.com/dashboard/project/_/editor).
+The above example creates a user entry that includes information about their name and age. The data is stored in the auth.users table in the `auth.raw_user_meta_data` column. You can view it in the auth schema with the [SQL Editor](/dashboard/project/_/editor).
 
-It can be accessed in a project's [Email Templates](https://supabase.com/dashboard/project/_/auth/templates). Below is an example:
+It can be accessed in a project's [Email Templates](/dashboard/project/_/auth/templates). Below is an example:
 
 ![image](/docs/img/troubleshooting/3eeb2435-dd1c-41bc-9557-44cabff38f59.png)
 
-If you need to update a user's meta-data, you can do so with the [`updateUser`](https://supabase.com/docs/reference/javascript/auth-updateuser?example=update-the-users-metadata) function.
+If you need to update a user's meta-data, you can do so with the [`updateUser`](/docs/reference/javascript/auth-updateuser?example=update-the-users-metadata) function.
 
 The meta-data can be used to store a users language preferences. You could then use "if statements" in the email template to set the response for a specific language:
 

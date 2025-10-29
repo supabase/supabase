@@ -3,8 +3,15 @@ import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { UpdateConnectionPayload } from './integrations.types'
+import { EnvironmentTargets } from './integrations.types'
 import { integrationKeys } from './keys'
+
+type UpdateConnectionPayload = {
+  id: string
+  organizationIntegrationId: string
+  envSyncTargets: EnvironmentTargets[]
+  publicEnvVarPrefix?: string
+}
 
 export async function updateVercelConnection({
   id,
@@ -37,23 +44,21 @@ export const useVercelConnectionUpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>(
-    (vars) => updateVercelConnection(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(
-          integrationKeys.vercelConnectionsList(variables.organizationIntegrationId)
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update Vercel connection: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>({
+    mutationFn: (vars) => updateVercelConnection(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: integrationKeys.vercelConnectionsList(variables.organizationIntegrationId),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update Vercel connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

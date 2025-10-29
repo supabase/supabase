@@ -10,8 +10,8 @@ import FormBoxEmpty from 'components/ui/FormBoxEmpty'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -40,6 +40,7 @@ import {
   TRIGGER_ORIENTATIONS,
   TRIGGER_TYPES,
 } from './Triggers.constants'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const formId = 'create-trigger'
 
@@ -50,10 +51,10 @@ const FormSchema = z.object({
     .regex(/^\S+$/, 'Name should not contain spaces or whitespaces'),
   schema: z.string(),
   table: z.string(),
-  activation: z.string(),
-  enabled_mode: z.string(),
-  orientation: z.string(),
-  function_name: z.string(),
+  activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),
+  enabled_mode: z.enum(['ORIGIN', 'REPLICA', 'ALWAYS', 'DISABLED']),
+  orientation: z.enum(['ROW', 'STATEMENT']),
+  function_name: z.string().min(1, 'Please select a database function for your trigger to call'),
   function_schema: z.string(),
   events: z.array(z.string()).min(1, 'Please select at least one event'),
 
@@ -61,7 +62,7 @@ const FormSchema = z.object({
   tableId: z.string().optional(),
 })
 
-const defaultValues = {
+const defaultValues: z.infer<typeof FormSchema> = {
   name: '',
   schema: '',
   table: '',
@@ -75,20 +76,27 @@ const defaultValues = {
 
 interface TriggerSheetProps {
   selectedTrigger?: PostgresTrigger
+  isDuplicatingTrigger?: boolean
   open: boolean
-  setOpen: (val: boolean) => void
+  onClose: () => void
 }
 
-export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetProps) => {
-  const project = useSelectedProject()
+export const TriggerSheet = ({
+  selectedTrigger,
+  isDuplicatingTrigger,
+  open,
+  onClose,
+}: TriggerSheetProps) => {
+  const { data: project } = useSelectedProjectQuery()
 
+  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
   const { mutate: createDatabaseTrigger, isLoading: isCreating } = useDatabaseTriggerCreateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully created trigger ${res.name}`)
-        setOpen(false)
+      onSuccess: () => {
+        toast.success(`Successfully created trigger`)
+        onClose()
       },
       onError: (error) => {
         toast.error(`Failed to create trigger: ${error.message}`)
@@ -97,9 +105,9 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
   )
   const { mutate: updateDatabaseTrigger, isLoading: isUpdating } = useDatabaseTriggerUpdateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully updated trigger ${res.name}`)
-        setOpen(false)
+      onSuccess: () => {
+        toast.success(`Successfully updated trigger`)
+        onClose()
       },
       onError: (error) => {
         toast.error(`Failed to update trigger: ${error.message}`)
@@ -107,15 +115,17 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     }
   )
 
-  const { data = [], isSuccess } = useTablesQuery({
+  const { data = [], isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: protectedSchemas, isSuccess: isSuccessProtectedSchemas } = useProtectedSchemas()
+  const isSuccess = isSuccessTables && isSuccessProtectedSchemas
 
   const tables = data
     .sort((a, b) => a.schema.localeCompare(b.schema))
-    .filter((a) => !PROTECTED_SCHEMAS.includes(a.schema))
-  const isEditing = !!selectedTrigger
+    .filter((a) => !protectedSchemas.find((s) => s.name === a.schema))
+  const isEditing = !isDuplicatingTrigger && !!selectedTrigger
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -125,6 +135,10 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
   })
   const { function_name, function_schema } = form.watch()
 
+  function isClosingSidePanel() {
+    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
+  }
+
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
     const { tableId, ...payload } = values
@@ -133,7 +147,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
       updateDatabaseTrigger({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        id: selectedTrigger.id,
+        originalTrigger: selectedTrigger,
         payload: { name: payload.name, enabled_mode: payload.enabled_mode },
       })
     } else {
@@ -149,9 +163,18 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     if (open && isSuccess) {
       form.clearErrors()
 
-      if (isEditing) {
+      if (isDuplicatingTrigger && selectedTrigger) {
+        const initalSelectedTable = tables.find((t) => t.name === selectedTrigger.table)
+
+        form.reset({
+          ...selectedTrigger,
+          tableId: initalSelectedTable?.id.toString(),
+          table: initalSelectedTable?.name,
+          schema: initalSelectedTable?.schema,
+        })
+      } else if (isEditing) {
         form.reset(selectedTrigger)
-      } else {
+      } else if (tables.length > 0) {
         form.reset({
           ...defaultValues,
           tableId: tables[0].id.toString(),
@@ -165,10 +188,16 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
   return (
     <>
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet open={open} onOpenChange={isClosingSidePanel}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
-            <SheetTitle>Create a new database trigger</SheetTitle>
+            <SheetTitle>
+              {isDuplicatingTrigger
+                ? 'Duplicate trigger'
+                : isEditing
+                  ? `Edit database trigger: ${selectedTrigger.name}`
+                  : 'Create a new database trigger'}
+            </SheetTitle>
           </SheetHeader>
 
           <Form_Shadcn_ {...form}>
@@ -244,10 +273,12 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
                           <Select_Shadcn_
                             defaultValue={field.value}
                             onValueChange={(val) => {
+                              // mark table ID as dirty to trigger validation
+                              field.onChange(val)
                               const table = tables.find((x) => x.id.toString() === val)
                               if (table) {
-                                form.setValue('table', table.name)
-                                form.setValue('schema', table.schema)
+                                form.setValue('table', table.name, { shouldDirty: true })
+                                form.setValue('schema', table.schema, { shouldDirty: true })
                               }
                             }}
                           >
@@ -374,46 +405,62 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
                   <Separator />
 
-                  <div className="px-5 flex flex-col gap-y-2">
-                    <p className="text-smn">Function to trigger</p>
-                    {function_name.length === 0 ? (
-                      <button
-                        type="button"
-                        className={cn(
-                          'relative w-full rounded border border-default',
-                          'bg-surface-200 px-5 py-1 shadow-sm transition-all',
-                          'hover:border-strong hover:bg-overlay-hover'
-                        )}
-                        onClick={() => setShowFunctionSelector(true)}
-                      >
-                        <FormBoxEmpty
-                          icon={<Terminal size={14} strokeWidth={2} />}
-                          text="Choose a function to trigger"
-                        />
-                      </button>
-                    ) : (
-                      <div
-                        className={cn(
-                          'relative w-full flex items-center justify-between',
-                          'space-x-3 px-5 py-4 border border-default',
-                          'rounded shadow-sm transition-shadow'
-                        )}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
-                            <Terminal size="18" strokeWidth={2} width={14} />
+                  <FormField_Shadcn_
+                    name="function_name"
+                    control={form.control}
+                    render={() => (
+                      <FormItemLayout layout="vertical" className="px-5">
+                        <FormControl_Shadcn_>
+                          <div className="flex flex-col gap-y-2">
+                            <p className="text-smn">Function to trigger</p>
+                            {function_name.length === 0 ? (
+                              <button
+                                type="button"
+                                className={cn(
+                                  'relative w-full rounded border border-default',
+                                  'bg-surface-200 px-5 py-1 shadow-sm transition-all',
+                                  'hover:border-strong hover:bg-overlay-hover'
+                                )}
+                                onClick={() => setShowFunctionSelector(true)}
+                              >
+                                <FormBoxEmpty
+                                  icon={<Terminal size={14} strokeWidth={2} />}
+                                  text="Choose a function to trigger"
+                                />
+                              </button>
+                            ) : (
+                              <div
+                                className={cn(
+                                  'relative w-full flex items-center justify-between',
+                                  'space-x-3 px-5 py-4 border border-default',
+                                  'rounded shadow-sm transition-shadow'
+                                )}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
+                                    <Terminal size="18" strokeWidth={2} width={14} />
+                                  </div>
+                                  <p>
+                                    <span className="text-sm text-foreground-light">
+                                      {function_schema}
+                                    </span>
+                                    .
+                                    <span className="text-sm text-foreground">{function_name}</span>
+                                  </p>
+                                </div>
+                                <Button
+                                  type="default"
+                                  onClick={() => setShowFunctionSelector(true)}
+                                >
+                                  Change function
+                                </Button>
+                              </div>
+                            )}
                           </div>
-                          <p>
-                            <span className="text-sm text-foreground-light">{function_schema}</span>
-                            .<span className="text-sm text-foreground">{function_name}</span>
-                          </p>
-                        </div>
-                        <Button type="default" onClick={() => setShowFunctionSelector(true)}>
-                          Change function
-                        </Button>
-                      </div>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
                     )}
-                  </div>
+                  />
                 </>
               )}
             </form>
@@ -424,14 +471,30 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
               type="default"
               htmlType="reset"
               disabled={isCreating || isUpdating}
-              onClick={() => setOpen(false)}
+              onClick={onClose}
             >
               Cancel
             </Button>
             <Button form={formId} htmlType="submit" loading={isCreating || isUpdating}>
-              Create trigger
+              {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>
+
+          <ConfirmationModal
+            visible={isClosingPanel}
+            title="Discard changes"
+            confirmLabel="Discard"
+            onCancel={() => setIsClosingPanel(false)}
+            onConfirm={() => {
+              setIsClosingPanel(false)
+              onClose()
+            }}
+          >
+            <p className="text-sm text-foreground-light">
+              There are unsaved changes. Are you sure you want to close the panel? Your changes will
+              be lost.
+            </p>
+          </ConfirmationModal>
         </SheetContent>
       </Sheet>
 

@@ -6,28 +6,23 @@ import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-  cn,
   Button,
-  SheetFooter,
-  SheetSection,
+  cn,
   Form_Shadcn_,
-  FormLabel_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
   FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
-  FormMessage_Shadcn_,
-  Card,
-  CardContent,
+  Sheet,
+  SheetClose,
+  SheetContent,
   SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
 } from 'ui'
-import { MultiSelector } from 'ui-patterns/multi-select'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
 interface NewPublicationPanelProps {
@@ -36,7 +31,7 @@ interface NewPublicationPanelProps {
   onClose: () => void
 }
 
-const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
+export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
   const { mutateAsync: createPublication, isLoading: creatingPublication } =
     useCreatePublicationMutation()
@@ -175,5 +170,3 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
     </>
   )
 }
-
-export default NewPublicationPanel

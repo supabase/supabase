@@ -13,7 +13,7 @@ import { fdwKeys } from './keys'
 
 export type FDWDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   wrapper: FDW
   wrapperMeta: WrapperMeta
 }
@@ -73,7 +73,7 @@ export const getDeleteFDWSql = ({
   const deleteEncryptedSecretsSql = deleteEncryptedSecretsSqlArray.join('\n')
 
   const sql = /* SQL */ `
-    drop foreign data wrapper if exists ${wrapper.name} cascade;
+    drop foreign data wrapper if exists "${wrapper.name}" cascade;
 
     ${deleteEncryptedSecretsSql}
   `
@@ -104,15 +104,16 @@ export const useFDWDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<FDWDeleteData, ResponseError, FDWDeleteVariables>((vars) => deleteFDW(vars), {
+  return useMutation<FDWDeleteData, ResponseError, FDWDeleteVariables>({
+    mutationFn: (vars) => deleteFDW(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(fdwKeys.list(projectRef), { refetchType: 'all' }),
-        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        queryClient.invalidateQueries(foreignTableKeys.list(projectRef)),
-        queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
+        queryClient.invalidateQueries({ queryKey: fdwKeys.list(projectRef), refetchType: 'all' }),
+        queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: foreignTableKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) }),
       ])
 
       await onSuccess?.(data, variables, context)

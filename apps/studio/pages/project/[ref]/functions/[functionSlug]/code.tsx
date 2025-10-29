@@ -1,11 +1,9 @@
 import { common, dirname, relative } from '@std/path/posix'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LogoLoader } from 'ui'
 import { useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -16,29 +14,25 @@ import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
+import { LogoLoader } from 'ui'
 
 const CodePage = () => {
-  const router = useRouter()
   const { ref, functionSlug } = useParams()
-  const project = useSelectedProject()
-  const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
-  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+
   const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
-  const canDeployFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const { can: canDeployFunction } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
   const {
-    data: functionFiles,
+    data: functionBody,
     isLoading: isLoadingFiles,
     isError: isErrorLoadingFiles,
     isSuccess: isSuccessLoadingFiles,
@@ -49,9 +43,16 @@ const CodePage = () => {
       slug: functionSlug,
     },
     {
+      // [Alaister]: These parameters prevent the function files
+      // from being refetched when the user is editing the code
       retry: false,
-      refetchOnWindowFocus: false,
       retryOnMount: false,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
+      refetchIntervalInBackground: false,
     }
   )
   const [files, setFiles] = useState<
@@ -119,15 +120,29 @@ const CodePage = () => {
     }
   }
 
-  function getBasePath(entrypoint: string | undefined): string {
+  function getBasePath(
+    entrypoint: string | undefined,
+    fileNames: string[],
+    version: number
+  ): string {
     if (!entrypoint) {
       return '/'
     }
 
+    let qualifiedEntrypoint = entrypoint
+
+    if (version >= 2) {
+      const candidate = fileNames.find((name) => entrypoint.endsWith(name))
+      if (candidate) {
+        qualifiedEntrypoint = `file://${candidate}`
+      } else {
+        qualifiedEntrypoint = entrypoint
+      }
+    }
     try {
-      return dirname(new URL(entrypoint).pathname)
+      return dirname(new URL(qualifiedEntrypoint).pathname)
     } catch (e) {
-      console.error('Failed to parse entrypoint', entrypoint)
+      console.error('Failed to parse entrypoint', qualifiedEntrypoint)
       return '/'
     }
   }
@@ -149,18 +164,15 @@ const CodePage = () => {
     onUpdate()
   }
 
-  // TODO (Saxon): Remove this once the flag is fully launched
-  useEffect(() => {
-    if (edgeFunctionCreate !== undefined && !edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
-    }
-  }, [edgeFunctionCreate])
-
   useEffect(() => {
     // Set files from API response when available
-    if (selectedFunction?.entrypoint_path && functionFiles) {
-      const base_path = getBasePath(selectedFunction?.entrypoint_path)
-      const filesWithRelPath = functionFiles
+    if (selectedFunction?.entrypoint_path && functionBody) {
+      const base_path = getBasePath(
+        selectedFunction?.entrypoint_path,
+        functionBody.files.map((file) => file.name),
+        functionBody.version
+      )
+      const filesWithRelPath = functionBody.files
         // ignore empty files
         .filter((file: { name: string; content: string }) => !!file.content.length)
         // set file paths relative to entrypoint
@@ -195,7 +207,7 @@ const CodePage = () => {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [functionFiles])
+  }, [functionBody])
 
   return (
     <div className="flex flex-col h-full">
@@ -223,11 +235,11 @@ const CodePage = () => {
           <FileExplorerAndEditor
             files={files}
             onFilesChange={setFiles}
-            aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+            aiEndpoint={`${BASE_PATH}/api/ai/code/complete`}
             aiMetadata={{
               projectRef: project?.ref,
               connectionString: project?.connectionString,
-              includeSchemaMetadata,
+              orgSlug: org?.slug,
             }}
           />
           <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
@@ -264,6 +276,7 @@ const CodePage = () => {
         visible={showDeployWarning}
         onCancel={() => setShowDeployWarning(false)}
         onConfirm={handleDeployConfirm}
+        isDeploying={isDeploying}
       />
     </div>
   )

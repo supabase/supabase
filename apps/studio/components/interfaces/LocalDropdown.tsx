@@ -2,7 +2,6 @@ import { ProfileImage } from 'components/ui/ProfileImage'
 import { Command, FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenu,
@@ -18,11 +17,12 @@ import {
   Theme,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
+import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const LocalDropdown = () => {
   const { theme, setTheme } = useTheme()
-  const snap = useAppStateSnapshot()
   const setCommandMenuOpen = useSetCommandMenuOpen()
+  const { openFeaturePreviewModal } = useFeaturePreviewModal()
 
   return (
     <DropdownMenu>
@@ -37,8 +37,8 @@ export const LocalDropdown = () => {
       <DropdownMenuContent side="bottom" align="end" className="w-44">
         <DropdownMenuItem
           className="flex gap-2"
-          onClick={() => snap.setShowFeaturePreviewModal(true)}
-          onSelect={() => snap.setShowFeaturePreviewModal(true)}
+          onClick={openFeaturePreviewModal}
+          onSelect={openFeaturePreviewModal}
         >
           <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Feature previews

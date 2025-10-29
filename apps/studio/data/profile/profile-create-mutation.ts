@@ -1,23 +1,20 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
+import { handleError, post } from 'data/fetchers'
 import { organizationKeys } from 'data/organizations/keys'
 import { permissionKeys } from 'data/permissions/keys'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
-import type { Profile } from './types'
 
-export type ProfileResponse = Profile
+export type ProfileResponse = components['schemas']['ProfileResponse']
 
 export async function createProfile() {
-  const response = await post(`${API_URL}/profile`, {})
-  if (response.error) {
-    throw response.error
-  }
+  const { data, error } = await post('/platform/profile')
 
-  return response as ProfileResponse
+  if (error) handleError(error)
+  return data
 }
 
 type ProfileCreateData = Awaited<ReturnType<typeof createProfile>>
@@ -29,12 +26,13 @@ export const useProfileCreateMutation = ({
 }: Omit<UseMutationOptions<ProfileCreateData, ResponseError, void>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProfileCreateData, ResponseError, void>(() => createProfile(), {
+  return useMutation<ProfileCreateData, ResponseError, void>({
+    mutationFn: () => createProfile(),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(profileKeys.profile()),
-        queryClient.invalidateQueries(organizationKeys.list()),
-        queryClient.invalidateQueries(permissionKeys.list()),
+        queryClient.invalidateQueries({ queryKey: profileKeys.profile() }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: permissionKeys.list() }),
       ])
       await onSuccess?.(data, variables, context)
     },

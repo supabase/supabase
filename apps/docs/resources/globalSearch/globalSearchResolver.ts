@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import {
   GraphQLError,
   GraphQLInt,
@@ -32,9 +33,13 @@ async function resolveSearch(
       info
     )
   ).match(
-    (data) => GraphQLCollectionBuilder.create({ items: data }),
+    // Building a collection from an array is infallible
+    async (data) => (await GraphQLCollectionBuilder.create({ items: data })).unwrap(),
     (error) => {
       console.error(`Error resolving ${GRAPHQL_FIELD_SEARCH_GLOBAL}:`, error)
+      if (!error.isUserError()) {
+        Sentry.captureException(error)
+      }
       return new GraphQLError(error.isPrivate() ? 'Internal Server Error' : error.message)
     }
   )
@@ -46,8 +51,9 @@ async function resolveSearchImpl(
   _context: unknown,
   info: GraphQLResolveInfo
 ): Promise<Result<Array<SearchResultModel>, ApiErrorGeneric>> {
-  const requestedFields = Object.keys(graphQLFields(info).nodes)
-  return await SearchResultModel.search(args, requestedFields)
+  const fieldsInfo = graphQLFields(info)
+  const requestedFields = Object.keys(fieldsInfo.nodes ?? fieldsInfo.edges?.node ?? {})
+  return await SearchResultModel.searchHybrid(args, requestedFields)
 }
 
 export const searchRoot = {

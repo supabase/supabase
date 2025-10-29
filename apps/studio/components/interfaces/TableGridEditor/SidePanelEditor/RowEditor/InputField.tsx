@@ -1,5 +1,5 @@
 import { includes, noop } from 'lodash'
-import { Edit, Edit2, Eye } from 'lucide-react'
+import { Edit, Eye } from 'lucide-react'
 
 import {
   Button,
@@ -21,6 +21,9 @@ import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.const
 import { DateTimeInput } from './DateTimeInput'
 import type { EditValue, RowField } from './RowEditor.types'
 import { isValueTruncated } from './RowEditor.utils'
+
+const TRUNCATE_DESCRIPTION =
+  'Note: Value is too large to be rendered in the dashboard. Please expand the editor to edit the value'
 
 export interface InputFieldProps {
   field: RowField
@@ -97,7 +100,7 @@ const InputField = ({
       <Input
         data-testid={`${field.name}-input`}
         layout="horizontal"
-        placeholder="NULL"
+        placeholder={field.defaultValue !== null ? `Default: ${field.defaultValue}` : 'NULL'}
         label={field.name}
         value={field.value ?? ''}
         descriptionText={
@@ -149,16 +152,11 @@ const InputField = ({
           data-testid={`${field.name}-input`}
           layout="horizontal"
           label={field.name}
-          className="text-sm"
+          className="input-sm"
           descriptionText={
             <>
               {field.comment && <p>{field.comment}</p>}
-              {isTruncated && (
-                <p>
-                  Note: Value is too large to be rendered in the dashboard. Please expand the editor
-                  to edit the value
-                </p>
-              )}
+              {isTruncated && <p>{TRUNCATE_DESCRIPTION}</p>}
             </>
           }
           textAreaClassName="pr-8"
@@ -170,11 +168,10 @@ const InputField = ({
           placeholder={
             field.value === null && field.defaultValue === null
               ? 'NULL'
-              : field.value === ''
+              : field.value === '' ||
+                  (typeof field.defaultValue === 'string' && field.defaultValue.length === 0)
                 ? 'EMPTY'
-                : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
-                  ? 'EMPTY'
-                  : `NULL (Default: ${field.defaultValue})`
+                : `Default: ${field.defaultValue}`
           }
           actions={
             <DropdownMenu>
@@ -213,17 +210,12 @@ const InputField = ({
         descriptionText={
           <>
             {field.comment && <p>{field.comment}</p>}
-            {isTruncated && (
-              <p>
-                Note: Value is too large to be rendered in the dashboard. Please expand the editor
-                to edit the value
-              </p>
-            )}
+            {isTruncated && <p>{TRUNCATE_DESCRIPTION}</p>}
           </>
         }
         labelOptional={field.format}
         disabled={!isEditable || isTruncated}
-        placeholder={field?.defaultValue ?? 'NULL'}
+        placeholder={!!field?.defaultValue ? `Default: ${field.defaultValue}` : 'NULL'}
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
@@ -231,9 +223,9 @@ const InputField = ({
             type="default"
             htmlType="button"
             onClick={() => onEditJson({ column: field.name, value: field.value })}
-            icon={isEditable ? <Edit2 /> : <Eye />}
+            icon={isEditable ? <Edit /> : <Eye />}
           >
-            {isEditable ? 'Edit JSON' : 'View JSON'}
+            {isEditable ? 'Edit' : 'View JSON'}
           </Button>
         }
       />
@@ -321,12 +313,19 @@ const InputField = ({
     )
   }
 
+  const isTruncated = isValueTruncated(field.value)
+
   return (
     <Input
       data-testid={`${field.name}-input`}
       layout="horizontal"
       label={field.name}
-      descriptionText={field.comment}
+      descriptionText={
+        <>
+          {field.comment && <p>{field.comment}</p>}
+          {isTruncated && <p>{TRUNCATE_DESCRIPTION}</p>}
+        </>
+      }
       labelOptional={field.format}
       error={errors[field.name]}
       value={field.value ?? ''}
@@ -337,8 +336,20 @@ const InputField = ({
             ? `Default: ${field.defaultValue}`
             : 'NULL'
       }
-      disabled={!isEditable}
+      disabled={!isEditable || isTruncated}
       onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+      actions={
+        isTruncated ? (
+          <Button
+            type="default"
+            htmlType="button"
+            onClick={() => onEditJson({ column: field.name, value: field.value })}
+            icon={isEditable ? <Edit /> : <Eye />}
+          >
+            {isEditable ? 'Edit' : 'View'}
+          </Button>
+        ) : undefined
+      }
     />
   )
 }

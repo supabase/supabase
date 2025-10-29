@@ -5,7 +5,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type PostgresQueue = {
@@ -35,11 +35,9 @@ export const useQueuesQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,
   { enabled = true, ...options }: UseQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
 ) =>
-  useQuery<DatabaseQueueData, DatabaseQueueError, TData>(
-    databaseQueuesKeys.list(projectRef),
-    () => getDatabaseQueues({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseQueueData, DatabaseQueueError, TData>({
+    queryKey: databaseQueuesKeys.list(projectRef),
+    queryFn: () => getDatabaseQueues({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

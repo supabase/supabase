@@ -1,15 +1,29 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 
-export type CreateColumnBody = components['schemas']['CreateColumnBody']
+export type CreateColumnBody = {
+  schema: string
+  table: string
+  name: string
+  type: string
+  check?: string
+  comment?: string
+  defaultValue?: any
+  defaultValueFormat?: 'expression' | 'literal'
+  identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
+  isIdentity?: boolean
+  isNullable?: boolean
+  isPrimaryKey?: boolean
+  isUnique?: boolean
+}
 
 export type DatabaseColumnCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: CreateColumnBody
 }
 
@@ -18,20 +32,30 @@ export async function createDatabaseColumn({
   connectionString,
   payload,
 }: DatabaseColumnCreateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await post('/platform/pg-meta/{ref}/columns', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-    },
-    body: payload,
-    headers,
+  const { sql } = pgMeta.columns.create({
+    schema: payload.schema,
+    table: payload.table,
+    name: payload.name,
+    type: payload.type,
+    default_value: payload.defaultValue,
+    default_value_format: payload.defaultValueFormat,
+    is_identity: payload.isIdentity,
+    identity_generation: payload.identityGeneration,
+    is_nullable: payload.isNullable,
+    is_primary_key: payload.isPrimaryKey,
+    is_unique: payload.isUnique,
+    comment: payload.comment,
+    check: payload.check,
   })
 
-  if (error) handleError(error)
-  return data
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['column', 'create'],
+  })
+
+  return result
 }
 
 type DatabaseColumnCreateData = Awaited<ReturnType<typeof createDatabaseColumn>>
@@ -44,20 +68,18 @@ export const useDatabaseColumnCreateMutation = ({
   UseMutationOptions<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>(
-    (vars) => createDatabaseColumn(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database column: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>({
+    mutationFn: (vars) => createDatabaseColumn(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database column: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

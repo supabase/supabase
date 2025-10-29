@@ -7,7 +7,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueMessageDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   queueName: string
   messageId: number
 }
@@ -48,12 +48,13 @@ export const useDatabaseQueueMessageDeleteMutation = ({
     DatabaseQueueMessageDeleteData,
     ResponseError,
     DatabaseQueueMessageDeleteVariables
-  >((vars) => deleteDatabaseQueueMessage(vars), {
+  >({
+    mutationFn: (vars) => deleteDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queueName } = variables
-      await queryClient.invalidateQueries(
-        databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

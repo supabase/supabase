@@ -16,7 +16,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/pg": "^8.11.11",
@@ -24,8 +24,8 @@
     "npm-run-all": "^4.1.5",
     "pg": "^8.13.1",
     "postgres-array": "^3.0.2",
-    "typescript": "~5.5.0",
-    "vite": "^6.2.6",
+    "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "^3.0.5"
   }
 }

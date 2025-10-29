@@ -96,7 +96,7 @@ WHERE
 
 export type ForeignKeyConstraintsVariables = GetForeignKeyConstraintsVariables & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getForeignKeyConstraints(
@@ -134,20 +134,21 @@ export const useForeignKeyConstraintsQuery = <TData = ForeignKeyConstraintsData>
     ...options
   }: UseQueryOptions<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData> = {}
 ) =>
-  useQuery<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData>(
-    databaseKeys.foreignKeyConstraints(projectRef, schema),
-    ({ signal }) => getForeignKeyConstraints({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData>({
+    queryKey: databaseKeys.foreignKeyConstraints(projectRef, schema),
+    queryFn: ({ signal }) =>
+      getForeignKeyConstraints({ projectRef, connectionString, schema }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
+    ...options,
+  })
 
 export function prefetchForeignKeyConstraints(
   client: QueryClient,
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables
 ) {
-  return client.fetchQuery(databaseKeys.foreignKeyConstraints(projectRef, schema), ({ signal }) =>
-    getForeignKeyConstraints({ projectRef, connectionString, schema }, signal)
-  )
+  return client.fetchQuery({
+    queryKey: databaseKeys.foreignKeyConstraints(projectRef, schema),
+    queryFn: ({ signal }) =>
+      getForeignKeyConstraints({ projectRef, connectionString, schema }, signal),
+  })
 }

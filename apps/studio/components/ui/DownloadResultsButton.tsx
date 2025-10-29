@@ -1,13 +1,13 @@
 import saveAs from 'file-saver'
-import { ChevronDown, Clipboard, Download } from 'lucide-react'
+import { ChevronDown, Copy, Download } from 'lucide-react'
 import { markdownTable } from 'markdown-table'
 import Papa from 'papaparse'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { copyToClipboard } from 'lib/helpers'
 import {
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -111,11 +111,11 @@ export const DownloadResultsButton = ({
           <p>Download CSV</p>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
-          <Clipboard size={14} />
+          <Copy size={14} />
           <p>Copy as markdown</p>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyAsJSON} className="gap-x-2">
-          <Clipboard size={14} />
+          <Copy size={14} />
           <p>Copy as JSON</p>
         </DropdownMenuItem>
       </DropdownMenuContent>

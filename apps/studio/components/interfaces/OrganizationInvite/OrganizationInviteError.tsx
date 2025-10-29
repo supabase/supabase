@@ -9,7 +9,7 @@ import { cn } from 'ui'
 
 interface OrganizationInviteError {
   data?: OrganizationInviteByToken
-  error?: ResponseError
+  error?: ResponseError | null
   isError: boolean
 }
 
@@ -26,14 +26,6 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
           subject="Failed to retrieve token"
           className="border-0 rounded-b [&>h5]:text-left [&>div]:items-start rounded-t-none"
         />
-      ) : data?.token_does_not_exist ? (
-        <div className="p-4 flex flex-col gap-y-1">
-          <p>The invite token is invalid.</p>
-          <p className="text-foreground-lighter">
-            Try copying and pasting the link from the invite email, or ask the organization owner to
-            invite you again.
-          </p>
-        </div>
       ) : !data?.email_match ? (
         <div className="p-4 flex flex-col gap-y-1">
           <p>
@@ -62,7 +54,15 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
             Please request a new one from the organization owner.
           </p>
         </div>
-      ) : null}
+      ) : (
+        <div className="p-4 flex flex-col gap-y-1">
+          <p>The invite token is invalid.</p>
+          <p className="text-foreground-lighter">
+            You could be logged in with the wrong account. Try copying and pasting the link from the
+            invite email, or ask the organization owner to invite you again.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

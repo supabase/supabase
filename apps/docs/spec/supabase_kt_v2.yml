@@ -127,7 +127,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Auth)
               install(Postgrest)
@@ -140,7 +140,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Auth) {
                   alwaysAutoRefresh = false // default: true
@@ -197,7 +197,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Postgrest) {
                   defaultSchema = "schema" // default: "public"
@@ -219,7 +219,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Storage) {
                   transferTimeout = 90.seconds // Default: 120 seconds
@@ -246,7 +246,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Realtime) {
                   reconnectDelay = 5.seconds // Default: 7 seconds
@@ -273,7 +273,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Functions) {
                   //no custom settings
@@ -290,7 +290,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(GraphQL) {
                   apolloConfiguration {
@@ -900,7 +900,7 @@ functions:
         description: The block to apply the `or` filter to.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -954,7 +954,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -980,7 +980,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -993,7 +993,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1006,7 +1006,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1018,7 +1018,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("function") {
@@ -1045,7 +1045,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1058,7 +1058,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1071,7 +1071,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1083,7 +1083,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.rpc("echo_all_cities") {
@@ -1108,7 +1108,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1121,7 +1121,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1134,7 +1134,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1146,7 +1146,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
@@ -1173,7 +1173,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1186,7 +1186,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1199,7 +1199,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1211,7 +1211,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
@@ -1238,7 +1238,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1251,7 +1251,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1264,7 +1264,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1276,7 +1276,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
@@ -1303,7 +1303,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1316,7 +1316,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1329,7 +1329,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1341,7 +1341,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
@@ -1368,7 +1368,7 @@ functions:
         description: The pattern to match with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1381,7 +1381,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1394,7 +1394,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1406,7 +1406,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
@@ -1433,7 +1433,7 @@ functions:
         description: The pattern to match with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1446,7 +1446,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1459,7 +1459,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1471,7 +1471,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
@@ -1500,7 +1500,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1513,7 +1513,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1526,7 +1526,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1538,7 +1538,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
@@ -1565,7 +1565,7 @@ functions:
         description: The values to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1578,7 +1578,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1591,7 +1591,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1603,7 +1603,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
@@ -1630,7 +1630,7 @@ functions:
         description: The jsonb, array, or range value to filter with
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1643,7 +1643,7 @@ functions:
           }
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
@@ -1656,7 +1656,7 @@ functions:
           }
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```kotlin
           supabase.from("cities").delete {
@@ -1668,7 +1668,7 @@ functions:
           }
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
@@ -1695,7 +1695,7 @@ functions:
         description: The values to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1759,7 +1759,7 @@ functions:
         description: The values to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1823,7 +1823,7 @@ functions:
         description: The values to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1888,7 +1888,7 @@ functions:
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -1952,7 +1952,7 @@ functions:
         description: The values to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```kotlin
@@ -2213,7 +2213,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```kotlin
           supabase.from("characters").select {
@@ -2330,7 +2330,7 @@ functions:
         description: The columns to select.
     examples:
       - id: with-upsert
-        name: With `upsert()`
+        name: With upsert()
         code: |
           ```kotlin
           val toUpsert = Character(id = 2, name = "Leia")
@@ -2388,7 +2388,7 @@ functions:
         description: The foreign table to order by.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```kotlin
           supabase.from("characters").select(columns = Columns.list("id", "name")) {
@@ -2515,7 +2515,7 @@ functions:
         description: The foreign table to limit by.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```kotlin
           supabase.from("countries").select {
@@ -2624,7 +2624,7 @@ functions:
         description: The foreign table to limit by.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```kotlin
           supabase.from("characters").select {
@@ -2666,7 +2666,7 @@ functions:
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```kotlin
           val result = supabase.from("characters").select(Columns.list("name")) {
@@ -2816,7 +2816,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val supabase = createSupabaseClient(supabaseURL = "https://xyzcompany.supabase.co'", supabaseKey = "public-anon-key") { ... }
+          val supabase = createSupabaseClient(supabaseURL = "https://xyzcompany.supabase.co'", supabaseKey = "publishable-or-anon-key") { ... }
           val auth = supabase.auth
           ```
   - id: sign-up
@@ -3125,7 +3125,7 @@ functions:
       - name: provider
         isOptional: false
         type: OAuthProvider
-        description: The OAuth provider to use for the user's authentication, for example `Google` or `Github`.
+        description: The OAuth provider to use for the user's authentication, for example `Google` or `GitHub`.
       - name: redirectUrl
         isOptional: true
         type: String?

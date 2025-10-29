@@ -1,16 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { AlertCircle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
@@ -23,16 +24,15 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { ExternalLink, AlertCircle } from 'lucide-react'
 
 const CustomDomainSidePanel = () => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
-  const canUpdateCustomDomain = useCheckPermissions(
+  const { can: canUpdateCustomDomain } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -120,7 +120,7 @@ const CustomDomainSidePanel = () => {
           <h4>Custom domains</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/custom-domains"
+              href={`${DOCS_URL}/guides/platform/custom-domains`}
               target="_blank"
               rel="noreferrer"
             >

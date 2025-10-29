@@ -205,7 +205,7 @@
             "key": "pricing",
             "title": "Price USD",
             "value": "Contact Us",
-            "url": "/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes"
+            "url": "/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes"
           },
           { "key": "cpu", "title": "CPU", "value": "Custom" },
           { "key": "dedicated", "title": "Dedicated", "value": true },

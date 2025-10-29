@@ -78,7 +78,7 @@ from records r;
 export type EntityDefinitionsVariables = {
   limit?: number
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schemas: string[]
 }
 
@@ -111,11 +111,10 @@ export const useEntityDefinitionsQuery = <TData = EntityDefinitionsData>(
     ...options
   }: UseQueryOptions<EntityDefinitionsData, EntityDefinitionsError, TData> = {}
 ) =>
-  useQuery<EntityDefinitionsData, EntityDefinitionsError, TData>(
-    databaseKeys.entityDefinitions(projectRef, schemas),
-    ({ signal }) => getEntityDefinitions({ projectRef, connectionString, schemas, limit }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && schemas.length > 0,
-      ...options,
-    }
-  )
+  useQuery<EntityDefinitionsData, EntityDefinitionsError, TData>({
+    queryKey: databaseKeys.entityDefinitions(projectRef, schemas),
+    queryFn: ({ signal }) =>
+      getEntityDefinitions({ projectRef, connectionString, schemas, limit }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && schemas.length > 0,
+    ...options,
+  })

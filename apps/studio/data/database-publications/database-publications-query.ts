@@ -2,10 +2,11 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databasePublicationsKeys } from './keys'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type DatabasePublicationsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabasePublications(
@@ -21,6 +22,7 @@ export async function getDatabasePublications(
     params: {
       header: {
         'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
       },
       path: {
         ref: projectRef,
@@ -44,11 +46,9 @@ export const useDatabasePublicationsQuery = <TData = DatabasePublicationsData>(
     ...options
   }: UseQueryOptions<DatabasePublicationsData, DatabasePublicationsError, TData> = {}
 ) =>
-  useQuery<DatabasePublicationsData, DatabasePublicationsError, TData>(
-    databasePublicationsKeys.list(projectRef),
-    ({ signal }) => getDatabasePublications({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabasePublicationsData, DatabasePublicationsError, TData>({
+    queryKey: databasePublicationsKeys.list(projectRef),
+    queryFn: ({ signal }) => getDatabasePublications({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

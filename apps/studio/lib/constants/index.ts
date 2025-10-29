@@ -37,10 +37,20 @@ export const GOTRUE_ERRORS = {
 export const STRIPE_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || 'pk_test_XVwg5IZH3I9Gti98hZw6KRzd00v5858heG'
 
+export const POSTHOG_URL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+    ? 'https://ph.supabase.green'
+    : 'https://ph.supabase.com'
+
 export const USAGE_APPROACHING_THRESHOLD = 0.75
+
+export const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://supabase.com/docs'
 
 export const OPT_IN_TAGS = {
   AI_SQL: 'AI_SQL_GENERATOR_OPT_IN',
+  AI_DATA: 'AI_DATA_GENERATOR_OPT_IN',
+  AI_LOG: 'AI_LOG_GENERATOR_OPT_IN',
 }
 
 export const GB = 1024 * 1024 * 1024

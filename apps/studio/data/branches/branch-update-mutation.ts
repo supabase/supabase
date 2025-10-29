@@ -6,27 +6,30 @@ import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchUpdateVariables = {
-  id: string
+  branchRef: string
   projectRef: string
   branchName?: string
   gitBranch?: string
   persistent?: boolean
+  requestReview?: boolean
 }
 
 export async function updateBranch({
-  id,
+  branchRef,
   branchName,
   gitBranch,
   persistent,
+  requestReview,
 }: BranchUpdateVariables) {
-  const { data, error } = await patch('/v1/branches/{branch_id}', {
+  const { data, error } = await patch('/v1/branches/{branch_id_or_ref}', {
     params: {
-      path: { branch_id: id },
+      path: { branch_id_or_ref: branchRef },
     },
     body: {
       branch_name: branchName,
       git_branch: gitBranch,
       persistent,
+      request_review: requestReview,
     },
   })
 
@@ -45,22 +48,20 @@ export const useBranchUpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchUpdateData, ResponseError, BranchUpdateVariables>(
-    (vars) => updateBranch(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(branchKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update branch: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BranchUpdateData, ResponseError, BranchUpdateVariables>({
+    mutationFn: (vars) => updateBranch(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update branch: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type DatabaseFunction = z.infer<typeof pgMeta.functions.pgFunctionZod>
@@ -45,11 +45,9 @@ export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
     ...options
   }: UseQueryOptions<DatabaseFunctionsData, DatabaseFunctionsError, TData> = {}
 ) =>
-  useQuery<DatabaseFunctionsData, DatabaseFunctionsError, TData>(
-    databaseKeys.databaseFunctions(projectRef),
-    ({ signal }) => getDatabaseFunctions({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseFunctionsData, DatabaseFunctionsError, TData>({
+    queryKey: databaseKeys.databaseFunctions(projectRef),
+    queryFn: ({ signal }) => getDatabaseFunctions({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

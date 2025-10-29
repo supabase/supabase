@@ -4,17 +4,16 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Form, Input, Modal } from 'ui'
 
-const DeleteOrganizationButton = () => {
+export const DeleteOrganizationButton = () => {
   const router = useRouter()
-  const newLayoutPreview = useIsNewLayoutEnabled()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
 
   const [isOpen, setIsOpen] = useState(false)
@@ -25,16 +24,16 @@ const DeleteOrganizationButton = () => {
     ''
   )
 
-  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canDeleteOrganization } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
+
   const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${orgName}`)
-      if (newLayoutPreview) {
-        setLastVisitedOrganization('')
-        router.push('/organizations')
-      } else {
-        router.push('/projects')
-      }
+      setLastVisitedOrganization('')
+      router.push('/organizations')
     },
   })
 
@@ -43,7 +42,7 @@ const DeleteOrganizationButton = () => {
     if (!values.orgName) {
       errors.orgName = 'Enter the name of the organization.'
     }
-    if (values.orgName !== orgSlug) {
+    if (values.orgName.trim() !== orgSlug?.trim()) {
       errors.orgName = 'Value entered does not match the value above.'
     }
     return errors
@@ -61,9 +60,22 @@ const DeleteOrganizationButton = () => {
   return (
     <>
       <div className="mt-2">
-        <Button loading={!orgSlug} onClick={() => setIsOpen(true)} type="danger">
+        <ButtonTooltip
+          type="danger"
+          disabled={!canDeleteOrganization}
+          loading={!orgSlug}
+          onClick={() => setIsOpen(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canDeleteOrganization
+                ? 'You need additional permissions to delete this organization'
+                : undefined,
+            },
+          }}
+        >
           Delete organization
-        </Button>
+        </ButtonTooltip>
       </div>
       <Modal
         hideFooter
@@ -127,5 +139,3 @@ const DeleteOrganizationButton = () => {
     </>
   )
 }
-
-export default DeleteOrganizationButton

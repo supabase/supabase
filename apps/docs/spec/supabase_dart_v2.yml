@@ -90,7 +90,7 @@ functions:
           Future<void> main() async {
             await Supabase.initialize(
               url: 'https://xyzcompany.supabase.co',
-              anonKey: 'public-anon-key',
+              anonKey: 'publishable-or-anon-key',
             );
 
             runApp(MyApp());
@@ -105,7 +105,7 @@ functions:
           ```dart
           final supabase = SupabaseClient(
             'https://xyzcompany.supabase.co',
-            'public-anon-key',
+            'publishable-or-anon-key',
           );
           ```
 
@@ -558,12 +558,12 @@ functions:
   - id: sign-in-with-id-token
     title: 'signInWithIdToken()'
     description: |
-      Allows you to perform native Google and Apple sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in) or [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) packages.
+      Allows you to perform native Google, Apple, and Facebook sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in), [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple), or [flutter_facebook_auth](https://pub.dev/packages/flutter_facebook_auth) packages.
     params:
       - name: provider
         isOptional: false
         type: OAuthProvider
-        description: The provider to perform the sign in with. Currently, `OAuthProvider.google` and `OAuthProvider.apple` are supported.
+        description: The provider to perform the sign in with.
       - name: idToken
         isOptional: false
         type: String
@@ -719,6 +719,36 @@ functions:
             nonce: rawNonce,
           );
           ```
+      - id: sign-in-with-facebook
+        name: Native Facebook Sign in
+        description: |
+          You can perform native Facebook sign in using [flutter_facebook_auth](https://pub.dev/packages/flutter_facebook_auth).
+
+          First, set up your Facebook app in the [Facebook Developer Console](https://developers.facebook.com) and configure it in your Supabase dashboard under `Authentication -> Providers -> Facebook`.
+        code: |
+          ```dart
+          import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+          import 'package:supabase_flutter/supabase_flutter.dart';
+
+          Future<void> signInWithFacebook() async {
+            final LoginResult result = await FacebookAuth.instance.login(
+              permissions: ['public_profile', 'email'],
+            );
+
+            if (result.status == LoginStatus.success) {
+              final accessToken = result.accessToken!.tokenString;
+
+              final response = await supabase.auth.signInWithIdToken(
+                provider: OAuthProvider.facebook,
+                idToken: accessToken,
+              );
+            } else {
+              throw const AuthException(
+                'Facebook login failed: ${result.status}',
+              );
+            }
+          }
+          ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
     description: |
@@ -859,7 +889,7 @@ functions:
   - id: verify-otp
     title: 'verifyOtp()'
     notes: |
-      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up or sign in a user.
     params:
       - name: token
@@ -1311,7 +1341,7 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          // retrieve all identites linked to a user
+          // retrieve all identities linked to a user
           final identities = await supabase.auth.getUserIdentities();
 
           // find the google identity
@@ -1321,6 +1351,106 @@ functions:
 
           // unlink the google identity
           await supabase.auth.unlinkIdentity(googleIdentity);
+          ```
+  - id: link-identity-with-id-token
+    title: 'linkIdentityWithIdToken()'
+    description: |
+      Links an identity to an existing user using an ID token obtained from a third-party OAuth provider. This allows linking identities using native OAuth flows (Google, Apple, Facebook, etc.) similar to `signInWithIdToken()` but for linking rather than signing in.
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentityWithIdToken()`.
+      - Supports the same OAuth providers as `signInWithIdToken()`: Google, Apple, Facebook, Kakao, and Keycloak.
+      - If the candidate identity is already linked to another user, the operation will fail.
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The OAuth provider to link the identity from.
+      - name: idToken
+        isOptional: false
+        type: String
+        description: The identity token obtained from the third-party provider.
+      - name: accessToken
+        isOptional: true
+        type: String
+        description: Access token obtained from the third-party provider. Required for Google sign in.
+      - name: nonce
+        isOptional: true
+        type: String
+        description: Raw nonce value used to perform the third-party sign in. Required for Apple sign-in.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+    examples:
+      - id: link-google-identity
+        name: Link Google identity
+        isSpotlight: true
+        description: |
+          Link a Google identity to the currently signed-in user using native Google Sign-In.
+        code: |
+          ```dart
+          import 'package:google_sign_in/google_sign_in.dart';
+          import 'package:supabase_flutter/supabase_flutter.dart';
+
+          const webClientId = '<web client ID>';
+          const iosClientId = '<iOS client ID>';
+
+          final GoogleSignIn googleSignIn = GoogleSignIn(
+            clientId: iosClientId,
+            serverClientId: webClientId,
+          );
+          final googleUser = await googleSignIn.signIn();
+          final googleAuth = await googleUser!.authentication;
+          final accessToken = googleAuth.accessToken;
+          final idToken = googleAuth.idToken;
+
+          if (accessToken == null) {
+            throw 'No Access Token found.';
+          }
+          if (idToken == null) {
+            throw 'No ID Token found.';
+          }
+
+          final response = await supabase.auth.linkIdentityWithIdToken(
+            provider: OAuthProvider.google,
+            idToken: idToken,
+            accessToken: accessToken,
+          );
+          ```
+      - id: link-apple-identity
+        name: Link Apple identity
+        description: |
+          Link an Apple identity to the currently signed-in user using native Apple Sign In.
+        code: |
+          ```dart
+          import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+          import 'package:supabase_flutter/supabase_flutter.dart';
+          import 'package:crypto/crypto.dart';
+
+          final rawNonce = supabase.auth.generateRawNonce();
+          final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+          final credential = await SignInWithApple.getAppleIDCredential(
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+            nonce: hashedNonce,
+          );
+
+          final idToken = credential.identityToken;
+          if (idToken == null) {
+            throw const AuthException(
+              'Could not find ID Token from generated credential.',
+            );
+          }
+
+          final response = await supabase.auth.linkIdentityWithIdToken(
+            provider: OAuthProvider.apple,
+            idToken: idToken,
+            nonce: rawNonce,
+          );
           ```
   - id: send-password-reauthentication
     title: 'reauthenticate()'
@@ -1633,9 +1763,9 @@ functions:
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
-      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+      Currently, Supabase supports time-based one-time password (TOTP) and phone verification code as the 2nd factor. Recovery codes are not supported but users can enroll multiple factors, with an upper limit of 10..
 
-      Having a 2nd TOTP factor for recovery means the user doesn't have to store their recovery codes. It also reduces the attack surface since the recovery factor is usually time-limited and not a single static code.
+      Having a 2nd factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup factor.
 
       Learn more about implementing MFA on your application on our guide [here](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
@@ -1644,7 +1774,7 @@ functions:
       Starts the enrollment process for a new Multi-Factor Authentication (MFA) factor. This method creates a new `unverified` factor.
       To verify a factor, present the QR code or secret to the user and ask them to add it to their authenticator app.
       The user has to enter the code from their authenticator app to verify it.
-      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - Use `totp` or `phone` as the `factorType` and the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/dart/auth-mfa-challengeandverify).
@@ -1661,6 +1791,10 @@ functions:
         isOptional: true
         type: String
         description: Human readable name assigned to the factor.
+      - name: phone
+        isOptional: true
+        type: String
+        description: Phone number to enroll for phone factor type.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -1680,6 +1814,27 @@ functions:
               qrCode: '<QR_CODE_AS_SVG_DATA>',
               secret: '<SECRET>',
               uri: '<URI>',
+            ),
+            phone: null,
+          );
+          ```
+      - id: enroll-phone-factor
+        name: Enroll a Phone Factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.enroll(factorType: FactorType.phone, phone: '+1234567890');
+
+          final phone = res.phone;
+          ```
+        response: |
+          ```json
+          AuthMFAEnrollResponse(
+            id: '<ID>',
+            type: FactorType.phone,
+            totp: null,
+            phone: PhoneEnrollment(
+              phone: '+1234567890',
             ),
           );
           ```
@@ -2446,20 +2601,6 @@ functions:
           final res = await supabase.functions.invoke('hello', body: {'foo': 'baa'});
           final data = res.data;
           ```
-      - id: specifying-response-type
-        name: Specifying response type.
-        description: |
-          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
-        isSpotlight: true
-        code: |
-          ```dart
-          final res = await supabase.functions.invoke(
-            'hello',
-            body: {'foo': 'baa'},
-            responseType: ResponseType.text,
-          );
-          final data = res.data;
-          ```
       - id: parsing-custom-headers
         name: Parsing custom headers.
         description: |
@@ -3181,7 +3322,7 @@ functions:
       - name: values
         isOptional: false
         type: Map<String, dynamic> or List<Map<String, dynamic>>
-        description: The values to upsert with. Pass a Map to upsert a single row or an List to upsert multiple rows.
+        description: The values to upsert with. Pass a Map to upsert a single row or an array to upsert multiple rows.
       - name: onConflict
         isOptional: true
         type: String
@@ -4584,7 +4725,7 @@ functions:
         description: Specify the referenced table when ordering by a column in an embedded resource.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -4745,7 +4886,7 @@ functions:
         description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -4843,7 +4984,7 @@ functions:
         description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -4876,13 +5017,67 @@ functions:
             }
           ]
           ```
+  - id: max-affected
+    title: maxAffected()
+    description: |
+      Sets the maximum number of rows that can be affected by the query. Only effective with PATCH and DELETE operations. Requires PostgREST v13 or higher.
+
+      When the limit is exceeded, the query will fail with an error. This provides a safety mechanism to prevent accidentally affecting more rows than intended.
+    notes: |
+      - This method is only effective with UPDATE and DELETE operations.
+      - Requires PostgREST v13 or higher on your Supabase instance.
+      - If the number of affected rows exceeds the limit, the query will fail and no rows will be modified.
+    params:
+      - name: count
+        isOptional: false
+        type: int
+        description: The maximum number of rows that can be affected by the query.
+    examples:
+      - id: with-update
+        name: With update()
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase
+            .from('users')
+            .update({'active': false})
+            .eq('status', 'inactive')
+            .maxAffected(5);
+          ```
+        description: |
+          Limit the number of rows that can be updated. If more than 5 rows match the filter, the operation will fail.
+      - id: with-delete
+        name: With delete()
+        code: |
+          ```dart
+          await supabase
+            .from('users')
+            .delete()
+            .eq('active', false)
+            .maxAffected(10);
+          ```
+        description: |
+          Limit the number of rows that can be deleted. If more than 10 rows match the filter, the operation will fail.
+      - id: with-select
+        name: With select()
+        code: |
+          ```dart
+          final data = await supabase
+            .from('users')
+            .update({'status': 'INACTIVE'})
+            .eq('id', 1)
+            .maxAffected(1)
+            .select();
+          ```
+        description: |
+          Combine maxAffected with select() to limit affected rows and return the updated data.
   - id: single
     title: single()
     description: |
       Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -5251,7 +5446,7 @@ functions:
         ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -5395,7 +5590,7 @@ functions:
         description: The value to filter with, following PostgREST syntax.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: false
         code: |
           ```dart
@@ -5426,7 +5621,7 @@ functions:
           ]
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```dart
           final data = await supabase
@@ -5435,7 +5630,7 @@ functions:
             .not('name', 'eq', 'Rohan');
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```dart
           final data = await supabase
@@ -5444,7 +5639,7 @@ functions:
             .not('name', 'eq', 'Mordor');
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
@@ -5464,7 +5659,7 @@ functions:
         description: The object to filter with, with column names as keys mapped to their filter values
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5511,7 +5706,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5559,7 +5754,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5611,7 +5806,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5659,7 +5854,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5711,7 +5906,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5759,7 +5954,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5811,7 +6006,7 @@ functions:
         description: The pattern to match with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5859,7 +6054,7 @@ functions:
         description: The pattern to match with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5960,7 +6155,7 @@ functions:
         description: The List to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6267,7 +6462,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6324,7 +6519,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6381,7 +6576,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6438,7 +6633,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6495,7 +6690,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6761,7 +6956,7 @@ functions:
       ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -6793,7 +6988,7 @@ functions:
           ]
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```dart
           final data = await supabase
@@ -6802,7 +6997,7 @@ functions:
             .filter('name', 'in', '("harpsichord","clavichord")');
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```dart
           final data = await supabase
@@ -6811,7 +7006,7 @@ functions:
             .filter('name', 'in', '("Rohan","Mordor")');
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.

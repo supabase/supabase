@@ -68,7 +68,7 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   )
 
   // Update publication
-  const { sql: updateSql } = pgMeta.publications.update(res!, {
+  const { sql: updateSql } = pgMeta.publications.update(res!.id, {
     name: 'b',
     publish_insert: false,
     tables: [],
@@ -150,12 +150,9 @@ withTestDatabase('tables with uppercase', async ({ executeQuery }) => {
   )
 
   // Update publication
-  const { sql: updateSql } = pgMeta.publications.update(
-    { id: res!.id },
-    {
-      tables: ['T'],
-    }
-  )
+  const { sql: updateSql } = pgMeta.publications.update(res!.id, {
+    tables: ['T'],
+  })
   await executeQuery(updateSql)
 
   // Verify update
@@ -241,7 +238,7 @@ withTestDatabase('update no tables -> all tables', async ({ executeQuery }) => {
   const res = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update publication
-  const { sql: updateSql } = pgMeta.publications.update(res!, {
+  const { sql: updateSql } = pgMeta.publications.update(res!.id, {
     tables: null,
   })
   await executeQuery(updateSql)
@@ -287,7 +284,7 @@ withTestDatabase('update all tables -> no tables', async ({ executeQuery }) => {
   const res = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update publication
-  const { sql: updateSql } = pgMeta.publications.update(res!, {
+  const { sql: updateSql } = pgMeta.publications.update(res!.id, {
     tables: [],
   })
   await executeQuery(updateSql)

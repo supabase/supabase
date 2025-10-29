@@ -1,5 +1,7 @@
-import type { FormSchema } from 'types'
 import { object, string } from 'yup'
+
+import { DOCS_URL } from 'lib/constants'
+import type { FormSchema } from 'types'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -7,7 +9,8 @@ const CONFIRMATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'CONFIRMATION',
   type: 'object',
-  title: 'Confirm signup',
+  title: 'Confirm sign up',
+  purpose: 'Email verification for new user registrations',
   properties: {
     MAILER_SUBJECTS_CONFIRMATION: {
       title: 'Subject heading',
@@ -18,7 +21,7 @@ const CONFIRMATION: FormSchema = {
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: ` 
-- \`{{ .ConfirmationURL }}\` : URL to confirm the e-mail address for the new account
+- \`{{ .ConfirmationURL }}\` : URL to confirm the email address for the new account
 - \`{{ .Token }}\` : The 6-digit numeric email OTP 
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
@@ -34,7 +37,7 @@ const CONFIRMATION: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -43,6 +46,7 @@ const INVITE: FormSchema = {
   id: 'INVITE',
   type: 'object',
   title: 'Invite user',
+  purpose: "Allows administrators to invite users who don't have accounts yet",
   properties: {
     MAILER_SUBJECTS_INVITE: {
       title: 'Subject heading',
@@ -69,7 +73,7 @@ const INVITE: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -77,7 +81,8 @@ const MAGIC_LINK: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MAGIC_LINK',
   type: 'object',
-  title: 'Magic Link',
+  title: 'Magic link',
+  purpose: 'Passwordless login using email links',
   properties: {
     MAILER_SUBJECTS_MAGIC_LINK: {
       title: 'Subject heading',
@@ -104,7 +109,7 @@ const MAGIC_LINK: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -112,7 +117,8 @@ const EMAIL_CHANGE: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'EMAIL_CHANGE',
   type: 'object',
-  title: 'Change Email Address',
+  title: 'Change email address',
+  purpose: 'Verification for email address changes',
   properties: {
     MAILER_SUBJECTS_EMAIL_CHANGE: {
       title: 'Subject heading',
@@ -140,7 +146,7 @@ const EMAIL_CHANGE: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -148,7 +154,8 @@ const RECOVERY: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'RECOVERY',
   type: 'object',
-  title: 'Reset Password',
+  title: 'Reset password',
+  purpose: 'Password recovery flow for users who forgot their password',
   properties: {
     MAILER_SUBJECTS_RECOVERY: {
       title: 'Subject heading',
@@ -175,7 +182,7 @@ const RECOVERY: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 const REAUTHENTICATION: FormSchema = {
@@ -183,6 +190,8 @@ const REAUTHENTICATION: FormSchema = {
   id: 'REAUTHENTICATION',
   type: 'object',
   title: 'Reauthentication',
+  purpose:
+    'Additional verification for sensitive actions (like changing password, deleting account)',
   properties: {
     MAILER_SUBJECTS_REAUTHENTICATION: {
       title: 'Subject heading',
@@ -206,7 +215,7 @@ const REAUTHENTICATION: FormSchema = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
