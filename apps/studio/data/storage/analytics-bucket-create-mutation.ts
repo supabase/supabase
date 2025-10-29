@@ -1,3 +1,5 @@
+// @ts-nocheck
+// [Joshen] To remove after infra changes for analytics bucket is in
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
