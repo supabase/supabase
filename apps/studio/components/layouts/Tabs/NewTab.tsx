@@ -109,7 +109,7 @@ export function NewTab() {
     tableQuickstartVariant !== undefined
 
   useEffect(() => {
-    if (shouldTrackExposure && tableQuickstartVariant && !hasTrackedExposure.current) {
+    if (shouldTrackExposure && !hasTrackedExposure.current) {
       hasTrackedExposure.current = true
       track('table_quickstart_opened', {
         variant: tableQuickstartVariant,
