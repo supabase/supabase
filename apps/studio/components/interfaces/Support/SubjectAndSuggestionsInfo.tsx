@@ -40,7 +40,7 @@ export function SubjectAndSuggestionsInfo({
         )}
       />
       <DocsSuggestions searchString={subject} />
-      {true && (
+      {subject && INCLUDE_DISCUSSIONS.includes(category) && (
         <GitHubDiscussionSuggestion subject={subject} />
       )}
     </div>
@@ -65,7 +65,7 @@ function GitHubDiscussionSuggestion({ subject }: GitHubDiscussionSuggestionProps
         GitHub discussions
         <ExternalLink size={14} strokeWidth={2} />
       </Link>
-      for a quick answer.
+      for a quick answer
     </p>
   )
 }
