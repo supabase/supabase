@@ -12,6 +12,7 @@ import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import type { DataTableTimerangeFilterField } from '../DataTable.types'
 import { isArrayOfDates } from '../DataTable.utils'
 import { useDataTable } from '../providers/DataTableProvider'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function DataTableFilterTimerange<TData>({
   value: _value,
@@ -23,8 +24,10 @@ export function DataTableFilterTimerange<TData>({
   const column = table.getColumn(value)
   const filterValue = columnFilters.find((i) => i.id === value)?.value
 
-  const { plan: orgPlan } = useCurrentOrgPlan()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
+
+  const { getEntitlementNumericValue } = useCheckEntitlements('security.audit_logs_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const date: DateRange | undefined = useMemo(
     () =>
@@ -37,8 +40,9 @@ export function DataTableFilterTimerange<TData>({
   )
 
   const handleDatePickerChange = (vals: DatePickerValue) => {
+
     // Check if the selected date range exceeds the plan limits
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(vals.from, orgPlan?.id)
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(vals.from, entitledToAuditLogDays)
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)

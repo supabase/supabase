@@ -10,6 +10,7 @@ import {
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import { useCheckEntitlements } from './useCheckEntitlements'
 
 export const DATERANGE_LIMITS: { [key: string]: number } = {
   free: 1,
@@ -244,7 +245,10 @@ export const useReportDateRange = (
   )
 
   const handleDatePickerChange = (values: DatePickerValue) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(values.from, orgPlan?.id)
+    const { getEntitlementNumericValue } = useCheckEntitlements('security.audit_log_days')
+    const entitledToAuditLogDays = getEntitlementNumericValue() ?? 1
+    console.log('entitledToAuditLogDays in handleDatePickerChange', entitledToAuditLogDays)
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(values.from, entitledToAuditLogDays)
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)
       return true
