@@ -7,13 +7,17 @@ subtitle: 'Set up redirect urls with Supabase Auth.'
 
 ## Overview
 
-Supabase Auth allows your application to receive a [user session](/docs/guides/auth/sessions) on web pages or in mobile apps that only you allow.
+Supabase Auth allows you to control how the [user sessions](/docs/guides/auth/sessions) are handled by your application.
 
-When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library methods provide a `redirectTo` parameter to specify where to redirect the user to after authentication. By default, the user will be redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls) but you can modify the `SITE_URL` or add additional redirect URLs to the allow list. Once you've added necessary URLs to the allow list, you can specify the URL you want the user to be redirected to in the `redirectTo` parameter.
+When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library provides a `redirectTo` parameter to specify where to redirect the user after authentication. The URL in `redirectTo` should match the [Redirect URLs](/dashboard/project/_/auth/url-configuration) list configuration.
 
-When using [Sign in with Web3](/docs/guides/auth/auth-web3) the message signed by the user in the Web3 wallet application will indicate the URL on which the signature took place. Supabase Auth will reject messages that are signed for URLs that have not been allowed.
+To configure allowed redirect URLs, go to the [URL Configuration](/dashboard/project/_/auth/url-configuration) page. Once you've added necessary URLs, you can use the URL you want the user to be redirected to in the `redirectTo` parameter.
 
-To edit the allow list, go to the [URL Configuration](/dashboard/project/_/auth/url-configuration) page. In local development or self-hosted projects, use the [configuration file](/docs/guides/cli/config#auth.additional_redirect_urls).
+The Site URL in [URL Configuration](/dashboard/project/_/auth/url-configuration) defines the **default redirect URL** when no `redirectTo` is specified in the code. Change this from `http://localhost:3000` to your production URL (e.g., https://example.com). This setting is critical for email confirmations and password resets.
+
+When using [Sign in with Web3](/docs/guides/auth/auth-web3), the message signed by the user in the Web3 wallet application will indicate the URL on which the signature took place. Supabase Auth will reject messages that are signed for URLs that are not on the allowed list.
+
+In local development or self-hosted projects, use the [configuration file](/docs/guides/local-development/cli/config#auth.additional_redirect_urls). See below for more information on configuring `SITE_URL` when deploying to Vercel or Netlify.
 
 ## Use wildcards in redirect URLs
 
