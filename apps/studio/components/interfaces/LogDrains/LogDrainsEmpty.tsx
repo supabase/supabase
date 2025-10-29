@@ -1,6 +1,6 @@
 import { Button, Card, cn } from 'ui'
 import Link from 'next/link'
-import { Github } from 'lucide-react'
+import { AnimatedLogos } from './AnimatedLogos'
 import Image from 'next/image'
 import { BASE_PATH } from 'lib/constants'
 
@@ -36,7 +36,7 @@ export const LogDrainsEmpty = () => {
     <div className="flex grow items-center justify-center p-12 @container">
       <div className="w-full max-w-4xl flex flex-col items-center gap-0">
         <div className="text-center mb-12">
-          <div>Image carousel</div>
+          <AnimatedLogos />
           <h2 className="heading-section mb-1">Capture your logs, your way</h2>
           <p className="text-foreground-light mb-6">
             Upgrade to a Team or Enterprise Plan to send your logs to your preferred platform
