@@ -22,8 +22,8 @@ export const useSessionAccessTokenQuery = <TData = SessionAccessTokenData>({
   enabled = true,
   ...options
 }: UseQueryOptions<SessionAccessTokenData, SessionAccessTokenError, TData> = {}) =>
-  useQuery<SessionAccessTokenData, SessionAccessTokenError, TData>(
-    authKeys.accessToken(),
-    () => getSessionAccessToken(),
-    options
-  )
+  useQuery<SessionAccessTokenData, SessionAccessTokenError, TData>({
+    queryKey: authKeys.accessToken(),
+    queryFn: () => getSessionAccessToken(),
+    ...options,
+  })

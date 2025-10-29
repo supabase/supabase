@@ -186,7 +186,9 @@ export const CreateBranchModal = () => {
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
-        await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectRef) }),
+        ])
       }
       sendEvent({
         action: 'branch_create_button_clicked',
@@ -396,11 +398,9 @@ export const CreateBranchModal = () => {
                       description="Clone production data into this branch"
                     >
                       <FormControl_Shadcn_>
-                        <Switch
-                          disabled={!hasPitrEnabled}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        {hasPitrEnabled && (
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        )}
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

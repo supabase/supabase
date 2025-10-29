@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode, useMemo, useState } from 'react'
+import { ReactNode, useMemo } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
@@ -13,18 +13,19 @@ import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
 import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
-import EditorPanel from 'components/ui/EditorPanel/EditorPanel'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Badge, cn } from 'ui'
+import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
 import { BreadcrumbsView } from './BreadcrumbsView'
-import { FeedbackDropdown } from './FeedbackDropdown'
+import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
@@ -70,16 +71,12 @@ const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
+  const { toggleSidebar } = useSidebarManagerSnapshot()
 
   const isAccountPage = router.pathname.startsWith('/account')
-
-  const [showEditorPanel, setShowEditorPanel] = useState(false)
-  useHotKey(
-    () => {
-      if (projectRef) setShowEditorPanel(!showEditorPanel)
-    },
-    'e',
-    [showEditorPanel, projectRef]
+  const [inlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
+    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
+    true
   )
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
@@ -225,7 +222,10 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <InlineEditorButton
+                          onClick={() => toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
+                          showShortcut={inlineEditorHotkeyEnabled}
+                        />
                         <AssistantButton />
                       </>
                     )}
@@ -240,7 +240,10 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <InlineEditorButton
+                          onClick={() => toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
+                          showShortcut={inlineEditorHotkeyEnabled}
+                        />
                         <AssistantButton />
                       </>
                     )}
@@ -252,7 +255,6 @@ const LayoutHeader = ({
           </div>
         </div>
       </header>
-      <EditorPanel open={showEditorPanel} onClose={() => setShowEditorPanel(false)} />
     </>
   )
 }

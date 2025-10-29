@@ -27,6 +27,7 @@ interface AIEditorProps {
   options?: monacoEditor.IStandaloneEditorConstructionOptions
   onChange?: (value: string) => void
   onClose?: () => void
+  closeShortcutEnabled?: boolean
   executeQuery?: () => void
 }
 
@@ -47,11 +48,14 @@ const AIEditor = ({
   options = {},
   onChange,
   onClose,
+  closeShortcutEnabled = true,
   executeQuery,
 }: AIEditorProps) => {
   const os = detectOS()
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<monacoEditor.IStandaloneDiffEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
+  const closeActionDisposableRef = useRef<{ dispose: () => void } | null>(null)
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
@@ -142,11 +146,33 @@ const AIEditor = ({
     handleReset()
   }
 
+  const refreshCloseAction = useCallback(() => {
+    closeActionDisposableRef.current?.dispose()
+    closeActionDisposableRef.current = null
+
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+
+    if (!editor || !monaco || !onClose || !closeShortcutEnabled) return
+
+    const action = editor.addAction({
+      id: 'close-editor',
+      label: 'Close editor',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyE],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: onClose,
+    })
+
+    closeActionDisposableRef.current = action ?? null
+  }, [closeShortcutEnabled, onClose])
+
   const handleEditorOnMount: OnMount = (
     editor: monacoEditor.IStandaloneCodeEditor,
     monaco: Monaco
   ) => {
     editorRef.current = editor
+    monacoRef.current = monaco
     // Set prompt state to open if promptInput exists
     if (promptInput) {
       const model = editor.getModel()
@@ -193,16 +219,7 @@ const AIEditor = ({
       })
     }
 
-    if (!!onClose) {
-      editor.addAction({
-        id: 'close-editor',
-        label: 'Close editor',
-        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyE],
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 0,
-        run: () => onClose(),
-      })
-    }
+    refreshCloseAction()
 
     editor.addAction({
       id: 'generate-ai',

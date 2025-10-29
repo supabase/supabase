@@ -30,8 +30,9 @@ export const useSecretsQuery = <TData = SecretsData>(
   { projectRef }: SecretsVariables,
   { enabled = true, ...options }: UseQueryOptions<SecretsData, SecretsError, TData> = {}
 ) =>
-  useQuery<SecretsData, SecretsError, TData>(
-    secretsKeys.list(projectRef),
-    ({ signal }) => getSecrets({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<SecretsData, SecretsError, TData>({
+    queryKey: secretsKeys.list(projectRef),
+    queryFn: ({ signal }) => getSecrets({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

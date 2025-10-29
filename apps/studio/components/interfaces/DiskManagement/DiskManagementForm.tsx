@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -19,7 +18,7 @@ import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-upd
 import { useDiskAutoscaleCustomConfigQuery } from 'data/config/disk-autoscale-config-query'
 import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale-config-update-mutation'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { setProjectStatus } from 'data/projects/projects-query'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -65,14 +64,16 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function DiskManagementForm() {
+  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const { ref: projectRef } = useParams()
-  const queryClient = useQueryClient()
+  const { setProjectStatus } = useSetProjectStatus()
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === project?.ref
   )
@@ -87,6 +88,8 @@ export function DiskManagementForm() {
         project_id: project?.id,
       },
     })
+
+  const { hasAccess, entitlementConfig } = useCheckEntitlements('instances.compute_update')
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
@@ -192,7 +195,7 @@ export function DiskManagementForm() {
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const isPlanUpgradeRequired = org?.plan.id === 'free'
+  const isPlanUpgradeRequired = !hasAccess
 
   const { formState } = form
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
@@ -200,8 +203,7 @@ export function DiskManagementForm() {
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
-    org?.plan.id !== 'free'
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) && !hasAccess
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -230,7 +232,7 @@ export function DiskManagementForm() {
       onError: () => {},
       onSuccess: () => {
         //Manually set project status to RESIZING, Project status should be RESIZING on next project status request.
-        setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
+        if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
       },
     })
   const { mutateAsync: updateDiskAutoscaleConfig, isLoading: isUpdatingDiskAutoscaleConfig } =
@@ -316,7 +318,7 @@ export function DiskManagementForm() {
         <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
           <NoticeBar
             type="default"
-            visible={isPlanUpgradeRequired}
+            visible={!hasAccess}
             title="Compute and Disk configuration is not available on the Free Plan"
             actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"

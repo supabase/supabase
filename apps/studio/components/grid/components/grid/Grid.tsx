@@ -72,6 +72,7 @@ export const Grid = memo(
         snap.setSelectedCellPosition({ idx: args.column.idx, rowIdx: args.rowIdx })
       }
 
+      const page = snap.page
       const table = snap.table
       const tableEntityType = snap.originalTable?.entity_type
       const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
@@ -154,7 +155,20 @@ export const Grid = memo(
 
               {isSuccess && (
                 <>
-                  {(filters ?? []).length === 0 ? (
+                  {page > 1 ? (
+                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                      <p className="text-sm text-light">This page does not have any data</p>
+                      <div className="flex items-center space-x-2 mt-4">
+                        <Button
+                          type="default"
+                          className="pointer-events-auto"
+                          onClick={() => snap.setPage(1)}
+                        >
+                          Head back to first page
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (filters ?? []).length === 0 ? (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
                       <p className="text-sm text-light">
                         {isDraggedOver ? 'Drop your CSV file here' : 'This table is empty'}
@@ -194,7 +208,7 @@ export const Grid = memo(
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center col-span-full">
+                    <div className="flex flex-col items-center justify-center col-span-full h-full">
                       <p className="text-sm text-light">
                         The filters applied have returned no results from this table
                       </p>

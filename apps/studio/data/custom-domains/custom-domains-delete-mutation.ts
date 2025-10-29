@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
+import { subscriptionKeys } from 'data/subscriptions/keys'
 import type { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
 
@@ -32,32 +33,33 @@ export const useCustomDomainDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>(
-    (vars) => deleteCustomDomain(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>({
+    mutationFn: (vars) => deleteCustomDomain(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        // we manually setQueriesData here instead of using
-        // the standard invalidateQueries is the custom domains
-        // endpoint doesn't immediately return the new state
-        queryClient.setQueriesData(customDomainKeys.list(projectRef), () => {
-          return {
-            customDomain: null,
-            status: '0_no_hostname_configured',
-          }
-        })
-
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete custom domain: ${data.message}`)
-        } else {
-          onError(data, variables, context)
+      // we manually setQueriesData here instead of using
+      // the standard invalidateQueries is the custom domains
+      // endpoint doesn't immediately return the new state
+      queryClient.setQueriesData({ queryKey: customDomainKeys.list(projectRef) }, () => {
+        return {
+          customDomain: null,
+          status: '0_no_hostname_configured',
         }
-      },
-      ...options,
-    }
-  )
+      })
+
+      // Invalidate addons cache since the backend removes the addon when deleting the domain
+      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
+
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete custom domain: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

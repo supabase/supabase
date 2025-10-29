@@ -25,7 +25,7 @@ interface PublicationsComboBoxProps {
   field: ControllerRenderProps<any, 'publicationName'>
 }
 
-const PublicationsComboBox = ({
+export const PublicationsComboBox = ({
   publications,
   isLoadingPublications,
   isLoadingCheck,
@@ -138,5 +138,3 @@ const PublicationsComboBox = ({
     </Popover_Shadcn_>
   )
 }
-
-export default PublicationsComboBox

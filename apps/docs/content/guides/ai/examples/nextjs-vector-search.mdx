@@ -130,7 +130,7 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
       page_id bigint not null references public.nods_page on delete cascade,
       content text,
       token_count int,
-      embedding vector(1536),
+      embedding extensions.vector(1536),
       slug text,
       heading text
     );
@@ -156,7 +156,7 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
     ```sql
     -- Create embedding similarity search functions
     create or replace function match_page_sections(
-        embedding vector(1536),
+        embedding extensions.vector(1536),
         match_threshold float,
         match_count int,
         min_content_length int
