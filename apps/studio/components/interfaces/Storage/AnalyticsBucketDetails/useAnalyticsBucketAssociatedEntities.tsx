@@ -66,10 +66,17 @@ export const useAnalyticsBucketAssociatedEntities = (
 }
 
 export const useAnalyticsBucketDeleteCleanUp = () => {
-  const { mutateAsync: deleteFDW, isLoading: isDeletingWrapper } = useFDWDeleteMutation()
+  const { mutateAsync: deleteFDW, isLoading: isDeletingWrapper } = useFDWDeleteMutation({
+    // Silence default error handler toast
+    onError: () => {},
+  })
 
-  const { mutateAsync: deleteS3AccessKey, isLoading: isDeletingKey } =
-    useS3AccessKeyDeleteMutation()
+  const { mutateAsync: deleteS3AccessKey, isLoading: isDeletingKey } = useS3AccessKeyDeleteMutation(
+    {
+      // Silence default error handler toast
+      onError: () => {},
+    }
+  )
 
   const isDeleting = isDeletingWrapper || isDeletingKey
 
@@ -91,26 +98,38 @@ export const useAnalyticsBucketDeleteCleanUp = () => {
     publication?: ReplicationPublication
   }) => {
     if (!!icebergWrapper && !!icebergWrapperMeta) {
-      await deleteFDW({
-        projectRef,
-        connectionString,
-        wrapper: icebergWrapper,
-        wrapperMeta: icebergWrapperMeta,
-      })
+      try {
+        await deleteFDW({
+          projectRef,
+          connectionString,
+          wrapper: icebergWrapper,
+          wrapperMeta: icebergWrapperMeta,
+        })
+      } catch (error: any) {
+        console.error(`Failed to delete iceberg wrapper for ${bucketId}:`, error.message)
+      }
     } else {
       console.warn(`Unable to find and delete iceberg wrapper for ${bucketId}`)
     }
 
     if (!!s3AccessKey) {
-      await deleteS3AccessKey({ projectRef, id: s3AccessKey.id })
+      try {
+        await deleteS3AccessKey({ projectRef, id: s3AccessKey.id })
+      } catch (error: any) {
+        console.error(`Failed to delete S3 access key for: ${bucketId}`, error.message)
+      }
     } else {
       console.warn(`Unable to find and delete corresponding S3 access key for ${bucketId}`)
     }
 
     if (!!publication) {
-      // [TODO] Delete the publication
+      try {
+        // [TODO] Delete the publication
+      } catch (error: any) {
+        console.error(`Failed to delete replication publication for: ${bucketId}`, error.message)
+      }
     } else {
-      console.log(`Unable to find and delete corresponding publication for ${bucketId}`)
+      console.warn(`Unable to find and delete replication publication for ${bucketId}`)
     }
   }
 
