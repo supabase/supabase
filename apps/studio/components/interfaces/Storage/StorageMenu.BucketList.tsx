@@ -1,95 +1,72 @@
 import type { CSSProperties } from 'react'
-import { memo, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import type { ListChildComponentProps } from 'react-window'
-import { FixedSizeList as List, areEqual } from 'react-window'
+import { memo, useCallback, useMemo } from 'react'
 
+import { InfiniteListDefault } from 'components/ui/InfiniteList'
 import type { Bucket } from 'data/storage/buckets-query'
 import { cn } from 'ui'
 import { BucketRow } from './BucketRow'
 
-type BucketListProps = {
-  buckets: Bucket[]
-  selectedBucketId?: string
+type VirtualizedBucketRowProps = {
+  item: Bucket
   projectRef?: string
+  selectedBucketId?: string
+  style?: CSSProperties
 }
 
 const BUCKET_ROW_HEIGHT = 'h-7'
 
 const VirtualizedBucketRow = memo(
-  ({ index, style, data }: ListChildComponentProps<BucketListProps>) => {
-    const bucket = data.buckets[index]
-    const isSelected = data.selectedBucketId === bucket.id
+  ({ item, projectRef, selectedBucketId, style }: VirtualizedBucketRowProps) => {
+    const isSelected = selectedBucketId === item.id
 
     return (
       <BucketRow
-        bucket={bucket}
+        bucket={item}
         isSelected={isSelected}
-        projectRef={data.projectRef}
+        projectRef={projectRef}
         style={style as CSSProperties}
         className={cn(BUCKET_ROW_HEIGHT)}
       />
     )
-  },
-  (prev, next) => {
-    if (!areEqual(prev, next)) return false
-
-    const prevBucket = prev.data.buckets[prev.index]
-    const nextBucket = next.data.buckets[next.index]
-
-    if (prevBucket !== nextBucket) return false
-
-    const wasSelected = prev.data.selectedBucketId === prevBucket.id
-    const isSelected = next.data.selectedBucketId === nextBucket.id
-
-    return wasSelected === isSelected
   }
 )
 VirtualizedBucketRow.displayName = 'VirtualizedBucketRow'
 
 const BucketListVirtualized = ({ buckets, selectedBucketId, projectRef = '' }: BucketListProps) => {
-  const [listHeight, setListHeight] = useState(500)
-  const sizerRef = useRef<HTMLDivElement>(null)
-
-  useLayoutEffect(() => {
-    if (sizerRef.current) {
-      const resizeObserver = new ResizeObserver(([entry]) => {
-        const { height } = entry.contentRect
-        setListHeight(height)
-      })
-
-      resizeObserver.observe(sizerRef.current)
-      setListHeight(sizerRef.current.getBoundingClientRect().height)
-
-      return () => {
-        resizeObserver.disconnect()
-      }
-    }
-  }, [])
-
-  const itemData = useMemo<BucketListProps>(
+  const itemData = useMemo(
     () => ({
-      buckets,
       projectRef,
       selectedBucketId,
     }),
-    [buckets, projectRef, selectedBucketId]
+    [projectRef, selectedBucketId]
+  )
+
+  const getItemKey = useCallback(
+    (index: number) => {
+      const item = buckets[index]
+      return item?.id || `bucket-${index}`
+    },
+    [buckets]
   )
 
   return (
-    <div ref={sizerRef} className="flex-grow">
-      <List
-        itemCount={buckets.length}
-        itemData={itemData}
-        itemKey={(index) => buckets[index].id}
-        height={listHeight}
-        // itemSize should match the height of BucketRow + any gap/margin
-        itemSize={28}
-        width="100%"
-      >
-        {VirtualizedBucketRow}
-      </List>
-    </div>
+    <InfiniteListDefault
+      items={buckets}
+      itemProps={itemData}
+      getItemKey={getItemKey}
+      // Keep in tandem with BUCKET_ROW_HEIGHT
+      getItemSize={() => 28}
+      ItemComponent={VirtualizedBucketRow}
+      // There is no loader because all buckets load from backend at once
+      LoaderComponent={() => null}
+    />
   )
+}
+
+type BucketListProps = {
+  buckets: Bucket[]
+  selectedBucketId?: string
+  projectRef?: string
 }
 
 export const BucketList = ({ buckets, selectedBucketId, projectRef = '' }: BucketListProps) => {

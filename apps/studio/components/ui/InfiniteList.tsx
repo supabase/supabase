@@ -101,7 +101,7 @@ export const InfiniteListScrollWrapper = <Item, Wrapper extends ElementType = 'd
   isLoadingNextPage = false,
   onLoadNextPage = () => {},
   className,
-  Component: Component,
+  Component,
 }: PropsWithChildren<InfiniteListWrapperProps<Item, Wrapper>>) => {
   const scrollRef = useRef<ExtractScrollElementFromRefComponent<Wrapper> | null>(null)
 
