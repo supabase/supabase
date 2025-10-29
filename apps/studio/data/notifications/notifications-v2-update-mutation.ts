@@ -34,7 +34,7 @@ export const useNotificationsV2UpdateMutation = ({
   return useMutation<NotificationsUpdateData, ResponseError, NotificationsUpdateVariables>({
     mutationFn: (vars) => updateNotifications(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(['notifications'])
+      await queryClient.invalidateQueries({ queryKey: ['notifications'] })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

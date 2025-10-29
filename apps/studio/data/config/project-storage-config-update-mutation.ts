@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { components } from 'api-types'
 
 type StorageConfigUpdatePayload = components['schemas']['UpdateStorageConfigBody']
 
@@ -51,7 +51,7 @@ export const useProjectStorageConfigUpdateUpdateMutation = ({
     mutationFn: (vars) => updateProjectStorageConfigUpdate(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(configKeys.storage(projectRef))
+      await queryClient.invalidateQueries({ queryKey: configKeys.storage(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

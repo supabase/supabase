@@ -38,7 +38,7 @@ export const useOAuthAppDeleteMutation = ({
     mutationFn: (vars) => deleteOAuthApp(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
-      await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
+      await queryClient.invalidateQueries({ queryKey: oauthAppKeys.oauthApps(slug) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

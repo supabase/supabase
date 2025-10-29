@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
+import { AnalyticsBucket, useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import {
   Button,
   Card,
@@ -31,19 +31,17 @@ export const AnalyticsBuckets = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
-  const [selectedBucket, setSelectedBucket] = useState<Bucket>()
   const [filterString, setFilterString] = useState('')
+  const [selectedBucket, setSelectedBucket] = useState<AnalyticsBucket>()
+  const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
 
-  const { data: buckets = [], isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef: ref })
+  const { data: buckets = [], isLoading: isLoadingBuckets } = useAnalyticsBucketsQuery({
+    projectRef: ref,
+  })
 
-  const analyticsBuckets = buckets
-    .filter((bucket) => !('type' in bucket) || bucket.type === 'ANALYTICS')
-    .filter((bucket) =>
-      filterString.length === 0
-        ? true
-        : bucket.name.toLowerCase().includes(filterString.toLowerCase())
-    )
+  const analyticsBuckets = buckets.filter((bucket) =>
+    filterString.length === 0 ? true : bucket.id.toLowerCase().includes(filterString.toLowerCase())
+  )
 
   return (
     <>
@@ -87,7 +85,7 @@ export const AnalyticsBuckets = () => {
                 </TableHeader>
                 <TableBody>
                   {analyticsBuckets.length === 0 && filterString.length > 0 && (
-                    <TableRow>
+                    <TableRow className="[&>td]:hover:bg-inherit">
                       <TableCell colSpan={3}>
                         <p className="text-sm text-foreground">No results found</p>
                         <p className="text-sm text-foreground-light">
@@ -97,17 +95,9 @@ export const AnalyticsBuckets = () => {
                     </TableRow>
                   )}
                   {analyticsBuckets.map((bucket) => (
-                    <TableRow
-                      key={bucket.id}
-                      className="cursor-pointer"
-                      onClick={(event) => {
-                        const url = `/project/${ref}/storage/analytics/buckets/${bucket.id}`
-                        if (event.metaKey) window.open(url, '_blank')
-                        else router.push(url)
-                      }}
-                    >
+                    <TableRow key={bucket.id}>
                       <TableCell>
-                        <p className="text-foreground">{bucket.name}</p>
+                        <p className="text-foreground">{bucket.id}</p>
                       </TableCell>
 
                       <TableCell>
@@ -124,25 +114,18 @@ export const AnalyticsBuckets = () => {
                           <Button asChild type="default">
                             <Link
                               href={`/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`}
-                              onClick={(e) => e.stopPropagation()}
                             >
                               View contents
                             </Link>
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<MoreVertical />}
-                                onClick={(e) => e.stopPropagation()}
-                              />
+                              <Button type="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-40">
                               <DropdownMenuItem
                                 className="flex items-center space-x-2"
                                 onClick={(e) => {
-                                  e.stopPropagation()
                                   setModal('delete')
                                   setSelectedBucket(bucket)
                                 }}
@@ -165,7 +148,7 @@ export const AnalyticsBuckets = () => {
 
       {selectedBucket && (
         <DeleteBucketModal
-          visible={modal === `delete`}
+          visible={modal === 'delete'}
           bucket={selectedBucket}
           onClose={() => setModal(null)}
         />

@@ -69,7 +69,12 @@ const FormSchema = z.object({
     .optional(),
 })
 
-const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: CreateFunctionProps) => {
+export const CreateFunction = ({
+  func,
+  visible,
+  isDuplicating = false,
+  onClose,
+}: CreateFunctionProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
@@ -415,8 +420,6 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
     </Sheet>
   )
 }
-
-export default CreateFunction
 
 interface FormFieldConfigParamsProps {
   readonly?: boolean

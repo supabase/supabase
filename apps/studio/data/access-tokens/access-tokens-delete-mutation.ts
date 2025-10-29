@@ -33,7 +33,7 @@ export const useAccessTokenDeleteMutation = ({
   return useMutation<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>({
     mutationFn: (vars) => deleteAccessToken(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(accessTokenKeys.list())
+      await queryClient.invalidateQueries({ queryKey: accessTokenKeys.list() })
 
       await onSuccess?.(data, variables, context)
     },

@@ -10,6 +10,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -20,12 +21,14 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
 
 export const HelpPopover = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -69,9 +72,9 @@ export const HelpPopover = () => {
                 size="tiny"
                 icon={<AiIconAnimation allowHoverEffect size={14} />}
                 onClick={() => {
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                   snap.newChat({
                     name: 'Support',
-                    open: true,
                     initialInput: `I need help with my project`,
                     suggestions: {
                       title:
@@ -99,7 +102,7 @@ export const HelpPopover = () => {
             )}
             <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
               <a
-                href={`${DOCS_URL}/guides/platform/troubleshooting`}
+                href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
                 target="_blank"
                 rel="noreferrer"
               >

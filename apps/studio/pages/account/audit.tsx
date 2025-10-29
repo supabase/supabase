@@ -1,4 +1,4 @@
-import { AuditLogs } from 'components/interfaces/Account'
+import { AuditLogs } from 'components/interfaces/Account/AuditLogs'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -27,7 +27,7 @@ const Audit: NextPageWithLayout = () => {
 
 Audit.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
         <AccountLayout title="Audit Logs">{page}</AccountLayout>
       </OrganizationLayout>

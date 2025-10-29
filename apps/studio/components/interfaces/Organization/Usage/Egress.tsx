@@ -1,16 +1,12 @@
 import { DataPoint } from 'data/analytics/constants'
-import {
-  PricingMetric,
-  useOrgDailyStatsQuery,
-  type OrgDailyUsageResponse,
-} from 'data/analytics/org-daily-stats-query'
+import { PricingMetric, type OrgDailyUsageResponse } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import UsageSection from './UsageSection/UsageSection'
 import { dailyUsageToDataPoints } from './Usage.utils'
 
 export interface EgressProps {
   orgSlug: string
-  projectRef?: string
+  projectRef: string | null
   subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
   orgDailyStats: OrgDailyUsageResponse | undefined

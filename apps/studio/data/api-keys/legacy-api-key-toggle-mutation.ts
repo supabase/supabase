@@ -40,7 +40,7 @@ export const useToggleLegacyAPIKeysMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
-      await queryClient.invalidateQueries(apiKeysKeys.status(projectRef))
+      await queryClient.invalidateQueries({ queryKey: apiKeysKeys.status(projectRef) })
 
       await onSuccess?.(data, variables, context)
     },

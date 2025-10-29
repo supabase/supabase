@@ -37,7 +37,7 @@ export const useDatabasePasswordResetMutation = ({
   return useMutation<DatabasePasswordResetData, ResponseError, DatabasePasswordResetVariables>({
     mutationFn: (vars) => resetDatabasePassword(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(projectKeys.detail(variables.ref))
+      await queryClient.invalidateQueries({ queryKey: projectKeys.detail(variables.ref) })
 
       await onSuccess?.(data, variables, context)
     },

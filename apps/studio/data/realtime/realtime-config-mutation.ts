@@ -69,7 +69,7 @@ export const useRealtimeConfigurationUpdateMutation = ({
     mutationFn: (vars) => updateRealtimeConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
-      await queryClient.invalidateQueries(realtimeKeys.configuration(ref))
+      await queryClient.invalidateQueries({ queryKey: realtimeKeys.configuration(ref) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

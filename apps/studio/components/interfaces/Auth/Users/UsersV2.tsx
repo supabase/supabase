@@ -296,7 +296,9 @@ export const UsersV2 = () => {
         userIds.map((id) => deleteUser({ projectRef, userId: id, skipInvalidation: true }))
       )
       // [Joshen] Skip invalidation within RQ to prevent multiple requests, then invalidate once at the end
-      await Promise.all([queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: authKeys.usersInfinite(projectRef) }),
+      ])
       toast.success(
         `Successfully deleted the selected ${selectedUsers.size} user${selectedUsers.size > 1 ? 's' : ''}`
       )
