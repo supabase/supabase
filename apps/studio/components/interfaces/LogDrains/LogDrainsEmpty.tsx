@@ -74,6 +74,7 @@ export const LogDrainsEmpty = () => {
               <Link
                 href="https://github.com/orgs/supabase/discussions/28324?sort=top"
                 className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
+                target="_blank"
               >
                 Vote here
               </Link>
