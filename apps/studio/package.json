@@ -182,8 +182,8 @@
     "@types/sqlstring": "^2.3.0",
     "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
-    "@vitest/coverage-v8": "^3.0.9",
-    "@vitest/ui": "^3.0.0",
+    "@vitest/coverage-v8": "^3.2.0",
+    "@vitest/ui": "^3.2.0",
     "api-types": "workspace:*",
     "common": "workspace:*",
     "config": "workspace:*",
@@ -201,10 +201,10 @@
     "raw-loader": "^4.0.2",
     "require-in-the-middle": "^7.5.2",
     "tailwindcss": "catalog:",
-    "tsx": "^4.19.3",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^3.0.5"
+    "vitest": "catalog:"
   }
 }

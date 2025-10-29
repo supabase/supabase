@@ -34,7 +34,7 @@ export const RevokeCredentialModal = ({
   })
 
   return (
-    <Dialog open={visible}>
+    <Dialog open={visible} onOpenChange={onClose}>
       <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>

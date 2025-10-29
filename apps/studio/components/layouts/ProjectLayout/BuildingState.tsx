@@ -2,7 +2,7 @@ import { ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
+import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
 import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
