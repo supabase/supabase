@@ -18,7 +18,7 @@ export type NotificationVariables = {
   }
 }
 
-export type Notification = components['schemas']['NotificationResponseV2']
+export type Notification = components['schemas']['NotificationResponse']
 
 /**
  * Notification Data - This is not typed from the API end as it's meant to be open-ended

@@ -27,6 +27,8 @@ import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
 import { DeleteBucketModal } from './DeleteBucketModal'
 import { EmptyBucketState } from './EmptyBucketState'
 
+// [Joshen] Remove typecasts bucket: any once infra changes for analytics bucket is in
+
 export const AnalyticsBuckets = () => {
   const router = useRouter()
   const { ref } = useParams()
@@ -39,14 +41,14 @@ export const AnalyticsBuckets = () => {
     projectRef: ref,
   })
 
-  const analyticsBuckets = buckets.filter((bucket) =>
+  const analyticsBuckets = buckets.filter((bucket: any) =>
     filterString.length === 0 ? true : bucket.id.toLowerCase().includes(filterString.toLowerCase())
   )
 
   return (
     <>
       {!isLoadingBuckets &&
-      buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'ANALYTICS').length ===
+      buckets.filter((bucket: any) => !('type' in bucket) || bucket.type === 'ANALYTICS').length ===
         0 ? (
         <EmptyBucketState bucketType="analytics" />
       ) : (
@@ -94,7 +96,7 @@ export const AnalyticsBuckets = () => {
                       </TableCell>
                     </TableRow>
                   )}
-                  {analyticsBuckets.map((bucket) => (
+                  {analyticsBuckets.map((bucket: any) => (
                     <TableRow key={bucket.id}>
                       <TableCell>
                         <p className="text-foreground">{bucket.id}</p>
