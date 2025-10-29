@@ -53,7 +53,7 @@ export const LogDrainsEmpty = () => {
                   <h3 className="heading-default">{item.title}</h3>
                 </div>
                 <p className="text-foreground-light text-sm mb-4 flex-1">{item.description}</p>
-                <Button type="default" className="w-full">
+                <Button type="default" className="w-full" asChild>
                   <Link href={item.link} target="_blank">
                     {item.label}
                   </Link>
