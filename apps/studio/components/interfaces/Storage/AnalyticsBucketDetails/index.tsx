@@ -1,11 +1,14 @@
+import { uniq } from 'lodash'
+import { SquarePlus } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
+
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
-  wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -22,17 +25,12 @@ import {
   DatabaseExtension,
   useDatabaseExtensionsQuery,
 } from 'data/database-extensions/database-extensions-query'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { Bucket } from 'data/storage/buckets-query'
+import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { snakeCase, uniq } from 'lodash'
-import { Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
 import {
   Button,
   Card,
@@ -47,51 +45,36 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteBucketModal } from '../DeleteBucketModal'
+import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { NamespaceRow } from './NamespaceRow'
+import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
+import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
-export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
+export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) => {
+  const config = BUCKET_TYPES.analytics
   const [modal, setModal] = useState<'delete' | null>(null)
   const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
+  const { state: extensionState } = useIcebergWrapperExtension()
+
+  /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
+  const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance({
+    bucketId: bucket.id,
+  })
+  const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
+  const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
+  const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta
 
   const { data: extensionsData } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const { data, isLoading: isFDWsLoading } = useFDWsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
-  const wrapperInstance = useMemo(() => {
-    return data
-      ?.filter((wrapper) =>
-        wrapperMetaComparator(
-          {
-            handlerName: WRAPPER_HANDLERS.ICEBERG,
-            server: {
-              options: [],
-            },
-          },
-          wrapper
-        )
-      )
-      .find((w) => w.name === snakeCase(`${bucket.name}_fdw`))
-  }, [data, bucket.name])
-
-  const { state: extensionState } = useIcebergWrapperExtension()
-
-  const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
-
-  const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
-  const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta
+  const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
 
   const { data: token, isSuccess: isSuccessToken } = useVaultSecretDecryptedValueQuery(
     {
@@ -99,9 +82,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
       connectionString: project?.connectionString,
       id: wrapperValues.vault_token,
     },
-    {
-      enabled: wrapperValues.vault_token !== undefined,
-    }
+    { enabled: wrapperValues.vault_token !== undefined }
   )
 
   const { data: namespacesData, isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
@@ -135,11 +116,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
     })
   }, [wrapperTables, namespacesData])
 
-  const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
-
-  const config = BUCKET_TYPES['analytics']
-
-  const state = isFDWsLoading
+  const state = isLoading
     ? 'loading'
     : extensionState === 'installed'
       ? wrapperInstance
@@ -150,7 +127,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
   return (
     <>
       <PageLayout
-        title={bucket.name}
+        title={bucket.id}
         breadcrumbs={
           isStorageV2
             ? [
@@ -171,7 +148,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           )}
           {state === 'not-installed' && (
             <ExtensionNotInstalled
-              bucketName={bucket.name}
+              bucketName={bucket.id}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
@@ -179,7 +156,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           )}
           {state === 'needs-upgrade' && (
             <ExtensionNeedsUpgrade
-              bucketName={bucket.name}
+              bucketName={bucket.id}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
@@ -190,39 +167,47 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             <>
               {isStorageV2 ? (
                 <ScaffoldSection isFullWidth>
-                  <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
+                  <ScaffoldHeader className="pt-0 flex flex-row justify-between items-end gap-x-8">
                     <div>
                       <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
                       <ScaffoldSectionDescription>
-                        Analytics tables connected to this bucket.
+                        Analytics tables stored in this bucket
                       </ScaffoldSectionDescription>
                     </div>
-                    <Button type="primary" size="tiny" icon={<Plus size={14} />} onClick={() => {}}>
-                      New table
-                    </Button>
+                    {namespaces.length > 0 && <ConnectTablesDialog bucket={bucket} />}
                   </ScaffoldHeader>
 
-                  <Card>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-foreground-muted">Name</TableHead>
-                          <TableHead className="text-foreground-muted">Schema</TableHead>
-                          <TableHead className="text-foreground-muted">Created at</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell colSpan={4}>
-                            <p className="text-sm text-foreground">No tables yet</p>
-                            <p className="text-sm text-foreground-lighter">
-                              Create an analytics table to get started
-                            </p>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </Card>
+                  {isLoadingNamespaces || isLoading ? (
+                    <GenericSkeletonLoader />
+                  ) : namespaces.length === 0 ? (
+                    <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
+                      <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
+                      <div className="flex flex-col items-center text-center">
+                        <h3>Connect database tables</h3>
+                        <p className="text-foreground-light text-sm">
+                          Stream data from tables for archival, backups, or analytical queries.
+                        </p>
+                      </div>
+                      <ConnectTablesDialog bucket={bucket} />
+                    </aside>
+                  ) : (
+                    <div className="flex flex-col gap-y-10">
+                      {namespaces.map(({ namespace, schema, tables }) => (
+                        <NamespaceWithTables
+                          key={namespace}
+                          bucketName={bucket.id}
+                          namespace={namespace}
+                          sourceType="direct"
+                          schema={schema}
+                          tables={tables as any}
+                          token={token!}
+                          wrapperInstance={wrapperInstance}
+                          wrapperValues={wrapperValues}
+                          wrapperMeta={wrapperMeta}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </ScaffoldSection>
               ) : (
                 <ScaffoldSection isFullWidth>
@@ -233,7 +218,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                     </ScaffoldSectionDescription>
                   </ScaffoldHeader>
 
-                  {isLoadingNamespaces || isFDWsLoading ? (
+                  {isLoadingNamespaces || isLoading ? (
                     <GenericSkeletonLoader />
                   ) : namespaces.length === 0 ? (
                     <Card>
@@ -275,7 +260,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                           {namespaces.map(({ namespace, schema, tables }) => (
                             <NamespaceRow
                               key={namespace}
-                              bucketName={bucket.name}
+                              bucketName={bucket.id}
                               namespace={namespace}
                               schema={schema}
                               tables={tables as any}
@@ -295,9 +280,9 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
               <ScaffoldSection isFullWidth>
                 <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
                   <div>
-                    <ScaffoldSectionTitle>Configuration</ScaffoldSectionTitle>
+                    <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
                     <ScaffoldSectionDescription>
-                      Connect to this bucket from an Iceberg client.{' '}
+                      Connect an Iceberg client to this bucket.{' '}
                       <InlineLink
                         href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
                       >
@@ -332,7 +317,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
               </ScaffoldSection>
             </>
           )}
-          {state === 'missing' && <WrapperMissing bucketName={bucket.name} />}
+          {state === 'missing' && <WrapperMissing bucketName={bucket.id} />}
 
           <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
             <header>

@@ -109,7 +109,7 @@
     "shiki": "^1.1.7",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "tsx": "^4.19.3",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"
   }
