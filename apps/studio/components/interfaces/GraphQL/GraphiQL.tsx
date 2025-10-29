@@ -39,7 +39,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
-import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
+import { RoleImpersonationSelector } from '../RoleImpersonationSelector/RoleImpersonationSelector'
 import styles from './graphiql.module.css'
 
 export interface GraphiQLProps {

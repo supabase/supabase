@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { useIsAdvisorRulesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ProductMenu } from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu/ProductMenu'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { ProjectLayout } from '../ProjectLayout/ProjectLayout'

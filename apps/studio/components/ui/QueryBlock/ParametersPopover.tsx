@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { ArrowUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { DatePicker } from 'components/ui/DatePicker'
+import { DatePicker } from 'components/ui/DatePicker/DatePicker'
 import { Parameter } from 'lib/sql-parameters'
 import {
   Button,

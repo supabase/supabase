@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { useFlag } from 'common'
 import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ProductMenu } from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu/ProductMenu'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'

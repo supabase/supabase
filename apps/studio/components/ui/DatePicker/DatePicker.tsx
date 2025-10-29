@@ -15,7 +15,7 @@ import {
 import { ButtonProps } from 'ui/src/components/Button/Button'
 import { TimeSplitInput } from './TimeSplitInput'
 
-export interface DatePickerProps {
+interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
   to?: string // ISO string
   from?: string // ISO string
@@ -288,5 +288,3 @@ export function DatePicker({
     </Popover_Shadcn_>
   )
 }
-
-export default DatePicker

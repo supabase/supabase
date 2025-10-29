@@ -28,7 +28,7 @@ interface DateTimeInputProps {
  * e.g Yes: 2022-05-13T14:29:03
  *     No:  2022-05-13T14:29:03+0800
  */
-const DateTimeInput = ({
+export const DateTimeInput = ({
   value,
   onChange,
   name,
@@ -91,5 +91,3 @@ const DateTimeInput = ({
     />
   )
 }
-
-export default DateTimeInput

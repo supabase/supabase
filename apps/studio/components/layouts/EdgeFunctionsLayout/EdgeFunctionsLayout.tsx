@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import { ProductMenu } from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu/ProductMenu'
 import { withAuth } from 'hooks/misc/withAuth'
 import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 

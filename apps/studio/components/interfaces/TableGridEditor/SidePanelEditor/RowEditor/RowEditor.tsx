@@ -11,7 +11,7 @@ import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.util
 import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
 import HeaderTitle from './HeaderTitle'
 import InputField from './InputField'
-import { JsonEditor } from './JsonEditor'
+import { JsonEditor } from './JsonEditor/JsonEditor'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
   convertByteaToHex,

@@ -6,7 +6,7 @@ import {
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import InvoicesSettings from './InvoicesSettings'
+import { InvoicesSettings } from './InvoicesSettings'
 
 const InvoicesSection = () => {
   const { isSuccess: isPermissionsLoaded, can: canReadInvoices } = useAsyncCheckPermissions(

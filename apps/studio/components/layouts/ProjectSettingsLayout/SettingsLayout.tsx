@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
 import { useParams } from 'common'
-import { ProductMenu } from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu/ProductMenu'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
