@@ -108,24 +108,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
   })
 
-  const onDeclineRequest = async () => {
+  const onDeclineRequest = form.handleSubmit((values) => {
     if (!auth_id) {
       return toast.error('Unable to decline request: auth_id is missing ')
     }
 
-    // Guard: ensure organizations are loaded
-    if (!organizations || organizations.length === 0) {
-      return toast.error('Unable to decline request: Organizations not loaded')
-    }
-
-    const slugToUse = selectedOrgSlug || organization_slug || organizations[0]?.slug
-    if (!slugToUse) {
-      return toast.error('Unable to decline request: No organization context available')
-    }
-
     setIsDeclining(true)
-    declineRequest({ id: auth_id, slug: slugToUse }, { onError: () => setIsDeclining(false) })
-  }
+    declineRequest(
+      { id: auth_id, slug: values.selectedOrgSlug },
+      { onError: () => setIsDeclining(false) }
+    )
+  })
 
   useEffect(() => {
     if (isSuccessOrganizations && organizations.length > 0) {
