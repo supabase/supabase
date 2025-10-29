@@ -10,6 +10,7 @@ import type { PlanId } from 'data/subscriptions/types'
 import logConstants from 'shared-data/logConstants'
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -274,21 +275,24 @@ const genCrossJoinUnnests = (table: LogsTableName) => {
 /**
  * SQL query to retrieve only one log
  */
-export const genSingleLogQuery = (table: LogsTableName, id: string) =>
+export const genSingleLogQuery = (table: LogsTableName, id: string) =>z
   `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`
 
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
  */
 export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?: PlanId) => {
+  console.log('maybeShowUpgradePrompt', from, planId)
+  const {getEntitlementNumericValue} = useCheckEntitlements('security.audit_logs_days')
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
+  const auditLogsDays = getEntitlementNumericValue()
 
-  return (
-    (day > 1 && planId === 'free') ||
-    (day > 7 && planId === 'pro') ||
-    (day > 28 && planId === 'team') ||
-    (day > 90 && planId === 'enterprise')
-  )
+  if (!auditLogsDays) {
+    return false
+  }
+
+  return day > auditLogsDays 
+  
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
