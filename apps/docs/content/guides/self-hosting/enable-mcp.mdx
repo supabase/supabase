@@ -4,7 +4,7 @@ description: 'Configure secure access to the MCP server in your self-hosted Supa
 subtitle: 'Configure secure access to the MCP server in your self-hosted Supabase instance.'
 ---
 
-The MCP (Model Context Protocol) server in [self-hosted Supabase](/docs/guides/self-hosting/docker) runs behind the Studio API. Currently, it does not offer OAuth 2.1 authentication, and is not intended to be exposed to the Internet. The corresponding API route has to be protected by restricting network connections from the outside. By default, all connections to the MCP server are denied.
+The MCP (Model Context Protocol) server in [self-hosted Supabase](/docs/guides/self-hosting/docker) runs behind the internal API. Currently, it does not offer OAuth 2.1 authentication, and is not intended to be exposed to the Internet. The corresponding API route has to be protected by restricting network connections from the outside. By default, all connections to the MCP server are denied.
 
 This guide explains how to securely enable access to your self-hosted MCP server.
 
@@ -32,15 +32,16 @@ docker inspect supabase-kong \
   --format '{{range .NetworkSettings.Networks}}{{println .Gateway}}{{end}}'
 ```
 
-This command will output a private range IP address, e.g., `172.18.0.1`.
+This command will output an IP address, e.g., `172.18.0.1`.
 
 ### Step 2: Allow connections from the gateway IP
 
 Add the IP address you discovered to the Kong configuration by editing the following section in `./volumes/api/kong.yml`:
 
-1. Comment out the 'request-termination' section
-2. Remove #'s from the entire section starting with `- name: cors`, including `deny: []`
-3. Add your local IPs to the 'allow' list as shown in the example below
+1. Comment out the request-termination section
+2. Remove the # symbols from the entire section starting with `- name: cors`, including `deny: []`
+3. Add your local IP to the 'allow' list.
+4. Your edited configuration should look like the example below.
 
 ```yaml
 ## MCP endpoint - local access
