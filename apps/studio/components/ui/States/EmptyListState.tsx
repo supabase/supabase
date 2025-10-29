@@ -1,4 +1,4 @@
-const EmptyListState = ({ title, description }: { title: string; description: string }) => {
+export const EmptyListState = ({ title, description }: { title: string; description: string }) => {
   return (
     <div className="flex flex-col items-center justify-center gap-6 text-center">
       <div className="flex flex-col gap-1">
@@ -12,5 +12,3 @@ const EmptyListState = ({ title, description }: { title: string; description: st
     </div>
   )
 }
-
-export { EmptyListState }
