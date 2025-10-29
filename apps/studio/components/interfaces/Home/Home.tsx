@@ -98,6 +98,14 @@ export const Home = () => {
   // [Joshen] JFYI minus 1 as the replicas endpoint returns the primary DB minimally
   const replicasCount = Math.max(0, (replicasData?.length ?? 1) - 1)
 
+  if (isPaused) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <ProjectPausedState />
+      </div>
+    )
+  }
+
   return (
     <div className="w-full px-4">
       <div className={cn('py-16 ', !isPaused && 'border-b border-muted ')}>
@@ -200,84 +208,81 @@ export const Home = () => {
             </div>
           </div>
           <ProjectUpgradeFailedBanner />
-          {isPaused && <ProjectPausedState />}
         </div>
       </div>
 
-      {!isPaused && (
-        <>
-          <div className="py-16 border-b border-muted">
-            <div className="mx-auto max-w-7xl space-y-16">
-              {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
-                <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
-              )}
-              {!isNewProject && project?.status !== PROJECT_STATUS.INACTIVE && <AdvisorWidget />}
-            </div>
+      <>
+        <div className="py-16 border-b border-muted">
+          <div className="mx-auto max-w-7xl space-y-16">
+            {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
+              <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
+            )}
+            {!isNewProject && project?.status !== PROJECT_STATUS.INACTIVE && <AdvisorWidget />}
           </div>
+        </div>
 
-          <div className="bg-surface-100/5 py-16">
-            <div className="mx-auto max-w-7xl space-y-16">
-              {project?.status !== PROJECT_STATUS.INACTIVE && (
-                <>
-                  <div className="space-y-8">
-                    <h2 className="text-lg">Client libraries</h2>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mb-12 md:grid-cols-3">
-                      {clientLibraries!.map((library) => (
-                        // [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later.
-                        <ClientLibrary key={(library as any).language} {...(library as any)} />
-                      ))}
-                    </div>
+        <div className="bg-surface-100/5 py-16">
+          <div className="mx-auto max-w-7xl space-y-16">
+            {project?.status !== PROJECT_STATUS.INACTIVE && (
+              <>
+                <div className="space-y-8">
+                  <h2 className="text-lg">Client libraries</h2>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mb-12 md:grid-cols-3">
+                    {clientLibraries!.map((library) => (
+                      // [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later.
+                      <ClientLibrary key={(library as any).language} {...(library as any)} />
+                    ))}
                   </div>
-                  {showExamples && (
-                    <div className="flex flex-col gap-y-8">
-                      <h4 className="text-lg">Example projects</h4>
-                      {!!projectHomepageExampleProjects ? (
-                        <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                          {/* [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later. */}
-                          {(projectHomepageExampleProjects as any)
-                            .sort((a: any, b: any) => a.title.localeCompare(b.title))
-                            .map((project: any) => (
-                              <ExampleProject key={project.url} {...project} />
-                            ))}
-                        </div>
-                      ) : (
-                        <div className="flex justify-center">
-                          <Tabs_Shadcn_ defaultValue="app" className="w-full">
-                            <TabsList_Shadcn_ className="flex gap-4 mb-8">
-                              <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
-                              <TabsTrigger_Shadcn_ value="mobile">
-                                Mobile Frameworks
-                              </TabsTrigger_Shadcn_>
-                            </TabsList_Shadcn_>
-                            <TabsContent_Shadcn_ value="app">
-                              <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                                {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
-                                  .sort((a, b) => a.title.localeCompare(b.title))
-                                  .map((project) => (
-                                    <ExampleProject key={project.url} {...project} />
-                                  ))}
-                              </div>
-                            </TabsContent_Shadcn_>
-                            <TabsContent_Shadcn_ value="mobile">
-                              <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                                {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
-                                  .sort((a, b) => a.title.localeCompare(b.title))
-                                  .map((project) => (
-                                    <ExampleProject key={project.url} {...project} />
-                                  ))}
-                              </div>
-                            </TabsContent_Shadcn_>
-                          </Tabs_Shadcn_>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+                </div>
+                {showExamples && (
+                  <div className="flex flex-col gap-y-8">
+                    <h4 className="text-lg">Example projects</h4>
+                    {!!projectHomepageExampleProjects ? (
+                      <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                        {/* [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later. */}
+                        {(projectHomepageExampleProjects as any)
+                          .sort((a: any, b: any) => a.title.localeCompare(b.title))
+                          .map((project: any) => (
+                            <ExampleProject key={project.url} {...project} />
+                          ))}
+                      </div>
+                    ) : (
+                      <div className="flex justify-center">
+                        <Tabs_Shadcn_ defaultValue="app" className="w-full">
+                          <TabsList_Shadcn_ className="flex gap-4 mb-8">
+                            <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
+                            <TabsTrigger_Shadcn_ value="mobile">
+                              Mobile Frameworks
+                            </TabsTrigger_Shadcn_>
+                          </TabsList_Shadcn_>
+                          <TabsContent_Shadcn_ value="app">
+                            <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                              {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
+                                .sort((a, b) => a.title.localeCompare(b.title))
+                                .map((project) => (
+                                  <ExampleProject key={project.url} {...project} />
+                                ))}
+                            </div>
+                          </TabsContent_Shadcn_>
+                          <TabsContent_Shadcn_ value="mobile">
+                            <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                              {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
+                                .sort((a, b) => a.title.localeCompare(b.title))
+                                .map((project) => (
+                                  <ExampleProject key={project.url} {...project} />
+                                ))}
+                            </div>
+                          </TabsContent_Shadcn_>
+                        </Tabs_Shadcn_>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        </>
-      )}
+        </div>
+      </>
     </div>
   )
 }
