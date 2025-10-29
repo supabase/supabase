@@ -33,14 +33,12 @@ export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
   { projectRef, connectionString }: DatabaseRolesVariables,
   { enabled = true, ...options }: UseQueryOptions<DatabaseRolesData, DatabaseRolesError, TData> = {}
 ) =>
-  useQuery<DatabaseRolesData, DatabaseRolesError, TData>(
-    databaseRoleKeys.databaseRoles(projectRef),
-    ({ signal }) => getDatabaseRoles({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseRolesData, DatabaseRolesError, TData>({
+    queryKey: databaseRoleKeys.databaseRoles(projectRef),
+    queryFn: ({ signal }) => getDatabaseRoles({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export function invalidateRolesQuery(client: QueryClient, projectRef: string | undefined) {
   return client.invalidateQueries(databaseRoleKeys.databaseRoles(projectRef))

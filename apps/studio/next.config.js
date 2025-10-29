@@ -304,13 +304,18 @@ const nextConfig = {
       },
       {
         permanent: true,
-        source: '/project/:ref/reports/query-performance',
-        destination: '/project/:ref/advisors/query-performance',
+        source: '/project/:ref/query-performance',
+        destination: '/project/:ref/reports/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/reports/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/database/query-performance',
-        destination: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/reports/query-performance',
       },
       {
         permanent: true,
@@ -385,6 +390,11 @@ const nextConfig = {
       {
         source: '/projects',
         destination: '/organizations',
+        permanent: false,
+      },
+      {
+        source: '/project/:ref/settings/auth',
+        destination: '/project/:ref/auth',
         permanent: false,
       },
 
@@ -526,8 +536,8 @@ const nextConfig = {
     pagesBufferLength: 100,
   },
   typescript: {
-    // WARNING: production builds can successfully complete even there are type errors
-    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    // Typechecking is run via GitHub Action only for efficiency
+    // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
     ignoreBuildErrors: true,
   },
   eslint: {

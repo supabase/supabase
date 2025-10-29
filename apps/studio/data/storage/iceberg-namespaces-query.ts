@@ -10,6 +10,7 @@ type GetNamespacesVariables = {
   token: string
 }
 
+// [Joshen] Investigate if we can use the temp API keys here
 async function getNamespaces({ catalogUri, warehouse, token }: GetNamespacesVariables) {
   let headers = new Headers()
   // handle both secret key and service role key
@@ -56,9 +57,9 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
   params: GetNamespacesVariables,
   { ...options }: UseQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
-  return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>(
-    storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
-    () => getNamespaces(params),
-    { ...options }
-  )
+  return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
+    queryKey: storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
+    queryFn: () => getNamespaces(params),
+    ...options,
+  })
 }

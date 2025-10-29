@@ -3,7 +3,7 @@ import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
@@ -52,7 +52,7 @@ const SchemaSelector = ({
   align = 'start',
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
-  const { can: canCreateSchemas } = useAsyncCheckProjectPermissions(
+  const { can: canCreateSchemas } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'schemas'
   )
@@ -124,7 +124,7 @@ const SchemaSelector = ({
                 </div>
               ) : (
                 <div className="w-full flex gap-1">
-                  <p className="text-foreground-lighter">Choose a schema…</p>
+                  <p className="text-foreground-lighter">Choose a schema...</p>
                 </div>
               )}
             </Button>

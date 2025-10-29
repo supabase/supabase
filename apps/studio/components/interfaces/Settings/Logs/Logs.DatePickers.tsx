@@ -391,7 +391,7 @@ export const LogsDatePicker = ({
             />
           </div>
           {isLargeRange && !hideWarnings && (
-            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning-600">
+            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning">
               Large ranges may result in memory errors for <br /> big projects.
             </div>
           )}

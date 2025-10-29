@@ -306,7 +306,9 @@ async function upsertSnippet(
     }
 
     let snippet = sqlEditorState.snippets[id]?.snippet
-    if (snippet?.content) snippet.isNotSavedInDatabaseYet = false
+    if (snippet?.content && 'isNotSavedInDatabaseYet' in snippet) {
+      snippet.isNotSavedInDatabaseYet = false
+    }
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
     sqlEditorState.savingStates[id] = 'UPDATING_FAILED'

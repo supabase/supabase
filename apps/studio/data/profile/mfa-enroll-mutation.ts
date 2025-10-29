@@ -21,7 +21,8 @@ export const useMfaEnrollMutation = ({
   UseMutationOptions<CustomMFAEnrollResponse, CustomMFAEnrollError, MFAEnrollParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation((vars) => mfaEnroll(vars), {
+  return useMutation({
+    mutationFn: (vars) => mfaEnroll(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

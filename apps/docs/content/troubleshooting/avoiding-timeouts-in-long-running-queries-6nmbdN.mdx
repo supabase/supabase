@@ -13,18 +13,18 @@ This page covers long-running queries via the Dashboard or external interfaces. 
 
 </Admonition>
 
-Certain queries, like indexing a table or changing a column's data type, are inherently time-consuming. The [Dashboard's SQL Editor](https://supabase.com/dashboard/project/_/sql/) has a 1-minute timeout limit.
+Certain queries, like indexing a table or changing a column's data type, are inherently time-consuming. The [Dashboard's SQL Editor](/dashboard/project/_/sql/) has a 1-minute timeout limit.
 
 To execute long-running queries, follow the below steps.
 
 ### Install an external SQL client
 
-The guide focuses on [psql](https://supabase.com/docs/guides/database/psql) but you can use any Postgres client.
+The guide focuses on [psql](/docs/guides/database/psql) but you can use any Postgres client.
 
 Some other options include:
 
-- [pgAdmin](https://supabase.com/docs/guides/database/pgadmin)
-- [DBeaver](https://supabase.com/docs/guides/database/dbeaver)
+- [pgAdmin](/docs/guides/database/pgadmin)
+- [DBeaver](/docs/guides/database/dbeaver)
 
 You can install PSQL in [macOS](https://stackoverflow.com/a/49689589/2188186) and [Windows](https://www.postgresql.org/download/windows/) by following these links and instructions. For Linux (Debian) you can run the following:
 
@@ -33,7 +33,7 @@ sudo apt-get update
 sudo apt-get install postgresql-client
 ```
 
-Once installed, you can find your PSQL string on the dashboard by clicking [connect](https://supabase.com/dashboard/project/_?showConnect=true). Make sure if you are using the pooler connection that it is the Session pooler (port 5432).
+Once installed, you can find your PSQL string on the dashboard by clicking [connect](/dashboard/project/_?showConnect=true). Make sure if you are using the pooler connection that it is the Session pooler (port 5432).
 
 <Admonition type="tip">
 

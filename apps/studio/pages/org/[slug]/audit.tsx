@@ -1,4 +1,4 @@
-import { AuditLogs } from 'components/interfaces/Organization'
+import { AuditLogs } from 'components/interfaces/Organization/AuditLogs/AuditLogs'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'

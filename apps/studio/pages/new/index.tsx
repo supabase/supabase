@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useCallback, useEffect, useState } from 'react'
 
-import { NewOrgForm } from 'components/interfaces/Organization'
+import { NewOrgForm } from 'components/interfaces/Organization/NewOrg/NewOrgForm'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import WizardLayout from 'components/layouts/WizardLayout'

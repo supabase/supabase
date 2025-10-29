@@ -36,7 +36,7 @@ npm install @nuxtjs/supabase --save-dev
 ```
 
 And finally we want to save the environment variables in a `.env`.
-All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+All we need are the API URL and the key that you copied [earlier](#get-api-details).
 
 <$CodeTabs>
 
@@ -122,7 +122,7 @@ const handleLogin = async () => {
 
 ### User state
 
-To access the user information, use the composable [`useSupabaseUser`](https://supabase.nuxtjs.org/usage/composables/usesupabaseuser) provided by the Supabase Nuxt module.
+To access the user information, use the composable [`useSupabaseUser`](https://supabase.nuxtjs.org/composables/usesupabaseuser) provided by the Supabase Nuxt module.
 
 ### Account component
 

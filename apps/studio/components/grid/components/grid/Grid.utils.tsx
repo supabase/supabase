@@ -11,6 +11,7 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Dictionary } from 'types'
@@ -27,11 +28,11 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
 
-      await queryClient.cancelQueries(queryKey)
+      await queryClient.cancelQueries({ queryKey })
 
-      const previousRowsQueries = queryClient.getQueriesData<TableRowsData>(queryKey)
+      const previousRowsQueries = queryClient.getQueriesData<TableRowsData>({ queryKey })
 
-      queryClient.setQueriesData<TableRowsData>(queryKey, (old) => {
+      queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
         return {
           rows:
             old?.rows.map((row) => {
@@ -66,9 +67,9 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       previousRowsQueries.forEach(([queryKey, previousRows]) => {
         if (previousRows) {
-          queryClient.setQueriesData(queryKey, previousRows)
+          queryClient.setQueriesData({ queryKey }, previousRows)
         }
-        queryClient.invalidateQueries(queryKey)
+        queryClient.invalidateQueries({ queryKey })
       })
 
       toast.error(error?.message ?? error)
@@ -115,7 +116,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
                 each row before updating or deleting the row.
               </p>
               <div className="mt-3">
-                <DocsButton href="https://supabase.com/docs/guides/database/tables#primary-keys" />
+                <DocsButton href={`${DOCS_URL}/guides/database/tables#primary-keys`} />
               </div>
             </div>
           ),

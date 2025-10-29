@@ -1,13 +1,12 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { Sidebar } from 'components/interfaces/Sidebar'
-import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
 import { useAppStateSnapshot } from 'state/app-state'
 import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
@@ -16,6 +15,7 @@ import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
+  hideMobileMenu?: boolean
 }
 
 /**
@@ -28,7 +28,11 @@ export interface DefaultLayoutProps {
  * - Mobile navigation bar
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  */
-const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
+const DefaultLayout = ({
+  children,
+  headerTitle,
+  hideMobileMenu,
+}: PropsWithChildren<DefaultLayoutProps>) => {
   const { ref } = useParams()
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
@@ -56,7 +60,7 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
             {/* Top Banner */}
             <AppBannerWrapper />
             <div className="flex-shrink-0">
-              <MobileNavigationBar />
+              <MobileNavigationBar hideMobileMenu={hideMobileMenu} />
               <LayoutHeader
                 showProductMenu={showProductMenu}
                 headerTitle={headerTitle}

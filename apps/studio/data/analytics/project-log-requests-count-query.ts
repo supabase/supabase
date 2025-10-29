@@ -40,20 +40,19 @@ export const useProjectLogRequestsCountQuery = <TData = ProjectLogRequestsCountD
     ...options
   }: UseQueryOptions<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData> = {}
 ) =>
-  useQuery<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData>(
-    analyticsKeys.usageApiRequestsCount(projectRef),
-    ({ signal }) => getProjectLogRequestsCountStats({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData>({
+    queryKey: analyticsKeys.usageApiRequestsCount(projectRef),
+    queryFn: ({ signal }) => getProjectLogRequestsCountStats({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export function prefetchProjectLogRequestsCount(
   client: QueryClient,
   { projectRef }: ProjectLogRequestsCountVariables
 ) {
-  return client.fetchQuery(analyticsKeys.usageApiRequestsCount(projectRef), ({ signal }) =>
-    getProjectLogRequestsCountStats({ projectRef }, signal)
-  )
+  return client.fetchQuery({
+    queryKey: analyticsKeys.usageApiRequestsCount(projectRef),
+    queryFn: ({ signal }) => getProjectLogRequestsCountStats({ projectRef }, signal),
+  })
 }

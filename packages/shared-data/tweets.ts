@@ -78,12 +78,6 @@ const tweets = [
     img_url: '/images/twitter-profiles/GtrVV2dD_400x400.jpg',
   },
   {
-    text: "Working with @supabase has been one of the best dev experiences I've had lately. Incredibly easy to set up, great documentation, and so many fewer hoops to jump through than the competition. I definitely plan to use it on any and all future projects.",
-    url: 'https://twitter.com/thatguy_tex/status/1497602628410388480',
-    handle: 'thatguy_tex',
-    img_url: '/images/twitter-profiles/09HouOSt_400x400.jpg',
-  },
-  {
     text: '@supabase is just 🤯 Now I see why a lot of people love using it as a backend for their applications. I am really impressed with how easy it is to set up an Auth and then just code it together for the frontend. @IngoKpp now I see your joy with Supabase #coding #fullstackwebdev',
     url: 'https://twitter.com/IxoyeDesign/status/1497473731777728512',
     handle: 'IxoyeDesign',

@@ -38,13 +38,13 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Color usage',
-          href: '/docs/color-usage',
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
           items: [],
         },
         {
-          title: 'Tailwind classes',
-          href: '/docs/tailwind-classes',
+          title: 'Color Usage',
+          href: '/docs/color-usage',
           items: [],
         },
         {
@@ -65,6 +65,16 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Changelog',
           href: '/docs/changelog',
+          items: [],
+        },
+      ],
+    },
+    {
+      title: 'UI Patterns',
+      items: [
+        {
+          title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
       ],
@@ -105,6 +115,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Inner Side Menu',
           href: '/docs/fragments/inner-side-menu',
+          items: [],
+        },
+        {
+          title: 'Data Input',
+          href: '/docs/fragments/data-input',
           items: [],
         },
         {
@@ -287,6 +302,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Menubar',
           href: '/docs/components/menubar',
+          items: [],
+        },
+        {
+          title: 'NavMenu',
+          href: '/docs/components/nav-menu',
           items: [],
         },
         {

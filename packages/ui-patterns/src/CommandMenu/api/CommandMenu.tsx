@@ -1,19 +1,28 @@
 'use client'
-
-import { AlertTriangle, ArrowLeft } from 'lucide-react'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import { AlertTriangle, ArrowLeft, Command, Search } from 'lucide-react'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { useBreakpoint } from 'common'
 import useDragToClose from 'common/hooks/useDragToClose'
-import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
+import {
+  Button,
+  Command_Shadcn_,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  cn,
+} from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
+import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 import {
-  useCommandMenuSize,
   useCommandMenuOpen,
+  useCommandMenuSize,
   useSetCommandMenuOpen,
   useSetupCommandMenuTouchEvents,
 } from './hooks/viewHooks'
@@ -26,6 +35,7 @@ function Breadcrumb({ className }: { className?: string }) {
 
   return (
     <button
+      type="button"
       className={cn(
         'p-2 bg-overlay flex items-center gap-2 text-xs text-foreground-muted',
         className
@@ -108,6 +118,7 @@ function useTouchGestures({ toggleOpen }: { toggleOpen: () => void }) {
 function CommandMenuTrigger({ children }: PropsWithChildren) {
   const open = useCommandMenuOpen()
   const setOpen = useSetCommandMenuOpen()
+  const telemetryContext = useCommandMenuTelemetryContext()
 
   const childFromProps = Children.only(children) as ReactElement<
     {
@@ -120,6 +131,20 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
   const handleOpen = () => {
     setOpen(!open)
     childFromProps.props.onOpen?.(!open)
+
+    // Send telemetry when opening via click
+    if (!open && telemetryContext?.onTelemetry) {
+      const event = {
+        action: 'command_menu_opened' as const,
+        properties: {
+          trigger_type: 'search_input' as const,
+          app: telemetryContext.app,
+        },
+        groups: {},
+      }
+
+      telemetryContext.onTelemetry(event)
+    }
   }
 
   const childWithClickHandler = cloneElement(childFromProps, {
@@ -141,6 +166,47 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
     ),
   })
   return childWithClickHandler
+}
+
+function CommandMenuTriggerInput({
+  className,
+  placeholder = 'Search...',
+}: {
+  className?: string
+  placeholder?: string | React.ReactNode
+}) {
+  return (
+    <CommandMenuTrigger>
+      <button
+        type="button"
+        className={cn(
+          'group',
+          'flex-grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
+          'pl-1.5 md:pl-2 pr-1',
+          'flex items-center justify-between',
+          'bg-surface-100/75 text-foreground-lighter border',
+          'hover:bg-opacity-100 hover:border-strong',
+          'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
+          'transition',
+          className
+        )}
+      >
+        <div className="flex items-center space-x-2 text-foreground-muted">
+          <Search size={18} strokeWidth={2} />
+          <p className="flex text-sm pr-2">{placeholder}</p>
+        </div>
+        <div className="command-shortcut hidden md:flex items-center space-x-1">
+          <div
+            aria-hidden="true"
+            className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
+          >
+            <Command size={12} strokeWidth={1.5} />
+            <span className="text-[12px]">K</span>
+          </div>
+        </div>
+      </button>
+    </CommandMenuTrigger>
+  )
 }
 
 interface CommandMenuProps extends PropsWithChildren {
@@ -194,6 +260,10 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
           className: cn('overflow-hidden flex data-closed:delay-100'),
         }}
       >
+        <VisuallyHidden>
+          <DialogTitle>Command menu</DialogTitle>
+          <DialogDescription>Type a command or search</DialogDescription>
+        </VisuallyHidden>
         <ErrorBoundary FallbackComponent={CommandError}>
           <PageSwitch>{children}</PageSwitch>
         </ErrorBoundary>
@@ -202,4 +272,4 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
   )
 }
 
-export { Breadcrumb, CommandMenu, CommandMenuTrigger, CommandWrapper }
+export { Breadcrumb, CommandMenu, CommandMenuTrigger, CommandMenuTriggerInput, CommandWrapper }

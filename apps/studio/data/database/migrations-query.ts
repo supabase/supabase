@@ -57,11 +57,9 @@ export const useMigrationsQuery = <TData = MigrationsData>(
   { projectRef, connectionString }: MigrationsVariables,
   { enabled = true, ...options }: UseQueryOptions<MigrationsData, MigrationsError, TData> = {}
 ) =>
-  useQuery<MigrationsData, MigrationsError, TData>(
-    databaseKeys.migrations(projectRef),
-    ({ signal }) => getMigrations({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<MigrationsData, MigrationsError, TData>({
+    queryKey: databaseKeys.migrations(projectRef),
+    queryFn: ({ signal }) => getMigrations({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

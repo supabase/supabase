@@ -10,8 +10,7 @@ export async function getGitHubRepositories(signal?: AbortSignal) {
   })
 
   if (error) handleError(error)
-  // [Alaister]: temp fix until we have a proper response type
-  return (data as any).repositories
+  return data.repositories
 }
 
 export type GitHubRepositoriesData = Awaited<ReturnType<typeof getGitHubRepositories>>
@@ -24,9 +23,11 @@ export const useGitHubRepositoriesQuery = <TData = GitHubRepositoriesData>({
   enabled = true,
   ...options
 }: UseQueryOptions<GitHubRepositoriesData, GitHubRepositoriesError, TData> = {}) => {
-  return useQuery<GitHubRepositoriesData, GitHubRepositoriesError, TData>(
-    integrationKeys.githubRepositoriesList(),
-    ({ signal }) => getGitHubRepositories(signal),
-    { enabled, staleTime: 0, ...options }
-  )
+  return useQuery<GitHubRepositoriesData, GitHubRepositoriesError, TData>({
+    queryKey: integrationKeys.githubRepositoriesList(),
+    queryFn: ({ signal }) => getGitHubRepositories(signal),
+    enabled,
+    staleTime: 0,
+    ...options,
+  })
 }

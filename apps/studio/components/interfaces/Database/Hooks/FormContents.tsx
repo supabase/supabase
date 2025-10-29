@@ -51,7 +51,9 @@ export const FormContents = ({
   const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const { data: keys = [] } = useAPIKeysQuery({ projectRef: ref, reveal: true })
-  const { data: functions = [] } = useEdgeFunctionsQuery({ projectRef: ref })
+  const { data: functions = [], isSuccess: isSuccessEdgeFunctions } = useEdgeFunctionsQuery({
+    projectRef: ref,
+  })
 
   const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
 
@@ -81,6 +83,8 @@ export const FormContents = ({
   }, [values.function_type])
 
   useEffect(() => {
+    if (!isSuccessEdgeFunctions) return
+
     const isEdgeFunctionSelected = isEdgeFunction({ ref, restUrlTld, url: values.http_url })
 
     if (values.http_url && isEdgeFunctionSelected) {
@@ -105,7 +109,7 @@ export const FormContents = ({
       setHttpHeaders(updatedHttpHeaders)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values.http_url])
+  }, [values.http_url, isSuccessEdgeFunctions])
 
   return (
     <div>

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import CardButton from 'components/ui/CardButton'
 import Panel from 'components/ui/Panel'
@@ -55,6 +55,8 @@ export function LogDrains({
       enabled: logDrainsEnabled,
     }
   )
+  const sentryEnabled = useFlag('SentryLogDrain')
+
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
     onSuccess: () => {
       setIsDeleteModalOpen(false)
@@ -91,7 +93,7 @@ export function LogDrains({
   if (!isLoading && logDrains?.length === 0) {
     return (
       <div className="grid lg:grid-cols-2 gap-3">
-        {LOG_DRAIN_TYPES.map((src) => (
+        {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
           <CardButton
             key={src.value}
             title={src.name}

@@ -1,8 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
+import { createSupportStorageClient } from 'components/interfaces/Support/support-storage-client'
+import { generateAttachmentURLs } from 'data/support/generate-attachment-urls-mutation'
 import { uuidv4 } from 'lib/helpers'
-
-const SUPPORT_API_URL = process.env.NEXT_PUBLIC_SUPPORT_API_URL || ''
-const SUPPORT_API_KEY = process.env.NEXT_PUBLIC_SUPPORT_ANON_KEY || ''
 
 export const convertB64toBlob = (image: string) => {
   const contentType = 'image/png'
@@ -25,40 +23,37 @@ export const convertB64toBlob = (image: string) => {
   return blob
 }
 
-export const uploadAttachment = async (ref: string, image: string) => {
-  const supabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      // @ts-ignore
-      multiTab: false,
-      detectSessionInUrl: false,
-      localStorage: {
-        getItem: (key: string) => undefined,
-        setItem: (key: string, value: string) => {},
-        removeItem: (key: string) => {},
-      },
-    },
-  })
+type UploadAttachmentArgs = {
+  image: string
+  userId?: string
+}
 
-  const blob = convertB64toBlob(image)
-  const name = `${ref || 'no-project'}/${uuidv4()}.png`
-  const options = { cacheControl: '3600' }
-  const { data: file, error: uploadError } = await supabaseClient.storage
-    .from('feedback-attachments')
-    .upload(name, blob, options)
-
-  if (uploadError) {
-    console.error('Failed to upload:', uploadError)
+export const uploadAttachment = async ({ image, userId }: UploadAttachmentArgs) => {
+  if (!userId) {
+    console.error(
+      '[FeedbackWidget > uploadAttachment] Unable to upload screenshot, missing user ID'
+    )
     return undefined
   }
 
-  if (file) {
-    const { data } = await supabaseClient.storage
-      .from('feedback-attachments')
-      .createSignedUrls([file.path], 10 * 365 * 24 * 60 * 60)
-    return data?.[0].signedUrl
+  const supabaseClient = createSupportStorageClient()
+
+  const blob = convertB64toBlob(image)
+  const filename = `${userId}/${uuidv4()}.png`
+  const options = { cacheControl: '3600' }
+
+  const { data: file, error: uploadError } = await supabaseClient.storage
+    .from('feedback-attachments')
+    .upload(filename, blob, options)
+
+  if (uploadError || !file) {
+    console.error('Failed to upload screenshot attachment:', uploadError)
+    return undefined
   }
 
-  return undefined
+  const signedUrls = await generateAttachmentURLs({
+    bucket: 'feedback-attachments',
+    filenames: [file.path],
+  })
+  return signedUrls[0]
 }

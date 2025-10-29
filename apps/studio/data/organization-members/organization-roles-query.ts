@@ -36,19 +36,17 @@ export const useOrganizationRolesV2Query = <TData = OrganizationRolesData>(
     ...options
   }: UseQueryOptions<OrganizationRolesData, OrganizationRolesError, TData> = {}
 ) =>
-  useQuery<OrganizationRolesData, OrganizationRolesError, TData>(
-    organizationKeys.rolesV2(slug),
-    ({ signal }) => getOrganizationRoles({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      select: (data) => {
-        return {
-          ...data,
-          org_scoped_roles: data.org_scoped_roles.sort((a, b) => {
-            return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
-          }),
-        } as any
-      },
-      ...options,
-    }
-  )
+  useQuery<OrganizationRolesData, OrganizationRolesError, TData>({
+    queryKey: organizationKeys.rolesV2(slug),
+    queryFn: ({ signal }) => getOrganizationRoles({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    select: (data) => {
+      return {
+        ...data,
+        org_scoped_roles: data.org_scoped_roles.sort((a, b) => {
+          return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
+        }),
+      } as any
+    },
+    ...options,
+  })

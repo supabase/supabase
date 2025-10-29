@@ -44,10 +44,10 @@ export async function executeSql<T = any>(
   >,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
-  fetcherOverride?: (
-    sql: string,
+  fetcherOverride?: (options: {
+    query: string
     headers?: HeadersInit
-  ) => Promise<{ data: T } | { error: ResponseError }>
+  }) => Promise<{ data: T } | { error: ResponseError }>
 ): Promise<{ result: T }> {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -64,7 +64,7 @@ export async function executeSql<T = any>(
   let error
 
   if (fetcherOverride) {
-    const result = await fetcherOverride(sql, headers)
+    const result = await fetcherOverride({ query: sql, headers })
     if ('data' in result) {
       data = result.data
     } else {
@@ -162,13 +162,15 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
-    sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]),
-    ({ signal }) =>
+  return useQuery<ExecuteSqlData, ExecuteSqlError, TData>({
+    queryKey: sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]),
+    queryFn: ({ signal }) =>
       executeSql(
         { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
         signal
       ),
-    { enabled: enabled && typeof projectRef !== 'undefined' && isActive, staleTime: 0, ...options }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    staleTime: 0,
+    ...options,
+  })
 }

@@ -1,14 +1,16 @@
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+// End of third-party imports
+
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Button } from 'ui'
+import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface AIAssistantOptionProps {
-  projectRef: string
-  organizationSlug: string
+  projectRef?: string | null
+  organizationSlug?: string | null
   isCondensed?: boolean
 }
 
@@ -17,11 +19,8 @@ export const AIAssistantOption = ({
   organizationSlug,
   isCondensed = false,
 }: AIAssistantOptionProps) => {
-  const { data } = useProjectsQuery()
-  const projects = data?.projects ?? []
-
   const { mutate: sendEvent } = useSendEventMutation()
-  const [isVisible, setIsVisible] = useState(isCondensed ? true : false)
+  const [isVisible, setIsVisible] = useState(isCondensed)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 800)
@@ -32,26 +31,19 @@ export const AIAssistantOption = ({
     sendEvent({
       action: 'ai_assistant_in_support_form_clicked',
       groups: {
-        project: projectRef === 'no-project' ? undefined : projectRef,
-        organization: organizationSlug,
+        project: projectRef === null || projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
+        organization:
+          organizationSlug === null || organizationSlug === NO_ORG_MARKER
+            ? undefined
+            : organizationSlug,
       },
     })
   }, [projectRef, organizationSlug, sendEvent])
 
-  if (!organizationSlug || organizationSlug === 'no-org') {
-    return null
-  }
+  // If no specific project selected, use the wildcard route
+  const aiLink = `/project/${projectRef !== NO_PROJECT_MARKER ? projectRef : '_'}?aiAssistantPanelOpen=true&slug=${organizationSlug}`
 
-  const getProjectRef = () => {
-    if (projectRef !== 'no-project') {
-      return projectRef
-    }
-    // If no specific project selected, use first project from the org
-    const orgProjects = projects?.filter((p) => p.organization_slug === organizationSlug)
-    return orgProjects?.[0]?.ref || '_'
-  }
-
-  const aiLink = `/project/${getProjectRef()}?aiAssistantPanelOpen=true`
+  if (!organizationSlug || organizationSlug === NO_ORG_MARKER) return null
 
   return (
     <AnimatePresence initial={false}>

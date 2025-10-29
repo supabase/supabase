@@ -2,19 +2,16 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
-
-import { useParams } from 'common'
+import { useParams, useFlag } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { PROJECT_STATUS } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
@@ -24,14 +21,16 @@ import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
-import PauseFailedState from './PauseFailedState'
+import { PauseFailedState } from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
-import RestoreFailedState from './RestoreFailedState'
+import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { LayoutSidebar } from './LayoutSidebar'
+import { LayoutSidebarProvider } from './LayoutSidebar/LayoutSidebarProvider'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -70,7 +69,7 @@ export interface ProjectLayoutProps {
   productMenuClassName?: string
 }
 
-const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
+export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
   (
     {
       title,
@@ -90,11 +89,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
-
     const { mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
-    const aiSnap = useAiAssistantStateSnapshot()
 
-    useHotKey(() => aiSnap.toggleAssistant(), 'i', [aiSnap])
+    const { appTitle } = useCustomContent(['app:title'])
+    const titleSuffix = appTitle || 'Supabase'
 
     const editor = useEditorType()
     const forceShowProductMenu = editor === undefined
@@ -124,14 +122,14 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
         <Head>
           <title>
             {title
-              ? `${title} | Supabase`
+              ? `${title} | ${titleSuffix}`
               : selectedTable
-                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                ? `${selectedTable} | ${projectName} | ${organizationName} | ${titleSuffix}`
                 : projectName
-                  ? `${projectName} | ${organizationName} | Supabase`
+                  ? `${projectName} | ${organizationName} | ${titleSuffix}`
                   : organizationName
-                    ? `${organizationName} | Supabase`
-                    : 'Supabase'}
+                    ? `${organizationName} | ${titleSuffix}`
+                    : titleSuffix}
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
@@ -183,7 +181,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 className="hidden md:flex"
               />
             )}
-            <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
+            <ResizablePanel
+              defaultSize={1}
+              order={2}
+              id="panel-right"
+              className="h-full flex flex-col w-full"
+            >
               <ResizablePanelGroup
                 direction="horizontal"
                 className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
@@ -191,6 +194,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               >
                 <ResizablePanel
                   id="panel-content"
+                  defaultSize={1}
                   className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
                 >
                   <main
@@ -211,24 +215,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     )}
                   </main>
                 </ResizablePanel>
-                {isClient && aiSnap.open && (
-                  <>
-                    <ResizableHandle withHandle />
-                    <ResizablePanel
-                      id="panel-assistant"
-                      minSize={30}
-                      maxSize={50}
-                      className={cn(
-                        'border-l bg fixed z-40 right-0 top-0 bottom-0',
-                        'w-screen h-[100dvh]',
-                        'md:absolute md:h-auto md:w-3/4',
-                        'xl:relative xl:border-l-0'
-                      )}
-                    >
-                      <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
-                    </ResizablePanel>
-                  </>
-                )}
+                <LayoutSidebarProvider>
+                  <LayoutSidebar />
+                </LayoutSidebarProvider>
               </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -250,8 +239,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 ProjectLayout.displayName = 'ProjectLayout'
 
 export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
-
-export default ProjectLayout
 
 interface MenuBarWrapperProps {
   isLoading: boolean
@@ -303,11 +290,13 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
   const { data: selectedProject } = useSelectedProjectQuery()
+  const isHomeNewFlag = useFlag('homeNew')
 
   const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
+  const isHomePage = router.pathname === '/project/[ref]'
 
   const requiresDbConnection: boolean =
     (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
@@ -327,6 +316,20 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
+
+  // handle redirect to home for building state
+  const shouldRedirectToHomeForBuilding =
+    isHomeNewFlag && requiresDbConnection && isProjectBuilding && !isBranchesPage && !isHomePage
+
+  // We won't be showing the building state with the new home page
+  const shouldShowBuildingState =
+    requiresDbConnection && isProjectBuilding && !isBranchesPage && !(isHomeNewFlag && isHomePage)
+
+  useEffect(() => {
+    if (shouldRedirectToHomeForBuilding && ref) {
+      router.replace(`/project/${ref}`)
+    }
+  }, [shouldRedirectToHomeForBuilding, ref, router])
 
   useEffect(() => {
     if (ref) state.setSelectedDatabaseId(ref)
@@ -368,7 +371,11 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoreFailedState />
   }
 
-  if (requiresDbConnection && isProjectBuilding && !isBranchesPage) {
+  if (shouldRedirectToHomeForBuilding) {
+    return <Loading />
+  }
+
+  if (shouldShowBuildingState) {
     return <BuildingState />
   }
 

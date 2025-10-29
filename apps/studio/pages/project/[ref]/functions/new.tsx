@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -14,7 +14,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
@@ -42,6 +42,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -103,6 +105,8 @@ const NewFunctionPage = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
+  const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
@@ -117,6 +121,14 @@ const NewFunctionPage = () => {
   const [open, setOpen] = useState(false)
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
+
+  const templates = useMemo(() => {
+    if (showStripeExample) {
+      return EDGE_FUNCTION_TEMPLATES
+    }
+    // Filter out Stripe template
+    return EDGE_FUNCTION_TEMPLATES.filter((template) => template.value !== 'stripe-webhook')
+  }, [showStripeExample])
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -158,9 +170,9 @@ const NewFunctionPage = () => {
 
   const handleChat = () => {
     const selectedFile = files.find((f) => f.selected) ?? files[0]
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     snap.newChat({
       name: 'Explain edge function',
-      open: true,
       sqlSnippets: [selectedFile.content],
       initialInput: 'Help me understand and improve this edge function...',
       suggestions: {
@@ -288,7 +300,7 @@ const NewFunctionPage = () => {
                 <CommandList_Shadcn_>
                   <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    {EDGE_FUNCTION_TEMPLATES.map((template) => (
+                    {templates.map((template) => (
                       <CommandItem_Shadcn_
                         key={template.value}
                         value={template.value}

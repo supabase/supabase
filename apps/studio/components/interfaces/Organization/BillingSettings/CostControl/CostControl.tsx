@@ -12,17 +12,16 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
+import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-
-import PartnerIcon from 'components/ui/PartnerIcon'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import SpendCapSidePanel from './SpendCapSidePanel'
 
@@ -33,8 +32,10 @@ const CostControl = ({}: CostControlProps) => {
   const { resolvedTheme } = useTheme()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -76,7 +77,7 @@ const CostControl = ({}: CostControlProps) => {
               <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
                 <Link
-                  href="https://supabase.com/docs/guides/platform/cost-control#spend-cap"
+                  href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
                   target="_blank"
                   rel="noreferrer"
                 >

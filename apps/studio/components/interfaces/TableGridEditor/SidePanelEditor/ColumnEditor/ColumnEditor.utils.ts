@@ -4,14 +4,15 @@ import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { uuidv4 } from 'lib/helpers'
+import { toast } from 'sonner'
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
-import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -135,10 +136,10 @@ export const generateUpdateColumnPayload = (
     payload.name = name
   }
   if (!isEqual(originalColumn.comment?.trim(), comment)) {
-    payload.comment = comment || null
+    payload.comment = comment
   }
   if (!isEqual(originalColumn.check?.trim(), check)) {
-    payload.check = check || null
+    payload.check = check
   }
 
   if (!isEqual(originalColumn.format, type)) {
@@ -170,9 +171,11 @@ export const validateFields = (field: ColumnField) => {
   const errors = {} as Dictionary<any>
   if (field.name.length === 0) {
     errors['name'] = `Please assign a name for your column`
+    toast.error(errors['name'])
   }
   if (field.format.length === 0) {
     errors['format'] = `Please select a type for your column`
+    toast.error(errors['format'])
   }
   return errors
 }

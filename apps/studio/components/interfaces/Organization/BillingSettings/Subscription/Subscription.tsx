@@ -1,7 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 
 import { useFlag, useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -11,21 +12,23 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
-import PlanUpdateSidePanel from './PlanUpdateSidePanel'
+import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 
 const Subscription = () => {
   const { slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   const {
     data: subscription,
@@ -107,15 +110,16 @@ const Subscription = () => {
                           variant="info"
                           title={`Unable to update plan from ${planName}`}
                           actions={[
-                            <div key="contact-support">
-                              <Button asChild type="default">
-                                <Link
-                                  href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
-                                >
-                                  Contact support
-                                </Link>
-                              </Button>
-                            </div>,
+                            <Button asChild key="contact-support" type="default">
+                              <SupportLink
+                                queryParams={{
+                                  category: SupportCategories.SALES_ENQUIRY,
+                                  subject: `Change plan away from ${planName}`,
+                                }}
+                              >
+                                Contact support
+                              </SupportLink>
+                            </Button>,
                           ]}
                         >
                           Please contact us if you'd like to change your plan.

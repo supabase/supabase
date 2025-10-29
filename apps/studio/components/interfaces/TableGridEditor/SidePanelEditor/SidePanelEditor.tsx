@@ -21,6 +21,7 @@ import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-muta
 import { tableKeys } from 'data/tables/keys'
 import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { getTables } from 'data/tables/tables-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
@@ -47,7 +48,7 @@ import {
   updateColumn,
   updateTable,
 } from './SidePanelEditor.utils'
-import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
+import { SpreadsheetImport } from './SpreadsheetImport/SpreadsheetImport'
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 
@@ -74,6 +75,7 @@ const SidePanelEditor = ({
 
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
@@ -267,21 +269,23 @@ const SidePanelEditor = ({
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(tableEditorKeys.tableEditor(project?.ref, selectedTable?.id)),
-        queryClient.invalidateQueries(
-          databaseKeys.foreignKeyConstraints(project?.ref, selectedTable?.schema)
-        ),
-        queryClient.invalidateQueries(
-          databaseKeys.tableDefinition(project?.ref, selectedTable?.id)
-        ),
-        queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+        queryClient.invalidateQueries({
+          queryKey: tableEditorKeys.tableEditor(project?.ref, selectedTable?.id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: databaseKeys.foreignKeyConstraints(project?.ref, selectedTable?.schema),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: databaseKeys.tableDefinition(project?.ref, selectedTable?.id),
+        }),
+        queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
       ])
 
       // We need to invalidate tableRowsAndCount after tableEditor
       // to ensure the query sent is correct
-      await queryClient.invalidateQueries(
-        tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id),
+      })
 
       setIsEdited(false)
       snap.closeSidePanel()
@@ -433,8 +437,10 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
-          queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+          queryClient.invalidateQueries({
+            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+          }),
+          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
         ])
 
         toast.success(
@@ -454,12 +460,15 @@ const SidePanelEditor = ({
           foreignKeyRelations,
           isRLSEnabled,
           importContent,
+          organizationSlug: org?.slug,
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
-          queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+          queryClient.invalidateQueries({
+            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+          }),
+          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
         ])
 
         toast.success(`Table ${table.name} is good to go!`, { id: toastId })
@@ -477,6 +486,7 @@ const SidePanelEditor = ({
           foreignKeyRelations,
           existingForeignKeyRelations,
           primaryKey,
+          organizationSlug: org?.slug,
         })
 
         if (table === undefined) {
@@ -570,9 +580,9 @@ const SidePanelEditor = ({
       }
     }
 
-    await queryClient.invalidateQueries(
-      tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
-    )
+    await queryClient.invalidateQueries({
+      queryKey: tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id),
+    })
     toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
     })
@@ -623,6 +633,16 @@ const SidePanelEditor = ({
             : undefined
         }
         isDuplicating={snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'}
+        templateData={
+          snap.sidePanel?.type === 'table' && snap.sidePanel.templateData
+            ? {
+                ...snap.sidePanel.templateData,
+                columns: snap.sidePanel.templateData.columns
+                  ? [...snap.sidePanel.templateData.columns]
+                  : undefined,
+              }
+            : undefined
+        }
         visible={snap.sidePanel?.type === 'table'}
         closePanel={onClosePanel}
         saveChanges={saveTable}

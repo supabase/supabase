@@ -31,6 +31,54 @@ import { PreviewFilterPanelWithUniversal } from './PreviewFilterPanelWithUnivers
 import UpgradePrompt from './UpgradePrompt'
 
 /**
+ * Calculates the appropriate time range for bar click filtering based on the current time range duration.
+ *
+ * @param currentRangeStart - The start timestamp of the current time range
+ * @param currentRangeEnd - The end timestamp of the current time range
+ * @param clickedTimestamp - The timestamp of the clicked bar
+ * @returns Object containing the new start and end timestamps for filtering
+ */
+export const calculateBarClickTimeRange = (
+  currentRangeStart: string,
+  currentRangeEnd: string | undefined,
+  clickedTimestamp: string
+) => {
+  const datumTimestamp = dayjs(clickedTimestamp).toISOString()
+
+  // Calculate the current time range duration in hours
+  // If currentRangeEnd is not provided, use current time as the end
+  const endTime = currentRangeEnd ? dayjs(currentRangeEnd) : dayjs()
+  const currentRangeDuration = endTime.diff(dayjs(currentRangeStart), 'hour', true)
+
+  let rangeOffset: number
+  let rangeUnit: dayjs.ManipulateType
+
+  if (currentRangeDuration >= 12) {
+    // For ranges >= 12h, use 1h range
+    rangeOffset = 0.5
+    rangeUnit = 'hour'
+  } else if (currentRangeDuration >= 1) {
+    // For ranges >= 1h but < 12h, use 5min range
+    rangeOffset = 2.5
+    rangeUnit = 'minute'
+  } else if (currentRangeDuration >= 1 / 30) {
+    // 2 minutes = 1/30 hour
+    // For ranges >= 2min but < 1h, use 2min range
+    rangeOffset = 1
+    rangeUnit = 'minute'
+  } else {
+    // For ranges < 2min, use 15sec range
+    rangeOffset = 7.5
+    rangeUnit = 'second'
+  }
+
+  return {
+    start: dayjs(datumTimestamp).subtract(rangeOffset, rangeUnit).toISOString(),
+    end: dayjs(datumTimestamp).add(rangeOffset, rangeUnit).toISOString(),
+  }
+}
+
+/**
  * Acts as a container component for the entire log display
  *
  * ## Query Params Syncing
@@ -257,10 +305,11 @@ export const LogsPreviewer = ({
               onBarClick={(datum) => {
                 if (!datum?.timestamp) return
 
-                const datumTimestamp = dayjs(datum.timestamp).toISOString()
-
-                const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
-                const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+                const { start, end } = calculateBarClickTimeRange(
+                  timestampStart,
+                  timestampEnd,
+                  datum.timestamp
+                )
 
                 handleSearch('event-chart-bar-click', {
                   query: filters.search_query?.toString(),
@@ -321,5 +370,3 @@ export const LogsPreviewer = ({
     </div>
   )
 }
-
-export default LogsPreviewer

@@ -113,7 +113,7 @@ const ColumnForeignKey = ({
         </Button>
       </div>
 
-      {table !== undefined && (
+      {table != undefined && (
         <ForeignKeySelector
           visible={open}
           column={column}

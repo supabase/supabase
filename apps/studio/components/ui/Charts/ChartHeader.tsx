@@ -9,12 +9,14 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { cn } from 'ui'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { formatBytes } from 'lib/helpers'
 import { numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 export interface ChartHeaderProps {
   title?: string
@@ -25,6 +27,8 @@ export interface ChartHeaderProps {
   highlightedLabel?: number | string | any | null
   highlightedValue?: number | string | any | null
   hideHighlightedValue?: boolean
+  hideHighlightedLabel?: boolean
+  hideHighlightArea?: boolean
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
@@ -41,6 +45,7 @@ export interface ChartHeaderProps {
   isNetworkChart?: boolean
   attributes?: any[]
   sql?: string
+  titleTooltip?: string
 }
 
 export const ChartHeader = ({
@@ -48,6 +53,8 @@ export const ChartHeader = ({
   highlightedValue,
   highlightedLabel,
   hideHighlightedValue = false,
+  hideHighlightedLabel = false,
+  hideHighlightArea = false,
   title,
   minimalHeader = false,
   hideChartType = false,
@@ -68,6 +75,7 @@ export const ChartHeader = ({
   isNetworkChart = false,
   attributes,
   sql,
+  titleTooltip,
 }: ChartHeaderProps) => {
   const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
@@ -162,9 +170,12 @@ export const ChartHeader = ({
 
   const chartTitle = (
     <div className="flex flex-row items-center gap-x-2">
-      <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
-        {title}
-      </h3>
+      <div className="flex flex-row items-center gap-x-2">
+        <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
+          {title}
+        </h3>
+        {titleTooltip && <InfoTooltip>{titleTooltip}</InfoTooltip>}
+      </div>
       {docsUrl && (
         <ButtonTooltip
           type="text"
@@ -196,11 +207,14 @@ export const ChartHeader = ({
 
   if (minimalHeader) {
     return (
-      <div className="flex flex-row items-center gap-x-4" style={{ minHeight: '1.8rem' }}>
+      <div
+        className={cn('flex flex-row items-center gap-x-4', hideHighlightArea && 'hidden')}
+        style={{ minHeight: '1.8rem' }}
+      >
         {title && chartTitle}
         <div className="flex flex-row items-baseline gap-x-2">
           {highlightedValue !== undefined && !hideHighlightedValue && highlighted}
-          {label}
+          {!hideHighlightedLabel && label}
         </div>
       </div>
     )
@@ -209,12 +223,17 @@ export const ChartHeader = ({
   const hasHighlightedValue = highlightedValue !== undefined && !hideHighlightedValue
 
   return (
-    <div className="flex-grow flex justify-between items-start min-h-16">
+    <div
+      className={cn(
+        'flex-grow flex justify-between items-start min-h-16',
+        hideHighlightArea && 'hidden'
+      )}
+    >
       <div className="flex flex-col">
         {title && chartTitle}
         <div className="h-4">
           {hasHighlightedValue && highlighted}
-          {label}
+          {!hideHighlightedLabel && label}
         </div>
       </div>
       <div className="flex items-center gap-2">

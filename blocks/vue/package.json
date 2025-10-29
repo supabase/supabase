@@ -1,0 +1,23 @@
+{
+  "name": "@supabase/vue-blocks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./index.ts",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules .next .turbo",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "h3": "^1.15.4",
+    "nuxt": "^4.0.3",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "catalog:"
+  },
+  "devDependencies": {
+    "shadcn": "^3.0.0",
+    "tsconfig": "workspace:*",
+    "vite": "catalog:"
+  }
+}

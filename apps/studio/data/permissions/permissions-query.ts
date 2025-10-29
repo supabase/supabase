@@ -1,5 +1,4 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import * as Sentry from '@sentry/nextjs'
 
 import { useIsLoggedIn } from 'common'
 import { get, handleError } from 'data/fetchers'
@@ -13,10 +12,12 @@ export async function getPermissions(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/permissions', { signal })
   if (error) {
     handleError(error, {
-      alwaysCapture: true,
       sentryContext: {
         tags: {
           permissionsQuery: true,
+        },
+        contexts: {
+          rawError: error,
         },
       },
     })
@@ -35,13 +36,11 @@ export const usePermissionsQuery = <TData = PermissionsData>({
 }: UseQueryOptions<PermissionsData, PermissionsError, TData> = {}) => {
   const isLoggedIn = useIsLoggedIn()
 
-  return useQuery<PermissionsData, PermissionsError, TData>(
-    permissionKeys.list(),
-    ({ signal }) => getPermissions(signal),
-    {
-      ...options,
-      enabled: IS_PLATFORM && enabled && isLoggedIn,
-      staleTime: 5 * 60 * 1000,
-    }
-  )
+  return useQuery<PermissionsData, PermissionsError, TData>({
+    queryKey: permissionKeys.list(),
+    queryFn: ({ signal }) => getPermissions(signal),
+    ...options,
+    enabled: IS_PLATFORM && enabled && isLoggedIn,
+    staleTime: 5 * 60 * 1000,
+  })
 }

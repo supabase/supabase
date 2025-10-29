@@ -5,25 +5,18 @@ import { Lock, Table } from 'lucide-react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Badge, CardTitle } from 'ui'
+import type { PolicyTable } from './PolicyTableRow.types'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 interface PolicyTableRowHeaderProps {
-  table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }
+  table: PolicyTable
   isLocked: boolean
-  onSelectToggleRLS: (table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }) => void
-  onSelectCreatePolicy: () => void
+  onSelectToggleRLS: (table: PolicyTable) => void
+  onSelectCreatePolicy: (table: PolicyTable) => void
 }
 
 export const PolicyTableRowHeader = ({
@@ -34,12 +27,13 @@ export const PolicyTableRowHeader = ({
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { can: canCreatePolicies } = useAsyncCheckProjectPermissions(
+  const { can: canCreatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'policies'
   )
-  const { can: canToggleRLS } = useAsyncCheckProjectPermissions(
+  const { can: canToggleRLS } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
@@ -91,7 +85,7 @@ export const PolicyTableRowHeader = ({
             <ButtonTooltip
               type="default"
               disabled={!canToggleRLS || !canCreatePolicies}
-              onClick={() => onSelectCreatePolicy()}
+              onClick={() => onSelectCreatePolicy(table)}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -110,9 +104,9 @@ export const PolicyTableRowHeader = ({
               type="default"
               className="px-1"
               onClick={() => {
+                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                 aiSnap.newChat({
                   name: 'Create new policy',
-                  open: true,
                   initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                 })
               }}

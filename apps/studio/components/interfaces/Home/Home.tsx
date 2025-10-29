@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
 import { ClientLibrary } from 'components/interfaces/Home'
 import { AdvisorWidget } from 'components/interfaces/Home/AdvisorWidget'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
-import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
+import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import { NewProjectPanel } from 'components/interfaces/Home/NewProjectPanel/NewProjectPanel'
 import { ProjectUsageSection } from 'components/interfaces/Home/ProjectUsageSection'
 import { ServiceStatus } from 'components/interfaces/Home/ServiceStatus'
@@ -16,17 +16,14 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsOrioleDb,
-  useProjectByRefQuery,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Badge,
@@ -44,29 +41,18 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 export const Home = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
+  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { ref, enableBranching } = useParams()
 
-  const { projectHomepageExampleProjects } = useCustomContent(['project_homepage:example_projects'])
+  const { projectHomepageExampleProjects, projectHomepageClientLibraries: clientLibraries } =
+    useCustomContent(['project_homepage:example_projects', 'project_homepage:client_libraries'])
 
   const {
-    projectHomepageShowAllClientLibraries: showAllClientLibraries,
     projectHomepageShowInstanceSize: showInstanceSize,
     projectHomepageShowExamples: showExamples,
-  } = useIsFeatureEnabled([
-    'project_homepage:show_all_client_libraries',
-    'project_homepage:show_instance_size',
-    'project_homepage:show_examples',
-  ])
-
-  const clientLibraries = useMemo(() => {
-    if (showAllClientLibraries) {
-      return CLIENT_LIBRARIES
-    }
-    return CLIENT_LIBRARIES.filter((library) => library.language === 'JavaScript')
-  }, [showAllClientLibraries])
+  } = useIsFeatureEnabled(['project_homepage:show_instance_size', 'project_homepage:show_examples'])
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
@@ -138,7 +124,7 @@ export const Home = () => {
                     <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
                       This project is using Postgres with OrioleDB which is currently in preview and
                       not suitable for production workloads. View our{' '}
-                      <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
+                      <InlineLink href={`${DOCS_URL}/guides/database/orioledb`}>
                         documentation
                       </InlineLink>{' '}
                       for all limitations.
@@ -147,12 +133,10 @@ export const Home = () => {
                 )}
                 {showInstanceSize && (
                   <ComputeBadgeWrapper
-                    project={{
-                      ref: project?.ref,
-                      organization_slug: organization?.slug,
-                      cloud_provider: project?.cloud_provider,
-                      infra_compute_size: project?.infra_compute_size,
-                    }}
+                    projectRef={project?.ref}
+                    slug={organization?.slug}
+                    cloudProvider={project?.cloud_provider}
+                    computeSize={project?.infra_compute_size}
                   />
                 )}
               </div>
@@ -238,8 +222,9 @@ export const Home = () => {
                   <div className="space-y-8">
                     <h2 className="text-lg">Client libraries</h2>
                     <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mb-12 md:grid-cols-3">
-                      {clientLibraries.map((library) => (
-                        <ClientLibrary key={library.language} {...library} />
+                      {clientLibraries!.map((library) => (
+                        // [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later.
+                        <ClientLibrary key={(library as any).language} {...(library as any)} />
                       ))}
                     </div>
                   </div>
@@ -248,9 +233,10 @@ export const Home = () => {
                       <h4 className="text-lg">Example projects</h4>
                       {!!projectHomepageExampleProjects ? (
                         <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                          {projectHomepageExampleProjects
-                            .sort((a, b) => a.title.localeCompare(b.title))
-                            .map((project) => (
+                          {/* [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later. */}
+                          {(projectHomepageExampleProjects as any)
+                            .sort((a: any, b: any) => a.title.localeCompare(b.title))
+                            .map((project: any) => (
                               <ExampleProject key={project.url} {...project} />
                             ))}
                         </div>

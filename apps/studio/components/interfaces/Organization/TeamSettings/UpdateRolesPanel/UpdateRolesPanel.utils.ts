@@ -42,9 +42,16 @@ export const formatMemberRoleToProjectRoleConfiguration = (
     })
     .filter(Boolean)
     .flat()
-    .filter(
-      (p) => p !== undefined && 'baseRoleId' in p && p.ref !== undefined
-    ) as ProjectRoleConfiguration[]
+    .filter((p) => {
+      // [Joshen] Validate only for project scoped roles
+      // This filters out project scoped roles for projects that the user doesn't have access to
+      // (e.g if the project was deleted)
+      if ('baseRoleId' in p!) {
+        return p.ref !== undefined
+      } else {
+        return p
+      }
+    }) as ProjectRoleConfiguration[]
 
   return roleConfiguration
 }

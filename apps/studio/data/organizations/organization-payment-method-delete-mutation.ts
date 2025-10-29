@@ -48,10 +48,11 @@ export const useOrganizationPaymentMethodDeleteMutation = ({
     OrganizationPaymentMethodDeleteData,
     ResponseError,
     OrganizationPaymentMethodDeleteVariables
-  >((vars) => deletePaymentMethod(vars), {
+  >({
+    mutationFn: (vars) => deletePaymentMethod(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
-      await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
+      await queryClient.invalidateQueries({ queryKey: organizationKeys.paymentMethods(slug) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
