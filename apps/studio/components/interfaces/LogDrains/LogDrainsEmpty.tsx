@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { AnimatedLogos } from './AnimatedLogos'
 import Image from 'next/image'
 import { BASE_PATH } from 'lib/constants'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 
 export const LogDrainsEmpty = () => {
   const items = [
@@ -34,9 +35,9 @@ export const LogDrainsEmpty = () => {
             <p className="text-foreground-light mb-6">
               Upgrade to a Team or Enterprise Plan to send your logs to your preferred platform
             </p>
-            <Button type="primary" onClick={() => console.log('hello')}>
+            <UpgradePlanButton type="primary" plan="Team" source="log-drains-empty-state">
               Upgrade plan
-            </Button>
+            </UpgradePlanButton>
           </div>
           <Card className="grid grid-cols-1 @xl:grid-cols-2 bg divide-x mb-8">
             {items.map((item, i) => (
