@@ -20,11 +20,6 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
   Separator,
   Sheet,
   SheetClose,
@@ -37,7 +32,6 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { OAUTH_APP_SCOPE_OPTIONS } from './OAuthAppsList'
 
 interface CreateOAuthAppSheetProps {
   visible: boolean
@@ -51,7 +45,7 @@ const FormSchema = z.object({
     .min(1, 'Please provide a name for your OAuth app')
     .max(100, 'Name must be less than 100 characters'),
   type: z.enum(['manual', 'dynamic']).default('manual'),
-  scope: z.string().min(1, 'Please select a scope'),
+  // scope: z.string().min(1, 'Please select a scope'),
   redirect_uris: z
     .object({
       value: z.string().trim().url('Please provide a valid URL'),
@@ -66,7 +60,7 @@ const FORM_ID = 'create-or-update-oauth-app-form'
 const initialValues = {
   name: '',
   type: 'manual' as const,
-  scope: 'email',
+  // scope: 'email',
   redirect_uris: [{ value: '' }],
   is_public: false,
 }
@@ -115,7 +109,7 @@ export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAut
     const payload: CreateOAuthClientParams = {
       client_name: data.name,
       client_uri: '',
-      scope: data.scope,
+      // scope: data.scope,
       redirect_uris: validRedirectUris,
     }
 
@@ -172,7 +166,7 @@ export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAut
                   )}
                 />
 
-                <FormField_Shadcn_
+                {/* <FormField_Shadcn_
                   control={form.control}
                   name="scope"
                   rules={{ required: true }}
@@ -211,7 +205,7 @@ export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAut
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
-                />
+                /> */}
 
                 <div className="px-5 gap-2 flex flex-col">
                   <FormLabel_Shadcn_ className="text-foreground">Redirect URIs</FormLabel_Shadcn_>

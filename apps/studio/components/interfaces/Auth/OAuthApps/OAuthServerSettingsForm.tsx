@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -14,37 +13,25 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  Badge,
   Button,
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
-  Input,
   Input_Shadcn_,
-  Separator,
   Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { OAUTH_APP_SCOPE_OPTIONS } from './OAuthAppsList'
 
 const configUrlSchema = z.object({
   id: z.string(),
@@ -88,7 +75,11 @@ interface OAuthServerSettings {
 
 export const OAuthServerSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    isLoading: isAuthConfigLoading,
+    isSuccess,
+  } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading } = useAuthConfigUpdateMutation({
     onSuccess: () => {
       toast.success('OAuth server settings updated successfully')
@@ -102,10 +93,11 @@ export const OAuthServerSettingsForm = () => {
   const [showDisableOAuthServerConfirmation, setShowDisableOAuthServerConfirmation] =
     useState(false)
 
-  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
-  )
+  const {
+    can: canReadConfig,
+    isLoading: isLoadingPermissions,
+    isSuccess: isPermissionsLoaded,
+  } = useAsyncCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   const { data: oAuthAppsData } = useOAuthServerAppsQuery({ projectRef })
 
@@ -152,12 +144,6 @@ export const OAuthServerSettingsForm = () => {
     updateAuthConfig({ projectRef, config })
   }
 
-  const removeScope = (scopeToRemove: string) => {
-    const currentScopes = form.getValues('availableScopes')
-    const updatedScopes = currentScopes.filter((scope) => scope !== scopeToRemove)
-    form.setValue('availableScopes', updatedScopes, { shouldDirty: true })
-  }
-
   const handleDynamicAppsToggle = (checked: boolean) => {
     if (checked) {
       setShowDynamicAppsConfirmation(true)
@@ -192,23 +178,6 @@ export const OAuthServerSettingsForm = () => {
     setShowDisableOAuthServerConfirmation(false)
   }
 
-  const generateConfigUrls = (): ConfigUrl[] => {
-    return [
-      {
-        id: 'authorize_url',
-        name: 'Authorize URL',
-        value: `https://${projectRef}.supabase.co/auth/v1/authorize`,
-        description: 'OAuth authorization endpoint',
-      },
-      {
-        id: 'token_url',
-        name: 'Token URL',
-        value: `https://${projectRef}.supabase.co/auth/v1/token`,
-        description: 'OAuth token endpoint',
-      },
-    ]
-  }
-
   if (isPermissionsLoaded && !canReadConfig) {
     return (
       <ScaffoldSection isFullWidth>
@@ -217,6 +186,14 @@ export const OAuthServerSettingsForm = () => {
           <NoPermission resourceText="view OAuth server settings" />
         </div>
       </ScaffoldSection>
+    )
+  }
+
+  if (isAuthConfigLoading || isLoadingPermissions) {
+    return (
+      <div className="pt-12">
+        <GenericSkeletonLoader />
+      </div>
     )
   }
 
@@ -359,91 +336,6 @@ export const OAuthServerSettingsForm = () => {
                   </Button>
                 </CardFooter>
               </Card>
-
-              {/* Additional Settings Section - Only show when OAuth Server is enabled */}
-              {form.watch('OAUTH_SERVER_ENABLED') && (
-                <ScaffoldSection isFullWidth>
-                  <ScaffoldSectionContent>
-                    <Separator />
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Scope</CardTitle>
-                        <CardDescription>
-                          OAuth scope that can be requested by OAuth applications.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="p-0">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="px-6">Value</TableHead>
-                              <TableHead>Description</TableHead>
-                              <TableHead className="w-8"></TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {form.watch('availableScopes').map((scope) => (
-                              <TableRow key={scope}>
-                                <TableCell>
-                                  <Badge variant="secondary" className="font-mono">
-                                    {scope}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell>
-                                  {OAUTH_APP_SCOPE_OPTIONS.find((opt) => opt.value === scope)
-                                    ?.name || 'Custom scope'}
-                                </TableCell>
-                                <TableCell>
-                                  {!['profile', 'email', 'openid'].includes(scope) && (
-                                    <Button
-                                      type="default"
-                                      size="tiny"
-                                      icon={<Trash2 size={14} />}
-                                      onClick={() => removeScope(scope)}
-                                      disabled={!canUpdateConfig}
-                                    />
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
-                    </Card>
-
-                    {form.watch('config_urls') && (form.watch('config_urls')?.length ?? 0) > 0 && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>Configuration URLs</CardTitle>
-                          <CardDescription>
-                            OAuth endpoints for your authorization server. Click to copy.
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="flex flex-col gap-4">
-                            {form
-                              .watch('config_urls')
-                              ?.map((configUrl) => (
-                                <Input
-                                  key={configUrl.id}
-                                  id={configUrl.id}
-                                  label={configUrl.name}
-                                  descriptionText={configUrl.description}
-                                  layout="vertical"
-                                  copy
-                                  value={configUrl.value}
-                                  readOnly
-                                  className="font-mono text-sm"
-                                />
-                              ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </ScaffoldSectionContent>
-                </ScaffoldSection>
-              )}
             </form>
           </Form_Shadcn_>
         </ScaffoldSectionContent>
