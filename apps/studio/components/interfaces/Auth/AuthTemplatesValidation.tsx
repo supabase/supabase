@@ -32,6 +32,9 @@ const CONFIRMATION: FormSchema = {
   validationSchema: object().shape({
     MAILER_SUBJECTS_CONFIRMATION: string().required('Subject heading is required.'),
   }),
+  misc: {
+    emailTemplateType: 'authentication',
+  },
 }
 
 const INVITE: FormSchema = {
@@ -63,6 +66,9 @@ const INVITE: FormSchema = {
   validationSchema: object().shape({
     MAILER_SUBJECTS_INVITE: string().required('Subject heading is required.'),
   }),
+  misc: {
+    emailTemplateType: 'authentication',
+  },
 }
 
 const MAGIC_LINK: FormSchema = {
@@ -94,6 +100,9 @@ const MAGIC_LINK: FormSchema = {
   validationSchema: object().shape({
     MAILER_SUBJECTS_MAGIC_LINK: string().required('Subject heading is required.'),
   }),
+  misc: {
+    emailTemplateType: 'authentication',
+  },
 }
 
 const EMAIL_CHANGE: FormSchema = {
@@ -126,6 +135,9 @@ const EMAIL_CHANGE: FormSchema = {
   validationSchema: object().shape({
     MAILER_SUBJECTS_EMAIL_CHANGE: string().required('Subject heading is required.'),
   }),
+  misc: {
+    emailTemplateType: 'authentication',
+  },
 }
 
 const RECOVERY: FormSchema = {
@@ -157,6 +169,9 @@ const RECOVERY: FormSchema = {
   validationSchema: object().shape({
     MAILER_SUBJECTS_RECOVERY: string().required('Subject heading is required.'),
   }),
+  misc: {
+    emailTemplateType: 'authentication',
+  },
 }
 const REAUTHENTICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
@@ -185,6 +200,9 @@ const REAUTHENTICATION: FormSchema = {
   validationSchema: object().shape({
     MAILER_SUBJECTS_REAUTHENTICATION: string().required('Subject heading is required.'),
   }),
+  misc: {
+    emailTemplateType: 'authentication',
+  },
 }
 
 // Notifications
@@ -214,6 +232,9 @@ const PASSWORD_CHANGED_NOTIFICATION: FormSchema = {
       'Subject heading is required.'
     ),
   }),
+  misc: {
+    emailTemplateType: 'security',
+  },
 }
 
 const EMAIL_CHANGED_NOTIFICATION: FormSchema = {
@@ -241,6 +262,9 @@ const EMAIL_CHANGED_NOTIFICATION: FormSchema = {
   validationSchema: object().shape({
     MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: string().required('Subject heading is required.'),
   }),
+  misc: {
+    emailTemplateType: 'security',
+  },
 }
 
 const PHONE_CHANGED_NOTIFICATION: FormSchema = {
@@ -269,6 +293,9 @@ const PHONE_CHANGED_NOTIFICATION: FormSchema = {
   validationSchema: object().shape({
     MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: string().required('Subject heading is required.'),
   }),
+  misc: {
+    emailTemplateType: 'security',
+  },
 }
 
 const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
@@ -296,6 +323,9 @@ const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
   validationSchema: object().shape({
     MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: string().required('Subject heading is required.'),
   }),
+  misc: {
+    emailTemplateType: 'security',
+  },
 }
 
 const IDENTITY_UNLINKED_NOTIFICATION: FormSchema = {
@@ -325,6 +355,9 @@ const IDENTITY_UNLINKED_NOTIFICATION: FormSchema = {
       'Subject heading is required.'
     ),
   }),
+  misc: {
+    emailTemplateType: 'security',
+  },
 }
 
 const MFA_FACTOR_ENROLLED_NOTIFICATION: FormSchema = {
@@ -354,6 +387,9 @@ const MFA_FACTOR_ENROLLED_NOTIFICATION: FormSchema = {
       'Subject heading is required.'
     ),
   }),
+  misc: {
+    emailTemplateType: 'security',
+  },
 }
 
 const MFA_FACTOR_UNENROLLED_NOTIFICATION: FormSchema = {
@@ -383,6 +419,9 @@ const MFA_FACTOR_UNENROLLED_NOTIFICATION: FormSchema = {
       'Subject heading is required.'
     ),
   }),
+  misc: {
+    emailTemplateType: 'security',
+  },
 }
 
 export const TEMPLATES_SCHEMAS = [

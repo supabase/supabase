@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -13,11 +13,40 @@ import {
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Switch,
+  FormControl_Shadcn_,
+  CardFooter,
+  Button,
+  Form_Shadcn_,
+  FormField_Shadcn_,
 } from 'ui'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
 import TemplateEditor from './TemplateEditor'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { toast } from 'sonner'
+import { useEffect } from 'react'
+
+const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
+  (t) => t.misc?.emailTemplateType === 'security'
+).map((template) => {
+  return `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED`
+})
+const NotificationsFormSchema = z.object({
+  ...notificationEnabledKeys.reduce(
+    (acc, key) => {
+      acc[key] = z.boolean()
+      return acc
+    },
+    {} as Record<string, z.ZodBoolean>
+  ),
+})
 
 export const EmailTemplates = () => {
   const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
@@ -29,11 +58,53 @@ export const EmailTemplates = () => {
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
   const builtInSMTP =
     isSuccess &&
     authConfig &&
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
+
+  const getNotificationEnabledKeys = () =>
+    notificationEnabledKeys.reduce(
+      (acc, key) => {
+        acc[key] = authConfig ? Boolean(authConfig[key as keyof typeof authConfig]) : false
+        return acc
+      },
+      {} as Record<string, boolean>
+    )
+  const notificationsForm = useForm<z.infer<typeof NotificationsFormSchema>>({
+    resolver: zodResolver(NotificationsFormSchema),
+    defaultValues: {
+      ...getNotificationEnabledKeys(),
+    },
+  })
+
+  useEffect(() => {
+    if (authConfig) {
+      notificationsForm.reset({
+        ...getNotificationEnabledKeys(),
+      })
+    }
+  }, [authConfig])
+
+  const onSubmit = (values: any) => {
+    updateAuthConfig(
+      { projectRef: projectRef!, config: { ...values } },
+      {
+        onError: (error) => {
+          toast.error(`Failed to update settings: ${error?.message}`)
+        },
+        onSuccess: () => {
+          toast.success('Successfully updated settings')
+        },
+      }
+    )
+  }
 
   return (
     <ScaffoldSection isFullWidth className="!pt-0">
@@ -57,30 +128,123 @@ export const EmailTemplates = () => {
             </div>
           ) : null}
           {isSecurityNotificationsEnabled ? (
-            <Card>
-              {TEMPLATES_SCHEMAS.map((template) => {
-                const templateSlug = slugifyTitle(template.title)
-                return (
-                  <CardContent key={`${template.id}`} className="p-0">
-                    <Link
-                      href={`/project/${projectRef}/auth/templates/${templateSlug}`}
-                      className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
-                    >
-                      <div className="flex flex-col">
-                        <h3 className="text-sm text-foreground">{template.title}</h3>
-                        {template.purpose && (
-                          <p className="text-sm text-foreground-lighter">{template.purpose}</p>
+            <div className="space-y-8">
+              <div>
+                <ScaffoldSectionTitle className="mb-4">Authenticaton</ScaffoldSectionTitle>
+                <Card>
+                  {TEMPLATES_SCHEMAS.filter(
+                    (t) => t.misc?.emailTemplateType === 'authentication'
+                  ).map((template) => {
+                    const templateSlug = slugifyTitle(template.title)
+
+                    return (
+                      <CardContent key={`${template.id}`} className="p-0">
+                        <Link
+                          href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                          className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
+                        >
+                          <div className="flex flex-col">
+                            <h3 className="text-sm text-foreground">{template.title}</h3>
+                            {template.purpose && (
+                              <p className="text-sm text-foreground-lighter">{template.purpose}</p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-4 group">
+                            <Switch checked disabled />
+
+                            <ChevronRight
+                              size={16}
+                              className="text-foreground-muted group-hover:text-foreground transition-colors"
+                            />
+                          </div>
+                        </Link>
+                      </CardContent>
+                    )
+                  })}
+                </Card>
+              </div>
+
+              <div>
+                <ScaffoldSectionTitle className="mb-4">Security</ScaffoldSectionTitle>
+                <Form_Shadcn_ {...notificationsForm}>
+                  <form onSubmit={notificationsForm.handleSubmit(onSubmit)} className="space-y-4">
+                    <Card>
+                      {TEMPLATES_SCHEMAS.filter(
+                        (t) => t.misc?.emailTemplateType === 'security'
+                      ).map((template) => {
+                        const templateSlug = slugifyTitle(template.title)
+                        const templateEnabledKey =
+                          `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as keyof typeof authConfig
+
+                        return (
+                          <CardContent key={`${template.id}`} className="p-0">
+                            <div className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full">
+                              <Link
+                                href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                                className="flex flex-col flex-1"
+                              >
+                                <h3 className="text-sm text-foreground">{template.title}</h3>
+                                {template.purpose && (
+                                  <p className="text-sm text-foreground-lighter">
+                                    {template.purpose}
+                                  </p>
+                                )}
+                              </Link>
+
+                              <div className="flex items-center gap-4 group">
+                                <FormField_Shadcn_
+                                  control={notificationsForm.control}
+                                  name={templateEnabledKey}
+                                  render={({ field }) => (
+                                    <FormControl_Shadcn_>
+                                      <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        disabled={!canUpdateConfig}
+                                        onClick={(e) => e.stopPropagation()}
+                                      />
+                                    </FormControl_Shadcn_>
+                                  )}
+                                />
+
+                                <Link
+                                  href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                                >
+                                  <ChevronRight
+                                    size={16}
+                                    className="text-foreground-muted hover:text-foreground transition-colors"
+                                  />
+                                </Link>
+                              </div>
+                            </div>
+                          </CardContent>
+                        )
+                      })}
+                      <CardFooter className="justify-end space-x-2">
+                        {notificationsForm.formState.isDirty && (
+                          <Button type="default" onClick={() => notificationsForm.reset()}>
+                            Cancel
+                          </Button>
                         )}
-                      </div>
-                      <ChevronRight
-                        size={16}
-                        className="text-foreground-muted group-hover:text-foreground transition-colors"
-                      />
-                    </Link>
-                  </CardContent>
-                )
-              })}
-            </Card>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          disabled={
+                            !canUpdateConfig ||
+                            isUpdatingConfig ||
+                            !notificationsForm.formState.isDirty
+                          }
+                          loading={isUpdatingConfig}
+                        >
+                          Save changes
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </form>
+                </Form_Shadcn_>
+              </div>
+            </div>
           ) : (
             <Card>
               <Tabs_Shadcn_ defaultValue={slugifyTitle(TEMPLATES_SCHEMAS[0].title)}>
