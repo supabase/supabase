@@ -15,7 +15,7 @@ import { DOCS_URL } from 'lib/constants'
 import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-const TransferProjectButton = () => {
+export const TransferProjectButton = () => {
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
@@ -291,5 +291,3 @@ const TransferProjectButton = () => {
     </>
   )
 }
-
-export default TransferProjectButton
