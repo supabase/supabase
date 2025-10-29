@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AppBannerWrapper } from 'components/interfaces/App'
+import { AppBannerWrapper } from 'components/interfaces/App/AppBannerWrapper'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { Sidebar } from 'components/interfaces/Sidebar'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'

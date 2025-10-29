@@ -8,7 +8,7 @@ import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constan
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
-import { ColumnMenu } from '../menu'
+import { ColumnMenu } from '../menu/ColumnMenu'
 
 export function ColumnHeader<R>({
   column,

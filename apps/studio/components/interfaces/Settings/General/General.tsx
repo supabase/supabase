@@ -27,7 +27,7 @@ import {
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
-const General = () => {
+export const General = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
@@ -199,5 +199,3 @@ const General = () => {
     </div>
   )
 }
-
-export default General
