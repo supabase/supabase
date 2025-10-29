@@ -76,7 +76,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 

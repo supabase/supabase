@@ -1,5 +1,5 @@
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
@@ -25,7 +25,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 interface OrganizationProjectSelectorSelectorProps {
   slug?: string
   open?: boolean
-  selectedRef?: string
+  selectedRef?: string | null
   searchPlaceholder?: string
   sameWidthAsTrigger?: boolean
   checkPosition?: 'right' | 'left'
@@ -41,6 +41,7 @@ interface OrganizationProjectSelectorSelectorProps {
   renderActions?: (setOpen: (value: boolean) => void) => ReactNode
   onSelect?: (project: OrgProject) => void
   onInitialLoad?: (projects: OrgProject[]) => void
+  fetchOnMount?: boolean
 }
 
 export const OrganizationProjectSelector = ({
@@ -56,6 +57,7 @@ export const OrganizationProjectSelector = ({
   renderActions,
   onSelect,
   onInitialLoad,
+  fetchOnMount = false,
 }: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = _slug ?? organization?.slug
@@ -86,7 +88,7 @@ export const OrganizationProjectSelector = ({
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true }
+    { enabled: fetchOnMount || open, keepPreviousData: true }
   )
 
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
@@ -98,8 +100,7 @@ export const OrganizationProjectSelector = ({
       !isFetching &&
       entry?.isIntersecting &&
       hasNextPage &&
-      !isFetchingNextPage &&
-      !isLoadingProjects
+      !isFetchingNextPage
     ) {
       fetchNextPage()
     }
@@ -124,7 +125,7 @@ export const OrganizationProjectSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        {!!renderTrigger ? (
+        {renderTrigger ? (
           renderTrigger({ isLoading: isLoadingProjects || isFetching, project: selectedProject })
         ) : (
           <Button

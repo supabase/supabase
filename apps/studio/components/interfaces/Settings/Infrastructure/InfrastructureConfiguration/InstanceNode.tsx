@@ -294,8 +294,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 <Badge>Restarting</Badge>
               ) : status === REPLICA_STATUS.RESIZING ? (
                 <Badge>Resizing</Badge>
-              ) : initStatus === ReplicaInitializationStatus.Completed &&
-                status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
+              ) : status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
                 <Badge variant="brand">Healthy</Badge>
               ) : (
                 <Badge variant="warning">Unhealthy</Badge>

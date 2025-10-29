@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isArray } from 'lodash'
 import { Check, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
@@ -13,7 +13,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useOrganizationQuery } from 'data/organizations/organization-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import type { OrgPlan } from 'data/subscriptions/types'
@@ -47,7 +47,8 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
     }
   }
 }
-const PlanUpdateSidePanel = () => {
+
+export const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const { slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -64,10 +65,13 @@ const PlanUpdateSidePanel = () => {
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
-  const { data: projectsData } = useProjectsQuery()
-  const orgProjects = (projectsData?.projects ?? []).filter(
-    (it) => it.organization_id === selectedOrganization?.id
-  )
+
+  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const orgProjects =
+    useMemo(
+      () => orgProjectsData?.pages.flatMap((page) => page.projects),
+      [orgProjectsData?.pages]
+    ) || []
 
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
@@ -98,6 +102,9 @@ const PlanUpdateSidePanel = () => {
   const availablePlans: OrgPlan[] = plans?.plans ?? []
   const hasMembersExceedingFreeTierLimit =
     (membersExceededLimit || []).length > 0 &&
+    // [Joshen] Note that orgProjects is paginated so there's a chance this may omit certain projects
+    // Although I don't foresee this affecting a majority of users. Ideally perhaps we could return
+    // this data from the organization query
     orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
 
   useEffect(() => {
@@ -357,5 +364,3 @@ const PlanUpdateSidePanel = () => {
     </>
   )
 }
-
-export default PlanUpdateSidePanel

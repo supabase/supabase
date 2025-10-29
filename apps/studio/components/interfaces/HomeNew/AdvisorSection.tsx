@@ -2,17 +2,20 @@ import { BarChart, Shield } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import {
   createLintSummaryPrompt,
   LintCategoryBadge,
   lintInfoMap,
 } from 'components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -28,14 +31,21 @@ import {
 } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import LintDetail from 'components/interfaces/Linter/LintDetail'
 
-export const AdvisorSection = () => {
+export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery(
+    {
+      projectRef,
+    },
+    {
+      enabled: !showEmptyState,
+    }
+  )
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
@@ -57,7 +67,7 @@ export const AdvisorSection = () => {
   }, [totalErrors])
 
   const handleAskAssistant = useCallback(() => {
-    snap.toggleAssistant()
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     if (projectRef && organization?.slug) {
       sendEvent({
         action: 'home_advisor_ask_assistant_clicked',
@@ -70,7 +80,7 @@ export const AdvisorSection = () => {
         },
       })
     }
-  }, [snap, sendEvent, projectRef, organization, totalErrors])
+  }, [sendEvent, openSidebar, projectRef, organization, totalErrors])
 
   const handleCardClick = useCallback(
     (lint: Lint) => {
@@ -92,6 +102,10 @@ export const AdvisorSection = () => {
     },
     [sendEvent, projectRef, organization]
   )
+
+  if (showEmptyState) {
+    return <EmptyState />
+  }
 
   return (
     <div>
@@ -139,9 +153,9 @@ export const AdvisorSection = () => {
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
+                        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                         snap.newChat({
                           name: 'Summarize lint',
-                          open: true,
                           initialInput: createLintSummaryPrompt(lint),
                         })
                         if (projectRef && organization?.slug) {
@@ -199,15 +213,21 @@ export const AdvisorSection = () => {
           </Sheet>
         </>
       ) : (
-        <Card className="bg-transparent">
-          <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
-            <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
-            <p className="text-sm text-foreground-light text-center">
-              No security or performance errors found
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState />
       )}
     </div>
+  )
+}
+
+function EmptyState() {
+  return (
+    <Card className="bg-transparent">
+      <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
+        <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
+        <p className="text-sm text-foreground-light text-center">
+          No security or performance errors found
+        </p>
+      </CardContent>
+    </Card>
   )
 }

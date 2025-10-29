@@ -43,21 +43,19 @@ export const useBucketObjectDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BucketObjectDeleteData, ResponseError, DeleteBucketObjectParams>(
-    (vars) => deleteBucketObject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        // [Joshen] TODO figure out what queries to invalidate
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete bucket object: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BucketObjectDeleteData, ResponseError, DeleteBucketObjectParams>({
+    mutationFn: (vars) => deleteBucketObject(vars),
+    async onSuccess(data, variables, context) {
+      // [Joshen] TODO figure out what queries to invalidate
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete bucket object: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

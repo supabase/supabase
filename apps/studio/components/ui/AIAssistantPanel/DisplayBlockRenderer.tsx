@@ -85,7 +85,9 @@ export const DisplayBlockRenderer = ({
   const [rows, setRows] = useState<any[] | undefined>(
     Array.isArray(initialResults) ? initialResults : undefined
   )
-  const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+  const isReportsPage = router.pathname.endsWith('/reports/[id]')
+  const isHomePage = router.pathname === '/project/[ref]'
+  const isDraggableToReports = canCreateSQLSnippet && (isReportsPage || isHomePage)
   const label = initialArgs.label || 'SQL Results'
   const [isWriteQuery, setIsWriteQuery] = useState<boolean>(initialArgs.isWriteQuery || false)
   const sqlQuery = initialArgs.sql

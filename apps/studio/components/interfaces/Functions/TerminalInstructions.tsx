@@ -83,7 +83,7 @@ export const TerminalInstructions = forwardRef<
         return (
           <>
             <span className="text-brand-600">curl</span> -L -X POST '{functionsEndpoint}
-            /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]' s
+            /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'
             {anonKey?.type === 'publishable' ? " -H 'apikey: [YOUR ANON KEY]' " : ''}
             {`--data '{"name":"Functions"}'`}
           </>

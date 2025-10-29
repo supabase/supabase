@@ -26,7 +26,7 @@ export interface ComposedChartHandlerProps {
   attributes: MultiAttribute[]
   startDate: string
   endDate: string
-  interval: string
+  interval?: string
   customDateFormat?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hideChartType?: boolean
@@ -343,8 +343,6 @@ const useAttributeQueries = (
     ref,
     startDate,
     endDate,
-    interval,
-    databaseIdentifier,
     data,
     isVisible
   )

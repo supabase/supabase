@@ -67,8 +67,12 @@
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
         "NEXT_PUBLIC_GOOGLE_MAPS_KEY",
         "NEXT_RUNTIME",
+        "NIMBUS_PROD_PROJECTS_URL",
+        "NIMBUS_PROD_PROJECTS_URL_WS",
         "NODE_ENV",
         "SUPABASE_URL",
+        "VERCEL",
+        "VERCEL_ENV",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
@@ -82,6 +86,11 @@
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
+        "PG_META_CRYPTO_KEY",
+        "POSTGRES_PASSWORD",
+        "POSTGRES_HOST",
+        "POSTGRES_DB",
+        "POSTGRES_PORT",
         "READ_ONLY_URL",
         "READ_ONLY_API_KEY",
         "SUPABASE_SERVICE_KEY",
@@ -107,7 +116,9 @@
         "VERCEL_URL",
         "IS_THROTTLED",
         "AI_PRO_MODEL",
-        "AI_NORMAL_MODEL"
+        "AI_NORMAL_MODEL",
+        "SUPPORT_SUPABASE_SECRET_KEY",
+        "NEXT_PUBLIC_IS_NIMBUS"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]
@@ -116,6 +127,7 @@
       "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
+        "CI",
         "CF_ACCESS_CLIENT_ID",
         "CF_ACCESS_CLIENT_SECRET",
         "CMS_API_KEY",
@@ -138,6 +150,9 @@
         "NEXT_PUBLIC_SENTRY_DSN",
         "NEXT_PUBLIC_SURVEY_SUPABASE_URL",
         "NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY",
+        "VERCEL",
+        "VERCEL_ENV",
+        "VERCEL_GIT_COMMIT_SHA",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",

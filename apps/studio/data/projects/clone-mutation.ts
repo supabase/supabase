@@ -47,24 +47,22 @@ export const useProjectCloneMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectCloneData, ResponseError, ProjectCloneVariables>(
-    (vars) => triggerClone(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries({
-          queryKey: projectKeys.listCloneBackups(variables.projectRef),
-        })
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          console.error(data)
-          toast.error(`Failed to trigger clone: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectCloneData, ResponseError, ProjectCloneVariables>({
+    mutationFn: (vars) => triggerClone(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: projectKeys.listCloneBackups(variables.projectRef),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        console.error(data)
+        toast.error(`Failed to trigger clone: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

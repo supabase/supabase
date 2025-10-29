@@ -11,6 +11,7 @@ export const generateAuthMenu = (
     authenticationAttackProtection: boolean
     authenticationAdvanced: boolean
     authenticationShowOverview: boolean
+    authenticationShowSecurityNotifications: boolean
   }
 ): ProductMenuGroup[] => {
   const {
@@ -21,6 +22,7 @@ export const generateAuthMenu = (
     authenticationAttackProtection,
     authenticationAdvanced,
     authenticationShowOverview,
+    authenticationShowSecurityNotifications,
   } = flags ?? {}
 
   return [
@@ -33,6 +35,26 @@ export const generateAuthMenu = (
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
       ],
     },
+    ...(authenticationEmails && authenticationShowSecurityNotifications && IS_PLATFORM
+      ? [
+          {
+            title: 'Notifications',
+            items: [
+              ...(authenticationEmails
+                ? [
+                    {
+                      name: 'Email',
+                      key: 'email',
+                      pages: ['templates', 'smtp'],
+                      url: `/project/${ref}/auth/templates`,
+                      items: [],
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
+      : []),
     {
       title: 'Configuration',
       items: [
@@ -71,7 +93,7 @@ export const generateAuthMenu = (
                     },
                   ]
                 : []),
-              ...(authenticationEmails
+              ...(authenticationEmails && !authenticationShowSecurityNotifications
                 ? [
                     {
                       name: 'Emails',

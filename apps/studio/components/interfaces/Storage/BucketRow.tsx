@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Columns3, Edit2, MoreVertical, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 import { useState } from 'react'
 
 import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
@@ -26,9 +27,17 @@ export interface BucketRowProps {
   bucket: Bucket
   projectRef?: string
   isSelected: boolean
+  style?: CSSProperties
+  className?: string
 }
 
-export const BucketRow = ({ bucket, projectRef = '', isSelected = false }: BucketRowProps) => {
+export const BucketRow = ({
+  bucket,
+  projectRef = '',
+  isSelected = false,
+  style,
+  className,
+}: BucketRowProps) => {
   const { can: canUpdateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const [modal, setModal] = useState<string | null>(null)
   const onClose = () => setModal(null)
@@ -36,9 +45,11 @@ export const BucketRow = ({ bucket, projectRef = '', isSelected = false }: Bucke
   return (
     <div
       key={bucket.id}
+      style={style}
       className={cn(
         'group flex items-center justify-between rounded-md',
-        isSelected && 'text-foreground bg-surface-100'
+        isSelected && 'text-foreground bg-surface-100',
+        className
       )}
     >
       {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}

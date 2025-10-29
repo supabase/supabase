@@ -9,7 +9,7 @@
  * @module telemetry-frontend
  */
 
-type TelemetryGroups = {
+export type TelemetryGroups = {
   project: string
   organization: string
 }
@@ -239,7 +239,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
    * the instance size selected in the project creation form
    */
   properties: {
-    instanceSize: string
+    instanceSize?: string
   }
   groups: TelemetryGroups
 }
@@ -257,7 +257,7 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
    * the instance size selected in the project creation form
    */
   properties: {
-    instanceSize: string
+    instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -698,17 +698,6 @@ export interface EventPageCtaClickedEvent {
  */
 export interface HomepageGitHubButtonClickedEvent {
   action: 'homepage_github_button_clicked'
-}
-
-/**
- * User clicked the GitHub Discussions button in the homepage community section.
- *
- * @group Events
- * @source www
- * @page /
- */
-export interface HomepageGitHubDiscussionsButtonClickedEvent {
-  action: 'homepage_github_discussions_button_clicked'
 }
 
 /**
@@ -1187,6 +1176,35 @@ export interface SupportTicketSubmittedEvent {
 export interface AiAssistantInSupportFormClickedEvent {
   action: 'ai_assistant_in_support_form_clicked'
   groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User rated an AI assistant message with thumbs up or thumbs down.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantMessageRatingSubmittedEvent {
+  action: 'assistant_message_rating_submitted'
+  properties: {
+    /**
+     * The rating given by the user: positive (thumbs up) or negative (thumbs down)
+     */
+    rating: 'positive' | 'negative'
+    /**
+     * The category of the conversation
+     */
+    category:
+      | 'sql_generation'
+      | 'schema_design'
+      | 'rls_policies'
+      | 'edge_functions'
+      | 'database_optimization'
+      | 'debugging'
+      | 'general_help'
+      | 'other'
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -1833,12 +1851,327 @@ export interface TableRLSEnabledEvent {
 }
 
 /**
+ * User opened API docs panel.
+ *
+ * @group Events
+ * @source studio
+ * @page Various pages with API docs button
+ */
+export interface ApiDocsOpenedEvent {
+  action: 'api_docs_opened'
+  properties: {
+    /**
+     * Source of the API docs button click, e.g. table_editor, sidebar
+     */
+    source: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked copy button in API docs panel.
+ *
+ * @group Events
+ * @source studio
+ * @page API docs panel
+ */
+export interface ApiDocsCodeCopyButtonClickedEvent {
+  action: 'api_docs_code_copy_button_clicked'
+  properties: {
+    /**
+     * Title of the content being copied
+     */
+    title?: string
+    /**
+     * Selected programming language, e.g. js, bash
+     */
+    selectedLanguage?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User performed a search via the Auth Users page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/auth/users
+ */
+export interface AuthUsersSearchSubmittedEvent {
+  action: 'auth_users_search_submitted'
+  properties: {
+    /**
+     * The trigger that initiated the search
+     */
+    trigger:
+      | 'search_input'
+      | 'refresh_button'
+      | 'sort_change'
+      | 'provider_filter'
+      | 'user_type_filter'
+    /**
+     * The column being sorted on, e.g. email, phone, created_at, last_sign_in_at
+     */
+    sort_column: string
+    /**
+     * The sort order, either ascending or descending
+     */
+    sort_order: string
+    /**
+     * The authentication provider(s) being filtered on, e.g. email, phone, google, github
+     */
+    providers?: string[]
+    /**
+     * The user role(s) being filtered on, e.g. verified, unverified, anonymous
+     */
+    user_type?: string
+    /**
+     * The keywords being searched for
+     */
+    keywords?: string
+    /**
+     * The column being filtered on, e.g. email, phone
+     * (only included if filtering by a specific column and not all columns)
+     */
+    filter_column?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuOpenedEvent {
+  action: 'command_menu_opened'
+  properties: {
+    /**
+     * The trigger that opened the command menu
+     */
+    trigger_type: 'keyboard_shortcut' | 'search_input'
+    /**
+     * The location where the command menu was opened
+     */
+    trigger_location?: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User typed a search term in the command menu input.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuSearchSubmittedEvent {
+  action: 'command_menu_search_submitted'
+  properties: {
+    /**
+     * Search term typed into the command menu input
+     */
+    value: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked a command from the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuCommandClickedEvent {
+  action: 'command_menu_command_clicked'
+  properties: {
+    /**
+     * The clicked command
+     */
+    command_name: string
+    command_value?: string
+    command_type: 'action' | 'route'
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User was exposed to the table quickstart experiment.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (NewTab)
+ */
+export interface TableQuickstartOpenedEvent {
+  action: 'table_quickstart_opened'
+  properties: {
+    /**
+     * Which variation the user was shown: ai, templates, assistant, or control
+     */
+    variant: 'ai' | 'templates' | 'assistant' | 'control'
+  }
+  groups: TelemetryGroups
+}
+/**
+ * User submitted a prompt in the AI quickstart variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartAIPromptSubmittedEvent {
+  action: 'table_quickstart_ai_prompt_submitted'
+  properties: {
+    /**
+     * Length of the AI prompt
+     */
+    promptLength: number
+    /**
+     * Whether this was triggered by a quick idea button
+     */
+    wasQuickIdea: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * AI table generation completed (success or failure).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartAIGenerationCompletedEvent {
+  action: 'table_quickstart_ai_generation_completed'
+  properties: {
+    /**
+     * Whether generation succeeded
+     */
+    success: boolean
+    /**
+     * Number of tables generated (0 if failed)
+     */
+    tablesGenerated: number
+    /**
+     * Length of the prompt used
+     */
+    promptLength: number
+    /**
+     * Error message if failed
+     */
+    errorMessage?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a quick idea button in the AI variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartQuickIdeaClickedEvent {
+  action: 'table_quickstart_quick_idea_clicked'
+  properties: {
+    /**
+     * Text of the quick idea clicked
+     */
+    ideaText: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a category in the templates variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartTemplatesWidget)
+ */
+export interface TableQuickstartCategoryClickedEvent {
+  action: 'table_quickstart_category_clicked'
+  properties: {
+    /**
+     * Name of the category clicked
+     */
+    categoryName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a table template from either AI-generated suggestions or pre-made templates.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget, QuickstartTemplatesWidget)
+ */
+export interface TableQuickstartTemplateClickedEvent {
+  action: 'table_quickstart_template_clicked'
+  properties: {
+    /**
+     * Name of the table clicked
+     */
+    tableName: string
+    /**
+     * Number of columns in the template
+     */
+    columnCount: number
+    /**
+     * Source of the template clicked
+     */
+    source: 'ai' | 'templates'
+    /**
+     * Category the template belongs to (only present for templates source)
+     */
+    categoryName?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the assistant button in the assistant variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (NewTab)
+ */
+export interface TableQuickstartAssistantOpenedEvent {
+  action: 'table_quickstart_assistant_opened'
+  properties: {
+    /**
+     * Whether the assistant chat was successfully created
+     */
+    chatCreated: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
   | ConnectionStringCopiedEvent
+  | ApiDocsOpenedEvent
+  | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent
   | CronJobUpdatedEvent
   | CronJobDeletedEvent
@@ -1871,13 +2204,13 @@ export type TelemetryEvent =
   | AssistantSuggestionRunQueryClickedEvent
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
+  | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
   | EventPageCtaClickedEvent
   | HomepageGitHubButtonClickedEvent
-  | HomepageGitHubDiscussionsButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
@@ -1942,3 +2275,14 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRLSEnabledEvent
+  | TableQuickstartOpenedEvent
+  | TableQuickstartAIPromptSubmittedEvent
+  | TableQuickstartAIGenerationCompletedEvent
+  | TableQuickstartQuickIdeaClickedEvent
+  | TableQuickstartCategoryClickedEvent
+  | TableQuickstartTemplateClickedEvent
+  | TableQuickstartAssistantOpenedEvent
+  | AuthUsersSearchSubmittedEvent
+  | CommandMenuOpenedEvent
+  | CommandMenuSearchSubmittedEvent
+  | CommandMenuCommandClickedEvent

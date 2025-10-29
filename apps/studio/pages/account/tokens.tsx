@@ -72,7 +72,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
 
 UserAccessTokens.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
         <AccountLayout title="Access Tokens">{page}</AccountLayout>
       </OrganizationLayout>

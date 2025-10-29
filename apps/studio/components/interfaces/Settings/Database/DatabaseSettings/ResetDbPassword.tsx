@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { debounce } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -12,7 +11,7 @@ import { useDatabasePasswordResetMutation } from 'data/database/database-passwor
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import passwordStrength from 'lib/password-strength'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { Button, Input, Modal } from 'ui'
 
@@ -62,17 +61,13 @@ const ResetDbPassword = ({ disabled = false }) => {
     setPasswordStrengthMessage(message)
   }
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value) => checkPasswordStrength(value), 300)
-  ).current
-
   const onDbPassChange = (e: any) => {
     const value = e.target.value
     setPassword(value)
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
+    } else checkPasswordStrength(value)
   }
 
   const confirmResetDbPass = async () => {
@@ -86,7 +81,7 @@ const ResetDbPassword = ({ disabled = false }) => {
   function generatePassword() {
     const password = generateStrongPassword()
     setPassword(password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   return (

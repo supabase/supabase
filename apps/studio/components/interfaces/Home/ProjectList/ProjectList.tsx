@@ -7,7 +7,7 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -86,7 +86,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ slug })
 
   // Move all hooks to the top to comply with Rules of Hooks
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
@@ -241,6 +241,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
           {sortedProjects?.map((project) => (
             <ProjectCard
               key={project.ref}
+              slug={slug}
               project={project}
               rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
               resourceWarnings={resourceWarnings?.find(

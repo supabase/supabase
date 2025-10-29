@@ -37,11 +37,9 @@ export const useReplicationPublicationsQuery = <TData = ReplicationPublicationsD
     ...options
   }: UseQueryOptions<ReplicationPublicationsData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationPublicationsData, ResponseError, TData>(
-    replicationKeys.publications(projectRef, sourceId),
-    ({ signal }) => fetchReplicationPublications({ projectRef, sourceId }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ReplicationPublicationsData, ResponseError, TData>({
+    queryKey: replicationKeys.publications(projectRef, sourceId),
+    queryFn: ({ signal }) => fetchReplicationPublications({ projectRef, sourceId }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
+    ...options,
+  })

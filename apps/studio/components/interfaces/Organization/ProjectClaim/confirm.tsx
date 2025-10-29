@@ -41,22 +41,29 @@ export const ProjectClaimConfirm = ({
   const queryClient = useQueryClient()
 
   const { mutateAsync: approveRequest, isLoading: isApproving } =
-    useApiAuthorizationApproveMutation()
+    useApiAuthorizationApproveMutation({ onError: () => {} })
 
   const { mutateAsync: claimProject, isLoading: isClaiming } = useOrganizationProjectClaimMutation()
 
   const onClaimProject = async () => {
     try {
-      await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
+      const response = await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
+
       await claimProject({
         slug: selectedOrganization.slug,
         token: claimToken!,
       })
 
       toast.success('Project claimed successfully')
-      // invalidate the org projects to force them to be refetched
-      queryClient.invalidateQueries(projectKeys.list())
-      router.push(`/org/${selectedOrganization.slug}`)
+      try {
+        // check if the redirect url is valid. If not, redirect the user to the org dashboard
+        const url = new URL(response.url)
+        window.location.href = url.toString()
+      } catch {
+        // invalidate the org projects to force them to be refetched
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() })
+        router.push(`/org/${selectedOrganization.slug}`)
+      }
     } catch (error: any) {
       toast.error(`Failed to claim project ${error.message}`)
     }
