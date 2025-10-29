@@ -179,14 +179,13 @@ export const AdvisorPanel = () => {
       {isDetailView ? (
         <>
           <div className="border-b px-4 py-3 flex items-center gap-3">
-            <Button
+            <ButtonTooltip
               type="text"
-              className="px-2"
+              className="w-7 h-7 p-0 flex justify-center items-center"
               icon={<ChevronLeft size={16} strokeWidth={1.5} aria-hidden={true} />}
               onClick={handleBackToList}
-            >
-              <span className="sr-only">Back to list</span>
-            </Button>
+              tooltip={{ content: { side: 'bottom', text: 'Back to list' } }}
+            />
             <div className="flex items-center gap-2 overflow-hidden flex-1">
               <div className="flex-1">
                 <span className="heading-default">{selectedItem?.title}</span>
