@@ -26,6 +26,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
+import { LogDrainsCard } from './LogDrainsCard'
 
 export function LogDrains({
   onNewDrainClick,
@@ -81,13 +82,23 @@ export function LogDrains({
 
   if (!isLoading && !hasLogDrains) {
     return (
-      <div className="grid lg:grid-cols-2 gap-3">
+      <div className="grid lg:grid-cols-3 gap-3">
         {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
-          <CardButton
+          // <CardButton
+          //   key={src.value}
+          //   title={src.name}
+          //   description={src.description}
+          //   icon={src.icon}
+          //   onClick={() => {
+          //     onNewDrainClick(src.value)
+          //   }}
+          // />
+          <LogDrainsCard
             key={src.value}
             title={src.name}
             description={src.description}
             icon={src.icon}
+            subheading="Additional $60"
             onClick={() => {
               onNewDrainClick(src.value)
             }}
