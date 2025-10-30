@@ -4,6 +4,7 @@ import minify from 'pg-minify'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { SUPPORTED_PGMQ_VERSIONS, SupportedPgmqVersion } from './constants'
 
 export type DatabaseQueuesVersionVariables = {
   projectRef?: string
@@ -28,10 +29,15 @@ export async function getDatabaseQueuesVersion({
     sql: pgmqVersionQuery,
   })
 
-  return result[0]?.extversion as string | null
+  const version = result[0]?.extversion
+  if (!version) return null
+
+  if (!SUPPORTED_PGMQ_VERSIONS.includes(version)) return null
+
+  return version as SupportedPgmqVersion
 }
 
-export type DatabaseQueueVersionData = string | null
+export type DatabaseQueueVersionData = SupportedPgmqVersion | null
 export type DatabaseQueueVersionError = ResponseError
 
 export const useDatabaseQueuesVersionQuery = <TData = DatabaseQueueVersionData>(
