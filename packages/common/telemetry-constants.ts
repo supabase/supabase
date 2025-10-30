@@ -2011,6 +2011,24 @@ export interface CommandMenuCommandClickedEvent {
 }
 
 /**
+ * User opened a sidebar panel.
+ *
+ * @group Events
+ * @source studio
+ * @page Various pages with sidebar buttons
+ */
+export interface SidebarOpenedEvent {
+  action: 'sidebar_opened'
+  properties: {
+    /**
+     * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
+     */
+    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User was exposed to the table quickstart experiment.
  *
  * @group Events
@@ -2286,3 +2304,4 @@ export type TelemetryEvent =
   | CommandMenuOpenedEvent
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
+  | SidebarOpenedEvent

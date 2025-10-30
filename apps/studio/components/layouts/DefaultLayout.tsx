@@ -12,6 +12,7 @@ import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
@@ -55,29 +56,31 @@ const DefaultLayout = ({
   return (
     <SidebarProvider defaultOpen={false}>
       <ProjectContextProvider projectRef={ref}>
-        <AppBannerContextProvider>
-          <div className="flex flex-col h-screen w-screen">
-            {/* Top Banner */}
-            <AppBannerWrapper />
-            <div className="flex-shrink-0">
-              <MobileNavigationBar hideMobileMenu={hideMobileMenu} />
-              <LayoutHeader
-                showProductMenu={showProductMenu}
-                headerTitle={headerTitle}
-                backToDashboardURL={
-                  router.pathname.startsWith('/account') ? backToDashboardURL : undefined
-                }
-              />
+        <LayoutSidebarProvider>
+          <AppBannerContextProvider>
+            <div className="flex flex-col h-screen w-screen">
+              {/* Top Banner */}
+              <AppBannerWrapper />
+              <div className="flex-shrink-0">
+                <MobileNavigationBar hideMobileMenu={hideMobileMenu} />
+                <LayoutHeader
+                  showProductMenu={showProductMenu}
+                  headerTitle={headerTitle}
+                  backToDashboardURL={
+                    router.pathname.startsWith('/account') ? backToDashboardURL : undefined
+                  }
+                />
+              </div>
+              {/* Main Content Area */}
+              <div className="flex flex-1 w-full overflow-y-hidden">
+                {/* Sidebar - Only show for project pages, not account pages */}
+                {!router.pathname.startsWith('/account') && <Sidebar />}
+                {/* Main Content */}
+                <div className="flex-grow h-full overflow-y-auto">{children}</div>
+              </div>
             </div>
-            {/* Main Content Area */}
-            <div className="flex flex-1 w-full overflow-y-hidden">
-              {/* Sidebar - Only show for project pages, not account pages */}
-              {!router.pathname.startsWith('/account') && <Sidebar />}
-              {/* Main Content */}
-              <div className="flex-grow h-full overflow-y-auto">{children}</div>
-            </div>
-          </div>
-        </AppBannerContextProvider>
+          </AppBannerContextProvider>
+        </LayoutSidebarProvider>
       </ProjectContextProvider>
     </SidebarProvider>
   )
