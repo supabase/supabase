@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
-import { constructHeaders, fetchHandler, get, handleError } from 'data/fetchers'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
@@ -16,7 +16,7 @@ export type EdgeFunctionFile = {
 }
 
 export type EdgeFunctionBodyResponse = {
-  files: EdgFunctionFile[]
+  files: EdgeFunctionFile[]
 }
 
 async function streamToString(stream: ReadableStream<Uint8Array>) {
@@ -46,8 +46,8 @@ export async function getEdgeFunctionBody(
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
 
-  const { data, response, error } = await get(`/v1/projects/{ref}/functions/{slug}/body`, {
-    params: { path: { ref: projectRef, slug: slug } },
+  const { data, response, error } = await get('/v1/projects/{ref}/functions/{function_slug}/body', {
+    params: { path: { ref: projectRef, function_slug: slug } },
     headers: { Accept: 'multipart/form-data' },
     parseAs: 'stream',
     signal,
@@ -55,8 +55,11 @@ export async function getEdgeFunctionBody(
 
   if (error) handleError(error)
 
-  const boundary = getMultipartBoundary(response.headers.get('content-type'))
+  const contentTypeHeader = response.headers.get('content-type') ?? ''
+  const boundary = getMultipartBoundary(contentTypeHeader)
   const files = []
+
+  if (!data || !boundary) return { files: [] }
 
   for await (let part of parseMultipartStream(data, { boundary })) {
     if (part.isFile) {
