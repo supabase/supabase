@@ -295,7 +295,10 @@ export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?:
  * Determine if we should show the user an upgrade prompt while browsing logs
  * This method should replace maybeShowUpgradePrompt once we have migrated all usage to the Entitlements API.
  */
-export const maybeShowUpgradePromptIfNotEntitled = (from: string | null | undefined, entitledToDays: number | undefined) => {
+export const maybeShowUpgradePromptIfNotEntitled = (
+  from: string | null | undefined,
+  entitledToDays: number | undefined
+) => {
   if (!entitledToDays) return false
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
   return day > entitledToDays
