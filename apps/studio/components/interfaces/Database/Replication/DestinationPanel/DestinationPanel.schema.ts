@@ -27,79 +27,38 @@ export const DestinationPanelFormSchema = z
     s3Region: z.string().optional(),
   })
   .superRefine((data, ctx) => {
+    const addRequiredFieldError = (path: string, message: string) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message,
+        path: [path],
+      })
+    }
+
     if (data.type === 'BigQuery') {
-      if (!data.projectId || data.projectId.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Project ID is required',
-          path: ['projectId'],
-        })
-      }
-      if (!data.datasetId || data.datasetId.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Dataset ID is required',
-          path: ['datasetId'],
-        })
-      }
-      if (!data.serviceAccountKey || data.serviceAccountKey.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Service Account Key is required',
-          path: ['serviceAccountKey'],
-        })
-      }
+      if (!data.projectId?.length) addRequiredFieldError('projectId', 'Project ID is required')
+      if (!data.datasetId?.length) addRequiredFieldError('datasetId', 'Dataset ID is required')
+      if (!data.serviceAccountKey?.length)
+        addRequiredFieldError('serviceAccountKey', 'Service Account Key is required')
     } else if (data.type === 'Analytics Bucket') {
-      if (!data.warehouseName || data.warehouseName.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Bucket is required',
-          path: ['warehouseName'],
-        })
-      }
+      if (!data.warehouseName?.length) addRequiredFieldError('warehouseName', 'Bucket is required')
 
       const hasValidNamespace =
-        (data.namespace &&
-          data.namespace.length > 0 &&
-          data.namespace !== 'create-new-namespace') ||
-        (data.namespace === 'create-new-namespace' &&
-          data.newNamespaceName &&
-          data.newNamespaceName.length > 0)
+        (data.namespace?.length && data.namespace !== 'create-new-namespace') ||
+        (data.namespace === 'create-new-namespace' && data.newNamespaceName?.length)
 
       if (!hasValidNamespace) {
-        if (data.namespace === 'create-new-namespace') {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Namespace name is required',
-            path: ['newNamespaceName'],
-          })
-        } else {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Namespace is required',
-            path: ['namespace'],
-          })
-        }
+        const isCreatingNew = data.namespace === 'create-new-namespace'
+        addRequiredFieldError(
+          isCreatingNew ? 'newNamespaceName' : 'namespace',
+          isCreatingNew ? 'Namespace name is required' : 'Namespace is required'
+        )
       }
 
-      if (!data.s3Region || data.s3Region.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'S3 Region is required',
-          path: ['s3Region'],
-        })
-      }
+      if (!data.s3Region?.length) addRequiredFieldError('s3Region', 'S3 Region is required')
 
-      // Validate S3 keys when not creating new
-      if (
-        data.s3AccessKeyId !== 'create-new' &&
-        (!data.s3SecretAccessKey || data.s3SecretAccessKey.length === 0)
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'S3 Secret Access Key is required',
-          path: ['s3SecretAccessKey'],
-        })
+      if (data.s3AccessKeyId !== 'create-new' && !data.s3SecretAccessKey?.length) {
+        addRequiredFieldError('s3SecretAccessKey', 'S3 Secret Access Key is required')
       }
     }
   })

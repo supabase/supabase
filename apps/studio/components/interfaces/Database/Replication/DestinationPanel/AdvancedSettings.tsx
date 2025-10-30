@@ -1,3 +1,4 @@
+import React from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
 import {
@@ -12,8 +13,29 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
+const Badge = ({
+  children,
+  variant = 'default',
+}: {
+  children: React.ReactNode
+  variant?: 'default' | 'brand'
+}) => (
+  <span
+    className={`text-xs font-normal px-2 py-0.5 rounded-full ${
+      variant === 'brand' ? 'text-brand-600 bg-brand-200' : 'text-foreground-lighter bg-surface-200'
+    }`}
+  >
+    {children}
+  </span>
+)
+
 export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   const { type } = form.watch()
+
+  const handleNumberChange = (field: any) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    field.onChange(val === '' ? undefined : Number(val))
+  }
 
   return (
     <Accordion_Shadcn_ type="single" collapsible>
@@ -36,9 +58,7 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
                 label={
                   <div className="flex items-center gap-2">
                     <span>Batch wait time (milliseconds)</span>
-                    <span className="text-xs font-normal text-foreground-lighter px-2 py-0.5 rounded-full bg-surface-200">
-                      All destinations
-                    </span>
+                    <Badge>All destinations</Badge>
                   </div>
                 }
                 layout="vertical"
@@ -49,10 +69,7 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
                     {...field}
                     type="number"
                     value={field.value ?? ''}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      field.onChange(val === '' ? undefined : Number(val))
-                    }}
+                    onChange={handleNumberChange(field)}
                     placeholder="e.g., 5000 (5 seconds)"
                   />
                 </FormControl_Shadcn_>
@@ -67,32 +84,27 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
                 control={form.control}
                 name="maxStalenessMins"
                 render={({ field }) => (
-                <FormItemLayout
-                  label={
-                    <div className="flex items-center gap-2">
-                      <span>Maximum staleness (minutes)</span>
-                      <span className="text-xs font-normal text-brand-600 px-2 py-0.5 rounded-full bg-brand-200">
-                        BigQuery only
-                      </span>
-                    </div>
-                  }
-                  layout="vertical"
-                  description="How long data can remain outdated in BigQuery before a refresh is triggered. Lower values keep data fresher but may increase costs."
-                >
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      {...field}
-                      type="number"
-                      value={field.value ?? ''}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        field.onChange(val === '' ? undefined : Number(val))
-                      }}
-                      placeholder="e.g., 60 (1 hour)"
-                    />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
+                  <FormItemLayout
+                    label={
+                      <div className="flex items-center gap-2">
+                        <span>Maximum staleness (minutes)</span>
+                        <Badge variant="brand">BigQuery only</Badge>
+                      </div>
+                    }
+                    layout="vertical"
+                    description="How long data can remain outdated in BigQuery before a refresh is triggered. Lower values keep data fresher but may increase costs."
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder="e.g., 60 (1 hour)"
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
               />
             </div>
           )}

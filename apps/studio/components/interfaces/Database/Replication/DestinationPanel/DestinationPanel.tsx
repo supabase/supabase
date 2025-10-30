@@ -145,32 +145,15 @@ export const DestinationPanel = ({
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
   const defaultValues = useMemo(() => {
-    // Type guards to safely access union properties
     const config = destinationData?.config
     const isBigQueryConfig = config && 'big_query' in config
     const isIcebergConfig = config && 'iceberg' in config
 
-    // In edit mode, use existing destination type
-    // In create mode, select the first available destination type
-    let defaultType: z.infer<typeof TypeEnum>
-    if (editMode) {
-      defaultType = (
-        isBigQueryConfig
-          ? TypeEnum.enum.BigQuery
-          : isIcebergConfig
-            ? TypeEnum.enum['Analytics Bucket']
-            : TypeEnum.enum.BigQuery
-      ) as z.infer<typeof TypeEnum>
-    } else {
-      // Select first available destination type in create mode
-      defaultType = (
-        etlEnableBigQuery
-          ? TypeEnum.enum.BigQuery
-          : etlEnableIceberg
-            ? TypeEnum.enum['Analytics Bucket']
-            : TypeEnum.enum.BigQuery
-      ) as z.infer<typeof TypeEnum>
-    }
+    const defaultType = editMode
+      ? isBigQueryConfig
+        ? TypeEnum.enum.BigQuery
+        : TypeEnum.enum['Analytics Bucket']
+      : availableDestinations[0]?.value || TypeEnum.enum.BigQuery
 
     return {
       // Common fields
@@ -199,8 +182,7 @@ export const DestinationPanel = ({
     catalogToken,
     projectSettings,
     editMode,
-    etlEnableBigQuery,
-    etlEnableIceberg,
+    availableDestinations,
   ])
 
   const form = useForm<z.infer<typeof FormSchema>>({
