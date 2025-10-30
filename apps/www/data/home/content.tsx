@@ -5,7 +5,7 @@ import { Button } from 'ui'
 import ProductModules from '../ProductModules'
 
 import MainProducts from 'data/MainProducts'
-import tweets from 'shared-data/tweets'
+import { topTweets } from 'shared-data/tweets'
 import { IconDiscord } from 'ui'
 
 export default () => {
@@ -188,7 +188,7 @@ export default () => {
           </Link>
         </Button>
       ),
-      tweets: tweets.slice(0, 18),
+      tweets: topTweets,
     },
   }
 }
