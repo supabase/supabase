@@ -50,7 +50,7 @@ export const InlineEditorSettings = () => {
               <FormItemLayout
                 layout="flex-row-reverse"
                 label="Edit entities in SQL"
-                description="When enabled, view and edit policies, triggers, and functions directly in the SQL editor."
+                description="When enabled, view and edit policies, triggers, and functions directly in the SQL editor instead of a more beginner-friendly UI panel. Ideal for those comfortable with SQL."
               >
                 <FormControl_Shadcn_>
                   <Switch
