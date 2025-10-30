@@ -62,7 +62,7 @@ export interface SidePanelEditorProps {
   onTableCreated?: (table: RetrieveTableResult) => void
 }
 
-const SidePanelEditor = ({
+export const SidePanelEditor = ({
   editable = true,
   selectedTable,
   includeColumns = false,
@@ -707,5 +707,3 @@ const SidePanelEditor = ({
     </>
   )
 }
-
-export default SidePanelEditor

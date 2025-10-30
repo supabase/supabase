@@ -15,6 +15,7 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Separator,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -25,6 +26,7 @@ interface ConnectionPanelProps {
   badge?: string
   title: string
   description: string
+  contentFooter?: ReactNode
   connectionString: string
   ipv4Status: {
     type: 'error' | 'success'
@@ -105,6 +107,7 @@ export const ConnectionPanel = ({
   badge,
   title,
   description,
+  contentFooter,
   connectionString,
   ipv4Status,
   notice,
@@ -123,16 +126,24 @@ export const ConnectionPanel = ({
 
   const links = ipv4Status.links ?? []
 
+  const isTransactionDedicatedPooler = type === 'transaction' && badge === 'Dedicated Pooler'
+
   return (
     <div className="relative text-sm flex flex-col gap-5 lg:grid lg:grid-cols-12 w-full">
       <div className="col-span-4 flex flex-col">
         <div className="flex items-center gap-x-2 mb-2">
           <h1 className="text-sm">{title}</h1>
-          {!!badge && <Badge>{badge}</Badge>}
+          {!!badge && !isTransactionDedicatedPooler && <Badge>{badge}</Badge>}
         </div>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
+        {contentFooter}
       </div>
       <div className="col-span-8 flex flex-col gap-2">
+        {isTransactionDedicatedPooler && (
+          <div className="text-xs flex items-center text-foreground-light">
+            Using the Dedicated Pooler:
+          </div>
+        )}
         <div className="flex flex-col -space-y-px">
           {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
           {type === 'transaction' && isSessionMode ? (
@@ -177,7 +188,6 @@ export const ConnectionPanel = ({
               {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
             </>
           )}
-          {children}
         </div>
         <div className="flex flex-col -space-y-px w-full">
           {IS_PLATFORM && (
@@ -278,6 +288,8 @@ export const ConnectionPanel = ({
             </Collapsible_Shadcn_>
           )}
         </div>
+        {isTransactionDedicatedPooler && <Separator className="w-full" />}
+        {children}
       </div>
     </div>
   )

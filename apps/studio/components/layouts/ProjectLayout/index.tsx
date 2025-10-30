@@ -1,6 +1,10 @@
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+
 import { useFlag, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
-import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -9,9 +13,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
@@ -20,7 +21,6 @@ import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LayoutSidebar } from './LayoutSidebar'
-import { LayoutSidebarProvider } from './LayoutSidebar/LayoutSidebarProvider'
 import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
@@ -30,7 +30,7 @@ import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import RestoringState from './RestoringState'
-import { UpgradingState } from './UpgradingState/UpgradingState'
+import { UpgradingState } from './UpgradingState'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -215,9 +215,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                     )}
                   </main>
                 </ResizablePanel>
-                <LayoutSidebarProvider>
-                  <LayoutSidebar />
-                </LayoutSidebarProvider>
+                <LayoutSidebar />
               </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>

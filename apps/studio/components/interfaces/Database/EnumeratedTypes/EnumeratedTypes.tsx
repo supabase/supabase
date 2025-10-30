@@ -32,7 +32,7 @@ import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
 import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
 
-const EnumeratedTypes = () => {
+export const EnumeratedTypes = () => {
   const { data: project } = useSelectedProjectQuery()
   const [search, setSearch] = useState('')
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -195,5 +195,3 @@ const EnumeratedTypes = () => {
     </div>
   )
 }
-
-export default EnumeratedTypes

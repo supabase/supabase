@@ -24,7 +24,7 @@ import { getClientTimezone } from './PITR.utils'
 import { PITRForm } from './PITRForm'
 import PITRStatus from './PITRStatus'
 
-const PITRSelection = () => {
+export const PITRSelection = () => {
   const router = useRouter()
   const { ref } = useParams()
 
@@ -187,5 +187,3 @@ const PITRSelection = () => {
     </>
   )
 }
-
-export default PITRSelection

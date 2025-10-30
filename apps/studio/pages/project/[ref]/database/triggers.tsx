@@ -10,15 +10,24 @@ import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/T
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 const TriggersPage: NextPageWithLayout = () => {
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const {
+    templates: editorPanelTemplates,
+    setValue: setEditorPanelValue,
+    setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
+  } = useEditorPanelStateSnapshot()
 
   const [selectedTrigger, setSelectedTrigger] = useState<PostgresTrigger>()
   const [isDuplicatingTrigger, setIsDuplicatingTrigger] = useState<boolean>(false)
@@ -26,19 +35,23 @@ const TriggersPage: NextPageWithLayout = () => {
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
-  // Local editor panel state
-  const [editorPanelOpen, setEditorPanelOpen] = useState(false)
-  const [selectedTriggerForEditor, setSelectedTriggerForEditor] = useState<PostgresTrigger>()
-
   const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'triggers'
   )
 
   const createTrigger = () => {
+    setIsDuplicatingTrigger(false)
     if (isInlineEditorEnabled) {
-      setSelectedTriggerForEditor(undefined)
-      setEditorPanelOpen(true)
+      setEditorPanelInitialPrompt('Create a new database trigger that...')
+      setEditorPanelValue(`create trigger trigger_name
+after insert or update or delete on table_name
+for each row
+execute function function_name();`)
+      if (editorPanelTemplates.length > 0) {
+        setEditorPanelTemplates([])
+      }
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedTrigger(undefined)
       setShowCreateTriggerForm(true)
@@ -46,9 +59,11 @@ const TriggersPage: NextPageWithLayout = () => {
   }
 
   const editTrigger = (trigger: PostgresTrigger) => {
+    setIsDuplicatingTrigger(false)
     if (isInlineEditorEnabled) {
-      setSelectedTriggerForEditor(trigger)
-      setEditorPanelOpen(true)
+      setEditorPanelValue(generateTriggerCreateSQL(trigger))
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedTrigger(trigger)
       setShowCreateTriggerForm(true)
@@ -64,8 +79,9 @@ const TriggersPage: NextPageWithLayout = () => {
     }
 
     if (isInlineEditorEnabled) {
-      setSelectedTriggerForEditor(dupTrigger)
-      setEditorPanelOpen(true)
+      setEditorPanelValue(generateTriggerCreateSQL(dupTrigger))
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedTrigger(dupTrigger)
       setShowCreateTriggerForm(true)
@@ -75,12 +91,6 @@ const TriggersPage: NextPageWithLayout = () => {
   const deleteTrigger = (trigger: PostgresTrigger) => {
     setSelectedTrigger(trigger)
     setShowDeleteTriggerForm(true)
-  }
-
-  const resetEditorPanel = () => {
-    setIsDuplicatingTrigger(false)
-    setEditorPanelOpen(false)
-    setSelectedTriggerForEditor(undefined)
   }
 
   if (isPermissionsLoaded && !canReadTriggers) {
@@ -119,34 +129,6 @@ const TriggersPage: NextPageWithLayout = () => {
         trigger={selectedTrigger}
         visible={showDeleteTriggerForm}
         setVisible={setShowDeleteTriggerForm}
-      />
-
-      <EditorPanel
-        open={editorPanelOpen}
-        onRunSuccess={resetEditorPanel}
-        onClose={resetEditorPanel}
-        initialValue={
-          selectedTriggerForEditor
-            ? generateTriggerCreateSQL(selectedTriggerForEditor)
-            : `create trigger trigger_name
-after insert or update or delete on table_name
-for each row
-execute function function_name();`
-        }
-        label={
-          selectedTriggerForEditor
-            ? isDuplicatingTrigger
-              ? `Duplicate trigger "${selectedTriggerForEditor.name}"`
-              : `Edit trigger "${selectedTriggerForEditor.name}"`
-            : 'Create new database trigger'
-        }
-        initialPrompt={
-          selectedTriggerForEditor
-            ? isDuplicatingTrigger
-              ? `Duplicate the database trigger "${selectedTriggerForEditor.name}" to...`
-              : `Update the database trigger "${selectedTriggerForEditor.name}" to...`
-            : 'Create a new database trigger that...'
-        }
       />
     </>
   )

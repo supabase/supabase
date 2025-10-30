@@ -25,6 +25,8 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
     const { pathname } = router
     const suffix = !!featurePreviewModal ? `?featurePreviewModal=${featurePreviewModal}` : ''
 
+    if (!ref) return
+
     if (isStorageV2) {
       // From old UI to new UI
       if (pathname.endsWith('/storage/settings')) {
@@ -58,7 +60,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStorageV2])
+  }, [ref, isStorageV2])
 
   return (
     <ProjectLayout

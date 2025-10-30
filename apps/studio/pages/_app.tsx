@@ -41,23 +41,24 @@ import {
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
+import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
+import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
 import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { LegacyInlineEditorHotkeyMigration } from 'hooks/misc/useLegacyInlineEditorHotkeyMigration'
 import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
-import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -163,6 +164,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
+                  {/* Temporary migration, to be removed by 2025-11-28 */}
+                  <LegacyInlineEditorHotkeyMigration />
                   <Telemetry />
                   {!isTestEnv && (
                     <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />

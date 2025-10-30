@@ -843,11 +843,10 @@ export interface paths {
       cookie?: never
     }
     /** Get notifications */
-    get: operations['NotificationsController_getNotificationsV2']
+    get: operations['NotificationsController_getNotifications']
     put?: never
     post?: never
-    /** Delete notifications */
-    delete: operations['NotificationsController_deleteNotifications']
+    delete?: never
     options?: never
     head?: never
     /** Update notifications */
@@ -3765,7 +3764,11 @@ export interface paths {
     }
     get?: never
     put?: never
-    post?: never
+    /**
+     * Update publication for source
+     * @description Update a publication for a source. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationSourcesController_updatePublication']
     /**
      * Delete publication for source
      * @description Delete a publication for a source. Requires bearer auth and an active, healthy project.
@@ -5818,9 +5821,6 @@ export interface components {
     GetCloudMarketplaceRedirectUrlResponse: {
       url: string
     }
-    GetContentCountResponse: {
-      count: number
-    }
     GetContentCountV2Response: {
       favorites: number
       private: number
@@ -6842,6 +6842,7 @@ export interface components {
             }
           | {
               enabled: boolean
+              unit: string
               unlimited: boolean
               value: number
             }
@@ -6855,6 +6856,8 @@ export interface components {
           type: 'boolean' | 'numeric' | 'set'
         }
         hasAccess: boolean
+        /** @enum {string} */
+        type: 'boolean' | 'numeric' | 'set'
       }[]
     }
     ListGitHubConnectionsResponse: {
@@ -7017,18 +7020,7 @@ export interface components {
       from: string
       to: string
     }
-    NotificationResponseV1: {
-      /** @description Any JSON-serializable value */
-      data: unknown
-      id: string
-      inserted_at: string
-      /** @description Any JSON-serializable value */
-      meta: unknown
-      notification_name: string
-      notification_status: string
-      project_id: number
-    }
-    NotificationResponseV2: {
+    NotificationResponse: {
       /** @description Any JSON-serializable value */
       data: unknown
       id: string
@@ -7514,6 +7506,7 @@ export interface components {
       relation_schema: string
     }
     PostgresConfigResponse: {
+      checkpoint_timeout?: number
       effective_cache_size?: string
       hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
@@ -9701,7 +9694,7 @@ export interface components {
       name: string
       role_scoped_projects: string[]
     }
-    UpdateNotificationBodyV2: {
+    UpdateNotificationBody: {
       /** Format: uuid */
       id: string
       /** @enum {string} */
@@ -9717,9 +9710,6 @@ export interface components {
       }
       lint_name?: string
       note?: string
-    }
-    UpdateNotificationsBodyV1: {
-      ids: string[]
     }
     UpdateOrganizationBody: {
       additional_billing_emails?: string[]
@@ -9780,6 +9770,7 @@ export interface components {
       server_lifetime?: number
     }
     UpdatePostgresConfigBody: {
+      checkpoint_timeout?: number
       effective_cache_size?: string
       hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
@@ -10074,6 +10065,21 @@ export interface components {
        * @example 4
        */
       version_id: number
+    }
+    UpdateReplicationPublicationBody: {
+      /** @description Publication tables */
+      tables: {
+        /**
+         * @description Table name
+         * @example orders
+         */
+        name: string
+        /**
+         * @description Table schema
+         * @example public
+         */
+        schema: string
+      }[]
     }
     UpdateSecretsConfigBody: {
       change_tracking_id: string
@@ -12598,7 +12604,7 @@ export interface operations {
       }
     }
   }
-  NotificationsController_getNotificationsV2: {
+  NotificationsController_getNotifications: {
     parameters: {
       query?: {
         limit?: number
@@ -12619,40 +12625,10 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NotificationResponseV2'][]
+          'application/json': components['schemas']['NotificationResponse'][]
         }
       }
       /** @description Failed to retrieve notifications */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  NotificationsController_deleteNotifications: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateNotificationsBodyV1']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['NotificationResponseV1'][]
-        }
-      }
-      /** @description Failed to delete notifications */
       500: {
         headers: {
           [name: string]: unknown
@@ -12670,7 +12646,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateNotificationBodyV2']
+        'application/json': components['schemas']['UpdateNotificationBody']
       }
     }
     responses: {
@@ -12679,7 +12655,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NotificationResponseV2'][]
+          'application/json': components['schemas']['NotificationResponse'][]
         }
       }
       /** @description Failed to update notifications */
@@ -23622,6 +23598,63 @@ export interface operations {
         content?: never
       }
       /** @description Unexpected error while creating publication. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSourcesController_updatePublication: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Publication name */
+        publication_name: string
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationPublicationBody']
+      }
+    }
+    responses: {
+      /** @description Publication updated. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while updating publication. */
       500: {
         headers: {
           [name: string]: unknown
