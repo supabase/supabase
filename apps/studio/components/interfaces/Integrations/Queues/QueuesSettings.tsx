@@ -35,7 +35,6 @@ import {
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { DEFAULT_PGMQ_VERSION } from 'data/database-queues/constants'
 
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
@@ -168,14 +167,16 @@ export const QueuesSettings = () => {
         `Failed to toggle queue exposure via PostgREST: Unable to retrieve PostgREST configuration (${configError.message})`
       )
     }
+    if (!pgmqVersion) {
+      return toast.error('Unable to retrieve PGMQ version. Please try again later.')
+    }
 
     setIsToggling(true)
     toggleExposeQueuePostgrest({
       projectRef: project.ref,
       connectionString: project.connectionString,
       enable: values.enable,
-      // default should be the latest version supported
-      pgmqVersion: pgmqVersion ?? DEFAULT_PGMQ_VERSION,
+      pgmqVersion,
     })
   }
 

@@ -6,21 +6,29 @@ import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
-import { DEFAULT_PGMQ_VERSION, SUPPORTED_PGMQ_VERSIONS, SupportedPgmqVersion } from './constants'
+import { isGreaterThanOrEqual, isLessThan } from 'lib/semver'
 
 export type DatabaseQueueExposePostgrestVariables = {
   projectRef: string
   enable: boolean
-  pgmqVersion: SupportedPgmqVersion
+  pgmqVersion: string
 
   connectionString?: string | null
 }
 
+const CONDITIONAL_READ_SIGNATURE_PGMQ_VERSION = '1.5.1'
 export const QUEUES_SCHEMA = 'pgmq_public'
 
-const getExposeQueuesSQL = (pgmqVersion: string | undefined) => {
-  const conditionalJsonb = pgmqVersion === '1.4.4' ? '' : `, conditional := '{}'::jsonb`
-  const jsonBArg = pgmqVersion === '1.4.4' ? '' : `, jsonb`
+const getExposeQueuesSQL = (pgmqVersion: string) => {
+  const conditionalJsonb = isGreaterThanOrEqual(
+    pgmqVersion,
+    CONDITIONAL_READ_SIGNATURE_PGMQ_VERSION
+  )
+    ? `, conditional := '{}'::jsonb`
+    : ''
+  const jsonBArg = isGreaterThanOrEqual(pgmqVersion, CONDITIONAL_READ_SIGNATURE_PGMQ_VERSION)
+    ? `, jsonb`
+    : ''
 
   return minify(/* SQL */ `
   create schema if not exists ${QUEUES_SCHEMA};
