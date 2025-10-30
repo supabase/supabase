@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { Edit, File, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -13,6 +14,7 @@ import {
   TreeView,
   TreeViewItem,
 } from 'ui'
+import { getLanguageFromFileName, isBinaryFile } from './FileExplorerAndEditor.utils'
 
 interface FileData {
   id: number
@@ -32,35 +34,16 @@ interface FileExplorerAndEditorProps {
   }
 }
 
-const getLanguageFromFileName = (fileName: string): string => {
-  const extension = fileName.split('.').pop()?.toLowerCase()
-  switch (extension) {
-    case 'ts':
-    case 'tsx':
-      return 'typescript'
-    case 'js':
-    case 'jsx':
-      return 'javascript'
-    case 'json':
-      return 'json'
-    case 'html':
-      return 'html'
-    case 'css':
-      return 'css'
-    case 'md':
-      return 'markdown'
-    default:
-      return 'typescript' // Default to typescript
-  }
-}
+const denoJsonDefaultContent = JSON.stringify({ imports: {} }, null, '\t')
 
-const FileExplorerAndEditor = ({
+export const FileExplorerAndEditor = ({
   files,
   onFilesChange,
   aiEndpoint,
   aiMetadata,
 }: FileExplorerAndEditorProps) => {
   const selectedFile = files.find((f) => f.selected) ?? files[0]
+  const [isDragOver, setIsDragOver] = useState(false)
 
   const [treeData, setTreeData] = useState({
     name: '',
@@ -95,9 +78,55 @@ const FileExplorerAndEditor = ({
     ])
   }
 
+  const addDroppedFiles = async (droppedFiles: FileList) => {
+    const newFiles: FileData[] = []
+    const updatedFiles = files.map((f) => ({ ...f, selected: false }))
+
+    for (let i = 0; i < droppedFiles.length; i++) {
+      const file = droppedFiles[i]
+      const newId = Math.max(0, ...files.map((f) => f.id), ...newFiles.map((f) => f.id)) + 1
+
+      try {
+        let content: string
+        if (isBinaryFile(file.name)) {
+          // For binary files, read as ArrayBuffer and convert to base64 or keep as binary data
+          const arrayBuffer = await file.arrayBuffer()
+          const bytes = new Uint8Array(arrayBuffer)
+          content = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('')
+        } else {
+          content = await file.text()
+        }
+
+        newFiles.push({
+          id: newId,
+          name: file.name,
+          content,
+          selected: i === droppedFiles.length - 1, // Select the last dropped file
+        })
+      } catch (error) {
+        console.error(`Failed to read file ${file.name}:`, error)
+      }
+    }
+
+    if (newFiles.length > 0) {
+      onFilesChange([...updatedFiles, ...newFiles])
+    }
+  }
+
   const handleFileNameChange = (id: number, newName: string) => {
     if (!newName.trim()) return // Don't allow empty names
-    const updatedFiles = files.map((file) => (file.id === id ? { ...file, name: newName } : file))
+    const updatedFiles = files.map((file) =>
+      file.id === id
+        ? {
+            ...file,
+            name: newName,
+            content:
+              newName === 'deno.json' && file.content === ''
+                ? denoJsonDefaultContent
+                : file.content,
+          }
+        : file
+    )
     onFilesChange(updatedFiles)
   }
 
@@ -145,6 +174,26 @@ const FileExplorerAndEditor = ({
     setTreeData(updatedTreeData)
   }
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+
+    const droppedFiles = e.dataTransfer.files
+    if (droppedFiles.length > 0) {
+      await addDroppedFiles(droppedFiles)
+    }
+  }
+
   // Update treeData when files change
   useEffect(() => {
     setTreeData({
@@ -161,7 +210,27 @@ const FileExplorerAndEditor = ({
   }, [files])
 
   return (
-    <div className="flex-1 overflow-hidden flex h-full">
+    <div
+      className={`flex-1 overflow-hidden flex h-full relative ${isDragOver ? 'bg-blue-50' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      <AnimatePresence>
+        {isDragOver && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+            className="absolute inset-0 bg bg-opacity-30 z-10 flex items-center justify-center"
+          >
+            <div className="w-96 py-20 bg bg-opacity-60 border-2 border-dashed border-muted flex items-center justify-center">
+              <div className="text-base">Drop files here to add them</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="w-64 border-r bg-surface-200 flex flex-col">
         <div className="py-4 px-6 border-b flex items-center justify-between">
           <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
@@ -197,13 +266,17 @@ const FileExplorerAndEditor = ({
                         icon={<File size={14} className="text-foreground-light shrink-0" />}
                         isEditing={Boolean(element.metadata?.isEditing)}
                         onEditSubmit={(value) => {
-                          if (originalId !== null) handleFileNameChange(originalId, value)
+                          if (originalId !== null) {
+                            handleFileNameChange(originalId, value)
+                          }
                         }}
                         onClick={() => {
                           if (originalId !== null) handleFileSelect(originalId)
                         }}
                         onDoubleClick={() => {
-                          if (originalId !== null) handleStartRename(originalId)
+                          if (originalId !== null) {
+                            handleStartRename(originalId)
+                          }
                         }}
                       />
                     </div>
@@ -226,7 +299,9 @@ const FileExplorerAndEditor = ({
                         <ContextMenuItem_Shadcn_
                           className="gap-x-2"
                           onSelect={() => {
-                            if (originalId !== null) handleFileDelete(originalId)
+                            if (originalId !== null) {
+                              handleFileDelete(originalId)
+                            }
                           }}
                           onFocusCapture={(e) => e.stopPropagation()}
                         >
@@ -243,26 +318,36 @@ const FileExplorerAndEditor = ({
         </div>
       </div>
       <div className="flex-1 min-h-0 relative px-3 bg-surface-200">
-        <AIEditor
-          language={getLanguageFromFileName(selectedFile?.name || 'index.ts')}
-          value={selectedFile?.content}
-          onChange={handleChange}
-          aiEndpoint={aiEndpoint}
-          aiMetadata={aiMetadata}
-          options={{
-            tabSize: 2,
-            fontSize: 13,
-            minimap: { enabled: false },
-            wordWrap: 'on',
-            lineNumbers: 'on',
-            folding: false,
-            padding: { top: 20, bottom: 20 },
-            lineNumbersMinChars: 3,
-          }}
-        />
+        {selectedFile && isBinaryFile(selectedFile.name) ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="text-foreground-light text-lg mb-2">Cannot Edit Selected File</div>
+              <div className="text-foreground-lighter text-sm">
+                Binary files like .{selectedFile.name.split('.').pop()} cannot be edited in the text
+                editor
+              </div>
+            </div>
+          </div>
+        ) : (
+          <AIEditor
+            language={getLanguageFromFileName(selectedFile?.name || 'index.ts')}
+            value={selectedFile?.content}
+            onChange={handleChange}
+            aiEndpoint={aiEndpoint}
+            aiMetadata={aiMetadata}
+            options={{
+              tabSize: 2,
+              fontSize: 13,
+              minimap: { enabled: false },
+              wordWrap: 'on',
+              lineNumbers: 'on',
+              folding: false,
+              padding: { top: 20, bottom: 20 },
+              lineNumbersMinChars: 3,
+            }}
+          />
+        )}
       </div>
     </div>
   )
 }
-
-export default FileExplorerAndEditor
