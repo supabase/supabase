@@ -20,7 +20,7 @@ export const useIsInlineEditorEnabled = () => {
     true
   )
 
-  return inlineEditorEnabled ?? true
+  return inlineEditorEnabled ?? false
 }
 
 export const InlineEditorSettings = () => {
@@ -35,7 +35,7 @@ export const InlineEditorSettings = () => {
   const form = useForm<z.infer<typeof InlineEditorSchema>>({
     resolver: zodResolver(InlineEditorSchema),
     values: {
-      inlineEditorEnabled: inlineEditorEnabled ?? true,
+      inlineEditorEnabled: inlineEditorEnabled ?? false,
     },
   })
 

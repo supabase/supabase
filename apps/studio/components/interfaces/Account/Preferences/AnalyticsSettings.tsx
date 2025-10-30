@@ -1,12 +1,13 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
 import { useConsentState } from 'common'
 import Panel from 'components/ui/Panel'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 import { FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 
 const AnalyticsSchema = z.object({
   telemetryEnabled: z.boolean(),
@@ -20,17 +21,14 @@ export const AnalyticsSettings = () => {
 
   const form = useForm<z.infer<typeof AnalyticsSchema>>({
     resolver: zodResolver(AnalyticsSchema),
-    values: {
-      telemetryEnabled: hasAccepted,
-    },
+    values: { telemetryEnabled: hasAccepted },
   })
 
   const handleToggle = (value: boolean) => {
     if (!hasLoaded) {
-      toast.error(
+      return toast.error(
         "We couldn't load the privacy settings due to an ad blocker or network error. Please disable any ad blockers and try again. If the problem persists, please contact support."
       )
-      return
     }
 
     if (value) {
