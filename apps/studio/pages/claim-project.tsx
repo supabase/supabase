@@ -12,7 +12,7 @@ import { useOrganizationProjectClaimQuery } from 'data/organizations/organizatio
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { withAuth } from 'hooks/misc/withAuth'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { Admonition } from 'ui-patterns/admonition'
 
 const ClaimProjectPageLayout = ({ children }: PropsWithChildren) => {

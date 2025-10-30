@@ -29,7 +29,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useStorageReport } from 'data/reports/storage-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()

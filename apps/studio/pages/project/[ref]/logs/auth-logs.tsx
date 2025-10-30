@@ -6,7 +6,7 @@ import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const LogsPage: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()

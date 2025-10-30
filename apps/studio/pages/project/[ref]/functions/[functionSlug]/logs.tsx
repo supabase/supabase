@@ -3,7 +3,7 @@ import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 export const LogPage: NextPageWithLayout = () => {
   const { ref, functionSlug } = useParams()

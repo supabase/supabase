@@ -14,7 +14,7 @@ import { Bucket } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { Badge, Button } from 'ui'
 
 const BucketPage: NextPageWithLayout = () => {

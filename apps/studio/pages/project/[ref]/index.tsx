@@ -4,7 +4,7 @@ import { HomeV2 } from 'components/interfaces/HomeNew/Home'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
 import { usePHFlag } from 'hooks/ui/useFlag'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const HomePage: NextPageWithLayout = () => {
   const isHomeNew = useFlag('homeNew')

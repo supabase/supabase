@@ -1,6 +1,6 @@
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const Database: NextPageWithLayout = () => {
   return <>{/* <h1>Use this as a page template for database</h1> */}</>

@@ -7,7 +7,7 @@ import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLay
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const JWTSigningKeysPage: NextPageWithLayout = () => {
   const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(

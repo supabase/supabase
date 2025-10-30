@@ -9,7 +9,7 @@ import { TableEditorMenu } from 'components/layouts/TableEditorLayout/TableEdito
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { id: _id, ref: projectRef } = useParams()

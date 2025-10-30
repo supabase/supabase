@@ -4,7 +4,7 @@ import { AuthProvidersLayout } from 'components/layouts/AuthLayout/AuthProviders
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const ProvidersPage: NextPageWithLayout = () => {
   const showProviders = useIsFeatureEnabled('authentication:show_providers')

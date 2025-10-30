@@ -21,7 +21,7 @@ import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-muta
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { Alert_Shadcn_, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 

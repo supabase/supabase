@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { Dashboards, LogSqlSnippets, SqlSnippets } from 'types'
+import type { Dashboards, LogSqlSnippets, SqlSnippets } from 'types/userContent'
 import { contentKeys } from './keys'
 
 export type ContentBase = components['schemas']['GetUserContentResponse']['data'][number]

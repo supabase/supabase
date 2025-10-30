@@ -1,8 +1,8 @@
+import { usePrevious } from '@uidotdev/usehooks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import { usePrevious } from '@uidotdev/usehooks'
 import { useParams } from 'common/hooks/useParams'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -16,7 +16,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 

@@ -7,9 +7,9 @@ import { toast } from 'sonner'
 import { getAccessToken } from 'common'
 import { SignInMfaForm } from 'components/interfaces/SignIn/SignInMfaForm'
 import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
-import { Loading } from 'components/ui/Loading'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
+import { LogoLoader } from 'ui'
 
 const ForgotPasswordMfa: NextPageWithLayout = () => {
   const router = useRouter()
@@ -69,7 +69,7 @@ const ForgotPasswordMfa: NextPageWithLayout = () => {
   if (loading) {
     return (
       <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
-        <Loading />
+        <LogoLoader />
       </div>
     )
   }

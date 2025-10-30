@@ -19,7 +19,8 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout, Organization } from 'types'
+import type { Organization } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const VERCEL_ICON = (
   <img src={`${BASE_PATH}/img/icons/vercel-icon.svg`} alt="Vercel Icon" className="w-4" />

@@ -5,7 +5,7 @@ import { SignUpForm } from 'components/interfaces/SignIn/SignUpForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const SignUpPage: NextPageWithLayout = () => {
   const {

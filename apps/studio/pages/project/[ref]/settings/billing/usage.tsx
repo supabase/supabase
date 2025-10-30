@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
   // This component is only used for redirects, as nextjs cant redirect based on hash

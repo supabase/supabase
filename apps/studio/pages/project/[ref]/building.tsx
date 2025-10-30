@@ -2,7 +2,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const ProjectBuildingPage: NextPageWithLayout = () => {
   return <RedirectToDashboard />

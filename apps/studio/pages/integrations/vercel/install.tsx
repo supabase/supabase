@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { AlertTriangle, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -13,9 +14,9 @@ import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { AlertTriangle, Info } from 'lucide-react'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout, Organization } from 'types'
+import type { Organization } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 /**
  * Variations of the Vercel integration flow.

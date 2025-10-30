@@ -6,13 +6,13 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { Loading } from 'components/ui/Loading'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
+import { LogoLoader } from 'ui'
 
 export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()
@@ -73,7 +73,7 @@ export const GraphiQLTab = () => {
   }, [projectRef, getImpersonatedRoleState, jwtSecret, accessToken, serviceKey, secretKey?.api_key])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched) {
-    return <Loading />
+    return <LogoLoader />
   }
 
   return <GraphiQL fetcher={fetcher} theme={currentTheme} />

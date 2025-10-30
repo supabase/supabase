@@ -15,7 +15,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 

@@ -16,7 +16,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {

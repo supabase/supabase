@@ -1,6 +1,6 @@
 import { removeCommentsFromSql } from 'lib/helpers'
 import type { SnippetWithContent } from 'state/sql-editor-v2'
-import type { SqlSnippets, UserContent } from 'types'
+import type { SqlSnippets, UserContent } from 'types/userContent'
 import {
   NEW_SQL_SNIPPET_SKELETON,
   destructiveSqlRegex,

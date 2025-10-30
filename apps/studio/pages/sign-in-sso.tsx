@@ -2,7 +2,7 @@ import { SignInSSOForm } from 'components/interfaces/SignIn/SignInSSOForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const SignInSSOPage: NextPageWithLayout = () => {
   const signInWithSSOEnabled = useIsFeatureEnabled('dashboard_auth:sign_in_with_sso')

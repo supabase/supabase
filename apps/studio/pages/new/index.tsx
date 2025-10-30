@@ -6,7 +6,7 @@ import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import WizardLayout from 'components/layouts/WizardLayout'
 import { SetupIntentResponse, useSetupIntent } from 'data/stripe/setup-intent-mutation'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 /**
  * No org selected yet, create a new one

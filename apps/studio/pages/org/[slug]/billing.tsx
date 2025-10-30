@@ -10,7 +10,7 @@ import {
   ORG_SETTINGS_PANEL_KEYS,
   useOrgSettingsPageStateSnapshot,
 } from 'state/organization-settings'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const OrgBillingSettings: NextPageWithLayout = () => {
   const { panel, slug } = useParams()

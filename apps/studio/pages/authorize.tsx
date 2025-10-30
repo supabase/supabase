@@ -13,7 +13,7 @@ import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-a
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,

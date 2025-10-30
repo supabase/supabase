@@ -12,7 +12,7 @@ import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()

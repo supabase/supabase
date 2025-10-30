@@ -13,7 +13,7 @@ import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const DatabaseTables: NextPageWithLayout = () => {

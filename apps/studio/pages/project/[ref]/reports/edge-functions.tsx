@@ -32,8 +32,8 @@ import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { EDGE_FUNCTION_REGIONS } from 'components/interfaces/Reports/Reports.constants'
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import { BASE_PATH } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
-import { useQueryState, parseAsJson } from 'nuqs'
+import { parseAsJson, useQueryState } from 'nuqs'
+import type { NextPageWithLayout } from 'types/next'
 
 const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (

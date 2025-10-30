@@ -9,7 +9,7 @@ import ApiKeysLayout from 'components/layouts/APIKeys/APIKeysLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { DisableInteraction } from 'components/ui/DisableInteraction'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { Separator } from 'ui'
 
 const ApiKeysNewPage: NextPageWithLayout = () => {

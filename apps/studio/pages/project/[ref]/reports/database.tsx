@@ -43,7 +43,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 const DatabaseReport: NextPageWithLayout = () => {

@@ -8,7 +8,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const router = useRouter()

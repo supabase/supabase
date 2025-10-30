@@ -1,4 +1,4 @@
-import type { SqlSnippets, UserContent } from 'types'
+import type { SqlSnippets, UserContent } from 'types/userContent'
 
 const SQL_SNIPPET_SCHEMA_VERSION = '1.0'
 

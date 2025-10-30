@@ -9,7 +9,7 @@ import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 

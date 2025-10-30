@@ -4,7 +4,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const StorageSettingsPage: NextPageWithLayout = () => {
   return (

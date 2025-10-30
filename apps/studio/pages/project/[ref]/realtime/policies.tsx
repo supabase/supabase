@@ -1,5 +1,5 @@
 import { RealtimePolicies } from 'components/interfaces/Realtime/Policies'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'

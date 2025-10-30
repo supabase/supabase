@@ -8,7 +8,7 @@ import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 
 const SqlTemplates: NextPageWithLayout = () => {
   const router = useRouter()

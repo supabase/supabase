@@ -17,7 +17,7 @@ import { useBackupsQuery } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types/next'
 import { Admonition } from 'ui-patterns'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {

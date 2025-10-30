@@ -9,8 +9,8 @@ import {
 import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { Plus, RefreshCw } from 'lucide-react'
+import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -36,7 +36,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { Dashboards } from 'types'
+import type { Dashboards } from 'types/userContent'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
 
