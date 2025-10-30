@@ -26,7 +26,8 @@ export type ProjectCreateVariables = {
   name: string
   organizationSlug: string
   dbPass: string
-  dbRegion: string
+  dbRegion?: string
+  regionSelection?: CreateProjectBody['region_selection']
   dbSql?: string
   dbPricingTierId?: string
   cloudProvider?: string
@@ -44,6 +45,7 @@ export async function createProject({
   organizationSlug,
   dbPass,
   dbRegion,
+  regionSelection,
   dbSql,
   cloudProvider = PROVIDERS.AWS.id,
   authSiteUrl,
@@ -60,6 +62,7 @@ export async function createProject({
     name,
     db_pass: dbPass,
     db_region: dbRegion,
+    region_selection: regionSelection,
     db_sql: dbSql,
     auth_site_url: authSiteUrl,
     ...(customSupabaseRequest !== undefined && {
@@ -92,24 +95,27 @@ export const useProjectCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectCreateData, ResponseError, ProjectCreateVariables>(
-    (vars) => createProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(projectKeys.list()),
-          await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create new project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-          Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectCreateData, ResponseError, ProjectCreateVariables>({
+    mutationFn: (vars) => createProject(vars),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
+        queryClient.invalidateQueries({
+          queryKey: projectKeys.infiniteListByOrg(variables.organizationSlug),
+        }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create new project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+      if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+        Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
+      }
+    },
+    ...options,
+  })
 }

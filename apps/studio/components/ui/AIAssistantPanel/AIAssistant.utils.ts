@@ -106,7 +106,7 @@ export const getContextualInvalidationKeys = ({
 }
 
 export const onErrorChat = (error: Error) => {
-  const parsedError = tryParseJson(error.message)
+  const parsedError = error ? tryParseJson(error.message) : undefined
 
   try {
     handleError(parsedError?.error || parsedError || error)

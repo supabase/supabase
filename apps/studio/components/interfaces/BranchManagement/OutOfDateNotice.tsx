@@ -1,5 +1,8 @@
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { GitBranchIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from 'ui'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,12 +13,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
+  Button,
 } from 'ui'
-import { GitBranchIcon } from 'lucide-react'
 import { Admonition } from 'ui-patterns'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 interface OutOfDateNoticeProps {
   isBranchOutOfDateMigrations: boolean
@@ -44,8 +44,8 @@ export const OutOfDateNotice = ({
 }: OutOfDateNoticeProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const hasOutdatedMigrations = isBranchOutOfDateMigrations && missingMigrationsCount > 0
-  const selectedOrg = useSelectedOrganization()
-  const project = useSelectedProject()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isBranch = project?.parent_project_ref !== undefined

@@ -5,6 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
 import type { Organization, ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { MANAGED_BY, ManagedBy } from 'lib/constants/infrastructure'
 
 export type OrganizationBase = components['schemas']['OrganizationResponse']
 
@@ -12,8 +13,19 @@ export function castOrganizationResponseToOrganization(org: OrganizationBase): O
   return {
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
-    managed_by: org.slug.startsWith('vercel_icfg_') ? 'vercel-marketplace' : 'supabase',
+    managed_by: getManagedBy(org),
     partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
+  }
+}
+
+function getManagedBy(org: OrganizationBase): ManagedBy {
+  switch (org.billing_partner) {
+    case 'vercel_marketplace':
+      return MANAGED_BY.VERCEL_MARKETPLACE
+    case 'aws_marketplace':
+      return MANAGED_BY.AWS_MARKETPLACE
+    default:
+      return MANAGED_BY.SUPABASE
   }
 }
 
@@ -42,13 +54,15 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   ...options
 }: UseQueryOptions<OrganizationsData, OrganizationsError, TData> = {}) => {
   const { profile } = useProfile()
-  return useQuery<OrganizationsData, OrganizationsError, TData>(
-    organizationKeys.list(),
-    ({ signal }) => getOrganizations({ signal }),
-    { enabled: enabled && profile !== undefined, ...options, staleTime: 30 * 60 * 1000 }
-  )
+  return useQuery<OrganizationsData, OrganizationsError, TData>({
+    queryKey: organizationKeys.list(),
+    queryFn: ({ signal }) => getOrganizations({ signal }),
+    enabled: enabled && profile !== undefined,
+    ...options,
+    staleTime: 30 * 60 * 1000,
+  })
 }
 
 export function invalidateOrganizationsQuery(client: QueryClient) {
-  return client.invalidateQueries(organizationKeys.list())
+  return client.invalidateQueries({ queryKey: organizationKeys.list() })
 }

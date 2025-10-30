@@ -11,7 +11,7 @@ import { useDatabaseQueueMessageDeleteMutation } from 'data/database-queues/data
 import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
 import { useDatabaseQueueMessageReadMutation } from 'data/database-queues/database-queue-messages-read-mutation'
 import dayjs from 'dayjs'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON } from 'lib/helpers'
 import {
   Button,
@@ -48,7 +48,7 @@ export const MessageDetailsPanel = ({
   setSelectedMessage,
 }: MessageDetailsPanelProps) => {
   const { id: _id, childId: queueName } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   useEscapeKeydown(() => setSelectedMessage(null))
 

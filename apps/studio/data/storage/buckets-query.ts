@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
@@ -32,31 +32,28 @@ export const useBucketsQuery = <TData = BucketsData>(
   { projectRef }: BucketsVariables,
   { enabled = true, ...options }: UseQueryOptions<BucketsData, BucketsError, TData> = {}
 ) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useQuery<BucketsData, BucketsError, TData>(
-    storageKeys.buckets(projectRef),
-    ({ signal }) => getBuckets({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-      ...options,
-      retry: (failureCount, error) => {
-        if (
-          typeof error === 'object' &&
-          error !== null &&
-          error.message.startsWith('Tenant config') &&
-          error.message.endsWith('not found')
-        ) {
-          return false
-        }
-
-        if (failureCount < 3) {
-          return true
-        }
-
+  return useQuery<BucketsData, BucketsError, TData>({
+    queryKey: storageKeys.buckets(projectRef),
+    queryFn: ({ signal }) => getBuckets({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    ...options,
+    retry: (failureCount, error) => {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        error.message.includes('Missing tenant config')
+      ) {
         return false
-      },
-    }
-  )
+      }
+
+      if (failureCount < 3) {
+        return true
+      }
+
+      return false
+    },
+  })
 }

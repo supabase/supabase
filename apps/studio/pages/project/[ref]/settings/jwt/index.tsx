@@ -8,16 +8,22 @@ import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-ty
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from 'components/interfaces/JwtSecrets/jwt.constants'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { configKeys } from 'data/config/keys'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 const JWTKeysLegacyPage: NextPageWithLayout = () => {
-  const { ref: projectRef, source } = useParams()
   const client = useQueryClient()
+  const { ref: projectRef } = useParams()
+  const { projectSettingsLegacyJwtKeys } = useIsFeatureEnabled(['project_settings:legacy_jwt_keys'])
 
-  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const { data } = useJwtSecretUpdatingStatusQuery(
+    { projectRef },
+    { enabled: projectSettingsLegacyJwtKeys }
+  )
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
   const jwtSecretUpdateError = data?.jwtSecretUpdateError
 
@@ -44,14 +50,20 @@ const JWTKeysLegacyPage: NextPageWithLayout = () => {
     previousJwtSecretUpdateStatus.current = jwtSecretUpdateStatus
   }, [jwtSecretUpdateStatus])
 
-  return <JWTSettings />
+  if (!projectSettingsLegacyJwtKeys) {
+    return <UnknownInterface urlBack={`/project/${projectRef}/settings/jwt/signing-keys`} />
+  }
+
+  return (
+    <JWTKeysLayout>
+      <JWTSettings />
+    </JWTKeysLayout>
+  )
 }
 
 JWTKeysLegacyPage.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout>
-      <JWTKeysLayout>{page}</JWTKeysLayout>
-    </SettingsLayout>
+    <SettingsLayout>{page}</SettingsLayout>
   </DefaultLayout>
 )
 

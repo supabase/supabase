@@ -8,15 +8,15 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useRouter } from 'next/router'
 import {
@@ -48,8 +48,8 @@ interface EditBranchModalProps {
 export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => {
   const { ref } = useParams()
   const router = useRouter()
-  const projectDetails = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
+  const { data: projectDetails } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gitlessBranching = useIsBranching2Enabled()
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
@@ -147,16 +147,16 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!branch?.id) return console.error('Branch ID is required')
+    if (!ref) return console.error('Branch ref is required')
 
     const payload: {
+      branchRef: string
       projectRef: string
-      id: string
       branchName: string
       gitBranch?: string
     } = {
+      branchRef: ref,
       projectRef,
-      id: branch.id,
       branchName: data.branchName,
     }
 

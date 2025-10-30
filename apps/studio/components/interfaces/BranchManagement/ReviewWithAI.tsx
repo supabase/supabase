@@ -1,12 +1,14 @@
-import { AiIconAnimation } from 'ui'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { Branch } from 'data/branches/branches-query'
-import { tablesToSQL } from 'lib/helpers'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Branch } from 'data/branches/branches-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { tablesToSQL } from 'lib/helpers'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation } from 'ui'
 
 interface ReviewWithAIProps {
   currentBranch?: Branch
@@ -24,11 +26,12 @@ export const ReviewWithAI = ({
   disabled = false,
 }: ReviewWithAIProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
-  const selectedOrg = useSelectedOrganization()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   // Get parent project for production schema
-  const parentProject = useProjectByRef(parentProjectRef)
+  const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
 
   // Fetch production schema tables
   const { data: productionTables } = useTablesQuery(
@@ -75,9 +78,9 @@ export const ReviewWithAI = ({
       })
     }
 
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({
       name: `Review merge: ${currentBranch.name} → ${mainBranch.name}`,
-      open: true,
       sqlSnippets: sqlSnippets.length > 0 ? sqlSnippets : undefined,
       initialInput: `I want to run the attached database changes on my production database branch as part of a branch merge from "${currentBranch.name}" into "${mainBranch.name || 'main'}". I've included the current production database schema as extra context. Please analyze the proposed schema changes and provide concise feedback on their impact on the production schema including any migration concerns and potential conflicts.`,
       suggestions: {

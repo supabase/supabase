@@ -1,37 +1,35 @@
-import Link from 'next/link'
+import dayjs from 'dayjs'
 import { ArrowRight, ExternalLinkIcon, RefreshCw } from 'lucide-react'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import {
-  CacheHitRateChartRenderer,
-  TopCacheMissesRenderer,
-} from 'components/interfaces/Reports/renderers/StorageRenderers'
-import {
-  DatePickerValue,
-  LogsDatePicker,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import Link from 'next/link'
+
 import {
   NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import {
+  CacheHitRateChartRenderer,
+  TopCacheMissesRenderer,
+} from 'components/interfaces/Reports/renderers/StorageRenderers'
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import { useState } from 'react'
-
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { useStorageReport } from 'data/reports/storage-report-query'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import {
+  DatePickerValue,
+  LogsDatePicker,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-
-import type { NextPageWithLayout } from 'types'
-import dayjs from 'dayjs'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useStorageReport } from 'data/reports/storage-report-query'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { DOCS_URL } from 'lib/constants'
+import type { NextPageWithLayout } from 'types'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -168,10 +166,7 @@ export const StorageReport: NextPageWithLayout = () => {
                 The number of storage requests that are cached at the edge level. A higher number of
                 hits is better.{' '}
                 <span className="flex items-center gap-1 text-foreground-lighter">
-                  <Link
-                    href="https://supabase.com/docs/guides/storage/cdn/fundamentals"
-                    target="_blank"
-                  >
+                  <Link href={`${DOCS_URL}/guides/storage/cdn/fundamentals`} target="_blank">
                     Read More
                   </Link>
                   <ExternalLinkIcon className="w-3 h-3" />

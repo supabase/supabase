@@ -17,6 +17,7 @@ export type ApiAuthorizationResponse = {
   expires_at: string
   approved_at: string | null
   approved_organization_slug?: string
+  registration_type: string
 }
 
 export async function getApiAuthorizationDetails(
@@ -41,11 +42,9 @@ export const useApiAuthorizationQuery = <TData = ResourceData>(
   { id }: ApiAuthorizationVariables,
   { enabled = true, ...options }: UseQueryOptions<ResourceData, ResourceError, TData> = {}
 ) =>
-  useQuery<ResourceData, ResourceError, TData>(
-    resourceKeys.resource(id),
-    ({ signal }) => getApiAuthorizationDetails({ id }, signal),
-    {
-      enabled: enabled && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ResourceData, ResourceError, TData>({
+    queryKey: resourceKeys.resource(id),
+    queryFn: ({ signal }) => getApiAuthorizationDetails({ id }, signal),
+    enabled: enabled && typeof id !== 'undefined',
+    ...options,
+  })

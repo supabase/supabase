@@ -1,22 +1,21 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle, Download, Loader } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Button } from 'ui'
-import { useProjectContext } from './ProjectContext'
 
 const RestoringState = () => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -24,6 +23,8 @@ const RestoringState = () => {
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
   const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
+
+  const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
   useProjectStatusQuery(
     { projectRef: ref },
@@ -36,7 +37,7 @@ const RestoringState = () => {
         if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
           setIsCompleted(true)
         } else {
-          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+          if (ref) invalidateProjectDetailsQuery(ref)
         }
       },
     }
@@ -66,7 +67,7 @@ const RestoringState = () => {
     if (!project) return console.error('Project is required')
 
     setLoading(true)
-    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+    if (ref) await invalidateProjectDetailsQuery(ref)
   }
 
   return (
@@ -110,11 +111,15 @@ const RestoringState = () => {
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
               <Button asChild type="default">
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                <SupportLink
+                  queryParams={{
+                    category: SupportCategories.DATABASE_UNRESPONSIVE,
+                    projectRef: project?.ref,
+                    subject: 'Ongoing restoration for project',
+                  }}
                 >
                   Contact support
-                </Link>
+                </SupportLink>
               </Button>
               <ButtonTooltip
                 type="default"

@@ -1,17 +1,17 @@
-import { Badge, Button } from 'ui'
+import { BookOpen, Github } from 'lucide-react'
 
 import { BASE_PATH } from 'lib/constants'
-import { BookOpen, Github } from 'lucide-react'
+import { Badge, Button } from 'ui'
 
 interface ClientLibraryProps {
   language: string
   officialSupport?: boolean
   docsUrl?: string
-  gitUrl: string
+  gitUrl?: string
   altIconName?: string
 }
 
-const ClientLibrary = ({
+export const ClientLibrary = ({
   language,
   officialSupport,
   docsUrl,
@@ -50,15 +50,15 @@ const ClientLibrary = ({
               </Button>
             </a>
           )}
-          <a href={gitUrl} target="_blank" rel="noreferrer">
-            <Button icon={<Github />} type="default">
-              <span className="hidden md:inline">See</span> GitHub
-            </Button>
-          </a>
+          {gitUrl && (
+            <a href={gitUrl} target="_blank" rel="noreferrer">
+              <Button icon={<Github />} type="default">
+                <span className="hidden md:inline">See</span> GitHub
+              </Button>
+            </a>
+          )}
         </div>
       </div>
     </div>
   )
 }
-
-export default ClientLibrary

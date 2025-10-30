@@ -5,8 +5,8 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { isAnyone } from '@/access/isAnyone'
-import { isAuthenticated } from '@/access/isAuthenticated'
+import { isAnyone } from '../access/isAnyone.ts'
+import { isAuthenticated } from '../access/isAuthenticated.ts'
 
 export const Media: CollectionConfig = {
   slug: 'media',

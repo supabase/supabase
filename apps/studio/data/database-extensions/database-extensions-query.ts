@@ -1,11 +1,11 @@
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
-import { components } from 'api-types'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type DatabaseExtension = components['schemas']['PostgresExtension']
 
@@ -52,15 +52,13 @@ export const useDatabaseExtensionsQuery = <TData = DatabaseExtensionsData>(
     ...options
   }: UseQueryOptions<DatabaseExtensionsData, DatabaseExtensionsError, TData> = {}
 ) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useQuery<DatabaseExtensionsData, DatabaseExtensionsError, TData>(
-    databaseExtensionsKeys.list(projectRef),
-    ({ signal }) => getDatabaseExtensions({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-      ...options,
-    }
-  )
+  return useQuery<DatabaseExtensionsData, DatabaseExtensionsError, TData>({
+    queryKey: databaseExtensionsKeys.list(projectRef),
+    queryFn: ({ signal }) => getDatabaseExtensions({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    ...options,
+  })
 }

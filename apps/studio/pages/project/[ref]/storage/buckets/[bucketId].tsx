@@ -1,18 +1,19 @@
 import { useParams } from 'common'
 
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBucketDetails'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { StorageExplorer } from 'components/interfaces/Storage'
-import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticBucketDetails'
+import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
 import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   const { bucketId } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { projectRef } = useStorageExplorerStateSnapshot()
   const { bucket, error, isSuccess, isError } = useSelectedBucket()
 
@@ -20,7 +21,7 @@ const PageLayout: NextPageWithLayout = () => {
   if (!project || !projectRef) return null
 
   return (
-    <div className="storage-container flex flex-grow">
+    <div className="storage-container flex flex-grow p-4">
       {isError && <StorageBucketsError error={error as any} />}
 
       {isSuccess ? (
@@ -29,13 +30,11 @@ const PageLayout: NextPageWithLayout = () => {
             <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
           </div>
         ) : bucket.type === 'ANALYTICS' ? (
-          <AnalyticBucketDetails bucket={bucket} />
+          <AnalyticBucketDetails bucket={bucket as AnalyticsBucket} />
         ) : (
           <StorageExplorer bucket={bucket} />
         )
-      ) : (
-        <div />
-      )}
+      ) : null}
     </div>
   )
 }

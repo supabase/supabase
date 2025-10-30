@@ -1,10 +1,10 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidatePath, revalidateTag } from 'next/cache'
+// Avoid importing next/cache at module scope so migrations can run in a plain Node env
 
 import type { Customer } from '../../../payload-types'
 
-export const revalidateCustomer: CollectionAfterChangeHook<Customer> = ({
+export const revalidateCustomer: CollectionAfterChangeHook<Customer> = async ({
   doc,
   previousDoc,
   req: { payload, context },
@@ -14,9 +14,13 @@ export const revalidateCustomer: CollectionAfterChangeHook<Customer> = ({
       const path = `/customers/${doc.slug}`
 
       payload.logger.info(`Revalidating event at path: ${path}`)
-
-      revalidatePath(path)
-      revalidateTag('customers-sitemap')
+      try {
+        const { revalidatePath, revalidateTag } = await import('next/cache')
+        revalidatePath(path)
+        revalidateTag('customers-sitemap')
+      } catch {
+        // no-op when not running inside Next runtime (e.g., during payload migrate)
+      }
     }
 
     // If the event was previously published, we need to revalidate the old path
@@ -25,22 +29,27 @@ export const revalidateCustomer: CollectionAfterChangeHook<Customer> = ({
 
       payload.logger.info(`Revalidating old event at path: ${oldPath}`)
 
-      revalidatePath(oldPath)
-      revalidateTag('customers-sitemap')
+      try {
+        const { revalidatePath, revalidateTag } = await import('next/cache')
+        revalidatePath(oldPath)
+        revalidateTag('customers-sitemap')
+      } catch {}
     }
   }
   return doc
 }
 
-export const revalidateDelete: CollectionAfterDeleteHook<Customer> = ({
+export const revalidateDelete: CollectionAfterDeleteHook<Customer> = async ({
   doc,
   req: { context },
 }) => {
   if (!context.disableRevalidate) {
     const path = `/customers/${doc?.slug}`
-
-    revalidatePath(path)
-    revalidateTag('customers-sitemap')
+    try {
+      const { revalidatePath, revalidateTag } = await import('next/cache')
+      revalidatePath(path)
+      revalidateTag('customers-sitemap')
+    } catch {}
   }
 
   return doc

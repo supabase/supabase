@@ -1,14 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop, sortBy } from 'lodash'
-import { Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
+import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   DropdownMenu,
@@ -16,12 +18,17 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
 } from 'ui'
 
 interface FunctionListProps {
   schema: string
   filterString: string
   isLocked: boolean
+  returnTypeFilter: string[]
+  securityFilter: string[]
+  duplicateFunction: (fn: any) => void
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
 }
@@ -30,54 +37,65 @@ const FunctionList = ({
   schema,
   filterString,
   isLocked,
+  returnTypeFilter,
+  securityFilter,
+  duplicateFunction = noop,
   editFunction = noop,
   deleteFunction = noop,
 }: FunctionListProps) => {
   const router = useRouter()
-  const { project: selectedProject } = useProjectContext()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,
     connectionString: selectedProject?.connectionString,
   })
 
-  const filteredFunctions = (functions ?? []).filter((x) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
-  )
+  const filteredFunctions = (functions ?? []).filter((x) => {
+    const matchesName = includes(x.name.toLowerCase(), filterString.toLowerCase())
+    const matchesReturnType =
+      returnTypeFilter.length === 0 || returnTypeFilter.includes(x.return_type)
+    const matchesSecurity =
+      securityFilter.length === 0 ||
+      (securityFilter.includes('definer') && x.security_definer) ||
+      (securityFilter.includes('invoker') && !x.security_definer)
+    return matchesName && matchesReturnType && matchesSecurity
+  })
   const _functions = sortBy(
     filteredFunctions.filter((x) => x.schema == schema),
     (func) => func.name.toLocaleLowerCase()
   )
   const projectRef = selectedProject?.ref
-  const canUpdateFunctions = useCheckPermissions(
+  const { can: canUpdateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
 
   if (_functions.length === 0 && filterString.length === 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+      <TableRow key={schema}>
+        <TableCell colSpan={5}>
           <p className="text-sm text-foreground">No functions created yet</p>
           <p className="text-sm text-foreground-light">
             There are no functions found in the schema "{schema}"
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
   if (_functions.length === 0 && filterString.length > 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+      <TableRow key={schema}>
+        <TableCell colSpan={5}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
@@ -87,8 +105,8 @@ const FunctionList = ({
         const isApiDocumentAvailable = schema == 'public' && x.return_type !== 'trigger'
 
         return (
-          <Table.tr key={x.id}>
-            <Table.td className="truncate">
+          <TableRow key={x.id}>
+            <TableCell className="truncate">
               <Button
                 type="text"
                 className="text-foreground text-sm p-0 hover:bg-transparent"
@@ -96,23 +114,44 @@ const FunctionList = ({
               >
                 {x.name}
               </Button>
-            </Table.td>
-            <Table.td className="table-cell overflow-auto">
-              <p title={x.argument_types} className="truncate">
+            </TableCell>
+            <TableCell className="table-cell">
+              <p title={x.argument_types} className="truncate text-foreground-light">
                 {x.argument_types || '-'}
               </p>
-            </Table.td>
-            <Table.td className="table-cell">
-              <p title={x.return_type}>{x.return_type}</p>
-            </Table.td>
-            <Table.td className="table-cell">{x.security_definer ? 'Definer' : 'Invoker'}</Table.td>
-            <Table.td className="text-right">
+            </TableCell>
+            <TableCell className="table-cell">
+              {x.return_type === 'trigger' ? (
+                <Link
+                  href={`/project/${projectRef}/database/triggers?search=${x.name}`}
+                  className="truncate text-link"
+                  title={x.return_type}
+                >
+                  {x.return_type}
+                </Link>
+              ) : (
+                <p title={x.return_type} className="truncate text-foreground-light">
+                  {x.return_type}
+                </p>
+              )}
+            </TableCell>
+            <TableCell className="table-cell">
+              <p className="truncate text-foreground-light">
+                {x.security_definer ? 'Definer' : 'Invoker'}
+              </p>
+            </TableCell>
+            <TableCell className="text-right">
               {!isLocked && (
                 <div className="flex items-center justify-end">
                   {canUpdateFunctions ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button type="default" className="px-1" icon={<MoreVertical />} />
+                        <Button
+                          aria-label="More options"
+                          type="default"
+                          className="px-1"
+                          icon={<MoreVertical />}
+                        />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="left" className="w-52">
                         {isApiDocumentAvailable && (
@@ -124,6 +163,7 @@ const FunctionList = ({
                             <p>Client API docs</p>
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
                           <Edit2 size={14} />
                           <p>Edit function</p>
@@ -131,9 +171,9 @@ const FunctionList = ({
                         <DropdownMenuItem
                           className="space-x-2"
                           onClick={() => {
+                            openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                             aiSnap.newChat({
                               name: `Update function ${x.name}`,
-                              open: true,
                               initialInput: 'Update this function to do...',
                               suggestions: {
                                 title:
@@ -161,6 +201,13 @@ const FunctionList = ({
                           <Edit size={14} />
                           <p>Edit function with Assistant</p>
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="space-x-2"
+                          onClick={() => duplicateFunction(x)}
+                        >
+                          <Copy size={14} />
+                          <p>Duplicate function</p>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
                           <Trash size={14} className="text-destructive" />
@@ -184,8 +231,8 @@ const FunctionList = ({
                   )}
                 </div>
               )}
-            </Table.td>
-          </Table.tr>
+            </TableCell>
+          </TableRow>
         )
       })}
     </>

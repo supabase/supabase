@@ -1,11 +1,12 @@
 import * as Sentry from '@sentry/nextjs'
-import { useIsLoggedIn, useUser } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { toast } from 'sonner'
 
+import { useIsLoggedIn, useUser } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
+import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -96,12 +97,10 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
-    const isGHUser = !!profile && 'auth0_id' in profile && profile?.auth0_id.startsWith('github')
-    const profileImageUrl = isGHUser ? getGitHubProfileImgUrl(profile.username) : undefined
 
     return {
       error,
-      profile: !!profile ? { ...profile, profileImageUrl } : undefined,
+      profile,
       isLoading,
       isError,
       isSuccess,
@@ -120,3 +119,28 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
 }
 
 export const useProfile = () => useContext(ProfileContext)
+
+export function useProfileNameAndPicture(): {
+  username?: string
+  primaryEmail?: string
+  avatarUrl?: string
+  isLoading: boolean
+} {
+  const { profile, isLoading: isLoadingProfile } = useProfile()
+  const { data: identitiesData, isLoading: isLoadingIdentities } = useProfileIdentitiesQuery()
+
+  const username = profile?.username
+  const isGitHubProfile = profile?.auth0_id.startsWith('github')
+
+  const gitHubUsername = isGitHubProfile
+    ? identitiesData?.identities.find((x) => x.provider === 'github')?.identity_data?.user_name
+    : undefined
+  const avatarUrl = isGitHubProfile ? getGitHubProfileImgUrl(gitHubUsername) : undefined
+
+  return {
+    username: profile?.username,
+    primaryEmail: profile?.primary_email,
+    avatarUrl,
+    isLoading: isLoadingProfile || isLoadingIdentities,
+  }
+}

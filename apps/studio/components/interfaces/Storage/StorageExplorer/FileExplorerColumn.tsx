@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -19,8 +19,8 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
 } from '../Storage.constants'
-import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
-import FileExplorerRow from './FileExplorerRow'
+import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
+import { FileExplorerRow } from './FileExplorerRow'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
   return (
@@ -60,7 +60,6 @@ export interface FileExplorerColumnProps {
   index: number
   column: StorageColumn
   fullWidth?: boolean
-  openedFolders?: StorageItem[]
   selectedItems: StorageItemWithColumn[]
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
@@ -69,11 +68,10 @@ export interface FileExplorerColumnProps {
   onColumnLoadMore: (index: number, column: StorageColumn) => void
 }
 
-const FileExplorerColumn = ({
+export const FileExplorerColumn = ({
   index = 0,
   column,
   fullWidth = false,
-  openedFolders = [],
   selectedItems = [],
   itemSearchString,
   onFilesUpload = noop,
@@ -85,7 +83,7 @@ const FileExplorerColumn = ({
   const fileExplorerColumnRef = useRef<any>(null)
 
   const snap = useStorageExplorerStateSnapshot()
-  const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
     if (fileExplorerColumnRef) {
@@ -221,7 +219,6 @@ const FileExplorerColumn = ({
           view: snap.view,
           columnIndex: index,
           selectedItems,
-          openedFolders,
         }}
         ItemComponent={FileExplorerRow}
         getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
@@ -278,5 +275,3 @@ const FileExplorerColumn = ({
     </div>
   )
 }
-
-export default FileExplorerColumn

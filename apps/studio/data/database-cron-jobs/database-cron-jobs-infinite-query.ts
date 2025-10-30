@@ -22,6 +22,7 @@ export type CronJob = {
   status: string
 }
 
+// [Joshen] Just to call out that I had AI help me with this, so please let me know if this can be optimized
 const getCronJobSql = ({ searchTerm, page }: { searchTerm?: string; page: number }) =>
   `
 WITH latest_runs AS (
@@ -31,6 +32,17 @@ WITH latest_runs AS (
     MAX(start_time) AS latest_run
   FROM cron.job_run_details
   GROUP BY jobid, status
+), most_recent_runs AS (
+  SELECT 
+    jobid, 
+    status, 
+    latest_run
+  FROM latest_runs lr1
+  WHERE latest_run = (
+    SELECT MAX(latest_run) 
+    FROM latest_runs lr2 
+    WHERE lr2.jobid = lr1.jobid
+  )
 )
 SELECT 
   job.jobid,
@@ -38,11 +50,11 @@ SELECT
   job.schedule,
   job.command,
   job.active,
-  lr.latest_run,
-  lr.status
+  mr.latest_run,
+  mr.status
 FROM 
   cron.job job
-LEFT JOIN latest_runs lr ON job.jobid = lr.jobid
+LEFT JOIN most_recent_runs mr ON job.jobid = mr.jobid
 ${!!searchTerm ? `WHERE job.jobname ILIKE '%${searchTerm}%'` : ''}
 ORDER BY job.jobid
 LIMIT ${CRON_JOBS_PAGE_LIMIT}
@@ -81,9 +93,9 @@ export const useCronJobsInfiniteQuery = <TData = DatabaseCronJobsInfiniteData>(
     TData
   > = {}
 ) =>
-  useInfiniteQuery<DatabaseCronJobsInfiniteData, DatabaseCronJobsInfiniteError, TData>(
-    databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
-    ({ pageParam }) => {
+  useInfiniteQuery<DatabaseCronJobsInfiniteData, DatabaseCronJobsInfiniteError, TData>({
+    queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
+    queryFn: ({ pageParam }) => {
       return getDatabaseCronJobs({
         projectRef,
         connectionString,
@@ -91,15 +103,13 @@ export const useCronJobsInfiniteQuery = <TData = DatabaseCronJobsInfiniteData>(
         page: pageParam,
       })
     },
-    {
-      staleTime: 0,
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        const hasNextPage = lastPage.length >= CRON_JOBS_PAGE_LIMIT
-        if (!hasNextPage) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
+    staleTime: 0,
+    enabled: enabled && typeof projectRef !== 'undefined',
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      const hasNextPage = lastPage.length >= CRON_JOBS_PAGE_LIMIT
+      if (!hasNextPage) return undefined
+      return page
+    },
+    ...options,
+  })

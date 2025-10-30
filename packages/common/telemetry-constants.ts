@@ -9,10 +9,20 @@
  * @module telemetry-frontend
  */
 
-type TelemetryGroups = {
+export type TelemetryGroups = {
   project: string
   organization: string
 }
+
+export const TABLE_EVENT_ACTIONS = {
+  TableCreated: 'table_created',
+  TableDataAdded: 'table_data_added',
+  TableRLSEnabled: 'table_rls_enabled',
+} as const
+
+export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
+
+export const TABLE_EVENT_VALUES: TableEventAction[] = Object.values(TABLE_EVENT_ACTIONS)
 
 /**
  * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
@@ -29,7 +39,7 @@ export interface SignUpEvent {
 }
 
 /**
- * Triggered when a user signs in with Github, Email and Password or SSO.
+ * Triggered when a user signs in with GitHub, Email and Password or SSO.
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
@@ -229,7 +239,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
    * the instance size selected in the project creation form
    */
   properties: {
-    instanceSize: string
+    instanceSize?: string
   }
   groups: TelemetryGroups
 }
@@ -247,7 +257,7 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
    * the instance size selected in the project creation form
    */
   properties: {
-    instanceSize: string
+    instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -691,17 +701,6 @@ export interface HomepageGitHubButtonClickedEvent {
 }
 
 /**
- * User clicked the GitHub Discussions button in the homepage community section.
- *
- * @group Events
- * @source www
- * @page /
- */
-export interface HomepageGitHubDiscussionsButtonClickedEvent {
-  action: 'homepage_github_discussions_button_clicked'
-}
-
-/**
  * User clicked the Discord button in the homepage community section.
  *
  * @group Events
@@ -903,6 +902,18 @@ export interface ImportDataButtonClickedEvent {
      */
     tableType: 'New Table' | 'Existing Table'
   }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dropped a file into the import data dropzone on an empty table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface ImportDataFileDroppedEvent {
+  action: 'import_data_dropzone_file_added'
   groups: TelemetryGroups
 }
 
@@ -1168,6 +1179,35 @@ export interface AiAssistantInSupportFormClickedEvent {
 }
 
 /**
+ * User rated an AI assistant message with thumbs up or thumbs down.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantMessageRatingSubmittedEvent {
+  action: 'assistant_message_rating_submitted'
+  properties: {
+    /**
+     * The rating given by the user: positive (thumbs up) or negative (thumbs down)
+     */
+    rating: 'positive' | 'negative'
+    /**
+     * The category of the conversation
+     */
+    category:
+      | 'sql_generation'
+      | 'schema_design'
+      | 'rls_policies'
+      | 'edge_functions'
+      | 'database_optimization'
+      | 'debugging'
+      | 'general_help'
+      | 'other'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User copied the command for a Supabase UI component.
  *
  * @group Events
@@ -1395,12 +1435,761 @@ export interface BranchReviewWithAssistantClickedEvent {
 }
 
 /**
+ * User clicked on a DPA PDF link to open it.
+ *
+ * @group Events
+ * @source www, studio
+ */
+export interface DpaPdfOpenedEvent {
+  action: 'dpa_pdf_opened'
+  properties: {
+    /**
+     * The source of the click, e.g. www, studio
+     */
+    source: 'www' | 'studio'
+  }
+}
+
+/**
+ * User selected a workflow in the Getting Started section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedWorkflowClickedEvent {
+  action: 'home_getting_started_workflow_clicked'
+  properties: {
+    /**
+     * The workflow selected by the user
+     */
+    workflow: 'code' | 'no_code'
+    /**
+     * Whether this is switching from another workflow
+     */
+    is_switch: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on a step in the Getting Started section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedStepClickedEvent {
+  action: 'home_getting_started_step_clicked'
+  properties: {
+    /**
+     * The workflow type (code or no-code)
+     */
+    workflow: 'code' | 'no_code'
+    /**
+     * The step number (1-based index)
+     */
+    step_number: number
+    /**
+     * The title of the step
+     */
+    step_title: string
+    /**
+     * The action type of the button clicked
+     */
+    action_type: 'primary' | 'ai_assist' | 'external_link'
+    /**
+     * Whether the step was already completed
+     */
+    was_completed: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on an activity stat in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeActivityStatClickedEvent {
+  action: 'home_activity_stat_clicked'
+  properties: {
+    /**
+     * The type of activity stat clicked
+     */
+    stat_type: 'migrations' | 'backups' | 'branches'
+    /**
+     * The current value of the stat
+     */
+    stat_value: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the main Ask Assistant button in the Advisor section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeAdvisorAskAssistantClickedEvent {
+  action: 'home_advisor_ask_assistant_clicked'
+  properties: {
+    /**
+     * Number of issues found by the advisor
+     */
+    issues_count: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on an issue card in the Advisor section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeAdvisorIssueCardClickedEvent {
+  action: 'home_advisor_issue_card_clicked'
+  properties: {
+    /**
+     * Category of the issue (SECURITY or PERFORMANCE)
+     */
+    issue_category: string
+    /**
+     * Name/key of the lint issue
+     */
+    issue_name: string
+    issues_count: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Fix Issue button on an advisor card in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeAdvisorFixIssueClickedEvent {
+  action: 'home_advisor_fix_issue_clicked'
+  properties: {
+    /**
+     * Category of the issue (SECURITY or PERFORMANCE)
+     */
+    issue_category: string
+    /**
+     * Name/key of the lint issue
+     */
+    issue_name: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on a service title in Project Usage section of HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeProjectUsageServiceClickedEvent {
+  action: 'home_project_usage_service_clicked'
+  properties: {
+    /**
+     * The service that was clicked
+     */
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    /**
+     * Total requests for this service
+     */
+    total_requests: number
+    /**
+     * Number of errors for this service
+     */
+    error_count: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on a bar in the usage chart in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeProjectUsageChartClickedEvent {
+  action: 'home_project_usage_chart_clicked'
+  properties: {
+    /**
+     * The service type for this chart
+     */
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    /**
+     * Timestamp of the bar clicked
+     */
+    bar_timestamp: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User added a block to the custom report in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeCustomReportBlockAddedEvent {
+  action: 'home_custom_report_block_added'
+  properties: {
+    /**
+     * ID of the snippet/block added
+     */
+    block_id: string
+    /**
+     * If position is 0 it is equivalent to 'Add your first chart'.
+     */
+    position: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User removed a block from the custom report in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeCustomReportBlockRemovedEvent {
+  action: 'home_custom_report_block_removed'
+  properties: {
+    /**
+     * ID of the block removed
+     */
+    block_id: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the Getting Started section in HomeV2.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeGettingStartedClosedEvent {
+  action: 'home_getting_started_closed'
+  properties: {
+    /**
+     * The current workflow when dismissed
+     */
+    workflow: 'code' | 'no_code'
+    /**
+     * Number of steps completed when dismissed
+     */
+    steps_completed: number
+    /**
+     * Total number of steps in the workflow
+     */
+    total_steps: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User reordered sections in HomeV2 using drag and drop.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeSectionRowsMovedEvent {
+  action: 'home_section_rows_moved'
+  properties: {
+    /**
+     * The section that was moved
+     */
+    section_moved: string
+    /**
+     * The old position of the section (0-based index)
+     */
+    old_position: number
+    /**
+     * The new position of the section (0-based index)
+     */
+    new_position: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Request DPA button to open the confirmation modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/documents
+ */
+export interface DpaRequestButtonClickedEvent {
+  action: 'dpa_request_button_clicked'
+}
+
+/**
+ * User clicked a document view/download button to access a document.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/documents
+ */
+export interface DocumentViewButtonClickedEvent {
+  action: 'document_view_button_clicked'
+  properties: {
+    /**
+     * The name of the document being viewed, e.g. TIA, SOC2, Standard Security Questionnaire
+     */
+    documentName: 'TIA' | 'SOC2' | 'Standard Security Questionnaire'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the Request HIPAA button to open the HIPAA request form.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/documents
+ */
+export interface HipaaRequestButtonClickedEvent {
+  action: 'hipaa_request_button_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User successfully created a table in the project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableCreatedEvent {
+  action: 'table_created'
+  properties: {
+    /**
+     * Method used to create the table
+     */
+    method: 'sql_editor' | 'table_editor'
+    /**
+     * Schema where table was created
+     */
+    schema_name?: string
+    /**
+     * Name of the table created
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User successfully added data to a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableDataAddedEvent {
+  action: 'table_data_added'
+  properties: {
+    /**
+     * Method used to insert data
+     */
+    method: 'sql_editor' | 'table_editor' | 'spreadsheet_import'
+    /**
+     * Schema of the table
+     */
+    schema_name?: string
+    /**
+     * Name of the table
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User successfully enabled RLS on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ */
+export interface TableRLSEnabledEvent {
+  action: 'table_rls_enabled'
+  properties: {
+    /**
+     * Method used to enable RLS
+     */
+    method: 'sql_editor' | 'table_editor'
+    /**
+     * Schema of the table
+     */
+    schema_name?: string
+    /**
+     * Name of the table
+     */
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened API docs panel.
+ *
+ * @group Events
+ * @source studio
+ * @page Various pages with API docs button
+ */
+export interface ApiDocsOpenedEvent {
+  action: 'api_docs_opened'
+  properties: {
+    /**
+     * Source of the API docs button click, e.g. table_editor, sidebar
+     */
+    source: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked copy button in API docs panel.
+ *
+ * @group Events
+ * @source studio
+ * @page API docs panel
+ */
+export interface ApiDocsCodeCopyButtonClickedEvent {
+  action: 'api_docs_code_copy_button_clicked'
+  properties: {
+    /**
+     * Title of the content being copied
+     */
+    title?: string
+    /**
+     * Selected programming language, e.g. js, bash
+     */
+    selectedLanguage?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User performed a search via the Auth Users page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/auth/users
+ */
+export interface AuthUsersSearchSubmittedEvent {
+  action: 'auth_users_search_submitted'
+  properties: {
+    /**
+     * The trigger that initiated the search
+     */
+    trigger:
+      | 'search_input'
+      | 'refresh_button'
+      | 'sort_change'
+      | 'provider_filter'
+      | 'user_type_filter'
+    /**
+     * The column being sorted on, e.g. email, phone, created_at, last_sign_in_at
+     */
+    sort_column: string
+    /**
+     * The sort order, either ascending or descending
+     */
+    sort_order: string
+    /**
+     * The authentication provider(s) being filtered on, e.g. email, phone, google, github
+     */
+    providers?: string[]
+    /**
+     * The user role(s) being filtered on, e.g. verified, unverified, anonymous
+     */
+    user_type?: string
+    /**
+     * The keywords being searched for
+     */
+    keywords?: string
+    /**
+     * The column being filtered on, e.g. email, phone
+     * (only included if filtering by a specific column and not all columns)
+     */
+    filter_column?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuOpenedEvent {
+  action: 'command_menu_opened'
+  properties: {
+    /**
+     * The trigger that opened the command menu
+     */
+    trigger_type: 'keyboard_shortcut' | 'search_input'
+    /**
+     * The location where the command menu was opened
+     */
+    trigger_location?: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User typed a search term in the command menu input.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuSearchSubmittedEvent {
+  action: 'command_menu_search_submitted'
+  properties: {
+    /**
+     * Search term typed into the command menu input
+     */
+    value: string
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked a command from the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuCommandClickedEvent {
+  action: 'command_menu_command_clicked'
+  properties: {
+    /**
+     * The clicked command
+     */
+    command_name: string
+    command_value?: string
+    command_type: 'action' | 'route'
+    /**
+     * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened a sidebar panel.
+ *
+ * @group Events
+ * @source studio
+ * @page Various pages with sidebar buttons
+ */
+export interface SidebarOpenedEvent {
+  action: 'sidebar_opened'
+  properties: {
+    /**
+     * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
+     */
+    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the table quickstart experiment.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (NewTab)
+ */
+export interface TableQuickstartOpenedEvent {
+  action: 'table_quickstart_opened'
+  properties: {
+    /**
+     * Which variation the user was shown: ai, templates, assistant, or control
+     */
+    variant: 'ai' | 'templates' | 'assistant' | 'control'
+  }
+  groups: TelemetryGroups
+}
+/**
+ * User submitted a prompt in the AI quickstart variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartAIPromptSubmittedEvent {
+  action: 'table_quickstart_ai_prompt_submitted'
+  properties: {
+    /**
+     * Length of the AI prompt
+     */
+    promptLength: number
+    /**
+     * Whether this was triggered by a quick idea button
+     */
+    wasQuickIdea: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * AI table generation completed (success or failure).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartAIGenerationCompletedEvent {
+  action: 'table_quickstart_ai_generation_completed'
+  properties: {
+    /**
+     * Whether generation succeeded
+     */
+    success: boolean
+    /**
+     * Number of tables generated (0 if failed)
+     */
+    tablesGenerated: number
+    /**
+     * Length of the prompt used
+     */
+    promptLength: number
+    /**
+     * Error message if failed
+     */
+    errorMessage?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a quick idea button in the AI variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartQuickIdeaClickedEvent {
+  action: 'table_quickstart_quick_idea_clicked'
+  properties: {
+    /**
+     * Text of the quick idea clicked
+     */
+    ideaText: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a category in the templates variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartTemplatesWidget)
+ */
+export interface TableQuickstartCategoryClickedEvent {
+  action: 'table_quickstart_category_clicked'
+  properties: {
+    /**
+     * Name of the category clicked
+     */
+    categoryName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a table template from either AI-generated suggestions or pre-made templates.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget, QuickstartTemplatesWidget)
+ */
+export interface TableQuickstartTemplateClickedEvent {
+  action: 'table_quickstart_template_clicked'
+  properties: {
+    /**
+     * Name of the table clicked
+     */
+    tableName: string
+    /**
+     * Number of columns in the template
+     */
+    columnCount: number
+    /**
+     * Source of the template clicked
+     */
+    source: 'ai' | 'templates'
+    /**
+     * Category the template belongs to (only present for templates source)
+     */
+    categoryName?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the assistant button in the assistant variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (NewTab)
+ */
+export interface TableQuickstartAssistantOpenedEvent {
+  action: 'table_quickstart_assistant_opened'
+  properties: {
+    /**
+     * Whether the assistant chat was successfully created
+     */
+    chatCreated: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
   | ConnectionStringCopiedEvent
+  | ApiDocsOpenedEvent
+  | ApiDocsCodeCopyButtonClickedEvent
   | CronJobCreatedEvent
   | CronJobUpdatedEvent
   | CronJobDeletedEvent
@@ -1433,13 +2222,13 @@ export type TelemetryEvent =
   | AssistantSuggestionRunQueryClickedEvent
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
+  | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
   | EventPageCtaClickedEvent
   | HomepageGitHubButtonClickedEvent
-  | HomepageGitHubDiscussionsButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
@@ -1454,6 +2243,7 @@ export type TelemetryEvent =
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
   | ImportDataButtonClickedEvent
+  | ImportDataFileDroppedEvent
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
@@ -1484,3 +2274,34 @@ export type TelemetryEvent =
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
+  | DpaPdfOpenedEvent
+  | HomeGettingStartedWorkflowClickedEvent
+  | HomeGettingStartedStepClickedEvent
+  | HomeGettingStartedClosedEvent
+  | HomeSectionRowsMovedEvent
+  | HomeActivityStatClickedEvent
+  | HomeAdvisorAskAssistantClickedEvent
+  | HomeAdvisorIssueCardClickedEvent
+  | HomeAdvisorFixIssueClickedEvent
+  | HomeProjectUsageServiceClickedEvent
+  | HomeProjectUsageChartClickedEvent
+  | HomeCustomReportBlockAddedEvent
+  | HomeCustomReportBlockRemovedEvent
+  | DpaRequestButtonClickedEvent
+  | DocumentViewButtonClickedEvent
+  | HipaaRequestButtonClickedEvent
+  | TableCreatedEvent
+  | TableDataAddedEvent
+  | TableRLSEnabledEvent
+  | TableQuickstartOpenedEvent
+  | TableQuickstartAIPromptSubmittedEvent
+  | TableQuickstartAIGenerationCompletedEvent
+  | TableQuickstartQuickIdeaClickedEvent
+  | TableQuickstartCategoryClickedEvent
+  | TableQuickstartTemplateClickedEvent
+  | TableQuickstartAssistantOpenedEvent
+  | AuthUsersSearchSubmittedEvent
+  | CommandMenuOpenedEvent
+  | CommandMenuSearchSubmittedEvent
+  | CommandMenuCommandClickedEvent
+  | SidebarOpenedEvent

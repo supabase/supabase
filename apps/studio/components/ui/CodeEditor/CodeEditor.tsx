@@ -4,7 +4,7 @@ import { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
 import { cn } from 'ui'
@@ -61,7 +61,7 @@ const CodeEditor = ({
   onInputChange = noop,
 }: CodeEditorProps) => {
   const monaco = useMonaco()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const hasValue = useRef<any>()
   const ref = useRef<editor.IStandaloneCodeEditor>()

@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { ExportDialog } from 'components/grid/components/header/ExportDialog'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { SupaTable } from 'components/grid/types'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
@@ -13,10 +15,11 @@ import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -34,27 +37,26 @@ import {
   InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 export const TableEditorMenu = () => {
-  const { id: _id } = useParams()
+  const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const isMobile = useBreakpoint()
 
   const [searchText, setSearchText] = useState<string>('')
-  const [tableToExport, setTableToExport] = useState<{ name: string; schema: string }>()
+  const [tableToExport, setTableToExport] = useState<SupaTable>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
     'alphabetical'
   )
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const {
     data,
     isLoading,
@@ -83,9 +85,12 @@ export const TableEditorMenu = () => {
     [data?.pages]
   )
 
-  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canCreateTables } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
-  const { isSchemaLocked, reason } = useIsProtectedSchema({ schema: selectedSchema })
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -93,13 +98,22 @@ export const TableEditorMenu = () => {
     id,
   })
 
-  useEffect(() => {
-    if (selectedTable?.schema) {
-      setSelectedSchema(selectedTable.schema)
-    }
-  }, [selectedTable?.schema])
+  if (selectedTable?.schema && !selectedSchema) {
+    setSelectedSchema(selectedTable.schema)
+  }
 
   const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
+
+  const onSelectExportCLI = async (id: number) => {
+    const table = await getTableEditor({
+      id: id,
+      projectRef,
+      connectionString: project?.connectionString,
+    })
+    const supaTable = table && parseSupaTable(table)
+    setTableToExport(supaTable)
+  }
+
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
     if (entityTypes && !searchText) {
@@ -119,6 +133,7 @@ export const TableEditorMenu = () => {
               setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
+            portal={!isMobile}
           />
 
           <div className="grid gap-3 mx-4">
@@ -132,7 +147,7 @@ export const TableEditorMenu = () => {
                 icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
                 type="default"
                 className="justify-start"
-                onClick={snap.onAddTable}
+                onClick={() => snap.onAddTable()}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -255,11 +270,7 @@ export const TableEditorMenu = () => {
                       projectRef: project?.ref!,
                       id: Number(id),
                       isSchemaLocked,
-                      onExportCLI: () => {
-                        const entity = entityTypes?.find((x) => x.id === id)
-                        if (!entity) return
-                        setTableToExport({ name: entity.name, schema: entity.schema })
-                      },
+                      onExportCLI: () => onSelectExportCLI(Number(id)),
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
@@ -274,6 +285,7 @@ export const TableEditorMenu = () => {
       </div>
 
       <ExportDialog
+        ignoreRoleImpersonation
         table={tableToExport}
         open={!!tableToExport}
         onOpenChange={(open) => {
@@ -283,5 +295,3 @@ export const TableEditorMenu = () => {
     </>
   )
 }
-
-export default TableEditorMenu

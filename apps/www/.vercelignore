@@ -1,0 +1,73 @@
+# Dependencies
+node_modules
+**/node_modules
+**/.pnpm
+
+# Build artifacts - exclude heavy build files
+.next/cache
+.next/trace
+.next/static/chunks/pages/_buildManifest.js
+.next/static/chunks/pages/_ssgManifest.js
+.turbo
+.eslintcache
+
+# Content that shouldn't be bundled into functions
+_blog/**/*.mdx
+public/images/**/*
+public/videos/**/*
+public/fonts/**/*
+
+# Development files
+*.log
+*.map
+.env.local
+.env.*.local
+
+# Testing files
+**/*.test.*
+**/*.spec.*
+**/*.stories.*
+**/coverage
+
+# Documentation
+README.md
+*.md
+docs/**/*
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+.cursor
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Heavy node_modules subdirectories
+**/node_modules/@swc
+**/node_modules/@esbuild
+**/node_modules/rollup
+**/node_modules/webpack
+**/node_modules/terser
+**/node_modules/@babel
+**/node_modules/typescript
+**/node_modules/@types
+**/node_modules/highlight.js
+**/node_modules/refractor
+**/node_modules/@code-hike
+**/node_modules/framer-motion
+
+# Other apps (since we're only deploying www)
+../cms
+../design-system
+../docs
+../studio
+../ui-library
+../../examples
+../../tests
+../../supabase
+../../packages/ui-patterns
+../../packages/ui
+../../packages/shared-data 

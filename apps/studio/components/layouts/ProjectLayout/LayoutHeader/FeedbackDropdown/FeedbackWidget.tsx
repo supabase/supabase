@@ -1,21 +1,25 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { toPng } from 'html-to-image'
 import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useDebounce } from 'use-debounce'
 
-import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { timeout } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -28,47 +32,40 @@ import { Admonition } from 'ui-patterns'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
 interface FeedbackWidgetProps {
-  feedback: string
-  screenshot: string | undefined
   onClose: () => void
-  setFeedback: (value: string) => void
-  setScreenshot: (value: string | undefined) => void
 }
 
-export const FeedbackWidget = ({
-  feedback,
-  screenshot,
-  onClose,
-  setFeedback,
-  setScreenshot,
-}: FeedbackWidgetProps) => {
-  const FEEDBACK_STORAGE_KEY = 'feedback_content'
-  const SCREENSHOT_STORAGE_KEY = 'screenshot'
-
+export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
   const router = useRouter()
+  const { profile } = useProfile()
   const { ref, slug } = useParams()
-  const org = useSelectedOrganization()
-  const uploadButtonRef = useRef(null)
+  const { data: org } = useSelectedOrganizationQuery()
 
+  const uploadButtonRef = useRef(null)
+  const [feedback, setFeedback] = useState('')
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
   const [isFeedbackSent, setIsFeedbackSent] = useState(false)
-  const [debouncedFeedback] = useDebounce(feedback, 450)
 
-  const { data: category } = useFeedbackCategoryQuery({
-    prompt: debouncedFeedback,
-  })
+  const debouncedFeedback = useDebounce(feedback, 500)
+
+  const [storedFeedback, setStoredFeedback] = useLocalStorageQuery<string | null>(
+    LOCAL_STORAGE_KEYS.FEEDBACK_WIDGET_CONTENT,
+    null
+  )
+  const [screenshot, setScreenshot, { isSuccess }] = useLocalStorageQuery<string | null>(
+    LOCAL_STORAGE_KEYS.FEEDBACK_WIDGET_SCREENSHOT,
+    null
+  )
+
+  const { data: category } = useFeedbackCategoryQuery({ prompt: debouncedFeedback })
 
   const { mutate: sendEvent } = useSendEventMutation()
-
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
       setIsFeedbackSent(true)
       setFeedback('')
-      setScreenshot(undefined)
-      localStorage.removeItem(FEEDBACK_STORAGE_KEY)
-      localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
-
+      setScreenshot(null)
       setSending(false)
     },
     onError: (error) => {
@@ -76,28 +73,6 @@ export const FeedbackWidget = ({
       setSending(false)
     },
   })
-
-  useEffect(() => {
-    const storedFeedback = localStorage.getItem(FEEDBACK_STORAGE_KEY)
-    if (storedFeedback) {
-      setFeedback(storedFeedback)
-    }
-
-    const storedScreenshot = localStorage.getItem(SCREENSHOT_STORAGE_KEY)
-    if (storedScreenshot) {
-      setScreenshot(storedScreenshot)
-    }
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem(FEEDBACK_STORAGE_KEY, feedback)
-  }, [feedback])
-
-  useEffect(() => {
-    if (screenshot) {
-      localStorage.setItem(SCREENSHOT_STORAGE_KEY, screenshot)
-    }
-  }, [screenshot])
 
   const captureScreenshot = async () => {
     setIsSavingScreenshot(true)
@@ -112,14 +87,9 @@ export const FeedbackWidget = ({
     // Give time for dropdown to close
     await timeout(100)
     toPng(document.body, { filter })
-      .then((dataUrl: any) => {
-        localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
-        setScreenshot(dataUrl)
-      })
+      .then((dataUrl: any) => setScreenshot(dataUrl))
       .catch(() => toast.error('Failed to capture screenshot'))
-      .finally(() => {
-        setIsSavingScreenshot(false)
-      })
+      .finally(() => setIsSavingScreenshot(false))
   }
 
   const onFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -129,10 +99,7 @@ export const FeedbackWidget = ({
     const reader = new FileReader()
     reader.onload = function (event) {
       const dataUrl = event.target?.result
-      if (typeof dataUrl === 'string') {
-        setScreenshot(dataUrl)
-        localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
-      }
+      if (typeof dataUrl === 'string') setScreenshot(dataUrl)
     }
     reader.readAsDataURL(file)
     event.target.value = ''
@@ -147,10 +114,7 @@ export const FeedbackWidget = ({
       const reader = new FileReader()
       reader.onload = function (event) {
         const dataUrl = event.target?.result
-        if (typeof dataUrl === 'string') {
-          setScreenshot(dataUrl)
-          localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
-        }
+        if (typeof dataUrl === 'string') setScreenshot(dataUrl)
       }
       reader.readAsDataURL(blob)
     }
@@ -162,9 +126,13 @@ export const FeedbackWidget = ({
     } else if (feedback.length > 0) {
       setSending(true)
 
-      const attachmentUrl = screenshot
-        ? await uploadAttachment(ref as string, screenshot)
-        : undefined
+      const attachmentUrl =
+        screenshot && profile?.gotrue_id
+          ? await uploadAttachment({
+              image: screenshot,
+              userId: profile.gotrue_id,
+            })
+          : undefined
       const formattedFeedback =
         attachmentUrl !== undefined ? `${feedback}\n\nAttachments:\n${attachmentUrl}` : feedback
 
@@ -176,6 +144,15 @@ export const FeedbackWidget = ({
       })
     }
   }
+
+  useEffect(() => {
+    if (storedFeedback) setFeedback(storedFeedback)
+    if (screenshot) setScreenshot(screenshot)
+  }, [isSuccess])
+
+  useEffect(() => {
+    if (debouncedFeedback.length > 0) setStoredFeedback(debouncedFeedback)
+  }, [debouncedFeedback])
 
   return isFeedbackSent ? (
     <ThanksMessage onClose={onClose} />
@@ -209,12 +186,15 @@ export const FeedbackWidget = ({
               >
                 <p className="text-xs text-foreground-light !leading-tight">
                   Please{' '}
-                  <InlineLink
-                    className="text-foreground-light hover:text-foreground"
-                    href={`/support/new/?projectRef=${slug}&message=${encodeURIComponent(feedback)}`}
+                  <SupportLink
+                    className={cn(
+                      InlineLinkClassName,
+                      'text-foreground-light hover:text-foreground'
+                    )}
+                    queryParams={{ projectRef: slug, message: feedback }}
                   >
                     open a support ticket
-                  </InlineLink>{' '}
+                  </SupportLink>{' '}
                   to get help with this issue, as we do not reply to all product feedback.
                 </p>
               </Admonition>
@@ -230,14 +210,14 @@ export const FeedbackWidget = ({
           <p className="text-xs text-foreground">Have a technical issue?</p>
           <p className="text-xs text-foreground-light">
             Contact{' '}
-            <Link href="/support/new">
-              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+            <SupportLink>
+              <span className="cursor-pointer text-brand-link transition-colors hover:text-brand-600">
                 support
               </span>
-            </Link>{' '}
+            </SupportLink>{' '}
             or{' '}
-            <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">
-              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+            <a href={`${DOCS_URL}`} target="_blank" rel="noreferrer">
+              <span className="cursor-pointer text-brand-link transition-colors hover:text-brand-600">
                 see docs
               </span>
             </a>
@@ -245,7 +225,7 @@ export const FeedbackWidget = ({
           </p>
         </div>
         <div className="flex items-center gap-2 flex-row">
-          {screenshot !== undefined ? (
+          {!!screenshot ? (
             <div
               style={{ backgroundImage: `url("${screenshot}")` }}
               onClick={() => {
@@ -253,7 +233,7 @@ export const FeedbackWidget = ({
                 const blobUrl = URL.createObjectURL(blob)
                 window.open(blobUrl, '_blank')
               }}
-              className="cursor-pointer rounded h-[26px] w-[30px] border border-control relative bg-cover bg-center bg-no-repeat"
+              className="cursor-pointer rounded h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
             >
               <button
                 className={[
@@ -262,7 +242,7 @@ export const FeedbackWidget = ({
                 ].join(' ')}
                 onClick={(event) => {
                   event.stopPropagation()
-                  setScreenshot(undefined)
+                  setScreenshot(null)
                 }}
               >
                 <X size={8} strokeWidth={3} />
@@ -275,10 +255,9 @@ export const FeedbackWidget = ({
                   type="default"
                   disabled={isSavingScreenshot}
                   loading={isSavingScreenshot}
-                  className="px-2"
-                >
-                  <ImageIcon size={14} />
-                </Button>
+                  className="w-7"
+                  icon={<ImageIcon size={14} />}
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end" className="w-fit">
                 <DropdownMenuItem
@@ -344,11 +323,11 @@ const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
         <PopoverSeparator_Shadcn_ />
         <div className="flex items-center justify-between px-4">
           <p className="text-xs text-foreground-light">
-            <Link href="/support/new">
+            <SupportLink>
               <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
                 Create a Support Ticket
               </span>
-            </Link>
+            </SupportLink>
           </p>
 
           <Button type="default" onClick={onClose}>

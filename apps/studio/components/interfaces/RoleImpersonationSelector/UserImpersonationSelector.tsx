@@ -4,12 +4,13 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessTokenHookDetails'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { ResponseError } from 'types'
 import {
@@ -49,7 +50,7 @@ const UserImpersonationSelector = () => {
   const state = useRoleImpersonationStateSnapshot()
   const debouncedSearchText = useDebounce(searchText, 300)
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } =
     useUsersInfiniteQuery(
@@ -175,9 +176,9 @@ const UserImpersonationSelector = () => {
   return (
     <>
       <div className="px-5 py-3">
-        <h2 className="text-foreground text-sm">
+        <p className="text-foreground text-sm">
           {displayName ? `Impersonating ${displayName}` : 'Impersonate a User'}
-        </h2>
+        </p>
         <p className="text-sm text-foreground-light">
           {!impersonatingUser && !isExternalAuthImpersonating
             ? "Select a user to respect your database's Row-Level Security policies for that particular user."
@@ -393,10 +394,7 @@ const UserImpersonationSelector = () => {
                       AAL1 verifies users via standard login methods, while AAL2 adds a second
                       authentication factor. If you're not using MFA, you can leave this on AAL1.
                       Learn more about MFA{' '}
-                      <InlineLink href="https://supabase.com/docs/guides/auth/auth-mfa">
-                        here
-                      </InlineLink>
-                      .
+                      <InlineLink href={`${DOCS_URL}/guides/auth/auth-mfa`}>here</InlineLink>.
                     </InfoTooltip>
                   </div>
 

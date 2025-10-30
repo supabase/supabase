@@ -2,21 +2,19 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Code, Monitor } from 'lucide-react'
 import { editor } from 'monaco-editor'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-import { useForm } from 'react-hook-form'
 
 import { useParams } from 'common'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { FormSchema } from 'types'
 import {
-  Badge,
   Button,
-  Card,
   CardContent,
   CardFooter,
   Form_Shadcn_,
@@ -40,9 +38,12 @@ interface TemplateEditorProps {
   template: FormSchema
 }
 
-const TemplateEditor = ({ template }: TemplateEditorProps) => {
+export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
   // Add a ref to the code editor
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
@@ -75,7 +76,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
@@ -383,5 +383,3 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     </Form_Shadcn_>
   )
 }
-
-export default TemplateEditor

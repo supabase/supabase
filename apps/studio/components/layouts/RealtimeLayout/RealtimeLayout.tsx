@@ -1,12 +1,10 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { useIsRealtimeSettingsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
 
 export interface RealtimeLayoutProps {
@@ -14,11 +12,7 @@ export interface RealtimeLayoutProps {
 }
 
 const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
-  const project = useSelectedProject()
-  const enableRealtimeSettingsFF = useIsRealtimeSettingsFFEnabled()
-  const enableRealtimeSettingsFP = useIsRealtimeSettingsEnabled()
-
-  const enableRealtimeSettings = enableRealtimeSettingsFF && enableRealtimeSettingsFP
+  const { data: project } = useSelectedProjectQuery()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -27,12 +21,7 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
     <ProjectLayout
       title={title}
       product="Realtime"
-      productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateRealtimeMenu(project!, { enableRealtimeSettings })}
-        />
-      }
+      productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project!)} />}
     >
       {children}
     </ProjectLayout>

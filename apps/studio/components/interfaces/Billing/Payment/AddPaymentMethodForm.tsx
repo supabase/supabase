@@ -2,14 +2,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
-} from 'components/interfaces/Organization/BillingSettings/PaymentMethods/NewPaymentMethodElement'
+} from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { isEqual } from 'lodash'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -27,7 +27,7 @@ interface AddPaymentMethodFormProps {
 // Small UX annoyance here, that the page will be refreshed
 
 const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps) => {
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { data: customerProfile, isLoading: customerProfileLoading } =
     useOrganizationCustomerProfileQuery({
@@ -74,12 +74,12 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
             paymentMethodId: result.setupIntent.payment_method,
           })
 
-          await queryClient.invalidateQueries(
-            organizationKeys.paymentMethods(selectedOrganization.slug)
-          )
+          await queryClient.invalidateQueries({
+            queryKey: organizationKeys.paymentMethods(selectedOrganization.slug),
+          })
 
           queryClient.setQueriesData(
-            organizationKeys.paymentMethods(selectedOrganization.slug),
+            { queryKey: organizationKeys.paymentMethods(selectedOrganization.slug) },
             (prev: any) => {
               if (!prev) return prev
               return {
@@ -97,9 +97,9 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         }
       } else {
         if (selectedOrganization) {
-          await queryClient.invalidateQueries(
-            organizationKeys.paymentMethods(selectedOrganization.slug)
-          )
+          await queryClient.invalidateQueries({
+            queryKey: organizationKeys.paymentMethods(selectedOrganization.slug),
+          })
         }
       }
 

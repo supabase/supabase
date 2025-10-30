@@ -1,18 +1,26 @@
-import { Search } from 'lucide-react'
-import { useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { RefreshCw, Search, X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useMemo, useState } from 'react'
+import DataGrid, { Row } from 'react-data-grid'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useQueuesQuery } from 'data/database-queues/database-queues-query'
-import { Button, Input, Sheet, SheetContent } from 'ui'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Button, cn, LoadingLine, Sheet, SheetContent } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateQueueSheet } from './CreateQueueSheet'
-import { QueuesRows } from './QueuesRows'
+import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
 
 export const QueuesTab = () => {
-  const { project } = useProjectContext()
+  const router = useRouter()
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
+  const [search, setSearch] = useState(searchQuery)
 
   // used for confirmation prompt in the Create Queue Sheet
   const [isClosingCreateQueueSheet, setIsClosingCreateQueueSheet] = useState(false)
@@ -23,77 +31,135 @@ export const QueuesTab = () => {
     error,
     isLoading,
     isError,
+    isRefetching,
+    refetch,
   } = useQueuesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const [searchQuery, setSearchQuery] = useQueryState('search')
+  // Filter queues based on search query
+  const filteredQueues = useMemo(() => {
+    if (!queues) return []
+    if (!searchQuery) return queues
+    return queues.filter((queue) =>
+      queue.queue_name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [queues, searchQuery])
 
-  if (isLoading)
-    return (
-      <div className="p-10">
-        <GenericSkeletonLoader />
-      </div>
-    )
-  if (isError)
-    return (
-      <div className="p-10">
-        <AlertError error={error} subject="Failed to retrieve database queues" />
-      </div>
-    )
+  // Prepare queues for DataGrid
+  const queueData = useMemo(() => prepareQueuesForDataGrid(filteredQueues), [filteredQueues])
+
+  // Get columns configuration
+  const columns = useMemo(() => formatQueueColumns(), [])
 
   return (
     <>
-      <div className="w-full space-y-4 p-4 md:p-10">
-        {queues.length === 0 ? (
-          <div
-            className={
-              'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed'
-            }
-          >
-            <p className="text-sm text-foreground">No queues created yet</p>
-            <Button onClick={() => setCreateQueueSheetShown(true)}>Add a new queue</Button>
-          </div>
-        ) : (
-          <div className="w-full space-y-4">
-            <div className="flex items-center justify-between flex-wrap">
-              <Input
-                placeholder="Search for a queue"
-                size="small"
-                icon={<Search size={14} />}
-                value={searchQuery || ''}
-                className="w-64"
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-
-              <Button onClick={() => setCreateQueueSheetShown(true)}>Create a queue</Button>
-            </div>
-
-            <Table
-              className="table-fixed overflow-x-auto"
-              head={
-                <>
-                  <Table.th key="name">Name</Table.th>
-                  <Table.th key="arguments" className="table-cell">
-                    Type
-                  </Table.th>
-                  <Table.th key="rls_enabled" className="table-cell">
-                    <div className="flex justify-center">RLS enabled</div>
-                  </Table.th>
-                  <Table.th key="created_at" className="table-cell w-60">
-                    Created at
-                  </Table.th>
-                  <Table.th key="queue_size" className="table-cell">
-                    <div className="flex justify-center">Size</div>
-                  </Table.th>
-                  <Table.th key="buttons" className="table-cell"></Table.th>
-                </>
-              }
-              body={<QueuesRows queues={queues} filterString={searchQuery || ''} />}
+      <div className="h-full w-full space-y-4">
+        <div className="h-full w-full flex flex-col relative">
+          <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap">
+            <Input
+              size="tiny"
+              className="w-52"
+              placeholder="Search for a queue"
+              icon={<Search size={14} />}
+              value={search ?? ''}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.code === 'Enter' || e.code === 'NumpadEnter') setSearchQuery(search.trim())
+              }}
+              actions={[
+                search && (
+                  <Button
+                    size="tiny"
+                    type="text"
+                    icon={<X />}
+                    onClick={() => {
+                      setSearch('')
+                      setSearchQuery('')
+                    }}
+                    className="p-0 h-5 w-5"
+                  />
+                ),
+              ]}
             />
+
+            <div className="flex items-center gap-x-2">
+              <Button
+                type="default"
+                icon={<RefreshCw />}
+                loading={isRefetching}
+                onClick={() => refetch()}
+              >
+                Refresh
+              </Button>
+              <Button onClick={() => setCreateQueueSheetShown(true)}>Create queue</Button>
+            </div>
           </div>
-        )}
+
+          <LoadingLine loading={isLoading || isRefetching} />
+
+          <DataGrid
+            className="flex-grow border-t-0"
+            rowHeight={44}
+            headerRowHeight={36}
+            columns={columns}
+            rows={queueData}
+            rowKeyGetter={(row) => row.id}
+            rowClass={() => {
+              return cn(
+                'cursor-pointer',
+                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                '[&>.rdg-cell:first-child>div]:ml-8'
+              )
+            }}
+            renderers={{
+              renderRow(_, props) {
+                return (
+                  <Row
+                    key={props.row.queue_name}
+                    {...props}
+                    onClick={() => {
+                      const { queue_name } = props.row
+                      const url = `/project/${ref}/integrations/queues/queues/${queue_name}`
+                      router.push(url)
+                    }}
+                  />
+                )
+              },
+            }}
+          />
+
+          {/* Render 0 rows state outside of the grid */}
+          {queueData.length === 0 ? (
+            isLoading ? (
+              <div className="absolute top-28 px-10 w-full">
+                <GenericSkeletonLoader />
+              </div>
+            ) : isError ? (
+              <div className="absolute top-28 px-10 flex flex-col items-center justify-center w-full">
+                <AlertError subject="Failed to retrieve database queues" error={error} />
+              </div>
+            ) : (
+              <div className="absolute top-32 px-6 w-full">
+                <div className="text-center text-sm flex flex-col gap-y-1">
+                  <p className="text-foreground">
+                    {!!searchQuery ? 'No queues found' : 'No queues created yet'}
+                  </p>
+                  <p className="text-foreground-light">
+                    {!!searchQuery
+                      ? 'There are currently no queues based on the search applied'
+                      : 'There are currently no queues created yet in your project'}
+                  </p>
+                </div>
+              </div>
+            )
+          ) : null}
+
+          <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
+            {`Total: ${queueData.length} queues`}
+          </div>
+        </div>
       </div>
 
       <Sheet open={createQueueSheetShown} onOpenChange={() => setIsClosingCreateQueueSheet(true)}>

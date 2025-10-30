@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Input, SidePanel } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 interface SchemaEditorProps {
   visible: boolean
@@ -12,7 +12,7 @@ interface SchemaEditorProps {
 }
 
 const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [errors, setErrors] = useState<{ name?: string }>({ name: undefined })
   const [name, setName] = useState('')

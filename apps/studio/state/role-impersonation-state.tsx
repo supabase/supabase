@@ -4,7 +4,7 @@ import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { useConstant } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import useLatest from 'hooks/misc/useLatest'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getPostgrestClaims, ImpersonationRole } from 'lib/role-impersonation'
 import { CustomAccessTokenHookDetails } from '../hooks/misc/useCustomAccessTokenHookDetails'
 
@@ -58,7 +58,7 @@ export const RoleImpersonationStateContext = createContext<RoleImpersonationStat
 )
 
 export const RoleImpersonationStateContextProvider = ({ children }: PropsWithChildren) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   async function customizeAccessToken({
     schema,
     functionName,

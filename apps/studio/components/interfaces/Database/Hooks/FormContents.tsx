@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { Checkbox, Input, Listbox, Radio, SidePanel } from 'ui'
 import { HTTPArgument, isEdgeFunction } from './EditHookPanel'
@@ -45,13 +45,15 @@ export const FormContents = ({
   submitRef,
 }: FormContentsProps) => {
   const { ref } = useParams()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const restUrl = project?.restUrl
   const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const { data: keys = [] } = useAPIKeysQuery({ projectRef: ref, reveal: true })
-  const { data: functions = [] } = useEdgeFunctionsQuery({ projectRef: ref })
+  const { data: functions = [], isSuccess: isSuccessEdgeFunctions } = useEdgeFunctionsQuery({
+    projectRef: ref,
+  })
 
   const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
 
@@ -81,31 +83,33 @@ export const FormContents = ({
   }, [values.function_type])
 
   useEffect(() => {
+    if (!isSuccessEdgeFunctions) return
+
     const isEdgeFunctionSelected = isEdgeFunction({ ref, restUrlTld, url: values.http_url })
 
     if (values.http_url && isEdgeFunctionSelected) {
       const fnSlug = values.http_url.split('/').at(-1)
       const fn = functions.find((x) => x.slug === fnSlug)
+      const authorizationHeader = httpHeaders.find((x) => x.name === 'Authorization')
+      const edgeFunctionAuthHeaderVal = `Bearer ${legacyServiceRole}`
 
-      if (fn?.verify_jwt) {
-        if (!httpHeaders.some((x) => x.name === 'Authorization')) {
-          const authorizationHeader = {
-            id: uuidv4(),
-            name: 'Authorization',
-            value: `Bearer ${legacyServiceRole}`,
-          }
-          setHttpHeaders([...httpHeaders, authorizationHeader])
+      if (fn?.verify_jwt && authorizationHeader == null) {
+        const authorizationHeader = {
+          id: uuidv4(),
+          name: 'Authorization',
+          value: edgeFunctionAuthHeaderVal,
         }
-      } else {
-        const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
+        setHttpHeaders([...httpHeaders, authorizationHeader])
+      } else if (fn?.verify_jwt && authorizationHeader?.value !== edgeFunctionAuthHeaderVal) {
+        const updatedHttpHeaders = httpHeaders.map((x) => {
+          if (x.name === 'Authorization') return { ...x, value: edgeFunctionAuthHeaderVal }
+          else return x
+        })
         setHttpHeaders(updatedHttpHeaders)
       }
-    } else {
-      const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
-      setHttpHeaders(updatedHttpHeaders)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values.http_url])
+  }, [values.http_url, isSuccessEdgeFunctions])
 
   return (
     <div>

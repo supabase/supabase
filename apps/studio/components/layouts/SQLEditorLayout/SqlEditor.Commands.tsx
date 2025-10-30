@@ -9,8 +9,8 @@ import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/Com
 import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
 import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
 import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useProfile } from 'lib/profile'
 import {
@@ -59,7 +59,7 @@ export function useSqlEditorGotoCommands(options?: CommandOptions) {
 const SNIPPET_PAGE_NAME = 'Snippets'
 
 export function useSnippetCommands() {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const setPage = useSetPage()
 
   useRegisterPage(
@@ -103,10 +103,14 @@ function RunSnippetPage() {
   const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
   const { profile } = useProfile()
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   useSetCommandMenuSize('xlarge')
 
@@ -251,7 +255,7 @@ function snippetValue(snippet: SqlSnippet) {
 const QUERY_TABLE_PAGE_NAME = 'Query a table'
 
 export function useQueryTableCommands(options?: CommandOptions) {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const setPage = useSetPage()
 
   const commandMenuOpen = useCommandMenuOpen()
@@ -294,7 +298,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
 
 function TableSelector() {
   const router = useRouter()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { data: protectedSchemas } = useProtectedSchemas()
   const {
     data: tablesData,

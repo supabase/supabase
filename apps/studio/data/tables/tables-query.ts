@@ -3,10 +3,10 @@ import { useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-
 import { sortBy } from 'lodash'
 import { useCallback } from 'react'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type TablesVariables = {
   projectRef?: string
@@ -74,11 +74,13 @@ export const useTablesQuery = <TData = TablesData>(
   { projectRef, connectionString, schema, includeColumns }: TablesVariables,
   { enabled = true, ...options }: UseQueryOptions<TablesData, TablesError, TData> = {}
 ) => {
-  return useQuery<TablesData, TablesError, TData>(
-    tableKeys.list(projectRef, schema, includeColumns),
-    ({ signal }) => getTables({ projectRef, connectionString, schema, includeColumns }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  return useQuery<TablesData, TablesError, TData>({
+    queryKey: tableKeys.list(projectRef, schema, includeColumns),
+    queryFn: ({ signal }) =>
+      getTables({ projectRef, connectionString, schema, includeColumns }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }
 
 /**

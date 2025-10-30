@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
@@ -10,7 +11,6 @@ import { useNotificationsV2Query } from 'data/notifications/notifications-v2-que
 import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
 import {
   Button,
@@ -24,7 +24,6 @@ import {
 } from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -40,7 +39,6 @@ export const NotificationsPopoverV2 = () => {
   // so opting to simplify and implement it here for now
   const rowHeights = useRef<{ [key: number]: number }>({})
 
-  const { data: projects } = useProjectsQuery({ enabled: open })
   const { data: organizations } = useOrganizationsQuery({ enabled: open })
   const {
     data,
@@ -101,29 +99,34 @@ export const NotificationsPopoverV2 = () => {
               text: 'Notifications',
             },
           }}
-          type="text"
-          className={cn('rounded-none h-[30px] w-[32px] group relative')}
+          type="outline"
+          size="tiny"
+          className={cn(
+            'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
+            open && 'bg-foreground text-background'
+          )}
           icon={
             <div className="relative">
               <InboxIcon
                 size={18}
                 strokeWidth={1.5}
                 className={cn(
-                  '!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground'
+                  'text-foreground-light group-hover:text-foreground',
+                  open && 'text-background group-hover:text-background'
                 )}
               />
               {hasCritical && (
-                <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
+                <div className="absolute -top-1.5 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
                   <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent border-b-destructive" />
                 </div>
               )}
               {hasWarning && !hasCritical && (
-                <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
+                <div className="absolute -top-1.5 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
                   <div className="w-2 h-2 rounded-full bg-warning" />
                 </div>
               )}
               {!!hasNewNotifications && !hasCritical && !hasWarning && (
-                <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
+                <div className="absolute -top-1.5 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
                   <div className="w-2 h-2 rounded-full bg-brand" />
                 </div>
               )}
@@ -208,7 +211,6 @@ export const NotificationsPopoverV2 = () => {
                         rowHeights.current = { ...rowHeights.current, [idx]: height }
                       }
                     },
-                    getProject: (ref: string) => projects?.find((project) => project.ref === ref)!,
                     getOrganizationById: (id: number) =>
                       organizations?.find((org) => org.id === id)!,
                     getOrganizationBySlug: (slug: string) =>

@@ -7,12 +7,12 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import type { FormSchema } from 'types'
 import {
@@ -50,8 +50,9 @@ const FORM_ID = 'create-function-sidepanel'
 
 interface CreateFunctionProps {
   func?: DatabaseFunction
+  isDuplicating?: boolean
   visible: boolean
-  setVisible: (value: boolean) => void
+  onClose: () => void
 }
 
 const FormSchema = z.object({
@@ -68,15 +69,18 @@ const FormSchema = z.object({
     .optional(),
 })
 
-const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
-  const { project } = useProjectContext()
+export const CreateFunction = ({
+  func,
+  visible,
+  isDuplicating = false,
+  onClose,
+}: CreateFunctionProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
-  // For now, there's no AI assistant for functions
-  const [assistantVisible, setAssistantVisible] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
-  const isEditing = !!func?.id
+  const isEditing = !isDuplicating && !!func?.id
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -89,7 +93,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     useDatabaseFunctionUpdateMutation()
 
   function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
+    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
@@ -111,7 +115,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully updated function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -125,7 +129,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully created function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -155,19 +159,11 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
       <SheetContent
         showClose={false}
-        size={assistantVisible ? 'lg' : 'default'}
-        className={cn(
-          // 'bg-surface-200',
-          'p-0 flex flex-row gap-0',
-          assistantVisible ? '!min-w-screen lg:!min-w-[1200px]' : '!min-w-screen lg:!min-w-[600px]'
-        )}
+        size={'default'}
+        className={'p-0 flex flex-row gap-0 !min-w-screen lg:!min-w-[600px]'}
       >
-        <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
-          <CreateFunctionHeader
-            selectedFunction={func?.name}
-            assistantVisible={assistantVisible}
-            setAssistantVisible={setAssistantVisible}
-          />
+        <div className="flex flex-col grow w-full">
+          <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
           <Separator />
           <Form_Shadcn_ {...form}>
             <form
@@ -186,7 +182,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       layout="horizontal"
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} />
+                        <Input_Shadcn_ {...field} placeholder="Name of function" />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -401,15 +397,10 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               disabled={isCreating || isUpdating}
               loading={isCreating || isUpdating}
             >
-              Confirm
+              {isEditing ? 'Save' : 'Create'} function
             </Button>
           </SheetFooter>
         </div>
-        {assistantVisible ? (
-          <div className="border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10 w-[50%] bg-studio">
-            {/* This is where the AI assistant would be added */}
-          </div>
-        ) : null}
         <ConfirmationModal
           visible={isClosingPanel}
           title="Discard changes"
@@ -417,7 +408,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
           onCancel={() => setIsClosingPanel(false)}
           onConfirm={() => {
             setIsClosingPanel(false)
-            setVisible(!visible)
+            onClose()
           }}
         >
           <p className="text-sm text-foreground-light">
@@ -429,8 +420,6 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     </Sheet>
   )
 }
-
-export default CreateFunction
 
 interface FormFieldConfigParamsProps {
   readonly?: boolean
@@ -601,7 +590,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
 const ALL_ALLOWED_LANGUAGES = ['plpgsql', 'sql', 'plcoffee', 'plv8', 'plls']
 
 const FormFieldLanguage = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: enabledExtensions } = useDatabaseExtensionsQuery(
     {
