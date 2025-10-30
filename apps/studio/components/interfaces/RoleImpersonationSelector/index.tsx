@@ -13,7 +13,7 @@ export interface RoleImpersonationSelectorProps {
   disallowAuthenticatedOption?: boolean
 }
 
-const RoleImpersonationSelector = ({
+export const RoleImpersonationSelector = ({
   serviceRoleLabel,
   padded = true,
   disallowAuthenticatedOption = false,
@@ -137,5 +137,3 @@ const RoleImpersonationSelector = ({
     </>
   )
 }
-
-export default RoleImpersonationSelector

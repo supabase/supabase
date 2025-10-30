@@ -14,8 +14,8 @@ import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 
 import { Button, SidePanel, cn } from 'ui'
 import ActionBar from '../../ActionBar'
 import { isValueTruncated } from '../RowEditor.utils'
-import { DrilldownViewer } from './DrilldownViewer'
-import JsonCodeEditor from './JsonCodeEditor'
+import { DrilldownViewer } from './DrilldownViewer/DrilldownViewer'
+import { JsonCodeEditor } from './JsonCodeEditor'
 
 interface JsonEditProps {
   row?: { [key: string]: any }
@@ -28,7 +28,7 @@ interface JsonEditProps {
   onSaveJSON: (value: string | number | null, resolve: () => void) => void
 }
 
-const JsonEdit = ({
+export const JsonEditor = ({
   row,
   column,
   visible,
@@ -203,5 +203,3 @@ const JsonEdit = ({
     </SidePanel>
   )
 }
-
-export default JsonEdit
