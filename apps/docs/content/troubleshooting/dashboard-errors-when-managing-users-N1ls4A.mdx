@@ -62,31 +62,31 @@ These error are normal a side effect of issues in your custom user management lo
 - [Auth logs](/dashboard/project/_/logs/auth-logs): as the error relates to [Auth](/docs/guides/auth) users
 - [Postgres logs](/dashboard/project/_/logs/postgres-logs): for raw error logs related to database
 
-
 ## Common causes of this error:
 
 - Trigger/trigger function setup on the `auth.users` table
 - A constraint on the `auth.users` table which isn't being met
 - You are using Prisma and it has broken all the permissions on the `auth.users` table
 
-
 ## Example error messages
 
 Use the hints provided in the error message to fix issues in your custom user management logic.
 
-
 **Trigger/trigger function related error messages** - [Solution for trigger related issues](#solution-trigger)
+
 ```
 "error":"error update user`s last_sign_in field: ERROR: permission denied for table profiles (SQLSTATE 42501)"
 ```
 
 **Constraint related error message** - [Solution for constraint related issues](#solution-constraint)
+
 ```
 ERROR:  23503: update or delete on table "users" violates foreign key constraint "profiles_id_fkey" on table "profiles"
 DETAIL:  Key (id)=(7428a53c-75b7-4531-9ae9-1567d9c4ac0a) is still referenced from table "profiles".
 ```
 
 **Missing column**
+
 ```
 ERROR: column \"updated_at\" of relation \"profiles\" does not exist (SQLSTATE 42703)
 ```
@@ -97,7 +97,7 @@ ERROR: column \"updated_at\" of relation \"profiles\" does not exist (SQLSTATE 4
 failed to close prepared statement: ERROR: current transaction is aborted, commands ignored until end of transaction block (SQLSTATE 25P02): ERROR: relation \"public.profiles\" does not exist (SQLSTATE 42P01)
 ```
 
-----
+---
 
 ## Solution for constraint related issues [#solution-constraint]
 
@@ -105,8 +105,7 @@ failed to close prepared statement: ERROR: current transaction is aborted, comma
 - Then ALTER the [behavior](https://stackoverflow.com/questions/5383612/setting-up-table-relations-what-do-cascade-set-null-and-restrict-do) of the relationship and recreate it with a less [restrictive constraint](https://stackoverflow.com/questions/3359329/how-to-change-the-foreign-key-referential-action-behavior).
 - If this is related to deleting records, review the [Cascade Deletes doc](/docs/guides/database/postgres/cascade-deletes) for possible approaches (e.g. using `CASCADE` / `SET NULL`)
 
-
-----
+---
 
 ## Solution for trigger related issues [#solution-trigger]
 
@@ -123,6 +122,7 @@ DROP FUNCTION <function name>() CASCADE;
 -- If you'd prefer, you can drop the trigger alone with the following query:
 -- DROP TRIGGER <trigger_name> on auth.<table_name>;
 ```
+
 3. Recreate the functions with a [security definer](/docs/guides/database/functions#security-definer-vs-invoker) modifier
 4. Recreate the triggers
 
