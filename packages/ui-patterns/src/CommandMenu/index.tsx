@@ -10,6 +10,7 @@ export {
   CommandWrapper,
 } from './api/CommandMenu'
 export { CommandProvider } from './api/CommandProvider'
+export { useCommandMenuTelemetryContext } from './api/hooks/useCommandMenuTelemetryContext'
 export { TextHighlighter, TextHighlighterBase } from './api/TextHighlighter'
 export * from './api/hooks/commandsHooks'
 export * from './api/hooks/pagesHooks'

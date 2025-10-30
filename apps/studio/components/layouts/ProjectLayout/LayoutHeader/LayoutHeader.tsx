@@ -21,15 +21,14 @@ import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
-import { CommandMenuTriggerInput } from 'ui-patterns'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
+import CommandPopover from './CommandPopover'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
 import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
@@ -207,15 +206,12 @@ const LayoutHeader = ({
           </div>
           <div className="flex items-center gap-x-2">
             {customHeaderComponents && customHeaderComponents}
-            <CommandMenuTriggerInput
-              className="hidden md:flex md:min-w-32 xl:min-w-44"
-              placeholder="Search..."
-            />
             {IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />
 
                 <div className="overflow-hidden flex items-center gap-2">
+                  <CommandPopover />
                   <HelpPopover />
                   <NotificationsPopoverV2 />
                   <AnimatePresence initial={false}>
@@ -237,6 +233,7 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
+                        <CommandPopover />
                         <AdvisorButton />
                         <InlineEditorButton />
                         <AssistantButton />
