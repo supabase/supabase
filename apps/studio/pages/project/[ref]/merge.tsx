@@ -13,7 +13,7 @@ import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithA
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
