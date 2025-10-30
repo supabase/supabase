@@ -24,7 +24,7 @@ import {
   Popover_Shadcn_,
   Switch,
 } from 'ui'
-import { RealtimeConfig } from '../useRealtimeMessages'
+import { RealtimeConfig } from './useRealtimeMessages'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig

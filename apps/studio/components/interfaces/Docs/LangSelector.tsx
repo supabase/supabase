@@ -25,7 +25,7 @@ interface LangSelectorProps {
   setSelectedApiKey: (showApiKey: showApiKey) => void
 }
 
-const LangSelector = ({
+export const LangSelector = ({
   selectedLang,
   selectedApiKey,
   setSelectedLang,
@@ -165,5 +165,3 @@ const LangSelector = ({
     </div>
   )
 }
-
-export default LangSelector
