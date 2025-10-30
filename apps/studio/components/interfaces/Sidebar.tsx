@@ -1,15 +1,6 @@
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { isUndefined } from 'lodash'
-import {
-  Blocks,
-  Boxes,
-  ChartArea,
-  PanelLeftDashed,
-  Receipt,
-  Search,
-  Settings,
-  Users,
-} from 'lucide-react'
+import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
@@ -57,7 +48,6 @@ import {
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
 import { useFlag } from 'common'
-import { useSetCommandMenuOpen } from 'ui-patterns'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -259,7 +249,6 @@ const ProjectLinks = () => {
   ])
 
   const authOverviewPageEnabled = useFlag('authOverviewPage')
-  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
@@ -279,28 +268,6 @@ const ProjectLinks = () => {
   return (
     <SidebarMenu>
       <SidebarGroup className="gap-0.5">
-        <SideBarNavLink
-          key="search"
-          route={{
-            key: 'SEARCH',
-            label: 'Search',
-            icon: <Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-          }}
-          onClick={() => {
-            setCommandMenuOpen(true)
-            sendEvent({
-              action: 'command_menu_opened',
-              properties: {
-                trigger_type: 'search_input' as const,
-                app: 'studio',
-              },
-              groups: {
-                project: ref ?? 'Unknown',
-                organization: org?.slug ?? 'Unknown',
-              },
-            })
-          }}
-        />
         <SideBarNavLink
           key="home"
           active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}

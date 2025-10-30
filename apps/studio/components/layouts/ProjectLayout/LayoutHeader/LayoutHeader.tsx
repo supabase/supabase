@@ -24,6 +24,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
+import { CommandMenuTriggerInput } from 'ui-patterns'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
@@ -223,6 +224,10 @@ const LayoutHeader = ({
           </div>
           <div className="flex items-center gap-x-2">
             {customHeaderComponents && customHeaderComponents}
+            <CommandMenuTriggerInput
+              className="hidden md:flex md:min-w-32 xl:min-w-44"
+              placeholder="Search..."
+            />
             {IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />

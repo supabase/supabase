@@ -103,10 +103,6 @@ export function UserDropdown() {
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" onClick={handleCommandMenuOpen}>
-                <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Command menu
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
