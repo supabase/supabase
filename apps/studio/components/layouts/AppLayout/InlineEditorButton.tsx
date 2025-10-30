@@ -1,27 +1,44 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { SqlEditor } from 'icons'
-import { KeyboardShortcut } from 'ui'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { cn, KeyboardShortcut } from 'ui'
 
-export const InlineEditorButton = ({
-  onClick,
-  showShortcut = true,
-}: {
-  onClick: () => void
-  showShortcut?: boolean
-}) => {
+const InlineEditorKeyboardTooltip = () => {
+  const [hotkeyEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
+    true
+  )
+
+  return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'e']} /> : null
+}
+
+export const InlineEditorButton = () => {
+  const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
+  const isOpen = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
+
+  const handleClick = () => {
+    toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+  }
+
   return (
     <ButtonTooltip
-      type="text"
+      type="outline"
       size="tiny"
       id="editor-trigger"
-      className="rounded-none w-[32px] h-[30px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground"
-      onClick={onClick}
+      className={cn(
+        'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground',
+        isOpen && 'bg-foreground text-background hover:text-background'
+      )}
+      onClick={handleClick}
       tooltip={{
         content: {
           text: (
             <div className="flex items-center gap-4">
               <span>SQL Editor</span>
-              {showShortcut && <KeyboardShortcut keys={['Meta', 'e']} />}
+              <InlineEditorKeyboardTooltip />
             </div>
           ),
         },

@@ -92,7 +92,7 @@ export const FilesBuckets = () => {
                 </TableHeader>
                 <TableBody>
                   {filesBuckets.length === 0 && filterString.length > 0 && (
-                    <TableRow>
+                    <TableRow className="[&>td]:hover:bg-inherit">
                       <TableCell colSpan={3}>
                         <p className="text-sm text-foreground">No results found</p>
                         <p className="text-sm text-foreground-light">
@@ -102,15 +102,7 @@ export const FilesBuckets = () => {
                     </TableRow>
                   )}
                   {filesBuckets.map((bucket) => (
-                    <TableRow
-                      key={bucket.id}
-                      className="cursor-pointer"
-                      onClick={(event) => {
-                        const url = `/project/${ref}/storage/files/buckets/${bucket.id}`
-                        if (event.metaKey) window.open(url, '_blank')
-                        else router.push(url)
-                      }}
-                    >
+                    <TableRow key={bucket.id}>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <p className="text-foreground">{bucket.name}</p>
@@ -153,25 +145,18 @@ export const FilesBuckets = () => {
                           <Button asChild type="default">
                             <Link
                               href={`/project/${ref}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
-                              onClick={(e) => e.stopPropagation()}
                             >
                               View files
                             </Link>
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<MoreVertical />}
-                                onClick={(e) => e.stopPropagation()}
-                              />
+                              <Button type="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-40">
                               <DropdownMenuItem
                                 className="flex items-center space-x-2"
                                 onClick={(e) => {
-                                  e.stopPropagation()
                                   setModal('edit')
                                   setSelectedBucket(bucket)
                                 }}
@@ -183,7 +168,6 @@ export const FilesBuckets = () => {
                               <DropdownMenuItem
                                 className="flex items-center space-x-2"
                                 onClick={(e) => {
-                                  e.stopPropagation()
                                   setModal('empty')
                                   setSelectedBucket(bucket)
                                 }}
@@ -195,7 +179,6 @@ export const FilesBuckets = () => {
                               <DropdownMenuItem
                                 className="flex items-center space-x-2"
                                 onClick={(e) => {
-                                  e.stopPropagation()
                                   setModal('delete')
                                   setSelectedBucket(bucket)
                                 }}

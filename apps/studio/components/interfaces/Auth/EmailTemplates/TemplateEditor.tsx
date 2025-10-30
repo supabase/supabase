@@ -38,7 +38,7 @@ interface TemplateEditorProps {
   template: FormSchema
 }
 
-const TemplateEditor = ({ template }: TemplateEditorProps) => {
+export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -383,5 +383,3 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     </Form_Shadcn_>
   )
 }
-
-export default TemplateEditor

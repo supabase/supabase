@@ -28,7 +28,7 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
 
-const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
+export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ disabled, onDeleteConnection, ...props }, ref) => {
     const router = useRouter()
     const { data: org } = useSelectedOrganizationQuery()
@@ -165,5 +165,3 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
 )
 
 IntegrationConnectionItem.displayName = 'IntegrationConnectionItem'
-
-export { IntegrationConnectionItem }

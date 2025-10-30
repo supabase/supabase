@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Info } from 'lucide-react'
 
 import { useParams } from 'common'
-import { BackupsList } from 'components/interfaces/Database'
+import { BackupsList } from 'components/interfaces/Database/Backups/BackupsList'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'

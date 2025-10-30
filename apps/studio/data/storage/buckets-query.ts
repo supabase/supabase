@@ -44,8 +44,7 @@ export const useBucketsQuery = <TData = BucketsData>(
       if (
         typeof error === 'object' &&
         error !== null &&
-        error.message.startsWith('Tenant config') &&
-        error.message.endsWith('not found')
+        error.message.includes('Missing tenant config')
       ) {
         return false
       }

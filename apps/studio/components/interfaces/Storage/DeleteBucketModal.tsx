@@ -8,6 +8,8 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
+import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -27,11 +29,16 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
+import {
+  useAnalyticsBucketAssociatedEntities,
+  useAnalyticsBucketDeleteCleanUp,
+} from './AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 import { formatPoliciesForStorage } from './Storage.utils'
 
 export interface DeleteBucketModalProps {
   visible: boolean
-  bucket: Bucket
+  bucket: Bucket | AnalyticsBucket
   onClose: () => void
 }
 
@@ -41,10 +48,13 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const isStorageV2 = useIsNewStorageUIEnabled()
+
+  const isStandardBucketSelected = 'type' in bucket && bucket.type === 'STANDARD'
 
   const schema = z.object({
-    confirm: z.literal(bucket.name, {
-      errorMap: () => ({ message: `Please enter "${bucket.name}" to confirm` }),
+    confirm: z.literal(bucket.id, {
+      errorMap: () => ({ message: `Please enter "${bucket.id}" to confirm` }),
     }),
   })
 
@@ -53,14 +63,23 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   })
 
   const { data } = useBucketsQuery({ projectRef })
+  const buckets = data ?? []
+
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'storage',
   })
+
+  const { icebergWrapper, icebergWrapperMeta, s3AccessKey, publication } =
+    useAnalyticsBucketAssociatedEntities(
+      { projectRef, bucketId: bucket.id },
+      { enabled: !isStandardBucketSelected }
+    )
+
   const { mutateAsync: deletePolicy } = useDatabasePolicyDeleteMutation()
 
-  const { mutate: deleteBucket, isLoading } = useBucketDeleteMutation({
+  const { mutate: deleteBucket, isLoading: isDeletingBucket } = useBucketDeleteMutation({
     onSuccess: async () => {
       if (!project) return console.error('Project is required')
 
@@ -71,7 +90,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
         storageObjectsPolicies
       )
       const bucketPolicies = _get(
-        find(formattedStorageObjectPolicies, { name: bucket.name }),
+        find(formattedStorageObjectPolicies, { name: bucket.id }),
         ['policies'],
         []
       )
@@ -87,24 +106,65 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
           )
         )
 
-        toast.success(`Successfully deleted bucket ${bucket.name}`)
-        router.push(`/project/${projectRef}/storage/buckets`)
+        toast.success(`Successfully deleted bucket ${bucket.id}`)
+        if (isStorageV2) {
+          router.push(`/project/${projectRef}/storage/files`)
+        } else {
+          router.push(`/project/${projectRef}/storage/buckets`)
+        }
         onClose()
       } catch (error) {
         toast.success(
-          `Successfully deleted bucket ${bucket.name}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
+          `Successfully deleted bucket ${bucket.id}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
         )
       }
     },
   })
 
-  const buckets = data ?? []
+  const { mutateAsync: deleteAnalyticsBucketCleanUp, isLoading: isCleaningUpAnalyticsBucket } =
+    useAnalyticsBucketDeleteCleanUp()
+
+  const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
+    useAnalyticsBucketDeleteMutation({
+      onSuccess: async () => {
+        if (project?.connectionString) {
+          await deleteAnalyticsBucketCleanUp({
+            projectRef,
+            connectionString: project.connectionString,
+            bucketId: bucket.id,
+            icebergWrapper,
+            icebergWrapperMeta,
+            s3AccessKey,
+            publication,
+          })
+        }
+        toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
+        if (isStorageV2) {
+          router.push(`/project/${projectRef}/storage/analytics`)
+        } else {
+          router.push(`/project/${projectRef}/storage/buckets`)
+        }
+        onClose()
+      },
+    })
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
-    deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
+
+    // [Joshen] We'll need a third case to figure out for vector buckets
+    if (isStandardBucketSelected) {
+      deleteBucket({ projectRef, id: bucket.id })
+    } else {
+      if (isStorageV2) {
+        deleteAnalyticsBucket({ projectRef, id: bucket.id })
+      } else {
+        deleteBucket({ projectRef, id: bucket.id })
+      }
+    }
   }
+
+  const isDeleting = isDeletingBucket || isDeletingAnalyticsBucket || isCleaningUpAnalyticsBucket
 
   return (
     <Dialog
@@ -113,9 +173,9 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
         if (!open) onClose()
       }}
     >
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Confirm deletion of {bucket.name}</DialogTitle>
+          <DialogTitle>Confirm deletion of {bucket.id}</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
@@ -129,7 +189,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
 
         <DialogSection>
           <p className="text-sm">
-            Your bucket <span className="font-bold text-foreground">{bucket.name}</span> and all its
+            Your bucket <span className="font-bold text-foreground">{bucket.id}</span> and all its
             contents will be permanently deleted.
           </p>
         </DialogSection>
@@ -146,7 +206,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
                     name="confirm"
                     label={
                       <>
-                        Type <span className="font-bold text-foreground">{bucket.name}</span> to
+                        Type <span className="font-bold text-foreground">{bucket.id}</span> to
                         confirm.
                       </>
                     }
@@ -166,10 +226,10 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={onClose}>
+          <Button type="default" disabled={isDeleting} onClick={onClose}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" type="danger" loading={isLoading}>
+          <Button form={formId} htmlType="submit" type="danger" loading={isDeleting}>
             Delete bucket
           </Button>
         </DialogFooter>

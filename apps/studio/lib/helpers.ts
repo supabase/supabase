@@ -1,7 +1,11 @@
-export { default as passwordStrength } from './password-strength'
-export { default as uuidv4 } from './uuid'
 import { UIEvent } from 'react'
+import { v4 as _uuidV4 } from 'uuid'
+
 import type { TablesData } from '../data/tables/tables-query'
+
+export const uuidv4 = () => {
+  return _uuidV4()
+}
 
 export const isAtBottom = ({ currentTarget }: UIEvent<HTMLElement>): boolean => {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight

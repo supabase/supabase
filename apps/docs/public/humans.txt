@@ -74,6 +74,7 @@ Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
+Jean-Paul Argudo
 Jeff Smick
 Jenny Kibiri
 Jess Shears
@@ -118,7 +119,9 @@ Paul Cioanca
 Paul Copplestone
 Pavel Borisov
 Paweł Gulbinowicz
+Pedro Rodrigues
 Peter Lyn
+Peter Soderberg
 Qiao Han
 Rafael Chacón
 Raminder Singh

@@ -10,12 +10,12 @@ import { z } from 'zod'
 import { useFlag, useParams } from 'common'
 import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from 'components/interfaces/Markdown'
+import { extractPostgresVersionDetails } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import {
   ProjectUpgradeTargetVersion,
   useProjectUpgradeEligibilityQuery,
 } from 'data/config/project-upgrade-eligibility-query'
-import { ReleaseChannel } from 'data/projects/new-project.constants'
 import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -43,22 +43,8 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-interface PostgresVersionDetails {
-  postgresEngine: string
-  releaseChannel: ReleaseChannel
-}
-
 const formatValue = ({ postgres_version, release_channel }: ProjectUpgradeTargetVersion) => {
   return `${postgres_version}|${release_channel}`
-}
-
-export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails | null => {
-  if (!value) {
-    return null
-  }
-
-  const [postgresEngine, releaseChannel] = value.split('|')
-  return { postgresEngine, releaseChannel } as PostgresVersionDetails
 }
 
 export const ProjectUpgradeAlert = () => {
@@ -99,6 +85,7 @@ export const ProjectUpgradeAlert = () => {
 
     const versionDetails = extractPostgresVersionDetails(postgresVersionSelection)
     if (!versionDetails) return toast.error('Invalid Postgres version')
+    if (!versionDetails.postgresEngine) return toast.error('Missing target version')
 
     upgradeProject({
       ref,
