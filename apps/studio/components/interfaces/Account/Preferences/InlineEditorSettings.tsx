@@ -1,17 +1,27 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
 import { LOCAL_STORAGE_KEYS } from 'common'
 import Panel from 'components/ui/Panel'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 const InlineEditorSchema = z.object({
   inlineEditorEnabled: z.boolean(),
 })
+
+export const useIsInlineEditorEnabled = () => {
+  const [inlineEditorEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
+    true
+  )
+
+  return inlineEditorEnabled ?? true
+}
 
 export const InlineEditorSettings = () => {
   const [inlineEditorEnabled, setInlineEditorEnabled] = useLocalStorageQuery(

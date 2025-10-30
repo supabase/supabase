@@ -1,28 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { useIsInlineEditorEnabled } from 'hooks/misc/useIsInlineEditorEnabled'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
 import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
-  const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
-  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
-  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
-  const [isDuplicating, setIsDuplicating] = useState(false)
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const { openSidebar } = useSidebarManagerSnapshot()
   const {
@@ -35,6 +31,11 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'functions'
   )
+
+  const [isDuplicating, setIsDuplicating] = useState(false)
+  const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
+  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
 
   const createFunction = () => {
     setIsDuplicating(false)
