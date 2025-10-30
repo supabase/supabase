@@ -53,6 +53,7 @@ export function LogDrains({
     }
   )
   const sentryEnabled = useFlag('SentryLogDrain')
+  const hasLogDrains = !!logDrains?.length
 
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
     onSuccess: () => {
@@ -78,7 +79,7 @@ export function LogDrains({
     )
   }
 
-  if (!isLoading && logDrains?.length === 0) {
+  if (!isLoading && !hasLogDrains) {
     return (
       <div className="grid lg:grid-cols-2 gap-3">
         {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (

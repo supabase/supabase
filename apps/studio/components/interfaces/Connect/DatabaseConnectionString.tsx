@@ -1,6 +1,7 @@
-import { ChevronDown, GlobeIcon, InfoIcon } from 'lucide-react'
+import { BookOpen, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -19,6 +20,7 @@ import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
+  Button,
   CodeBlock,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -30,6 +32,7 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   Separator,
+  TextLink,
   cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -275,55 +278,69 @@ export const DatabaseConnectionString = () => {
 
   return (
     <div className="flex flex-col">
-      <div
-        className={cn(
-          'flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3',
-          DIALOG_PADDING_X
-        )}
-      >
-        <div className="flex">
-          <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
-            Type
-          </span>
-          <Select_Shadcn_ value={selectedTab} onValueChange={handleTabChange}>
-            <SelectTrigger_Shadcn_ size="small" className="w-auto rounded-l-none">
-              <SelectValue_Shadcn_ />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              {DATABASE_CONNECTION_TYPES.map((type) => (
-                <SelectItem_Shadcn_ key={type.id} value={type.id}>
-                  {type.label}
-                </SelectItem_Shadcn_>
-              ))}
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+      <div className={cn('w-full flex flex-col items-start gap-2 lg:gap-3', DIALOG_PADDING_X)}>
+        <div className="flex w-full flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
+          <div className="flex">
+            <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+              Type
+            </span>
+            <Select_Shadcn_ value={selectedTab} onValueChange={handleTabChange}>
+              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
+                <SelectValue_Shadcn_ />
+              </SelectTrigger_Shadcn_>
+              <SelectContent_Shadcn_>
+                {DATABASE_CONNECTION_TYPES.map((type) => (
+                  <SelectItem_Shadcn_ key={type.id} value={type.id}>
+                    {type.label}
+                  </SelectItem_Shadcn_>
+                ))}
+              </SelectContent_Shadcn_>
+            </Select_Shadcn_>
+          </div>
+          <DatabaseSelector
+            portal={false}
+            buttonProps={{
+              size: 'small',
+              className: 'w-full justify-between pr-2.5 [&_svg]:h-4',
+            }}
+            className="w-full md:w-auto [&>span]:w-1/2 [&>span]:md:w-auto"
+            onSelectId={handleDatabaseChange}
+          />
+          <div className="flex">
+            <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+              Method
+            </span>
+            <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
+              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
+                <SelectValue_Shadcn_ size="tiny">
+                  {connectionStringMethodOptions[selectedMethod].label}
+                </SelectValue_Shadcn_>
+              </SelectTrigger_Shadcn_>
+              <SelectContent_Shadcn_ className="max-w-sm">
+                {Object.keys(connectionStringMethodOptions).map((method) => (
+                  <ConnectionStringMethodSelectItem
+                    key={method}
+                    method={method as ConnectionStringMethod}
+                    poolerBadge={method === 'transaction' ? poolerBadge : undefined}
+                  />
+                ))}
+              </SelectContent_Shadcn_>
+            </Select_Shadcn_>
+          </div>
         </div>
-        <DatabaseSelector
-          portal={false}
-          buttonProps={{ size: 'small' }}
-          onSelectId={handleDatabaseChange}
-        />
-        <div className="flex">
-          <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
-            Method
-          </span>
-          <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
-            <SelectTrigger_Shadcn_ size="small" className="w-auto rounded-l-none">
-              <SelectValue_Shadcn_ size="tiny">
-                {connectionStringMethodOptions[selectedMethod].label}
-              </SelectValue_Shadcn_>
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_ className="max-w-sm">
-              {Object.keys(connectionStringMethodOptions).map((method) => (
-                <ConnectionStringMethodSelectItem
-                  key={method}
-                  method={method as ConnectionStringMethod}
-                  poolerBadge={poolerBadge}
-                />
-              ))}
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
-        </div>
+        <p className="text-xs inline-flex items-center gap-1 text-foreground-lighter">
+          <BookOpen size={12} strokeWidth={1.5} className="-mb-px" /> Learn how to connect to your
+          Postgres databases.
+          <Link
+            href="https://supabase.com/docs/guides/database/connecting-to-postgres"
+            className="underline transition hover:text-foreground inline-flex items-center gap-1"
+            target="_blank"
+            rel="noreferrer"
+            title="Read docs"
+          >
+            Read docs <ExternalLink size={12} strokeWidth={1.5} />
+          </Link>
+        </p>
       </div>
 
       {isLoading && (
@@ -458,7 +475,49 @@ export const DatabaseConnectionString = () => {
                     { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
                   ]}
                   onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
-                />
+                >
+                  {!sharedPoolerPreferred && !ipv4Addon && (
+                    <Collapsible_Shadcn_ className="group">
+                      <CollapsibleTrigger_Shadcn_
+                        asChild
+                        className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light px-3"
+                      >
+                        <Button
+                          type="default"
+                          size="large"
+                          iconRight={
+                            <ChevronDown className="transition group-data-[state=open]:rotate-180" />
+                          }
+                          className="text-foreground !bg-dash-sidebar justify-between"
+                        >
+                          <div className="text-xs flex items-center py-2 px-1">
+                            <span>Using the Shared Pooler</span>
+                            <Badge variant={'brand'} size={'small'} className="ml-2">
+                              IPv4 compatible
+                            </Badge>
+                          </div>
+                        </Button>
+                      </CollapsibleTrigger_Shadcn_>
+                      <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
+                        <CodeBlock
+                          wrapperClassName={cn(
+                            '[&_pre]:border-x-0 [&_pre]:border-t-0 [&_pre]:px-4 [&_pre]:py-3',
+                            '[&_pre]:rounded-t-none'
+                          )}
+                          language={lang}
+                          value={supavisorConnectionStrings['pooler'][selectedTab]}
+                          className="[&_code]:text-[12px] [&_code]:text-foreground"
+                          hideLineNumbers
+                          onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
+                        />
+                        <p className="px-3 py-2 text-foreground-light">
+                          Only recommended when your network does not support IPv6. Added latency
+                          compared to dedicated pooler.
+                        </p>
+                      </CollapsibleContent_Shadcn_>
+                    </Collapsible_Shadcn_>
+                  )}
+                </ConnectionPanel>
               )}
 
               {selectedMethod === 'session' && IS_PLATFORM && (
@@ -587,14 +646,30 @@ const ConnectionStringMethodSelectItem = ({
   poolerBadge,
 }: {
   method: ConnectionStringMethod
-  poolerBadge: string
-}) => (
-  <SelectItem_Shadcn_ value={method} className="[&>span:first-child]:top-3.5">
-    <div className="flex flex-col w-full py-1">
-      <div>{connectionStringMethodOptions[method].label}</div>
-      <div className="text-foreground-lighter text-xs">
-        {connectionStringMethodOptions[method].description}
+  poolerBadge?: string
+}) => {
+  const badges: ReactNode[] = []
+
+  if (method !== 'direct') {
+    badges.push(<Badge className="flex gap-x-1">Shared Pooler</Badge>)
+  }
+  if (poolerBadge === 'Dedicated Pooler') {
+    badges.push(<Badge className="flex gap-x-1">{poolerBadge}</Badge>)
+  }
+
+  return (
+    <SelectItem_Shadcn_ value={method} className="[&>span:first-child]:top-3.5">
+      <div className="flex flex-col w-full py-1">
+        <div className="flex gap-x-2 items-center">
+          {connectionStringMethodOptions[method].label}
+        </div>
+        <div className="text-foreground-lighter text-xs">
+          {connectionStringMethodOptions[method].description}
+        </div>
+        <div className="flex items-center gap-0.5 flex-wrap mt-1.5">
+          {badges.map((badge) => badge)}
+        </div>
       </div>
-    </div>
-  </SelectItem_Shadcn_>
-)
+    </SelectItem_Shadcn_>
+  )
+}

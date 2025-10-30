@@ -21,12 +21,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
-  useEffect(() => {
-    if (!IS_PLATFORM) {
-      router.push('/project/default')
-    }
-  }, [router])
-
   // billing pages live under /billing/invoices and /billing/subscription, etc
   // so we need to pass the [5]th part of the url to the menu
   const page = router.pathname.includes('billing')

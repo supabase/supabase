@@ -353,7 +353,7 @@ export const Connect = () => {
             {connectionTypes.length === 1 ? ` via ${connectionTypes[0].label.toLowerCase()}` : null}
           </DialogTitle>
           <DialogDescription>
-            Get the connection strings and environment variables for your app
+            Get the connection strings and environment variables for your app.
           </DialogDescription>
         </DialogHeader>
 
