@@ -9,4 +9,5 @@ export const databaseQueuesKeys = {
     ['projects', projectRef, 'queue-metrics', queueName] as const,
   exposePostgrestStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'queue-expose-status'] as const,
+  version: (projectRef: string | undefined) => ['projects', projectRef, 'queue-version'] as const,
 }
