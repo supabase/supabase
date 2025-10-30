@@ -48,7 +48,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
                 Project ID <span className="text-destructive-600">*</span>
               </span>
             }
-            description="Your Google Cloud project identifier"
+            description="The Google Cloud project ID where data will be sent"
           >
             <FormControl_Shadcn_>
               <Input_Shadcn_ {...field} placeholder="my-gcp-project" />
@@ -69,7 +69,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
             }
             layout="vertical"
             className="px-5"
-            description="The dataset where tables will be created"
+            description="The BigQuery dataset where replicated tables will be created"
           >
             <FormControl_Shadcn_>
               <Input_Shadcn_ {...field} placeholder="my_dataset" />
@@ -90,7 +90,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
                 Service Account Key <span className="text-destructive-600">*</span>
               </span>
             }
-            description="JSON key file for authentication with BigQuery"
+            description="Service account credentials JSON for authenticating with BigQuery"
           >
             <FormControl_Shadcn_>
               <TextArea_Shadcn_
@@ -201,7 +201,7 @@ export const AnalyticsBucketFields = ({
             }
             layout="vertical"
             className="px-5"
-            description="Select a storage Analytics Bucket to use as your warehouse"
+            description="The Analytics Bucket where data will be stored"
           >
             {isLoadingBuckets ? (
               <Button
@@ -269,7 +269,7 @@ export const AnalyticsBucketFields = ({
             }
             layout="vertical"
             className="px-5"
-            description="Select a namespace from your Analytics Bucket"
+            description="The namespace within the bucket where tables will be organized"
           >
             {isLoadingNamespaces && canSelectNamespace ? (
               <Button
@@ -347,7 +347,7 @@ export const AnalyticsBucketFields = ({
               }
               layout="vertical"
               className="px-5"
-              description="Enter a name for the new namespace"
+              description="A unique name for the new namespace"
             >
               <FormControl_Shadcn_>
                 <Input_Shadcn_ {...field} placeholder="new_namespace" value={field.value || ''} />
@@ -507,7 +507,7 @@ export const AnalyticsBucketFields = ({
                 </span>
               }
               className="relative px-5"
-              description="The corresponding secret access key for the selected key ID"
+              description="The secret key corresponding to your selected access key ID"
             >
               <FormControl_Shadcn_>
                 <Input_Shadcn_

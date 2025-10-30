@@ -445,7 +445,9 @@ export const DestinationPanel = ({
             <SheetHeader>
               <SheetTitle>{editMode ? 'Edit destination' : 'Create a new destination'}</SheetTitle>
               <SheetDescription>
-                {editMode ? null : 'Send data to a new destination'}
+                {editMode
+                  ? 'Update the configuration for this destination'
+                  : 'A destination is an external platform where your database changes are automatically sent in real-time'}
               </SheetDescription>
             </SheetHeader>
 
@@ -459,8 +461,8 @@ export const DestinationPanel = ({
                     No destinations available
                   </h3>
                   <p className="text-sm text-foreground-light max-w-md leading-relaxed">
-                    Database replication destinations are not currently available for this project.
-                    Please contact support if you need to enable data replication to external warehouses.
+                    Replication destinations are not currently enabled for this project. Contact
+                    support to enable real-time data replication to external platforms.
                   </p>
                 </div>
               ) : (
@@ -478,7 +480,7 @@ export const DestinationPanel = ({
                             </span>
                           }
                           layout="vertical"
-                          description="A name you will use to identify this destination"
+                          description="A descriptive name to identify this destination"
                         >
                           <FormControl_Shadcn_>
                             <Input_Shadcn_ {...field} placeholder="My destination" />
@@ -490,7 +492,9 @@ export const DestinationPanel = ({
                     <DialogSectionSeparator />
 
                   <div className="p-5">
-                    <p className="text-sm text-foreground-light mb-4">What data to send</p>
+                    <p className="text-sm text-foreground-light mb-4">
+                      Select which data to replicate
+                    </p>
                     <FormField_Shadcn_
                       control={form.control}
                       name="publicationName"
@@ -502,7 +506,7 @@ export const DestinationPanel = ({
                             </span>
                           }
                           layout="vertical"
-                          description="A publication is a collection of tables that you want to replicate "
+                          description="Choose which tables to replicate to this destination"
                         >
                           <FormControl_Shadcn_>
                             <PublicationsComboBox
@@ -559,11 +563,11 @@ export const DestinationPanel = ({
                       </p>
                       {editMode ? (
                         <p className="text-xs text-foreground-light mb-4">
-                          Destination type cannot be changed after creation
+                          The destination type cannot be changed after creation
                         </p>
                       ) : (
                         <p className="text-xs text-foreground-light mb-4">
-                          Select where you want to send your data
+                          Choose which platform to send your database changes to
                         </p>
                       )}
                       <FormField_Shadcn_
@@ -590,8 +594,8 @@ export const DestinationPanel = ({
                                     </div>
                                     <p className="text-xs text-foreground-light leading-relaxed">
                                       {field.value === 'BigQuery'
-                                        ? "Google Cloud's serverless data warehouse for analytics and business intelligence"
-                                        : 'Apache Iceberg tables in your Supabase Storage for flexible analytics workflows'}
+                                        ? 'Send data to Google Cloud\'s data warehouse for analytics and business intelligence'
+                                        : 'Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics workflows'}
                                     </p>
                                   </div>
                                 </div>
@@ -631,7 +635,7 @@ export const DestinationPanel = ({
                                         )}
                                       </div>
                                       <p className="text-xs text-foreground-light leading-relaxed">
-                                        Google Cloud's serverless data warehouse for analytics and
+                                        Send data to Google Cloud's data warehouse for analytics and
                                         business intelligence
                                       </p>
                                     </div>
@@ -669,8 +673,8 @@ export const DestinationPanel = ({
                                         )}
                                       </div>
                                       <p className="text-xs text-foreground-light leading-relaxed">
-                                        Apache Iceberg tables in your Supabase Storage for flexible
-                                        analytics workflows
+                                        Send data to Apache Iceberg tables in your Supabase Storage for
+                                        flexible analytics workflows
                                       </p>
                                     </div>
                                   </button>
@@ -687,10 +691,10 @@ export const DestinationPanel = ({
                         <DialogSectionSeparator />
                         <div className="px-5">
                           <p className="text-sm font-medium text-foreground mb-1">
-                            BigQuery configuration
+                            BigQuery settings
                           </p>
                           <p className="text-xs text-foreground-light mb-4">
-                            Configure your Google Cloud BigQuery destination
+                            Configure how data is sent to your BigQuery destination
                           </p>
                         </div>
                         <BigQueryFields form={form} />
@@ -700,10 +704,10 @@ export const DestinationPanel = ({
                         <DialogSectionSeparator />
                         <div className="px-5">
                           <p className="text-sm font-medium text-foreground mb-1">
-                            Analytics Bucket configuration
+                            Analytics Bucket settings
                           </p>
                           <p className="text-xs text-foreground-light mb-4">
-                            Configure your Supabase Storage Analytics Bucket
+                            Configure how data is sent to your Analytics Bucket destination
                           </p>
                         </div>
                         <AnalyticsBucketFields
@@ -724,29 +728,22 @@ export const DestinationPanel = ({
               )}
             </SheetSection>
 
-            <SheetFooter className="flex-col items-stretch gap-2">
-              {!editMode && !form.formState.isValid && form.formState.isDirty && (
-                <p className="text-xs text-foreground-lighter text-center">
-                  Please fill in all required fields to continue
-                </p>
-              )}
-              <div className="flex gap-2 justify-end">
-                <Button disabled={isSaving} type="default" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  disabled={isSubmitDisabled}
-                  loading={isSaving}
-                  form={formId}
-                  htmlType="submit"
-                >
-                  {editMode
-                    ? existingDestination?.enabled
-                      ? 'Apply and restart'
-                      : 'Apply and start'
-                    : 'Create and start'}
-                </Button>
-              </div>
+            <SheetFooter>
+              <Button disabled={isSaving} type="default" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                disabled={isSubmitDisabled}
+                loading={isSaving}
+                form={formId}
+                htmlType="submit"
+              >
+                {editMode
+                  ? existingDestination?.enabled
+                    ? 'Apply and restart'
+                    : 'Apply and start'
+                  : 'Create and start'}
+              </Button>
             </SheetFooter>
           </div>
         </SheetContent>
