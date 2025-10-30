@@ -1,7 +1,7 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'hooks/misc/useIsInlineEditorEnabled'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
@@ -89,7 +89,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
-  const { openSidebar } = useSidebarManagerSnapshot()
+  const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
   const {
     setValue: setEditorPanelValue,
     setTemplates: setEditorPanelTemplates,
@@ -188,19 +188,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     },
     [isInlineEditorEnabled, openSidebar]
   )
-
-  const isEditorPanelActive = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
-
-  useEffect(() => {
-    if (isEditorPanelActive) return
-
-    setSelectedPolicyToEdit(undefined)
-    setSelectedTable(undefined)
-
-    if (editorPanelTemplates.length > 0) {
-      setEditorPanelTemplates([])
-    }
-  }, [editorPanelTemplates.length, isEditorPanelActive, setEditorPanelTemplates])
 
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
 

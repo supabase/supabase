@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 const InlineEditorSchema = z.object({
   inlineEditorEnabled: z.boolean(),
@@ -17,6 +18,7 @@ export const InlineEditorSettings = () => {
     LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
     true
   )
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -35,6 +37,9 @@ export const InlineEditorSettings = () => {
       action: 'inline_editor_setting_toggled',
       properties: {
         enabled: value,
+      },
+      groups: {
+        organization: org?.slug,
       },
     })
   }

@@ -1,6 +1,6 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'hooks/misc/useIsInlineEditorEnabled'
 import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
@@ -92,17 +92,6 @@ execute function function_name();`)
     setSelectedTrigger(trigger)
     setShowDeleteTriggerForm(true)
   }
-
-  const isEditorPanelActive = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
-
-  useEffect(() => {
-    if (isEditorPanelActive) return
-
-    setSelectedTriggerForEditor(undefined)
-    if (editorPanelTemplates.length > 0) {
-      setEditorPanelTemplates([])
-    }
-  }, [editorPanelTemplates.length, isEditorPanelActive, setEditorPanelTemplates])
 
   if (isPermissionsLoaded && !canReadTriggers) {
     return <NoPermission isFullPage resourceText="view database triggers" />
