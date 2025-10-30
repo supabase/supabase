@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { CreateOAuthAppSheet } from './CreateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
@@ -54,6 +55,7 @@ export const OAuthAppsList = () => {
   // State for OAuth apps
   const [showCreateSheet, setShowCreateSheet] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
@@ -68,29 +70,20 @@ export const OAuthAppsList = () => {
     { enabled: isOAuthServerEnabled }
   )
 
-  const { mutateAsync: regenerateSecret } = useOAuthServerAppRegenerateSecretMutation()
+  const { mutateAsync: regenerateSecret, isLoading: isRegenerating } =
+    useOAuthServerAppRegenerateSecretMutation({
+      onSuccess: (data) => {
+        if (data) {
+          setNewOAuthApp(data)
+        }
+      },
+    })
 
   const oAuthApps = data?.clients || []
 
   const handleDeleteClick = (app: OAuthClient) => {
     setSelectedApp(app)
     setShowDeleteModal(true)
-  }
-
-  const handleRegenerateSecret = async (app: OAuthClient) => {
-    try {
-      const result = await regenerateSecret({
-        projectRef,
-        supabaseClient: supabaseClientData?.supabaseClient,
-        clientId: app.client_id,
-      })
-
-      if (result?.client_id && result?.client_secret) {
-        setNewOAuthApp(result)
-      }
-    } catch (error) {
-      console.error('Error regenerating secret:', error)
-    }
   }
 
   const [filterString, setFilterString] = useState<string>('')
@@ -236,7 +229,10 @@ export const OAuthAppsList = () => {
                             <DropdownMenuContent side="bottom" align="end" className="w-52">
                               <DropdownMenuItem
                                 className="space-x-2"
-                                onClick={() => handleRegenerateSecret(app)}
+                                onClick={() => {
+                                  setSelectedApp(app)
+                                  setShowRegenerateDialog(true)
+                                }}
                               >
                                 <RotateCw size={14} />
                                 <p>Regenerate client secret</p>
@@ -278,6 +274,28 @@ export const OAuthAppsList = () => {
         onClose={() => setShowDeleteModal(false)}
         selectedApp={selectedApp}
       />
+
+      <ConfirmationModal
+        variant="warning"
+        visible={showRegenerateDialog}
+        loading={isRegenerating}
+        title="Confirm regenerating client secret"
+        confirmLabel="Confirm"
+        onCancel={() => setShowRegenerateDialog(false)}
+        onConfirm={() => {
+          regenerateSecret({
+            projectRef,
+            supabaseClient: supabaseClientData?.supabaseClient,
+            clientId: selectedApp?.client_id!,
+          })
+          setShowRegenerateDialog(false)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Are you sure you wish to regenerate the client secret for "{selectedApp?.client_name}"?
+          All existing sessions will be invalidated. This action cannot be undone.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }
