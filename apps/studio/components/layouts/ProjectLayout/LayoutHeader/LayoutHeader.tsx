@@ -27,7 +27,6 @@ import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
-import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 
@@ -212,7 +211,6 @@ const LayoutHeader = ({
 
                 <div className="overflow-hidden flex items-center gap-2">
                   <HelpPopover />
-                  <NotificationsPopoverV2 />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
