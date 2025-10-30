@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
-import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+
+import { AdvisorPanel } from 'components/ui/AdvisorPanel/AdvisorPanel'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
-import { AdvisorPanel } from 'components/ui/AdvisorPanel/AdvisorPanel'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 export const SIDEBAR_KEYS = {
   AI_ASSISTANT: 'ai-assistant',
@@ -14,6 +15,8 @@ export const SIDEBAR_KEYS = {
   ADVISOR_PANEL: 'advisor-panel',
 } as const
 
+// LayoutSidebars are meant to be used within a project, but rendered within DefaultLayout
+// to prevent unnecessary registering / unregistering of sidebars with every route change
 export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -27,7 +30,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   useEffect(() => {
-    if (activeSidebar) {
+    if (!!project && activeSidebar) {
       // add event tracking
       sendEvent({
         action: 'sidebar_opened',
