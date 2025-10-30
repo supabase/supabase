@@ -1,8 +1,9 @@
-import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
+import { Activity, BookOpen, HelpCircle, Mail, Wrench } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
+import { IS_PLATFORM } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -57,81 +58,91 @@ export const HelpPopover = () => {
           }}
         />
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
-        <div className="mb-5 px-5">
-          <h5 className="text-foreground mb-2">Need help with your project?</h5>
-          <p className="text-sm text-foreground-lighter">
-            For issues with your project hosted on supabase.com or other hosted service inquiries.
-            Response times are based on your billing plan, with paid plans prioritized.
-          </p>
-        </div>
-        <div className="px-5">
-          <ButtonGroup className="w-full">
-            {projectRef && (
-              <ButtonGroupItem
-                size="tiny"
-                icon={<AiIconAnimation allowHoverEffect size={14} />}
-                onClick={() => {
-                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                  snap.newChat({
-                    name: 'Support',
-                    initialInput: `I need help with my project`,
-                    suggestions: {
-                      title:
-                        'I can help you with your project, here are some example prompts to get you started:',
-                      prompts: [
-                        {
-                          label: 'Database Health',
-                          description: 'Summarise my database health and performance',
-                        },
-                        {
-                          label: 'Debug Logs',
-                          description: 'View and debug my edge function logs',
-                        },
-                        {
-                          label: 'RLS Setup',
-                          description: 'Implement row level security for my tables',
-                        },
-                      ],
-                    },
-                  })
-                }}
-              >
-                Supabase Assistant
+      <PopoverContent_Shadcn_ className="w-[400px] space-y-5 p-0 py-5" align="end" side="bottom">
+        <div className="flex flex-col gap-4">
+          <div className="px-5 flex flex-col gap-1">
+            <h5 className="text-foreground">Need help with your project?</h5>
+            <p className="text-sm text-foreground-lighter text-balance">
+              Start with our {projectRef ? 'Assistant, docs,' : 'docs'} or community.
+            </p>
+          </div>
+
+          <div className="px-5">
+            <ButtonGroup className="w-full">
+              {projectRef && (
+                <ButtonGroupItem
+                  size="tiny"
+                  icon={<AiIconAnimation allowHoverEffect size={14} />}
+                  onClick={() => {
+                    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                    snap.newChat({
+                      name: 'Support',
+                      initialInput: `I need help with my project`,
+                      suggestions: {
+                        title:
+                          'I can help you with your project, here are some example prompts to get you started:',
+                        prompts: [
+                          {
+                            label: 'Database Health',
+                            description: 'Summarise my database health and performance',
+                          },
+                          {
+                            label: 'Debug Logs',
+                            description: 'View and debug my edge function logs',
+                          },
+                          {
+                            label: 'RLS Setup',
+                            description: 'Implement row level security for my tables',
+                          },
+                        ],
+                      },
+                    })
+                  }}
+                >
+                  Supabase Assistant
+                </ButtonGroupItem>
+              )}
+              <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
+                <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
+                  Docs
+                </a>
               </ButtonGroupItem>
-            )}
-            <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
-              <a
-                href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Troubleshooting
-              </a>
-            </ButtonGroupItem>
-            <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
-              <a href={`${DOCS_URL}/`} target="_blank" rel="noreferrer">
-                Docs
-              </a>
-            </ButtonGroupItem>
-            <ButtonGroupItem size="tiny" icon={<Activity strokeWidth={1.5} size={14} />} asChild>
-              <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
-                Supabase Status
-              </a>
-            </ButtonGroupItem>
-            <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
-              <SupportLink queryParams={{ projectRef }}>Contact Support</SupportLink>
-            </ButtonGroupItem>
-          </ButtonGroup>
+              <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
+                <a
+                  href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Troubleshooting
+                </a>
+              </ButtonGroupItem>
+              {IS_PLATFORM && (
+                <>
+                  <ButtonGroupItem
+                    size="tiny"
+                    icon={<Activity strokeWidth={1.5} size={14} />}
+                    asChild
+                  >
+                    <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+                      Supabase status
+                    </a>
+                  </ButtonGroupItem>
+
+                  <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
+                    <SupportLink queryParams={{ projectRef }}>Contact support</SupportLink>
+                  </ButtonGroupItem>
+                </>
+              )}
+            </ButtonGroup>
+          </div>
         </div>
         <Popover.Separator />
-        <div className="mb-4 space-y-2">
-          <div className="mb-4 px-5">
-            <h5 className="mb-2">Reach out to the community</h5>
-
-            <p className="text-sm text-foreground-lighter">
-              For other support, including questions on our client libraries, advice, or best
-              practices.
+        <div className="flex flex-col gap-4">
+          <div className="px-5 flex flex-col gap-1">
+            <h5 className="text-foreground">Community support</h5>
+            <p className="text-sm text-foreground-lighter text-balance">
+              Our Discord community can help with code-related issues. Many questions are answered
+              in minutes.
             </p>
           </div>
           <div className="px-5">
@@ -143,41 +154,21 @@ export const HelpPopover = () => {
                 href="https://discord.supabase.com"
                 target="_blank"
                 rel="noreferrer"
-                className="dark block cursor-pointer"
+                className="group dark block cursor-pointer"
               >
                 <Image
-                  className="absolute left-0 top-0 opacity-50"
+                  className="absolute left-0 top-0 opacity-50 transition-opacity group-hover:opacity-40"
                   src={`${router.basePath}/img/support/discord-bg-small.jpg`}
                   layout="fill"
                   objectFit="cover"
-                  alt="discord illustration header"
+                  alt="Discord illustration"
                 />
                 <Button
                   type="secondary"
+                  size="tiny"
                   icon={<SVG src={`${router.basePath}/img/discord-icon.svg`} className="h-4 w-4" />}
                 >
-                  <span style={{ color: '#404EED' }}>Join Discord server</span>
-                </Button>
-              </a>
-            </div>
-          </div>
-          <div className="px-5">
-            <div className="relative space-y-2 overflow-hidden rounded px-5 py-4 pb-12 shadow-md">
-              <a
-                href="https://github.com/supabase/supabase/discussions"
-                target="_blank"
-                rel="noreferrer"
-                className="block cursor-pointer"
-              >
-                <Image
-                  className="absolute left-0 top-0 opacity-50"
-                  src={`${router.basePath}/img/support/github-bg.jpg?v-1`}
-                  layout="fill"
-                  objectFit="cover"
-                  alt="discord illustration header"
-                />
-                <Button type="secondary" icon={<MessageCircle />}>
-                  GitHub Discussions
+                  <span style={{ color: '#404EED' }}>Join us on Discord</span>
                 </Button>
               </a>
             </div>
