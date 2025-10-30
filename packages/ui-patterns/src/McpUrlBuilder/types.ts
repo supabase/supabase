@@ -32,8 +32,8 @@ export interface McpClientBaseConfig {
 
 export interface CursorMcpConfig extends McpClientBaseConfig {}
 
-export interface VSCodeMcpConfig extends McpClientBaseConfig {
-  mcpServers: {
+export interface VSCodeMcpConfig {
+  servers: {
     supabase: {
       type: 'http'
       url: string
