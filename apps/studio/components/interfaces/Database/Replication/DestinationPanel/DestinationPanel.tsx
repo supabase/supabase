@@ -153,7 +153,7 @@ export const DestinationPanel = ({
       ? isBigQueryConfig
         ? TypeEnum.enum.BigQuery
         : TypeEnum.enum['Analytics Bucket']
-      : availableDestinations[0]?.value || TypeEnum.enum.BigQuery
+      : (availableDestinations[0]?.value as z.infer<typeof TypeEnum>) || TypeEnum.enum.BigQuery
 
     return {
       // Common fields
