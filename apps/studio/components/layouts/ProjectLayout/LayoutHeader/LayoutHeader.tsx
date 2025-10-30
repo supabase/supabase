@@ -70,7 +70,6 @@ const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
-  const { toggleSidebar } = useSidebarManagerSnapshot()
 
   const isAccountPage = router.pathname.startsWith('/account')
 
