@@ -58,7 +58,6 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
                 label={
                   <div className="flex items-center gap-2">
                     <span>Batch wait time (milliseconds)</span>
-                    <Badge>All destinations</Badge>
                   </div>
                 }
                 layout="vertical"
@@ -92,7 +91,7 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
                       </div>
                     }
                     layout="vertical"
-                    description="How long data can remain outdated in BigQuery before a refresh is triggered. Lower values keep data fresher but may increase costs."
+                    description="Maximum age of cached data before BigQuery reads from base tables at query time. Lower values ensure fresher results but may increase query costs."
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
