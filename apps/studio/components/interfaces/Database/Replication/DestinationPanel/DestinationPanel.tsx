@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { snakeCase } from 'lodash'
-import { Database, DatabaseZap, Lock, Warehouse } from 'lucide-react'
+import { DatabaseZap, Lock } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -149,13 +149,27 @@ export const DestinationPanel = ({
     const isBigQueryConfig = config && 'big_query' in config
     const isIcebergConfig = config && 'iceberg' in config
 
-    return {
-      // Common fields
-      type: (isBigQueryConfig
+    // In edit mode, use existing destination type
+    // In create mode, select the first available destination type
+    let defaultType: z.infer<typeof TypeEnum>
+    if (editMode) {
+      defaultType = (isBigQueryConfig
         ? TypeEnum.enum.BigQuery
         : isIcebergConfig
           ? TypeEnum.enum['Analytics Bucket']
-          : TypeEnum.enum.BigQuery) as z.infer<typeof TypeEnum>,
+          : TypeEnum.enum.BigQuery) as z.infer<typeof TypeEnum>
+    } else {
+      // Select first available destination type in create mode
+      defaultType = (etlEnableBigQuery
+        ? TypeEnum.enum.BigQuery
+        : etlEnableIceberg
+          ? TypeEnum.enum['Analytics Bucket']
+          : TypeEnum.enum.BigQuery) as z.infer<typeof TypeEnum>
+    }
+
+    return {
+      // Common fields
+      type: defaultType,
       name: destinationData?.name ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms,
@@ -174,7 +188,7 @@ export const DestinationPanel = ({
       s3Region:
         projectSettings?.region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
     }
-  }, [destinationData, pipelineData, catalogToken, projectSettings])
+  }, [destinationData, pipelineData, catalogToken, projectSettings, editMode, etlEnableBigQuery, etlEnableIceberg])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onChange',
@@ -577,14 +591,7 @@ export const DestinationPanel = ({
                           <FormControl_Shadcn_>
                             {editMode ? (
                               <div className="relative">
-                                <div className="flex items-start gap-4 p-4 rounded-lg border-2 border-default bg-surface-100 opacity-75">
-                                  <div className="flex items-center justify-center w-10 h-10 rounded-md bg-surface-300 text-foreground-light">
-                                    {field.value === 'BigQuery' ? (
-                                      <Database className="w-5 h-5" strokeWidth={2} />
-                                    ) : (
-                                      <Warehouse className="w-5 h-5" strokeWidth={2} />
-                                    )}
-                                  </div>
+                                <div className="flex items-start gap-3 p-4 rounded-lg border-2 border-default bg-surface-100 opacity-75">
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
                                       <p className="text-sm font-medium text-foreground">
@@ -610,21 +617,12 @@ export const DestinationPanel = ({
                                       setIsFormInteracting(true)
                                       field.onChange('BigQuery')
                                     }}
-                                    className={`relative flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
+                                    className={`relative flex items-start gap-3 p-4 rounded-lg border-2 transition-all text-left ${
                                       field.value === 'BigQuery'
                                         ? 'border-brand-600 bg-surface-200'
                                         : 'border-default bg-surface-100 hover:border-stronger'
                                     }`}
                                   >
-                                    <div
-                                      className={`flex items-center justify-center w-10 h-10 rounded-md ${
-                                        field.value === 'BigQuery'
-                                          ? 'bg-brand-400 text-brand-600'
-                                          : 'bg-surface-300 text-foreground-light'
-                                      }`}
-                                    >
-                                      <Database className="w-5 h-5" strokeWidth={2} />
-                                    </div>
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center gap-2 mb-1">
                                         <p className="text-sm font-medium text-foreground">
@@ -648,21 +646,12 @@ export const DestinationPanel = ({
                                       setIsFormInteracting(true)
                                       field.onChange('Analytics Bucket')
                                     }}
-                                    className={`relative flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
+                                    className={`relative flex items-start gap-3 p-4 rounded-lg border-2 transition-all text-left ${
                                       field.value === 'Analytics Bucket'
                                         ? 'border-brand-600 bg-surface-200'
                                         : 'border-default bg-surface-100 hover:border-stronger'
                                     }`}
                                   >
-                                    <div
-                                      className={`flex items-center justify-center w-10 h-10 rounded-md ${
-                                        field.value === 'Analytics Bucket'
-                                          ? 'bg-brand-400 text-brand-600'
-                                          : 'bg-surface-300 text-foreground-light'
-                                      }`}
-                                    >
-                                      <Warehouse className="w-5 h-5" strokeWidth={2} />
-                                    </div>
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center gap-2 mb-1">
                                         <p className="text-sm font-medium text-foreground">
