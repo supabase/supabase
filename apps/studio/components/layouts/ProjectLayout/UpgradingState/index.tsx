@@ -23,7 +23,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 
-const UpgradingState = () => {
+export const UpgradingState = () => {
   const { ref } = useParams()
   const queryParams = useSearchParams()
   const { data: project } = useSelectedProjectQuery()
@@ -248,5 +248,3 @@ const UpgradingState = () => {
     </div>
   )
 }
-
-export default UpgradingState

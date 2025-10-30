@@ -8,7 +8,7 @@ interface ProductMenuProps {
   menu: ProductMenuGroup[]
 }
 
-const ProductMenu = ({ page, menu }: ProductMenuProps) => {
+export const ProductMenu = ({ page, menu }: ProductMenuProps) => {
   return (
     <div className="flex flex-col space-y-8">
       <Menu type="pills">
@@ -56,5 +56,3 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
     </div>
   )
 }
-
-export default ProductMenu
