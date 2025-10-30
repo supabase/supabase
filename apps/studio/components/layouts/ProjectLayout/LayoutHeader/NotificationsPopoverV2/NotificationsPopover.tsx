@@ -99,29 +99,34 @@ export const NotificationsPopoverV2 = () => {
               text: 'Notifications',
             },
           }}
-          type="text"
-          className={cn('rounded-none h-[30px] w-[32px] group relative')}
+          type="outline"
+          size="tiny"
+          className={cn(
+            'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
+            open && 'bg-foreground text-background'
+          )}
           icon={
             <div className="relative">
               <InboxIcon
                 size={18}
                 strokeWidth={1.5}
                 className={cn(
-                  '!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground'
+                  'text-foreground-light group-hover:text-foreground',
+                  open && 'text-background group-hover:text-background'
                 )}
               />
               {hasCritical && (
-                <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
+                <div className="absolute -top-1.5 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
                   <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent border-b-destructive" />
                 </div>
               )}
               {hasWarning && !hasCritical && (
-                <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
+                <div className="absolute -top-1.5 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
                   <div className="w-2 h-2 rounded-full bg-warning" />
                 </div>
               )}
               {!!hasNewNotifications && !hasCritical && !hasWarning && (
-                <div className="absolute -top-1 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
+                <div className="absolute -top-1.5 -right-2 w-3.5 h-3.5 z-10 flex items-center justify-center">
                   <div className="w-2 h-2 rounded-full bg-brand" />
                 </div>
               )}

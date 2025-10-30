@@ -3,7 +3,7 @@ import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
@@ -15,15 +15,12 @@ import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationD
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Badge, cn } from 'ui'
-import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
@@ -31,6 +28,8 @@ import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
 import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -71,13 +70,8 @@ const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
-  const { toggleSidebar } = useSidebarManagerSnapshot()
 
   const isAccountPage = router.pathname.startsWith('/account')
-  const [inlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
-    true
-  )
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -216,16 +210,14 @@ const LayoutHeader = ({
               <>
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="overflow-hidden flex items-center gap-2">
                   <HelpPopover />
                   <NotificationsPopoverV2 />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <AdvisorButton />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -236,14 +228,12 @@ const LayoutHeader = ({
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="overflow-hidden flex items-center gap-2">
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton
-                          onClick={() => toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)}
-                          showShortcut={inlineEditorHotkeyEnabled}
-                        />
+                        <AdvisorButton />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}

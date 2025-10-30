@@ -24,7 +24,7 @@ export const fetchHandler: typeof fetch = async (input, init) => {
   }
 }
 
-const client = createClient<paths>({
+export const client = createClient<paths>({
   fetch: fetchHandler,
   // [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
   baseUrl: API_URL?.replace('/platform', ''),
