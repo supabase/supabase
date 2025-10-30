@@ -1,8 +1,19 @@
-import { Command, FlaskConical, Loader2, Settings } from 'lucide-react'
+import {
+  FlaskConical,
+  HelpCircle,
+  Lightbulb,
+  Loader2,
+  LogOut,
+  Settings,
+  SwatchBook,
+} from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 
+import { FeedbackWidget } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown/FeedbackWidget'
+import { HelpPopover } from 'components/layouts/ProjectLayout/LayoutHeader/HelpPopover'
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSignOut } from 'lib/auth'
@@ -32,6 +43,8 @@ export function UserDropdown() {
   const appStateSnapshot = useAppStateSnapshot()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   const signOut = useSignOut()
   const setCommandMenuOpen = useSetCommandMenuOpen()
@@ -82,7 +95,7 @@ export function UserDropdown() {
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2.5" asChild>
                 <Link
                   href="/account/me"
                   onClick={() => {
@@ -96,23 +109,23 @@ export function UserDropdown() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="flex gap-2"
+                className="flex gap-2.5"
                 onClick={openFeaturePreviewModal}
                 onSelect={openFeaturePreviewModal}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" onClick={handleCommandMenuOpen}>
-                <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Command menu
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
         )}
+
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Theme</DropdownMenuLabel>
+          <DropdownMenuLabel className="flex gap-2.5">
+            <SwatchBook size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+            Theme
+          </DropdownMenuLabel>
           <DropdownMenuRadioGroup
             value={theme}
             onValueChange={(value) => {
@@ -125,22 +138,39 @@ export function UserDropdown() {
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
         </DropdownMenuGroup>
+
+        <DropdownMenuGroup>
+          <DropdownMenuItem className="flex gap-2.5" onClick={() => setHelpOpen(true)}>
+            <HelpCircle size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+            Get help
+          </DropdownMenuItem>
+          <DropdownMenuItem className="flex gap-2.5" onClick={() => setFeedbackOpen(true)}>
+            <Lightbulb size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+            Leave feedback
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
         {IS_PLATFORM && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
+                className="flex gap-2.5"
                 onSelect={async () => {
                   await signOut()
                 }}
               >
+                <LogOut size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Log out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </>
         )}
       </DropdownMenuContent>
+      <HelpPopover open={helpOpen} onOpenChange={setHelpOpen} />
+      <FeedbackWidget open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </DropdownMenu>
   )
 }
