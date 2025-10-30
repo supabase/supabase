@@ -168,7 +168,7 @@ Since Next.js Server Components can't write cookies, you need middleware to refr
 
 The middleware is responsible for:
 
-1. Refreshing the Auth token by calling `supabase.auth.getUser()`.
+1. Refreshing the Auth token by calling `supabase.auth.getClaims()`.
 2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
 3. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
 
@@ -205,18 +205,18 @@ The following code samples are for App Router. For help with Pages Router, see t
 </Accordion>
 
 <div className="mt-12">
-<$CodeTabs>
-<$CodeSample
-path="/auth/nextjs/utils/supabase/client.ts"
-meta="name=utils/supabase/client.ts"
-language="typescript"
-/>
-<$CodeSample
-path="/auth/nextjs/utils/supabase/server.ts"
-meta="name=utils/supabase/server.ts"
-language="typescript"
-/>
-</$CodeTabs>
+  <$CodeTabs>
+    <$CodeSample
+      path="/auth/nextjs/utils/supabase/client.ts"
+      meta="name=utils/supabase/client.ts"
+      language="typescript"
+    />
+    <$CodeSample
+      path="/auth/nextjs/utils/supabase/server.ts"
+      meta="name=utils/supabase/server.ts"
+      language="typescript"
+    />
+  </$CodeTabs>
 </div>
 
 ### Hook up middleware
@@ -238,18 +238,18 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 </Admonition>
 
 <div className="mt-12">
-<$CodeTabs>
-<$CodeSample
-path="/auth/nextjs/middleware.ts"
-meta="name=middleware.ts"
-language="typescript"
-/>
-<$CodeSample
-path="/auth/nextjs/utils/supabase/middleware.ts"
-meta="name=utils/supabase/middleware.ts"
-language="typescript"
-/>
-</$CodeTabs>
+  <$CodeTabs>
+    <$CodeSample
+      path="/auth/nextjs/middleware.ts"
+      meta="name=middleware.ts"
+      language="typescript"
+    />
+    <$CodeSample
+      path="/auth/nextjs/utils/supabase/middleware.ts"
+      meta="name=utils/supabase/middleware.ts"
+      language="typescript"
+    />
+  </$CodeTabs>
 </div>
 
 </TabPanel>
