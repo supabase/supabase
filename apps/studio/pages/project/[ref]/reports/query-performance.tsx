@@ -21,7 +21,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()

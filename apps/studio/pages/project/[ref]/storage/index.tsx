@@ -6,7 +6,7 @@ import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePrevi
 import { DEFAULT_BUCKET_TYPE } from 'components/interfaces/Storage/Storage.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const Storage: NextPageWithLayout = () => {
   const { ref } = useParams()

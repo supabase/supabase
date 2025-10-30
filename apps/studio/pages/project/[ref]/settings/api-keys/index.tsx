@@ -4,7 +4,7 @@ import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLay
 import { DisplayApiSettings } from 'components/ui/ProjectSettings/DisplayApiSettings'
 import { ToggleLegacyApiKeysPanel } from 'components/ui/ProjectSettings/ToggleLegacyApiKeys'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const ApiKeysLegacyPage: NextPageWithLayout = () => {
   const { projectSettingsShowDisableLegacyApiKeys } = useIsFeatureEnabled([

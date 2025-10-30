@@ -16,7 +16,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 

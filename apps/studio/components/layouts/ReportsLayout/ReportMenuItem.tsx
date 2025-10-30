@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { ContentBase } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
-import type { Dashboards } from 'types/userContent'
+import type { Dashboards } from 'types'
 import {
   Button,
   cn,

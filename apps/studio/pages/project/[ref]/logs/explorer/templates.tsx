@@ -10,7 +10,7 @@ import CardButton from 'components/ui/CardButton'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { Button, Popover, cn } from 'ui'
 
 export const LogsTemplatesPage: NextPageWithLayout = () => {

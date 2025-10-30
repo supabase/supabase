@@ -2,7 +2,7 @@ import { StorageSettings } from 'components/interfaces/Storage/StorageSettings/S
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { StorageBucketsLayout } from 'components/layouts/StorageLayout/StorageBucketsLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const FilesSettingsPage: NextPageWithLayout = () => {
   return <StorageSettings />

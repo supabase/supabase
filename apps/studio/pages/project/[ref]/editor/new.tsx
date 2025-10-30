@@ -7,7 +7,7 @@ import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import { TableEditorMenu } from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from 'components/layouts/Tabs/NewTab'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const EditorNewPage: NextPageWithLayout = () => {
   const router = useRouter()

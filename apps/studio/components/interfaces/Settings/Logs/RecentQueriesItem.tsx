@@ -2,7 +2,7 @@ import { Play } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import Table from 'components/to-be-cleaned/Table'
-import type { LogSqlSnippets } from 'types/userContent'
+import type { LogSqlSnippets } from 'types'
 import { Button } from 'ui'
 import SqlSnippetCode from './Logs.SqlSnippetCode'
 

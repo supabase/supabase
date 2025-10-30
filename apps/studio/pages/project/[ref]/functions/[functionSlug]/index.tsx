@@ -21,8 +21,7 @@ import {
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { ChartIntervals } from 'types'
-import type { NextPageWithLayout } from 'types/next'
+import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

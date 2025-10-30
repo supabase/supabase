@@ -6,7 +6,7 @@ import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
 
 export const LogPage: NextPageWithLayout = () => {

@@ -27,7 +27,7 @@ import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (

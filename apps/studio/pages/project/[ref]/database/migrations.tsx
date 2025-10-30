@@ -10,7 +10,7 @@ import {
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const MigrationsPage: NextPageWithLayout = () => {
   return (

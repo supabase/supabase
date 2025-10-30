@@ -8,7 +8,7 @@ import { getAccessToken } from 'common'
 import { SignInMfaForm } from 'components/interfaces/SignIn/SignInMfaForm'
 import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
 
 const ForgotPasswordMfa: NextPageWithLayout = () => {

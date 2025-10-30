@@ -15,7 +15,7 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_wrapper']

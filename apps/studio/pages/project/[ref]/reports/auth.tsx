@@ -37,7 +37,7 @@ import {
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useRouter } from 'next/router'
 import { parseAsJson, useQueryState } from 'nuqs'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const AuthReport: NextPageWithLayout = () => {
   return (

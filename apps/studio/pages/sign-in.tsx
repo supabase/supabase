@@ -12,7 +12,7 @@ import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from 'lib/constants'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 
 const SignInPage: NextPageWithLayout = () => {

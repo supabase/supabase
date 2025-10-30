@@ -13,7 +13,7 @@ import {
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   cn,

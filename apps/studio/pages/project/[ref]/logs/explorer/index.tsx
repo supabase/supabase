@@ -42,8 +42,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import type { NextPageWithLayout } from 'types/next'
-import type { LogSqlSnippets } from 'types/userContent'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import {
   Button,
   Form,

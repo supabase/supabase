@@ -10,7 +10,7 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from 'data/content/content-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
 
 export const UserReportPage: NextPageWithLayout = () => {

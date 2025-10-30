@@ -21,7 +21,7 @@ import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (

@@ -7,7 +7,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 
 const ProjectsPage: NextPageWithLayout = () => {

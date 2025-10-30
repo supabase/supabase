@@ -1,4 +1,4 @@
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 import { RealtimeInspector } from 'components/interfaces/Realtime/Inspector'
 import DefaultLayout from 'components/layouts/DefaultLayout'

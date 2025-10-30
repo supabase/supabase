@@ -12,7 +12,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Entity, isTableLike, postgresTableToEntity } from 'data/table-editor/table-editor-types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()

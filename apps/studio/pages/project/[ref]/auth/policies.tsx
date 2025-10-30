@@ -29,7 +29,7 @@ import { DOCS_URL } from 'lib/constants'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 /**

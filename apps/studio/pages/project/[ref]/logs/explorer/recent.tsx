@@ -8,8 +8,7 @@ import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import type { NextPageWithLayout } from 'types/next'
-import type { LogSqlSnippets } from 'types/userContent'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 
 export const LogsSavedPage: NextPageWithLayout = () => {

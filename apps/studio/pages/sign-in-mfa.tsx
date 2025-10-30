@@ -11,7 +11,7 @@ import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import useLatest from 'hooks/misc/useLatest'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
 
 const SignInMfaPage: NextPageWithLayout = () => {

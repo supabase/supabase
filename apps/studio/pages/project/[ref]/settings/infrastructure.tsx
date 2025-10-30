@@ -9,7 +9,7 @@ import {
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectInfrastructure: NextPageWithLayout = () => {
   return (

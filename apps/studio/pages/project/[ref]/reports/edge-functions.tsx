@@ -33,7 +33,7 @@ import { EDGE_FUNCTION_REGIONS } from 'components/interfaces/Reports/Reports.con
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import { BASE_PATH } from 'lib/constants'
 import { parseAsJson, useQueryState } from 'nuqs'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const EdgeFunctionsReportV2: NextPageWithLayout = () => {
   return (

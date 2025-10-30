@@ -10,7 +10,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()

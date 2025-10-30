@@ -10,7 +10,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const ThirdPartyPage: NextPageWithLayout = () => {
   const { ref } = useParams()

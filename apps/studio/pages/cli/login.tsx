@@ -8,7 +8,7 @@ import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import CopyButton from 'components/ui/CopyButton'
 import { createCliLoginSession } from 'data/cli/login'
 import { withAuth } from 'hooks/misc/withAuth'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 import { InputOTP, InputOTPGroup, InputOTPSlot, LogoLoader } from 'ui'
 import { Admonition } from 'ui-patterns'
 

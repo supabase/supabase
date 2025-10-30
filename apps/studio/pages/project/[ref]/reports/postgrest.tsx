@@ -21,7 +21,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const PostgRESTReport: NextPageWithLayout = () => {
   return (

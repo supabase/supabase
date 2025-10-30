@@ -11,7 +11,7 @@ import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { getQueryClient } from 'data/query-client'
-import { SqlSnippets } from 'types/userContent'
+import { SqlSnippets } from 'types'
 
 export type StateSnippetFolder = {
   projectRef: string

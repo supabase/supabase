@@ -6,7 +6,7 @@ import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import type { SqlSnippets } from 'types/userContent'
+import type { SqlSnippets } from 'types'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export const UnshareSnippetModal = ({

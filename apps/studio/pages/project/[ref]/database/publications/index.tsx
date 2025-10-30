@@ -7,7 +7,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const DatabasePublications: NextPageWithLayout = () => {
   const { can: canViewPublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(

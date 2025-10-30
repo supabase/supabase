@@ -7,7 +7,7 @@ import {
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
   return (

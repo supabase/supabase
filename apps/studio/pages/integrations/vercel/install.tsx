@@ -15,8 +15,7 @@ import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { Organization } from 'types'
-import type { NextPageWithLayout } from 'types/next'
+import type { NextPageWithLayout, Organization } from 'types'
 
 /**
  * Variations of the Vercel integration flow.
