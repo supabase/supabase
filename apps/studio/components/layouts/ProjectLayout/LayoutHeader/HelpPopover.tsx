@@ -1,11 +1,11 @@
-import { Activity, BookOpen, HelpCircle, Mail, Wrench } from 'lucide-react'
+import { Activity, BookOpen, Mail, Wrench } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import SVG from 'react-inlinesvg'
 
 import { IS_PLATFORM } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -17,14 +17,19 @@ import {
   Button,
   ButtonGroup,
   ButtonGroupItem,
-  Popover,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from 'ui'
 import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
 
-export const HelpPopover = () => {
+interface HelpPopoverProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export const HelpPopover = ({ open, onOpenChange }: HelpPopoverProps) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -35,33 +40,23 @@ export const HelpPopover = () => {
 
   const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
 
+  useEffect(() => {
+    if (open) {
+      sendEvent({
+        action: 'help_button_clicked',
+        groups: { project: project?.ref, organization: org?.slug },
+      })
+    }
+  }, [open, sendEvent, project?.ref, org?.slug])
+
   return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_ asChild>
-        <ButtonTooltip
-          id="help-popover-button"
-          type="text"
-          className="rounded-none w-[32px] h-[30px] group"
-          icon={
-            <HelpCircle
-              size={18}
-              strokeWidth={1.5}
-              className="!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground"
-            />
-          }
-          tooltip={{ content: { side: 'bottom', text: 'Help' } }}
-          onClick={() => {
-            sendEvent({
-              action: 'help_button_clicked',
-              groups: { project: project?.ref, organization: org?.slug },
-            })
-          }}
-        />
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[400px] space-y-5 p-0 py-5" align="end" side="bottom">
-        <div className="flex flex-col gap-4">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-[400px] p-0 py-5">
+        <DialogHeader className="px-5">
+          <DialogTitle>Need help with your project?</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4 mt-2">
           <div className="px-5 flex flex-col gap-1">
-            <h5 className="text-foreground">Need help with your project?</h5>
             <p className="text-sm text-foreground-lighter text-balance">
               Start with our {projectRef ? 'Assistant, docs,' : 'docs'} or community.
             </p>
@@ -74,6 +69,7 @@ export const HelpPopover = () => {
                   size="tiny"
                   icon={<AiIconAnimation allowHoverEffect size={14} />}
                   onClick={() => {
+                    onOpenChange(false)
                     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                     snap.newChat({
                       name: 'Support',
@@ -129,15 +125,16 @@ export const HelpPopover = () => {
                   </ButtonGroupItem>
 
                   <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
-                    <SupportLink queryParams={{ projectRef }}>Contact support</SupportLink>
+                    <SupportLink target="_blank" queryParams={{ projectRef }}>
+                      Contact support
+                    </SupportLink>
                   </ButtonGroupItem>
                 </>
               )}
             </ButtonGroup>
           </div>
         </div>
-        <Popover.Separator />
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mt-4">
           <div className="px-5 flex flex-col gap-1">
             <h5 className="text-foreground">Community support</h5>
             <p className="text-sm text-foreground-lighter text-balance">
@@ -174,7 +171,7 @@ export const HelpPopover = () => {
             </div>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </DialogContent>
+    </Dialog>
   )
 }

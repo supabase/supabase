@@ -25,8 +25,6 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Badge, cn } from 'ui'
 import { SIDEBAR_KEYS } from '../LayoutSidebar/LayoutSidebarProvider'
 import { BreadcrumbsView } from './BreadcrumbsView'
-import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
-import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
@@ -214,10 +212,8 @@ const LayoutHeader = ({
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
-                <FeedbackDropdown />
-
                 <div className="overflow-hidden flex items-center rounded-full border">
-                  <HelpPopover />
+                  {/* <HelpAndFeedbackDropdown /> */}
                   <NotificationsPopoverV2 />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
