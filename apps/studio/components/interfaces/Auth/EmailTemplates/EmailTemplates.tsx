@@ -1,37 +1,37 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
+  Button,
   Card,
   CardContent,
+  CardFooter,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Switch,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Switch,
-  FormControl_Shadcn_,
-  CardFooter,
-  Button,
-  Form_Shadcn_,
-  FormField_Shadcn_,
 } from 'ui'
+import { z } from 'zod'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
 import TemplateEditor from './TemplateEditor'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { toast } from 'sonner'
-import { useEffect } from 'react'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
   (t) => t.misc?.emailTemplateType === 'security'
@@ -130,7 +130,7 @@ export const EmailTemplates = () => {
           {isSecurityNotificationsEnabled ? (
             <div className="space-y-8">
               <div>
-                <ScaffoldSectionTitle className="mb-4">Authenticaton</ScaffoldSectionTitle>
+                <ScaffoldSectionTitle className="mb-4">Authentication</ScaffoldSectionTitle>
                 <Card>
                   {TEMPLATES_SCHEMAS.filter(
                     (t) => t.misc?.emailTemplateType === 'authentication'
@@ -151,8 +151,6 @@ export const EmailTemplates = () => {
                           </div>
 
                           <div className="flex items-center gap-4 group">
-                            <Switch checked disabled />
-
                             <ChevronRight
                               size={16}
                               className="text-foreground-muted group-hover:text-foreground transition-colors"
@@ -178,45 +176,46 @@ export const EmailTemplates = () => {
                           `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as keyof typeof authConfig
 
                         return (
-                          <CardContent key={`${template.id}`} className="p-0">
-                            <div className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full">
+                          <CardContent
+                            key={`${template.id}`}
+                            className="p-0 flex items-center justify-between hover:bg-surface-200 transition-colors w-full h-full"
+                          >
+                            <Link
+                              href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                              className="flex flex-col flex-1 py-4 px-6"
+                            >
+                              <h3 className="text-sm text-foreground">{template.title}</h3>
+                              {template.purpose && (
+                                <p className="text-sm text-foreground-lighter">
+                                  {template.purpose}
+                                </p>
+                              )}
+                            </Link>
+
+                            <div className="flex items-center gap-4 group h-full pl-2">
+                              <FormField_Shadcn_
+                                control={notificationsForm.control}
+                                name={templateEnabledKey}
+                                render={({ field }) => (
+                                  <FormControl_Shadcn_>
+                                    <Switch
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                      disabled={!canUpdateConfig}
+                                    />
+                                  </FormControl_Shadcn_>
+                                )}
+                              />
+
                               <Link
                                 href={`/project/${projectRef}/auth/templates/${templateSlug}`}
-                                className="flex flex-col flex-1"
+                                className="py-6 pr-6"
                               >
-                                <h3 className="text-sm text-foreground">{template.title}</h3>
-                                {template.purpose && (
-                                  <p className="text-sm text-foreground-lighter">
-                                    {template.purpose}
-                                  </p>
-                                )}
-                              </Link>
-
-                              <div className="flex items-center gap-4 group">
-                                <FormField_Shadcn_
-                                  control={notificationsForm.control}
-                                  name={templateEnabledKey}
-                                  render={({ field }) => (
-                                    <FormControl_Shadcn_>
-                                      <Switch
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        disabled={!canUpdateConfig}
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                    </FormControl_Shadcn_>
-                                  )}
+                                <ChevronRight
+                                  size={16}
+                                  className="text-foreground-muted hover:text-foreground transition-colors"
                                 />
-
-                                <Link
-                                  href={`/project/${projectRef}/auth/templates/${templateSlug}`}
-                                >
-                                  <ChevronRight
-                                    size={16}
-                                    className="text-foreground-muted hover:text-foreground transition-colors"
-                                  />
-                                </Link>
-                              </div>
+                              </Link>
                             </div>
                           </CardContent>
                         )
