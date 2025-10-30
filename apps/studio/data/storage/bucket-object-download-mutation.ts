@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { components } from 'data/api'
 import { fetchPost } from 'data/fetchers'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 type DownloadBucketObjectParams = {
   projectRef: string

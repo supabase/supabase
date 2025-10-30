@@ -10,8 +10,12 @@ import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { getQueryClient } from 'data/query-client'
+<<<<<<< Updated upstream
 import { useMemo } from 'react'
 import { SqlSnippets } from 'types'
+=======
+import type { SqlSnippets } from 'types'
+>>>>>>> Stashed changes
 
 export type StateSnippetFolder = {
   projectRef: string

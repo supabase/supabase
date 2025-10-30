@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { ResponseData } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.types'
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type EdgeFunctionTestResponse = {
   title: string

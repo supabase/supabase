@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import minify from 'pg-minify'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { QUEUES_SCHEMA } from './database-queues-toggle-postgrest-mutation'
 import { databaseQueuesKeys } from './keys'
 
