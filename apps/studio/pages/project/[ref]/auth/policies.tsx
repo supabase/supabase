@@ -89,7 +89,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
-  const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const {
     setValue: setEditorPanelValue,
     setTemplates: setEditorPanelTemplates,
