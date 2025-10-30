@@ -35,7 +35,7 @@ import { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-5">
       <FormField_Shadcn_
         control={form.control}
         name="projectId"
@@ -185,7 +185,7 @@ export const AnalyticsBucketFields = ({
   )
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-5">
       <div className="px-5">
         <p className="text-xs font-medium text-foreground-light mb-3">Storage</p>
       </div>

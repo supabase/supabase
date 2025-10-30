@@ -477,228 +477,233 @@ export const DestinationPanel = ({
               ) : (
                 <Form_Shadcn_ {...form}>
                   <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          className="p-5"
-                          label={
-                            <span>
-                              Name <span className="text-destructive-600">*</span>
-                            </span>
-                          }
-                          layout="vertical"
-                          description="A descriptive name to identify this destination"
-                        >
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="My destination" />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
+                    <div className="p-5">
+                      <p className="text-sm font-medium text-foreground mb-1">
+                        Destination details
+                      </p>
+                      <p className="text-xs text-foreground-light mb-4">
+                        Name your destination and choose which data to replicate
+                      </p>
+
+                      <div className="space-y-4">
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label={
+                                <span>
+                                  Name <span className="text-destructive-600">*</span>
+                                </span>
+                              }
+                              layout="vertical"
+                              description="A descriptive name to identify this destination"
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_ {...field} placeholder="My destination" />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="publicationName"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label={
+                                <span>
+                                  Publication <span className="text-destructive-600">*</span>
+                                </span>
+                              }
+                              layout="vertical"
+                              description="Choose which tables to replicate to this destination"
+                            >
+                              <FormControl_Shadcn_>
+                                <PublicationsComboBox
+                                  publications={publicationNames}
+                                  isLoadingPublications={isLoadingPublications}
+                                  isLoadingCheck={!!selectedPublication && isLoadingCheck}
+                                  field={field}
+                                  onNewPublicationClick={() => setPublicationPanelVisible(true)}
+                                />
+                              </FormControl_Shadcn_>
+                              {isSelectedPublicationMissing ? (
+                                <Admonition type="warning" className="mt-2 mb-0">
+                                  <p className="!leading-normal">
+                                    The publication{' '}
+                                    <strong className="text-foreground">{publicationName}</strong>{' '}
+                                    was not found, it may have been renamed or deleted, please
+                                    select another one.
+                                  </p>
+                                </Admonition>
+                              ) : hasTablesWithNoPrimaryKeys ? (
+                                <Admonition type="warning" className="mt-2 mb-0">
+                                  <p className="!leading-normal">
+                                    Replication requires every table in the publication to have a
+                                    primary key to work, which these tables are missing:
+                                  </p>
+                                  <ul className="list-disc pl-6 mb-2">
+                                    {(checkPrimaryKeysExistsData?.offendingTables ?? []).map(
+                                      (x) => {
+                                        const value = `${x.schema}.${x.name}`
+                                        return (
+                                          <li key={value} className="!leading-normal">
+                                            <InlineLink
+                                              href={`/project/${projectRef}/editor/${x.id}`}
+                                            >
+                                              {value}
+                                            </InlineLink>
+                                          </li>
+                                        )
+                                      }
+                                    )}
+                                  </ul>
+                                  <p className="!leading-normal">
+                                    Ensure that these tables have primary keys first.
+                                  </p>
+                                </Admonition>
+                              ) : null}
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                    </div>
 
                     <DialogSectionSeparator />
 
-                    <div className="p-5">
-                      <p className="text-sm text-foreground-light mb-4">
-                        Select which data to replicate
-                      </p>
+                    <div className="px-5 py-5">
+                      <p className="text-sm font-medium text-foreground mb-1">Destination type</p>
+                      {editMode ? (
+                        <p className="text-xs text-foreground-light mb-4">
+                          The destination type cannot be changed after creation
+                        </p>
+                      ) : (
+                        <p className="text-xs text-foreground-light mb-4">
+                          Choose which platform to send your database changes to
+                        </p>
+                      )}
                       <FormField_Shadcn_
+                        name="type"
                         control={form.control}
-                        name="publicationName"
                         render={({ field }) => (
-                          <FormItemLayout
-                            label={
-                              <span>
-                                Publication <span className="text-destructive-600">*</span>
-                              </span>
-                            }
-                            layout="vertical"
-                            description="Choose which tables to replicate to this destination"
-                          >
-                            <FormControl_Shadcn_>
-                              <PublicationsComboBox
-                                publications={publicationNames}
-                                isLoadingPublications={isLoadingPublications}
-                                isLoadingCheck={!!selectedPublication && isLoadingCheck}
-                                field={field}
-                                onNewPublicationClick={() => setPublicationPanelVisible(true)}
-                              />
-                            </FormControl_Shadcn_>
-                            {isSelectedPublicationMissing ? (
-                              <Admonition type="warning" className="mt-2 mb-0">
-                                <p className="!leading-normal">
-                                  The publication{' '}
-                                  <strong className="text-foreground">{publicationName}</strong> was
-                                  not found, it may have been renamed or deleted, please select
-                                  another one.
-                                </p>
-                              </Admonition>
-                            ) : hasTablesWithNoPrimaryKeys ? (
-                              <Admonition type="warning" className="mt-2 mb-0">
-                                <p className="!leading-normal">
-                                  Replication requires every table in the publication to have a
-                                  primary key to work, which these tables are missing:
-                                </p>
-                                <ul className="list-disc pl-6 mb-2">
-                                  {(checkPrimaryKeysExistsData?.offendingTables ?? []).map((x) => {
-                                    const value = `${x.schema}.${x.name}`
-                                    return (
-                                      <li key={value} className="!leading-normal">
-                                        <InlineLink href={`/project/${projectRef}/editor/${x.id}`}>
-                                          {value}
-                                        </InlineLink>
-                                      </li>
-                                    )
-                                  })}
-                                </ul>
-                                <p className="!leading-normal">
-                                  Ensure that these tables have primary keys first.
-                                </p>
-                              </Admonition>
-                            ) : null}
-                          </FormItemLayout>
+                          <FormControl_Shadcn_>
+                            {editMode ? (
+                              <div className="relative">
+                                <div className="flex items-start gap-3 p-4 rounded-lg border-2 border-default bg-surface-100 opacity-75">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <p className="text-sm font-medium text-foreground">
+                                        {field.value}
+                                      </p>
+                                      <Lock className="w-3 h-3 text-foreground-lighter" />
+                                    </div>
+                                    <p className="text-xs text-foreground-light leading-relaxed">
+                                      {field.value === 'BigQuery'
+                                        ? "Send data to Google Cloud's data warehouse for analytics and business intelligence"
+                                        : 'Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics workflows'}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="absolute inset-0 cursor-not-allowed" />
+                              </div>
+                            ) : (
+                              <div className="grid gap-3">
+                                {etlEnableBigQuery && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setIsFormInteracting(true)
+                                      field.onChange('BigQuery')
+                                    }}
+                                    className={`relative flex items-start gap-3 p-4 rounded-lg border-2 transition-all text-left ${
+                                      field.value === 'BigQuery'
+                                        ? 'border-brand-600 bg-surface-200'
+                                        : 'border-default bg-surface-100 hover:border-stronger'
+                                    }`}
+                                  >
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <p className="text-sm font-medium text-foreground">
+                                          BigQuery
+                                        </p>
+                                        {field.value === 'BigQuery' && (
+                                          <div className="w-2 h-2 rounded-full bg-brand-600" />
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-foreground-light leading-relaxed">
+                                        Send data to Google Cloud's data warehouse for analytics and
+                                        business intelligence
+                                      </p>
+                                    </div>
+                                  </button>
+                                )}
+                                {etlEnableIceberg && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setIsFormInteracting(true)
+                                      field.onChange('Analytics Bucket')
+                                    }}
+                                    className={`relative flex items-start gap-3 p-4 rounded-lg border-2 transition-all text-left ${
+                                      field.value === 'Analytics Bucket'
+                                        ? 'border-brand-600 bg-surface-200'
+                                        : 'border-default bg-surface-100 hover:border-stronger'
+                                    }`}
+                                  >
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <p className="text-sm font-medium text-foreground">
+                                          Analytics Bucket
+                                        </p>
+                                        {field.value === 'Analytics Bucket' && (
+                                          <div className="w-2 h-2 rounded-full bg-brand-600" />
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-foreground-light leading-relaxed">
+                                        Send data to Apache Iceberg tables in your Supabase Storage
+                                        for flexible analytics workflows
+                                      </p>
+                                    </div>
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </FormControl_Shadcn_>
                         )}
                       />
                     </div>
 
-                    <DialogSectionSeparator />
-
-                    <div className="py-5 flex flex-col gap-y-4">
-                      <div className="px-5">
-                        <p className="text-sm font-medium text-foreground mb-1">Destination type</p>
-                        {editMode ? (
-                          <p className="text-xs text-foreground-light mb-4">
-                            The destination type cannot be changed after creation
+                    {selectedType === 'BigQuery' && etlEnableBigQuery ? (
+                      <>
+                        <DialogSectionSeparator />
+                        <div className="px-5 pt-5">
+                          <p className="text-sm font-medium text-foreground mb-1">
+                            BigQuery settings
                           </p>
-                        ) : (
                           <p className="text-xs text-foreground-light mb-4">
-                            Choose which platform to send your database changes to
+                            Configure how data is sent to your BigQuery destination
                           </p>
-                        )}
-                        <FormField_Shadcn_
-                          name="type"
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormControl_Shadcn_>
-                              {editMode ? (
-                                <div className="relative">
-                                  <div className="flex items-start gap-3 p-4 rounded-lg border-2 border-default bg-surface-100 opacity-75">
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <p className="text-sm font-medium text-foreground">
-                                          {field.value}
-                                        </p>
-                                        <Lock className="w-3 h-3 text-foreground-lighter" />
-                                      </div>
-                                      <p className="text-xs text-foreground-light leading-relaxed">
-                                        {field.value === 'BigQuery'
-                                          ? "Send data to Google Cloud's data warehouse for analytics and business intelligence"
-                                          : 'Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics workflows'}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="absolute inset-0 cursor-not-allowed" />
-                                </div>
-                              ) : (
-                                <div className="grid gap-3">
-                                  {etlEnableBigQuery && (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setIsFormInteracting(true)
-                                        field.onChange('BigQuery')
-                                      }}
-                                      className={`relative flex items-start gap-3 p-4 rounded-lg border-2 transition-all text-left ${
-                                        field.value === 'BigQuery'
-                                          ? 'border-brand-600 bg-surface-200'
-                                          : 'border-default bg-surface-100 hover:border-stronger'
-                                      }`}
-                                    >
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                          <p className="text-sm font-medium text-foreground">
-                                            BigQuery
-                                          </p>
-                                          {field.value === 'BigQuery' && (
-                                            <div className="w-2 h-2 rounded-full bg-brand-600" />
-                                          )}
-                                        </div>
-                                        <p className="text-xs text-foreground-light leading-relaxed">
-                                          Send data to Google Cloud's data warehouse for analytics
-                                          and business intelligence
-                                        </p>
-                                      </div>
-                                    </button>
-                                  )}
-                                  {etlEnableIceberg && (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setIsFormInteracting(true)
-                                        field.onChange('Analytics Bucket')
-                                      }}
-                                      className={`relative flex items-start gap-3 p-4 rounded-lg border-2 transition-all text-left ${
-                                        field.value === 'Analytics Bucket'
-                                          ? 'border-brand-600 bg-surface-200'
-                                          : 'border-default bg-surface-100 hover:border-stronger'
-                                      }`}
-                                    >
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                          <p className="text-sm font-medium text-foreground">
-                                            Analytics Bucket
-                                          </p>
-                                          {field.value === 'Analytics Bucket' && (
-                                            <div className="w-2 h-2 rounded-full bg-brand-600" />
-                                          )}
-                                        </div>
-                                        <p className="text-xs text-foreground-light leading-relaxed">
-                                          Send data to Apache Iceberg tables in your Supabase
-                                          Storage for flexible analytics workflows
-                                        </p>
-                                      </div>
-                                    </button>
-                                  )}
-                                </div>
-                              )}
-                            </FormControl_Shadcn_>
-                          )}
+                        </div>
+                        <BigQueryFields form={form} />
+                      </>
+                    ) : selectedType === 'Analytics Bucket' && etlEnableIceberg ? (
+                      <>
+                        <DialogSectionSeparator />
+                        <div className="px-5 pt-5">
+                          <p className="text-sm font-medium text-foreground mb-1">
+                            Analytics Bucket settings
+                          </p>
+                          <p className="text-xs text-foreground-light mb-4">
+                            Configure how data is sent to your Analytics Bucket destination
+                          </p>
+                        </div>
+                        <AnalyticsBucketFields
+                          form={form}
+                          setIsFormInteracting={setIsFormInteracting}
                         />
-                      </div>
-
-                      {selectedType === 'BigQuery' && etlEnableBigQuery ? (
-                        <>
-                          <DialogSectionSeparator />
-                          <div className="px-5">
-                            <p className="text-sm font-medium text-foreground mb-1">
-                              BigQuery settings
-                            </p>
-                            <p className="text-xs text-foreground-light mb-4">
-                              Configure how data is sent to your BigQuery destination
-                            </p>
-                          </div>
-                          <BigQueryFields form={form} />
-                        </>
-                      ) : selectedType === 'Analytics Bucket' && etlEnableIceberg ? (
-                        <>
-                          <DialogSectionSeparator />
-                          <div className="px-5">
-                            <p className="text-sm font-medium text-foreground mb-1">
-                              Analytics Bucket settings
-                            </p>
-                            <p className="text-xs text-foreground-light mb-4">
-                              Configure how data is sent to your Analytics Bucket destination
-                            </p>
-                          </div>
-                          <AnalyticsBucketFields
-                            form={form}
-                            setIsFormInteracting={setIsFormInteracting}
-                          />
-                        </>
-                      ) : null}
-                    </div>
+                      </>
+                    ) : null}
 
                     <DialogSectionSeparator />
 
