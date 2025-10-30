@@ -2,7 +2,7 @@ import { Book, Maximize2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
   createSqlSnippetSkeletonV2,
@@ -43,6 +43,7 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 
 export const EditorPanel = () => {
   const {
@@ -50,6 +51,7 @@ export const EditorPanel = () => {
     templates,
     results,
     error,
+    initialPrompt,
     onChange,
     setValue,
     setTemplates,
@@ -61,7 +63,10 @@ export const EditorPanel = () => {
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
 
   const label = 'SQL Editor'
-  const isInlineEditorHotkeyEnabled = true
+  const [isInlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
+    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
+    true
+  )
 
   const currentValue = value || ''
 
@@ -275,7 +280,7 @@ export const EditorPanel = () => {
               connectionString: project?.connectionString,
               orgSlug: org?.slug,
             }}
-            initialPrompt=""
+            initialPrompt={initialPrompt}
             options={{
               tabSize: 2,
               fontSize: 13,
@@ -328,7 +333,7 @@ export const EditorPanel = () => {
         )}
 
         {results !== undefined && results.length > 0 && (
-          <div className={`max-h-72 shrink-0 flex flex-col ${showResults && 'h-full'}`}>
+          <div className={cn(`max-h-72 shrink-0 flex flex-col`, showResults && 'h-full')}>
             {showResults && (
               <div className="border-t flex-1 overflow-auto">
                 <Results rows={results} />

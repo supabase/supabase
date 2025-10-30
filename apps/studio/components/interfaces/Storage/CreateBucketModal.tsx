@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
+import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticsBucketDetails/useIcebergWrapper'
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -265,7 +265,7 @@ export const CreateBucketModal = ({
         </ButtonTooltip>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create a {isStorageV2 ? config.singularName : 'storage'} bucket</DialogTitle>
         </DialogHeader>

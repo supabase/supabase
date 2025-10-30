@@ -12,7 +12,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
+import { useAnalyticsBucketCreateMutation } from 'data/storage/analytics-bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -37,7 +37,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useIcebergWrapperExtension } from './AnalyticBucketDetails/useIcebergWrapper'
+import { useIcebergWrapperExtension } from './AnalyticsBucketDetails/useIcebergWrapper'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { BUCKET_TYPES } from './Storage.constants'
 
@@ -110,23 +110,25 @@ export const CreateSpecializedBucketModal = ({
   const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutateAsync: createBucket, isLoading: isCreatingBucket } = useBucketCreateMutation({
-    // [Joshen] Silencing the error here as it's being handled in onSubmit
-    onError: () => {},
-  })
+
+  const { mutateAsync: createAnalyticsBucket, isLoading: isCreatingAnalyticsBucket } =
+    useAnalyticsBucketCreateMutation({
+      // [Joshen] Silencing the error here as it's being handled in onSubmit
+      onError: () => {},
+    })
+
   const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
+
   const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
 
   const config = BUCKET_TYPES['analytics']
-  const isCreating = isCreatingBucket || isEnablingExtension || isCreatingIcebergWrapper
+  const isCreating = isEnablingExtension || isCreatingIcebergWrapper || isCreatingAnalyticsBucket
 
   const form = useForm<CreateSpecializedBucketForm>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      name: '',
-    },
+    defaultValues: { name: '' },
   })
 
   const onSubmit: SubmitHandler<CreateSpecializedBucketForm> = async (values) => {
@@ -149,43 +151,39 @@ export const CreateSpecializedBucketModal = ({
       )
     }
 
-    // Determine bucket type based on the bucketType prop
-    // [Danny] Change STANDARD to VECTORS when ready
-    const bucketTypeValue = bucketType === 'analytics' ? 'ANALYTICS' : 'STANDARD'
-
     try {
-      await createBucket({
-        projectRef: ref,
-        id: values.name,
-        type: bucketTypeValue,
-        isPublic: false, // Specialized buckets are not public by default
-        file_size_limit: undefined, // Specialized buckets do not have a file size limit
-        allowed_mime_types: undefined, // Specialized buckets do not have allowed MIME types
-      })
+      if (bucketType === 'analytics') {
+        await createAnalyticsBucket({
+          projectRef: ref,
+          bucketName: values.name,
+        })
+
+        if (wrappersExtensionState === 'not-installed') {
+          await enableExtension({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            name: wrappersExtension.name,
+            schema: wrappersExtension.schema ?? 'extensions',
+            version: wrappersExtension.default_version,
+          })
+          await createIcebergWrapper({ bucketName: values.name })
+        } else if (wrappersExtensionState === 'installed') {
+          await createIcebergWrapper({ bucketName: values.name })
+        }
+      } else {
+        // TODO for vectors bucket
+      }
 
       sendEvent({
         action: 'storage_bucket_created',
-        properties: { bucketType: bucketTypeValue },
+        properties: { bucketType },
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
-
-      if (wrappersExtensionState === 'not-installed') {
-        await enableExtension({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          name: wrappersExtension.name,
-          schema: wrappersExtension.schema ?? 'extensions',
-          version: wrappersExtension.default_version,
-        })
-        await createIcebergWrapper({ bucketName: values.name })
-      } else if (wrappersExtensionState === 'installed') {
-        await createIcebergWrapper({ bucketName: values.name })
-      }
 
       toast.success(`Created bucket “${values.name}”`)
       form.reset()
       setVisible(false)
-      router.push(`/project/${ref}/storage/${bucketType}/${values.name}`)
+      router.push(`/project/${ref}/storage/${bucketType}/buckets/${values.name}`)
     } catch (error: any) {
       toast.error(`Failed to create bucket: ${error.message}`)
     }
@@ -229,7 +227,7 @@ export const CreateSpecializedBucketModal = ({
         </ButtonTooltip>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create {config.singularName} bucket</DialogTitle>
         </DialogHeader>

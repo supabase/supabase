@@ -2,7 +2,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'hooks/misc/useIsInlineEditorEnabled'
-import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
+import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
+import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -23,17 +24,12 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
   const [isDuplicating, setIsDuplicating] = useState(false)
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
-  const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const {
-    templates: editorPanelTemplates,
     setValue: setEditorPanelValue,
     setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
   } = useEditorPanelStateSnapshot()
-
-  // Local editor panel state
-  const [selectedFunctionForEditor, setSelectedFunctionForEditor] = useState<
-    DatabaseFunction | undefined
-  >()
 
   const { can: canReadFunctions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
@@ -41,9 +37,9 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
   )
 
   const createFunction = () => {
+    setIsDuplicating(false)
     if (isInlineEditorEnabled) {
-      setSelectedFunctionForEditor(undefined)
-      setIsDuplicating(false)
+      setEditorPanelInitialPrompt('Create a new database function that...')
       setEditorPanelValue(`create function function_name()
 returns void
 language plpgsql
@@ -52,9 +48,7 @@ begin
   -- Write your function logic here
 end;
 $$;`)
-      if (editorPanelTemplates.length > 0) {
-        setEditorPanelTemplates([])
-      }
+      setEditorPanelTemplates([])
       openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedFunction(undefined)
@@ -71,7 +65,7 @@ $$;`)
     }
 
     if (isInlineEditorEnabled) {
-      setSelectedFunctionForEditor(dupFn)
+      setEditorPanelInitialPrompt('Create new database function that...')
       setEditorPanelValue(dupFn.complete_statement)
       setEditorPanelTemplates([])
       openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
@@ -82,9 +76,8 @@ $$;`)
   }
 
   const editFunction = (fn: DatabaseFunction) => {
+    setIsDuplicating(false)
     if (isInlineEditorEnabled) {
-      setSelectedFunctionForEditor(fn)
-      setIsDuplicating(false)
       setEditorPanelValue(fn.complete_statement)
       setEditorPanelTemplates([])
       openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
@@ -98,20 +91,6 @@ $$;`)
     setSelectedFunction(fn)
     setShowDeleteFunctionForm(true)
   }
-
-  const isEditorPanelActive = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
-
-  useEffect(() => {
-    if (isEditorPanelActive) return
-
-    setSelectedFunctionForEditor(undefined)
-    if (isDuplicating) {
-      setIsDuplicating(false)
-    }
-    if (editorPanelTemplates.length > 0) {
-      setEditorPanelTemplates([])
-    }
-  }, [editorPanelTemplates.length, isDuplicating, isEditorPanelActive, setEditorPanelTemplates])
 
   if (isPermissionsLoaded && !canReadFunctions) {
     return <NoPermission isFullPage resourceText="view database functions" />

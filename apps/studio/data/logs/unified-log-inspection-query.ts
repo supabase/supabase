@@ -180,12 +180,10 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
     ...options
   }: UseQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
 ) =>
-  useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>(
-    logsKeys.serviceFlow(projectRef, search, logId),
-    ({ signal }) => getUnifiedLogInspection({ projectRef, logId, type, search }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+  useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
+    queryKey: logsKeys.serviceFlow(projectRef, search, logId),
+    queryFn: ({ signal }) => getUnifiedLogInspection({ projectRef, logId, type, search }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })

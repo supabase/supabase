@@ -49,12 +49,10 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
     'stripe.customer'
   )
 
-  return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>(
-    organizationKeys.customerProfile(slug),
-    ({ signal }) => getOrganizationCustomerProfile({ slug }, signal),
-    {
-      enabled: IS_PLATFORM && enabled && canReadCustomerProfile && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>({
+    queryKey: organizationKeys.customerProfile(slug),
+    queryFn: ({ signal }) => getOrganizationCustomerProfile({ slug }, signal),
+    enabled: IS_PLATFORM && enabled && canReadCustomerProfile && typeof slug !== 'undefined',
+    ...options,
+  })
 }

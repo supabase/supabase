@@ -57,15 +57,14 @@ export const useSQLSnippetFolderContentsQuery = <TData = SQLSnippetFolderContent
     TData
   > = {}
 ) =>
-  useInfiniteQuery<SQLSnippetFolderContentsData, SQLSnippetFolderContentsError, TData>(
-    contentKeys.folderContents(projectRef, folderId, { name, sort }),
-    ({ signal, pageParam }) =>
+  useInfiniteQuery<SQLSnippetFolderContentsData, SQLSnippetFolderContentsError, TData>({
+    queryKey: contentKeys.folderContents(projectRef, folderId, { name, sort }),
+    queryFn: ({ signal, pageParam }) =>
       getSQLSnippetFolderContents({ projectRef, folderId, cursor: pageParam, name, sort }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof folderId !== 'undefined',
-      getNextPageParam(lastPage) {
-        return lastPage.cursor
-      },
-      ...options,
-    }
-  )
+
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof folderId !== 'undefined',
+    getNextPageParam(lastPage) {
+      return lastPage.cursor
+    },
+    ...options,
+  })

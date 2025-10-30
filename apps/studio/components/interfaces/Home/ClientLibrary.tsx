@@ -1,7 +1,7 @@
-import { Badge, Button } from 'ui'
+import { BookOpen, Github } from 'lucide-react'
 
 import { BASE_PATH } from 'lib/constants'
-import { BookOpen, Github } from 'lucide-react'
+import { Badge, Button } from 'ui'
 
 interface ClientLibraryProps {
   language: string
@@ -11,7 +11,7 @@ interface ClientLibraryProps {
   altIconName?: string
 }
 
-const ClientLibrary = ({
+export const ClientLibrary = ({
   language,
   officialSupport,
   docsUrl,
@@ -62,5 +62,3 @@ const ClientLibrary = ({
     </div>
   )
 }
-
-export default ClientLibrary

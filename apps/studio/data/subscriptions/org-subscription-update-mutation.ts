@@ -1,13 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { handleError, put } from 'data/fetchers'
 import { invoicesKeys } from 'data/invoices/keys'
+import { organizationKeys } from 'data/organizations/keys'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 import { usageKeys } from 'data/usage/keys'
 import { toast } from 'sonner'
 import type { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
 import type { SubscriptionTier } from './types'
-import { organizationKeys } from 'data/organizations/keys'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string
@@ -59,28 +59,30 @@ export const useOrgSubscriptionUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrgSubscriptionUpdateData, ResponseError, OrgSubscriptionUpdateVariables>(
-    (vars) => updateOrgSubscription(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
+  return useMutation<OrgSubscriptionUpdateData, ResponseError, OrgSubscriptionUpdateVariables>({
+    mutationFn: (vars) => updateOrgSubscription(vars),
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
 
-        if (!data.pending_payment_intent_secret) {
-          // [Kevin] Backend can return stale data as it's waiting for the Stripe-sync to complete. Until that's solved in the backend
-          // we are going back to monkey here and delay the invalidation
-          await new Promise((resolve) => setTimeout(resolve, 2000))
+      if (!data.pending_payment_intent_secret) {
+        // [Kevin] Backend can return stale data as it's waiting for the Stripe-sync to complete. Until that's solved in the backend
+        // we are going back to monkey here and delay the invalidation
+        await new Promise((resolve) => setTimeout(resolve, 2000))
 
-          await Promise.all([
-            queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug)),
-            queryClient.invalidateQueries(subscriptionKeys.orgPlans(slug)),
-            queryClient.invalidateQueries(usageKeys.orgUsage(slug)),
-            queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
-            queryClient.invalidateQueries(organizationKeys.detail(slug)),
-            queryClient.invalidateQueries(organizationKeys.list()),
-          ])
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+          queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgPlans(slug) }),
+          queryClient.invalidateQueries({ queryKey: usageKeys.orgUsage(slug) }),
+          queryClient.invalidateQueries({ queryKey: invoicesKeys.orgUpcomingPreview(slug) }),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.detail(slug) }),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.entitlements(slug) }),
+        ])
 
-          if (variables.paymentMethod) {
-            queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
+        if (variables.paymentMethod) {
+          queryClient.setQueriesData(
+            { queryKey: organizationKeys.paymentMethods(slug) },
+            (prev: any) => {
               if (!prev) return prev
               return {
                 ...prev,
@@ -90,23 +92,23 @@ export const useOrgSubscriptionUpdateMutation = ({
                   is_default: pm.id === variables.paymentMethod,
                 })),
               }
-            })
-          }
+            }
+          )
         }
+      }
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(data.message, {
-            dismissible: true,
-            duration: 10_000,
-          })
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(data.message, {
+          dismissible: true,
+          duration: 10_000,
+        })
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

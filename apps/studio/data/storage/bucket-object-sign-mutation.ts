@@ -43,20 +43,18 @@ export const useGetSignBucketObjectMutation = ({
   UseMutationOptions<SignBucketObjectData, ResponseError, SignBucketObjectParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SignBucketObjectData, ResponseError, SignBucketObjectParams>(
-    (vars) => signBucketObject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to get sign bucket object: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SignBucketObjectData, ResponseError, SignBucketObjectParams>({
+    mutationFn: (vars) => signBucketObject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to get sign bucket object: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

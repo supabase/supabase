@@ -6,12 +6,22 @@ type Template = {
   content: string
 }
 
-const initialState = {
+type EditorPanelState = {
+  value: string
+  templates: Template[]
+  results: any[] | undefined
+  error: any
+  initialPrompt: string
+  onChange: ((value: string) => void) | undefined
+}
+
+const initialState: EditorPanelState = {
   value: '',
-  templates: [] as Template[],
-  results: undefined as any[] | undefined,
-  error: undefined as any,
-  onChange: undefined as ((value: string) => void) | undefined,
+  templates: [],
+  results: undefined,
+  error: undefined,
+  initialPrompt: '',
+  onChange: undefined,
 }
 
 export const editorPanelState = proxy({
@@ -30,6 +40,9 @@ export const editorPanelState = proxy({
   },
   setError(error: any) {
     editorPanelState.error = error
+  },
+  setInitialPrompt(initialPrompt: string) {
+    editorPanelState.initialPrompt = initialPrompt
   },
   reset() {
     Object.assign(editorPanelState, initialState)

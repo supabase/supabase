@@ -23,7 +23,7 @@ import {
   Theme,
   singleThemes,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { useCommandMenuOpenedTelemetry, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
 export function UserDropdown() {
@@ -35,7 +35,13 @@ export function UserDropdown() {
 
   const signOut = useSignOut()
   const setCommandMenuOpen = useSetCommandMenuOpen()
+  const sendTelemetry = useCommandMenuOpenedTelemetry()
   const { openFeaturePreviewModal } = useFeaturePreviewModal()
+
+  const handleCommandMenuOpen = () => {
+    setCommandMenuOpen(true)
+    sendTelemetry()
+  }
 
   return (
     <DropdownMenu>
@@ -97,7 +103,7 @@ export function UserDropdown() {
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
+              <DropdownMenuItem className="flex gap-2" onClick={handleCommandMenuOpen}>
                 <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Command menu
               </DropdownMenuItem>

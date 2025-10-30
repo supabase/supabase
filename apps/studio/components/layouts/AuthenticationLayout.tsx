@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react'
 
-import { AppBannerWrapper } from 'components/interfaces/App'
+import { AppBannerWrapper } from 'components/interfaces/App/AppBannerWrapper'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 
 export const AuthenticationLayout = ({ children }: PropsWithChildren<{}>) => {
