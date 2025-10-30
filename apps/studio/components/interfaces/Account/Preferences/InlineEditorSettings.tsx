@@ -17,7 +17,7 @@ const InlineEditorSchema = z.object({
 export const useIsInlineEditorEnabled = () => {
   const [inlineEditorEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    true
+    false
   )
 
   return inlineEditorEnabled ?? false
@@ -26,7 +26,7 @@ export const useIsInlineEditorEnabled = () => {
 export const InlineEditorSettings = () => {
   const [inlineEditorEnabled, setInlineEditorEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    true
+    false
   )
   const { data: org } = useSelectedOrganizationQuery()
 
