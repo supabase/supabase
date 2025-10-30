@@ -35,7 +35,7 @@ import { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   return (
-    <>
+    <div className="space-y-4">
       <FormField_Shadcn_
         control={form.control}
         name="projectId"
@@ -44,10 +44,10 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
             layout="vertical"
             className="px-5"
             label="Project ID"
-            description="Which BigQuery project to send data to"
+            description="Your Google Cloud project identifier"
           >
             <FormControl_Shadcn_>
-              <Input_Shadcn_ {...field} placeholder="Project ID" />
+              <Input_Shadcn_ {...field} placeholder="my-gcp-project" />
             </FormControl_Shadcn_>
           </FormItemLayout>
         )}
@@ -57,9 +57,14 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
         control={form.control}
         name="datasetId"
         render={({ field }) => (
-          <FormItemLayout label="Project's Dataset ID" layout="vertical" className="px-5">
+          <FormItemLayout
+            label="Dataset ID"
+            layout="vertical"
+            className="px-5"
+            description="The dataset where tables will be created"
+          >
             <FormControl_Shadcn_>
-              <Input_Shadcn_ {...field} placeholder="Dataset ID" />
+              <Input_Shadcn_ {...field} placeholder="my_dataset" />
             </FormControl_Shadcn_>
           </FormItemLayout>
         )}
@@ -73,20 +78,21 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
             layout="vertical"
             className="px-5"
             label="Service Account Key"
-            description="The service account key for BigQuery"
+            description="JSON key file for authentication with BigQuery"
           >
             <FormControl_Shadcn_>
               <TextArea_Shadcn_
                 {...field}
-                rows={4}
+                rows={5}
                 maxLength={5000}
-                placeholder="Service account key"
+                placeholder='{"type": "service_account", "project_id": "...", ...}'
+                className="font-mono text-xs"
               />
             </FormControl_Shadcn_>
           </FormItemLayout>
         )}
       />
-    </>
+    </div>
   )
 }
 
@@ -167,7 +173,10 @@ export const AnalyticsBucketFields = ({
   )
 
   return (
-    <>
+    <div className="space-y-4">
+      <div className="px-5">
+        <p className="text-xs font-medium text-foreground-light mb-3">Storage</p>
+      </div>
       <FormField_Shadcn_
         control={form.control}
         name="warehouseName"
@@ -324,9 +333,9 @@ export const AnalyticsBucketFields = ({
         />
       )}
 
-      <DialogSectionSeparator />
-
-      <p className="px-5 text-sm text-foreground-light">Credentials</p>
+      <div className="px-5 pt-4">
+        <p className="text-xs font-medium text-foreground-light mb-3">Credentials</p>
+      </div>
 
       <FormField_Shadcn_
         control={form.control}
@@ -489,6 +498,6 @@ export const AnalyticsBucketFields = ({
           )}
         />
       )}
-    </>
+    </div>
   )
 }

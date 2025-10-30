@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { snakeCase } from 'lodash'
+import { Database, DatabaseZap, Warehouse } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -78,6 +79,20 @@ export const DestinationPanel = ({
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { setRequestStatus } = usePipelineRequestStatus()
+
+  // Feature flags for ETL destinations
+  const etlEnableBigQuery = useFlag('etlEnableBigQuery')
+  const etlEnableIceberg = useFlag('etlEnableIceberg')
+
+  // Compute available destinations based on feature flags
+  const availableDestinations = useMemo(() => {
+    const destinations = []
+    if (etlEnableBigQuery) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
+    if (etlEnableIceberg) destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
+    return destinations
+  }, [etlEnableBigQuery, etlEnableIceberg])
+
+  const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const editMode = !!existingDestination
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
@@ -191,7 +206,11 @@ export const DestinationPanel = ({
   const hasTablesWithNoPrimaryKeys = (checkPrimaryKeysExistsData?.offendingTables ?? []).length > 0
 
   const isSubmitDisabled =
-    isSaving || isSelectedPublicationMissing || isLoadingCheck || hasTablesWithNoPrimaryKeys
+    isSaving ||
+    isSelectedPublicationMissing ||
+    isLoadingCheck ||
+    hasTablesWithNoPrimaryKeys ||
+    (hasNoAvailableDestinations && !editMode)
 
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
@@ -430,26 +449,40 @@ export const DestinationPanel = ({
             </SheetHeader>
 
             <SheetSection className="flex-grow overflow-auto px-0 py-0">
-              <Form_Shadcn_ {...form}>
-                <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        className="p-5"
-                        label="Name"
-                        layout="vertical"
-                        description="A name you will use to identify this destination"
-                      >
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_ {...field} placeholder="Name" />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
+              {hasNoAvailableDestinations && !editMode ? (
+                <div className="flex flex-col items-center justify-center h-full px-8 py-16 text-center">
+                  <div className="flex items-center justify-center w-20 h-20 rounded-full bg-surface-300 mb-6">
+                    <DatabaseZap className="w-10 h-10 text-foreground-light" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-xl font-medium text-foreground mb-3">
+                    No destinations available
+                  </h3>
+                  <p className="text-sm text-foreground-light max-w-md leading-relaxed">
+                    Database replication destinations are not currently available for this project.
+                    Please contact support if you need to enable data replication to external warehouses.
+                  </p>
+                </div>
+              ) : (
+                <Form_Shadcn_ {...form}>
+                  <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          className="p-5"
+                          label="Name"
+                          layout="vertical"
+                          description="A name you will use to identify this destination"
+                        >
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_ {...field} placeholder="Name" />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
 
-                  <DialogSectionSeparator />
+                    <DialogSectionSeparator />
 
                   <div className="p-5">
                     <p className="text-sm text-foreground-light mb-4">What data to send</p>
@@ -511,57 +544,141 @@ export const DestinationPanel = ({
                   <DialogSectionSeparator />
 
                   <div className="py-5 flex flex-col gap-y-4">
-                    <p className="px-5 text-sm text-foreground-light">Where to send that data</p>
-                    <FormField_Shadcn_
-                      name="type"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItemLayout
-                          label="Type"
-                          layout="vertical"
-                          className="px-5"
-                          description="The type of destination to send the data to"
-                        >
+                    <div className="px-5">
+                      <p className="text-sm font-medium text-foreground mb-1">
+                        Destination type
+                      </p>
+                      <p className="text-xs text-foreground-light mb-4">
+                        Select where you want to send your data
+                      </p>
+                      <FormField_Shadcn_
+                        name="type"
+                        control={form.control}
+                        render={({ field }) => (
                           <FormControl_Shadcn_>
-                            <Select_Shadcn_
-                              value={field.value}
-                              onValueChange={(value) => {
-                                setIsFormInteracting(true)
-                                field.onChange(value)
-                              }}
-                            >
-                              <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  <SelectItem_Shadcn_ value="BigQuery">BigQuery</SelectItem_Shadcn_>
-                                  <SelectItem_Shadcn_ value="Analytics Bucket">
-                                    Analytics Bucket
-                                  </SelectItem_Shadcn_>
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                            <div className="grid gap-3">
+                              {etlEnableBigQuery && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsFormInteracting(true)
+                                    field.onChange('BigQuery')
+                                  }}
+                                  className={`relative flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
+                                    field.value === 'BigQuery'
+                                      ? 'border-brand-600 bg-surface-200'
+                                      : 'border-default bg-surface-100 hover:border-stronger'
+                                  }`}
+                                >
+                                  <div
+                                    className={`flex items-center justify-center w-10 h-10 rounded-md ${
+                                      field.value === 'BigQuery'
+                                        ? 'bg-brand-400 text-brand-600'
+                                        : 'bg-surface-300 text-foreground-light'
+                                    }`}
+                                  >
+                                    <Database className="w-5 h-5" strokeWidth={2} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <p className="text-sm font-medium text-foreground">
+                                        BigQuery
+                                      </p>
+                                      {field.value === 'BigQuery' && (
+                                        <div className="w-2 h-2 rounded-full bg-brand-600" />
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-foreground-light leading-relaxed">
+                                      Google Cloud's serverless data warehouse for analytics and
+                                      business intelligence
+                                    </p>
+                                  </div>
+                                </button>
+                              )}
+                              {etlEnableIceberg && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsFormInteracting(true)
+                                    field.onChange('Analytics Bucket')
+                                  }}
+                                  className={`relative flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
+                                    field.value === 'Analytics Bucket'
+                                      ? 'border-brand-600 bg-surface-200'
+                                      : 'border-default bg-surface-100 hover:border-stronger'
+                                  }`}
+                                >
+                                  <div
+                                    className={`flex items-center justify-center w-10 h-10 rounded-md ${
+                                      field.value === 'Analytics Bucket'
+                                        ? 'bg-brand-400 text-brand-600'
+                                        : 'bg-surface-300 text-foreground-light'
+                                    }`}
+                                  >
+                                    <Warehouse className="w-5 h-5" strokeWidth={2} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <p className="text-sm font-medium text-foreground">
+                                        Analytics Bucket
+                                      </p>
+                                      {field.value === 'Analytics Bucket' && (
+                                        <div className="w-2 h-2 rounded-full bg-brand-600" />
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-foreground-light leading-relaxed">
+                                      Apache Iceberg tables in your Supabase Storage for flexible
+                                      analytics workflows
+                                    </p>
+                                  </div>
+                                </button>
+                              )}
+                            </div>
                           </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
-
-                    {selectedType === 'BigQuery' ? (
-                      <BigQueryFields form={form} />
-                    ) : selectedType === 'Analytics Bucket' ? (
-                      <AnalyticsBucketFields
-                        form={form}
-                        setIsFormInteracting={setIsFormInteracting}
+                        )}
                       />
+                    </div>
+
+                    {selectedType === 'BigQuery' && etlEnableBigQuery ? (
+                      <>
+                        <DialogSectionSeparator />
+                        <div className="px-5">
+                          <p className="text-sm font-medium text-foreground mb-1">
+                            BigQuery configuration
+                          </p>
+                          <p className="text-xs text-foreground-light mb-4">
+                            Configure your Google Cloud BigQuery destination
+                          </p>
+                        </div>
+                        <BigQueryFields form={form} />
+                      </>
+                    ) : selectedType === 'Analytics Bucket' && etlEnableIceberg ? (
+                      <>
+                        <DialogSectionSeparator />
+                        <div className="px-5">
+                          <p className="text-sm font-medium text-foreground mb-1">
+                            Analytics Bucket configuration
+                          </p>
+                          <p className="text-xs text-foreground-light mb-4">
+                            Configure your Supabase Storage Analytics Bucket
+                          </p>
+                        </div>
+                        <AnalyticsBucketFields
+                          form={form}
+                          setIsFormInteracting={setIsFormInteracting}
+                        />
+                      </>
                     ) : null}
                   </div>
 
                   <DialogSectionSeparator />
 
-                  <div className="px-5">
-                    <AdvancedSettings form={form} />
-                  </div>
-                </form>
-              </Form_Shadcn_>
+                    <div className="px-5">
+                      <AdvancedSettings form={form} />
+                    </div>
+                  </form>
+                </Form_Shadcn_>
+              )}
             </SheetSection>
 
             <SheetFooter>
