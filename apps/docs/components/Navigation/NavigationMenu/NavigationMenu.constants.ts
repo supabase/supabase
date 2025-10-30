@@ -2640,6 +2640,10 @@ export const self_hosting: NavMenuConstant = {
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker' },
     {
+      name: 'Configuration',
+      items: [{ name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' }],
+    },
+    {
       name: 'Auth Server',
       items: [
         { name: 'Reference', url: '/reference/self-hosting-auth/introduction' },
