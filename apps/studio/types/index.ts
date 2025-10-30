@@ -1,8 +1,8 @@
 export {
+  ResponseError,
   type Dictionary,
   type Organization,
   type Permission,
-  type ResponseError,
   type ResponseFailure,
   type Role,
   type SupaResponse,
