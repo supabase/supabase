@@ -8,6 +8,20 @@ import { Notification } from 'data/notifications/notifications-v2-query'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import { cn } from 'ui'
 
+const NoProjectNotice = () => {
+  return (
+    <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+      <Inbox className="text-foreground-muted" strokeWidth={1} />
+      <div className="text-center">
+        <p className="heading-default">Project required</p>
+        <p className="text-foreground-light text-sm">
+          Select a project to view security and performance advisories
+        </p>
+      </div>
+    </div>
+  )
+}
+
 const tabIconMap: Record<Exclude<AdvisorTab, 'all'>, React.ElementType> = {
   security: Shield,
   performance: Gauge,
@@ -30,6 +44,7 @@ interface AdvisorPanelBodyProps {
   onClearFilters: () => void
   hiddenItemsCount: number
   hasAnyFilters: boolean
+  hasProjectRef?: boolean
 }
 
 export const AdvisorPanelBody = ({
@@ -42,7 +57,13 @@ export const AdvisorPanelBody = ({
   onClearFilters,
   hiddenItemsCount,
   hasAnyFilters,
+  hasProjectRef = true,
 }: AdvisorPanelBodyProps) => {
+  // Show notice if no project ref and trying to view project-specific tabs
+  if (!hasProjectRef && activeTab !== 'messages') {
+    return <NoProjectNotice />
+  }
+
   if (isLoading) {
     return (
       <div>
@@ -121,4 +142,3 @@ export const AdvisorPanelBody = ({
     </>
   )
 }
-

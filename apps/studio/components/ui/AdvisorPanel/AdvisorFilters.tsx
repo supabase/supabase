@@ -24,6 +24,7 @@ interface AdvisorFiltersProps {
   statusFilters: string[]
   onStatusFiltersChange: (filters: string[]) => void
   unreadCount?: number
+  hasProjectRef?: boolean
   onClose: () => void
 }
 
@@ -35,6 +36,7 @@ export const AdvisorFilters = ({
   statusFilters,
   onStatusFiltersChange,
   unreadCount = 0,
+  hasProjectRef = true,
   onClose,
 }: AdvisorFiltersProps) => {
   return (

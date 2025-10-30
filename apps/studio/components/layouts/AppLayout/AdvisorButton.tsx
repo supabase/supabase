@@ -1,6 +1,5 @@
 import { Lightbulb } from 'lucide-react'
 
-import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
@@ -8,10 +7,16 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { cn } from 'ui'
 
-export const AdvisorButton = () => {
-  const { ref: projectRef } = useParams()
+interface AdvisorButtonProps {
+  projectRef?: string
+}
+
+export const AdvisorButton = ({ projectRef }: AdvisorButtonProps) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
-  const { data: lints } = useProjectLintsQuery({ projectRef })
+  const { data: lints } = useProjectLintsQuery(
+    { projectRef: projectRef ?? '' },
+    { enabled: !!projectRef }
+  )
   const { data: notificationsSummary } = useNotificationsSummaryQuery()
 
   const hasCriticalIssues = Array.isArray(lints) && lints.some((lint) => lint.level === 'ERROR')

@@ -211,10 +211,10 @@ const LayoutHeader = ({
 
                 <div className="overflow-hidden flex items-center gap-2">
                   <HelpPopover />
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <AdvisorButton />
                         <InlineEditorButton />
                         <AssistantButton />
                       </>
@@ -227,10 +227,10 @@ const LayoutHeader = ({
               <>
                 <LocalVersionPopover />
                 <div className="overflow-hidden flex items-center gap-2">
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <AdvisorButton />
                         <InlineEditorButton />
                         <AssistantButton />
                       </>

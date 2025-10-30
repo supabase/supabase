@@ -1,7 +1,6 @@
 import { useMemo, useRef } from 'react'
 import dayjs from 'dayjs'
 
-import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -12,7 +11,6 @@ import {
   useAdvisorStateSnapshot,
 } from 'state/advisor-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { NotificationDetail } from './NotificationDetail'
 import {
   Notification,
   NotificationData,
@@ -24,6 +22,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { AdvisorPanelHeader, AdvisorItem } from './AdvisorPanelHeader'
 import { AdvisorFilters } from './AdvisorFilters'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
+import { AdvisorDetail } from './AdvisorDetail'
 
 const severityOrder: Record<AdvisorSeverity, number> = {
   critical: 0,
@@ -75,6 +74,7 @@ export const AdvisorPanel = () => {
 
   const isSidebarOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
   const markedRead = useRef<string[]>([])
+  const hasProjectRef = !!project?.ref
 
   const { data: organizations } = useOrganizationsQuery({ enabled: isSidebarOpen })
 
@@ -84,10 +84,11 @@ export const AdvisorPanel = () => {
     isError: isLintsError,
   } = useProjectLintsQuery(
     { projectRef: project?.ref },
-    { enabled: isSidebarOpen && !!project?.ref && activeTab !== 'messages' }
+    { enabled: isSidebarOpen && hasProjectRef && activeTab !== 'messages' }
   )
 
-  const shouldLoadNotifications = isSidebarOpen && (activeTab === 'messages' || activeTab === 'all')
+  // Notifications should always load when sidebar is open (shown in both 'all' and 'messages' tabs)
+  const shouldLoadNotifications = isSidebarOpen
 
   const notificationStatus = useMemo(() => {
     if (notificationFilterStatuses.includes('archived')) {
@@ -99,6 +100,16 @@ export const AdvisorPanel = () => {
     return undefined
   }, [notificationFilterStatuses])
 
+  // Memoize filters to prevent query key changes on every render
+  const notificationFilters = useMemo(
+    () => ({
+      priority: notificationFilterPriorities,
+      organizations: notificationFilterOrganizations,
+      projects: notificationFilterProjects,
+    }),
+    [notificationFilterPriorities, notificationFilterOrganizations, notificationFilterProjects]
+  )
+
   const {
     data: notificationsData,
     isLoading: isNotificationsLoading,
@@ -106,12 +117,7 @@ export const AdvisorPanel = () => {
   } = useNotificationsV2Query(
     {
       status: notificationStatus,
-      filters: {
-        priority: notificationFilterPriorities,
-        organizations: notificationFilterOrganizations,
-        projects: notificationFilterProjects,
-      },
-      limit: 50,
+      filters: notificationFilters,
     },
     { enabled: shouldLoadNotifications }
   )
@@ -123,10 +129,11 @@ export const AdvisorPanel = () => {
   const { mutate: updateNotifications } = useNotificationsV2UpdateMutation()
 
   const notifications = useMemo(() => {
-    const apiNotifications = notificationsData?.pages.flatMap((page) => page) ?? []
+    if (!notificationsData?.pages) return []
+    const apiNotifications = notificationsData.pages.flatMap((page) => page ?? [])
     // Limit to 50 notifications
     return apiNotifications.slice(0, 50)
-  }, [notificationsData?.pages])
+  }, [notificationsData])
 
   const markNotificationsRead = () => {
     if (markedRead.current.length > 0) {
@@ -199,18 +206,30 @@ export const AdvisorPanel = () => {
       }
 
       // Filter by tab
-      if (activeTab === 'all') return true
+      if (activeTab === 'all') {
+        // When no projectRef, only show notifications in 'all' tab
+        if (!hasProjectRef && item.source !== 'notification') {
+          return false
+        }
+        return true
+      }
 
       return item.tab === activeTab
     })
-  }, [combinedItems, severityFilters, activeTab])
+  }, [combinedItems, severityFilters, activeTab, hasProjectRef])
 
   const itemsFilteredByTabOnly = useMemo<AdvisorItem[]>(() => {
     return combinedItems.filter((item) => {
-      if (activeTab === 'all') return true
+      if (activeTab === 'all') {
+        // When no projectRef, only show notifications in 'all' tab
+        if (!hasProjectRef && item.source !== 'notification') {
+          return false
+        }
+        return true
+      }
       return item.tab === activeTab
     })
-  }, [combinedItems, activeTab])
+  }, [combinedItems, activeTab, hasProjectRef])
 
   const hiddenItemsCount = itemsFilteredByTabOnly.length - filteredItems.length
 
@@ -219,7 +238,11 @@ export const AdvisorPanel = () => {
   )
   const isDetailView = !!selectedItem
 
-  const isLoading = isLintsLoading || (shouldLoadNotifications && isNotificationsLoading)
+  // Only show loading state if the query is actually enabled
+  const isLintsActuallyLoading =
+    isSidebarOpen && hasProjectRef && activeTab !== 'messages' && isLintsLoading
+  const isNotificationsActuallyLoading = shouldLoadNotifications && isNotificationsLoading
+  const isLoading = isLintsActuallyLoading || isNotificationsActuallyLoading
   const isError = isLintsError || isNotificationsError
 
   const handleTabChange = (tab: string) => {
@@ -303,6 +326,7 @@ export const AdvisorPanel = () => {
               toAdd.forEach((status) => setNotificationFilters(status, 'status'))
             }}
             unreadCount={unreadCount}
+            hasProjectRef={hasProjectRef}
             onClose={handleClose}
           />
           <div className="flex-1 overflow-y-auto">
@@ -316,41 +340,11 @@ export const AdvisorPanel = () => {
               onClearFilters={handleClearAllFilters}
               hiddenItemsCount={hiddenItemsCount}
               hasAnyFilters={hasAnyFilters}
+              hasProjectRef={hasProjectRef}
             />
           </div>
         </>
       )}
     </div>
   )
-}
-
-interface AdvisorDetailProps {
-  item: AdvisorItem
-  projectRef: string
-  onUpdateNotificationStatus?: (id: string, status: 'archived' | 'seen') => void
-}
-
-const AdvisorDetail = ({ item, projectRef, onUpdateNotificationStatus }: AdvisorDetailProps) => {
-  if (item.source === 'lint') {
-    const lint = item.original as Lint
-    return (
-      <div className="px-6 py-6">
-        <LintDetail lint={lint} projectRef={projectRef} />
-      </div>
-    )
-  }
-
-  if (item.source === 'notification') {
-    const notification = item.original as Notification
-    return (
-      <div className="px-6 py-6">
-        <NotificationDetail
-          notification={notification}
-          onUpdateStatus={onUpdateNotificationStatus || (() => {})}
-        />
-      </div>
-    )
-  }
-
-  return null
 }

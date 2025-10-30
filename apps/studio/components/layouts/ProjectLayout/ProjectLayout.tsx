@@ -20,7 +20,6 @@ import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import { LayoutSidebar } from './LayoutSidebar'
 import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
@@ -215,7 +214,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                     )}
                   </main>
                 </ResizablePanel>
-                <LayoutSidebar />
               </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>
