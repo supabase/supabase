@@ -59,7 +59,9 @@ export const DestinationPanelFormSchema = z
       }
 
       const hasValidNamespace =
-        (data.namespace && data.namespace.length > 0 && data.namespace !== 'create-new-namespace') ||
+        (data.namespace &&
+          data.namespace.length > 0 &&
+          data.namespace !== 'create-new-namespace') ||
         (data.namespace === 'create-new-namespace' &&
           data.newNamespaceName &&
           data.newNamespaceName.length > 0)
@@ -89,7 +91,10 @@ export const DestinationPanelFormSchema = z
       }
 
       // Validate S3 keys when not creating new
-      if (data.s3AccessKeyId !== 'create-new' && (!data.s3SecretAccessKey || data.s3SecretAccessKey.length === 0)) {
+      if (
+        data.s3AccessKeyId !== 'create-new' &&
+        (!data.s3SecretAccessKey || data.s3SecretAccessKey.length === 0)
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'S3 Secret Access Key is required',
