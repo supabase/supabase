@@ -40,7 +40,6 @@ export const RegenerateClientSecretDialog = ({
         projectRef,
         supabaseClient: supabaseClientData.supabaseClient,
         clientId,
-        temporaryApiKey: supabaseClientData.temporaryApiKey,
       })
       onClose()
     } catch (error) {

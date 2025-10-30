@@ -10,7 +10,6 @@ export type OAuthServerAppDeleteVariables = {
   clientId?: string
   projectRef?: string
   supabaseClient?: SupabaseClient<any>
-  temporaryApiKey?: string
 }
 
 export async function deleteOAuthServerApp({
@@ -43,9 +42,9 @@ export const useOAuthServerAppDeleteMutation = ({
   return useMutation<OAuthAppDeleteData, ResponseError, OAuthServerAppDeleteVariables>({
     mutationFn: (vars) => deleteOAuthServerApp(vars),
     onSuccess: async (data, variables, context) => {
-      const { projectRef, temporaryApiKey } = variables
+      const { projectRef } = variables
       await queryClient.invalidateQueries({
-        queryKey: oauthServerAppKeys.list(projectRef, temporaryApiKey),
+        queryKey: oauthServerAppKeys.list(projectRef),
       })
       await onSuccess?.(data, variables, context)
     },

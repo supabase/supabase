@@ -1,5 +1,4 @@
 import type { OAuthClient } from '@supabase/supabase-js'
-import dayjs from 'dayjs'
 import { MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -30,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { CreateOAuthAppSheet } from './CreateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
 import { NewOAuthAppBanner } from './NewOAuthAppBanner'
@@ -64,7 +64,6 @@ export const OAuthAppsList = () => {
     {
       projectRef,
       supabaseClient: supabaseClientData?.supabaseClient,
-      temporaryApiKey: supabaseClientData?.temporaryApiKey,
     },
     { enabled: isOAuthServerEnabled }
   )
@@ -215,7 +214,9 @@ export const OAuthAppsList = () => {
                       <TableCell className="max-w-40" title={app.client_id}>
                         <Badge>{app.client_id}</Badge>
                       </TableCell>
-                      <TableCell className="max-w-40">test</TableCell>
+                      <TableCell className="max-w-40">
+                        {app.client_type === 'public' ? 'Public' : 'Private'}
+                      </TableCell>
                       <TableCell className="max-w-40">
                         {app.scope ? (
                           <Badge>{app.scope}</Badge>
@@ -224,7 +225,7 @@ export const OAuthAppsList = () => {
                         )}
                       </TableCell>
                       <TableCell className="text-xs text-foreground-light w-1/6">
-                        {dayjs(app.created_at).format('D MMM, YYYY')}
+                        <TimestampInfo utcTimestamp={app.created_at} labelFormat="D MMM, YYYY" />
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-end items-center">

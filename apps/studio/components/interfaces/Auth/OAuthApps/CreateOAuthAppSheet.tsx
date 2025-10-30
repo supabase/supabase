@@ -116,7 +116,6 @@ export const CreateOAuthAppSheet = ({ visible, onSuccess, onCancel }: CreateOAut
     createOAuthApp({
       projectRef,
       supabaseClient: supabaseClientData?.supabaseClient,
-      temporaryApiKey: supabaseClientData?.temporaryApiKey,
       ...payload,
     })
   }

@@ -26,15 +26,19 @@ const getSupabaseClient = ({
 
   const supabaseClient = createClient(endpoint, temporaryApiKey)
 
-  return { supabaseClient, temporaryApiKey }
+  return { supabaseClient }
 }
 
+/**
+ * The client uses a temporary API key to authenticate requests. The API key expires after one hour which may cause
+ * 401 errors for all requests made with the client. It's easily fixable by refreshing the page.
+ */
 export const useSupabaseClientQuery = (
   { projectRef }: { projectRef?: string },
   { enabled = true, ...options } = {}
 ) => {
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: temporaryApiKeyData } = useTemporaryAPIKeyQuery({ projectRef })
+  const { data: temporaryApiKeyData } = useTemporaryAPIKeyQuery({ projectRef, expiry: 3600 })
 
   const endpoint = settings
     ? `${settings?.app_config?.protocol ?? 'https'}://${settings?.app_config?.endpoint}`

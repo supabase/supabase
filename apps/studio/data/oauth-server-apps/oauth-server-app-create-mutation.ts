@@ -9,7 +9,6 @@ import { oauthServerAppKeys } from './keys'
 export type OAuthServerAppCreateVariables = CreateOAuthClientParams & {
   projectRef?: string
   supabaseClient?: SupabaseClient<any>
-  temporaryApiKey?: string
 }
 
 export async function createOAuthServerApp({
@@ -41,9 +40,9 @@ export const useOAuthServerAppCreateMutation = ({
   return useMutation<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>({
     mutationFn: (vars) => createOAuthServerApp(vars),
     onSuccess: async (data, variables, context) => {
-      const { projectRef, temporaryApiKey } = variables
+      const { projectRef } = variables
       await queryClient.invalidateQueries({
-        queryKey: oauthServerAppKeys.list(projectRef, temporaryApiKey),
+        queryKey: oauthServerAppKeys.list(projectRef),
       })
       await onSuccess?.(data, variables, context)
     },

@@ -9,7 +9,6 @@ import { oauthServerAppKeys } from './keys'
 export type OAuthServerAppsVariables = {
   projectRef?: string
   supabaseClient?: SupabaseClient<any>
-  temporaryApiKey?: string
   page?: number
 }
 
@@ -38,14 +37,14 @@ export type OAuthServerAppsData = Awaited<ReturnType<typeof getOAuthServerApps>>
 export type OAuthServerAppsError = ResponseError
 
 export const useOAuthServerAppsQuery = <TData = OAuthServerAppsData>(
-  { projectRef, temporaryApiKey, supabaseClient }: OAuthServerAppsVariables,
+  { projectRef, supabaseClient }: OAuthServerAppsVariables,
   {
     enabled = true,
     ...options
   }: UseQueryOptions<OAuthServerAppsData, OAuthServerAppsError, TData> = {}
 ) => {
   return useQuery({
-    queryKey: oauthServerAppKeys.list(projectRef, temporaryApiKey),
+    queryKey: oauthServerAppKeys.list(projectRef),
     queryFn: () => getOAuthServerApps({ projectRef, supabaseClient }),
     enabled: enabled && typeof projectRef !== 'undefined' && !!supabaseClient,
     ...options,
