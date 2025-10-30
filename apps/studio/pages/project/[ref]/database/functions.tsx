@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'hooks/misc/useIsInlineEditorEnabled'
 import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
