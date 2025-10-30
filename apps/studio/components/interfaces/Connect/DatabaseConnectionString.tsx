@@ -1,4 +1,4 @@
-import { BookOpen, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react'
+import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
@@ -32,7 +32,6 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   Separator,
-  TextLink,
   cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -477,45 +476,48 @@ export const DatabaseConnectionString = () => {
                   onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
                 >
                   {!sharedPoolerPreferred && !ipv4Addon && (
-                    <Collapsible_Shadcn_ className="group">
-                      <CollapsibleTrigger_Shadcn_
-                        asChild
-                        className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light px-3"
-                      >
-                        <Button
-                          type="default"
-                          size="large"
-                          iconRight={
-                            <ChevronDown className="transition group-data-[state=open]:rotate-180" />
-                          }
-                          className="text-foreground !bg-dash-sidebar justify-between"
+                    <>
+                      <Separator className="w-full" />
+                      <Collapsible_Shadcn_ className="group">
+                        <CollapsibleTrigger_Shadcn_
+                          asChild
+                          className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light px-3"
                         >
-                          <div className="text-xs flex items-center py-2 px-1">
-                            <span>Using the Shared Pooler</span>
-                            <Badge variant={'brand'} size={'small'} className="ml-2">
-                              IPv4 compatible
-                            </Badge>
-                          </div>
-                        </Button>
-                      </CollapsibleTrigger_Shadcn_>
-                      <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
-                        <CodeBlock
-                          wrapperClassName={cn(
-                            '[&_pre]:border-x-0 [&_pre]:border-t-0 [&_pre]:px-4 [&_pre]:py-3',
-                            '[&_pre]:rounded-t-none'
-                          )}
-                          language={lang}
-                          value={supavisorConnectionStrings['pooler'][selectedTab]}
-                          className="[&_code]:text-[12px] [&_code]:text-foreground"
-                          hideLineNumbers
-                          onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
-                        />
-                        <p className="px-3 py-2 text-foreground-light">
-                          Only recommended when your network does not support IPv6. Added latency
-                          compared to dedicated pooler.
-                        </p>
-                      </CollapsibleContent_Shadcn_>
-                    </Collapsible_Shadcn_>
+                          <Button
+                            type="default"
+                            size="large"
+                            iconRight={
+                              <ChevronDown className="transition group-data-[state=open]:rotate-180" />
+                            }
+                            className="text-foreground !bg-dash-sidebar justify-between"
+                          >
+                            <div className="text-xs flex items-center py-2 px-1">
+                              <span>Using the Shared Pooler</span>
+                              <Badge variant={'brand'} size={'small'} className="ml-2">
+                                IPv4 compatible
+                              </Badge>
+                            </div>
+                          </Button>
+                        </CollapsibleTrigger_Shadcn_>
+                        <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
+                          <CodeBlock
+                            wrapperClassName={cn(
+                              '[&_pre]:border-x-0 [&_pre]:border-t-0 [&_pre]:px-4 [&_pre]:py-3',
+                              '[&_pre]:rounded-t-none'
+                            )}
+                            language={lang}
+                            value={supavisorConnectionStrings['pooler'][selectedTab]}
+                            className="[&_code]:text-[12px] [&_code]:text-foreground"
+                            hideLineNumbers
+                            onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
+                          />
+                          <p className="px-3 py-2 text-foreground-light">
+                            Only recommended when your network does not support IPv6. Added latency
+                            compared to dedicated pooler.
+                          </p>
+                        </CollapsibleContent_Shadcn_>
+                      </Collapsible_Shadcn_>
+                    </>
                   )}
                 </ConnectionPanel>
               )}
