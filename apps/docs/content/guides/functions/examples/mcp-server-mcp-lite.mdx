@@ -131,19 +131,23 @@ This gives you npm package access while staying in the Deno ecosystem.
 
 ## Local development
 
-### Initialize and start
+### Start Supabase
 
-Navigate to your project directory and start your development environment:
+Navigate to your project directory and start Supabase services:
 
 ```bash
-# Start Supabase services
 supabase start
+```
 
-# Serve your MCP function locally
+### Serve your function
+
+In a separate terminal, serve your MCP function locally:
+
+```bash
 supabase functions serve --no-verify-jwt mcp-server
 ```
 
-Or use the npm scripts:
+Or use the npm script (which runs the same command):
 
 ```bash
 npm run dev
