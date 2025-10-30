@@ -1,5 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+
 import { useParams } from 'common'
 import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -8,11 +15,6 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -27,17 +29,17 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
-import { z } from 'zod'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
-import TemplateEditor from './TemplateEditor'
+import { TemplateEditor } from './TemplateEditor'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
   (t) => t.misc?.emailTemplateType === 'security'
 ).map((template) => {
   return `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED`
 })
+
 const NotificationsFormSchema = z.object({
   ...notificationEnabledKeys.reduce(
     (acc, key) => {
@@ -49,8 +51,13 @@ const NotificationsFormSchema = z.object({
 })
 
 export const EmailTemplates = () => {
-  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
   const { ref: projectRef } = useParams()
+  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
+
   const {
     data: authConfig,
     error: authConfigError,
@@ -58,53 +65,45 @@ export const EmailTemplates = () => {
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
-  )
+
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to update settings: ${error?.message}`)
+    },
+    onSuccess: () => {
+      toast.success('Successfully updated settings')
+    },
+  })
 
   const builtInSMTP =
     isSuccess &&
     authConfig &&
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
 
-  const getNotificationEnabledKeys = () =>
-    notificationEnabledKeys.reduce(
-      (acc, key) => {
-        acc[key] = authConfig ? Boolean(authConfig[key as keyof typeof authConfig]) : false
-        return acc
-      },
-      {} as Record<string, boolean>
-    )
+  const defaultValues = notificationEnabledKeys.reduce(
+    (acc, key) => {
+      acc[key] = authConfig ? Boolean(authConfig[key as keyof typeof authConfig]) : false
+      return acc
+    },
+    {} as Record<string, boolean>
+  )
+
   const notificationsForm = useForm<z.infer<typeof NotificationsFormSchema>>({
     resolver: zodResolver(NotificationsFormSchema),
-    defaultValues: {
-      ...getNotificationEnabledKeys(),
-    },
+    defaultValues,
   })
+
+  const onSubmit = (values: any) => {
+    if (!projectRef) return console.error('Project ref is required')
+    updateAuthConfig({ projectRef: projectRef, config: { ...values } })
+  }
 
   useEffect(() => {
     if (authConfig) {
-      notificationsForm.reset({
-        ...getNotificationEnabledKeys(),
-      })
+      notificationsForm.reset(defaultValues)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authConfig])
-
-  const onSubmit = (values: any) => {
-    updateAuthConfig(
-      { projectRef: projectRef!, config: { ...values } },
-      {
-        onError: (error) => {
-          toast.error(`Failed to update settings: ${error?.message}`)
-        },
-        onSuccess: () => {
-          toast.success('Successfully updated settings')
-        },
-      }
-    )
-  }
 
   return (
     <ScaffoldSection isFullWidth className="!pt-0">
