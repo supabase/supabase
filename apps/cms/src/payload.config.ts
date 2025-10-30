@@ -106,6 +106,7 @@ export default buildConfig({
   },
   // Reduce payload init overhead
   telemetry: false,
+  // @ts-expect-error
   sharp,
   plugins,
 })
