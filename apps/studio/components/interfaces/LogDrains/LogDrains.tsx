@@ -57,7 +57,7 @@ export function LogDrains({
   )
   const sentryEnabled = useFlag('SentryLogDrain')
   const hasLogDrains = !!logDrains?.length
-  
+
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
     onSuccess: () => {
       setIsDeleteModalOpen(false)
