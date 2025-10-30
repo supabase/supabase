@@ -1,6 +1,7 @@
+import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
@@ -15,8 +16,27 @@ export type EdgeFunctionFile = {
 }
 
 export type EdgeFunctionBodyResponse = {
-  version: number
   files: EdgeFunctionFile[]
+}
+
+async function streamToString(stream: ReadableStream<Uint8Array>) {
+  const reader = stream.getReader()
+  const decoder = new TextDecoder()
+  let result = ''
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      result += decoder.decode(value, { stream: true })
+    }
+    // Final decode to handle any remaining bytes
+    result += decoder.decode()
+    return result
+  } catch (error) {
+    console.error('Error reading stream:', error)
+    throw error
+  }
 }
 
 export async function getEdgeFunctionBody(
@@ -26,41 +46,31 @@ export async function getEdgeFunctionBody(
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
 
-  try {
-    // Get authorization headers
-    const headers = await constructHeaders({
-      'Content-Type': 'application/json',
-    })
+  const { data, response, error } = await get('/v1/projects/{ref}/functions/{function_slug}/body', {
+    params: { path: { ref: projectRef, function_slug: slug } },
+    headers: { Accept: 'multipart/form-data' },
+    parseAs: 'stream',
+    signal,
+  })
 
-    // Send to our API for processing (the API will handle the fetch from v1 endpoint)
-    const parseResponse = await fetchHandler(`${BASE_PATH}/api/edge-functions/body`, {
-      method: 'POST',
-      body: JSON.stringify({ projectRef, slug }),
-      headers,
-      credentials: 'include',
-      signal,
-    })
+  if (error) handleError(error)
 
-    if (!parseResponse.ok) {
-      const { error } = await parseResponse.json()
-      handleError(
-        typeof error === 'object'
-          ? error
-          : typeof error === 'string'
-            ? { message: error }
-            : { message: 'Unknown error' }
-      )
+  const contentTypeHeader = response.headers.get('content-type') ?? ''
+  const boundary = getMultipartBoundary(contentTypeHeader)
+  const files = []
+
+  if (!data || !boundary) return { files: [] }
+
+  for await (let part of parseMultipartStream(data, { boundary })) {
+    if (part.isFile) {
+      files.push({
+        name: part.filename,
+        content: part.text,
+      })
     }
-
-    const response = (await parseResponse.json()) as EdgeFunctionBodyResponse
-    return response
-  } catch (error) {
-    handleError(error)
-    return {
-      version: 0,
-      files: [],
-    } as EdgeFunctionBodyResponse
   }
+
+  return { files: files as EdgeFunctionFile[] }
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>

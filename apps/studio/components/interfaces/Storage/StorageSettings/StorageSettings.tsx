@@ -52,6 +52,7 @@ import {
   StorageSizeUnits,
 } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const formId = 'storage-settings-form'
 
@@ -87,6 +88,8 @@ export const StorageSettings = () => {
     !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'canary'
 
   const { data: organization } = useSelectedOrganizationQuery()
+  const { getEntitlementNumericValue, isEntitlementUnlimited } =
+    useCheckEntitlements('storage.max_file_size')
   const isFreeTier = organization?.plan.id === 'free'
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
@@ -109,14 +112,12 @@ export const StorageSettings = () => {
   })
 
   const maxBytes = useMemo(() => {
-    if (organization?.plan.id === 'free') {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN
-    } else if (organization?.usage_billing_enabled) {
+    if (organization?.usage_billing_enabled || isEntitlementUnlimited()) {
       return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
     } else {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
+      return getEntitlementNumericValue() ?? STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
     }
-  }, [organization])
+  }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
 
   const FormSchema = z
     .object({

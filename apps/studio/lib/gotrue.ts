@@ -1,11 +1,6 @@
-import * as Sentry from '@sentry/nextjs'
 import type { JwtPayload } from '@supabase/supabase-js'
 import { getAccessToken, type User } from 'common/auth'
-import { gotrueClient, setCaptureException } from 'common/gotrue'
-
-setCaptureException((e: any) => {
-  Sentry.captureException(e)
-})
+import { gotrueClient } from 'common/gotrue'
 
 export const auth = gotrueClient
 export { getAccessToken }

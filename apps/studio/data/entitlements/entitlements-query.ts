@@ -11,6 +11,7 @@ export type EntitlementsVariables = {
 export type EntitlementConfig =
   components['schemas']['ListEntitlementsResponse']['entitlements'][0]['config']
 export type Entitlement = components['schemas']['ListEntitlementsResponse']['entitlements'][0]
+export type EntitlementType = Entitlement['type']
 
 export async function getEntitlements({ slug }: EntitlementsVariables, signal?: AbortSignal) {
   if (!slug) throw new Error('slug is required')
