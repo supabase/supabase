@@ -1,6 +1,6 @@
 import { Children } from 'react'
 
-const FormSection = ({
+export const FormSection = ({
   children,
   id,
   header,
@@ -28,7 +28,7 @@ const FormSection = ({
   )
 }
 
-const FormSectionLabel = ({
+export const FormSectionLabel = ({
   children,
   className = '',
   description,
@@ -62,7 +62,7 @@ const Shimmer = () => (
   </div>
 )
 
-const FormSectionContent = ({
+export const FormSectionContent = ({
   children,
   loading = true,
   loaders,
@@ -91,5 +91,3 @@ const FormSectionContent = ({
     </div>
   )
 }
-
-export { FormSection, FormSectionContent, FormSectionLabel }
