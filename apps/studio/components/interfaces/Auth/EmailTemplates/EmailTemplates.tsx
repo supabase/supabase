@@ -248,18 +248,20 @@ export const EmailTemplates = () => {
             <Card>
               <Tabs_Shadcn_ defaultValue={slugifyTitle(TEMPLATES_SCHEMAS[0].title)}>
                 <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
-                  {TEMPLATES_SCHEMAS.map((template) => {
-                    return (
-                      <TabsTrigger_Shadcn_
-                        key={`${template.id}`}
-                        value={slugifyTitle(template.title)}
-                      >
-                        {template.title}
-                      </TabsTrigger_Shadcn_>
-                    )
-                  })}
+                  {TEMPLATES_SCHEMAS.filter(
+                    (t) => t.misc?.emailTemplateType === 'authentication'
+                  ).map((template) => (
+                    <TabsTrigger_Shadcn_
+                      key={`${template.id}`}
+                      value={slugifyTitle(template.title)}
+                    >
+                      {template.title}
+                    </TabsTrigger_Shadcn_>
+                  ))}
                 </TabsList_Shadcn_>
-                {TEMPLATES_SCHEMAS.map((template) => {
+                {TEMPLATES_SCHEMAS.filter(
+                  (t) => t.misc?.emailTemplateType === 'authentication'
+                ).map((template) => {
                   const panelId = slugifyTitle(template.title)
                   return (
                     <TabsContent_Shadcn_ key={panelId} value={panelId} className="mt-0">
