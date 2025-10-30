@@ -43,7 +43,11 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
           <FormItemLayout
             layout="vertical"
             className="px-5"
-            label="Project ID"
+            label={
+              <span>
+                Project ID <span className="text-destructive-600">*</span>
+              </span>
+            }
             description="Your Google Cloud project identifier"
           >
             <FormControl_Shadcn_>
@@ -58,7 +62,11 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
         name="datasetId"
         render={({ field }) => (
           <FormItemLayout
-            label="Dataset ID"
+            label={
+              <span>
+                Dataset ID <span className="text-destructive-600">*</span>
+              </span>
+            }
             layout="vertical"
             className="px-5"
             description="The dataset where tables will be created"
@@ -77,7 +85,11 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
           <FormItemLayout
             layout="vertical"
             className="px-5"
-            label="Service Account Key"
+            label={
+              <span>
+                Service Account Key <span className="text-destructive-600">*</span>
+              </span>
+            }
             description="JSON key file for authentication with BigQuery"
           >
             <FormControl_Shadcn_>
@@ -182,7 +194,11 @@ export const AnalyticsBucketFields = ({
         name="warehouseName"
         render={({ field }) => (
           <FormItemLayout
-            label="Bucket"
+            label={
+              <span>
+                Bucket <span className="text-destructive-600">*</span>
+              </span>
+            }
             layout="vertical"
             className="px-5"
             description="Select a storage Analytics Bucket to use as your warehouse"
@@ -246,7 +262,11 @@ export const AnalyticsBucketFields = ({
         name="namespace"
         render={({ field }) => (
           <FormItemLayout
-            label="Namespace"
+            label={
+              <span>
+                Namespace <span className="text-destructive-600">*</span>
+              </span>
+            }
             layout="vertical"
             className="px-5"
             description="Select a namespace from your Analytics Bucket"
@@ -320,7 +340,11 @@ export const AnalyticsBucketFields = ({
           name="newNamespaceName"
           render={({ field }) => (
             <FormItemLayout
-              label="New Namespace Name"
+              label={
+                <span>
+                  New Namespace Name <span className="text-destructive-600">*</span>
+                </span>
+              }
               layout="vertical"
               className="px-5"
               description="Enter a name for the new namespace"
@@ -477,7 +501,11 @@ export const AnalyticsBucketFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="vertical"
-              label="S3 Secret Access Key"
+              label={
+                <span>
+                  S3 Secret Access Key <span className="text-destructive-600">*</span>
+                </span>
+              }
               className="relative px-5"
               description="The corresponding secret access key for the selected key ID"
             >

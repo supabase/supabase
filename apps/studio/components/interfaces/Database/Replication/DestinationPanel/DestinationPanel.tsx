@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { snakeCase } from 'lodash'
-import { Database, DatabaseZap, Warehouse } from 'lucide-react'
+import { Database, DatabaseZap, Lock, Warehouse } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -177,8 +177,8 @@ export const DestinationPanel = ({
   }, [destinationData, pipelineData, catalogToken, projectSettings])
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
@@ -210,7 +210,8 @@ export const DestinationPanel = ({
     isSelectedPublicationMissing ||
     isLoadingCheck ||
     hasTablesWithNoPrimaryKeys ||
-    (hasNoAvailableDestinations && !editMode)
+    (hasNoAvailableDestinations && !editMode) ||
+    !form.formState.isValid
 
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
@@ -471,12 +472,16 @@ export const DestinationPanel = ({
                       render={({ field }) => (
                         <FormItemLayout
                           className="p-5"
-                          label="Name"
+                          label={
+                            <span>
+                              Name <span className="text-destructive-600">*</span>
+                            </span>
+                          }
                           layout="vertical"
                           description="A name you will use to identify this destination"
                         >
                           <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Name" />
+                            <Input_Shadcn_ {...field} placeholder="My destination" />
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
@@ -491,7 +496,11 @@ export const DestinationPanel = ({
                       name="publicationName"
                       render={({ field }) => (
                         <FormItemLayout
-                          label="Publication"
+                          label={
+                            <span>
+                              Publication <span className="text-destructive-600">*</span>
+                            </span>
+                          }
                           layout="vertical"
                           description="A publication is a collection of tables that you want to replicate "
                         >
@@ -548,92 +557,126 @@ export const DestinationPanel = ({
                       <p className="text-sm font-medium text-foreground mb-1">
                         Destination type
                       </p>
-                      <p className="text-xs text-foreground-light mb-4">
-                        Select where you want to send your data
-                      </p>
+                      {editMode ? (
+                        <p className="text-xs text-foreground-light mb-4">
+                          Destination type cannot be changed after creation
+                        </p>
+                      ) : (
+                        <p className="text-xs text-foreground-light mb-4">
+                          Select where you want to send your data
+                        </p>
+                      )}
                       <FormField_Shadcn_
                         name="type"
                         control={form.control}
                         render={({ field }) => (
                           <FormControl_Shadcn_>
-                            <div className="grid gap-3">
-                              {etlEnableBigQuery && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setIsFormInteracting(true)
-                                    field.onChange('BigQuery')
-                                  }}
-                                  className={`relative flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
-                                    field.value === 'BigQuery'
-                                      ? 'border-brand-600 bg-surface-200'
-                                      : 'border-default bg-surface-100 hover:border-stronger'
-                                  }`}
-                                >
-                                  <div
-                                    className={`flex items-center justify-center w-10 h-10 rounded-md ${
+                            {editMode ? (
+                              <div className="relative">
+                                <div className="flex items-start gap-4 p-4 rounded-lg border-2 border-default bg-surface-100 opacity-75">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-md bg-surface-300 text-foreground-light">
+                                    {field.value === 'BigQuery' ? (
+                                      <Database className="w-5 h-5" strokeWidth={2} />
+                                    ) : (
+                                      <Warehouse className="w-5 h-5" strokeWidth={2} />
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <p className="text-sm font-medium text-foreground">
+                                        {field.value}
+                                      </p>
+                                      <Lock className="w-3 h-3 text-foreground-lighter" />
+                                    </div>
+                                    <p className="text-xs text-foreground-light leading-relaxed">
+                                      {field.value === 'BigQuery'
+                                        ? "Google Cloud's serverless data warehouse for analytics and business intelligence"
+                                        : 'Apache Iceberg tables in your Supabase Storage for flexible analytics workflows'}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="absolute inset-0 cursor-not-allowed" />
+                              </div>
+                            ) : (
+                              <div className="grid gap-3">
+                                {etlEnableBigQuery && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setIsFormInteracting(true)
+                                      field.onChange('BigQuery')
+                                    }}
+                                    className={`relative flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
                                       field.value === 'BigQuery'
-                                        ? 'bg-brand-400 text-brand-600'
-                                        : 'bg-surface-300 text-foreground-light'
+                                        ? 'border-brand-600 bg-surface-200'
+                                        : 'border-default bg-surface-100 hover:border-stronger'
                                     }`}
                                   >
-                                    <Database className="w-5 h-5" strokeWidth={2} />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <p className="text-sm font-medium text-foreground">
-                                        BigQuery
-                                      </p>
-                                      {field.value === 'BigQuery' && (
-                                        <div className="w-2 h-2 rounded-full bg-brand-600" />
-                                      )}
+                                    <div
+                                      className={`flex items-center justify-center w-10 h-10 rounded-md ${
+                                        field.value === 'BigQuery'
+                                          ? 'bg-brand-400 text-brand-600'
+                                          : 'bg-surface-300 text-foreground-light'
+                                      }`}
+                                    >
+                                      <Database className="w-5 h-5" strokeWidth={2} />
                                     </div>
-                                    <p className="text-xs text-foreground-light leading-relaxed">
-                                      Google Cloud's serverless data warehouse for analytics and
-                                      business intelligence
-                                    </p>
-                                  </div>
-                                </button>
-                              )}
-                              {etlEnableIceberg && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setIsFormInteracting(true)
-                                    field.onChange('Analytics Bucket')
-                                  }}
-                                  className={`relative flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
-                                    field.value === 'Analytics Bucket'
-                                      ? 'border-brand-600 bg-surface-200'
-                                      : 'border-default bg-surface-100 hover:border-stronger'
-                                  }`}
-                                >
-                                  <div
-                                    className={`flex items-center justify-center w-10 h-10 rounded-md ${
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <p className="text-sm font-medium text-foreground">
+                                          BigQuery
+                                        </p>
+                                        {field.value === 'BigQuery' && (
+                                          <div className="w-2 h-2 rounded-full bg-brand-600" />
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-foreground-light leading-relaxed">
+                                        Google Cloud's serverless data warehouse for analytics and
+                                        business intelligence
+                                      </p>
+                                    </div>
+                                  </button>
+                                )}
+                                {etlEnableIceberg && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setIsFormInteracting(true)
+                                      field.onChange('Analytics Bucket')
+                                    }}
+                                    className={`relative flex items-start gap-4 p-4 rounded-lg border-2 transition-all text-left ${
                                       field.value === 'Analytics Bucket'
-                                        ? 'bg-brand-400 text-brand-600'
-                                        : 'bg-surface-300 text-foreground-light'
+                                        ? 'border-brand-600 bg-surface-200'
+                                        : 'border-default bg-surface-100 hover:border-stronger'
                                     }`}
                                   >
-                                    <Warehouse className="w-5 h-5" strokeWidth={2} />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <p className="text-sm font-medium text-foreground">
-                                        Analytics Bucket
-                                      </p>
-                                      {field.value === 'Analytics Bucket' && (
-                                        <div className="w-2 h-2 rounded-full bg-brand-600" />
-                                      )}
+                                    <div
+                                      className={`flex items-center justify-center w-10 h-10 rounded-md ${
+                                        field.value === 'Analytics Bucket'
+                                          ? 'bg-brand-400 text-brand-600'
+                                          : 'bg-surface-300 text-foreground-light'
+                                      }`}
+                                    >
+                                      <Warehouse className="w-5 h-5" strokeWidth={2} />
                                     </div>
-                                    <p className="text-xs text-foreground-light leading-relaxed">
-                                      Apache Iceberg tables in your Supabase Storage for flexible
-                                      analytics workflows
-                                    </p>
-                                  </div>
-                                </button>
-                              )}
-                            </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <p className="text-sm font-medium text-foreground">
+                                          Analytics Bucket
+                                        </p>
+                                        {field.value === 'Analytics Bucket' && (
+                                          <div className="w-2 h-2 rounded-full bg-brand-600" />
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-foreground-light leading-relaxed">
+                                        Apache Iceberg tables in your Supabase Storage for flexible
+                                        analytics workflows
+                                      </p>
+                                    </div>
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </FormControl_Shadcn_>
                         )}
                       />
@@ -681,22 +724,29 @@ export const DestinationPanel = ({
               )}
             </SheetSection>
 
-            <SheetFooter>
-              <Button disabled={isSaving} type="default" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                disabled={isSubmitDisabled}
-                loading={isSaving}
-                form={formId}
-                htmlType="submit"
-              >
-                {editMode
-                  ? existingDestination?.enabled
-                    ? 'Apply and restart'
-                    : 'Apply and start'
-                  : 'Create and start'}
-              </Button>
+            <SheetFooter className="flex-col items-stretch gap-2">
+              {!editMode && !form.formState.isValid && form.formState.isDirty && (
+                <p className="text-xs text-foreground-lighter text-center">
+                  Please fill in all required fields to continue
+                </p>
+              )}
+              <div className="flex gap-2 justify-end">
+                <Button disabled={isSaving} type="default" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  disabled={isSubmitDisabled}
+                  loading={isSaving}
+                  form={formId}
+                  htmlType="submit"
+                >
+                  {editMode
+                    ? existingDestination?.enabled
+                      ? 'Apply and restart'
+                      : 'Apply and start'
+                    : 'Create and start'}
+                </Button>
+              </div>
             </SheetFooter>
           </div>
         </SheetContent>

@@ -26,38 +26,77 @@ export const DestinationPanelFormSchema = z
     s3SecretAccessKey: z.string().optional(),
     s3Region: z.string().optional(),
   })
-  .refine(
-    (data) => {
-      if (data.type === 'BigQuery') {
-        return (
-          data.projectId &&
-          data.projectId.length > 0 &&
-          data.datasetId &&
-          data.datasetId.length > 0 &&
-          data.serviceAccountKey &&
-          data.serviceAccountKey.length > 0
-        )
-      } else if (data.type === 'Analytics Bucket') {
-        const hasValidNamespace =
-          (data.namespace && data.namespace.length > 0) ||
-          (data.namespace === 'create-new-namespace' &&
-            data.newNamespaceName &&
-            data.newNamespaceName.length > 0)
-
-        return (
-          data.warehouseName &&
-          data.warehouseName.length > 0 &&
-          hasValidNamespace &&
-          data.s3Region &&
-          data.s3Region.length > 0
-        )
+  .superRefine((data, ctx) => {
+    if (data.type === 'BigQuery') {
+      if (!data.projectId || data.projectId.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Project ID is required',
+          path: ['projectId'],
+        })
       }
-      return true
-    },
-    {
-      message: 'All fields are required for the selected destination type',
-      path: ['projectId'],
+      if (!data.datasetId || data.datasetId.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Dataset ID is required',
+          path: ['datasetId'],
+        })
+      }
+      if (!data.serviceAccountKey || data.serviceAccountKey.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Service Account Key is required',
+          path: ['serviceAccountKey'],
+        })
+      }
+    } else if (data.type === 'Analytics Bucket') {
+      if (!data.warehouseName || data.warehouseName.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Bucket is required',
+          path: ['warehouseName'],
+        })
+      }
+
+      const hasValidNamespace =
+        (data.namespace && data.namespace.length > 0 && data.namespace !== 'create-new-namespace') ||
+        (data.namespace === 'create-new-namespace' &&
+          data.newNamespaceName &&
+          data.newNamespaceName.length > 0)
+
+      if (!hasValidNamespace) {
+        if (data.namespace === 'create-new-namespace') {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Namespace name is required',
+            path: ['newNamespaceName'],
+          })
+        } else {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Namespace is required',
+            path: ['namespace'],
+          })
+        }
+      }
+
+      if (!data.s3Region || data.s3Region.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'S3 Region is required',
+          path: ['s3Region'],
+        })
+      }
+
+      // Validate S3 keys when not creating new
+      if (data.s3AccessKeyId !== 'create-new' && (!data.s3SecretAccessKey || data.s3SecretAccessKey.length === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'S3 Secret Access Key is required',
+          path: ['s3SecretAccessKey'],
+        })
+      }
     }
-  )
+  })
 
 export type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>
