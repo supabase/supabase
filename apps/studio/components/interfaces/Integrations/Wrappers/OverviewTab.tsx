@@ -18,10 +18,9 @@ import {
   WarningIcon,
 } from 'ui'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
-import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
-import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
+import { getWrapperComponentForWrapper } from './Wrappers.utils'
 
 export const WrapperOverviewTab = () => {
   const { id } = useParams()
@@ -56,11 +55,7 @@ export const WrapperOverviewTab = () => {
 
   // [Joshen] Opting to declare custom wrapper sheets here instead of within Wrappers.constants.ts
   // as we'll easily run into circular dependencies doing so unfortunately
-  const CreateWrapperSheetComponent = wrapperMeta.customComponent
-    ? wrapperMeta.name === 'iceberg_wrapper'
-      ? CreateIcebergWrapperSheet
-      : ({}) => null
-    : CreateWrapperSheet
+  const CreateWrapperSheetComponent = getWrapperComponentForWrapper(wrapperMeta)
 
   return (
     <IntegrationOverviewTab

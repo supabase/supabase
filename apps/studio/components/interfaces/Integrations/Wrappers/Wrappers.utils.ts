@@ -1,6 +1,9 @@
 import { FDW, FDWTable } from 'data/fdw/fdws-query'
 import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
 import type { WrapperMeta } from './Wrappers.types'
+import { CreateDuckDbWrapperSheet } from './CreateDuckDbWrapperSheet'
+import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
+import { CreateWrapperSheet, CreateWrapperSheetProps } from './CreateWrapperSheet'
 
 export const makeValidateRequired = (options: { name: string; required: boolean }[]) => {
   const requiredOptionsSet = new Set(
@@ -130,4 +133,21 @@ export function wrapperMetaComparator(
 
 export function getWrapperMetaForWrapper(wrapper: FDW | undefined) {
   return WRAPPERS.find((w) => wrapperMetaComparator(w, wrapper))
+}
+
+export function getWrapperComponentForWrapper(
+  wrapperMeta: WrapperMeta
+): React.ComponentType<CreateWrapperSheetProps> {
+  if (wrapperMeta?.customComponent) {
+    switch (wrapperMeta.name) {
+      case 'iceberg_wrapper':
+        return CreateIcebergWrapperSheet
+      case 'duckdb_wrapper':
+        return CreateDuckDbWrapperSheet
+      default:
+        return CreateWrapperSheet
+    }
+  }
+
+  return CreateWrapperSheet
 }
