@@ -281,10 +281,12 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
  * Determine if we should show the user an upgrade prompt while browsing logs
  */
 export const maybeShowUpgradePrompt = (from: string | null | undefined, entitledToAuditLogDays: number | undefined) => {
+  console.log('entitledToAuditLogDays in maybeShowUpgradePrompt', entitledToAuditLogDays)
+  if (!entitledToAuditLogDays) return false
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 
-  // If for some reason the entitledToAuditLogDays is not set, default to 7 days
-  return day > (entitledToAuditLogDays ?? 7) 
+  console.log('day in maybeShowUpgradePrompt', day) 
+  return day > entitledToAuditLogDays 
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {

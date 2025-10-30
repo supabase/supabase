@@ -97,7 +97,7 @@ const LogsQueryPanel = ({
   const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
     getDefaultDatePickerValue()
   )
-
+  // [Ignacio] This is the old Logs Interface 
   return (
     <div className="border-b bg-surface-100">
       <div className="flex w-full items-center justify-between px-4 md:px-5 py-2 overflow-x-scroll no-scrollbar">
@@ -148,7 +148,7 @@ const LogsQueryPanel = ({
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-
+            
             <LogsDatePicker
               value={selectedDatePickerValue}
               onSubmit={(value) => {

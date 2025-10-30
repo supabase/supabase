@@ -136,7 +136,7 @@ export type Override = {
   key: string
   value: string | string[] | undefined
 }
-
+// [Ignacio] this type is used to determine if the helper is available for the current plan
 export interface DatetimeHelper {
   text: string
   calcTo: () => string
