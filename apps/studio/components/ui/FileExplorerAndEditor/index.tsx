@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { Edit, File, Plus, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -13,6 +14,7 @@ import {
   TreeView,
   TreeViewItem,
 } from 'ui'
+import { getLanguageFromFileName, isBinaryFile } from './FileExplorerAndEditor.utils'
 
 interface FileData {
   id: number
@@ -34,57 +36,7 @@ interface FileExplorerAndEditorProps {
 
 const denoJsonDefaultContent = JSON.stringify({ imports: {} }, null, '\t')
 
-const isBinaryFile = (fileName: string): boolean => {
-  const extension = fileName.split('.').pop()?.toLowerCase()
-  const binaryExtensions = [
-    'wasm',
-    'jpg',
-    'jpeg',
-    'png',
-    'gif',
-    'bmp',
-    'ico',
-    'svg',
-    'mp3',
-    'mp4',
-    'avi',
-    'mov',
-    'zip',
-    'rar',
-    '7z',
-    'tar',
-    'gz',
-    'bz2',
-    'pdf',
-  ]
-  return binaryExtensions.includes(extension || '')
-}
-
-const getLanguageFromFileName = (fileName: string): string => {
-  const extension = fileName.split('.').pop()?.toLowerCase()
-  switch (extension) {
-    case 'ts':
-    case 'tsx':
-      return 'typescript'
-    case 'js':
-    case 'jsx':
-      return 'javascript'
-    case 'json':
-      return 'json'
-    case 'html':
-      return 'html'
-    case 'css':
-      return 'css'
-    case 'md':
-      return 'markdown'
-    case 'csv':
-      return 'csv'
-    default:
-      return 'plaintext' // Default to plaintext
-  }
-}
-
-const FileExplorerAndEditor = ({
+export const FileExplorerAndEditor = ({
   files,
   onFilesChange,
   aiEndpoint,
@@ -264,11 +216,21 @@ const FileExplorerAndEditor = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      {isDragOver && (
-        <div className="absolute inset-0 bg-blue-100 bg-opacity-50 border-2 border-dashed border-blue-300 z-10 flex items-center justify-center">
-          <div className="text-blue-600 text-lg font-medium">Drop files here to add them</div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isDragOver && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+            className="absolute inset-0 bg bg-opacity-30 z-10 flex items-center justify-center"
+          >
+            <div className="w-96 py-20 bg bg-opacity-60 border-2 border-dashed border-muted flex items-center justify-center">
+              <div className="text-base">Drop files here to add them</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="w-64 border-r bg-surface-200 flex flex-col">
         <div className="py-4 px-6 border-b flex items-center justify-between">
           <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
@@ -389,5 +351,3 @@ const FileExplorerAndEditor = ({
     </div>
   )
 }
-
-export default FileExplorerAndEditor
