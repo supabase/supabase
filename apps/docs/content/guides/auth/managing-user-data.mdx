@@ -213,3 +213,40 @@ select * from auth.users;
 ```
 
 You can then export the results as CSV.
+
+## Frequently Asked Questions
+
+### How to disable/remove the user data management triggers on the auth.users table?
+
+Supabase Auth uses your project's database to store user data. It relies on the `auth` schema, and Supabase restricts access to the `auth` schema to prevent unintended custom changes that could break the functionality of the Auth service.
+
+If you want to disable or remove the custom triggers on the `auth.users` table you created, you must cascade-delete the trigger function.
+
+```sql
+drop function public.handle_new_user cascade;
+```
+
+This command still works because the `postgres` role has the ownership of `public.handle_new_user()` function, and the `cascade` clause will drop the trigger indirectly.
+
+### Running into **database errors** when creating/updating/deleting users.
+
+Errors in your custom user management logic can cause unexpected issues when creating, updating or deleting users. Here are some common examples.
+
+- Failed to create user: Database error creating new user
+- Failed to update user: Error updating user
+- Failed to delete user: Database error deleting user
+
+If you encounter a similar error, check your project's [auth logs](/dashboard/project/_/logs/auth-logs). Expanding the error log will display more details about what caused the issue.
+
+**Example error messages:**
+
+```
+failed to close prepared statement: ERROR: current transaction is aborted, commands ignored until
+ end of transaction block (SQLSTATE 25P02): ERROR: relation \"public.profiles\" does not exist (SQLSTATE 42P01)
+```
+
+```
+ERROR: column \"updated_at\" of relation \"profiles\" does not exist (SQLSTATE 42703)
+```
+
+Use the hints provided in the error message to fix issues in your custom user management logic.
