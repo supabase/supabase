@@ -83,28 +83,28 @@ The template uses a specific pattern required by Supabase Edge Functions:
 
 ```ts
 // Root handler - matches the function name
-const app = new Hono();
+const app = new Hono()
 
 // MCP protocol handler
-const mcpApp = new Hono();
+const mcpApp = new Hono()
 
-mcpApp.get("/", (c) => {
+mcpApp.get('/', (c) => {
   return c.json({
-    message: "MCP Server on Supabase Edge Functions",
+    message: 'MCP Server on Supabase Edge Functions',
     endpoints: {
-      mcp: "/mcp",
-      health: "/health",
+      mcp: '/mcp',
+      health: '/health',
     },
-  });
-});
+  })
+})
 
-mcpApp.all("/mcp", async (c) => {
-  const response = await httpHandler(c.req.raw);
-  return response;
-});
+mcpApp.all('/mcp', async (c) => {
+  const response = await httpHandler(c.req.raw)
+  return response
+})
 
 // Mount at /mcp-server (the function name)
-app.route("/mcp-server", mcpApp);
+app.route('/mcp-server', mcpApp)
 ```
 
 This is required because Supabase routes all requests to `/<function-name>/*`. The outer `app` handles the function-level routing, while `mcpApp` handles your actual MCP endpoints.
@@ -182,31 +182,31 @@ Then add the MCP endpoint URL in the inspector UI.
 The MCP server setup is straightforward:
 
 ```ts
-import { McpServer, StreamableHttpTransport } from "mcp-lite";
-import { z } from "zod";
+import { McpServer, StreamableHttpTransport } from 'mcp-lite'
+import { z } from 'zod'
 
 // Create MCP server instance
 const mcp = new McpServer({
-  name: "starter-mcp-supabase-server",
-  version: "1.0.0",
+  name: 'starter-mcp-supabase-server',
+  version: '1.0.0',
   schemaAdapter: (schema) => z.toJSONSchema(schema as z.ZodType),
-});
+})
 
 // Define a tool
-mcp.tool("sum", {
-  description: "Adds two numbers together",
+mcp.tool('sum', {
+  description: 'Adds two numbers together',
   inputSchema: z.object({
     a: z.number(),
     b: z.number(),
   }),
   handler: (args: { a: number; b: number }) => ({
-    content: [{ type: "text", text: String(args.a + args.b) }],
+    content: [{ type: 'text', text: String(args.a + args.b) }],
   }),
-});
+})
 
 // Bind to HTTP transport
-const transport = new StreamableHttpTransport();
-const httpHandler = transport.bind(mcp);
+const transport = new StreamableHttpTransport()
+const httpHandler = transport.bind(mcp)
 ```
 
 ## Adding more tools
@@ -214,8 +214,8 @@ const httpHandler = transport.bind(mcp);
 Extend your MCP server by adding tools directly to the `mcp` instance. Here's an example of adding a database search tool:
 
 ```ts
-mcp.tool("searchDatabase", {
-  description: "Search your Supabase database",
+mcp.tool('searchDatabase', {
+  description: 'Search your Supabase database',
   inputSchema: z.object({
     table: z.string(),
     query: z.string(),
@@ -224,10 +224,10 @@ mcp.tool("searchDatabase", {
     // Access Supabase client here
     // const { data } = await supabase.from(args.table).select('*')
     return {
-      content: [{ type: "text", text: `Searching ${args.table}...` }],
-    };
+      content: [{ type: 'text', text: `Searching ${args.table}...` }],
+    }
   },
-});
+})
 ```
 
 You can add tools that:
@@ -297,4 +297,4 @@ With your MCP server running on Supabase Edge Functions, you can:
 - [Model Context Protocol Spec](https://modelcontextprotocol.io/)
 - [Supabase Edge Functions Docs](/guides/functions)
 - [Deno Runtime Documentation](https://deno.land/)
-- [Original tutorial by Fiberplane](https://blog.fiberplane.com/blog/mcp-lite-supabase-edge-functions/)
+- [Fiberplane tutorial](https://blog.fiberplane.com/blog/mcp-lite-supabase-edge-functions/)
