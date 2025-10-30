@@ -72,7 +72,7 @@ const Avatar = ({ src }: { src: string | undefined }) => {
   )
 }
 
-const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallationProps>(
+export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallationProps>(
   ({ integration, disabled, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
@@ -144,7 +144,7 @@ export interface IntegrationConnectionProps extends HTMLAttributes<HTMLLIElement
   orientation?: 'horizontal' | 'vertical'
 }
 
-const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
+export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   (
     { connection, type, actions, showNode = true, orientation = 'horizontal', className, ...props },
     ref
@@ -233,7 +233,7 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
   }
 )
 
-const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
+export const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ connection, type, ...props }, ref) => {
     const { data: project } = useProjectDetailQuery({ ref: connection.supabase_project_ref })
 
@@ -266,7 +266,7 @@ const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnect
   }
 )
 
-const EmptyIntegrationConnection = forwardRef<
+export const EmptyIntegrationConnection = forwardRef<
   HTMLDivElement,
   HTMLAttributes<HTMLDivElement> & {
     showNode?: boolean
@@ -319,7 +319,7 @@ interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElemen
   showNode?: boolean
 }
 
-const IntegrationConnectionHeader = forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
+export const IntegrationConnectionHeader = forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
   ({ className, markdown = '', showNode = true, ...props }, ref) => {
     return (
       <div
@@ -343,11 +343,3 @@ IntegrationConnection.displayName = 'IntegrationConnection'
 IntegrationConnectionHeader.displayName = 'IntegrationConnectionHeader'
 EmptyIntegrationConnection.displayName = 'EmptyIntegrationConnection'
 IntegrationConnectionOption.displayName = 'IntegrationConnectionOption'
-
-export {
-  EmptyIntegrationConnection,
-  IntegrationConnection,
-  IntegrationConnectionHeader,
-  IntegrationConnectionOption,
-  IntegrationInstallation,
-}
