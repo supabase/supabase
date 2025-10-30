@@ -81,32 +81,36 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   return (
     <>
       <ScaffoldContainer>
-        <ScaffoldHeader className="flex flex-row justify-between">
-          <div>
-            <ScaffoldTitle>Log Drains</ScaffoldTitle>
-            <ScaffoldDescription>
-              Send your project logs to third party destinations
-            </ScaffoldDescription>
-          </div>
-          <div className="flex items-center justify-end gap-2">
-            <DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />
+        {(logDrainsEnabled || planLoading) && (
+          <ScaffoldHeader className="flex flex-row justify-between">
+            <div>
+              <ScaffoldTitle>Log Drains</ScaffoldTitle>
+              <ScaffoldDescription>
+                Send your project logs to third party destinations
+              </ScaffoldDescription>
+            </div>
 
-            {!(logDrains?.length === 0) && (
-              <Button
-                disabled={!logDrainsEnabled || !canManageLogDrains}
-                onClick={() => {
-                  setSelectedLogDrain(null)
-                  setMode('create')
-                  setOpen(true)
-                }}
-                type="primary"
-              >
-                Add destination
-              </Button>
-            )}
-          </div>
-        </ScaffoldHeader>
+            <div className="flex items-center justify-end gap-2">
+              <DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />
+
+              {!(logDrains?.length === 0) && (
+                <Button
+                  disabled={!logDrainsEnabled || !canManageLogDrains}
+                  onClick={() => {
+                    setSelectedLogDrain(null)
+                    setMode('create')
+                    setOpen(true)
+                  }}
+                  type="primary"
+                >
+                  Add destination
+                </Button>
+              )}
+            </div>
+          </ScaffoldHeader>
+        )}
       </ScaffoldContainer>
+
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         <LogDrainDestinationSheetForm
           mode={mode}
