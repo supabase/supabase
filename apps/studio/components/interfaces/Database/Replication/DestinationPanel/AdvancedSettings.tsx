@@ -12,7 +12,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { DestinationPanelSchemaType } from './DestinationPanel.schema'
+import type { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   const { type } = form.watch()

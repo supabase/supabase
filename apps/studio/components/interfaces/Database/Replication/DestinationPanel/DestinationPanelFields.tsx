@@ -1,6 +1,6 @@
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import type { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
 import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -30,7 +30,7 @@ import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationPanel.constants'
-import { DestinationPanelSchemaType } from './DestinationPanel.schema'
+import type { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   return (

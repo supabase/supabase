@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import type { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -11,7 +11,7 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { NewPublicationPanel } from '../NewPublicationPanel'
 import { PublicationsComboBox } from '../PublicationsComboBox'
-import { DestinationPanelSchemaType } from './DestinationPanel.schema'
+import type { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>

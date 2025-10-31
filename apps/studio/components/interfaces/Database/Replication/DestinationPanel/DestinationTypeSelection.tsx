@@ -1,4 +1,4 @@
-import { UseFormReturn } from 'react-hook-form'
+import type { UseFormReturn } from 'react-hook-form'
 
 import { useFlag } from 'common'
 import {
@@ -7,7 +7,7 @@ import {
   RadioGroupStacked,
   RadioGroupStackedItem,
 } from 'ui'
-import { DestinationPanelSchemaType } from './DestinationPanel.schema'
+import type { DestinationPanelSchemaType } from './DestinationPanel.schema'
 
 type DestinationTypeSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
