@@ -4,11 +4,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
-import { useFlag } from 'common'
+import { getAccessToken, useFlag } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
+import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
 
 type SignInLayoutProps = {

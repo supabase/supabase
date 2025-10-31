@@ -2,11 +2,11 @@ import { Transition } from '@headlessui/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { get, noop, sum } from 'lodash'
 import { Upload } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useContextMenu } from 'react-contexify'
 import { toast } from 'sonner'
 
-import InfiniteList from 'components/ui/InfiniteList'
+import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
@@ -146,6 +146,23 @@ export const FileExplorerColumn = ({
     />
   )
 
+  const getItemKey = useCallback(
+    (index: number) => {
+      const item = columnItems[index]
+      return item?.id || `file-explorer-item-${index}`
+    },
+    [columnItems]
+  )
+
+  const itemProps = useMemo(
+    () => ({
+      view: snap.view,
+      columnIndex: index,
+      selectedItems,
+    }),
+    [snap.view, index, selectedItems]
+  )
+
   return (
     <div
       ref={fileExplorerColumnRef}
@@ -213,19 +230,20 @@ export const FileExplorerColumn = ({
       )}
 
       {/* Column Interface */}
-      <InfiniteList
-        items={columnItems}
-        itemProps={{
-          view: snap.view,
-          columnIndex: index,
-          selectedItems,
-        }}
-        ItemComponent={FileExplorerRow}
-        getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
-        hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
-        isLoadingNextPage={column.isLoadingMoreItems}
-        onLoadNextPage={() => onColumnLoadMore(index, column)}
-      />
+      {columnItems.length > 0 && (
+        <InfiniteListDefault
+          className="h-full"
+          items={columnItems}
+          itemProps={itemProps}
+          getItemKey={getItemKey}
+          getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
+          ItemComponent={FileExplorerRow}
+          LoaderComponent={LoaderForIconMenuItems}
+          hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
+          isLoadingNextPage={column.isLoadingMoreItems}
+          onLoadNextPage={() => onColumnLoadMore(index, column)}
+        />
+      )}
 
       {/* Drag drop upload CTA for when column is empty */}
       {!(snap.isSearching && itemSearchString.length > 0) &&

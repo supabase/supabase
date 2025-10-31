@@ -1,6 +1,6 @@
 import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
 

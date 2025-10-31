@@ -57,7 +57,7 @@ interface LayoutHeaderProps {
   backToDashboardURL?: string
 }
 
-const LayoutHeader = ({
+export const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerTitle,
@@ -248,5 +248,3 @@ const LayoutHeader = ({
     </>
   )
 }
-
-export default LayoutHeader

@@ -6,7 +6,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { parseAsString, useQueryState } from 'nuqs'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import { Badge, Button, Card, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
 import { ButtonTooltip } from './ButtonTooltip'
 

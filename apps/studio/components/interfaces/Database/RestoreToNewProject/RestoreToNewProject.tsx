@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
+import { PITRForm } from 'components/interfaces/Database/Backups/PITR/PITRForm'
 import { BackupsList } from 'components/interfaces/Database/Backups/RestoreToNewProject/BackupsList'
 import { ConfirmRestoreDialog } from 'components/interfaces/Database/Backups/RestoreToNewProject/ConfirmRestoreDialog'
 import { CreateNewProjectDialog } from 'components/interfaces/Database/Backups/RestoreToNewProject/CreateNewProjectDialog'

@@ -56,8 +56,8 @@ export const EnumeratedTypes = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
           <SchemaSelector
             className="w-full lg:w-[180px]"
             size="tiny"

@@ -93,7 +93,7 @@ The connection string looks like this:
 postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
 ```
 
-Get your project's Session pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
+Get your project's Session pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=session).
 
 ### Supavisor transaction mode
 
@@ -111,7 +111,7 @@ The connection string looks like this:
 postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 ```
 
-Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
+Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction).
 
 ## Dedicated pooler
 
@@ -119,7 +119,7 @@ For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.p
 
 The Dedicated Pooler ensures best performance and latency, while using up more of your project's compute resources. If your network supports IPv6 or you have the IPv4 add-on, we encourage you to use the Dedicated Pooler over the Shared Pooler.
 
-Get your project's Dedicated pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
+Get your project's Dedicated pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction).
 
 <Admonition type="note">
 
