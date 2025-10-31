@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobsVariables = {

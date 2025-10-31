@@ -9,15 +9,15 @@ import { generateTriggerCreateSQL } from 'components/interfaces/Database/Trigger
 import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import type { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
   const isInlineEditorEnabled = useIsInlineEditorEnabled()

@@ -14,7 +14,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 export function useOnRowsChange(rows: SupaRow[]) {
   const queryClient = useQueryClient()
