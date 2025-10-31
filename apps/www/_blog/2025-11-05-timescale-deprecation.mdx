@@ -30,7 +30,73 @@ We hope that this change reduces confusion for users and unlocks more options to
 Postgres 17 does not have `TimescaleDB` support, though recent updates include `pg_partman` for more flexible partitioning options.
 If you are running Postgres 15 on Supabase, newer versions will include both the TimescaleDB extension and `pg_partman` to allow you to migrate your data before upgrading.
 
+To migrate from TimescaleDB hypertables to a standard Postgres table, the general steps are outlined below:
+
+1. Create a new table
+2. Copy the data from your hypertable
+3. Drop the hypertable
+4. Set up `pg_partman` to manage your table partitions [Optional]
+
 We strongly recommend testing your migration path in a staging project, using a [copy of your production project](https://supabase.com/blog/restore-to-a-new-project) or via [branching](/docs/guides/platform/branching).
+
+### From hypertable to table
+
+Let's say we have a chat application and we have a table for messages that contains the sender of the message, the recipient, the contents and the date it was sent. Now that you have launched your app, you find that more than just your friends and family are using it and you are soon sending thousands of messages a day. That also means you are storing thousands of messages a day and querying a table with thousands of messages. Your users note that the app sometimes feels a bit sluggish and you know you have to do some optimising.
+
+If you have read our docs on [partitioning](https://supabase.com/docs/guides/database/partitions), you know there are quite a few options for how we could make this table scalable. Using `TimescaleDB`, we can create a `hypertable` and split the table based on the time that each message was sent. It would look something like this:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS timescaledb;
+
+SELECT create_hypertable('messages',  by_range('sent_at', INTERVAL '7 days'));
+```
+
+This converts our `messages` table to a `hypertable` and it is partitioned into a `chunk` (like a partition) every 7 days. When we want to query for a message, we can use SQL as normal and get the benefits of partitioned data with no extra effort.
+
+Following the steps outlined earlier, let's covert our hypertable to a table managed by `pg_partman`.
+
+1. Create a new table and rename the hypertable
+
+```sql
+ALTER TABLE messages to ht_messages;
+
+CREATE TABLE messages (LIKE ht_messages) PARTITION BY RANGE(sent_at);
+```
+
+2. Copy the data from your hypertable
+
+```sql
+INSERT INTO messages SELECT * FROM ht_messages;
+```
+
+3. Drop the hypertable
+
+```sql
+DROP TABLE ht_messages;
+DROP EXTENSION timescaledb;
+```
+
+4. Use `pg_partman` to manage your partitioning [Optional]
+
+```sql
+CREATE SCHEMA partman
+CREATE EXTENSION partman WITH SCHEMA partman;
+
+SELECT partman.create_parent(
+        p_parent_table := 'public.messages',
+        p_control := 'sent_at',
+        p_type := 'range',
+        p_interval := '7 days',
+        p_premake := 7
+        p_start_partition := '2025-01-01 00:00:00'
+);
+```
+
+Done! We are safe to upgrade to Postgres 17 now and use `pg_partman` to manage our partitions going forward.
+
+
+
+
 
 
 
