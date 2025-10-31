@@ -43,7 +43,7 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   )
 }
 
-const IntegrationSettings = () => {
+export const IntegrationSettings = () => {
   const router = useRouter()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -193,5 +193,3 @@ The GitHub app will watch for changes in your repository such as file changes, b
     </>
   )
 }
-
-export default IntegrationSettings

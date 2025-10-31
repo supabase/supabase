@@ -19,7 +19,7 @@ interface RpcContentProps {
   refreshDocs: () => void
 }
 
-const RpcContent = ({
+export const RpcContent = ({
   rpcId,
   rpcs,
   paths,
@@ -100,5 +100,3 @@ const RpcContent = ({
     </>
   )
 }
-
-export default RpcContent

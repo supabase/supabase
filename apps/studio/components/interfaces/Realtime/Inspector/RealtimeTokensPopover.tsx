@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
+import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
@@ -11,7 +11,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { RealtimeConfig } from '../useRealtimeMessages'
+import { RealtimeConfig } from './useRealtimeMessages'
 
 interface RealtimeTokensPopoverProps {
   config: RealtimeConfig
