@@ -5,7 +5,6 @@ import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState
 import { useFlag, useParams } from 'common'
 import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
@@ -15,7 +14,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import { cn, LogoLoader, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
@@ -334,7 +333,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   }, [ref])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
-    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
+    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <LogoLoader />
   }
 
   if (isRestarting && !isBackupsPage) {
@@ -370,7 +369,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   }
 
   if (shouldRedirectToHomeForBuilding) {
-    return <Loading />
+    return <LogoLoader />
   }
 
   if (shouldShowBuildingState) {

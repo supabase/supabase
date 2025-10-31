@@ -2,13 +2,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
-import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
-import { ReportSectionHeader } from 'components/interfaces/Reports/v2/ReportSectionHeader'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
+import { ReportSectionHeader } from 'components/interfaces/Reports/v2/ReportSectionHeader'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
@@ -18,17 +18,6 @@ import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import type { NextPageWithLayout } from 'types'
-import {
-  createUsageReportConfig,
-  createErrorsReportConfig,
-  createLatencyReportConfig,
-} from 'data/reports/v2/auth.config'
-import { ReportSettings } from 'components/ui/Charts/ReportSettings'
-import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
-import { useRouter } from 'next/router'
 import {
   ReportsNumericFilter,
   numericFilterSchema,
@@ -37,7 +26,18 @@ import {
   ReportsSelectFilter,
   selectFilterSchema,
 } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
-import { useQueryState, parseAsJson } from 'nuqs'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
+import { ReportSettings } from 'components/ui/Charts/ReportSettings'
+import {
+  createErrorsReportConfig,
+  createLatencyReportConfig,
+  createUsageReportConfig,
+} from 'data/reports/v2/auth.config'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useRouter } from 'next/router'
+import { parseAsJson, useQueryState } from 'nuqs'
+import type { NextPageWithLayout } from 'types'
 
 const AuthReport: NextPageWithLayout = () => {
   return (

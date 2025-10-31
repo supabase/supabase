@@ -1,25 +1,27 @@
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 
 import { useParams } from 'common'
-import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
+import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
-import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
+import {
+  PRESET_CONFIG,
+  REPORT_DATERANGE_HELPER_LABELS,
+} from 'components/interfaces/Reports/Reports.constants'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()

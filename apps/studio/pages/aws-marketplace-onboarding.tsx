@@ -1,4 +1,6 @@
 import { useRouter } from 'next/router'
+
+import type { NextPageWithLayout } from 'types'
 import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
 import { AwsMarketplaceLinkExistingOrg } from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceLinkExistingOrg'
 import AwsMarketplaceOnboardingPlaceholder from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboardingPlaceholder'
@@ -11,7 +13,6 @@ import {
   ScaffoldTitle,
 } from '../components/layouts/Scaffold'
 import { useOrganizationsQuery } from '../data/organizations/organizations-query'
-import { NextPageWithLayout } from '../types'
 
 const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
   const {
