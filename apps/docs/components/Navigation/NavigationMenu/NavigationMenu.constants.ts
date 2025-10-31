@@ -748,10 +748,7 @@ export const auth: NavMenuConstant = {
         {
           name: 'Social Login (OAuth)',
           url: '/',
-          items: [
-            { name: 'Overview', url : '/guides/auth/social-login' },
-            ...SocialLoginItems
-          ],
+          items: [{ name: 'Overview', url: '/guides/auth/social-login' }, ...SocialLoginItems],
           enabled: allAuthProvidersEnabled,
         },
 
@@ -760,7 +757,7 @@ export const auth: NavMenuConstant = {
           url: '/',
           enabled: allAuthProvidersEnabled,
           items: [
-            {name: 'Overview', url: '/guides/auth/enterprise-sso' },
+            { name: 'Overview', url: '/guides/auth/enterprise-sso' },
             {
               name: 'SAML 2.0',
               url: '/guides/auth/enterprise-sso/auth-sso-saml' as `/${string}`,
@@ -890,7 +887,7 @@ export const auth: NavMenuConstant = {
           enabled: authFullSecurityEnabled,
           items: [
             { name: 'Overview', url: '/guides/auth/jwt-structure' },
-            { name: 'Claims Reference', url: '/guides/auth/jwt-fields' }
+            { name: 'Claims Reference', url: '/guides/auth/jwt-fields' },
           ],
         },
         {
