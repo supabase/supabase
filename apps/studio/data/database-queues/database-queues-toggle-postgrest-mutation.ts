@@ -4,9 +4,9 @@ import { toast } from 'sonner'
 
 import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { isGreaterThanOrEqual } from 'lib/semver'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
-import { isGreaterThanOrEqual, isLessThan } from 'lib/semver'
 
 export type DatabaseQueueExposePostgrestVariables = {
   projectRef: string
@@ -16,7 +16,7 @@ export type DatabaseQueueExposePostgrestVariables = {
   connectionString?: string | null
 }
 
-const CONDITIONAL_READ_SIGNATURE_PGMQ_VERSION = '1.5.1'
+const CONDITIONAL_READ_SIGNATURE_PGMQ_VERSION = '1.5.0'
 export const QUEUES_SCHEMA = 'pgmq_public'
 
 const getExposeQueuesSQL = (pgmqVersion: string) => {
