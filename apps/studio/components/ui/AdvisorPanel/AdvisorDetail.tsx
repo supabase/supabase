@@ -10,7 +10,11 @@ interface AdvisorDetailProps {
   onUpdateNotificationStatus?: (id: string, status: 'archived' | 'seen') => void
 }
 
-export const AdvisorDetail = ({ item, projectRef, onUpdateNotificationStatus }: AdvisorDetailProps) => {
+export const AdvisorDetail = ({
+  item,
+  projectRef,
+  onUpdateNotificationStatus,
+}: AdvisorDetailProps) => {
   if (item.source === 'lint') {
     const lint = item.original as Lint
     return (
@@ -34,4 +38,3 @@ export const AdvisorDetail = ({ item, projectRef, onUpdateNotificationStatus }: 
 
   return null
 }
-
