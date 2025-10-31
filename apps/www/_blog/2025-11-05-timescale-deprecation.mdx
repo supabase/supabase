@@ -1,0 +1,36 @@
+---
+title: 'Migrating from TimescaleDB Hypertables to Supabase'
+description: 'Learn how to prepare for the deprecation of the TimescaleDB community extension in Supabase'
+author: chris_gwilliams
+image: 2025-11-05-timescale-deprecation/og.png
+thumb: 2025-11-05-timescale-deprecation/og.png
+categories:
+  - product
+date: '2025-11-05:10:00:00'
+toc_depth: 2
+---
+
+As you might have seen, Supabase is deprecating support for the [TimescaleDB community extension](https://github.com/orgs/supabase/discussions/35851). This change affects users who have been using hypertables in their Supabase projects. In this post, we'll explain what this means for you and how to migrate your data and queries to standard PostgreSQL tables.
+
+For Postgres versions 17 and later, `TimescaleDB` is no longer available and support for [pg_partman](https://github.com/pgpartman/pg_partman) has been added. 
+
+### Why no TimescaleDB?
+
+Timescale (now Tiger Data) is an extremely powerful extension that unlocks many time-series use-cases for Postgres.
+We have seen that customers using the extension often need more features than the community edition provides and this can block them or cause them to look for workarounds that might not be performant.
+On the other end of the use case spectrum, some customers have a need for the advanced partitioning features, similar to what the TimescaleDB extension provided, but not for time-series data.
+
+This is why we are adding support for `pg_partman`, which provides automatic partition management for standard Postgres tables.
+
+We hope that this change reduces confusion for users and unlocks more options to scale your data efficiently.
+
+
+### How to migrate?
+
+Postgres 17 does not have `TimescaleDB` support, though recent updates include `pg_partman` for more flexible partitioning options.
+If you are running Postgres 15 on Supabase, newer versions will include both the TimescaleDB extension and `pg_partman` to allow you to migrate your data before upgrading.
+
+We strongly recommend testing your migration path in a staging project, using a [copy of your production project](https://supabase.com/blog/restore-to-a-new-project) or via [branching](/docs/guides/platform/branching).
+
+
+
