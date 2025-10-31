@@ -181,6 +181,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
+                portal
                 className="p-0"
                 side="bottom"
                 align="start"
@@ -261,6 +262,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
+                portal
                 className="p-0"
                 side="bottom"
                 align="start"

@@ -370,7 +370,7 @@ export const CreateHookSheet = ({
                         >
                           <FormControl_Shadcn_>
                             <SchemaSelector
-                              portal={false}
+                              portal
                               size="small"
                               showError={false}
                               selectedSchemaName={field.value}
@@ -392,6 +392,7 @@ export const CreateHookSheet = ({
                         >
                           <FormControl_Shadcn_>
                             <FunctionSelector
+                              portal
                               size="small"
                               schema={values.postgresValues.schema}
                               value={field.value}

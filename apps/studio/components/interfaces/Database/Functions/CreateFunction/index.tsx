@@ -201,7 +201,7 @@ export const CreateFunction = ({
                     >
                       <FormControl_Shadcn_>
                         <SchemaSelector
-                          portal={false}
+                          portal
                           selectedSchemaName={field.value}
                           excludedSchemas={protectedSchemas?.map((s) => s.name)}
                           size="small"

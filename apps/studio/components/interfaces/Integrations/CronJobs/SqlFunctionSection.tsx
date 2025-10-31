@@ -21,7 +21,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
         render={({ field }) => (
           <FormItemLayout label="Schema" className="gap-1">
             <SchemaSelector
-              portal={false}
+              portal
               size="small"
               className="w-56 2xl:w-full"
               selectedSchemaName={field.value}
@@ -41,6 +41,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
         render={({ field }) => (
           <FormItemLayout label="Function name" className="gap-1">
             <FunctionSelector
+              portal
               size="small"
               className="w-56 2xl:w-full"
               schema={schema}

@@ -305,7 +305,7 @@ export const NewPaymentMethodElement = forwardRef(
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                      <PopoverContent portal sameWidthAsTrigger className="p-0" align="start">
                         <Command>
                           <CommandInput placeholder="Search tax ID..." />
                           <CommandList>

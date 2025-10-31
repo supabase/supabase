@@ -7,6 +7,7 @@ import {
   DatabaseFunctionsData,
   useDatabaseFunctionsQuery,
 } from 'data/database-functions/database-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
@@ -26,7 +27,6 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 type DatabaseFunction = DatabaseFunctionsData[number]
 
@@ -41,6 +41,7 @@ interface FunctionSelectorProps {
   // used to filter the functions by a criteria
   filterFunction?: (func: DatabaseFunction) => boolean
   noResultsLabel?: React.ReactNode
+  portal?: boolean
 }
 
 const FunctionSelector = ({
@@ -53,6 +54,7 @@ const FunctionSelector = ({
   onChange,
   filterFunction = () => true,
   noResultsLabel = <span>No functions found in this schema.</span>,
+  portal = false,
 }: FunctionSelectorProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -117,7 +119,13 @@ const FunctionSelector = ({
               )}
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+          <PopoverContent_Shadcn_
+            portal={portal}
+            className="p-0"
+            side="bottom"
+            align="start"
+            sameWidthAsTrigger
+          >
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Search functions..." />
               <CommandList_Shadcn_>
