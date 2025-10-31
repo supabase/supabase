@@ -89,6 +89,8 @@ const EntityListItem = ({
     projectRef: project?.ref,
   })
 
+  console.log(lints)
+
   const tableHasLints: boolean = getEntityLintDetails(
     entity.name,
     'rls_disabled_in_public',
