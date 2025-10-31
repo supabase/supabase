@@ -225,59 +225,6 @@ export function DatePicker({
                 handleDatePickerChange([range?.from ?? null, range?.to ?? null])
               }}
             />
-            {/*
-            <ReactDatePicker
-              inline
-              selectsRange={selectsRange}
-              selected={startDate}
-              onChange={(dates) => {
-                handleDatePickerChange(dates)
-              }}
-              dateFormat="MMMM d, yyyy h:mm aa"
-              startDate={startDate}
-              endDate={endDate}
-              minDate={minDate}
-              maxDate={maxDate}
-              dayClassName={() => 'cursor-pointer'}
-              renderCustomHeader={({
-                date,
-                decreaseMonth,
-                increaseMonth,
-                prevMonthButtonDisabled,
-                nextMonthButtonDisabled,
-              }) => (
-                <div className="flex items-center justify-between">
-                  <div className="flex w-full items-center justify-between">
-                    <button
-                      onClick={decreaseMonth}
-                      disabled={prevMonthButtonDisabled}
-                      type="button"
-                      className={`
-                        ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light hover:text-foreground focus:outline-none p-2
-                    `}
-                    >
-                      <ChevronLeft size={16} strokeWidth={2} />
-                    </button>
-                    <span className="text-sm text-foreground-light">
-                      {format(date, 'MMMM yyyy')}
-                    </span>
-                    <button
-                      onClick={increaseMonth}
-                      disabled={nextMonthButtonDisabled}
-                      type="button"
-                      className={`
-                        ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light p-2 hover:text-foreground focus:outline-none
-                    `}
-                    >
-                      <ChevronRight size={16} strokeWidth={2} />
-                    </button>
-                  </div>
-                </div>
-              )}
-            />
-			*/}
           </div>
           {renderFooter({
             from: startDate?.toISOString() || null,

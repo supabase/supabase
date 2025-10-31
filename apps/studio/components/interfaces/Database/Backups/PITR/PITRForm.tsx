@@ -40,6 +40,8 @@ export function PITRForm({
   const latestAvailableBackup = dayjs
     .unix(latestAvailableBackupUnix ?? 0)
     .tz(selectedTimezone.utc[0])
+  const earliestAvailableBackupAsDate = earliestAvailableBackup.toDate()
+  const latestAvailableBackupAsDate = latestAvailableBackup.toDate()
 
   const [selectedDateRaw, setSelectedDateRaw] = useState<Date>(latestAvailableBackup.toDate())
 
@@ -129,12 +131,12 @@ export function PITRForm({
               required={true}
               selected={selectedDateRaw}
               onSelect={onUpdateDate}
-              defaultMonth={latestAvailableBackup.toDate()}
-              startMonth={earliestAvailableBackup.toDate()}
-              endMonth={latestAvailableBackup.toDate()}
+              defaultMonth={latestAvailableBackupAsDate}
+              startMonth={earliestAvailableBackupAsDate}
+              endMonth={latestAvailableBackupAsDate}
               disabled={[
-                { before: earliestAvailableBackup.toDate() },
-                { after: latestAvailableBackup.toDate() },
+                { before: earliestAvailableBackupAsDate },
+                { after: latestAvailableBackupAsDate },
               ]}
               classNames={{
                 day: cn(
