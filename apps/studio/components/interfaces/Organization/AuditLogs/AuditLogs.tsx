@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -97,7 +98,7 @@ export const AuditLogs = () => {
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { keepPreviousData: true, enabled: showFilters }
+    { placeholderData: keepPreviousData, enabled: showFilters }
   )
   const { data: organizations } = useOrganizationsQuery({
     enabled: showFilters,

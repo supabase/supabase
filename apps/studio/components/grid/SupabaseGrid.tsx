@@ -20,6 +20,7 @@ import { Header, HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu/RowContextMenu'
 import { GridProps } from './types'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
@@ -66,7 +67,7 @@ export const SupabaseGrid = ({
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
       enabled: tableQueriesEnabled,
       retry: (_, error: any) => {
         const doesNotExistError = error && error.message?.includes('does not exist')

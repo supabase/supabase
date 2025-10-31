@@ -2,6 +2,7 @@ import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-esti
 import { ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
@@ -89,7 +90,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
       enabled: !isForeignTableSelected,
     }
   )

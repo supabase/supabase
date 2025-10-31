@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import {
   formatSortURLParams,
@@ -111,7 +112,7 @@ export const ForeignRowSelector = ({
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
 
