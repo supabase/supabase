@@ -174,8 +174,9 @@ export function useNestedRoute({
     if (!router.isReady || isNavigatingRef.current || typeof window === 'undefined') return
 
     if (isOpen) {
-      const currentAsPath = router.asPath
-      const [pathWithoutQuery, queryString] = currentAsPath.split('?')
+      // Use window.location.pathname because router.asPath might be stale after History API changes
+      const currentPath = window.location.pathname + window.location.search
+      const [pathWithoutQuery, queryString] = currentPath.split('?')
 
       // Check if URL already has the nested route (from initial load)
       const alreadyHasNestedRoute = pathWithoutQuery.endsWith(`/${normalizedRoute}`)
@@ -192,13 +193,30 @@ export function useNestedRoute({
         }
       } else {
         // Normal flow: user clicked to open, append nested route to URL
-        // Store current location before navigating
-        if (!previousPathRef.current) {
-          previousPathRef.current = currentAsPath
+        // First, determine the base path by checking if we're on a catch-all route
+        // We need to strip any existing nested routes to get back to the true parent
+        let basePath = pathWithoutQuery
+
+        // Check if current path has any nested segments (e.g., /types/17702/edit or /types/new)
+        // by comparing with router.pathname template
+        const pathSegments = pathWithoutQuery.split('/').filter(Boolean)
+        const pathnameSegments = router.pathname.split('/').filter(Boolean)
+
+        // If we have more segments than the template pathname, we're on a nested route
+        // Find the index where [...action] or similar catch-all would be
+        const catchAllIndex = pathnameSegments.findIndex((seg) => seg.startsWith('[...'))
+        if (catchAllIndex !== -1 && pathSegments.length > pathnameSegments.length - 1) {
+          // We're on a catch-all route, strip back to the parent
+          basePath = '/' + pathSegments.slice(0, catchAllIndex).join('/')
         }
 
-        // Build the new path with nested route
-        const newPath = `${pathWithoutQuery}/${normalizedRoute}${queryString ? `?${queryString}` : ''}`
+        // Store current location before navigating
+        if (!previousPathRef.current) {
+          previousPathRef.current = basePath + (queryString ? `?${queryString}` : '')
+        }
+
+        // Build the new path with nested route from the base path
+        const newPath = `${basePath}/${normalizedRoute}${queryString ? `?${queryString}` : ''}`
 
         // Update URL using History API without triggering Next.js navigation
         isNavigatingRef.current = true
@@ -209,23 +227,33 @@ export function useNestedRoute({
       // Reset the stored path when closed
       previousPathRef.current = null
     }
-  }, [isOpen, router.isReady, normalizedRoute, router.asPath])
+  }, [isOpen, router.isReady, normalizedRoute, router.pathname])
 
   // Handle browser back/forward navigation
   useEffect(() => {
-    if (typeof window === 'undefined' || !isOpen) return
+    if (typeof window === 'undefined' || !router.isReady) return
 
     const handlePopState = () => {
       // User clicked back/forward - the URL has already changed by the browser
-      // Just close the component without modifying the URL
+      // Check the current URL to determine if we should open or close
+      const currentPath = window.location.pathname
+      const shouldBeOpen = normalizedRoute && currentPath.endsWith(`/${normalizedRoute}`)
+
       previousPathRef.current = null
-      onCloseTrigger()
-      onRouteRestore?.()
+
+      if (shouldBeOpen && !isOpen) {
+        // Forward navigation - panel should open
+        if (onOpenTrigger) onOpenTrigger()
+      } else if (!shouldBeOpen && isOpen) {
+        // Back navigation - panel should close
+        if (onCloseTrigger) onCloseTrigger()
+        onRouteRestore?.()
+      }
     }
 
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
-  }, [isOpen, onCloseTrigger, onRouteRestore])
+  }, [isOpen, normalizedRoute, onOpenTrigger, onCloseTrigger, onRouteRestore, router.isReady])
 
   // Cleanup on unmount
   useEffect(() => {

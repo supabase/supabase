@@ -27,7 +27,6 @@ import {
 } from 'ui'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 import { NATIVE_POSTGRES_TYPES } from './EnumeratedTypes.constants'
-import { useNestedRoute } from '../../../../hooks/misc/useNestedRoute'
 
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -44,20 +43,16 @@ const CreateEnumeratedTypeSidePanel = ({
   const submitRef = useRef<HTMLButtonElement>(null)
   const { data: project } = useSelectedProjectQuery()
   const { mutate: createEnumeratedType, isLoading: isCreating } = useEnumeratedTypeCreateMutation({
-    onSuccess: (res, vars) => {
+    onSuccess: (_res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
       closePanel()
     },
   })
 
-  const { onClose: onCloseNestedRoute } = useNestedRoute({
-    nestedRoute: 'new',
-    isOpen: visible,
-  })
-
+  // Note: This side panel is already controlled by the parent EnumeratedTypes component
+  // which handles the useNestedRoute hook. We don't need to use it here again.
   const onClose = () => {
     onCloseParent()
-    onCloseNestedRoute()
   }
 
   useEffect(() => {

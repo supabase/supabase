@@ -1,5 +1,5 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -47,11 +47,36 @@ const EnumeratedTypes = () => {
     onCloseTrigger: () => setShowCreateTypePanel(false),
   })
 
+  // Add routing support for the edit panel
+  const { onClose: onCloseEditPanel } = useNestedRoute({
+    nestedRoute: selectedTypeToEdit ? `${selectedTypeToEdit.id}/edit` : '',
+    isOpen: selectedTypeToEdit !== undefined,
+    onOpenTrigger: () => {
+      // Trigger handled by useEffect below after data is loaded
+    },
+    onCloseTrigger: () => setSelectedTypeToEdit(undefined),
+  })
+
   const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
+
+  // Handle deep linking to edit panel - open when data is loaded
+  useEffect(() => {
+    if (!isSuccess || selectedTypeToEdit !== undefined) return
+
+    const pathSegments = window.location.pathname.split('/')
+    const editIndex = pathSegments.indexOf('edit')
+    if (editIndex > 0) {
+      const id = parseInt(pathSegments[editIndex - 1], 10)
+      const typeToEdit = enumeratedTypes.find((t) => t.id === id)
+      if (typeToEdit) {
+        setSelectedTypeToEdit(typeToEdit)
+      }
+    }
+  }, [isSuccess, enumeratedTypes, selectedTypeToEdit])
   const filteredEnumeratedTypes =
     search.length > 0
       ? enumeratedTypes.filter(
@@ -191,7 +216,7 @@ const EnumeratedTypes = () => {
       <EditEnumeratedTypeSidePanel
         visible={selectedTypeToEdit !== undefined}
         selectedEnumeratedType={selectedTypeToEdit}
-        onClose={() => setSelectedTypeToEdit(undefined)}
+        onClose={onCloseEditPanel}
       />
 
       <DeleteEnumeratedTypeModal
