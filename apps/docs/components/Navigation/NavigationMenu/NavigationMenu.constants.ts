@@ -695,7 +695,7 @@ export const auth: NavMenuConstant = {
         { name: 'Identities', url: '/guides/auth/identities' },
         {
           name: 'Sessions',
-          url: '/',
+          url: '/guides/auth/sessions',
           items: [
             { name: 'User sessions', url: '/guides/auth/sessions' },
             { name: 'Implicit flow', url: '/guides/auth/sessions/implicit-flow' },
@@ -710,9 +710,9 @@ export const auth: NavMenuConstant = {
       items: [
         {
           name: 'Server-Side Rendering',
-          url: '/',
+          url: '/guides/auth/server-side',
           items: [
-            { name: 'How SSR works with Supabase Auth', url: '/guides/auth/server-side' },
+            { name: 'Overview', url: '/guides/auth/server-side' },
             { name: 'Next.js guide', url: '/guides/auth/server-side/nextjs' },
             {
               name: 'SvelteKit guide',
@@ -747,14 +747,14 @@ export const auth: NavMenuConstant = {
 
         {
           name: 'Social Login (OAuth)',
-          url: '/',
+          url: '/guides/auth/social-login',
           items: [{ name: 'Overview', url: '/guides/auth/social-login' }, ...SocialLoginItems],
           enabled: allAuthProvidersEnabled,
         },
 
         {
           name: 'Enterprise SSO',
-          url: '/',
+          url: '/guides/auth/enterprise-sso',
           enabled: allAuthProvidersEnabled,
           items: [
             { name: 'Overview', url: '/guides/auth/enterprise-sso' },
@@ -782,7 +782,7 @@ export const auth: NavMenuConstant = {
         },
         {
           name: 'Multi-Factor Authentication',
-          url: '/',
+          url: '/guides/auth/auth-mfa',
           items: [
             { name: 'Overview', url: '/guides/auth/auth-mfa' },
             { name: 'App Authenticator (TOTP)', url: '/guides/auth/auth-mfa/totp' },
@@ -833,7 +833,7 @@ export const auth: NavMenuConstant = {
         },
         {
           name: 'Auth Hooks',
-          url: '/',
+          url: '/guides/auth/auth-hooks',
           items: [
             { name: 'Overview', url: '/guides/auth/auth-hooks' },
             {
@@ -883,10 +883,10 @@ export const auth: NavMenuConstant = {
         { name: 'Audit Logs', url: '/guides/auth/audit-logs', enabled: authFullSecurityEnabled },
         {
           name: 'JSON Web Tokens (JWT)',
-          url: '/',
+          url: '/guides/auth/jwts',
           enabled: authFullSecurityEnabled,
           items: [
-            { name: 'Overview', url: '/guides/auth/jwt-structure' },
+            { name: 'Overview', url: '/guides/auth/jwts' },
             { name: 'Claims Reference', url: '/guides/auth/jwt-fields' },
           ],
         },
@@ -927,7 +927,7 @@ const ormQuickstarts: NavMenuSection = {
   items: [
     {
       name: 'Prisma',
-      url: '/',
+      url: '/guides/database/prisma',
       items: [
         { name: 'Connecting with Prisma', url: '/guides/database/prisma' as `/${string}` },
         {
@@ -2009,7 +2009,13 @@ export const ai: NavMenuConstant = {
         {
           name: 'Vector indexes',
           url: '/guides/ai/vector-indexes',
-          items: vectorIndexItems,
+          items: [
+            {
+              name: 'Overview',
+              url: '/guides/ai/vector-indexes',
+            },
+            ...vectorIndexItems,
+          ],
         },
         {
           name: 'Automatic embeddings',
@@ -2357,6 +2363,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/migrating-within-supabase',
           items: [
             {
+              name: 'Overview',
+              url: '/guides/platform/migrating-within-supabase' as `/${string}`,
+            },
+            {
               name: 'Restore Dashboard backup',
               url: '/guides/platform/migrating-within-supabase/dashboard-restore' as `/${string}`,
             },
@@ -2369,7 +2379,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Migrating to Supabase',
           url: '/guides/platform/migrating-to-supabase',
-          items: MIGRATION_PAGES,
+          items: [
+            { name: 'Overview', url: '/guides/platform/migrating-to-supabase' as `/${string}` },
+            ...MIGRATION_PAGES,
+          ],
         },
       ],
     },
@@ -2386,6 +2399,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/multi-factor-authentication',
           enabled: fullPlatformEnabled,
           items: [
+            {
+              name: 'Overview',
+              url: '/guides/platform/multi-factor-authentication' as `/${string}`,
+            },
             {
               name: 'Enforce MFA on organization',
               url: '/guides/platform/mfa/org-mfa-enforcement' as `/${string}`,
@@ -2406,6 +2423,7 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/sso',
           enabled: fullPlatformEnabled,
           items: [
+            { name: 'Overview', url: '/guides/platform/sso' as `/${string}` },
             { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
             {
               name: 'SSO with Google Workspace',
@@ -2464,8 +2482,12 @@ export const platform: NavMenuConstant = {
         },
         {
           name: 'Manage your usage',
-          url: '/guides/platform/manage-your-usage' as `/${string}`,
+          url: '/guides/platform/manage-your-usage',
           items: [
+            {
+              name: 'Overview',
+              url: '/guides/platform/manage-your-usage' as `/${string}`,
+            },
             {
               name: 'Compute',
               url: '/guides/platform/manage-your-usage/compute' as `/${string}`,
@@ -2564,6 +2586,10 @@ export const platform: NavMenuConstant = {
           name: 'AWS Marketplace',
           url: '/guides/platform/aws-marketplace',
           items: [
+            {
+              name: 'Overview',
+              url: '/guides/platform/aws-marketplace' as `/${string}`,
+            },
             {
               name: 'Getting Started',
               url: '/guides/platform/aws-marketplace/getting-started',
@@ -2805,6 +2831,10 @@ export const integrations: NavMenuConstant = {
           name: 'Build a Supabase integration',
           url: '/guides/integrations/build-a-supabase-integration',
           items: [
+            {
+              name: 'Overview',
+              url: '/guides/integrations/build-a-supabase-integration' as `/${string}`,
+            },
             {
               name: 'OAuth scopes',
               url: '/guides/integrations/build-a-supabase-integration/oauth-scopes' as `/${string}`,
