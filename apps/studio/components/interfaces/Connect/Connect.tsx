@@ -14,6 +14,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { useRouter } from 'next/router'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -32,11 +33,12 @@ import {
   cn,
 } from 'ui'
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './Connect.constants'
-import { getContentFilePath } from './Connect.utils'
+import { getContentFilePath, inferConnectTabFromParentKey } from './Connect.utils'
 import { ConnectDropdown } from './ConnectDropdown'
 import { ConnectTabContent } from './ConnectTabContent'
 
 export const Connect = () => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -83,10 +85,13 @@ export const Connect = () => {
     }
   }
 
-  const [tab, setTab] = useQueryState('tab', parseAsString.withDefault('direct'))
+  const [tab, setTab] = useQueryState('connectTab', parseAsString.withDefault('direct'))
   const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
   const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
   const [queryWith, setQueryWith] = useQueryState('with', parseAsString)
+  const [_, setQueryType] = useQueryState('type', parseAsString)
+  const [__, setQuerySource] = useQueryState('source', parseAsString)
+  const [___, setQueryMethod] = useQueryState('method', parseAsString)
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -242,17 +247,38 @@ export const Connect = () => {
     selectedGrandchild,
   })
 
+  const resetQueryStates = () => {
+    setQueryFramework(null)
+    setQueryUsing(null)
+    setQueryWith(null)
+    setQueryType(null)
+    setQuerySource(null)
+    setQueryMethod(null)
+  }
+
   const handleDialogChange = (open: boolean) => {
     if (!open) {
       setShowConnect(null)
       setTab(null)
-      setQueryFramework(null)
-      setQueryUsing(null)
-      setQueryWith(null)
+      resetQueryStates()
     } else {
       setShowConnect(open)
     }
   }
+
+  useEffect(() => {
+    if (!showConnect) return
+    const noConnectTabInUrl = typeof router.query.connectTab === 'undefined'
+    const hasQuery = queryFramework || queryUsing || queryWith
+    const inferred = inferConnectTabFromParentKey(queryFramework)
+
+    if (noConnectTabInUrl && hasQuery && inferred) {
+      setTab(inferred)
+      if (inferred === 'frameworks') setConnectionObject(FRAMEWORKS)
+      if (inferred === 'mobiles') setConnectionObject(MOBILES)
+      if (inferred === 'orms') setConnectionObject(ORMS)
+    }
+  }, [showConnect, router.query.connectTab, queryFramework, queryUsing, queryWith, setTab])
 
   useEffect(() => {
     if (!showConnect) return
@@ -283,7 +309,16 @@ export const Connect = () => {
     if (queryWith) {
       if (grandchild?.key !== queryWith) setQueryWith(grandchild?.key ?? null)
     }
-  }, [showConnect, tab, FRAMEWORKS, queryFramework, queryUsing, queryWith])
+  }, [
+    showConnect,
+    tab,
+    queryFramework,
+    setQueryFramework,
+    queryUsing,
+    setQueryUsing,
+    queryWith,
+    setQueryWith,
+  ])
 
   if (!isActiveHealthy) {
     return (
@@ -311,18 +346,24 @@ export const Connect = () => {
           <span>Connect</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
-        <DialogHeader className={DIALOG_PADDING_X}>
+      <DialogContent className={cn('sm:max-w-5xl p-0 rounded-lg')} centered={false}>
+        <DialogHeader className={cn('text-left', DIALOG_PADDING_X)}>
           <DialogTitle>
             Connect to your project
             {connectionTypes.length === 1 ? ` via ${connectionTypes[0].label.toLowerCase()}` : null}
           </DialogTitle>
           <DialogDescription>
-            Get the connection strings and environment variables for your app
+            Get the connection strings and environment variables for your app.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs_Shadcn_ defaultValue={tab} onValueChange={(value) => handleConnectionType(value)}>
+        <Tabs_Shadcn_
+          value={tab}
+          onValueChange={(value) => {
+            resetQueryStates()
+            handleConnectionType(value)
+          }}
+        >
           {connectionTypes.length > 1 ? (
             <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
               {connectionTypes.map((type) => (

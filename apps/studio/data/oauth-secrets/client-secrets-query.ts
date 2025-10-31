@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { clientSecretKeys } from './keys'
 
 import { components } from 'api-types'
@@ -51,11 +51,9 @@ export const useClientSecretsQuery = <TData = ClientSecretsData>(
   { slug, appId }: ClientSecretsVariables,
   { enabled = true, ...options }: UseQueryOptions<ClientSecretsData, ClientSecretsError, TData> = {}
 ) =>
-  useQuery<ClientSecretsData, ClientSecretsError, TData>(
-    clientSecretKeys.list(slug, appId),
-    ({ signal }) => getClientSecrets({ slug, appId }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined' && typeof appId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ClientSecretsData, ClientSecretsError, TData>({
+    queryKey: clientSecretKeys.list(slug, appId),
+    queryFn: ({ signal }) => getClientSecrets({ slug, appId }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && typeof appId !== 'undefined',
+    ...options,
+  })

@@ -3,34 +3,28 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 export function EmailRateLimitsAlert() {
   const { ref } = useParams()
 
   return (
-    <Alert_Shadcn_ variant="warning">
-      <WarningIcon />
-      <AlertTitle_Shadcn_>Email rate-limits and restrictions</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
-        You're using the built-in email service. The service has rate limits and it's not meant to
-        be used for production apps. Check the{' '}
+    <Admonition
+      type="warning"
+      title="Set up custom SMTP"
+      className="bg-warning-200 border-warning-400"
+    >
+      <p>
+        You’re using the built-in email service. This service has rate limits and is not meant to be
+        used for production apps.{' '}
         <InlineLink href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}>
-          documentation
+          Learn more
         </InlineLink>{' '}
-        for an up-to-date information on the current rate limits.
-      </AlertDescription_Shadcn_>
-      <AlertDescription_Shadcn_ className="mt-2">
-        <Button asChild type="default">
-          <Link href={`/project/${ref}/auth/smtp`}>Set up custom SMTP server</Link>
-        </Button>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </p>
+      <Button asChild type="default" className="mt-2">
+        <Link href={`/project/${ref}/auth/smtp`}>Set up SMTP</Link>
+      </Button>
+    </Admonition>
   )
 }

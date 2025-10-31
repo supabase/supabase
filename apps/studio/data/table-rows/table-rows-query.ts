@@ -7,7 +7,6 @@ import {
   type UseQueryOptions,
 } from '@tanstack/react-query'
 
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
@@ -50,7 +49,7 @@ async function sleep(ms: number) {
 export async function executeWithRetry<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  baseDelay: number = 500
+  baseDelay: number = 1000
 ): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -98,9 +97,9 @@ export const getAllTableRowsSql = ({
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
 
-  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
-  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
-    const primaryKeys = getDefaultOrderByColumns(table)
+  // Always enforce deterministic ordering for pagination/export
+  const primaryKeys = getDefaultOrderByColumns(table)
+  if (sorts.length === 0) {
     if (primaryKeys.length > 0) {
       primaryKeys.forEach((col) => {
         queryChains = queryChains.order(table.name, col)
@@ -110,7 +109,22 @@ export const getAllTableRowsSql = ({
     sorts.forEach((sort) => {
       queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
     })
+
+    // Add primary keys as tie-breakers so page order doesn't shuffle
+    if (primaryKeys.length > 0) {
+      const sortedColumns = new Set(
+        sorts.filter((s) => s.table === table.name).map((s) => s.column)
+      )
+      primaryKeys
+        .filter((pk) => !sortedColumns.has(pk))
+        .forEach((pk) => {
+          queryChains = queryChains.order(table.name, pk)
+        })
+    }
   }
+
+  // Final tie-breaker: use system column ctid to guarantee a stable, unique order
+  queryChains = queryChains.order(table.name, 'ctid')
 
   return queryChains
 }
@@ -248,30 +262,28 @@ export const useTableRowsQuery = <TData = TableRowsData>(
   { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  return useQuery<TableRowsData, TableRowsError, TData>(
-    tableRowKeys.tableRows(projectRef, {
+  return useQuery<TableRowsData, TableRowsError, TData>({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+    ...options,
+  })
 }
 
 export function prefetchTableRows(
   client: QueryClient,
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
 ) {
-  return client.fetchQuery(
-    tableRowKeys.tableRows(projectRef, {
+  return client.fetchQuery({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
-      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal)
-  )
+    queryFn: ({ signal }) =>
+      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal),
+  })
 }

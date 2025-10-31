@@ -93,7 +93,7 @@ export const ScaffoldSection = forwardRef<
       {...props}
       className={cn(
         'flex flex-col first:pt-12 py-6',
-        isFullWidth ? 'w-full' : 'gap-3 lg:grid md:grid-cols-12',
+        isFullWidth ? 'w-full' : 'gap-3 @lg:grid @md:grid-cols-12',
         className
       )}
     />

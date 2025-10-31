@@ -385,12 +385,30 @@ export const examples: Registry = [
     registryDependencies: ['context-menu'],
     files: ['example/context-menu-demo.tsx'],
   },
-  // {
-  //   name: 'data-table-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['data-table'],
-  //   files: ['example/data-table-demo.tsx'],
-  // },
+  {
+    name: 'data-input-demo',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-demo.tsx'],
+  },
+  {
+    name: 'data-input-with-copy',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-copy.tsx'],
+  },
+  {
+    name: 'data-input-with-copy-secret',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-copy-secret.tsx'],
+  },
+  {
+    name: 'data-input-with-reveal-copy',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy.tsx'],
+  },
   {
     name: 'date-picker-demo',
     type: 'components:example',

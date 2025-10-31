@@ -1,7 +1,7 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 
 type ReplicationTablesParams = { projectRef?: string; sourceId?: number }
@@ -30,11 +30,9 @@ export const useReplicationTablesQuery = <TData = ReplicationTablesData>(
   { projectRef, sourceId }: ReplicationTablesParams,
   { enabled = true, ...options }: UseQueryOptions<ReplicationTablesData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationTablesData, ResponseError, TData>(
-    replicationKeys.tables(projectRef, sourceId),
-    ({ signal }) => fetchReplicationTables({ projectRef, sourceId }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ReplicationTablesData, ResponseError, TData>({
+    queryKey: replicationKeys.tables(projectRef, sourceId),
+    queryFn: ({ signal }) => fetchReplicationTables({ projectRef, sourceId }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
+    ...options,
+  })

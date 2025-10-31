@@ -843,11 +843,10 @@ export interface paths {
       cookie?: never
     }
     /** Get notifications */
-    get: operations['NotificationsController_getNotificationsV2']
+    get: operations['NotificationsController_getNotifications']
     put?: never
     post?: never
-    /** Delete notifications */
-    delete: operations['NotificationsController_deleteNotifications']
+    delete?: never
     options?: never
     head?: never
     /** Update notifications */
@@ -1243,6 +1242,46 @@ export interface paths {
     }
     /** Get standard security questionnaire URL */
     get: operations['OrgDocumentsController_getStandardSecurityQuestionnaireUrl']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['OrganizationEntitlementsController_getEntitlements']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/entitlements/entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['OrganizationEntitlementsController_getEntitlements']
     put?: never
     post?: never
     delete?: never
@@ -1723,33 +1762,11 @@ export interface paths {
     /** Retrieve column privileges */
     get: operations['ColumnPrivilegesController_getColumnPrivileges']
     put?: never
-    /** Grant column privileges */
-    post: operations['ColumnPrivilegesController_grantColumnPrivileges']
-    /** Revoke column privileges */
-    delete: operations['ColumnPrivilegesController_revokeColumnPrivileges']
+    post?: never
+    delete?: never
     options?: never
     head?: never
     patch?: never
-    trace?: never
-  }
-  '/platform/pg-meta/{ref}/columns': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project pg.columns */
-    get: operations['ColumnsController_getColumns']
-    put?: never
-    /** Creates project pg.column */
-    post: operations['ColumnsController_createColumn']
-    /** Deletes project pg.column with the given ID */
-    delete: operations['ColumnsController_deleteColumn']
-    options?: never
-    head?: never
-    /** Updates project pg.column with the given ID */
-    patch: operations['ColumnsController_updateColumn']
     trace?: never
   }
   '/platform/pg-meta/{ref}/extensions': {
@@ -1762,10 +1779,8 @@ export interface paths {
     /** Gets project pg.extensions */
     get: operations['ExtensionsController_getExtensions']
     put?: never
-    /** Creates project pg.extension */
-    post: operations['ExtensionsController_createExtension']
-    /** Deletes project pg.extension with the given ID */
-    delete: operations['ExtensionsController_deleteExtension']
+    post?: never
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -1786,26 +1801,6 @@ export interface paths {
     options?: never
     head?: never
     patch?: never
-    trace?: never
-  }
-  '/platform/pg-meta/{ref}/functions': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project pg.functions */
-    get: operations['FunctionsController_getFunctions']
-    put?: never
-    /** Creates project pg.function */
-    post: operations['FunctionsController_createFunction']
-    /** Deletes project pg.function with the given ID */
-    delete: operations['FunctionsController_deleteFunction']
-    options?: never
-    head?: never
-    /** Updates project pg.function with the given ID */
-    patch: operations['FunctionsController_updateFunction']
     trace?: never
   }
   '/platform/pg-meta/{ref}/materialized-views': {
@@ -1835,14 +1830,11 @@ export interface paths {
     /** Gets project pg.policies */
     get: operations['PoliciesController_getPolicies']
     put?: never
-    /** Creates project pg.policy */
-    post: operations['PoliciesController_createPolicy']
-    /** Deletes project pg.policy with the given ID */
-    delete: operations['PoliciesController_deletePolicy']
+    post?: never
+    delete?: never
     options?: never
     head?: never
-    /** Updates project pg.policy with the given ID */
-    patch: operations['PoliciesController_updatePolicy']
+    patch?: never
     trace?: never
   }
   '/platform/pg-meta/{ref}/publications': {
@@ -1855,14 +1847,11 @@ export interface paths {
     /** Gets project pg.publications */
     get: operations['PublicationsController_getPublications']
     put?: never
-    /** Creates project pg.publication */
-    post: operations['PublicationsController_createPublication']
-    /** Deletes project pg.publication with the given ID */
-    delete: operations['PublicationsController_deletePublication']
+    post?: never
+    delete?: never
     options?: never
     head?: never
-    /** Updates project pg.publication with the given ID */
-    patch: operations['PublicationsController_updatePublication']
+    patch?: never
     trace?: never
   }
   '/platform/pg-meta/{ref}/query': {
@@ -1882,60 +1871,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/pg-meta/{ref}/query/format': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Format sql query */
-    post: operations['QueryController_formatQuery']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/pg-meta/{ref}/query/validate': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Validate sql query */
-    post: operations['QueryController_validateQuery']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/pg-meta/{ref}/schemas': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project pg.schemas */
-    get: operations['SchemasController_getSchemas']
-    put?: never
-    /** Creates project pg.schema */
-    post: operations['SchemasController_createSchema']
-    /** Deletes project pg.schema with the given ID */
-    delete: operations['SchemasController_deleteSchema']
-    options?: never
-    head?: never
-    /** Updates project pg.schema with the given ID */
-    patch: operations['SchemasController_updateSchema']
-    trace?: never
-  }
   '/platform/pg-meta/{ref}/tables': {
     parameters: {
       query?: never
@@ -1946,14 +1881,11 @@ export interface paths {
     /** Gets project pg.tables or pg.table with the given ID */
     get: operations['TablesController_getTables']
     put?: never
-    /** Creates project pg.table */
-    post: operations['TablesController_createTable']
-    /** Deletes project pg.table with the given ID */
-    delete: operations['TablesController_deleteTable']
+    post?: never
+    delete?: never
     options?: never
     head?: never
-    /** Updates project pg.table with the given ID */
-    patch: operations['TablesController_updateTable']
+    patch?: never
     trace?: never
   }
   '/platform/pg-meta/{ref}/triggers': {
@@ -1966,14 +1898,11 @@ export interface paths {
     /** Gets project pg.triggers */
     get: operations['TriggersController_getTriggers']
     put?: never
-    /** Creates project pg.trigger */
-    post: operations['TriggersController_createTrigger']
-    /** Deletes project pg.trigger with the given ID */
-    delete: operations['TriggersController_deleteTrigger']
+    post?: never
+    delete?: never
     options?: never
     head?: never
-    /** Updates project pg.trigger with the given ID */
-    patch: operations['TriggersController_updateTrigger']
+    patch?: never
     trace?: never
   }
   '/platform/pg-meta/{ref}/types': {
@@ -3835,7 +3764,11 @@ export interface paths {
     }
     get?: never
     put?: never
-    post?: never
+    /**
+     * Update publication for source
+     * @description Update a publication for a source. Requires bearer auth and an active, healthy project.
+     */
+    post: operations['ReplicationSourcesController_updatePublication']
     /**
      * Delete publication for source
      * @description Delete a publication for a source. Requires bearer auth and an active, healthy project.
@@ -4071,6 +4004,23 @@ export interface paths {
     put?: never
     /** Gets list of objects with the given bucket */
     post: operations['StorageObjectsController_getObjects']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/buckets/{id}/objects/list-v2': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Gets list of objects with the given bucket */
+    post: operations['StorageObjectsController_getObjectsV2']
     delete?: never
     options?: never
     head?: never
@@ -4639,6 +4589,7 @@ export interface components {
     CloudMarketplaceOnboardingInfoResponse: {
       aws_contract_auto_renewal: boolean
       aws_contract_end_date: string
+      aws_contract_is_private_offer: boolean
       aws_contract_settings_url: string
       aws_contract_start_date: string
       organization_linking_eligibility: {
@@ -4738,7 +4689,16 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
+      type:
+        | 'postgres'
+        | 'bigquery'
+        | 'clickhouse'
+        | 'webhook'
+        | 'datadog'
+        | 'elastic'
+        | 'loki'
+        | 'sentry'
+        | 's3'
     }
     CreateCliLoginSessionBody: {
       public_key: string
@@ -4749,22 +4709,6 @@ export interface components {
     CreateCollectionBody: {
       name: string
       retention_days: number
-    }
-    CreateColumnBody: {
-      check?: string
-      comment?: string
-      defaultValue?: unknown
-      /** @enum {string} */
-      defaultValueFormat?: 'expression' | 'literal'
-      /** @enum {string} */
-      identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
-      isIdentity?: boolean
-      isNullable?: boolean
-      isPrimaryKey?: boolean
-      isUnique?: boolean
-      name: string
-      tableId: number
-      type: string
     }
     CreateContentBody: {
       content?: {
@@ -4816,26 +4760,6 @@ export interface components {
       download_url?: string
       name: string
       status: string
-    }
-    CreateExtensionBody: {
-      cascade: boolean
-      name: string
-      schema: string
-      version: string
-    }
-    CreateFunctionBody: {
-      args: string[]
-      /** @enum {string} */
-      behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-      config_params?: {
-        [key: string]: string
-      }
-      definition: string
-      language: string
-      name: string
-      return_type: string
-      schema: string
-      security_definer: boolean
     }
     CreateGitHubAuthorizationBody: {
       code: string
@@ -5013,6 +4937,7 @@ export interface components {
           is_owner: boolean
           name: string
           opt_in_tags: string[]
+          organization_missing_address: boolean
           organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
@@ -5035,18 +4960,6 @@ export interface components {
        * @example 1012
        */
       id: number
-    }
-    CreatePolicyBody: {
-      /** @enum {string} */
-      action?: 'PERMISSIVE' | 'RESTRICTIVE'
-      check?: string
-      /** @enum {string} */
-      command?: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
-      definition?: string
-      name: string
-      roles?: string[]
-      schema?: string
-      table: string
     }
     CreateProjectBody: {
       auth_site_url?: string
@@ -5161,15 +5074,6 @@ export interface components {
       service_key: string
       status: string
       subscription_id: string | null
-    }
-    CreatePublicationBody: {
-      name: string
-      owner?: string
-      publish_delete?: boolean
-      publish_insert?: boolean
-      publish_truncate?: boolean
-      publish_update?: boolean
-      tables?: string[] | null
     }
     CreateReplicationDestinationBody: {
       /** @description Destination configuration */
@@ -5402,10 +5306,6 @@ export interface components {
         schema: string
       }[]
     }
-    CreateSchemaBody: {
-      name: string
-      owner: string
-    }
     CreateScopedAccessTokenBody: {
       /** Format: date-time */
       expires_at?: string
@@ -5566,11 +5466,6 @@ export interface components {
       id: string
       secret_key: string
     }
-    CreateTableBody: {
-      comment?: string
-      name: string
-      schema?: string
-    }
     CreateTaxIdBody: {
       country?: string
       type: string
@@ -5587,22 +5482,6 @@ export interface components {
        * @example tenant_9f3a2c
        */
       tenant_id: string
-    }
-    CreateTriggerBody: {
-      /** @enum {string} */
-      activation: 'AFTER' | 'BEFORE'
-      /** @enum {string} */
-      enabled_mode: 'ORIGIN' | 'REPLICA' | 'ALWAYS' | 'DISABLED'
-      events: ('INSERT' | 'UPDATE' | 'DELETE')[]
-      function_args?: string[]
-      function_name: string
-      function_schema: string
-      name: string
-      /** @enum {string} */
-      orientation: 'ROW' | 'STATEMENT'
-      schema: string
-      table: string
-      table_id?: number
     }
     CreateUserBody: {
       email: string
@@ -5730,6 +5609,11 @@ export interface components {
       billing_name?: string
       billing_via_partner: boolean
       email: string
+      tax_id: {
+        country: string
+        type: string
+        value: string
+      } | null
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
@@ -5929,9 +5813,6 @@ export interface components {
       scope?: string
       token_endpoint_auth_method?: string
     }
-    FormatQueryBody: {
-      query: string
-    }
     GetArchiveResponse: {
       archive_empty: boolean
       file_url: string
@@ -5939,9 +5820,6 @@ export interface components {
     }
     GetCloudMarketplaceRedirectUrlResponse: {
       url: string
-    }
-    GetContentCountResponse: {
-      count: number
     }
     GetContentCountV2Response: {
       favorites: number
@@ -6059,6 +5937,19 @@ export interface components {
         }
       }
       path: string
+    }
+    GetObjectsV2Body: {
+      cursor?: string
+      /** @default 1000 */
+      limit?: number
+      prefix?: string
+      sortBy?: {
+        /** @enum {string} */
+        column: 'name' | 'updated_at' | 'created_at'
+        /** @enum {string} */
+        order?: 'asc' | 'desc'
+      }
+      with_delimiter?: boolean
     }
     GetOrganizationByFlyOrganizationIdResponse: {
       slug: string
@@ -6361,7 +6252,7 @@ export interface components {
       cached_egress_enabled: boolean
       current_period_end: number
       current_period_start: number
-      customer_balance: number
+      customer_balance?: number
       next_invoice_at: number
       payment_method_type: string
       plan: {
@@ -6797,13 +6688,6 @@ export interface components {
       SMTP_USER: string
       URI_ALLOW_LIST: string
     }
-    GrantColumnPrivilegesBody: {
-      column_id: string
-      grantee: string
-      is_grantable?: boolean
-      /** @enum {string} */
-      privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }[]
     InvitationByTokenResponse: {
       authorized_user: boolean
       email_match: boolean
@@ -6895,7 +6779,16 @@ export interface components {
       name: string
       token: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
+      type:
+        | 'postgres'
+        | 'bigquery'
+        | 'clickhouse'
+        | 'webhook'
+        | 'datadog'
+        | 'elastic'
+        | 'loki'
+        | 'sentry'
+        | 's3'
       user_id: number
     }
     LFEndpoint: {
@@ -6940,6 +6833,32 @@ export interface components {
     }
     LinkClazarBuyerBody: {
       buyer_id: string
+    }
+    ListEntitlementsResponse: {
+      entitlements: {
+        config:
+          | {
+              enabled: boolean
+            }
+          | {
+              enabled: boolean
+              unit: string
+              unlimited: boolean
+              value: number
+            }
+          | {
+              enabled: boolean
+              set: string[]
+            }
+        feature: {
+          key: string
+          /** @enum {string} */
+          type: 'boolean' | 'numeric' | 'set'
+        }
+        hasAccess: boolean
+        /** @enum {string} */
+        type: 'boolean' | 'numeric' | 'set'
+      }[]
     }
     ListGitHubConnectionsResponse: {
       connections: {
@@ -7101,18 +7020,7 @@ export interface components {
       from: string
       to: string
     }
-    NotificationResponseV1: {
-      /** @description Any JSON-serializable value */
-      data: unknown
-      id: string
-      inserted_at: string
-      /** @description Any JSON-serializable value */
-      meta: unknown
-      notification_name: string
-      notification_status: string
-      project_id: number
-    }
-    NotificationResponseV2: {
+    NotificationResponse: {
       /** @description Any JSON-serializable value */
       data: unknown
       id: string
@@ -7259,6 +7167,7 @@ export interface components {
       is_owner: boolean
       name: string
       opt_in_tags: string[]
+      organization_missing_address: boolean
       organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
@@ -7541,6 +7450,9 @@ export interface components {
       }[]
       defaultPaymentMethodId: string | null
     }
+    PendingConfirmationResponse: {
+      message: string
+    }
     PgbouncerConfigResponse: {
       connection_string: string
       db_dns_name: string
@@ -7580,27 +7492,6 @@ export interface components {
     PointInTimeRestoreBody: {
       recovery_time_target_unix: number
     }
-    PostgresColumn: {
-      check: string | null
-      comment: string | null
-      data_type: string
-      default_value: (string | number) | null
-      enums: string[]
-      format: string
-      id: string
-      /** @enum {string|null} */
-      identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
-      is_generated: boolean
-      is_identity: boolean
-      is_nullable: boolean
-      is_unique: boolean
-      is_updatable: boolean
-      name: string
-      ordinal_position: number
-      schema: string
-      table: string
-      table_id: number
-    }
     PostgresColumnPrivileges: {
       column_id: string
       column_name: string
@@ -7615,7 +7506,9 @@ export interface components {
       relation_schema: string
     }
     PostgresConfigResponse: {
+      checkpoint_timeout?: number
       effective_cache_size?: string
+      hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -7674,23 +7567,6 @@ export interface components {
       name: string
       schema: string
     }
-    PostgresFunction: {
-      argument_types: string
-      /** @enum {string} */
-      behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-      complete_statement: string
-      config_params: {
-        [key: string]: string
-      } | null
-      definition: string
-      id: number
-      identity_argument_types: string
-      language: string
-      name: string
-      return_type: string
-      schema: string
-      security_definer: boolean
-    }
     PostgresMaterializedView: {
       columns?: {
         check: string | null
@@ -7748,11 +7624,6 @@ export interface components {
             schema: string
           }[]
         | null
-    }
-    PostgresSchema: {
-      id: number
-      name: string
-      owner: string
     }
     PostgresTable: {
       bytes: number
@@ -8238,8 +8109,14 @@ export interface components {
       max_events_per_second: number | null
       /** @description Sets maximum number of joins per second rate limit */
       max_joins_per_second: number | null
+      /** @description Sets maximum number of payload size in KB rate limit */
+      max_payload_size_in_kb: number | null
+      /** @description Sets maximum number of presence events per second rate limit */
+      max_presence_events_per_second: number | null
       /** @description Whether to only allow private channels */
       private_only: boolean | null
+      /** @description Whether to suspend realtime */
+      suspend: boolean | null
     }
     RegionsInfo: {
       all: {
@@ -8881,12 +8758,6 @@ export interface components {
       name: string
       website: string
     }
-    RevokeColumnPrivilegesBody: {
-      column_id: string
-      grantee: string
-      /** @enum {string} */
-      privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }[]
     RollbackTableStateBody: {
       /**
        * @description Rollback type
@@ -9011,6 +8882,7 @@ export interface components {
     RunQueryBody: {
       /** @default false */
       disable_statement_timeout?: boolean
+      parameters?: unknown[]
       query: string
     }
     SendDocsFeedbackBody: {
@@ -9117,6 +8989,33 @@ export interface components {
       }
       /** Format: int64 */
       fileSizeLimit: number
+    }
+    StorageListResponseV2: {
+      folders: {
+        created_at: string
+        key: string
+        name: string
+        updated_at: string
+      }[]
+      hasNext: boolean
+      nextCursor?: string
+      objects: {
+        created_at: string
+        id: string
+        key: string
+        last_accessed_at: string
+        metadata: {
+          cacheControl?: string | null
+          contentLength?: number | null
+          eTag?: string | null
+          httpStatusCode?: number | null
+          lastModified?: string | null
+          mimetype?: string | null
+          size?: number | null
+        }
+        name: string
+        updated_at: string
+      }[]
     }
     StorageObject: {
       bucket_id: string
@@ -9497,22 +9396,6 @@ export interface components {
       name: string
       retention_days: number
     }
-    UpdateColumnBody: {
-      check?: string
-      comment?: string
-      defaultValue?: unknown
-      /** @enum {string} */
-      defaultValueFormat?: 'expression' | 'literal'
-      dropDefault?: boolean
-      id?: number
-      /** @enum {string} */
-      identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
-      isIdentity?: boolean
-      isNullable?: boolean
-      isUnique?: boolean
-      name?: string
-      type?: string
-    }
     UpdateContentFolderBody: {
       name: string
     }
@@ -9535,21 +9418,6 @@ export interface components {
     }
     UpdateEmailBody: {
       newEmail: string
-    }
-    UpdateFunctionBody: {
-      args?: string[]
-      /** @enum {string} */
-      behavior?: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-      config_params?: {
-        [key: string]: string
-      }
-      definition?: string
-      id?: number
-      language?: string
-      name?: string
-      return_type?: string
-      schema?: string
-      security_definer?: boolean
     }
     UpdateGitHubConnectionBody: {
       branch_limit?: number
@@ -9826,7 +9694,7 @@ export interface components {
       name: string
       role_scoped_projects: string[]
     }
-    UpdateNotificationBodyV2: {
+    UpdateNotificationBody: {
       /** Format: uuid */
       id: string
       /** @enum {string} */
@@ -9842,9 +9710,6 @@ export interface components {
       }
       lint_name?: string
       note?: string
-    }
-    UpdateNotificationsBodyV1: {
-      ids: string[]
     }
     UpdateOrganizationBody: {
       additional_billing_emails?: string[]
@@ -9888,13 +9753,6 @@ export interface components {
       server_idle_timeout?: number
       server_lifetime?: number
     }
-    UpdatePolicyBody: {
-      check?: string
-      definition?: string
-      id?: number
-      name?: string
-      roles?: string[]
-    }
     UpdatePoolingConfigResponse: {
       default_pool_size?: number
       ignore_startup_parameters: string
@@ -9912,7 +9770,9 @@ export interface components {
       server_lifetime?: number
     }
     UpdatePostgresConfigBody: {
+      checkpoint_timeout?: number
       effective_cache_size?: string
+      hot_standby_feedback?: boolean
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -9966,16 +9826,6 @@ export interface components {
     UpdateProjectBody: {
       name: string
     }
-    UpdatePublicationBody: {
-      id?: number
-      name?: string
-      owner?: string
-      publish_delete?: boolean
-      publish_insert?: boolean
-      publish_truncate?: boolean
-      publish_update?: boolean
-      tables?: string[] | null
-    }
     UpdateRealtimeConfigBody: {
       /** @description Sets connection pool size for Realtime Authorization */
       connection_pool?: number
@@ -9989,8 +9839,14 @@ export interface components {
       max_events_per_second?: number
       /** @description Sets maximum number of joins per second rate limit */
       max_joins_per_second?: number
+      /** @description Sets maximum number of payload size in KB rate limit */
+      max_payload_size_in_kb?: number
+      /** @description Sets maximum number of presence events per second rate limit */
+      max_presence_events_per_second?: number
       /** @description Whether to only allow private channels */
       private_only?: boolean
+      /** @description Whether to suspend realtime */
+      suspend?: boolean
     }
     UpdateReplicationDestinationBody: {
       /** @description Destination configuration */
@@ -10210,9 +10066,20 @@ export interface components {
        */
       version_id: number
     }
-    UpdateSchemaBody: {
-      name?: string
-      owner?: string
+    UpdateReplicationPublicationBody: {
+      /** @description Publication tables */
+      tables: {
+        /**
+         * @description Table name
+         * @example orders
+         */
+        name: string
+        /**
+         * @description Table schema
+         * @example public
+         */
+        schema: string
+      }[]
     }
     UpdateSecretsConfigBody: {
       change_tracking_id: string
@@ -10334,34 +10201,6 @@ export interface components {
     UpdateSupavisorConfigResponse: {
       default_pool_size: number | null
       pool_mode: string
-    }
-    UpdateTableBody: {
-      comment?: string
-      id?: number
-      name?: string
-      /** @enum {string} */
-      replica_identity?: 'DEFAULT' | 'INDEX' | 'FULL' | 'NOTHING'
-      replica_identity_index?: string
-      rls_enabled?: boolean
-      rls_forced?: boolean
-      schema?: string
-    }
-    UpdateTriggerBody: {
-      /** @enum {string} */
-      activation?: 'AFTER' | 'BEFORE'
-      /** @enum {string} */
-      enabled_mode?: 'ORIGIN' | 'REPLICA' | 'ALWAYS' | 'DISABLED'
-      events?: ('INSERT' | 'UPDATE' | 'DELETE')[]
-      function_args?: string[]
-      function_name?: string
-      function_schema?: string
-      id?: number
-      name?: string
-      /** @enum {string} */
-      orientation?: 'ROW' | 'STATEMENT'
-      schema?: string
-      table?: string
-      table_id?: number
     }
     UpdateUserBody: {
       ban_duration?: string
@@ -10495,12 +10334,6 @@ export interface components {
       updated_at: string
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    ValidateQueryBody: {
-      query: string
-    }
-    ValidateQueryResponse: {
-      valid: boolean
     }
     ValidateSpamBody: {
       content: string
@@ -12771,7 +12604,7 @@ export interface operations {
       }
     }
   }
-  NotificationsController_getNotificationsV2: {
+  NotificationsController_getNotifications: {
     parameters: {
       query?: {
         limit?: number
@@ -12792,40 +12625,10 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NotificationResponseV2'][]
+          'application/json': components['schemas']['NotificationResponse'][]
         }
       }
       /** @description Failed to retrieve notifications */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  NotificationsController_deleteNotifications: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateNotificationsBodyV1']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['NotificationResponseV1'][]
-        }
-      }
-      /** @description Failed to delete notifications */
       500: {
         headers: {
           [name: string]: unknown
@@ -12843,7 +12646,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateNotificationBodyV2']
+        'application/json': components['schemas']['UpdateNotificationBody']
       }
     }
     responses: {
@@ -12852,7 +12655,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['NotificationResponseV2'][]
+          'application/json': components['schemas']['NotificationResponse'][]
         }
       }
       /** @description Failed to update notifications */
@@ -13748,6 +13551,14 @@ export interface operations {
         }
         content?: never
       }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
+        }
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -14139,6 +13950,92 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OrgDocumentUrlResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationEntitlementsController_getEntitlements: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListEntitlementsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationEntitlementsController_getEntitlements: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListEntitlementsResponse']
         }
       }
       /** @description Unauthorized */
@@ -16000,6 +15897,14 @@ export interface operations {
           'application/json': components['schemas']['CreateOrganizationResponse']
         }
       }
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PendingConfirmationResponse']
+        }
+      }
       /** @description Failed to confirm subscription changes */
       500: {
         headers: {
@@ -16084,355 +15989,6 @@ export interface operations {
       }
     }
   }
-  ColumnPrivilegesController_grantColumnPrivileges: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GrantColumnPrivilegesBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresColumnPrivileges'][]
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to grant column privileges */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ColumnPrivilegesController_revokeColumnPrivileges: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RevokeColumnPrivilegesBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresColumnPrivileges'][]
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to revoke column privileges */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ColumnsController_getColumns: {
-    parameters: {
-      query?: {
-        excluded_schemas?: string
-        included_schemas?: string
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresColumn'][]
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get pg.columns */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ColumnsController_createColumn: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateColumnBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresColumn']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.column */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ColumnsController_deleteColumn: {
-    parameters: {
-      query: {
-        /** @description Boolean string, true or false */
-        cascade?: boolean
-        id: string
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresColumn']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.column with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ColumnsController_updateColumn: {
-    parameters: {
-      query: {
-        id: string
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateColumnBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresColumn']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update pg.column with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ExtensionsController_getExtensions: {
     parameters: {
       query?: never
@@ -16479,120 +16035,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get pg.extensions */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ExtensionsController_createExtension: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateExtensionBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresExtension']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.extension */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ExtensionsController_deleteExtension: {
-    parameters: {
-      query: {
-        id: string
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresExtension']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.extension with the given ID */
       500: {
         headers: {
           [name: string]: unknown
@@ -16652,237 +16094,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve database foreign tables */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  FunctionsController_getFunctions: {
-    parameters: {
-      query?: {
-        excluded_schemas?: string
-        included_schemas?: string
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresFunction'][]
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get pg.functions */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  FunctionsController_createFunction: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateFunctionBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresFunction']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.function */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  FunctionsController_deleteFunction: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresFunction']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.function with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  FunctionsController_updateFunction: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateFunctionBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresFunction']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update pg.function with the given ID */
       500: {
         headers: {
           [name: string]: unknown
@@ -17010,180 +16221,6 @@ export interface operations {
       }
     }
   }
-  PoliciesController_createPolicy: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreatePolicyBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresPolicy']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.policy */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  PoliciesController_deletePolicy: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresPolicy']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.policy with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  PoliciesController_updatePolicy: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdatePolicyBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresPolicy']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update pg.policy with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   PublicationsController_getPublications: {
     parameters: {
       query?: never
@@ -17230,180 +16267,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get pg.publications */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  PublicationsController_createPublication: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreatePublicationBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresPublication']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.publication */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  PublicationsController_deletePublication: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresPublication']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.publication with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  PublicationsController_updatePublication: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdatePublicationBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresPublication']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update pg.publication with the given ID */
       500: {
         headers: {
           [name: string]: unknown
@@ -17460,340 +16323,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to run sql query */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  QueryController_formatQuery: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['FormatQueryBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to format sql query */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  QueryController_validateQuery: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ValidateQueryBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ValidateQueryResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to validate sql query */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  SchemasController_getSchemas: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresSchema'][]
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get pg.schemas */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  SchemasController_createSchema: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateSchemaBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresSchema']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.schema */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  SchemasController_deleteSchema: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresSchema']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.schema with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  SchemasController_updateSchema: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateSchemaBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresSchema']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update pg.schema with the given ID */
       500: {
         headers: {
           [name: string]: unknown
@@ -17864,182 +16393,6 @@ export interface operations {
       }
     }
   }
-  TablesController_createTable: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateTableBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresTable']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.table */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TablesController_deleteTable: {
-    parameters: {
-      query: {
-        /** @description Boolean string, true or false */
-        cascade?: boolean
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresTable']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.table with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TablesController_updateTable: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateTableBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresTable']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update pg.table with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   TriggersController_getTriggers: {
     parameters: {
       query?: {
@@ -18089,180 +16442,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get pg.triggers */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TriggersController_createTrigger: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateTriggerBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresTrigger']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.trigger */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TriggersController_deleteTrigger: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresTrigger']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.trigger with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TriggersController_updateTrigger: {
-    parameters: {
-      query: {
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-        /** @description PostgreSQL connection application name */
-        'x-pg-application-name'?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateTriggerBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresTrigger']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update pg.trigger with the given ID */
       500: {
         headers: {
           [name: string]: unknown
@@ -24068,6 +22247,27 @@ export interface operations {
     parameters: {
       query: {
         cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+        desired_instance_size?:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
         organization_slug: string
       }
       header?: never
@@ -25406,6 +23606,63 @@ export interface operations {
       }
     }
   }
+  ReplicationSourcesController_updatePublication: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Publication name */
+        publication_name: string
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationPublicationBody']
+      }
+    }
+    responses: {
+      /** @description Publication updated. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while updating publication. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ReplicationSourcesController_deletePublication: {
     parameters: {
       query?: never
@@ -26225,6 +24482,62 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['StorageObject'][]
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get list of objects with the given bucket */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageObjectsController_getObjectsV2: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage bucket id */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GetObjectsV2Body']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StorageListResponseV2']
         }
       }
       /** @description Unauthorized */

@@ -53,7 +53,6 @@ export const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
   const [itemSearchString, setItemSearchString] = useState('')
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchContents = async () => {
       if (view === STORAGE_VIEWS.LIST) {

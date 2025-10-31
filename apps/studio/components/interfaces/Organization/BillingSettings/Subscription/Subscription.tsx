@@ -1,7 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 
 import { useFlag, useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -109,15 +110,16 @@ const Subscription = () => {
                           variant="info"
                           title={`Unable to update plan from ${planName}`}
                           actions={[
-                            <div key="contact-support">
-                              <Button asChild type="default">
-                                <Link
-                                  href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
-                                >
-                                  Contact support
-                                </Link>
-                              </Button>
-                            </div>,
+                            <Button asChild key="contact-support" type="default">
+                              <SupportLink
+                                queryParams={{
+                                  category: SupportCategories.SALES_ENQUIRY,
+                                  subject: `Change plan away from ${planName}`,
+                                }}
+                              >
+                                Contact support
+                              </SupportLink>
+                            </Button>,
                           ]}
                         >
                           Please contact us if you'd like to change your plan.

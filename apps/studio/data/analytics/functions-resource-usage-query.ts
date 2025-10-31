@@ -56,15 +56,14 @@ export const useFunctionsResourceUsageQuery = <TData = FunctionsResourceUsageDat
     ...options
   }: UseQueryOptions<FunctionsResourceUsageData, FunctionsResourceUsageError, TData> = {}
 ) =>
-  useQuery<FunctionsResourceUsageData, FunctionsResourceUsageError, TData>(
-    analyticsKeys.functionsResourceUsage(projectRef, { functionId, interval }),
-    ({ signal }) => getFunctionsResourceUsage({ projectRef, functionId, interval }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof functionId !== 'undefined' &&
-        typeof interval !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<FunctionsResourceUsageData, FunctionsResourceUsageError, TData>({
+    queryKey: analyticsKeys.functionsResourceUsage(projectRef, { functionId, interval }),
+    queryFn: ({ signal }) =>
+      getFunctionsResourceUsage({ projectRef, functionId, interval }, signal),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof functionId !== 'undefined' &&
+      typeof interval !== 'undefined',
+    ...options,
+  })
