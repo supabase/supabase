@@ -256,7 +256,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(from, entitledToAuditLogDays)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      from,
+      entitledToAuditLogDays
+    )
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)
@@ -288,12 +291,13 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     setWarnings(newWarnings)
   }, [editorValue, timestampStart, timestampEnd])
 
-
-  
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(timestampStart, entitledToAuditLogDays)
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
