@@ -27,7 +27,6 @@ import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (

@@ -299,12 +299,9 @@ export const AdvisorPanel = () => {
             onSeverityFiltersChange={setSeverityFilters}
             statusFilters={[...notificationFilterStatuses]}
             onStatusFiltersChange={(values) => {
-              // Toggle each status filter individually to match NotificationsPopover pattern
-              // Remove filters that are no longer selected
               notificationFilterStatuses
                 .filter((status) => !values.includes(status))
                 .forEach((status) => setNotificationFilters(status, 'status'))
-              // Add filters that are newly selected
               values
                 .filter((status) => !notificationFilterStatuses.includes(status))
                 .forEach((status) => setNotificationFilters(status, 'status'))
