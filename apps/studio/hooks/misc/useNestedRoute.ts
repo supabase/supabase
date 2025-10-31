@@ -11,10 +11,15 @@ interface UseNestedRouteOptions {
    */
   isOpen: boolean
   /**
-   * Whether to use shallow routing (default: true)
-   * Shallow routing updates the URL without re-running data fetching methods
+   * Callback that should open the component (e.g., setIsOpen(true))
+   * This will be called when the URL already contains the nested route on initial load
    */
-  shallow?: boolean
+  onOpenTrigger: () => void
+  /**
+   * Callback that should close the component (e.g., setIsOpen(false))
+   * This will be called when the browser back/forward button is pressed
+   */
+  onCloseTrigger: () => void
   /**
    * Optional callback fired when the route is restored (on close)
    */
@@ -35,13 +40,18 @@ interface UseNestedRouteReturn {
 /**
  * Hook to add routing capabilities to Sheet/Dialog components.
  *
+ * This hook updates the browser URL to reflect UI state (like an open side panel) without
+ * actually navigating to a new page. The nested route doesn't need to exist in Next.js's
+ * file system - it's purely for URL state management.
+ *
  * When the component opens, the nestedRoute is appended to the current URL while preserving
- * query parameters. When closed, the previous URL state is restored.
+ * query parameters. When closed, the previous URL state is restored. This works by using
+ * the browser's History API directly, bypassing Next.js routing.
  *
  * This is particularly useful for:
  * - Deep-linkable modals/sheets that users can bookmark or share
  * - Browser back/forward navigation support
- * - Preserving UI state in the URL
+ * - Preserving UI state in the URL without creating actual routes
  *
  * @example Basic usage with Sheet
  * ```tsx
@@ -49,6 +59,8 @@ interface UseNestedRouteReturn {
  * const { onClose } = useNestedRoute({
  *   nestedRoute: 'create',
  *   isOpen,
+ *   onOpenTrigger: () => setIsOpen(true),
+ *   onCloseTrigger: () => setIsOpen(false),
  * })
  *
  * return (
@@ -74,6 +86,12 @@ interface UseNestedRouteReturn {
  * const { onClose } = useNestedRoute({
  *   nestedRoute: selectedId ? `edit/${selectedId}` : '',
  *   isOpen,
+ *   onOpenTrigger: () => {
+ *     // Extract ID from URL and open
+ *     const id = router.asPath.split('/edit/')[1]
+ *     setSelectedId(id)
+ *   },
+ *   onCloseTrigger: () => setSelectedId(null),
  * })
  *
  * return (
@@ -97,6 +115,8 @@ interface UseNestedRouteReturn {
  * const { onClose } = useNestedRoute({
  *   nestedRoute: 'settings',
  *   isOpen,
+ *   onOpenTrigger: () => setIsOpen(true),
+ *   onCloseTrigger: () => setIsOpen(false),
  *   onRouteRestore: () => {
  *     // Cleanup or analytics tracking
  *     console.log('Settings sheet closed')
@@ -107,13 +127,14 @@ interface UseNestedRouteReturn {
 export function useNestedRoute({
   nestedRoute,
   isOpen,
-  shallow = true,
+  onOpenTrigger,
+  onCloseTrigger,
   onRouteRestore,
 }: UseNestedRouteOptions): UseNestedRouteReturn {
   const router = useRouter()
   const previousPathRef = useRef<string | null>(null)
-  const previousQueryRef = useRef<Record<string, string | string[]>>({})
   const isNavigatingRef = useRef(false)
+  const hasCheckedInitialUrl = useRef(false)
 
   // Normalize nested route (remove leading/trailing slashes)
   const normalizedRoute = nestedRoute.replace(/^\/+|\/+$/g, '')
@@ -123,91 +144,100 @@ export function useNestedRoute({
 
     isNavigatingRef.current = true
 
-    // Restore the previous path and query
-    if (previousPathRef.current) {
-      router
-        .push(
-          {
-            pathname: previousPathRef.current,
-            query: previousQueryRef.current,
-          },
-          undefined,
-          { shallow }
-        )
-        .finally(() => {
-          isNavigatingRef.current = false
-          onRouteRestore?.()
-        })
-    } else {
-      isNavigatingRef.current = false
-      onRouteRestore?.()
+    // Restore the previous URL
+    if (previousPathRef.current && typeof window !== 'undefined') {
+      window.history.pushState(null, '', previousPathRef.current)
     }
-  }, [router, shallow, onRouteRestore])
+
+    isNavigatingRef.current = false
+    if (onCloseTrigger) onCloseTrigger()
+    onRouteRestore?.()
+  }, [onCloseTrigger, onRouteRestore])
+
+  // Check if URL contains nested route on initial load
+  useEffect(() => {
+    if (!router.isReady || hasCheckedInitialUrl.current || typeof window === 'undefined') return
+
+    hasCheckedInitialUrl.current = true
+
+    const currentAsPath = router.asPath
+    const [pathWithoutQuery] = currentAsPath.split('?')
+
+    // Check if the current URL ends with the nested route
+    if (normalizedRoute && pathWithoutQuery.endsWith(`/${normalizedRoute}`)) {
+      // URL already contains the nested route, trigger open
+      if (onOpenTrigger) onOpenTrigger()
+    }
+  }, [router.isReady, router.asPath, normalizedRoute, onOpenTrigger])
 
   useEffect(() => {
-    if (!router.isReady || isNavigatingRef.current) return
+    if (!router.isReady || isNavigatingRef.current || typeof window === 'undefined') return
 
     if (isOpen) {
-      // Store current location before navigating
-      const currentPath = router.pathname
-      // Filter out undefined values from query
-      const currentQuery = Object.entries(router.query).reduce(
-        (acc, [key, value]) => {
-          if (value !== undefined) {
-            acc[key] = value
-          }
-          return acc
-        },
-        {} as Record<string, string | string[]>
-      )
+      const currentAsPath = router.asPath
+      const [pathWithoutQuery, queryString] = currentAsPath.split('?')
 
-      // Only store if we haven't stored yet (prevents overwriting on re-renders)
-      if (!previousPathRef.current) {
-        previousPathRef.current = currentPath
-        previousQueryRef.current = currentQuery
+      // Check if URL already has the nested route (from initial load)
+      const alreadyHasNestedRoute = pathWithoutQuery.endsWith(`/${normalizedRoute}`)
+
+      if (alreadyHasNestedRoute) {
+        // URL already contains the nested route (deep link scenario)
+        // Store the parent path by removing the nested route
+        if (!previousPathRef.current) {
+          const parentPath = pathWithoutQuery.substring(
+            0,
+            pathWithoutQuery.length - normalizedRoute.length - 1
+          )
+          previousPathRef.current = parentPath + (queryString ? `?${queryString}` : '')
+        }
+      } else {
+        // Normal flow: user clicked to open, append nested route to URL
+        // Store current location before navigating
+        if (!previousPathRef.current) {
+          previousPathRef.current = currentAsPath
+        }
+
+        // Build the new path with nested route
+        const newPath = `${pathWithoutQuery}/${normalizedRoute}${queryString ? `?${queryString}` : ''}`
+
+        // Update URL using History API without triggering Next.js navigation
+        isNavigatingRef.current = true
+        window.history.pushState(null, '', newPath)
+        isNavigatingRef.current = false
       }
-
-      // Build the new path with nested route
-      const currentAsPath = router.asPath.split('?')[0]
-      const newPath = `${currentAsPath}/${normalizedRoute}`
-
-      // Preserve query params
-      const newQuery = { ...currentQuery }
-
-      // Navigate to nested route
-      isNavigatingRef.current = true
-      router
-        .push(
-          {
-            pathname: newPath,
-            query: newQuery,
-          },
-          undefined,
-          { shallow }
-        )
-        .finally(() => {
-          isNavigatingRef.current = false
-        })
     } else if (previousPathRef.current) {
       // Reset the stored path when closed
       previousPathRef.current = null
-      previousQueryRef.current = {}
     }
-  }, [isOpen, router.isReady, normalizedRoute, shallow])
+  }, [isOpen, router.isReady, normalizedRoute, router.asPath])
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isOpen) return
+
+    const handlePopState = () => {
+      // User clicked back/forward - the URL has already changed by the browser
+      // Just close the component without modifying the URL
+      previousPathRef.current = null
+      onCloseTrigger()
+      onRouteRestore?.()
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [isOpen, onCloseTrigger, onRouteRestore])
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (isOpen && previousPathRef.current && !isNavigatingRef.current) {
+      if (
+        isOpen &&
+        previousPathRef.current &&
+        !isNavigatingRef.current &&
+        typeof window !== 'undefined'
+      ) {
         // Component unmounted while open, restore previous route
-        router.push(
-          {
-            pathname: previousPathRef.current,
-            query: previousQueryRef.current,
-          },
-          undefined,
-          { shallow }
-        )
+        window.history.pushState(null, '', previousPathRef.current)
       }
     }
   }, [])

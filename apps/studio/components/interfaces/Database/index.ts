@@ -6,3 +6,4 @@ export { default as CreateFunction } from './Functions/CreateFunction'
 export { default as DeleteFunction } from './Functions/DeleteFunction'
 
 export { default as EnumeratedTypes } from './EnumeratedTypes/EnumeratedTypes'
+export { EnumeratedTypesPage } from './EnumeratedTypes/EnumeratedTypesPage'

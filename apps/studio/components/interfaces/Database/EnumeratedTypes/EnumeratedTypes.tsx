@@ -5,10 +5,9 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import {
-  EnumeratedType,
-  useEnumeratedTypesQuery,
-} from 'data/enumerated-types/enumerated-types-query'
+import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useNestedRoute } from 'hooks/misc/useNestedRoute'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
@@ -39,6 +38,14 @@ const EnumeratedTypes = () => {
   const [showCreateTypePanel, setShowCreateTypePanel] = useState(false)
   const [selectedTypeToEdit, setSelectedTypeToEdit] = useState<EnumeratedType>()
   const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
+
+  // Add routing support for the create panel
+  const { onClose: onCloseCreatePanel } = useNestedRoute({
+    nestedRoute: 'new',
+    isOpen: showCreateTypePanel,
+    onOpenTrigger: () => setShowCreateTypePanel(true),
+    onCloseTrigger: () => setShowCreateTypePanel(false),
+  })
 
   const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -177,7 +184,7 @@ const EnumeratedTypes = () => {
 
       <CreateEnumeratedTypeSidePanel
         visible={showCreateTypePanel}
-        onClose={() => setShowCreateTypePanel(false)}
+        onClose={onCloseCreatePanel}
         schema={selectedSchema}
       />
 
