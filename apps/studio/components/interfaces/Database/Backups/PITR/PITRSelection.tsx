@@ -21,8 +21,8 @@ import { BackupsEmpty } from '../BackupsEmpty'
 import { BackupsStorageAlert } from '../BackupsStorageAlert'
 import type { Timezone } from './PITR.types'
 import { getClientTimezone } from './PITR.utils'
+import { PITRForm } from './PITRForm'
 import PITRStatus from './PITRStatus'
-import { PITRForm } from './pitr-form'
 
 export const PITRSelection = () => {
   const router = useRouter()

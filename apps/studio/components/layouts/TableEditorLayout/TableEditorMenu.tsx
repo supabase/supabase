@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Filter, Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
@@ -11,7 +11,7 @@ import { ProtectedSchemaWarning } from 'components/interfaces/Database/Protected
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import InfiniteList from 'components/ui/InfiniteList'
+import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
@@ -104,15 +104,36 @@ export const TableEditorMenu = () => {
 
   const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
 
-  const onSelectExportCLI = async (id: number) => {
-    const table = await getTableEditor({
-      id: id,
-      projectRef,
-      connectionString: project?.connectionString,
-    })
-    const supaTable = table && parseSupaTable(table)
-    setTableToExport(supaTable)
-  }
+  const onSelectExportCLI = useCallback(
+    async (id: number) => {
+      const table = await getTableEditor({
+        id: id,
+        projectRef,
+        connectionString: project?.connectionString,
+      })
+      const supaTable = table && parseSupaTable(table)
+      setTableToExport(supaTable)
+    },
+    [project?.connectionString, projectRef]
+  )
+
+  const getItemKey = useCallback(
+    (index: number) => {
+      const item = entityTypes?.[index]
+      return item?.id ? String(item.id) : `table-editor-entity-${index}`
+    },
+    [entityTypes]
+  )
+
+  const entityProps = useMemo(
+    () => ({
+      projectRef: project?.ref!,
+      id: Number(id),
+      isLocked: isSchemaLocked,
+      onExportCLI: () => onSelectExportCLI(Number(id)),
+    }),
+    [project?.ref, id, isSchemaLocked, onSelectExportCLI]
+  )
 
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
@@ -164,7 +185,7 @@ export const TableEditorMenu = () => {
             )}
           </div>
         </div>
-        <div className="flex flex-auto flex-col gap-2 pb-4">
+        <div className="grow min-h-0 flex flex-col gap-2 pb-4">
           <InnerSideBarFilters className="mx-2">
             <InnerSideBarFilterSearchInput
               autoFocus={!isMobile}
@@ -261,21 +282,20 @@ export const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1 flex-grow" data-testid="tables-list">
-                  <InfiniteList
-                    items={entityTypes}
-                    // @ts-expect-error
+                <div className="flex flex-1 min-h-0 w-full" data-testid="tables-list">
+                  <InfiniteListDefault
+                    className="h-full w-full"
+                    items={entityTypes!}
                     ItemComponent={EntityListItem}
-                    itemProps={{
-                      projectRef: project?.ref!,
-                      id: Number(id),
-                      isSchemaLocked,
-                      onExportCLI: () => onSelectExportCLI(Number(id)),
-                    }}
-                    getItemSize={() => 28}
+                    LoaderComponent={LoaderForIconMenuItems}
+                    itemProps={entityProps}
+                    getItemKey={getItemKey}
+                    getItemSize={(index) =>
+                      index !== 0 && index === entityTypes!.length ? 85 : 28
+                    }
                     hasNextPage={hasNextPage}
                     isLoadingNextPage={isFetchingNextPage}
-                    onLoadNextPage={() => fetchNextPage()}
+                    onLoadNextPage={fetchNextPage}
                   />
                 </div>
               )}

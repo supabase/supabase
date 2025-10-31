@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { getAccessToken } from 'common'
 import { authKeys } from './keys'
-import { getAccessToken } from 'lib/gotrue'
 
 export async function getSessionAccessToken() {
   // ignore if server-side

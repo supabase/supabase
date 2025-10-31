@@ -1,157 +1,373 @@
-import { propsAreEqual } from 'lib/helpers'
-import memoize from 'memoize-one'
-import { CSSProperties, ComponentType, MutableRefObject, ReactNode, memo, useRef } from 'react'
-import AutoSizer from 'react-virtualized-auto-sizer'
-import { VariableSizeList, areEqual } from 'react-window'
-import InfiniteLoader from 'react-window-infinite-loader'
-import { Skeleton } from 'ui'
+import { Virtualizer, useVirtualizer } from '@tanstack/react-virtual'
+import {
+  CSSProperties,
+  ComponentPropsWithRef,
+  ComponentType,
+  ElementType,
+  ReactNode,
+  Ref,
+  createContext,
+  createElement,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  type ComponentProps,
+  type PropsWithChildren,
+} from 'react'
 
-/**
- * Note that the loading more logic of this component works best with a cursor-based
- * pagination API such that each payload response from the API returns a structure like
- * { cursor, items, hasNext, hasPrevious }
- */
+import { Skeleton, cn } from 'ui'
 
-const createItemData = memoize((items, itemProps) => ({ items, ...itemProps }))
+// Regular memo erases generics, so this helper adds them back
+const typedMemo = <Component extends (props: any) => JSX.Element | null>(
+  component: Component,
+  propsAreEqual?: (
+    prevProps: Readonly<Parameters<Component>[0]>,
+    nextProps: Readonly<Parameters<Component>[0]>
+  ) => boolean
+) => memo(component, propsAreEqual) as unknown as Component & { displayName?: string }
 
-export type ItemRenderer<T, P> = ComponentType<
-  {
-    item: T
-    listRef: MutableRefObject<VariableSizeList<any> | null | undefined>
-    index: number
-  } & P
+const createStyleObject = ({ size, start }: { size: number; start: number }): CSSProperties => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: `${size}px`,
+  transform: `translateY(${start}px)`,
+})
+
+type VirtualizerInstance = Virtualizer<Element, Element>
+type VirtualItems = ReturnType<VirtualizerInstance['getVirtualItems']>
+
+type VirtualizerContextValue = {
+  virtualizer: VirtualizerInstance
+  virtualItems: VirtualItems
+}
+
+const VirtualizerContext = createContext<VirtualizerContextValue | null>(null)
+
+export const VirtualizerProvider = ({
+  children,
+  value,
+}: PropsWithChildren<{ value: VirtualizerContextValue }>) => {
+  return <VirtualizerContext.Provider value={value}>{children}</VirtualizerContext.Provider>
+}
+
+export const useVirtualizerContext = () => {
+  const context = useContext(VirtualizerContext)
+  if (!context) {
+    throw new Error('useVirtualizerContext must be used within a VirtualizerProvider')
+  }
+  return context
+}
+
+type ExtractRefType<Elem extends ElementType> =
+  ComponentPropsWithRef<Elem> extends { ref?: Ref<infer RefType> } ? RefType : never
+
+type ExtractScrollElementFromRefComponent<RefComponent extends ElementType> = Extract<
+  ExtractRefType<RefComponent>,
+  Element
 >
 
-export interface ItemProps<T, P> {
-  data: {
-    items: T[]
-    itemProps: P
-    ItemComponent: ItemRenderer<T, P>
-    listRef: MutableRefObject<VariableSizeList<any> | null | undefined>
-    LoaderComponent?: ReactNode
-  }
-  index: number
-  style: CSSProperties
-}
+type ScrollWrapperComponentConstraints<Component extends ElementType> =
+  ComponentPropsWithRef<Component> extends { className?: string }
+    ? ComponentPropsWithRef<Component> extends { children?: ReactNode | ReactNode[] }
+      ? ExtractRefType<Component> extends never
+        ? { ERROR_WRAPPER_COMPONENT_REQUIRES_REF_SUPPORT: never }
+        : ExtractRefType<Component> extends Element
+          ? {}
+          : { ERROR_WRAPPER_COMPONENT_REF_MUST_EXTEND_ELEMENT: never }
+      : { ERROR_WRAPPER_COMPONENT_REQUIRES_CHILDREN: never }
+    : { ERROR_WRAPPER_COMPONENT_REQUIRES_CLASSNAME: never }
 
-export interface InfiniteListProps<T, P> {
-  items?: T[]
-  itemProps?: P
+type InfiniteListWrapperProps<Item, Component extends ElementType = 'div'> = {
+  className?: string
+  items: Item[]
+  getItemKey?: (index: number) => string
+  getItemSize: (index: number) => number
   hasNextPage?: boolean
   isLoadingNextPage?: boolean
-  getItemSize?: (index: number) => number
   onLoadNextPage?: () => void
-  ItemComponent?: ItemRenderer<T, P>
-  LoaderComponent?: ReactNode
-}
+  Component?: Component
+} & ScrollWrapperComponentConstraints<Component>
 
-const Item = memo(<T, P>({ data, index, style }: ItemProps<T, P>) => {
-  const { items, itemProps, ItemComponent, listRef, LoaderComponent } = data
-  const item = index < items.length ? items[index] : undefined
-
-  return item ? (
-    <div style={style}>
-      <ItemComponent index={index} item={item} listRef={listRef} {...itemProps} />
-    </div>
-  ) : LoaderComponent !== undefined ? (
-    <div style={style}>{LoaderComponent}</div>
-  ) : (
-    <div className="space-y-1 my-1" style={style}>
-      <div className="flex flex-col gap-y-1">
-        <div className="flex flex-row h-6 px-4 items-center gap-2">
-          <Skeleton className="h-4 w-5" />
-          <Skeleton className="w-40 h-4" />
-        </div>
-        <div className="flex flex-row h-6 px-4 items-center gap-2">
-          <Skeleton className="h-4 w-5" />
-          <Skeleton className="w-32 h-4" />
-        </div>
-        <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-75">
-          <Skeleton className="h-4 w-5" />
-          <Skeleton className="w-20 h-4" />
-        </div>
-        <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-50">
-          <Skeleton className="h-4 w-5" />
-          <Skeleton className="w-40 h-4" />
-        </div>
-        <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-25">
-          <Skeleton className="h-4 w-5" />
-          <Skeleton className="w-20 h-4" />
-        </div>
-      </div>
-    </div>
-  )
-}, areEqual)
-
-Item.displayName = 'Item'
-
-function InfiniteList<T, P>({
-  items = [],
-  itemProps,
+export const InfiniteListScrollWrapper = <Item, Wrapper extends ElementType = 'div'>({
+  children,
+  items,
+  getItemKey,
+  getItemSize,
   hasNextPage = false,
   isLoadingNextPage = false,
-  getItemSize = () => 40,
   onLoadNextPage = () => {},
-  ItemComponent = () => null,
-  LoaderComponent,
-}: InfiniteListProps<T, P>) {
-  const listRef = useRef<VariableSizeList<any> | null>()
+  className,
+  Component,
+}: PropsWithChildren<InfiniteListWrapperProps<Item, Wrapper>>) => {
+  const scrollRef = useRef<ExtractScrollElementFromRefComponent<Wrapper> | null>(null)
 
-  // Only load 1 page of items at a time
-  // Pass an empty callback to InfiniteLoader in case it asks to load more than once
-  const loadMoreItems = isLoadingNextPage ? () => {} : onLoadNextPage
+  const rowVirtualizer = useVirtualizer<ExtractScrollElementFromRefComponent<Wrapper>, Element>({
+    count: hasNextPage ? items.length + 1 : items.length,
+    getScrollElement: () => scrollRef.current,
+    getItemKey,
+    estimateSize: getItemSize,
+    overscan: 5,
+  })
 
-  // Every row is loaded except for our loading indicator row
-  const isItemLoaded = (index: number) => {
-    return !hasNextPage || index < items.length
+  const virtualItems = rowVirtualizer.getVirtualItems()
+  const virtualizerContextValue = useMemo(
+    () => ({
+      virtualizer: rowVirtualizer as unknown as Virtualizer<Element, Element>,
+      virtualItems,
+    }),
+    [rowVirtualizer, virtualItems]
+  )
+
+  useEffect(() => {
+    const lastItem = virtualItems[virtualItems.length - 1]
+    if (!lastItem) return
+
+    if (lastItem.index >= items.length - 1 && hasNextPage && !isLoadingNextPage) {
+      onLoadNextPage()
+    }
+  }, [virtualItems, items.length, hasNextPage, isLoadingNextPage, onLoadNextPage])
+
+  const WrapperToRender: Wrapper = Component ?? ('div' as Wrapper)
+  const wrapperProps = {
+    ref: (node: ExtractScrollElementFromRefComponent<Wrapper> | null) => {
+      scrollRef.current = node
+    },
+    className: cn('overflow-auto', className),
+    children,
+  } as ComponentPropsWithRef<Wrapper>
+
+  return (
+    <VirtualizerProvider value={virtualizerContextValue}>
+      <WrapperToRender {...wrapperProps} />
+    </VirtualizerProvider>
+  )
+}
+
+type ComponentWithStylePropConstraint<Component extends ElementType> =
+  ComponentProps<Component> extends { style?: CSSProperties }
+    ? {}
+    : { ERROR_SIZER_COMPONENT_MUST_TAKE_STYLE_PROP: never }
+
+type InfiniteListSizerProps = {
+  Component?: ElementType
+} & ComponentWithStylePropConstraint<ElementType>
+
+export const InfiniteListSizer = ({
+  children,
+  Component = 'div',
+}: PropsWithChildren<InfiniteListSizerProps>) => {
+  const { virtualizer } = useVirtualizerContext()
+
+  return (
+    <Component
+      style={{
+        height: `${virtualizer.getTotalSize()}px`,
+        width: '100%',
+        position: 'relative',
+      }}
+    >
+      {children}
+    </Component>
+  )
+}
+
+type RowComponentBaseProps<Item> = {
+  index: number
+  item: Item
+  style?: CSSProperties
+}
+
+type InfiniteListItemProps<
+  Item,
+  ExtraProps extends object = Record<string, never>,
+  RowComponent extends ComponentType<RowComponentBaseProps<Item> & ExtraProps> = ComponentType<
+    RowComponentBaseProps<Item> & ExtraProps
+  >,
+> = {
+  index: number
+  start: number
+  size: number
+  item: Item
+  itemProps?: ExtraProps
+  ItemComponent: RowComponent
+}
+
+const MemoizedInfiniteListItem = typedMemo(
+  <
+    Item,
+    ExtraProps extends object = Record<string, never>,
+    RowComponent extends ComponentType<RowComponentBaseProps<Item> & ExtraProps> = ComponentType<
+      RowComponentBaseProps<Item> & ExtraProps
+    >,
+  >({
+    index,
+    start,
+    size,
+    item,
+    itemProps,
+    ItemComponent,
+  }: InfiniteListItemProps<Item, ExtraProps, RowComponent>) => {
+    const styleObject = useMemo<CSSProperties>(
+      () => createStyleObject({ size, start }),
+      [size, start]
+    )
+
+    const baseProps = useMemo<RowComponentBaseProps<Item>>(
+      () => ({
+        index,
+        item,
+        style: styleObject,
+      }),
+      [index, item, styleObject]
+    )
+
+    const combinedProps = useMemo(
+      () =>
+        ({
+          ...baseProps,
+          ...(itemProps ?? ({} as ExtraProps)),
+        }) as RowComponentBaseProps<Item> & ExtraProps,
+      [baseProps, itemProps]
+    )
+
+    // Not JSX to avoid type error with generic function component
+    return createElement(ItemComponent, combinedProps)
   }
+)
+MemoizedInfiniteListItem.displayName = 'MemoizedInfiniteListItem'
 
-  const itemCount = hasNextPage ? items.length + 1 : items.length
-  const itemData = createItemData(items, { itemProps, ItemComponent, LoaderComponent, listRef })
+type InfiniteListItemsProps<
+  Item,
+  ExtraProps extends object = Record<string, never>,
+  RowComponent extends ComponentType<RowComponentBaseProps<Item> & ExtraProps> = ComponentType<
+    RowComponentBaseProps<Item> & ExtraProps
+  >,
+> = {
+  items: Item[]
+  itemProps?: ExtraProps
+  ItemComponent: RowComponent
+  LoaderComponent: ComponentType<{ style?: CSSProperties }>
+}
+
+export const InfiniteListItems = <
+  Item,
+  ExtraProps extends object = Record<string, never>,
+  RowComponent extends ComponentType<RowComponentBaseProps<Item> & ExtraProps> = ComponentType<
+    RowComponentBaseProps<Item> & ExtraProps
+  >,
+>({
+  items,
+  itemProps,
+  ItemComponent,
+  LoaderComponent,
+}: InfiniteListItemsProps<Item, ExtraProps, RowComponent>) => {
+  const { virtualItems } = useVirtualizerContext()
 
   return (
     <>
-      <div className="flex-grow">
-        <AutoSizer>
-          {({ height, width }: { height: number; width: number }) => (
-            <InfiniteLoader
-              itemCount={itemCount}
-              isItemLoaded={isItemLoaded}
-              loadMoreItems={loadMoreItems}
-            >
-              {({ onItemsRendered, ref }) => (
-                <VariableSizeList
-                  ref={(refy) => {
-                    ref(refy)
-                    listRef.current = refy
-                  }}
-                  height={height ?? 0}
-                  width={width ?? 0}
-                  itemCount={itemCount}
-                  itemData={itemData}
-                  itemSize={getItemSize}
-                  onItemsRendered={onItemsRendered}
-                >
-                  {Item}
-                </VariableSizeList>
-              )}
-            </InfiniteLoader>
-          )}
-        </AutoSizer>
-      </div>
-      <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-          pointerEvents: 'none', //https://github.com/bvaughn/react-window/issues/455
-        }}
-      />
+      {virtualItems.map((virtualRow) => {
+        const isLoaderRow = virtualRow.index > items.length - 1
+        const item = items[virtualRow.index]
+
+        return isLoaderRow ? (
+          <LoaderComponent
+            key={virtualRow.index}
+            style={createStyleObject({ size: virtualRow.size, start: virtualRow.start })}
+          />
+        ) : (
+          // Not JSX so we can pass type arguments to the generic function component
+          createElement(MemoizedInfiniteListItem<Item, ExtraProps>, {
+            key: virtualRow.index,
+            index: virtualRow.index,
+            start: virtualRow.start,
+            size: virtualRow.size,
+            item,
+            itemProps,
+            ItemComponent,
+          })
+        )
+      })}
     </>
   )
 }
 
-// memo erases generics so this magic is needed
-export default memo(InfiniteList, propsAreEqual) as typeof InfiniteList
+type InfiniteListDefaultProps<Item, ItemComponentProps extends object = Record<string, never>> = {
+  className?: string
+  items: Item[]
+  itemProps?: ItemComponentProps
+  getItemKey?: (index: number) => string
+  getItemSize: (index: number) => number
+  hasNextPage?: boolean
+  isLoadingNextPage?: boolean
+  onLoadNextPage?: () => void
+  ItemComponent: ComponentType<RowComponentBaseProps<Item> & ItemComponentProps>
+  LoaderComponent: ComponentType<{ style?: CSSProperties }>
+}
+
+export const InfiniteListDefault = <
+  Item,
+  ItemComponentProps extends object = Record<string, never>,
+>({
+  className,
+  items,
+  itemProps,
+  getItemKey,
+  getItemSize,
+  hasNextPage = false,
+  isLoadingNextPage = false,
+  onLoadNextPage = () => {},
+  ItemComponent,
+  LoaderComponent,
+}: InfiniteListDefaultProps<Item, ItemComponentProps>) => {
+  return (
+    <InfiniteListScrollWrapper
+      className={className}
+      items={items}
+      getItemKey={getItemKey}
+      getItemSize={getItemSize}
+      hasNextPage={hasNextPage}
+      isLoadingNextPage={isLoadingNextPage}
+      onLoadNextPage={onLoadNextPage}
+    >
+      <InfiniteListSizer>
+        <InfiniteListItems
+          items={items}
+          itemProps={itemProps}
+          ItemComponent={ItemComponent}
+          LoaderComponent={LoaderComponent}
+        />
+      </InfiniteListSizer>
+    </InfiniteListScrollWrapper>
+  )
+}
+
+export const LoaderForIconMenuItems = ({ style }: { style?: CSSProperties }) => (
+  <div className="space-y-1 my-1" style={style}>
+    <div className="flex flex-col gap-y-1">
+      <div className="flex flex-row h-6 px-4 items-center gap-2">
+        <Skeleton className="h-4 w-5" />
+        <Skeleton className="w-40 h-4" />
+      </div>
+      <div className="flex flex-row h-6 px-4 items-center gap-2">
+        <Skeleton className="h-4 w-5" />
+        <Skeleton className="w-32 h-4" />
+      </div>
+      <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-75">
+        <Skeleton className="h-4 w-5" />
+        <Skeleton className="w-20 h-4" />
+      </div>
+      <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-50">
+        <Skeleton className="h-4 w-5" />
+        <Skeleton className="w-40 h-4" />
+      </div>
+      <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-25">
+        <Skeleton className="h-4 w-5" />
+        <Skeleton className="w-20 h-4" />
+      </div>
+    </div>
+  </div>
+)
