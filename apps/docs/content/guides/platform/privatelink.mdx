@@ -6,7 +6,7 @@ description: 'Secure private network connectivity to your Supabase database usin
 
 <Admonition type="note">
 
-PrivateLink is currently in alpha and available exclusively to Enterprise customers. Contact your account manager or [reach out to our team](/contact/enterprise) to enable this feature.
+PrivateLink is currently in beta and available only to Teams and Enterprise customers.
 
 </Admonition>
 
@@ -37,13 +37,19 @@ To use PrivateLink with your Supabase project:
 
 ## Getting started
 
-#### Step 1: Contact Supabase support
+#### Step 1: Add AWS Account
 
-Reach out to your Enterprise account manager or [contact our team](/contact/enterprise) to initiate PrivateLink setup. During this initial contact, be prepared to provide:
+Navigate to your project's Integrations section to set up PrivateLink:
 
-- Your Supabase organization slug
-- The specific projects you want to enable PrivateLink for (optional)
-- Your AWS Account ID(s)
+1. Go to your Supabase project dashboard
+2. Navigate to [**Settings** > **Integrations**](https://supabase.com/dashboard/project/_/settings/integrations)
+3. Find the **AWS PrivateLink** section
+4. Click **Add Account**
+5. Enter your AWS Account ID
+6. Provide a description for the account (optional but recommended)
+7. Click **Add Account** to submit
+
+After submission, Supabase will create a VPC Lattice Resource Configuration for your project and send an AWS Resource Share to the specified AWS Account ID. This process may take a few moments. Once complete, the account will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted.
 
 #### Step 2: Accept resource share
 
@@ -54,7 +60,7 @@ Supabase will send you an AWS Resource Share containing the VPC Lattice Resource
    {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 3. Go to [Shared with me > Resource shares](https://console.aws.amazon.com/ram/home#SharedResourceShares)
 4. Locate the resource share from Supabase.
-   - The resource share will have the format `cust-prod-[region]-pl-[organisation]-rc-share`
+   - The resource share will have the format `sspl-[project_ref]-[random alphanumeric string]`
 5. Click on the resource share name to view details. Review the list of resource shares - it should only include resources of type vpc-lattice:ResourceConfiguration.
 6. Click **Accept resource share**
 7. Confirm the acceptance in the dialog box
@@ -152,11 +158,11 @@ For maximum security, you can disable public internet access for your database:
 2. Ensure all applications are successfully using the private connection
 3. Update any monitoring or backup tools to use the private endpoint
 
-## Alpha limitations
+## Beta limitations
 
-During the alpha phase:
+During the beta phase:
 
-- **Setup Coordination**: Configuration requires direct coordination with Supabase support team
+- **Read Replicas**: PrivateLink does not currently support read replicas
 - **Feature Evolution**: The setup process and capabilities may evolve as we refine the offering
 
 ## Compatibility
