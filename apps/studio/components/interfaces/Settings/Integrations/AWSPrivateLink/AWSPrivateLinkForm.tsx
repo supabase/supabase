@@ -15,6 +15,7 @@ import {
   Card,
   CardContent,
 } from 'ui'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { AWSAccount } from 'data/aws-accounts/aws-accounts-query'
@@ -44,6 +45,14 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
     },
   })
 
+  // Reset form when account changes
+  useEffect(() => {
+    form.reset({
+      awsAccountId: account?.aws_account_id ?? '',
+      accountName: account?.account_name ?? '',
+    })
+  }, [account, form])
+
   const onSubmit = (values: FormValues) => {
     if (!project) return
     if (isNew) {
@@ -64,7 +73,15 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
         <SheetHeader>
           <SheetTitle>{isNew ? 'Add AWS Account' : 'AWS Account Details'}</SheetTitle>
           <SheetDescription>
-            Connect to your Supabase project from your AWS VPC using AWS PrivateLink.
+            Connect to your Supabase project from your AWS VPC using AWS PrivateLink.{' '}
+            <a 
+              href="https://supabase.com/docs/guides/platform/privatelink" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Learn more
+            </a>
           </SheetDescription>
         </SheetHeader>
         <Form_Shadcn_ {...form}>
@@ -74,19 +91,26 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
                 <Card className="mb-6">
                   <CardContent className="flex items-center gap-2">
                     <p className="text-sm flex-1">
-                      {account.status === 'ASSOCIATION_ACCEPTED'
-                        ? 'This account has been accepted by the AWS account owner.'
-                        : account.status === 'READY'
-                        ? 'This account is ready to be accepted by the AWS account owner.'
+                      {account.status === 'READY'
+                        ? <>
+                            This connection is ready. It may be awaiting acceptance from the AWS account owner or already accepted. Association requests are automatically deleted if not accepted within 12 hours.
+                            <br />
+                            <a 
+                              href="https://supabase.com/docs/guides/platform/privatelink#step-2-accept-resource-share" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="underline"
+                            >
+                              Learn how to accept
+                            </a>
+                          </>
                         : account.status === 'CREATING'
-                        ? 'This account is being created.'
+                        ? 'This account connection is being created.'
                         : 'This account needs to be accepted by the AWS account owner.'}
                     </p>
                     <Badge 
                       variant={
-                        account.status === 'ASSOCIATION_ACCEPTED' 
-                          ? 'success' 
-                          : account.status === 'READY'
+                        account.status === 'READY'
                           ? 'success'
                           : account.status === 'CREATING'
                           ? 'warning'
@@ -95,9 +119,7 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
                           : 'warning'
                       }
                     >
-                      {account.status === 'ASSOCIATION_ACCEPTED' 
-                        ? 'Connected'
-                        : account.status === 'READY'
+                      {account.status === 'READY'
                         ? 'Ready'
                         : account.status === 'CREATING'
                         ? 'Creating'
@@ -122,7 +144,16 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
                     description="The ID of the AWS account you want to connect to."
                   >
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} />
+                      <Input_Shadcn_ 
+                        {...field} 
+                        readOnly={!isNew} 
+                        autoFocus={isNew}
+                        onFocus={(e) => {
+                          if (!isNew) {
+                            e.target.blur()
+                          }
+                        }}
+                      />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
@@ -133,7 +164,15 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
                 render={({ field }) => (
                   <FormItemLayout label="Account Name" description="A name for this account connection.">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} />
+                      <Input_Shadcn_ 
+                        {...field} 
+                        readOnly={!isNew}
+                        onFocus={(e) => {
+                          if (!isNew) {
+                            e.target.blur()
+                          }
+                        }}
+                      />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
