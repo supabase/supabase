@@ -10,7 +10,13 @@ import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
-export const QueryPerformanceFilterBar = ({ actions }: { actions?: ReactNode }) => {
+export const QueryPerformanceFilterBar = ({
+  actions,
+  showRolesFilter = false,
+}: {
+  actions?: ReactNode
+  showRolesFilter?: boolean
+}) => {
   const { data: project } = useSelectedProjectQuery()
   const { sort, clearSort } = useQueryPerformanceSort()
 
@@ -72,15 +78,17 @@ export const QueryPerformanceFilterBar = ({ actions }: { actions?: ReactNode }) 
             ]}
           />
 
-          <FilterPopover
-            name="Roles"
-            options={roles}
-            labelKey="name"
-            valueKey="name"
-            activeOptions={isLoadingRoles ? [] : filters.roles}
-            onSaveFilters={onFilterRolesChange}
-            className="w-56"
-          />
+          {showRolesFilter && (
+            <FilterPopover
+              name="Roles"
+              options={roles}
+              labelKey="name"
+              valueKey="name"
+              activeOptions={isLoadingRoles ? [] : filters.roles}
+              onSaveFilters={onFilterRolesChange}
+              className="w-56"
+            />
+          )}
 
           {sort && (
             <div className="text-xs border rounded-md px-1.5 md:px-2.5 py-1 h-[26px] flex items-center gap-x-2">
