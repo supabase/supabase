@@ -1,5 +1,4 @@
 import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -10,7 +9,6 @@ import Panel from 'components/ui/Panel'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -27,6 +25,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { LogDrainsEmpty } from './LogDrainsEmpty'
 
 export function LogDrains({
   onNewDrainClick,
@@ -35,8 +34,6 @@ export function LogDrains({
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
 }) {
-  const { data: org } = useSelectedOrganizationQuery()
-
   const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
   const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
 
@@ -56,6 +53,7 @@ export function LogDrains({
     }
   )
   const sentryEnabled = useFlag('SentryLogDrain')
+  const hasLogDrains = !!logDrains?.length
 
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
     onSuccess: () => {
@@ -70,16 +68,7 @@ export function LogDrains({
   })
 
   if (!orgPlanLoading && !logDrainsEnabled) {
-    return (
-      <CardButton
-        title="Upgrade to a Team Plan"
-        description="Upgrade to a Team or Enterprise Plan to use Log Drains"
-      >
-        <Button className="mt-2" asChild>
-          <Link href={`/org/${org?.slug}/billing`}>Upgrade to Team</Link>
-        </Button>
-      </CardButton>
-    )
+    return <LogDrainsEmpty />
   }
 
   if (isLoading || orgPlanLoading) {
@@ -90,7 +79,7 @@ export function LogDrains({
     )
   }
 
-  if (!isLoading && logDrains?.length === 0) {
+  if (!isLoading && !hasLogDrains) {
     return (
       <div className="grid lg:grid-cols-2 gap-3">
         {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (

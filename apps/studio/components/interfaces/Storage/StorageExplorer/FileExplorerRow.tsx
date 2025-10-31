@@ -18,10 +18,10 @@ import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import type { CSSProperties } from 'react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
@@ -46,7 +46,7 @@ import {
   STORAGE_VIEWS,
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
-import { StorageItem, StorageItemWithColumn } from '../Storage.types'
+import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
@@ -99,18 +99,22 @@ export const RowIcon = ({
 }
 
 interface FileExplorerRowProps {
+  index: number
+  item: StorageItem
   view: STORAGE_VIEWS
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
+  style?: CSSProperties
 }
 
-export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
+export const FileExplorerRow = ({
   index: itemIndex,
   item,
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
   selectedItems = [],
-}) => {
+  style,
+}: FileExplorerRowProps) => {
   const { ref: projectRef, bucketId } = useParams()
 
   const {
@@ -141,7 +145,7 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  const onSelectFile = async (columnIndex: number, file: StorageItem) => {
+  const onSelectFile = async (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
     setSelectedFilePreview(itemWithColumnIndex)
@@ -299,11 +303,14 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
         : '100%'
 
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
-    return <FileExplorerRowEditing view={view} item={item} columnIndex={columnIndex} />
+    return (
+      <FileExplorerRowEditing style={style} view={view} item={item} columnIndex={columnIndex} />
+    )
   }
 
   return (
     <div
+      style={style}
       className="h-full border-b border-default"
       onContextMenu={(event) => {
         event.stopPropagation()
@@ -326,7 +333,7 @@ export const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = 
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
             item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
               ? openFolder(columnIndex, item)
-              : onSelectFile(columnIndex, item)
+              : onSelectFile(columnIndex)
           }
         }}
       >
