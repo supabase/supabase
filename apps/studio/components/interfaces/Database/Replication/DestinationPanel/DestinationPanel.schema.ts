@@ -26,38 +26,44 @@ export const DestinationPanelFormSchema = z
     s3SecretAccessKey: z.string().optional(),
     s3Region: z.string().optional(),
   })
-  .refine(
-    (data) => {
-      if (data.type === 'BigQuery') {
-        return (
-          data.projectId &&
-          data.projectId.length > 0 &&
-          data.datasetId &&
-          data.datasetId.length > 0 &&
-          data.serviceAccountKey &&
-          data.serviceAccountKey.length > 0
-        )
-      } else if (data.type === 'Analytics Bucket') {
-        const hasValidNamespace =
-          (data.namespace && data.namespace.length > 0) ||
-          (data.namespace === 'create-new-namespace' &&
-            data.newNamespaceName &&
-            data.newNamespaceName.length > 0)
+  .superRefine((data, ctx) => {
+    const addRequiredFieldError = (path: string, message: string) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message,
+        path: [path],
+      })
+    }
 
-        return (
-          data.warehouseName &&
-          data.warehouseName.length > 0 &&
-          hasValidNamespace &&
-          data.s3Region &&
-          data.s3Region.length > 0
+    if (data.type === 'BigQuery') {
+      if (!data.projectId?.length) addRequiredFieldError('projectId', 'Project ID is required')
+      if (!data.datasetId?.length) addRequiredFieldError('datasetId', 'Dataset ID is required')
+      if (!data.serviceAccountKey?.length)
+        addRequiredFieldError('serviceAccountKey', 'Service Account Key is required')
+    } else if (data.type === 'Analytics Bucket') {
+      if (!data.warehouseName?.length) addRequiredFieldError('warehouseName', 'Bucket is required')
+
+      const hasValidNamespace =
+        (data.namespace?.length && data.namespace !== 'create-new-namespace') ||
+        (data.namespace === 'create-new-namespace' && data.newNamespaceName?.length)
+
+      if (!hasValidNamespace) {
+        const isCreatingNew = data.namespace === 'create-new-namespace'
+        addRequiredFieldError(
+          isCreatingNew ? 'newNamespaceName' : 'namespace',
+          isCreatingNew ? 'Namespace name is required' : 'Namespace is required'
         )
       }
-      return true
-    },
-    {
-      message: 'All fields are required for the selected destination type',
-      path: ['projectId'],
+
+      if (!data.s3Region?.length) addRequiredFieldError('s3Region', 'S3 Region is required')
+
+      if (!data.s3AccessKeyId?.length)
+        addRequiredFieldError('s3AccessKeyId', 'S3 Access Key ID is required')
+
+      if (data.s3AccessKeyId !== 'create-new' && !data.s3SecretAccessKey?.length) {
+        addRequiredFieldError('s3SecretAccessKey', 'S3 Secret Access Key is required')
+      }
     }
-  )
+  })
 
 export type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>
