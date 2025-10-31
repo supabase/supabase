@@ -33,8 +33,9 @@ export const useDownloadableBackupQuery = <TData = DownloadableBackupData>(
     ...options
   }: UseQueryOptions<DownloadableBackupData, DownloadableBackupError, TData> = {}
 ) =>
-  useQuery<DownloadableBackupData, DownloadableBackupError, TData>(
-    databaseKeys.backups(projectRef),
-    ({ signal }) => getDownloadableBackup({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DownloadableBackupData, DownloadableBackupError, TData>({
+    queryKey: databaseKeys.backups(projectRef),
+    queryFn: ({ signal }) => getDownloadableBackup({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

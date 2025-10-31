@@ -28,8 +28,9 @@ export const useGenerateTypesQuery = <TData = GenerateTypesData>(
   { ref, included_schemas }: GenerateTypesVariables,
   { enabled = true, ...options }: UseQueryOptions<GenerateTypesData, GenerateTypesError, TData> = {}
 ) =>
-  useQuery<GenerateTypesData, GenerateTypesError, TData>(
-    projectKeys.types(ref),
-    ({ signal }) => generateTypes({ ref, included_schemas }, signal),
-    { enabled: enabled && typeof ref !== 'undefined', ...options }
-  )
+  useQuery<GenerateTypesData, GenerateTypesError, TData>({
+    queryKey: projectKeys.types(ref),
+    queryFn: ({ signal }) => generateTypes({ ref, included_schemas }, signal),
+    enabled: enabled && typeof ref !== 'undefined',
+    ...options,
+  })

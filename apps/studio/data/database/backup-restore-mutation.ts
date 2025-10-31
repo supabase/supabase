@@ -41,20 +41,18 @@ export const useBackupRestoreMutation = ({
   UseMutationOptions<BackupRestoreData, ResponseError, BackupRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupRestoreData, ResponseError, BackupRestoreVariables>(
-    (vars) => restoreFromBackup(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to restore from backup: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BackupRestoreData, ResponseError, BackupRestoreVariables>({
+    mutationFn: (vars) => restoreFromBackup(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to restore from backup: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

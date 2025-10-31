@@ -12,7 +12,7 @@ import {
 } from 'ui/src/components/shadcn/ui/table'
 
 // Only create a custom component for Table with the added props
-const Table = forwardRef<HTMLTableElement, ComponentPropsWithRef<typeof ShadcnTable>>(
+export const Table = forwardRef<HTMLTableElement, ComponentPropsWithRef<typeof ShadcnTable>>(
   ({ className, onScroll, ...props }, ref) => (
     <ShadcnTable
       ref={ref}
@@ -27,7 +27,7 @@ const Table = forwardRef<HTMLTableElement, ComponentPropsWithRef<typeof ShadcnTa
 )
 Table.displayName = 'Table'
 
-const TableHeader = forwardRef<
+export const TableHeader = forwardRef<
   HTMLTableSectionElement,
   ComponentPropsWithRef<typeof ShadcnTableHeader>
 >(({ className, ...props }, ref) => (
@@ -35,7 +35,7 @@ const TableHeader = forwardRef<
 ))
 TableHeader.displayName = 'TableHeader'
 
-const TableBody = forwardRef<
+export const TableBody = forwardRef<
   HTMLTableSectionElement,
   ComponentPropsWithRef<typeof ShadcnTableBody>
 >(({ className, ...props }, ref) => (
@@ -49,7 +49,7 @@ const TableBody = forwardRef<
 ))
 TableBody.displayName = 'TableBody'
 
-const TableFooter = forwardRef<
+export const TableFooter = forwardRef<
   HTMLTableSectionElement,
   ComponentPropsWithRef<typeof ShadcnTableFooter>
 >(({ className, ...props }, ref) => (
@@ -57,50 +57,51 @@ const TableFooter = forwardRef<
 ))
 TableFooter.displayName = 'TableFooter'
 
-const TableRow = forwardRef<HTMLTableRowElement, ComponentPropsWithRef<typeof ShadcnTableRow>>(
-  ({ className, ...props }, ref) => (
-    <ShadcnTableRow
-      ref={ref}
-      className={cn('bg-background hover:bg-surface-100 border-b-0', className)}
-      {...props}
-    />
-  )
-)
+export const TableRow = forwardRef<
+  HTMLTableRowElement,
+  ComponentPropsWithRef<typeof ShadcnTableRow>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableRow
+    ref={ref}
+    className={cn('bg-background hover:bg-surface-100 border-b-0', className)}
+    {...props}
+  />
+))
 TableRow.displayName = 'TableRow'
 
-const TableHead = forwardRef<HTMLTableCellElement, ComponentPropsWithRef<typeof ShadcnTableHead>>(
-  ({ className, ...props }, ref) => (
-    <ShadcnTableHead
-      ref={ref}
-      className={cn(
-        '!text-xs !font-normal text-foreground-lighter font-mono',
-        'relative select-none truncate [&>.cursor-col-resize]:last:opacity-0',
-        'text-muted-foreground h-8 px-2 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
-        className
-      )}
-      {...props}
-    />
-  )
-)
+export const TableHead = forwardRef<
+  HTMLTableCellElement,
+  ComponentPropsWithRef<typeof ShadcnTableHead>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableHead
+    ref={ref}
+    className={cn(
+      '!text-xs !font-normal text-foreground-lighter font-mono',
+      'relative select-none truncate [&>.cursor-col-resize]:last:opacity-0',
+      'text-muted-foreground h-8 px-2 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+      className
+    )}
+    {...props}
+  />
+))
 TableHead.displayName = 'TableHead'
 
-const TableCell = forwardRef<HTMLTableCellElement, ComponentPropsWithRef<typeof ShadcnTableCell>>(
-  ({ className, ...props }, ref) => (
-    <ShadcnTableCell
-      ref={ref}
-      className={cn('text-xs !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px] truncate', className)}
-      {...props}
-    />
-  )
-)
+export const TableCell = forwardRef<
+  HTMLTableCellElement,
+  ComponentPropsWithRef<typeof ShadcnTableCell>
+>(({ className, ...props }, ref) => (
+  <ShadcnTableCell
+    ref={ref}
+    className={cn('text-xs !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px] truncate', className)}
+    {...props}
+  />
+))
 TableCell.displayName = 'TableCell'
 
-const TableCaption = forwardRef<
+export const TableCaption = forwardRef<
   HTMLTableCaptionElement,
   ComponentPropsWithRef<typeof ShadcnTableCaption>
 >(({ className, ...props }, ref) => (
   <ShadcnTableCaption ref={ref} className={cn('text-sm', className)} {...props} />
 ))
 TableCaption.displayName = 'TableCaption'
-
-export { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow }

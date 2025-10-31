@@ -6,7 +6,7 @@ import {
   QuerySearchParamsType,
 } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { logsKeys } from './keys'
 
 const LOGS_PAGE_LIMIT = 50
@@ -161,25 +161,23 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     ...options
   }: UseInfiniteQueryOptions<UnifiedLogsData, UnifiedLogsError, TData> = {}
 ) => {
-  return useInfiniteQuery<UnifiedLogsData, UnifiedLogsError, TData>(
-    logsKeys.unifiedLogsInfinite(projectRef, search),
-    ({ signal, pageParam }) => {
+  return useInfiniteQuery<UnifiedLogsData, UnifiedLogsError, TData>({
+    queryKey: logsKeys.unifiedLogsInfinite(projectRef, search),
+    queryFn: ({ signal, pageParam }) => {
       return getUnifiedLogs({ projectRef, search, pageParam }, signal)
     },
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      keepPreviousData: true,
-      getPreviousPageParam: (firstPage) => {
-        if (!firstPage.prevCursor) return null
-        const result = { cursor: firstPage.prevCursor, direction: 'prev' }
-        return result
-      },
-      getNextPageParam(lastPage) {
-        if (!lastPage.nextCursor || lastPage.data.length === 0) return null
-        return { cursor: lastPage.nextCursor, direction: 'next' }
-      },
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    keepPreviousData: true,
+    getPreviousPageParam: (firstPage) => {
+      if (!firstPage.prevCursor) return null
+      const result = { cursor: firstPage.prevCursor, direction: 'prev' }
+      return result
+    },
+    getNextPageParam(lastPage) {
+      if (!lastPage.nextCursor || lastPage.data.length === 0) return null
+      return { cursor: lastPage.nextCursor, direction: 'next' }
+    },
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })
 }

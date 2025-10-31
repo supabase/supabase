@@ -10,7 +10,7 @@ export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
 }
 
-const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
+export const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -39,5 +39,3 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
     </>
   )
 }
-
-export default DeleteProjectButton

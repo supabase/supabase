@@ -1,7 +1,7 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 
 type ReplicationPipelinesParams = { projectRef?: string }
@@ -33,8 +33,9 @@ export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
     ...options
   }: UseQueryOptions<ReplicationPipelinesData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelinesData, ResponseError, TData>(
-    replicationKeys.pipelines(projectRef),
-    ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ReplicationPipelinesData, ResponseError, TData>({
+    queryKey: replicationKeys.pipelines(projectRef),
+    queryFn: ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

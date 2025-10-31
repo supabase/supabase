@@ -110,12 +110,10 @@ export const useCustomDomainsQuery = <TData = CustomDomainsData>(
   const { data } = useProjectAddonsQuery({ projectRef })
   const hasCustomDomainsAddon = !!data?.selected_addons.find((x) => x.type === 'custom_domain')
 
-  return useQuery<CustomDomainsData, CustomDomainsError, TData>(
-    customDomainKeys.list(projectRef),
-    ({ signal }) => getCustomDomains({ projectRef }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && hasCustomDomainsAddon,
-      ...options,
-    }
-  )
+  return useQuery<CustomDomainsData, CustomDomainsError, TData>({
+    queryKey: customDomainKeys.list(projectRef),
+    queryFn: ({ signal }) => getCustomDomains({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && hasCustomDomainsAddon,
+    ...options,
+  })
 }

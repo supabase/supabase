@@ -24,8 +24,8 @@ import { Snippet } from 'data/content/sql-folders-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import uuidv4 from 'lib/uuid'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,

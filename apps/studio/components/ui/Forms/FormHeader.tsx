@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 import { cn } from 'ui'
 import { DocsButton } from '../DocsButton'
 
-const FormHeader = ({
+export const FormHeader = ({
   title,
   description,
   docsUrl,
@@ -32,5 +32,3 @@ const FormHeader = ({
     </div>
   )
 }
-
-export { FormHeader }

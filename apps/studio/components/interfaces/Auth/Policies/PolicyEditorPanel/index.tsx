@@ -125,7 +125,7 @@ export const PolicyEditorPanel = memo(function ({
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async () => {
       // refresh all policies
-      await queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
+      await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(ref) })
       toast.success('Successfully created new policy')
       onSelectCancel()
     },

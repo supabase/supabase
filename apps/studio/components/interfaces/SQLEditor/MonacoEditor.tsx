@@ -4,10 +4,12 @@ import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
@@ -55,6 +57,7 @@ const MonacoEditor = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -112,9 +115,9 @@ const MonacoEditor = ({
         const selectedValue = (editorRef?.current as any)
           .getModel()
           .getValueInRange((editorRef?.current as any)?.getSelection())
+        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         aiSnap.newChat({
           name: 'Explain code section',
-          open: true,
           sqlSnippets: [selectedValue],
           initialInput: 'Can you explain this section to me in more detail?',
         })

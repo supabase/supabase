@@ -39,17 +39,15 @@ export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibil
   }: UseQueryOptions<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData> = {}
 ) => {
   const { data: project } = useProjectDetailQuery({ ref: projectRef })
-  return useQuery<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData>(
-    configKeys.upgradeEligibility(projectRef),
-    ({ signal }) => getProjectUpgradeEligibility({ projectRef }, signal),
-    {
-      enabled:
-        enabled &&
-        project !== undefined &&
-        project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
-        typeof projectRef !== 'undefined' &&
-        IS_PLATFORM,
-      ...options,
-    }
-  )
+  return useQuery<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData>({
+    queryKey: configKeys.upgradeEligibility(projectRef),
+    queryFn: ({ signal }) => getProjectUpgradeEligibility({ projectRef }, signal),
+    enabled:
+      enabled &&
+      project !== undefined &&
+      project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
+      typeof projectRef !== 'undefined' &&
+      IS_PLATFORM,
+    ...options,
+  })
 }

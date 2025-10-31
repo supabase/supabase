@@ -89,7 +89,7 @@ export const FilterPopover = <T extends Record<string, any>>({
   })
 
   useEffect(() => {
-    if (!open && activeOptions.length > 0) setSelectedOptions(activeOptions)
+    if (!open) setSelectedOptions(activeOptions)
     if (!open) setSearch('')
   }, [open, activeOptions])
 

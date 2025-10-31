@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -26,9 +27,12 @@ import {
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
-const General = () => {
+export const General = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+
+  // [Joshen] Need to refactor to use RHF so we don't need manual error handlers like this
+  const [nameError, setNameError] = useState<string>()
 
   const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
   const isBranch = parentProject !== undefined
@@ -49,6 +53,11 @@ const General = () => {
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!project?.ref) return console.error('Ref is required')
+
+    if (values.name.length < 3) {
+      setNameError('Project name must be at least 3 characters long')
+      return
+    }
 
     updateProject(
       { ref: project.ref, name: values.name.trim() },
@@ -95,7 +104,10 @@ const General = () => {
                       form={formId}
                       isSubmitting={isUpdating}
                       hasChanges={hasChanges}
-                      handleReset={handleReset}
+                      handleReset={() => {
+                        handleReset()
+                        setNameError(undefined)
+                      }}
                       helper={
                         !canUpdateProject
                           ? "You need additional permissions to manage this project's settings"
@@ -112,6 +124,8 @@ const General = () => {
                       size="small"
                       label="Project name"
                       disabled={isBranch || !canUpdateProject}
+                      onChange={() => setNameError(undefined)}
+                      error={nameError}
                     />
                     <Input copy disabled id="ref" size="small" label="Project ID" />
                   </FormSectionContent>
@@ -126,7 +140,7 @@ const General = () => {
           <div className="mt-6" id="restart-project">
             <FormPanel>
               <div className="flex flex-col px-8 py-4">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
                   <div>
                     <p className="text-sm">
                       {projectSettingsRestartProject ? 'Restart project' : 'Restart database'}
@@ -141,7 +155,7 @@ const General = () => {
                 </div>
               </div>
               <div
-                className="flex w-full items-center justify-between px-8 py-4"
+                className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4 px-8 py-4"
                 id="pause-project"
               >
                 <div>
@@ -159,7 +173,7 @@ const General = () => {
           <div className="mt-6">
             <Panel>
               <Panel.Content>
-                <div className="flex justify-between">
+                <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
                   <div className="flex space-x-4">
                     <BarChart2 strokeWidth={2} />
                     <div>
@@ -185,5 +199,3 @@ const General = () => {
     </div>
   )
 }
-
-export default General

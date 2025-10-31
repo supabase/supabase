@@ -1,9 +1,8 @@
 import { OrganizationSelector } from 'components/ui/org-selector'
-import { Organization } from 'types'
 import { ProjectClaimLayout } from './layout'
 
 export interface ProjectClaimChooseOrgProps {
-  onChoose: (org: Organization) => void
+  onChoose: (orgSlug: string) => void
 }
 
 const MAX_ORGS_TO_SHOW = 5
