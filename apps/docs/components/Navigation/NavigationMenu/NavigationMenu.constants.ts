@@ -695,8 +695,9 @@ export const auth: NavMenuConstant = {
         { name: 'Identities', url: '/guides/auth/identities' },
         {
           name: 'Sessions',
-          url: '/guides/auth/sessions',
+          url: '/',
           items: [
+            { name: 'User sessions', url: '/guides/auth/sessions' },
             { name: 'Implicit flow', url: '/guides/auth/sessions/implicit-flow' },
             { name: 'PKCE flow', url: '/guides/auth/sessions/pkce-flow' },
           ],
@@ -709,8 +710,9 @@ export const auth: NavMenuConstant = {
       items: [
         {
           name: 'Server-Side Rendering',
-          url: '/guides/auth/server-side',
+          url: '/',
           items: [
+            { name: 'How SSR works with Supabase Auth', url: '/guides/auth/server-side' },
             { name: 'Next.js guide', url: '/guides/auth/server-side/nextjs' },
             {
               name: 'SvelteKit guide',
@@ -745,16 +747,20 @@ export const auth: NavMenuConstant = {
 
         {
           name: 'Social Login (OAuth)',
-          url: '/guides/auth/social-login',
-          items: [...SocialLoginItems],
+          url: '/',
+          items: [
+            { name: 'Social Login', url : '/guides/auth/social-login' },
+            ...SocialLoginItems
+          ],
           enabled: allAuthProvidersEnabled,
         },
 
         {
           name: 'Enterprise SSO',
-          url: '/guides/auth/enterprise-sso',
+          url: '/',
           enabled: allAuthProvidersEnabled,
           items: [
+            {name: 'Overview', url: '/guides/auth/enterprise-sso' },
             {
               name: 'SAML 2.0',
               url: '/guides/auth/enterprise-sso/auth-sso-saml' as `/${string}`,
@@ -779,8 +785,9 @@ export const auth: NavMenuConstant = {
         },
         {
           name: 'Multi-Factor Authentication',
-          url: '/guides/auth/auth-mfa',
+          url: '/',
           items: [
+            { name: 'Overview', url: '/guides/auth/auth-mfa' },
             { name: 'App Authenticator (TOTP)', url: '/guides/auth/auth-mfa/totp' },
             { name: 'Phone', url: '/guides/auth/auth-mfa/phone' },
           ],
@@ -829,8 +836,9 @@ export const auth: NavMenuConstant = {
         },
         {
           name: 'Auth Hooks',
-          url: '/guides/auth/auth-hooks',
+          url: '/',
           items: [
+            { name: 'Overview', url: '/guides/auth/auth-hooks' },
             {
               name: 'Custom access token hook',
               url: '/guides/auth/auth-hooks/custom-access-token-hook' as `/${string}`,
@@ -878,9 +886,12 @@ export const auth: NavMenuConstant = {
         { name: 'Audit Logs', url: '/guides/auth/audit-logs', enabled: authFullSecurityEnabled },
         {
           name: 'JSON Web Tokens (JWT)',
-          url: '/guides/auth/jwts',
+          url: '/',
           enabled: authFullSecurityEnabled,
-          items: [{ name: 'Claims Reference', url: '/guides/auth/jwt-fields' }],
+          items: [
+            { name: 'Overview', url: '/guides/auth/jwt-structure' },
+            { name: 'Claims Reference', url: '/guides/auth/jwt-fields' }
+          ],
         },
         {
           name: 'JWT Signing Keys',
@@ -919,8 +930,9 @@ const ormQuickstarts: NavMenuSection = {
   items: [
     {
       name: 'Prisma',
-      url: '/guides/database/prisma',
+      url: '/',
       items: [
+        { name: 'Connecting with Prisma', url: '/guides/database/prisma' as `/${string}` },
         {
           name: 'Prisma troubleshooting',
           url: '/guides/database/prisma/prisma-troubleshooting' as `/${string}`,
