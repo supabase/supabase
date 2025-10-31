@@ -160,7 +160,7 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
       'inline-flex items-center justify-center',
       'whitespace-nowrap',
       'rounded-md border border-input bg-background',
-      'text-sm font-medium',
+      'text-sm',
       'hover:bg-accent hover:text-accent-foreground',
       'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'disabled:pointer-events-none disabled:opacity-50',
@@ -206,15 +206,15 @@ function CommandMenuTriggerInput({
             'pl-1.5 md:pl-2 pr-1',
             'flex items-center justify-between',
             'bg-surface-100/75 text-foreground-lighter border',
-            'hover:bg-opacity-100 hover:border-strong',
+            'hover:bg-opacity-100 hover:border-foreground-muted',
             'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
             'transition',
             className
           )}
         >
-          <div className="flex items-center space-x-2 text-foreground-muted">
-            <Search size={18} strokeWidth={2} />
-            <p className="flex text-sm pr-2">{placeholder}</p>
+          <div className="flex items-center space-x-1.5 text-foreground-lighter">
+            <Search size={16} strokeWidth={1.5} />
+            <p className="flex text-xs pr-2">{placeholder}</p>
           </div>
           <div className="command-shortcut hidden md:flex items-center space-x-1">
             <div

@@ -30,6 +30,7 @@ import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
 import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
+import { CommandMenuTriggerInput } from 'ui-patterns'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -211,7 +212,15 @@ const LayoutHeader = ({
                 <FeedbackDropdown />
 
                 <div className="overflow-hidden flex items-center gap-2">
-                  <CommandPopover />
+                  <CommandMenuTriggerInput
+                    placeholder="Search..."
+                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
+                    [&_.command-shortcut>div]:border-none
+                    [&_.command-shortcut>div]:pr-2
+                    [&_.command-shortcut>div]:bg-transparent
+                    [&_.command-shortcut>div]:text-foreground-lighter
+                  "
+                  />
                   <HelpPopover />
                   <NotificationsPopoverV2 />
                   <AnimatePresence initial={false}>
@@ -233,7 +242,15 @@ const LayoutHeader = ({
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <CommandPopover />
+                        <CommandMenuTriggerInput
+                          placeholder="Search..."
+                          className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
+                            [&_.command-shortcut>div]:border-none
+                            [&_.command-shortcut>div]:pr-2
+                            [&_.command-shortcut>div]:bg-transparent
+                            [&_.command-shortcut>div]:text-foreground-lighter
+                          "
+                        />
                         <AdvisorButton />
                         <InlineEditorButton />
                         <AssistantButton />
