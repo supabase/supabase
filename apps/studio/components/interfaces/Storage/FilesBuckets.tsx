@@ -1,6 +1,6 @@
-import { Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { ArrowDownNarrowWide, Edit, FolderOpen, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
@@ -18,6 +18,7 @@ import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { IS_PLATFORM } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Badge,
   Button,
@@ -25,6 +26,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
@@ -34,6 +37,7 @@ import { DeleteBucketModal } from './DeleteBucketModal'
 import { EditBucketModal } from './EditBucketModal'
 import { EmptyBucketModal } from './EmptyBucketModal'
 import { EmptyBucketState } from './EmptyBucketState'
+import { STORAGE_BUCKET_SORT } from './Storage.constants'
 
 type BucketDropdownMenuProps = {
   bucket: Bucket
@@ -110,7 +114,7 @@ const BucketsTable = ({
     <VirtualizedTable data={buckets} estimateSize={() => 59} getItemKey={(bucket) => bucket.id}>
       <VirtualizedTableHeader>
         <VirtualizedTableRow>
-          <VirtualizedTableHead>Name</VirtualizedTableHead>
+          <VirtualizedTableHead className="w-[280px]">Name</VirtualizedTableHead>
           <VirtualizedTableHead>Policies</VirtualizedTableHead>
           <VirtualizedTableHead>File size limit</VirtualizedTableHead>
           <VirtualizedTableHead>Allowed MIME types</VirtualizedTableHead>
@@ -194,6 +198,7 @@ const BucketsTable = ({
 
 export const FilesBuckets = () => {
   const { ref } = useParams()
+  const snap = useStorageExplorerStateSnapshot()
 
   const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
   const [selectedBucket, setSelectedBucket] = useState<Bucket>()
@@ -213,6 +218,17 @@ export const FilesBuckets = () => {
         ? true
         : bucket.name.toLowerCase().includes(filterString.toLowerCase())
     )
+
+  const sortedFilesBuckets = useMemo(
+    () =>
+      snap.sortBucket === 'alphabetical'
+        ? filesBuckets.sort((a, b) =>
+            a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
+          )
+        : filesBuckets.sort((a, b) => (new Date(b.created_at) > new Date(a.created_at) ? 1 : -1)),
+    [filesBuckets, snap.sortBucket]
+  )
+
   return (
     <>
       {!isLoading &&
@@ -222,14 +238,34 @@ export const FilesBuckets = () => {
         // Add !pt-8 to override the default first:pt-12
         <ScaffoldSection isFullWidth className="h-full gap-y-4">
           <div className="flex flex-grow justify-between gap-x-2 items-center">
-            <Input
-              size="tiny"
-              className="flex-grow lg:flex-grow-0 w-52"
-              placeholder="Search for a bucket"
-              value={filterString}
-              onChange={(e) => setFilterString(e.target.value)}
-              icon={<Search size={12} />}
-            />
+            <div className="flex items-center gap-x-2">
+              <Input
+                size="tiny"
+                className="flex-grow lg:flex-grow-0 w-52"
+                placeholder="Search for a bucket"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+                icon={<Search size={12} />}
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" icon={<ArrowDownNarrowWide />}>
+                    Sorted by {snap.sortBucket === 'alphabetical' ? 'name' : 'created at'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-40">
+                  <DropdownMenuRadioGroup
+                    value={snap.sortBucket}
+                    onValueChange={(value) => snap.setSortBucket(value as STORAGE_BUCKET_SORT)}
+                  >
+                    <DropdownMenuRadioItem value="alphabetical">Sort by name</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="created_at">
+                      Sort by created at
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <CreateBucketModal buttonType="primary" buttonClassName="w-fit" />
           </div>
 
@@ -238,7 +274,7 @@ export const FilesBuckets = () => {
           ) : (
             <Card>
               <BucketsTable
-                buckets={filesBuckets}
+                buckets={sortedFilesBuckets}
                 projectRef={ref ?? '_'}
                 filterString={filterString}
                 formattedGlobalUploadLimit={formattedGlobalUploadLimit}
