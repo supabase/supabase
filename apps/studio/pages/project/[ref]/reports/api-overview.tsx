@@ -17,7 +17,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
