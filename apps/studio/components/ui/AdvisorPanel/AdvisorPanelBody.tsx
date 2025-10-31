@@ -119,7 +119,7 @@ export const AdvisorPanelBody = ({
                       strokeWidth={1.5}
                       className={cn('flex-shrink-0', severityClass)}
                     />
-                    <span className="truncate">{item.title}</span>
+                    <span className="truncate">{item.title.replace(/[`\\]/g, '')}</span>
                   </div>
                   <ChevronRight
                     size={16}

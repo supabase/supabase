@@ -47,7 +47,7 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
       />
       <div className="flex items-center gap-2 overflow-hidden flex-1">
         <div className="flex-1 flex flex-col gap-0.5">
-          <span className="heading-default">{selectedItem?.title}</span>
+          <span className="heading-default">{selectedItem?.title?.replace(/[`\\]/g, '')}</span>
           {selectedItem?.createdAt && (
             <span className="text-xs text-foreground-light capitalize-sentence">
               {(() => {
