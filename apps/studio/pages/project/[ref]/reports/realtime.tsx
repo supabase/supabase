@@ -90,7 +90,9 @@ const RealtimeUsage = () => {
     if (!selectedDateRange) return
 
     setIsRefreshing(true)
-    queryClient.invalidateQueries(['projects', ref, 'report-v2', { queryGroup: 'realtime' }])
+    queryClient.invalidateQueries({
+      queryKey: ['projects', ref, 'report-v2', { queryGroup: 'realtime' }],
+    })
     refetch()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
