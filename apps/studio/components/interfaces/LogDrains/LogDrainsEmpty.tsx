@@ -18,7 +18,7 @@ export const LogDrainsEmpty = () => {
       step: 2,
       title: 'Connect to your drain',
       description:
-        'We offer support for multiple destinations including HTTPS, Datadog, Loki and Sentry.',
+        'We offer support for multiple destinations including Datadog, Loki, Sentry or a custom endpoint.',
       label: 'Read our documentation',
       link: 'https://supabase.com/docs/guides/telemetry/log-drains',
     },
