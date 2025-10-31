@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { jwtSigningKeysKeys } from './keys'
 
 interface LegacyJWTSigningKeyCreateVariables {
@@ -29,7 +29,7 @@ export const useLegacyJWTSigningKeyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     LegacyJWTSigningKeyCreateData,
     ResponseError,
     LegacyJWTSigningKeyCreateVariables

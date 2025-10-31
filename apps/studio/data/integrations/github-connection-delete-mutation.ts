@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { integrationKeys } from './keys'
 
 type DeleteVariables = {
@@ -27,7 +27,7 @@ export const useGitHubConnectionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
+  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export async function addLoginEvent() {
   const { error } = await post('/platform/profile/audit-login')
@@ -18,7 +18,7 @@ export const useAddLoginEvent = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AddLoginEventData, ResponseError, AddLoginEventVariables>,
+  UseCustomMutationOptions<AddLoginEventData, ResponseError, AddLoginEventVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<AddLoginEventData, ResponseError, AddLoginEventVariables>({

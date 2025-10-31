@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseIndexesKeys } from './keys'
 
 export type DatabaseIndexDeleteVariables = {
@@ -37,7 +37,7 @@ export const useDatabaseIndexDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseIndexDeleteData, ResponseError, DatabaseIndexDeleteVariables>,
+  UseCustomMutationOptions<DatabaseIndexDeleteData, ResponseError, DatabaseIndexDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
