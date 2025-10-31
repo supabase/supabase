@@ -184,7 +184,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
               defaultSize={1}
               order={2}
               id="panel-project-content"
-              className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
+              className={cn('h-full flex flex-col w-full bg-dash-sidebar')}
             >
               <main
                 className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"

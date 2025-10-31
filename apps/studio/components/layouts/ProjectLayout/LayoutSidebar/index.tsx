@@ -15,7 +15,7 @@ export const LayoutSidebar = () => {
       <ResizablePanel
         id="panel-side"
         key={activeSidebar.id}
-        defaultSize={30}
+        defaultSize={25}
         minSize={30}
         maxSize={50}
         className={cn(

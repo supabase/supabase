@@ -38,9 +38,13 @@ export const AdvisorFilters = ({
   onClose,
 }: AdvisorFiltersProps) => {
   return (
-    <div className="border-b">
-      <div className="flex items-center justify-between gap-3 px-4 h-[46px]">
-        <Tabs_Shadcn_ value={activeTab} onValueChange={onTabChange} className="h-full">
+    <div className="border-b overflow-hidden">
+      <div className="flex items-center justify-between px-4 h-[46px]">
+        <Tabs_Shadcn_
+          value={activeTab}
+          onValueChange={onTabChange}
+          className="h-full  overflow-x-auto"
+        >
           <TabsList_Shadcn_ className="border-b-0 gap-4 h-full">
             <TabsTrigger_Shadcn_ value="all" className="h-full text-xs">
               All
@@ -59,7 +63,7 @@ export const AdvisorFilters = ({
             </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
         </Tabs_Shadcn_>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <FilterPopover
             name="Status"
             options={statusOptions}
