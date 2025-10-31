@@ -23,14 +23,9 @@ ${query}
 
 /**
  * Pulled from https://github.com/supabase/splinter/blob/main/splinter.sql
- * [Joshen] JFYI I've had to remove the following line from ^ the source on some of the lints so that it works for self-hosted
- * and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
- * I'm guessing the difference might be something with running running this SQL through the API vs through the DB directly from the dashboard
- *
  * Things to do after copy pasting from splinter.sql
- * - Replace all "`%s`" with backquotes to escape the tick character ("\`%s\`")
- * - Replace docs url with DOCS_URL (https://supabase.com/docs)
- * - Remove any checks against current_setting('pgrst.db_schemas', 't') (Refer to above)
+ * - Replace all "\`%s\`" with backquotes to escape the tick character ("\`%s\`")
+ * - Replace docs url with DOCS_URL (${DOCS_URL})
  */
 const LINT_SQL = /* SQL */ `set local search_path = '';
 
@@ -151,6 +146,7 @@ where
       pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
       or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
     )
+    and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     -- Exclude self
     and c.relname <> '0002_auth_users_exposed'
     -- There are 3 insecure configurations
@@ -643,6 +639,7 @@ where
         or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
     )
     and substring(pg_catalog.version() from 'PostgreSQL ([0-9]+)') >= '15' -- security invoker was added in pg15
+    and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
         '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
@@ -737,6 +734,7 @@ where
         pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
         or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
     )
+    and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
         '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     ))
@@ -867,6 +865,7 @@ where
         pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
         or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
     )
+    and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
         '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
@@ -909,6 +908,7 @@ where
         pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
         or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
     )
+    and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     and n.nspname not in (
         '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
