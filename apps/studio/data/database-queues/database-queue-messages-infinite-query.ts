@@ -1,10 +1,11 @@
 import { UseInfiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { last } from 'lodash'
+
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
-import dayjs from 'dayjs'
 import { DATE_FORMAT } from 'lib/constants'
-import { last } from 'lodash'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueVariables = {

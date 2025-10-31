@@ -1,6 +1,6 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesMetricsVariables = {

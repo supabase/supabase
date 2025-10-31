@@ -195,8 +195,8 @@ const ProjectUsage = () => {
           Statistics for {selectedInterval.label.toLowerCase()}
         </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
-        <Panel className="mb-0 md:mb-0">
+      <div className="grid grid-cols-1 @md:grid-cols-2 gap-4 @2xl:grid-cols-4">
+        <Panel className="mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={

@@ -78,7 +78,7 @@ export const FormSectionContent = ({
   return (
     <div
       className={`
-        relative col-span-12 flex flex-col gap-6 lg:col-span-7
+        relative col-span-12 flex flex-col gap-6 @lg:col-span-7
         ${fullWidth && '!col-span-12'}
         ${className}
       `}

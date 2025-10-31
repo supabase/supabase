@@ -2,7 +2,7 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 
 type ReplicationPublicationsParams = { projectRef?: string; sourceId?: number }
