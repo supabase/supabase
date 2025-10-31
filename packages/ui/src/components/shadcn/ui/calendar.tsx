@@ -12,49 +12,81 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
   const fullDateRangeSelected =
     props.mode === 'range' && !!props.selected?.from && !!props.selected?.to
 
+  const {
+    months,
+    month,
+    month_caption,
+    caption_label,
+    button_previous,
+    button_next,
+    month_grid,
+    weekdays,
+    weekday,
+    week,
+    day,
+    day_button,
+    selected,
+    today,
+    outside,
+    disabled,
+    range_start,
+    range_middle,
+    range_end,
+    hidden,
+    ...restClassNames
+  } = classNames ?? {}
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn('p-3', className)}
       classNames={{
-        months:
+        months: cn(
           'relative flex flex-col sm:flex-row space-y-4 sm:[&>*:not(nav)+*]:ml-4 sm:space-y-0',
-        month: 'space-y-4',
-        month_caption: 'flex justify-center pt-1 relative items-center',
-        caption_label: 'text-sm font-medium',
+          months
+        ),
+        month: cn('space-y-4', month),
+        month_caption: cn('flex justify-center pt-1 relative items-center', month_caption),
+        caption_label: cn('text-sm font-medium', caption_label),
         button_previous: cn(
           buttonVariants({ variant: 'outline' }),
           'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
           'z-[5]',
-          'absolute left-0 top-0'
+          'aria-disabled:opacity-25 aria-disabled:hover:opacity-25 aria-disabled:cursor-not-allowed',
+          'absolute left-0 top-0',
+          button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: 'outline' }),
           'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
           'z-[5]',
-          'absolute right-0 top-0'
+          'aria-disabled:opacity-25 aria-disabled:hover:opacity-25 aria-disabled:cursor-not-allowed',
+          'absolute right-0 top-0',
+          button_next
         ),
-        month_grid: 'w-full border-collapse space-y-1',
-        weekdays: 'flex',
-        weekday: 'text-foreground-muted rounded-md w-9 font-normal text-[0.8rem]',
-        week: 'flex w-full mt-2',
+        month_grid: cn('w-full border-collapse space-y-1', month_grid),
+        weekdays: cn('flex', weekdays),
+        weekday: cn('text-foreground-muted rounded-md w-9 font-normal text-[0.8rem]', weekday),
+        week: cn('flex w-full mt-2', week),
         day: cn(
           'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md',
-          'last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20'
+          'last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+          day
         ),
         day_button: cn(
           buttonVariants({ variant: 'ghost' }),
-          'h-9 w-9 p-0 font-normal aria-selected:opacity-100'
+          'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
+          day_button
         ),
-        selected: 'bg-brand-500 text-foreground text-foreground',
-        today: 'bg-accent text-accent-foreground',
-        outside: 'text-foreground-muted opacity-50',
-        disabled: 'text-foreground-muted opacity-50',
-        range_start: cn(fullDateRangeSelected && 'bg-brand-500 rounded-r-none'),
-        range_middle: 'aria-selected:bg-brand-400 rounded-none',
-        range_end: cn(fullDateRangeSelected && 'bg-brand-500 rounded-l-none'),
-        hidden: 'invisible',
-        ...classNames,
+        selected: cn('bg-brand-500 text-foreground text-foreground', selected),
+        today: cn('bg-accent text-accent-foreground', today),
+        outside: cn('text-foreground-muted opacity-50', outside),
+        disabled: cn('text-foreground-muted opacity-50', disabled),
+        range_start: cn(fullDateRangeSelected && 'bg-brand-500 rounded-r-none', range_start),
+        range_middle: cn('aria-selected:bg-brand-400 rounded-none', range_middle),
+        range_end: cn(fullDateRangeSelected && 'bg-brand-500 rounded-l-none', range_end),
+        hidden: cn('invisible', hidden),
+        ...restClassNames,
       }}
       components={{
         Chevron: (props) => {

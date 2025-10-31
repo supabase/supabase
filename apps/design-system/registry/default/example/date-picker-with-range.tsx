@@ -3,9 +3,9 @@
 import { addDays, format } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import * as React from 'react'
-// @ts-expect-error
-import { cn } from '@/lib/utils'
 import { DateRange } from 'react-day-picker'
+
+import { cn } from '@/lib/utils'
 import {
   Button,
   Calendar,

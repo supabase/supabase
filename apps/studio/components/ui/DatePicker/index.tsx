@@ -1,12 +1,12 @@
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
-import { ArrowRight, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, Calendar } from 'lucide-react'
 import { ReactNode, useEffect, useState } from 'react'
-import ReactDatePicker from 'react-datepicker'
 
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
   Button,
+  Calendar as CalendarPicker,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -145,7 +145,7 @@ export function DatePicker({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+    <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           title={triggerButtonTitle}
@@ -218,6 +218,14 @@ export function DatePicker({
             </>
           )}
           <div className="p-2">
+            <CalendarPicker
+              mode="range"
+              selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
+              onSelect={(range) => {
+                handleDatePickerChange([range?.from ?? null, range?.to ?? null])
+              }}
+            />
+            {/*
             <ReactDatePicker
               inline
               selectsRange={selectsRange}
@@ -269,6 +277,7 @@ export function DatePicker({
                 </div>
               )}
             />
+			*/}
           </div>
           {renderFooter({
             from: startDate?.toISOString() || null,

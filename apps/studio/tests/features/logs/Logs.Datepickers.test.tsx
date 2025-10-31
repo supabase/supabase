@@ -71,8 +71,8 @@ test('renders datepicker selected dates in local time', async () => {
     `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
   )
   // selected date should be in local time
-  await screen.findByText('25', { selector: "*[class*='--range-start'" })
-  await screen.findByText('27', { selector: "*[class*='--range-end'" })
+  await screen.findByText('25', { selector: "*[aria-label*='selected'" })
+  await screen.findByText('27', { selector: "*[aria-label*='selected'" })
 })
 
 test('datepicker onSubmit will return ISO string of selected dates', async () => {

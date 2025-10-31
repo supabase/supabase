@@ -259,6 +259,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 18.3.1
+      react-day-picker:
+        specifier: ^9.11.1
+        version: 9.11.1(react@18.3.1)
       react-docgen:
         specifier: ^7.0.3
         version: 7.0.3(supports-color@8.1.1)
@@ -990,9 +993,6 @@ importers:
       react-data-grid:
         specifier: 7.0.0-beta.41
         version: 7.0.0-beta.41(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-datepicker:
-        specifier: ^4.18.0
-        version: 4.18.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-day-picker:
         specifier: ^9.11.1
         version: 9.11.1(react@18.3.1)
@@ -16788,12 +16788,6 @@ packages:
       react: ^18.0
       react-dom: ^18.0
 
-  react-datepicker@4.18.0:
-    resolution: {integrity: sha512-0MYt3HmLbHVk1sw4v+RCbLAVg5TA3jWP7RyjZbo53PC+SEi+pjdgc92lB53ai/ENZaTOhbXmgni9GzvMrorMAw==}
-    peerDependencies:
-      react: ^16.9.0 || ^17 || ^18
-      react-dom: ^16.9.0 || ^17 || ^18
-
   react-datepicker@7.6.0:
     resolution: {integrity: sha512-9cQH6Z/qa4LrGhzdc3XoHbhrxNcMi9MKjZmYgF/1MNNaJwvdSjv3Xd+jjvrEEbKEf71ZgCA3n7fQbdwd70qCRw==}
     peerDependencies:
@@ -16938,12 +16932,6 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-
-  react-onclickoutside@6.13.0:
-    resolution: {integrity: sha512-ty8So6tcUpIb+ZE+1HAhbLROvAIJYyJe/1vRrrcmW+jLsaM+/powDRqxzo6hSh9CuRZGSL1Q8mvcF5WRD93a0A==}
-    peerDependencies:
-      react: ^15.5.x || ^16.x || ^17.x || ^18.x
-      react-dom: ^15.5.x || ^16.x || ^17.x || ^18.x
 
   react-popper@2.3.0:
     resolution: {integrity: sha512-e1hj8lL3uM+sgSR4Lxzn5h1GxBlpa4CQz0XLF8kx4MDrDRWY0Ena4c97PUeSX9i5W3UAfDP0z0FXCTQkoXUl3Q==}
@@ -38584,17 +38572,6 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  react-datepicker@4.18.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      '@popperjs/core': 2.11.8
-      classnames: 2.3.2
-      date-fns: 2.30.0
-      prop-types: 15.8.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      react-onclickoutside: 6.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-
   react-datepicker@7.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@floating-ui/react': 0.27.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -38783,11 +38760,6 @@ snapshots:
       - supports-color
 
   react-medium-image-zoom@5.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
-  react-onclickoutside@6.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
