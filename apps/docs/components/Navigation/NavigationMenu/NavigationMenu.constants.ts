@@ -749,7 +749,7 @@ export const auth: NavMenuConstant = {
           name: 'Social Login (OAuth)',
           url: '/',
           items: [
-            { name: 'Social Login', url : '/guides/auth/social-login' },
+            { name: 'Overview', url : '/guides/auth/social-login' },
             ...SocialLoginItems
           ],
           enabled: allAuthProvidersEnabled,
