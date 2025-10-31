@@ -11,7 +11,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
-      const { data, error } = await getLints({ headers: constructHeaders(req.headers) })
+      // [Joshen] JFYI it seems like the exposed schemas is being hardcoded for self-host here
+      // https://github.com/supabase/supabase/blob/master/apps/studio/pages/api/platform/projects/%5Bref%5D/config/postgrest.ts#L23
+      // Not exactly sure if that's supposed to be the case but if it's meant to be configured dynamically somewhere
+      // we should update in config/postgrest.ts and here
+      const { data, error } = await getLints({
+        headers: constructHeaders(req.headers),
+        exposedSchemas: 'public, storage',
+      })
 
       if (error) {
         return res.status(400).json(error)

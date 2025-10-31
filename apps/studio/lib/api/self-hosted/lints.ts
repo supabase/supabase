@@ -4,22 +4,31 @@ import { executeQuery } from './query'
 
 interface GetLintsOptions {
   headers?: HeadersInit
+  exposedSchemas?: string
 }
 
-export async function getLints({ headers }: GetLintsOptions) {
-  return await executeQuery<ResponseData[number]>({ query: enrichQuery(LINT_SQL), headers })
+export async function getLints({ headers, exposedSchemas }: GetLintsOptions) {
+  return await executeQuery<ResponseData[number]>({
+    query: enrichLintsQuery(LINT_SQL, exposedSchemas),
+    headers,
+  })
 }
 
 export type ResponseData =
   paths['/platform/projects/{ref}/run-lints']['get']['responses']['200']['content']['application/json']
 
-export const enrichQuery = (query: string) => `
+export const enrichLintsQuery = (query: string, exposedSchemas?: string) => {
+  const literalSchemas = exposedSchemas ? `'${exposedSchemas}'` : ''
+  return `
+set pg_stat_statements.track = none;
+set local pgrst.db_schemas = ${literalSchemas};
 -- source: dashboard
 -- user: ${'self host'}
 -- date: ${new Date().toISOString()}
 
 ${query}
 `
+}
 
 /**
  * Pulled from https://github.com/supabase/splinter/blob/main/splinter.sql
