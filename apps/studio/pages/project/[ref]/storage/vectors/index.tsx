@@ -1,4 +1,4 @@
-import { VectorsBuckets } from 'components/interfaces/Storage/VectorBuckets/VectorsBuckets'
+import { VectorsBuckets } from 'components/interfaces/Storage/VectorBuckets'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { StorageBucketsLayout } from 'components/layouts/StorageLayout/StorageBucketsLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'

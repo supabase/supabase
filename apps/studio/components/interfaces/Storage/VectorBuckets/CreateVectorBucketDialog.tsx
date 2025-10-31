@@ -1,17 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
 import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -27,38 +25,28 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from '../CreateBucketModal.utils'
 
-const FormSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, 'Please provide a name for your bucket')
-      .max(100, 'Bucket name should be below 100 characters')
-      .refine(
-        (value) => !value.endsWith(' '),
-        'The name of the bucket cannot end with a whitespace'
-      )
-      .refine(
-        (value) => value !== 'public',
-        '"public" is a reserved name. Please choose another name'
-      ),
-  })
-  .superRefine((data, ctx) => {
-    if (!validBucketNameRegex.test(data.name)) {
-      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
-      ctx.addIssue({
-        path: ['name'],
-        code: z.ZodIssueCode.custom,
-        message: !!match
-          ? `Bucket name cannot contain the "${match}" character`
-          : 'Bucket name contains an invalid special character',
-      })
-    }
-  })
+const FormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Please provide a name for your bucket')
+    .max(100, 'Bucket name should be below 100 characters')
+    .superRefine((name, ctx) => {
+      if (!validBucketNameRegex.test(name)) {
+        const [match] = name.match(inverseValidBucketNameRegex) ?? []
+        ctx.addIssue({
+          path: [],
+          code: z.ZodIssueCode.custom,
+          message: !!match
+            ? `Bucket name cannot contain the "${match}" character`
+            : 'Bucket name contains an invalid special character',
+        })
+      }
+    }),
+})
 
 const formId = 'create-storage-bucket-form'
 
@@ -66,7 +54,18 @@ export type CreateBucketForm = z.infer<typeof FormSchema>
 
 export const CreateVectorBucketDialog = () => {
   const { ref } = useParams()
-  const { mutate: createVectorBucket, isLoading: isCreating } = useVectorBucketCreateMutation()
+  const { mutate: createVectorBucket, isLoading: isCreating } = useVectorBucketCreateMutation({
+    onSuccess: (values) => {
+      toast.success(`Successfully created vector bucket ${values.name}`)
+      form.reset()
+
+      setVisible(false)
+    },
+    onError: (error) => {
+      toast.error(`Failed to create vector bucket: ${error.message}`)
+    },
+  })
+
   const [visible, setVisible] = useState(false)
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const form = useForm<CreateBucketForm>({
@@ -76,42 +75,23 @@ export const CreateVectorBucketDialog = () => {
     },
   })
 
-  // TODO: replace with proper check for wrappers extension state
-  const wrappersExtensionState = 'installed'
-
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
 
-    try {
-      await createVectorBucket({
-        projectRef: ref,
-        bucketName: values.name,
-      })
+    createVectorBucket({
+      projectRef: ref,
+      bucketName: values.name,
+    })
+  }
 
-      toast.success(`Successfully created vector bucket ${values.name}`)
+  useEffect(() => {
+    if (!visible) {
       form.reset()
-
-      setVisible(false)
-    } catch (error: any) {
-      // For other errors, show a toast as fallback
-      toast.error(`Failed to create bucket: ${error.message}`)
     }
-  }
-
-  const handleClose = () => {
-    form.reset()
-    setVisible(false)
-  }
+  }, [visible])
 
   return (
-    <Dialog
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) {
-          handleClose()
-        }
-      }}
-    >
+    <Dialog open={visible} onOpenChange={setVisible}>
       <DialogTrigger asChild>
         <ButtonTooltip
           block
@@ -170,7 +150,7 @@ export const CreateVectorBucketDialog = () => {
                 )}
               />
 
-              <Admonition type="default">
+              {/* <Admonition type="default">
                 <p>
                   Supabase will install the{' '}
                   {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
@@ -180,7 +160,7 @@ export const CreateVectorBucketDialog = () => {
                   </InlineLink>
                   .
                 </p>
-              </Admonition>
+              </Admonition> */}
             </DialogSection>
           </form>
         </Form_Shadcn_>

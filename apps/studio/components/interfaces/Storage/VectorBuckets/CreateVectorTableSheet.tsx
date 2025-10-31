@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink, Lock, Plus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -49,53 +49,45 @@ const DISTANCE_METRICS = [
   },
 ] as const
 
-const FormSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(3, 'Name must be at least 3 characters')
-      .max(63, 'Name must be below 63 characters')
-      .refine(
-        (value) => !value.endsWith(' '),
-        'The name of the bucket cannot end with a whitespace'
-      )
-      .refine(
-        (value) => value !== 'public',
-        '"public" is a reserved name. Please choose another name'
-      ),
-    targetSchema: z.string().default('tdai_data'),
-    dimension: z
-      .number({
-        required_error: 'Dimension is required',
-        invalid_type_error: 'Dimension must be a number',
-      })
-      .int('Dimension must be an integer')
-      .min(1, 'Dimension must be at least 1')
-      .max(4096, 'Dimension must be at most 4096'),
-    distanceMetric: z.enum(['cosine', 'euclidean'], {
-      required_error: 'Please select a distance metric',
-    }),
-    metadataKeys: z
-      .array(
-        z.object({
-          value: z.string().min(1, 'The metadata key needs to be at least 1 character long'),
+const FormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, 'Name must be at least 3 characters')
+    .max(63, 'Name must be below 63 characters')
+    .refine(
+      (value) => value !== 'public',
+      '"public" is a reserved name. Please choose another name'
+    )
+    .superRefine((name, ctx) => {
+      if (!BUCKET_INDEX_NAME_REGEX.test(name)) {
+        const [match] = name.match(inverseValidBucketNameRegex) ?? []
+        ctx.addIssue({
+          path: [],
+          code: z.ZodIssueCode.custom,
+          message: !!match
+            ? `Bucket name cannot contain the "${match}" character`
+            : 'Bucket name contains an invalid special character',
         })
-      )
-      .default([]),
-  })
-  .superRefine((data, ctx) => {
-    if (!BUCKET_INDEX_NAME_REGEX.test(data.name)) {
-      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
-      ctx.addIssue({
-        path: ['name'],
-        code: z.ZodIssueCode.custom,
-        message: !!match
-          ? `Bucket name cannot contain the "${match}" character`
-          : 'Bucket name contains an invalid special character',
+      }
+    }),
+  targetSchema: z.string().default(''),
+  dimension: z
+    .number()
+    .int('Dimension must be an integer')
+    .min(1, 'Dimension must be at least 1')
+    .max(4096, 'Dimension must be at most 4096'),
+  distanceMetric: z.enum(['cosine', 'euclidean'], {
+    required_error: 'Please select a distance metric',
+  }),
+  metadataKeys: z
+    .array(
+      z.object({
+        value: z.string().min(1, 'The metadata key needs to be at least 1 character long'),
       })
-    }
-  })
+    )
+    .default([]),
+})
 
 const formId = 'create-vector-table-form'
 
@@ -107,8 +99,20 @@ interface CreateVectorTableSheetProps {
 
 export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
   const { ref } = useParams()
-  const { mutateAsync: createVectorBucketTable, isLoading: isCreating } =
-    useVectorBucketIndexCreateMutation({ onError: () => {} })
+  const { mutate: createVectorBucketTable, isLoading: isCreating } =
+    useVectorBucketIndexCreateMutation({
+      onSuccess: (values) => {
+        toast.success(`Successfully created vector table ${values.name}`)
+        form.reset()
+
+        setVisible(false)
+      },
+      onError: (error) => {
+        // For other errors, show a toast as fallback
+        toast.error(`Failed to create vector table: ${error.message}`)
+      },
+    })
+
   const [visible, setVisible] = useState(false)
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const form = useForm<CreateVectorTableForm>({
@@ -129,42 +133,25 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
 
   const onSubmit: SubmitHandler<CreateVectorTableForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
+    createVectorBucketTable({
+      projectRef: ref,
+      bucketName: values.targetSchema,
+      indexName: values.name,
+      dataType: 'float32',
+      dimension: values.dimension!,
+      distanceMetric: values.distanceMetric,
+      metadataKeys: values.metadataKeys.map((key) => key.value),
+    })
+  }
 
-    try {
-      await createVectorBucketTable({
-        projectRef: ref,
-        bucketName: values.targetSchema,
-        indexName: values.name,
-        dataType: 'float32',
-        dimension: values.dimension!,
-        distanceMetric: values.distanceMetric,
-        metadataKeys: values.metadataKeys.map((key) => key.value),
-      })
-
-      toast.success(`Successfully created vector table ${values.name}`)
+  useEffect(() => {
+    if (!visible) {
       form.reset()
-
-      setVisible(false)
-    } catch (error: any) {
-      // For other errors, show a toast as fallback
-      toast.error(`Failed to create vector table: ${error.message}`)
     }
-  }
-
-  const handleClose = () => {
-    form.reset()
-    setVisible(false)
-  }
+  }, [visible])
 
   return (
-    <Sheet
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) {
-          handleClose()
-        }
-      }}
-    >
+    <Sheet open={visible} onOpenChange={setVisible}>
       <SheetTrigger asChild>
         <ButtonTooltip
           block
