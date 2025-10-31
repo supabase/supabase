@@ -26,7 +26,7 @@ import {
   PREVIEWER_DATEPICKER_HELPERS,
 } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
-import { maybeShowUpgradePrompt, maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
+import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
 import { PreviewFilterPanelWithUniversal } from './PreviewFilterPanelWithUniversal'
 import UpgradePrompt from './UpgradePrompt'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
