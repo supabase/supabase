@@ -13,7 +13,7 @@ interface AdvisorDetailProps {
 export const AdvisorDetail = ({
   item,
   projectRef,
-  onUpdateNotificationStatus,
+  onUpdateNotificationStatus = () => {},
 }: AdvisorDetailProps) => {
   if (item.source === 'lint') {
     const lint = item.original as Lint
@@ -30,7 +30,7 @@ export const AdvisorDetail = ({
       <div className="px-6 py-6">
         <NotificationDetail
           notification={notification}
-          onUpdateStatus={onUpdateNotificationStatus || (() => {})}
+          onUpdateStatus={onUpdateNotificationStatus}
         />
       </div>
     )
