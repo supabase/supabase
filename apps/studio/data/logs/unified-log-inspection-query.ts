@@ -9,7 +9,7 @@ import {
 } from 'components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { logsKeys } from './keys'
 import {
   getUnifiedLogsISOStartEnd,

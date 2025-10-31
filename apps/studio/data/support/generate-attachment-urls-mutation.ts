@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { constructHeaders } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type GenerateAttachmentURLsResponse = {
   title: string

@@ -6,7 +6,7 @@ import {
   QuerySearchParamsType,
 } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { logsKeys } from './keys'
 
 const LOGS_PAGE_LIMIT = 50
