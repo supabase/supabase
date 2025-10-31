@@ -5585,6 +5585,9 @@ export interface components {
       id: string
       secret_key: string
     }
+    CreateStorageVectorBucketBody: {
+      bucketName: string
+    }
     CreateTaxIdBody: {
       country?: string
       type: string
@@ -25280,7 +25283,9 @@ export interface operations {
   }
   StorageVectorBucketsController_getBuckets: {
     parameters: {
-      query?: never
+      query?: {
+        nextToken?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -25338,7 +25343,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateStorageVectorBucketBody']
+      }
+    }
     responses: {
       201: {
         headers: {

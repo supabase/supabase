@@ -152,7 +152,16 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
 
-    deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
+    // [Joshen] We'll need a third case to figure out for vector buckets
+    if (isStandardBucketSelected) {
+      deleteBucket({ projectRef, id: bucket.id })
+    } else {
+      if (isStorageV2) {
+        deleteAnalyticsBucket({ projectRef, id: bucket.id })
+      } else {
+        deleteBucket({ projectRef, id: bucket.id })
+      }
+    }
   }
 
   const isDeleting = isDeletingBucket || isDeletingAnalyticsBucket || isCleaningUpAnalyticsBucket
