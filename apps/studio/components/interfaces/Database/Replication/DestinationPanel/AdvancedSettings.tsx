@@ -1,4 +1,4 @@
-import type { ChangeEvent, ReactNode } from 'react'
+import type { ChangeEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 
 import {
@@ -6,30 +6,13 @@ import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
-  cn,
+  Badge,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DestinationPanelSchemaType } from './DestinationPanel.schema'
-
-const Badge = ({
-  children,
-  variant = 'default',
-}: {
-  children: ReactNode
-  variant?: 'default' | 'brand'
-}) => (
-  <span
-    className={cn(
-      'text-xs font-normal px-2 py-0.5 rounded-full',
-      variant === 'brand' ? 'text-brand-600 bg-brand-200' : 'text-foreground-lighter bg-surface-200'
-    )}
-  >
-    {children}
-  </span>
-)
 
 export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
   const { type } = form.watch()
@@ -91,7 +74,7 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
                       label={
                         <div className="flex items-center gap-2">
                           <span>Maximum staleness (minutes)</span>
-                          <Badge variant="brand">BigQuery only</Badge>
+                          <Badge>BigQuery only</Badge>
                         </div>
                       }
                       layout="vertical"
