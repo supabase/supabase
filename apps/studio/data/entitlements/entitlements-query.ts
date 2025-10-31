@@ -1,8 +1,9 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types/base'
+import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
+import { get, handleError } from 'data/fetchers'
 import { organizationKeys } from 'data/organizations/keys'
+import { UseCustomQueryOptions } from 'types'
+import { ResponseError } from 'types/base'
 
 export type EntitlementsVariables = {
   slug: string
@@ -30,7 +31,10 @@ export type EntitlementsError = ResponseError
 
 export const useEntitlementsQuery = <TData = EntitlementsData>(
   { slug }: EntitlementsVariables,
-  { enabled = true, ...options }: UseQueryOptions<EntitlementsData, EntitlementsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<EntitlementsData, EntitlementsError, TData> = {}
 ) => {
   return useQuery<EntitlementsData, EntitlementsError, TData>({
     queryKey: [organizationKeys.entitlements(slug)],

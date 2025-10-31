@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { operations } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { actionKeys } from './keys'
 
 export type ActionLogsVariables = operations['v1-get-action-run-logs']['parameters']['path']
@@ -27,7 +27,10 @@ export type WorkflowRunLogsError = ResponseError
 
 export const useActionRunLogsQuery = <TData = ActionLogsData>(
   { ref, run_id }: ActionLogsVariables,
-  { enabled = true, ...options }: UseQueryOptions<ActionLogsData, WorkflowRunLogsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ActionLogsData, WorkflowRunLogsError, TData> = {}
 ) =>
   useQuery<ActionLogsData, WorkflowRunLogsError, TData>({
     queryKey: actionKeys.detail(ref, run_id),

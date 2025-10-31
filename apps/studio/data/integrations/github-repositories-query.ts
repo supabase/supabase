@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { integrationKeys } from './keys'
 
 export async function getGitHubRepositories(signal?: AbortSignal) {
@@ -22,7 +22,7 @@ export type GitHubRepositoriesError = ResponseError
 export const useGitHubRepositoriesQuery = <TData = GitHubRepositoriesData>({
   enabled = true,
   ...options
-}: UseQueryOptions<GitHubRepositoriesData, GitHubRepositoriesError, TData> = {}) => {
+}: UseCustomQueryOptions<GitHubRepositoriesData, GitHubRepositoriesError, TData> = {}) => {
   return useQuery<GitHubRepositoriesData, GitHubRepositoriesError, TData>({
     queryKey: integrationKeys.githubRepositoriesList(),
     queryFn: ({ signal }) => getGitHubRepositories(signal),

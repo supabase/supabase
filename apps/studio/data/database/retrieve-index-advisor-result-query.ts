@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
 
 export type GetIndexAdvisorResultVariables = {
@@ -45,7 +45,7 @@ export const useGetIndexAdvisorResult = <TData = GetIndexAdvisorResultData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<GetIndexAdvisorResultData, GetIndexAdvisorResultError, TData> = {}
+  }: UseCustomQueryOptions<GetIndexAdvisorResultData, GetIndexAdvisorResultError, TData> = {}
 ) =>
   useQuery<GetIndexAdvisorResultData, GetIndexAdvisorResultError, TData>({
     queryKey: databaseKeys.indexAdvisorFromQuery(projectRef, query),
