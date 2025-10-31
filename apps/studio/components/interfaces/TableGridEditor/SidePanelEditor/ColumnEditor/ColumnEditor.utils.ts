@@ -4,15 +4,15 @@ import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { uuidv4 } from 'lib/helpers'
+import { toast } from 'sonner'
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
-import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
-import { toast } from 'sonner'
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -136,10 +136,10 @@ export const generateUpdateColumnPayload = (
     payload.name = name
   }
   if (!isEqual(originalColumn.comment?.trim(), comment)) {
-    payload.comment = comment || null
+    payload.comment = comment
   }
   if (!isEqual(originalColumn.check?.trim(), check)) {
-    payload.check = check || null
+    payload.check = check
   }
 
   if (!isEqual(originalColumn.format, type)) {

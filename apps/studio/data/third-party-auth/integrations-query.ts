@@ -36,11 +36,9 @@ export const useThirdPartyAuthIntegrationsQuery = <TData = ThirdPartyAuthIntegra
     ...options
   }: UseQueryOptions<ThirdPartyAuthIntegrationsData, ResponseError, TData> = {}
 ) =>
-  useQuery<ThirdPartyAuthIntegrationsData, ResponseError, TData>(
-    keys.integrations(projectRef),
-    ({ signal }) => getThirdPartyAuthIntegrations({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ThirdPartyAuthIntegrationsData, ResponseError, TData>({
+    queryKey: keys.integrations(projectRef),
+    queryFn: ({ signal }) => getThirdPartyAuthIntegrations({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

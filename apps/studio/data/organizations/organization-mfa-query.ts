@@ -31,11 +31,9 @@ export const useOrganizationMfaQuery = <TData = boolean>(
   { slug }: OrganizationMfaVariables,
   { enabled = true, ...options }: UseQueryOptions<boolean, OrganizationMfaError, TData> = {}
 ) =>
-  useQuery<boolean, OrganizationMfaError, TData>(
-    organizationKeys.mfa(slug),
-    ({ signal }) => getOrganizationMfaEnforcement({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<boolean, OrganizationMfaError, TData>({
+    queryKey: organizationKeys.mfa(slug),
+    queryFn: ({ signal }) => getOrganizationMfaEnforcement({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

@@ -12,7 +12,7 @@ import { useOrganizationProjectClaimMutation } from 'data/organizations/organiza
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
 import { projectKeys } from 'data/projects/keys'
 import { BASE_PATH } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import {
   Button,
   cn,
@@ -41,13 +41,14 @@ export const ProjectClaimConfirm = ({
   const queryClient = useQueryClient()
 
   const { mutateAsync: approveRequest, isLoading: isApproving } =
-    useApiAuthorizationApproveMutation()
+    useApiAuthorizationApproveMutation({ onError: () => {} })
 
   const { mutateAsync: claimProject, isLoading: isClaiming } = useOrganizationProjectClaimMutation()
 
   const onClaimProject = async () => {
     try {
       const response = await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
+
       await claimProject({
         slug: selectedOrganization.slug,
         token: claimToken!,
@@ -60,7 +61,7 @@ export const ProjectClaimConfirm = ({
         window.location.href = url.toString()
       } catch {
         // invalidate the org projects to force them to be refetched
-        queryClient.invalidateQueries(projectKeys.list())
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() })
         router.push(`/org/${selectedOrganization.slug}`)
       }
     } catch (error: any) {

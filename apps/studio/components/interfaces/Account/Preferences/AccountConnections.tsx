@@ -1,4 +1,3 @@
-import { Github } from 'lucide-react'
 import Image from 'next/image'
 
 import Panel from 'components/ui/Panel'
@@ -8,7 +7,7 @@ import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { Badge, Button, cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
-const AccountConnections = () => {
+export const AccountConnections = () => {
   const {
     data: gitHubAuthorization,
     isLoading,
@@ -78,5 +77,3 @@ const AccountConnections = () => {
     </Panel>
   )
 }
-
-export { AccountConnections }

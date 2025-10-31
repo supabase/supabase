@@ -22,9 +22,10 @@ export const useNotificationsArchiveAllMutation = ({
   ...options
 }: Omit<UseMutationOptions<NotificationsArchiveAllData, ResponseError>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<NotificationsArchiveAllData, ResponseError>(() => archiveAllNotifications(), {
+  return useMutation<NotificationsArchiveAllData, ResponseError>({
+    mutationFn: () => archiveAllNotifications(),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(notificationKeys.list())
+      await queryClient.invalidateQueries({ queryKey: notificationKeys.list() })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -90,23 +90,23 @@ export const FormContents = ({
     if (values.http_url && isEdgeFunctionSelected) {
       const fnSlug = values.http_url.split('/').at(-1)
       const fn = functions.find((x) => x.slug === fnSlug)
+      const authorizationHeader = httpHeaders.find((x) => x.name === 'Authorization')
+      const edgeFunctionAuthHeaderVal = `Bearer ${legacyServiceRole}`
 
-      if (fn?.verify_jwt) {
-        if (!httpHeaders.some((x) => x.name === 'Authorization')) {
-          const authorizationHeader = {
-            id: uuidv4(),
-            name: 'Authorization',
-            value: `Bearer ${legacyServiceRole}`,
-          }
-          setHttpHeaders([...httpHeaders, authorizationHeader])
+      if (fn?.verify_jwt && authorizationHeader == null) {
+        const authorizationHeader = {
+          id: uuidv4(),
+          name: 'Authorization',
+          value: edgeFunctionAuthHeaderVal,
         }
-      } else {
-        const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
+        setHttpHeaders([...httpHeaders, authorizationHeader])
+      } else if (fn?.verify_jwt && authorizationHeader?.value !== edgeFunctionAuthHeaderVal) {
+        const updatedHttpHeaders = httpHeaders.map((x) => {
+          if (x.name === 'Authorization') return { ...x, value: edgeFunctionAuthHeaderVal }
+          else return x
+        })
         setHttpHeaders(updatedHttpHeaders)
       }
-    } else {
-      const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
-      setHttpHeaders(updatedHttpHeaders)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.http_url, isSuccessEdgeFunctions])

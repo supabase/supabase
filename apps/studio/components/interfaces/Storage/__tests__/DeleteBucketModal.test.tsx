@@ -12,8 +12,8 @@ import { routerMock } from 'tests/lib/route-mock'
 import { DeleteBucketModal } from '../DeleteBucketModal'
 
 const bucket: Bucket = {
-  id: faker.string.uuid(),
-  name: `test`,
+  id: 'test',
+  name: 'test',
   owner: faker.string.uuid(),
   public: faker.datatype.boolean(),
   allowed_mime_types: faker.helpers.multiple(() => faker.system.mimeType(), {

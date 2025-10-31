@@ -39,11 +39,9 @@ export const useAuthorizedAppsQuery = <TData = AuthorizedAppsData>(
     ...options
   }: UseQueryOptions<AuthorizedAppsData, AuthorizedAppsError, TData> = {}
 ) =>
-  useQuery<AuthorizedAppsData, AuthorizedAppsError, TData>(
-    oauthAppKeys.authorizedApps(slug),
-    ({ signal }) => getAuthorizedApps({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<AuthorizedAppsData, AuthorizedAppsError, TData>({
+    queryKey: oauthAppKeys.authorizedApps(slug),
+    queryFn: ({ signal }) => getAuthorizedApps({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

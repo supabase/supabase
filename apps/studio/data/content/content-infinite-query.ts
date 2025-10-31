@@ -50,14 +50,12 @@ export const useContentInfiniteQuery = <TData = ContentData>(
   { projectRef, type, name, limit, sort }: GetContentVariables,
   { enabled = true, ...options }: UseInfiniteQueryOptions<ContentData, ContentError, TData> = {}
 ) => {
-  return useInfiniteQuery<ContentData, ContentError, TData>(
-    contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery<ContentData, ContentError, TData>({
+    queryKey: contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
+    queryFn: ({ signal, pageParam }) =>
       getContent({ projectRef, type, name, limit, sort, cursor: pageParam }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam: (lastPage) => lastPage.cursor,
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    getNextPageParam: (lastPage) => lastPage.cursor,
+    ...options,
+  })
 }

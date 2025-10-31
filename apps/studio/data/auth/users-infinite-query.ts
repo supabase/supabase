@@ -43,9 +43,9 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useInfiniteQuery<UsersData, UsersError, TData>(
-    authKeys.usersInfinite(projectRef, { keywords, filter, providers, sort, order }),
-    ({ signal, pageParam }) => {
+  return useInfiniteQuery<UsersData, UsersError, TData>({
+    queryKey: authKeys.usersInfinite(projectRef, { keywords, filter, providers, sort, order }),
+    queryFn: ({ signal, pageParam }) => {
       return executeSql(
         {
           projectRef,
@@ -66,21 +66,19 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
         signal
       )
     },
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-      getNextPageParam(lastPage, pages) {
-        const hasNextPage = lastPage.result.length >= USERS_PAGE_LIMIT
-        if (column) {
-          const lastItem = lastPage.result[lastPage.result.length - 1]
-          if (hasNextPage && lastItem) return lastItem[column]
-          return undefined
-        } else {
-          const page = pages.length
-          if (!hasNextPage) return undefined
-          return page
-        }
-      },
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    getNextPageParam(lastPage, pages) {
+      const hasNextPage = lastPage.result.length >= USERS_PAGE_LIMIT
+      if (column) {
+        const lastItem = lastPage.result[lastPage.result.length - 1]
+        if (hasNextPage && lastItem) return lastItem[column]
+        return undefined
+      } else {
+        const page = pages.length
+        if (!hasNextPage) return undefined
+        return page
+      }
+    },
+    ...options,
+  })
 }

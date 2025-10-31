@@ -50,21 +50,20 @@ export const useProjectDailyStatsQuery = <TData = ProjectDailyStatsData>(
     ...options
   }: UseQueryOptions<ProjectDailyStatsData, ProjectDailyStatsError, TData> = {}
 ) =>
-  useQuery<ProjectDailyStatsData, ProjectDailyStatsError, TData>(
-    analyticsKeys.infraMonitoring(projectRef, {
+  useQuery<ProjectDailyStatsData, ProjectDailyStatsError, TData>({
+    queryKey: analyticsKeys.infraMonitoring(projectRef, {
       attribute,
       startDate,
       endDate,
     }),
-    ({ signal }) => getProjectDailyStats({ projectRef, attribute, startDate, endDate }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof attribute !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined',
-      staleTime: 1000 * 60 * 30, // default good for 30m, stats only refresh once a day
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) =>
+      getProjectDailyStats({ projectRef, attribute, startDate, endDate }, signal),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof attribute !== 'undefined' &&
+      typeof startDate !== 'undefined' &&
+      typeof endDate !== 'undefined',
+    staleTime: 1000 * 60 * 30,
+    ...options,
+  })

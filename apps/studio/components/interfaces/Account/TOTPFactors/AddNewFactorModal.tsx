@@ -128,7 +128,9 @@ const SecondStep = ({
     },
     onSuccess: async () => {
       if (lastVisitedOrganization) {
-        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+        await queryClient.invalidateQueries({
+          queryKey: organizationKeys.members(lastVisitedOrganization),
+        })
       }
       toast.success(`Successfully added a second factor authentication`)
       onClose()

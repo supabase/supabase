@@ -280,11 +280,14 @@ export const QueryPerformanceGrid = ({
         }
 
         if (col.id === 'cache_hit_rate') {
+          const numericValue = typeof value === 'number' ? value : parseFloat(value)
           return (
             <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
-              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
-                <p className={cn(value.toFixed(2) === '0.00' && 'text-foreground-lighter')}>
-                  {value.toLocaleString(undefined, {
+              {typeof numericValue === 'number' &&
+              !isNaN(numericValue) &&
+              isFinite(numericValue) ? (
+                <p className={cn(numericValue.toFixed(2) === '0.00' && 'text-foreground-lighter')}>
+                  {numericValue.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
