@@ -23,6 +23,7 @@ import {
   Badge,
   Button,
   Card,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -30,6 +31,12 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateBucketModal } from './CreateBucketModal'
@@ -38,6 +45,128 @@ import { EditBucketModal } from './EditBucketModal'
 import { EmptyBucketModal } from './EmptyBucketModal'
 import { EmptyBucketState } from './EmptyBucketState'
 import { STORAGE_BUCKET_SORT } from './Storage.constants'
+
+type BucketTableMode = 'standard' | 'virtualized'
+
+type BucketTableHeaderProps = {
+  mode: BucketTableMode
+}
+
+const BucketTableHeader = ({ mode }: BucketTableHeaderProps) => {
+  const BucketTableHeader = mode === 'standard' ? TableHeader : VirtualizedTableHeader
+  const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
+  const BucketTableHead = mode === 'standard' ? TableHead : VirtualizedTableHead
+
+  const stickyClasses = 'sticky top-0 z-10 bg-200'
+
+  return (
+    <BucketTableHeader>
+      <BucketTableRow>
+        <BucketTableHead className={cn('w-[280px]', stickyClasses)}>Name</BucketTableHead>
+        <BucketTableHead className={stickyClasses}>Policies</BucketTableHead>
+        <BucketTableHead className={stickyClasses}>File size limit</BucketTableHead>
+        <BucketTableHead className={stickyClasses}>Allowed MIME types</BucketTableHead>
+        <BucketTableHead className={stickyClasses}>
+          <span className="sr-only">Actions</span>
+        </BucketTableHead>
+      </BucketTableRow>
+    </BucketTableHeader>
+  )
+}
+
+type BucketTableEmptyStateProps = {
+  mode: BucketTableMode
+  filterString: string
+}
+
+const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptyStateProps) => {
+  const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
+  const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
+
+  return (
+    <BucketTableRow className="[&>td]:hover:bg-inherit">
+      <BucketTableCell colSpan={5}>
+        <p className="text-sm text-foreground">No results found</p>
+        <p className="text-sm text-foreground-light">
+          Your search for "{filterString}" did not return any results
+        </p>
+      </BucketTableCell>
+    </BucketTableRow>
+  )
+}
+
+type BucketTableRowProps = {
+  mode: BucketTableMode
+  bucket: Bucket
+  projectRef: string
+  formattedGlobalUploadLimit: string
+  getPolicyCount: (bucketName: string) => number
+  setSelectedBucket: (bucket: Bucket) => void
+  setModal: (modal: 'edit' | 'empty' | 'delete' | null) => void
+}
+
+const BucketTableRow = ({
+  mode,
+  bucket,
+  projectRef,
+  formattedGlobalUploadLimit,
+  getPolicyCount,
+  setSelectedBucket,
+  setModal,
+}: BucketTableRowProps) => {
+  const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
+  const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
+
+  return (
+    <BucketTableRow key={bucket.id}>
+      <BucketTableCell>
+        <div className="flex items-center gap-2">
+          <p title={bucket.id} className="text-foreground truncate max-w-[240px]">
+            {bucket.id}
+          </p>
+          {bucket.public && <Badge variant="warning">Public</Badge>}
+        </div>
+      </BucketTableCell>
+
+      <BucketTableCell>
+        <p className="text-foreground-light">{getPolicyCount(bucket.id)}</p>
+      </BucketTableCell>
+
+      <BucketTableCell>
+        <p className={bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'}>
+          {bucket.file_size_limit
+            ? formatBytes(bucket.file_size_limit)
+            : `Unset (${formattedGlobalUploadLimit})`}
+        </p>
+      </BucketTableCell>
+
+      <BucketTableCell>
+        <p
+          className={bucket.allowed_mime_types ? 'text-foreground-light' : 'text-foreground-muted'}
+        >
+          {bucket.allowed_mime_types ? bucket.allowed_mime_types.join(', ') : 'Any'}
+        </p>
+      </BucketTableCell>
+
+      <BucketTableCell>
+        <div className="flex justify-end gap-2">
+          <Button asChild type="default">
+            <Link
+              href={`/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
+            >
+              View files
+            </Link>
+          </Button>
+          <BucketDropdownMenu
+            bucket={bucket}
+            setSelectedBucket={setSelectedBucket}
+            setModal={setModal}
+          />
+        </div>
+      </BucketTableCell>
+    </BucketTableRow>
+  )
+}
 
 type BucketDropdownMenuProps = {
   bucket: Bucket
@@ -99,7 +228,45 @@ type BucketsTableProps = {
   getPolicyCount: (bucketName: string) => number
 }
 
-const BucketsTable = ({
+const BucketsTableUnvirtualized = ({
+  buckets,
+  projectRef,
+  filterString,
+  formattedGlobalUploadLimit,
+  setSelectedBucket,
+  setModal,
+  getPolicyCount,
+}: BucketsTableProps) => {
+  const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
+
+  return (
+    <Table
+      containerProps={{ containerClassName: 'h-full overflow-auto', className: 'overflow-visible' }}
+    >
+      <BucketTableHeader mode="standard" />
+      <TableBody>
+        {showSearchEmptyState ? (
+          <BucketTableEmptyState mode="standard" filterString={filterString} />
+        ) : (
+          buckets.map((bucket) => (
+            <BucketTableRow
+              mode="standard"
+              key={bucket.id}
+              bucket={bucket}
+              projectRef={projectRef}
+              formattedGlobalUploadLimit={formattedGlobalUploadLimit}
+              getPolicyCount={getPolicyCount}
+              setSelectedBucket={setSelectedBucket}
+              setModal={setModal}
+            />
+          ))
+        )}
+      </TableBody>
+    </Table>
+  )
+}
+
+const BucketsTableVirtualized = ({
   buckets,
   projectRef,
   filterString,
@@ -112,89 +279,38 @@ const BucketsTable = ({
 
   return (
     <VirtualizedTable data={buckets} estimateSize={() => 59} getItemKey={(bucket) => bucket.id}>
-      <VirtualizedTableHeader>
-        <VirtualizedTableRow>
-          <VirtualizedTableHead className="w-[280px]">Name</VirtualizedTableHead>
-          <VirtualizedTableHead>Policies</VirtualizedTableHead>
-          <VirtualizedTableHead>File size limit</VirtualizedTableHead>
-          <VirtualizedTableHead>Allowed MIME types</VirtualizedTableHead>
-          <VirtualizedTableHead>
-            <span className="sr-only">Actions</span>
-          </VirtualizedTableHead>
-        </VirtualizedTableRow>
-      </VirtualizedTableHeader>
+      <BucketTableHeader mode="virtualized" />
       <VirtualizedTableBody<Bucket>
         paddingColSpan={5}
         emptyContent={
           showSearchEmptyState ? (
-            <VirtualizedTableRow className="[&>td]:hover:bg-inherit">
-              <VirtualizedTableCell colSpan={5}>
-                <p className="text-sm text-foreground">No results found</p>
-                <p className="text-sm text-foreground-light">
-                  Your search for "{filterString}" did not return any results
-                </p>
-              </VirtualizedTableCell>
-            </VirtualizedTableRow>
+            <BucketTableEmptyState mode="virtualized" filterString={filterString} />
           ) : undefined
         }
       >
         {(bucket) => (
-          <VirtualizedTableRow key={bucket.id}>
-            <VirtualizedTableCell>
-              <div className="flex items-center gap-2">
-                <p title={bucket.id} className="text-foreground truncate max-w-[240px]">
-                  {bucket.id}
-                </p>
-                {bucket.public && <Badge variant="warning">Public</Badge>}
-              </div>
-            </VirtualizedTableCell>
-
-            <VirtualizedTableCell>
-              <p className="text-foreground-light">{getPolicyCount(bucket.id)}</p>
-            </VirtualizedTableCell>
-
-            <VirtualizedTableCell>
-              <p
-                className={
-                  bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'
-                }
-              >
-                {bucket.file_size_limit
-                  ? formatBytes(bucket.file_size_limit)
-                  : `Unset (${formattedGlobalUploadLimit})`}
-              </p>
-            </VirtualizedTableCell>
-
-            <VirtualizedTableCell>
-              <p
-                className={
-                  bucket.allowed_mime_types ? 'text-foreground-light' : 'text-foreground-muted'
-                }
-              >
-                {bucket.allowed_mime_types ? bucket.allowed_mime_types.join(', ') : 'Any'}
-              </p>
-            </VirtualizedTableCell>
-
-            <VirtualizedTableCell>
-              <div className="flex justify-end gap-2">
-                <Button asChild type="default">
-                  <Link
-                    href={`/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
-                  >
-                    View files
-                  </Link>
-                </Button>
-                <BucketDropdownMenu
-                  bucket={bucket}
-                  setSelectedBucket={setSelectedBucket}
-                  setModal={setModal}
-                />
-              </div>
-            </VirtualizedTableCell>
-          </VirtualizedTableRow>
+          <BucketTableRow
+            mode="virtualized"
+            key={bucket.id}
+            bucket={bucket}
+            projectRef={projectRef}
+            formattedGlobalUploadLimit={formattedGlobalUploadLimit}
+            getPolicyCount={getPolicyCount}
+            setSelectedBucket={setSelectedBucket}
+            setModal={setModal}
+          />
         )}
       </VirtualizedTableBody>
     </VirtualizedTable>
+  )
+}
+
+const BucketsTable = (props: BucketsTableProps) => {
+  const isVirtualized = props.buckets.length > 50
+  return isVirtualized ? (
+    <BucketsTableVirtualized {...props} />
+  ) : (
+    <BucketsTableUnvirtualized {...props} />
   )
 }
 

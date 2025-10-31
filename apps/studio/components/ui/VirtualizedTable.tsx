@@ -228,7 +228,7 @@ export const VirtualizedTableHead = forwardRef<
   HTMLTableCellElement,
   React.ComponentProps<typeof TableHead>
 >(({ className, ...props }, ref) => {
-  return <TableHead ref={ref} className={cn('sticky top-0 z-10', className)} {...props} />
+  return <TableHead ref={ref} className={cn('sticky top-0 z-10 bg-200', className)} {...props} />
 })
 VirtualizedTableHead.displayName = 'VirtualizedTableHead'
 
