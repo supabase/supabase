@@ -1,10 +1,8 @@
 import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
 import { useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import CardButton from 'components/ui/CardButton'
 import Panel from 'components/ui/Panel'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
@@ -27,6 +25,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { LogDrainsCard } from './LogDrainsCard'
+import { VoteLink } from './VoteLink'
 
 export function LogDrains({
   onNewDrainClick,
@@ -82,29 +81,23 @@ export function LogDrains({
 
   if (!isLoading && !hasLogDrains) {
     return (
-      <div className="grid lg:grid-cols-3 gap-3">
-        {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
-          // <CardButton
-          //   key={src.value}
-          //   title={src.name}
-          //   description={src.description}
-          //   icon={src.icon}
-          //   onClick={() => {
-          //     onNewDrainClick(src.value)
-          //   }}
-          // />
-          <LogDrainsCard
-            key={src.value}
-            title={src.name}
-            description={src.description}
-            icon={src.icon}
-            subheading="Additional $60"
-            onClick={() => {
-              onNewDrainClick(src.value)
-            }}
-          />
-        ))}
-      </div>
+      <>
+        <div className="grid lg:grid-cols-2 gap-3">
+          {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
+            <LogDrainsCard
+              key={src.value}
+              title={src.name}
+              description={src.description}
+              icon={src.icon}
+              subheading="Additional $60"
+              onClick={() => {
+                onNewDrainClick(src.value)
+              }}
+            />
+          ))}
+        </div>
+        <VoteLink />
+      </>
     )
   }
 

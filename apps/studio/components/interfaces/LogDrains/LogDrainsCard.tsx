@@ -1,6 +1,4 @@
-import { Card, Button, cn } from 'ui'
-import { Datadog, Grafana, Sentry } from 'icons'
-import { BracesIcon } from 'lucide-react'
+import { Card } from 'ui'
 
 interface LogDrainsCardProps {
   title: string
@@ -19,7 +17,7 @@ export const LogDrainsCard = ({
 }: LogDrainsCardProps) => {
   return (
     <button className="w-full h-full text-left" onClick={onClick}>
-      <Card className="p-6 cursor-pointer hover:bg-surface-200 transition-colors h-full">
+      <Card className="p-6 cursor-pointer hover:bg-surface-200 hover:border-strong transition-colors h-48">
         <div className="flex flex-col gap-5">
           <div className="flex items-start justify-between w-full">
             <div>{icon}</div>
