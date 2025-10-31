@@ -142,13 +142,15 @@ const BucketsTable = ({
           <VirtualizedTableRow key={bucket.id}>
             <VirtualizedTableCell>
               <div className="flex items-center gap-2">
-                <p className="text-foreground">{bucket.name}</p>
+                <p title={bucket.id} className="text-foreground truncate max-w-[240px]">
+                  {bucket.id}
+                </p>
                 {bucket.public && <Badge variant="warning">Public</Badge>}
               </div>
             </VirtualizedTableCell>
 
             <VirtualizedTableCell>
-              <p className="text-foreground-light">{getPolicyCount(bucket.name)}</p>
+              <p className="text-foreground-light">{getPolicyCount(bucket.id)}</p>
             </VirtualizedTableCell>
 
             <VirtualizedTableCell>
@@ -216,14 +218,14 @@ export const FilesBuckets = () => {
     .filter((bucket) =>
       filterString.length === 0
         ? true
-        : bucket.name.toLowerCase().includes(filterString.toLowerCase())
+        : bucket.id.toLowerCase().includes(filterString.toLowerCase())
     )
 
   const sortedFilesBuckets = useMemo(
     () =>
       snap.sortBucket === 'alphabetical'
         ? filesBuckets.sort((a, b) =>
-            a.name.toLowerCase().trim().localeCompare(b.name.toLowerCase().trim())
+            a.id.toLowerCase().trim().localeCompare(b.id.toLowerCase().trim())
           )
         : filesBuckets.sort((a, b) => (new Date(b.created_at) > new Date(a.created_at) ? 1 : -1)),
     [filesBuckets, snap.sortBucket]
