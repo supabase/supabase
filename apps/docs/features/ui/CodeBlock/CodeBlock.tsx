@@ -71,19 +71,29 @@ export async function CodeBlock({
         className
       )}
     >
-      <pre className="py-6">
+      <pre>
         <code className={lineNumbers ? 'grid grid-cols-[auto_1fr]' : ''}>
           {lineNumbers ? (
-            tokens.map((line, idx) => (
-              <Fragment key={idx}>
-                <div className="select-none text-right text-muted bg-control px-2 min-h-5 leading-5">
-                  {idx + 1}
-                </div>
-                <div className="code-content min-h-5 leading-5 pl-6 pr-6">
-                  <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
-                </div>
-              </Fragment>
-            ))
+            <>
+              {tokens.map((line, idx) => (
+                <Fragment key={idx}>
+                  <div className={cn(
+                    "select-none text-right text-muted bg-control px-2 min-h-5 leading-5",
+                    idx === 0 && "pt-6",
+                    idx === tokens.length - 1 && "pb-6"
+                  )}>
+                    {idx + 1}
+                  </div>
+                  <div className={cn(
+                    "code-content min-h-5 leading-5 pl-6 pr-6",
+                    idx === 0 && "pt-6",
+                    idx === tokens.length - 1 && "pb-6"
+                  )}>
+                    <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
+                  </div>
+                </Fragment>
+              ))}
+            </>
           ) : (
             <div className="code-content p-6">
               {tokens.map((line, idx) => (
