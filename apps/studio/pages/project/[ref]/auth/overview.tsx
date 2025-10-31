@@ -5,18 +5,29 @@ import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import { DOCS_URL } from 'lib/constants'
-import { OverviewUsage } from 'components/interfaces/Auth/Overview/OverviewUsage'
+import { OverviewMetrics } from 'components/interfaces/Auth/Overview/OverviewMetrics'
 import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
-import { OverviewMonitoring } from 'components/interfaces/Auth/Overview/OverviewMonitoring'
 import { useRouter } from 'next/router'
 import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { useContext, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { fetchAllAuthMetrics } from 'components/interfaces/Auth/Overview/OverviewUsage.constants'
 
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
   const authOverviewPageEnabled = useFlag('authOverviewPage')
+
+  const {
+    data: metrics,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['auth-metrics', ref],
+    queryFn: () => fetchAllAuthMetrics(ref as string),
+    enabled: !!ref,
+  })
 
   useEffect(() => {
     if (hasLoaded && !authOverviewPageEnabled) {
@@ -32,8 +43,8 @@ const AuthOverview: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer size="large">
       <div className="mb-4 flex flex-col gap-2">
-        <OverviewUsage />
-        <OverviewMonitoring />
+        <pre>{JSON.stringify(metrics, null, 2)}</pre>
+        <OverviewMetrics metrics={metrics} isLoading={isLoading} error={error} />
         <OverviewLearnMore />
       </div>
     </ScaffoldContainer>
