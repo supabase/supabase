@@ -27,7 +27,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   useEffect(() => {
-    if (activeSidebar) {
+    if (!!project && activeSidebar) {
       // add event tracking
       sendEvent({
         action: 'sidebar_opened',
