@@ -20,6 +20,7 @@ import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
+import { ResponseError } from 'types'
 
 export interface GetTableRowsArgs {
   table?: SupaTable
@@ -42,6 +43,27 @@ const getDefaultOrderByColumns = (table: SupaTable) => {
   }
 }
 
+function getErrorCode(error: any): number | undefined {
+  // Our custom ResponseError's use 'code' instead of 'status'
+  if (error instanceof ResponseError) {
+    return error.code
+  }
+  return error.status
+}
+
+function getRetryAfter(error: any): number | undefined {
+  if (error instanceof ResponseError) {
+    return error.retryAfter
+  }
+
+  const headerRetry = error.headers?.get('retry-after')
+  if (headerRetry) {
+    return parseInt(headerRetry)
+  }
+
+  return undefined
+}
+
 async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -54,12 +76,13 @@ export async function executeWithRetry<T>(
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn()
-    } catch (error: any) {
-      // Our custom ResponseError's use 'code' instead of 'status'
-      if ((error?.status ?? error?.code) === 429 && attempt < maxRetries) {
+    } catch (error: unknown) {
+      const errorCode = getErrorCode(error)
+      if (errorCode === 429 && attempt < maxRetries) {
         // Get retry delay from headers or use exponential backoff (1s, then 2s, then 4s)
-        const retryAfter = error.headers?.get('retry-after')
-        const delayMs = retryAfter ? parseInt(retryAfter) * 1000 : baseDelay * Math.pow(2, attempt)
+        const retryAfter = getRetryAfter(error)
+        const delayMs = retryAfter ? retryAfter * 1000 : baseDelay * Math.pow(2, attempt)
+
         await sleep(delayMs)
         continue
       }
