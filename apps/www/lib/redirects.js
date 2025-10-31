@@ -1299,13 +1299,13 @@ module.exports = [
     destination: '/docs/guides/auth/auth-helpers/auth-ui',
   },
   {
-    permanent: true,
+    permanent: false,
     source: '/docs/guides/auth/server-side/nextjs',
     destination:
       '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs',
   },
   {
-    permanent: true,
+    permanent: false,
     source: '/docs/guides/auth/server-side/sveltekit',
     destination:
       '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=sveltekit',

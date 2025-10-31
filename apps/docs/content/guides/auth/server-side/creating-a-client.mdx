@@ -172,9 +172,6 @@ The middleware is responsible for:
 2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
 3. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
 
-{/* TODO: Admonition or etc */}
-The following code samples are for App Router. For help with Pages Router, see the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs?queryGroups=router&router=pages).
-
 <Accordion>
 
     <AccordionItem
@@ -204,6 +201,8 @@ The following code samples are for App Router. For help with Pages Router, see t
 
 </Accordion>
 
+Create a `utils/supabase` folder at the root of your project, or inside the `./src` folder if you are using one, with a file for each type of client. Then copy the utility functions for each client type.
+
 <div className="mt-12">
   <$CodeTabs>
     <$CodeSample
@@ -220,8 +219,6 @@ The following code samples are for App Router. For help with Pages Router, see t
 </div>
 
 ### Hook up middleware
-
-Create a `utils/supabase` folder at the root of your project, or inside the `./src` folder if you are using one, with a file for each type of client. Then copy the utility functions for each client type.
 
 The code adds a [matcher](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths) so the middleware doesn't run on routes that don't access Supabase.
 
@@ -251,6 +248,17 @@ It's safe to trust `getClaims()` because it sends a request to the Supabase Auth
     />
   </$CodeTabs>
 </div>
+
+## Congratulations
+
+You're done! To recap, you've successfully:
+
+- Called Supabase from a Server Action.
+- Called Supabase from a Server Component.
+- Set up a Supabase client utility to call Supabase from a Client Component. You can use this if you need to call Supabase from a Client Component, for example to set up a realtime subscription.
+- Set up middleware to automatically refresh the Supabase Auth session.
+
+You can now use any Supabase features from your client or server code!
 
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
@@ -296,6 +304,15 @@ meta="name=src/routes/+layout.server.ts"
 language="typescript"
 />
 </$CodeTabs>
+
+## Congratulations
+
+You're done! To recap, you've successfully:
+
+- Set up server-side hooks to create a request-specific Supabase client and guard protected pages.
+- Created a Supabase client in your root layout to use on both the client and server.
+
+You can now use any Supabase features from your client or server code!
 
 </TabPanel>
 <TabPanel id="astro" label="Astro">
@@ -418,6 +435,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
 </TabPanel>
 </Tabs>
 
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
 </TabPanel>
 <TabPanel id="remix" label="Remix">
 
@@ -524,6 +545,10 @@ export default function Index() {
 </TabPanel>
 </Tabs>
 
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
 </TabPanel>
 
 <TabPanel id="react-router" label="React Router">
@@ -623,6 +648,10 @@ export default function Index() {
 </TabPanel>
 </Tabs>
 
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
 </TabPanel>
 
 <TabPanel id="express" label="Express">
@@ -677,6 +706,10 @@ app.post("/hello-world", async function (req, res, next) {
 </TabPanel>
 </Tabs>
 
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
 </TabPanel>
 
 <TabPanel id="hono" label="Hono">
@@ -714,17 +747,6 @@ language="typescript"
 
 </TabPanel>
 </Tabs>
-
-## Congratulations
-
-You're done! To recap, you've successfully:
-
-- Called Supabase from a Server Action.
-- Called Supabase from a Server Component.
-- Set up a Supabase client utility to call Supabase from a Client Component. You can use this if you need to call Supabase from a Client Component, for example to set up a realtime subscription.
-- Set up middleware to automatically refresh the Supabase Auth session.
-
-You can now use any Supabase features from your client or server code!
 
 ## Next steps
 
