@@ -11,10 +11,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
-      // [Joshen] JFYI it seems like the exposed schemas is being hardcoded for self-host here
-      // https://github.com/supabase/supabase/blob/master/apps/studio/pages/api/platform/projects/%5Bref%5D/config/postgrest.ts#L23
-      // Not exactly sure if that's supposed to be the case but if it's meant to be configured dynamically somewhere
-      // we should update in config/postgrest.ts and here
+      /**
+       * [Joshen] JFYI technically the exposed schemas is being set here via docker-compose.yml
+       * https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml#L183
+       * https://github.com/supabase/supabase/blob/474a78721e510301d15ca9dbd41f05ce10fa29e5/docker/.env.example#L55
+       *
+       * But i noticed that the local API route on config/postgrest.ts has currently hardcoded db_schema to `public, storage`
+       * As such, this is only just a temporary patch here that we're hardcoding the exposed schemas but we will need to figure
+       * out how to get the dashboard to retrieve the values from docker-compose
+       */
       const { data, error } = await getLints({
         headers: constructHeaders(req.headers),
         exposedSchemas: 'public, storage',
