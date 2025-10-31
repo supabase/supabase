@@ -44,23 +44,6 @@ export const NotificationDetail = ({ notification, onUpdateStatus }: Notificatio
                 {organization.name}
               </Link>
             )}
-            {organization !== undefined && project !== undefined && (
-              <span className="text-foreground-lighter">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                  shapeRendering="geometricPrecision"
-                >
-                  <path d="M16 3.549L7.12 20.600"></path>
-                </svg>
-              </span>
-            )}
             {project !== undefined && (
               <Link
                 title={project.name}

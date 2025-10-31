@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
@@ -57,12 +58,11 @@ export const AdvisorPanel = () => {
     setSelectedItem,
     notificationFilterStatuses,
     notificationFilterPriorities,
-    notificationFilterOrganizations,
-    notificationFilterProjects,
     setNotificationFilters,
     resetNotificationFilters,
   } = useAdvisorStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
   const isSidebarOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
@@ -92,13 +92,14 @@ export const AdvisorPanel = () => {
   }, [notificationFilterStatuses])
 
   // Memoize filters to prevent query key changes on every render
+  // Use selected organization and project if they exist
   const notificationFilters = useMemo(
     () => ({
       priority: notificationFilterPriorities,
-      organizations: notificationFilterOrganizations,
-      projects: notificationFilterProjects,
+      organizations: selectedOrganization?.slug ? [selectedOrganization.slug] : [],
+      projects: project?.ref ? [project.ref] : [],
     }),
-    [notificationFilterPriorities, notificationFilterOrganizations, notificationFilterProjects]
+    [notificationFilterPriorities, selectedOrganization?.slug, project?.ref]
   )
 
   const {

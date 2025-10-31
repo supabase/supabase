@@ -12,15 +12,8 @@ const initialState = {
   // Notification filters
   notificationFilterStatuses: [] as string[],
   notificationFilterPriorities: [] as string[],
-  notificationFilterOrganizations: [] as string[],
-  notificationFilterProjects: [] as string[],
   get numNotificationFiltersApplied() {
-    return [
-      ...this.notificationFilterStatuses,
-      ...this.notificationFilterPriorities,
-      ...this.notificationFilterOrganizations,
-      ...this.notificationFilterProjects,
-    ].length
+    return [...this.notificationFilterStatuses, ...this.notificationFilterPriorities].length
   },
 }
 
@@ -46,10 +39,7 @@ export const advisorState = proxy({
     advisorState.selectedItemId = id
     advisorState.selectedItemSource = source
   },
-  setNotificationFilters: (
-    value: string,
-    type: 'status' | 'priority' | 'organizations' | 'projects'
-  ) => {
+  setNotificationFilters: (value: string, type: 'status' | 'priority') => {
     switch (type) {
       case 'status':
         if (advisorState.notificationFilterStatuses.includes(value)) {
@@ -71,33 +61,11 @@ export const advisorState = proxy({
             advisorState.notificationFilterPriorities.concat([value])
         }
         break
-      case 'organizations':
-        if (advisorState.notificationFilterOrganizations.includes(value)) {
-          advisorState.notificationFilterOrganizations =
-            advisorState.notificationFilterOrganizations.filter((x) => x !== value)
-        } else {
-          advisorState.notificationFilterOrganizations =
-            advisorState.notificationFilterOrganizations.concat([value])
-        }
-        break
-      case 'projects':
-        if (advisorState.notificationFilterProjects.includes(value)) {
-          advisorState.notificationFilterProjects = advisorState.notificationFilterProjects.filter(
-            (x) => x !== value
-          )
-        } else {
-          advisorState.notificationFilterProjects = advisorState.notificationFilterProjects.concat([
-            value,
-          ])
-        }
-        break
     }
   },
   resetNotificationFilters() {
     advisorState.notificationFilterStatuses = []
     advisorState.notificationFilterPriorities = []
-    advisorState.notificationFilterOrganizations = []
-    advisorState.notificationFilterProjects = []
   },
   reset() {
     Object.assign(advisorState, initialState)
