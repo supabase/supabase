@@ -83,8 +83,6 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     setOpen(true)
   }
 
-  const hasLogDrains = logDrains && logDrains.length > 0
-
   const content = (
     <ScaffoldSection isFullWidth id="log-drains" className="gap-6">
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
@@ -139,52 +137,56 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   )
 
   // [kemal]: Ordinarily <PageLayout /> would be bundled with the getLayout function below, however in this case we need access to some bits for the "Add destination" button to render as part of the in-built page header in <PageLayout />.
-  if (hasLogDrains) {
+  if (logDrainsEnabled && !planLoading) {
     return (
       <PageLayout
         title="Log Drains"
         subtitle="Send your project logs to third party destinations"
         primaryActions={
-          <div className="flex items-center">
-            <Button
-              disabled={!logDrainsEnabled || !canManageLogDrains}
-              onClick={() => {
-                setSelectedLogDrain(null)
-                setMode('create')
-                setOpen(true)
-              }}
-              type="primary"
-              className="rounded-r-none px-3"
-            >
-              Add destination
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+          <>
+            {!(logDrains?.length === 0) && (
+              <div className="flex items-center">
                 <Button
+                  disabled={!logDrainsEnabled || !canManageLogDrains}
+                  onClick={() => {
+                    setSelectedLogDrain(null)
+                    setMode('create')
+                    setOpen(true)
+                  }}
                   type="primary"
-                  title="Choose token scope"
-                  className="rounded-l-none px-[4px] py-[5px]"
-                  icon={<ChevronDown />}
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" side="bottom">
-                {LOG_DRAIN_TYPES.map((drainType) => (
-                  <DropdownMenuItem
-                    key={drainType.value}
-                    onClick={() => handleNewClick(drainType.value)}
-                  >
-                    <div className="flex items-center gap-3">
-                      {cloneElement(drainType.icon, { height: 16, width: 16 })}
-                      <div className="space-y-1">
-                        <p className="block text-foreground">{drainType.name}</p>
-                        <p className="text-xs text-foreground-lighter">Additional $60</p>
-                      </div>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                  className="rounded-r-none px-3"
+                >
+                  Add destination
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="primary"
+                      title="Choose token scope"
+                      className="rounded-l-none px-[4px] py-[5px]"
+                      icon={<ChevronDown />}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="bottom">
+                    {LOG_DRAIN_TYPES.map((drainType) => (
+                      <DropdownMenuItem
+                        key={drainType.value}
+                        onClick={() => handleNewClick(drainType.value)}
+                      >
+                        <div className="flex items-center gap-3">
+                          {cloneElement(drainType.icon, { height: 16, width: 16 })}
+                          <div className="space-y-1">
+                            <p className="block text-foreground">{drainType.name}</p>
+                            <p className="text-xs text-foreground-lighter">Additional $60</p>
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
+          </>
         }
         secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />}
       >
