@@ -5,20 +5,28 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Button, Card, CardContent } from 'ui'
+import { Button, Card, CardContent, cn } from 'ui'
 import AWSPrivateLinkAccountItem from './AWSPrivateLinkAccountItem'
 import AWSPrivateLinkForm from './AWSPrivateLinkForm'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
 import { useAWSAccountDeleteMutation } from 'data/aws-accounts/aws-account-delete-mutation'
+import { IS_PLATFORM } from 'lib/constants'
 
 const AWSPrivateLinkSection = () => {
   const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
   const { mutate: deleteAccount } = useAWSAccountDeleteMutation()
+
+  const isTeamsOrEnterpriseAndUp = 
+    organization?.plan?.id === 'enterprise' || organization?.plan?.id === 'team'
+  const promptPlanUpgrade = IS_PLATFORM && !isTeamsOrEnterpriseAndUp
 
   const [selectedAccount, setSelectedAccount] = useState<any>(null)
   const [showForm, setShowForm] = useState(false)
@@ -65,29 +73,41 @@ const AWSPrivateLinkSection = () => {
                   Connecting to AWS PrivateLink allows you to create a private connection between
                   your AWS VPC and your Supabase project.
                 </p>
-              </div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-foreground text-sm">AWS Accounts</h3>
-                <Button onClick={onAddAccount}>Add Account</Button>
-              </div>
-              {(accounts?.length ?? 0) > 0 ? (
-                <ResourceList>
-                  {accounts?.map((account) => (
-                    <AWSPrivateLinkAccountItem
-                      key={account.aws_account_id}
-                      {...account}
-                      onClick={() => onEditAccount(account)}
-                      onDelete={() => onDeleteAccount(account)}
+                {promptPlanUpgrade && (
+                  <div className="mb-6">
+                    <UpgradeToPro
+                      primaryText="Upgrade to Team or Enterprise to unlock AWS PrivateLink"
+                      secondaryText="Connect your AWS VPC privately to your Supabase project using AWS PrivateLink."
+                      buttonText="Upgrade to Team"
+                      source="aws-privatelink-integration"
                     />
-                  ))}
-                </ResourceList>
-              ) : (
-                <Card>
-                  <CardContent>
-                    <p className="text-foreground-lighter text-sm">No accounts connected</p>
-                  </CardContent>
-                </Card>
-              )}
+                  </div>
+                )}
+              </div>
+              <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-foreground text-sm">AWS Accounts</h3>
+                  <Button onClick={onAddAccount}>Add Account</Button>
+                </div>
+                {(accounts?.length ?? 0) > 0 ? (
+                  <ResourceList>
+                    {accounts?.map((account) => (
+                      <AWSPrivateLinkAccountItem
+                        key={account.aws_account_id}
+                        {...account}
+                        onClick={() => onEditAccount(account)}
+                        onDelete={() => onDeleteAccount(account)}
+                      />
+                    ))}
+                  </ResourceList>
+                ) : (
+                  <Card>
+                    <CardContent>
+                      <p className="text-foreground-lighter text-sm">No accounts connected</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             </div>
           </ScaffoldSectionContent>
         </ScaffoldSection>
