@@ -2,7 +2,7 @@ import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
 type StorageArchiveCreateVariables = {

@@ -671,6 +671,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-all-projects-for-organization",
+        "title": "Get all projects for organization",
+        "slug": "v1-get-all-projects-for-organization",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-available-regions",
         "title": "Get available regions",
         "slug": "v1-get-available-regions",

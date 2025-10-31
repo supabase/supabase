@@ -2,7 +2,7 @@ import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { storageCredentialsKeys } from './s3-access-key-keys'
 
 type S3AccessKeyDeleteVariables = {

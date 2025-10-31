@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 
 export type CloneStatus = components['schemas']['ProjectClonedStatusResponse']

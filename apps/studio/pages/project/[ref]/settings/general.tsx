@@ -1,3 +1,4 @@
+import { IS_PLATFORM } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ComplianceConfig } from 'components/interfaces/Settings/General/ComplianceConfig/ProjectComplianceMode'
 import { CustomDomainConfig } from 'components/interfaces/Settings/General/CustomDomainConfig/CustomDomainConfig'
@@ -11,6 +12,8 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
@@ -20,6 +23,13 @@ const ProjectSettings: NextPageWithLayout = () => {
   const isBranch = !!project?.parent_project_ref
   const { projectsTransfer: projectTransferEnabled, projectSettingsCustomDomains } =
     useIsFeatureEnabled(['projects:transfer', 'project_settings:custom_domains'])
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      router.push(`/project/default/settings/log-drains`)
+    }
+  }, [router])
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)

@@ -15,7 +15,6 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Separator,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -288,7 +287,6 @@ export const ConnectionPanel = ({
             </Collapsible_Shadcn_>
           )}
         </div>
-        {isTransactionDedicatedPooler && <Separator className="w-full" />}
         {children}
       </div>
     </div>

@@ -4,7 +4,7 @@ import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { lintKeys } from './keys'
 
 type ProjectLintsVariables = {

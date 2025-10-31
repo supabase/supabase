@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { logDrainsKeys } from './keys'
-import { ResponseError } from 'types'
 
 export type LogDrainsVariables = {
   ref?: string
