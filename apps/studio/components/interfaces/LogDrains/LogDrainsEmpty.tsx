@@ -25,7 +25,7 @@ export const LogDrainsEmpty = () => {
   ]
 
   return (
-    <div className="flex grow h-full pt-16">
+    <div className="flex grow h-full">
       <div className="flex grow items-center justify-center p-12 @container">
         <div className="w-full max-w-4xl flex flex-col items-center gap-0">
           <div className="text-center mb-12">

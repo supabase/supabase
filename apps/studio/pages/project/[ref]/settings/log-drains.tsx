@@ -8,12 +8,7 @@ import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
 import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
@@ -24,6 +19,7 @@ import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -78,39 +74,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     setOpen(true)
   }
 
-  return (
-    <>
-      <ScaffoldContainer>
-        {(logDrainsEnabled || planLoading) && (
-          <ScaffoldHeader className="flex flex-row justify-between">
-            <div>
-              <ScaffoldTitle>Log Drains</ScaffoldTitle>
-              <ScaffoldDescription>
-                Send your project logs to third party destinations
-              </ScaffoldDescription>
-            </div>
+  const hasLogDrains = logDrains && logDrains.length > 0
 
-            <div className="flex items-center justify-end gap-2">
-              <DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />
-
-              {!(logDrains?.length === 0) && (
-                <Button
-                  disabled={!logDrainsEnabled || !canManageLogDrains}
-                  onClick={() => {
-                    setSelectedLogDrain(null)
-                    setMode('create')
-                    setOpen(true)
-                  }}
-                  type="primary"
-                >
-                  Add destination
-                </Button>
-              )}
-            </div>
-          </ScaffoldHeader>
-        )}
-      </ScaffoldContainer>
-
+  const content = (
+    <ScaffoldSection isFullWidth id="log-drains" className="gap-6">
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         <LogDrainDestinationSheetForm
           mode={mode}
@@ -159,13 +126,44 @@ const LogDrainsSettings: NextPageWithLayout = () => {
           <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
         )}
       </ScaffoldContainer>
-    </>
+    </ScaffoldSection>
+  )
+
+  // [kemal]: Ordinarily <PageLayout /> would be bundled with the getLayout function below, however in this case we need access to some bits for the "Add destination" button to render as part of the in-built page header.
+  if (hasLogDrains) {
+    return (
+      <PageLayout
+        title="Log Drains"
+        subtitle="Send your project logs to third party destinations"
+        primaryActions={
+          <Button
+            disabled={!logDrainsEnabled || !canManageLogDrains}
+            onClick={() => {
+              setSelectedLogDrain(null)
+              setMode('create')
+              setOpen(true)
+            }}
+            type="primary"
+          >
+            Add destination
+          </Button>
+        }
+        secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />}
+      >
+        {content}
+      </PageLayout>
+    )
+  }
+
+  return content
+}
+
+LogDrainsSettings.getLayout = (page) => {
+  return (
+    <DefaultLayout>
+      <SettingsLayout title="Log Drains">{page}</SettingsLayout>
+    </DefaultLayout>
   )
 }
 
-LogDrainsSettings.getLayout = (page) => (
-  <DefaultLayout>
-    <SettingsLayout title="Log Drains">{page}</SettingsLayout>
-  </DefaultLayout>
-)
 export default LogDrainsSettings

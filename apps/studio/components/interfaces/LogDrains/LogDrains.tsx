@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import Panel from 'components/ui/Panel'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
@@ -19,6 +18,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Card,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -26,6 +26,7 @@ import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { LogDrainsCard } from './LogDrainsCard'
 import { VoteLink } from './VoteLink'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 
 export function LogDrains({
   onNewDrainClick,
@@ -82,14 +83,14 @@ export function LogDrains({
   if (!isLoading && !hasLogDrains) {
     return (
       <>
-        <div className="grid lg:grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-2 gap-4">
           {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
             <LogDrainsCard
               key={src.value}
               title={src.name}
               description={src.description}
               icon={src.icon}
-              subheading="Additional $60"
+              rightLabel="Additional $60"
               onClick={() => {
                 onNewDrainClick(src.value)
               }}
@@ -107,7 +108,7 @@ export function LogDrains({
 
   return (
     <>
-      <Panel className="">
+      <Card>
         <Table>
           <TableHeader>
             <TableRow>
@@ -122,7 +123,7 @@ export function LogDrains({
           <TableBody>
             {logDrains?.map((drain) => (
               <TableRow key={drain.id}>
-                <TableCell className="font-medium truncate max-w-72" title={drain.name}>
+                <TableCell className="font-medium truncate max-w-[200px]" title={drain.name}>
                   {drain.name}
                 </TableCell>
                 <TableCell
@@ -187,7 +188,7 @@ export function LogDrains({
             </div>
           </ConfirmationModal>
         </Table>
-      </Panel>
+      </Card>
     </>
   )
 }

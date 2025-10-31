@@ -3,7 +3,7 @@ import { Card } from 'ui'
 interface LogDrainsCardProps {
   title: string
   description: string
-  subheading?: string
+  rightLabel?: string
   icon: React.ReactNode
   onClick: () => void
 }
@@ -11,7 +11,7 @@ interface LogDrainsCardProps {
 export const LogDrainsCard = ({
   title,
   description,
-  subheading,
+  rightLabel,
   icon,
   onClick,
 }: LogDrainsCardProps) => {
@@ -21,7 +21,7 @@ export const LogDrainsCard = ({
         <div className="flex flex-col gap-5">
           <div className="flex items-start justify-between w-full">
             <div>{icon}</div>
-            <div className="text-xs text-foreground-light">{subheading}</div>
+            <div className="text-xs text-foreground-light">{rightLabel}</div>
           </div>
           <div className="flex flex-col gap-1">
             <h1 className="text-base">{title}</h1>
