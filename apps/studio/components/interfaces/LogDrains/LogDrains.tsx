@@ -142,7 +142,7 @@ export function LogDrains({
                         ?.icon as React.ReactElement,
                       { width: 16, height: 16 }
                     )}
-                    <span>{drain.type}</span>
+                    <span>{LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
