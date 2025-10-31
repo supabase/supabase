@@ -31,7 +31,7 @@ export const HooksListing = () => {
 
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
 
-  const { mutate: updateAuthHooks, isLoading: isDeletingAuthHook } = useAuthHooksUpdateMutation({
+  const { mutate: updateAuthHooks, isPending: isDeletingAuthHook } = useAuthHooksUpdateMutation({
     onSuccess: async () => {
       if (!selectedHookForDeletion) return
 

@@ -115,16 +115,16 @@ export const CreateAnalyticsBucketModal = ({
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutateAsync: createAnalyticsBucket, isLoading: isCreatingAnalyticsBucket } =
+  const { mutateAsync: createAnalyticsBucket, isPending: isCreatingAnalyticsBucket } =
     useAnalyticsBucketCreateMutation({
       // [Joshen] Silencing the error here as it's being handled in onSubmit
       onError: () => {},
     })
 
-  const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
+  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
-  const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
+  const { mutateAsync: enableExtension, isPending: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
 
   const config = BUCKET_TYPES['analytics']

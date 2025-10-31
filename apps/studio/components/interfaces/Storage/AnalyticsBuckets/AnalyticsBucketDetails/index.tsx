@@ -65,7 +65,7 @@ export const AnalyticBucketDetails = () => {
   const [pollIntervalNamespaces, setPollIntervalNamespaces] = useState(0)
   const [pollIntervalNamespaceTables, setPollIntervalNamespaceTables] = useState(0)
 
-  const { mutateAsync: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
 
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
   const { data: wrapperInstance, isLoading: isLoadingWrapperInstance } =
@@ -455,7 +455,7 @@ const ExtensionNeedsUpgrade = ({
 }
 
 const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
-  const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
+  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
   const onSetupWrapper = async () => {

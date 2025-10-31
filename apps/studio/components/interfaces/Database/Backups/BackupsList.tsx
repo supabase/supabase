@@ -29,7 +29,7 @@ export const BackupsList = () => {
   const { data: backups } = useBackupsQuery({ projectRef })
   const {
     mutate: restoreFromBackup,
-    isLoading: isRestoring,
+    isPending: isRestoring,
     isSuccess: isSuccessBackup,
   } = useBackupRestoreMutation({
     onSuccess: () => {

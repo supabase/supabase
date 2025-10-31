@@ -49,7 +49,7 @@ export const General = () => {
     },
   })
 
-  const { mutate: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
+  const { mutate: updateProject, isPending: isUpdating } = useProjectUpdateMutation()
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!project?.ref) return console.error('Ref is required')

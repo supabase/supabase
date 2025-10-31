@@ -37,7 +37,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const signOut = useSignOut()
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
+  const { mutate: createProfile, isPending: isCreatingProfile } = useProfileCreateMutation({
     onSuccess: () => {
       sendEvent({ action: 'sign_up', properties: { category: 'conversion' } })
 

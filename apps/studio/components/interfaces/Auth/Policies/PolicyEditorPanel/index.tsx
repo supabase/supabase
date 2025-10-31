@@ -122,7 +122,7 @@ export const PolicyEditorPanel = memo(function ({
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
-  const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: executeMutation, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess: async () => {
       // refresh all policies
       await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(ref) })
@@ -132,7 +132,7 @@ export const PolicyEditorPanel = memo(function ({
     onError: (error) => setError(error),
   })
 
-  const { mutate: updatePolicy, isLoading: isUpdating } = useDatabasePolicyUpdateMutation({
+  const { mutate: updatePolicy, isPending: isUpdating } = useDatabasePolicyUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully updated policy')
       onSelectCancel()

@@ -77,7 +77,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const { mutate: createConnections, isLoading: isCreatingConnection } =
+  const { mutate: createConnections, isPending: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
       onSuccess() {
         if (next && isVercelUrl(next)) {

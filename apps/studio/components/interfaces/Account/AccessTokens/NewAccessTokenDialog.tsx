@@ -67,7 +67,7 @@ export const NewAccessTokenDialog = ({
     defaultValues: { tokenName: '', expiresAt: ExpiresAtOptions['month'].value },
     mode: 'onChange',
   })
-  const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation()
+  const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
     // Use custom date if custom option is selected
@@ -240,7 +240,7 @@ export const NewAccessTokenDialog = ({
         <DialogFooter>
           <Button
             type="default"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => {
               form.reset()
               setCustomExpiryDate(undefined)
@@ -250,7 +250,7 @@ export const NewAccessTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isLoading}>
+          <Button form={formId} htmlType="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>

@@ -20,7 +20,7 @@ export const EnableReplicationModal = () => {
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
 
-  const { mutate: createTenantSource, isLoading: creatingTenantSource } =
+  const { mutate: createTenantSource, isPending: creatingTenantSource } =
     useCreateTenantSourceMutation({
       onSuccess: () => {
         toast.success('ETL replication has been successfully enabled!')

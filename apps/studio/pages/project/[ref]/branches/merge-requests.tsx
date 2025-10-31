@@ -91,7 +91,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
       toast.error(`Failed to update the branch`)
     },
@@ -330,7 +330,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+  const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
       toast.error(`Failed to update the branch`)
     },

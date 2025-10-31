@@ -33,7 +33,7 @@ export const TransferProjectButton = () => {
   const {
     mutate: transferProject,
     error: transferError,
-    isLoading: isTransferring,
+    isPending: isTransferring,
   } = useProjectTransferMutation({
     onSuccess: () => {
       toast.success(`Successfully transferred project ${project?.name}.`)

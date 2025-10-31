@@ -31,7 +31,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const { mutate: updateDatabaseRole, isLoading: isUpdating } = useDatabaseRoleUpdateMutation()
+  const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
 
   const { isSuperuser, canLogin, canCreateRole, canCreateDb, isReplicationRole, canBypassRls } =
     role
