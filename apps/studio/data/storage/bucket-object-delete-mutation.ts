@@ -2,7 +2,7 @@ import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react
 
 import { del, handleError } from 'data/fetchers'
 import { toast } from 'sonner'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 type DeleteBucketObjectParams = {
   projectRef: string

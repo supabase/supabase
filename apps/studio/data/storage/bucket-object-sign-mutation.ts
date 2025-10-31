@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 type SignBucketObjectParams = {
   projectRef: string

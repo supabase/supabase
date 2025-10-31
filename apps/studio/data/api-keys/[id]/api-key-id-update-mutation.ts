@@ -1,7 +1,8 @@
+import { toast } from 'sonner'
+
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { handleError, patch } from 'data/fetchers'
-import { toast } from 'sonner'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { apiKeysKeys } from '../keys'
 
 export interface UpdateAPIKeybyIdVariables {

@@ -12,7 +12,7 @@ import { useOrganizationProjectClaimMutation } from 'data/organizations/organiza
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
 import { projectKeys } from 'data/projects/keys'
 import { BASE_PATH } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import {
   Button,
   cn,

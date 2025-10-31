@@ -14,7 +14,7 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
