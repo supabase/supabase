@@ -154,7 +154,7 @@ export const useRegisterSidebar = (
   const { sidebars, registerSidebar, unregisterSidebar } = useSidebarManagerSnapshot()
 
   useEffect(() => {
-    const isEnabled = enabled !== false;
+    const isEnabled = enabled !== false
     if (!sidebars[id] && isEnabled) {
       registerSidebar(id, component, handlers)
     } else if (sidebars[id] && !isEnabled) {
