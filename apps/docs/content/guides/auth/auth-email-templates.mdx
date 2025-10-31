@@ -79,7 +79,7 @@ To guard against this there are the options below:
 ```html
 <a href="{{ .SiteURL }}/confirm-signup">Confirm your signup</a>
 ```
-- Log them in by verifying the OTP token value with their email e.g. with [`supabase.auth.verifyOtp`](https://supabase.com/docs/reference/javascript/auth-verifyotp) show below
+- Log them in by verifying the OTP token value with their email e.g. with [`supabase.auth.verifyOtp`](/docs/reference/javascript/auth-verifyotp) show below
 ```ts
 const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email'})
 ```
