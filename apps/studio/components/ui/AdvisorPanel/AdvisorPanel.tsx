@@ -4,12 +4,7 @@ import dayjs from 'dayjs'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  AdvisorItemSource,
-  AdvisorSeverity,
-  AdvisorTab,
-  useAdvisorStateSnapshot,
-} from 'state/advisor-state'
+import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Notification,
@@ -17,8 +12,6 @@ import {
   useNotificationsV2Query,
 } from 'data/notifications/notifications-v2-query'
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
-import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { AdvisorPanelHeader, AdvisorItem } from './AdvisorPanelHeader'
 import { AdvisorFilters } from './AdvisorFilters'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
@@ -76,8 +69,6 @@ export const AdvisorPanel = () => {
   const markedRead = useRef<string[]>([])
   const hasProjectRef = !!project?.ref
 
-  const { data: organizations } = useOrganizationsQuery({ enabled: isSidebarOpen })
-
   const {
     data: lintData,
     isLoading: isLintsLoading,
@@ -118,27 +109,20 @@ export const AdvisorPanel = () => {
     {
       status: notificationStatus,
       filters: notificationFilters,
+      limit: 10,
     },
     { enabled: shouldLoadNotifications }
   )
 
-  const { data: notificationsSummary } = useNotificationsSummaryQuery({
-    enabled: shouldLoadNotifications,
-  })
-
   const { mutate: updateNotifications } = useNotificationsV2UpdateMutation()
 
   const notifications = useMemo(() => {
-    if (!notificationsData?.pages) return []
-    const apiNotifications = notificationsData.pages.flatMap((page) => page ?? [])
-    // Limit to 50 notifications
-    return apiNotifications.slice(0, 50)
-  }, [notificationsData])
+    return notificationsData?.pages.flatMap((page) => page) ?? []
+  }, [notificationsData?.pages])
 
   const markNotificationsRead = () => {
     if (markedRead.current.length > 0) {
       updateNotifications({ ids: markedRead.current, status: 'seen' })
-      markedRead.current = []
     }
   }
 
@@ -281,8 +265,6 @@ export const AdvisorPanel = () => {
 
   const hasAnyFilters = severityFilters.length > 0 || notificationFilterStatuses.length > 0
 
-  const unreadCount = notificationsSummary?.unread_count ?? 0
-
   return (
     <div className="flex h-full flex-col bg-background">
       {isDetailView ? (
@@ -317,15 +299,16 @@ export const AdvisorPanel = () => {
             onSeverityFiltersChange={setSeverityFilters}
             statusFilters={[...notificationFilterStatuses]}
             onStatusFiltersChange={(values) => {
-              // Sync status filters: remove ones not in new array, add ones in new array
-              const currentFilters = [...notificationFilterStatuses]
-              const toRemove = currentFilters.filter((f) => !values.includes(f))
-              const toAdd = values.filter((f) => !currentFilters.includes(f))
-
-              toRemove.forEach((status) => setNotificationFilters(status, 'status'))
-              toAdd.forEach((status) => setNotificationFilters(status, 'status'))
+              // Toggle each status filter individually to match NotificationsPopover pattern
+              // Remove filters that are no longer selected
+              notificationFilterStatuses
+                .filter((status) => !values.includes(status))
+                .forEach((status) => setNotificationFilters(status, 'status'))
+              // Add filters that are newly selected
+              values
+                .filter((status) => !notificationFilterStatuses.includes(status))
+                .forEach((status) => setNotificationFilters(status, 'status'))
             }}
-            unreadCount={unreadCount}
             hasProjectRef={hasProjectRef}
             onClose={handleClose}
           />

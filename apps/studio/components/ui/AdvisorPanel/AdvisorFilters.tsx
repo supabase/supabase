@@ -23,7 +23,6 @@ interface AdvisorFiltersProps {
   onSeverityFiltersChange: (filters: AdvisorSeverity[]) => void
   statusFilters: string[]
   onStatusFiltersChange: (filters: string[]) => void
-  unreadCount?: number
   hasProjectRef?: boolean
   onClose: () => void
 }
@@ -35,7 +34,6 @@ export const AdvisorFilters = ({
   onSeverityFiltersChange,
   statusFilters,
   onStatusFiltersChange,
-  unreadCount = 0,
   hasProjectRef = true,
   onClose,
 }: AdvisorFiltersProps) => {
@@ -58,16 +56,6 @@ export const AdvisorFilters = ({
               className="h-full text-xs flex items-center gap-2"
             >
               Messages
-              {unreadCount > 0 && (
-                <div
-                  className={cn(
-                    'flex items-center justify-center text-xs rounded-full bg-surface-300 h-4',
-                    unreadCount > 9 ? 'px-0.5 w-auto' : 'w-4'
-                  )}
-                >
-                  {unreadCount}
-                </div>
-              )}
             </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
         </Tabs_Shadcn_>
