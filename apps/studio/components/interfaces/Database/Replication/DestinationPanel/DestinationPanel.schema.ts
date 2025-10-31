@@ -57,6 +57,9 @@ export const DestinationPanelFormSchema = z
 
       if (!data.s3Region?.length) addRequiredFieldError('s3Region', 'S3 Region is required')
 
+      if (!data.s3AccessKeyId?.length)
+        addRequiredFieldError('s3AccessKeyId', 'S3 Access Key ID is required')
+
       if (data.s3AccessKeyId !== 'create-new' && !data.s3SecretAccessKey?.length) {
         addRequiredFieldError('s3SecretAccessKey', 'S3 Secret Access Key is required')
       }

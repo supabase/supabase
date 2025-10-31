@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { snakeCase } from 'lodash'
-import { DatabaseZap, Lock } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -8,7 +7,6 @@ import * as z from 'zod'
 
 import { useFlag, useParams } from 'common'
 import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPrimaryKeysExists } from 'data/database/primary-keys-exists-query'
@@ -29,14 +27,6 @@ import {
   Button,
   DialogSectionSeparator,
   Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -45,15 +35,15 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { NewPublicationPanel } from '../NewPublicationPanel'
-import { PublicationsComboBox } from '../PublicationsComboBox'
 import { ReplicationDisclaimerDialog } from '../ReplicationDisclaimerDialog'
 import { AdvancedSettings } from './AdvancedSettings'
+import { DestinationNameInput } from './DestinationNameInput'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationPanel.constants'
 import { DestinationPanelFormSchema as FormSchema, TypeEnum } from './DestinationPanel.schema'
 import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
+import { DestinationTypeSelection } from './DestinationTypeSelection'
+import { NoDestinationsAvailable } from './NoDestinationsAvailable'
+import { PublicationSelection } from './PublicationSelection'
 
 const formId = 'destination-editor'
 
@@ -96,7 +86,6 @@ export const DestinationPanel = ({
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const editMode = !!existingDestination
-  const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
@@ -123,7 +112,6 @@ export const DestinationPanel = ({
 
   const {
     data: publications = [],
-    isLoading: isLoadingPublications,
     isSuccess: isSuccessPublications,
     refetch: refetchPublications,
   } = useReplicationPublicationsQuery({ projectRef, sourceId })
@@ -217,10 +205,9 @@ export const DestinationPanel = ({
   const isSubmitDisabled =
     isSaving ||
     isSelectedPublicationMissing ||
-    isLoadingCheck ||
+    (!!selectedPublication && isLoadingCheck) ||
     hasTablesWithNoPrimaryKeys ||
-    (hasNoAvailableDestinations && !editMode) ||
-    !form.formState.isValid
+    (!editMode && hasNoAvailableDestinations)
 
   // Helper function to handle namespace creation if needed
   const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
@@ -456,24 +443,13 @@ export const DestinationPanel = ({
               <SheetDescription>
                 {editMode
                   ? 'Update the configuration for this destination'
-                  : 'A destination is an external platform where your database changes are automatically sent in real-time'}
+                  : 'A destination is an external platform that automatically receives your database changes in real time.'}
               </SheetDescription>
             </SheetHeader>
 
             <SheetSection className="flex-grow overflow-auto px-0 py-0">
               {hasNoAvailableDestinations && !editMode ? (
-                <div className="flex flex-col items-center justify-center h-full px-8 py-16 text-center">
-                  <div className="flex items-center justify-center w-20 h-20 rounded-full bg-surface-300 mb-6">
-                    <DatabaseZap className="w-10 h-10 text-foreground-light" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="text-xl font-medium text-foreground mb-3">
-                    No destinations available
-                  </h3>
-                  <p className="text-sm text-foreground-light max-w-md leading-relaxed">
-                    Replication destinations are not currently enabled for this project. Contact
-                    support to enable real-time data replication to external platforms.
-                  </p>
-                </div>
+                <NoDestinationsAvailable />
               ) : (
                 <Form_Shadcn_ {...form}>
                   <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
@@ -481,235 +457,33 @@ export const DestinationPanel = ({
                       <p className="text-sm font-medium text-foreground mb-1">
                         Destination details
                       </p>
-                      <p className="text-xs text-foreground-light mb-4">
+                      <p className="text-sm text-foreground-light mb-4">
                         Name your destination and choose which data to replicate
                       </p>
 
                       <div className="space-y-4">
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label={
-                                <span>
-                                  Name <span className="text-destructive-600">*</span>
-                                </span>
-                              }
-                              layout="vertical"
-                              description="A descriptive name to identify this destination"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_ {...field} placeholder="My destination" />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="publicationName"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label={
-                                <span>
-                                  Publication <span className="text-destructive-600">*</span>
-                                </span>
-                              }
-                              layout="vertical"
-                              description="Choose which tables to replicate to this destination"
-                            >
-                              <FormControl_Shadcn_>
-                                <PublicationsComboBox
-                                  publications={publicationNames}
-                                  isLoadingPublications={isLoadingPublications}
-                                  isLoadingCheck={!!selectedPublication && isLoadingCheck}
-                                  field={field}
-                                  onNewPublicationClick={() => setPublicationPanelVisible(true)}
-                                />
-                              </FormControl_Shadcn_>
-                              {isSelectedPublicationMissing ? (
-                                <Admonition type="warning" className="mt-2 mb-0">
-                                  <p className="!leading-normal">
-                                    The publication{' '}
-                                    <strong className="text-foreground">{publicationName}</strong>{' '}
-                                    was not found, it may have been renamed or deleted, please
-                                    select another one.
-                                  </p>
-                                </Admonition>
-                              ) : hasTablesWithNoPrimaryKeys ? (
-                                <Admonition type="warning" className="mt-2 mb-0">
-                                  <p className="!leading-normal">
-                                    Replication requires every table in the publication to have a
-                                    primary key to work, which these tables are missing:
-                                  </p>
-                                  <ul className="list-disc pl-6 mb-2">
-                                    {(checkPrimaryKeysExistsData?.offendingTables ?? []).map(
-                                      (x) => {
-                                        const value = `${x.schema}.${x.name}`
-                                        return (
-                                          <li key={value} className="!leading-normal">
-                                            <InlineLink
-                                              href={`/project/${projectRef}/editor/${x.id}`}
-                                            >
-                                              {value}
-                                            </InlineLink>
-                                          </li>
-                                        )
-                                      }
-                                    )}
-                                  </ul>
-                                  <p className="!leading-normal">
-                                    Ensure that these tables have primary keys first.
-                                  </p>
-                                </Admonition>
-                              ) : null}
-                            </FormItemLayout>
-                          )}
-                        />
+                        <DestinationNameInput form={form} />
+                        <PublicationSelection form={form} sourceId={sourceId} visible={visible} />
                       </div>
                     </div>
-
                     <DialogSectionSeparator />
-
-                    <div className="px-5 py-5">
-                      <p className="text-sm font-medium text-foreground mb-1">Destination type</p>
-                      {editMode ? (
-                        <p className="text-xs text-foreground-light mb-4">
-                          The destination type cannot be changed after creation
-                        </p>
-                      ) : (
-                        <p className="text-xs text-foreground-light mb-4">
-                          Choose which platform to send your database changes to
-                        </p>
-                      )}
-                      <FormField_Shadcn_
-                        name="type"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormControl_Shadcn_>
-                            {editMode ? (
-                              <div className="relative">
-                                <div className="flex items-start gap-3 p-4 rounded-lg border-2 border-default bg-surface-100 opacity-75">
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <p className="text-sm font-medium text-foreground">
-                                        {field.value}
-                                      </p>
-                                      <Lock className="w-3 h-3 text-foreground-lighter" />
-                                    </div>
-                                    <p className="text-xs text-foreground-light leading-relaxed">
-                                      {field.value === 'BigQuery'
-                                        ? "Send data to Google Cloud's data warehouse for analytics and business intelligence"
-                                        : 'Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics workflows'}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="absolute inset-0 cursor-not-allowed" />
-                              </div>
-                            ) : (
-                              <div className="grid gap-3">
-                                {etlEnableBigQuery && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setIsFormInteracting(true)
-                                      field.onChange('BigQuery')
-                                    }}
-                                    className={`relative flex items-start gap-3 p-4 rounded-lg border-2 transition-all text-left ${
-                                      field.value === 'BigQuery'
-                                        ? 'border-brand-600 bg-surface-200'
-                                        : 'border-default bg-surface-100 hover:border-stronger'
-                                    }`}
-                                  >
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <p className="text-sm font-medium text-foreground">
-                                          BigQuery
-                                        </p>
-                                        {field.value === 'BigQuery' && (
-                                          <div className="w-2 h-2 rounded-full bg-brand-600" />
-                                        )}
-                                      </div>
-                                      <p className="text-xs text-foreground-light leading-relaxed">
-                                        Send data to Google Cloud's data warehouse for analytics and
-                                        business intelligence
-                                      </p>
-                                    </div>
-                                  </button>
-                                )}
-                                {etlEnableIceberg && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setIsFormInteracting(true)
-                                      field.onChange('Analytics Bucket')
-                                    }}
-                                    className={`relative flex items-start gap-3 p-4 rounded-lg border-2 transition-all text-left ${
-                                      field.value === 'Analytics Bucket'
-                                        ? 'border-brand-600 bg-surface-200'
-                                        : 'border-default bg-surface-100 hover:border-stronger'
-                                    }`}
-                                  >
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <p className="text-sm font-medium text-foreground">
-                                          Analytics Bucket
-                                        </p>
-                                        {field.value === 'Analytics Bucket' && (
-                                          <div className="w-2 h-2 rounded-full bg-brand-600" />
-                                        )}
-                                      </div>
-                                      <p className="text-xs text-foreground-light leading-relaxed">
-                                        Send data to Apache Iceberg tables in your Supabase Storage
-                                        for flexible analytics workflows
-                                      </p>
-                                    </div>
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </FormControl_Shadcn_>
-                        )}
-                      />
-                    </div>
-
+                    <DestinationTypeSelection form={form} editMode={editMode} />
                     {selectedType === 'BigQuery' && etlEnableBigQuery ? (
                       <>
                         <DialogSectionSeparator />
-                        <div className="px-5 pt-5">
-                          <p className="text-sm font-medium text-foreground mb-1">
-                            BigQuery settings
-                          </p>
-                          <p className="text-xs text-foreground-light mb-4">
-                            Configure how data is sent to your BigQuery destination
-                          </p>
-                        </div>
                         <BigQueryFields form={form} />
                       </>
                     ) : selectedType === 'Analytics Bucket' && etlEnableIceberg ? (
                       <>
                         <DialogSectionSeparator />
-                        <div className="px-5 pt-5">
-                          <p className="text-sm font-medium text-foreground mb-1">
-                            Analytics Bucket settings
-                          </p>
-                          <p className="text-xs text-foreground-light mb-4">
-                            Configure how data is sent to your Analytics Bucket destination
-                          </p>
-                        </div>
                         <AnalyticsBucketFields
                           form={form}
                           setIsFormInteracting={setIsFormInteracting}
                         />
                       </>
                     ) : null}
-
                     <DialogSectionSeparator />
-
-                    <div className="px-5">
-                      <AdvancedSettings form={form} />
-                    </div>
+                    <AdvancedSettings form={form} />
                   </form>
                 </Form_Shadcn_>
               )}
@@ -741,12 +515,6 @@ export const DestinationPanel = ({
         onOpenChange={handleDisclaimerDialogChange}
         isLoading={isSaving}
         onConfirm={handleDisclaimerConfirm}
-      />
-
-      <NewPublicationPanel
-        visible={publicationPanelVisible}
-        sourceId={sourceId}
-        onClose={() => setPublicationPanelVisible(false)}
       />
     </>
   )
