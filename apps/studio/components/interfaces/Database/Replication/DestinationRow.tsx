@@ -16,7 +16,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'

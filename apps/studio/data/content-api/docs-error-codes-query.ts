@@ -1,6 +1,6 @@
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
-import { graphql } from 'data/graphql'
 import { executeGraphQL } from 'data/graphql/execute'
+import { graphql } from 'data/graphql/gql'
 import { Service } from 'data/graphql/graphql'
 import { contentApiKeys } from './keys'
 
@@ -35,9 +35,10 @@ export const useErrorCodesQuery = <TData = ErrorCodeDescriptionsData>(
     ...options
   }: UseQueryOptions<ErrorCodeDescriptionsData, ErrorCodeDescriptionsError, TData> = {}
 ) => {
-  return useQuery<ErrorCodeDescriptionsData, ErrorCodeDescriptionsError, TData>(
-    contentApiKeys.errorCodes(variables),
-    ({ signal }) => getErrorCodeDescriptions(variables, signal),
-    { enabled, ...options }
-  )
+  return useQuery<ErrorCodeDescriptionsData, ErrorCodeDescriptionsError, TData>({
+    queryKey: contentApiKeys.errorCodes(variables),
+    queryFn: ({ signal }) => getErrorCodeDescriptions(variables, signal),
+    enabled,
+    ...options,
+  })
 }

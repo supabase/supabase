@@ -6,60 +6,24 @@
 cp .env.local.example .env.local
 ```
 
-Edit the `.env.local` file with your credentials and environment.
-
 ### Install the playwright browser
 
 ⚠️ This should be done in the `e2e/studio` directory
 
 ```bash
+cd e2e/studio
+
 pnpm exec playwright install
 ```
 
-## Environments
+### Run a local Supabase instance
 
-### Staging
-
-```bash
-STUDIO_URL=https://supabase.green/dashboard
-API_URL=https://api.supabase.green
-AUTHENTICATION=true
-EMAIL=your@email.com
-PASSWORD=yourpassword
-PROJECT_REF=yourprojectref
-```
-
-### CLI (NO AUTH)
-
-You'll need to run the CLI locally.
+Make sure you have Supabase CLI installed
 
 ```bash
-STUDIO_URL=http://localhost:54323
-API_URL=http://localhost:54323/api
-AUTHENTICATION=false
-```
+cd e2e/studio
 
-### CLI Development (NO AUTH)
-
-You'll need to run Studio in development mode with `IS_PLATFORM=false`
-
-```bash
-STUDIO_URL=http://localhost:8082/
-API_URL=http://localhost:8082/api
-AUTHENTICATION=false
-```
-
-### Hosted Development
-
-You'll need to run Studio in development mode with `IS_PLATFORM=true`
-
-```bash
-STUDIO_URL=http://localhost:8082/
-API_URL=http://localhost:8080/api
-AUTHENTICATION=true
-EMAIL=your@email.com
-PASSWORD=yourpassword
-PROJECT_REF=yourprojectref
+supabase start
 ```
 
 ---
@@ -67,8 +31,6 @@ PROJECT_REF=yourprojectref
 ## Running the tests
 
 Check the `package.json` for the available commands and environments.
-
-#### Example:
 
 ```bash
 pnpm run e2e
@@ -107,19 +69,6 @@ import { test } from '../utils/test'
 
 ```bash
 PWDEBUG=1 pnpm run e2e -- --ui
-```
-
----
-
-## Organization
-
-Name the folders based on the feature you are testing.
-
-```bash
-e2e/studio/logs/
-e2e/studio/sql-editor/
-e2e/studio/storage/
-e2e/studio/auth/
 ```
 
 ---

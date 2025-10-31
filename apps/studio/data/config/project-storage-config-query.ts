@@ -45,8 +45,9 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
     ...options
   }: UseQueryOptions<ProjectStorageConfigData, ProjectStorageConfigError, TData> = {}
 ) =>
-  useQuery<ProjectStorageConfigData, ProjectStorageConfigError, TData>(
-    configKeys.storage(projectRef),
-    ({ signal }) => getProjectStorageConfig({ projectRef }, signal),
-    { enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ProjectStorageConfigData, ProjectStorageConfigError, TData>({
+    queryKey: configKeys.storage(projectRef),
+    queryFn: ({ signal }) => getProjectStorageConfig({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    ...options,
+  })

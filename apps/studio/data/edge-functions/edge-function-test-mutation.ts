@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { ResponseData } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.types'
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type EdgeFunctionTestResponse = {
   title: string
@@ -52,20 +52,18 @@ export const useEdgeFunctionTestMutation = ({
   UseMutationOptions<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>(
-    (vars) => testEdgeFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to test edge function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>({
+    mutationFn: (vars) => testEdgeFunction(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to test edge function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

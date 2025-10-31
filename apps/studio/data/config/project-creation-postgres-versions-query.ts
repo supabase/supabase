@@ -43,19 +43,17 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
     TData
   > = {}
 ) => {
-  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>(
-    configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
-    ({ signal }) =>
+  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>({
+    queryKey: configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
+    queryFn: ({ signal }) =>
       getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof organizationSlug !== 'undefined' &&
-        organizationSlug !== '_' &&
-        typeof dbRegion !== 'undefined',
-      ...options,
-    }
-  )
+    enabled:
+      enabled &&
+      typeof organizationSlug !== 'undefined' &&
+      organizationSlug !== '_' &&
+      typeof dbRegion !== 'undefined',
+    ...options,
+  })
 }
 
 export const useAvailableOrioleImageVersion = (

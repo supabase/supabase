@@ -21,8 +21,9 @@ export const useUserIPAddressQuery = <TData = UserIPAddressData>({
   enabled = true,
   ...options
 }: UseQueryOptions<UserIPAddressData, UserIPAddressError, TData> = {}) =>
-  useQuery<UserIPAddressData, UserIPAddressError, TData>(
-    miscKeys.ipAddress(),
-    () => getUserIPAddress(),
-    { enabled: enabled && !IS_PLATFORM, ...options }
-  )
+  useQuery<UserIPAddressData, UserIPAddressError, TData>({
+    queryKey: miscKeys.ipAddress(),
+    queryFn: () => getUserIPAddress(),
+    enabled: enabled && !IS_PLATFORM,
+    ...options,
+  })

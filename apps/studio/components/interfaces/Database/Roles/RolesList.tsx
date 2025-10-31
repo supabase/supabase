@@ -19,7 +19,7 @@ import { SUPABASE_ROLES } from './Roles.constants'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
-const RolesList = () => {
+export const RolesList = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
@@ -219,5 +219,3 @@ const RolesList = () => {
     </>
   )
 }
-
-export default RolesList

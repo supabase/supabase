@@ -34,13 +34,11 @@ export const useProjectsQuery = <TData = ProjectsData>({
   ...options
 }: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
   const { profile } = useProfile()
-  return useQuery<ProjectsData, ProjectsError, TData>(
-    projectKeys.list(),
-    ({ signal }) => getProjects({ signal }),
-    {
-      enabled: enabled && profile !== undefined,
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      ...options,
-    }
-  )
+  return useQuery<ProjectsData, ProjectsError, TData>({
+    queryKey: projectKeys.list(),
+    queryFn: ({ signal }) => getProjects({ signal }),
+    enabled: enabled && profile !== undefined,
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  })
 }

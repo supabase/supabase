@@ -72,7 +72,7 @@
     "react-intersection-observer": "^9.8.2",
     "react-medium-image-zoom": "^5.2.4",
     "react-resizable-panels": "^2.1.4",
-    "react-syntax-highlighter": "^15.5.0",
+    "react-syntax-highlighter": "^15.6.6",
     "recharts": "^2.12.7",
     "sonner": "^1.5.0",
     "tailwind-merge": "^1.13.2",
@@ -88,8 +88,8 @@
     "@types/react": "catalog:",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "catalog:",
-    "@types/react-syntax-highlighter": "^15.5.6",
-    "@vitest/coverage-v8": "^3.0.9",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "@vitest/coverage-v8": "^3.2.0",
     "common": "workspace:*",
     "config": "workspace:*",
     "glob": "^8.1.0",
@@ -97,7 +97,7 @@
     "tsconfig": "workspace:*",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "^3.0.5"
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "next": "catalog:"

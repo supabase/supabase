@@ -13,7 +13,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import {
   Button,
   CodeBlock,

@@ -44,14 +44,15 @@ export const useOrganizationDeleteInvitationMutation = ({
     OrganizationDeleteInvitationData,
     ResponseError,
     OrganizationDeleteInvitationVariables
-  >((vars) => deleteOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => deleteOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       const { slug, skipInvalidation } = variables
 
       if (!skipInvalidation) {
         await Promise.all([
-          queryClient.invalidateQueries(organizationKeys.rolesV2(slug)),
-          queryClient.invalidateQueries(organizationKeysV1.members(slug)),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
+          queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
         ])
       }
 

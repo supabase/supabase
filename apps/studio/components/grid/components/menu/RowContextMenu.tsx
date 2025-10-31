@@ -75,13 +75,14 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
         <Copy size={12} />
         <span className="ml-2 text-xs">Copy row</span>
       </Item>
+
       <DialogSectionSeparator className="my-1.5" />
-      <Item onClick={onEditRowClick} hidden={!snap.editable} data="edit">
+      <Item onClick={onEditRowClick} data="edit">
         <Edit size={12} />
         <span className="ml-2 text-xs">Edit row</span>
       </Item>
       <DialogSectionSeparator className="my-1.5" />
-      <Item onClick={onDeleteRow} hidden={!snap.editable} data="delete">
+      <Item onClick={onDeleteRow} data="delete">
         <Trash size={12} />
         <span className="ml-2 text-xs">Delete row</span>
       </Item>

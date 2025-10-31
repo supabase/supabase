@@ -10,6 +10,7 @@ import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { Bucket } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -23,8 +24,8 @@ const BucketPage: NextPageWithLayout = () => {
   const { bucket, error, isSuccess, isError } = useSelectedBucket()
   const [showEditModal, setShowEditModal] = useState(false)
 
-  const { getPolicyCount } = useStoragePolicyCounts(bucket ? [bucket] : [])
-  const policyCount = bucket ? getPolicyCount(bucket.name) : 0
+  const { getPolicyCount } = useStoragePolicyCounts(bucket ? [bucket as Bucket] : [])
+  const policyCount = bucket ? getPolicyCount(bucket.id) : 0
 
   // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
   if (!project || !projectRef || !isSuccess) return null

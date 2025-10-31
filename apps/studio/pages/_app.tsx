@@ -30,36 +30,35 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { ErrorInfo, PropsWithChildren, useCallback } from 'react'
+import { ErrorInfo, useCallback } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import {
   FeatureFlagProvider,
   getFlags,
-  LOCAL_STORAGE_KEYS,
   TelemetryTagManager,
   ThemeProvider,
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
+import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
-import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState'
+import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
+import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LegacyInlineEditorHotkeyMigration } from 'hooks/misc/useLegacyInlineEditorHotkeyMigration'
 import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
-import { AppPropsWithLayout } from 'types'
+import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -79,15 +78,6 @@ loader.config({
       : `${BASE_PATH}/monaco-editor`,
   },
 })
-
-const CommandProviderWithPreferences = ({ children }: PropsWithChildren) => {
-  const [commandMenuHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU,
-    true
-  )
-
-  return <CommandProvider openKey={commandMenuHotkeyEnabled ? 'k' : ''}>{children}</CommandProvider>
-}
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
 // a lot of them are unnecessary and introduce way too many cluttered CSS especially with the height styles that make
@@ -143,6 +133,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     <title>{appTitle ?? 'Supabase'}</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                     <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
+                    <meta name="googlebot" content="notranslate" />
                     {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
                     <style
                       dangerouslySetInnerHTML={{
@@ -160,7 +151,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         disableTransitionOnChange
                       >
                         <AppBannerContextProvider>
-                          <CommandProviderWithPreferences>
+                          <CommandProvider>
                             <FeaturePreviewContextProvider>
                               {getLayout(<Component {...pageProps} />)}
                               <StudioCommandMenu />
@@ -168,11 +159,13 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             </FeaturePreviewContextProvider>
                             <SonnerToaster position="top-right" />
                             <MonacoThemeProvider />
-                          </CommandProviderWithPreferences>
+                          </CommandProvider>
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
+                  {/* Temporary migration, to be removed by 2025-11-28 */}
+                  <LegacyInlineEditorHotkeyMigration />
                   <Telemetry />
                   {!isTestEnv && (
                     <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />

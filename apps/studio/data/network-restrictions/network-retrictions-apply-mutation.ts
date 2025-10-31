@@ -47,10 +47,11 @@ export const useNetworkRestrictionsApplyMutation = ({
     NetworkRestrictionsApplyData,
     ResponseError,
     NetworkRestrictionsApplyVariables
-  >((vars) => applyNetworkRestrictions(vars), {
+  >({
+    mutationFn: (vars) => applyNetworkRestrictions(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(networkRestrictionKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: networkRestrictionKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -17,6 +17,7 @@ The following table lists the supported destinations and the required setup conf
 | Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
 | DataDog               | HTTP             | API Key <br /> Region                             |
 | Loki                  | HTTP             | URL <br /> Headers                                |
+| Sentry                | HTTP             | DSN                                               |
 
 HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
 
@@ -195,6 +196,20 @@ The log source and product name will be used as stream labels.
 The `event_message` and `timestamp` fields will be dropped from the events to avoid duplicate data.
 
 Loki must be configured to accept **structured metadata**, and it is advised to increase the default maximum number of structured metadata fields to at least 500 to accommodate large log event payloads of different products.
+
+## Sentry
+
+Logs are sent to Sentry as part of [Sentry's Logging Product](https://docs.sentry.io/product/explore/logs/). Ingesting Supabase logs as Sentry errors is currently not supported.
+
+To setup the Sentry log drain, you need to do the following:
+
+1. Grab your DSN from your [Sentry project settings](https://docs.sentry.io/concepts/key-terms/dsn-explainer/). It should be of the format `{PROTOCOL}://{PUBLIC_KEY}:{SECRET_KEY}@{HOST}{PATH}/{PROJECT_ID}`.
+2. Create log drain in [Supabase dashboard](/dashboard/project/_/settings/log-drains)
+3. Watch for events in the [Sentry Logs page](https://sentry.io/explore/logs/)
+
+All fields from the log event are attached as attributes to the Sentry log, which can be used for filtering and grouping in the Sentry UI. There are no limits to cardinality or the number of attributes that can be attached to a log.
+
+If you are self-hosting Sentry, Sentry Logs are only supported in self-hosted version [25.9.0](https://github.com/getsentry/self-hosted/releases/tag/25.9.0) and later.
 
 ## Pricing
 

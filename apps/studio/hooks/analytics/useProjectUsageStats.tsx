@@ -68,9 +68,9 @@ function useProjectUsageStats({
     [projectRef, chartQuery, timestampStart, timestampEnd, table]
   )
 
-  const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
-    chartQueryKey,
-    async ({ signal }) => {
+  const { data: eventChartResponse, refetch: refreshEventChart } = useQuery({
+    queryKey: chartQueryKey,
+    queryFn: async ({ signal }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -88,11 +88,9 @@ function useProjectUsageStats({
 
       return data as unknown as EventChart
     },
-    {
-      refetchOnWindowFocus: false,
-      enabled: typeof projectRef !== 'undefined',
-    }
-  )
+    refetchOnWindowFocus: false,
+    enabled: typeof projectRef !== 'undefined',
+  })
 
   const normalizedEventChartData = useTimeseriesUnixToIso(
     eventChartResponse?.result ?? [],
