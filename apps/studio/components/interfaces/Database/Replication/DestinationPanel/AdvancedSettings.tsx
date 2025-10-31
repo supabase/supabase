@@ -42,11 +42,7 @@ export const AdvancedSettings = ({ form }: { form: UseFormReturn<DestinationPane
               name="maxFillMs"
               render={({ field }) => (
                 <FormItemLayout
-                  label={
-                    <div className="flex items-center gap-2">
-                      <span>Batch wait time (milliseconds)</span>
-                    </div>
-                  }
+                  label="Batch wait time (milliseconds)"
                   layout="vertical"
                   description="How long to wait for more changes before sending. Shorter times mean more real-time updates but higher overhead."
                 >
