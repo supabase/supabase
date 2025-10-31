@@ -35,7 +35,7 @@ interface FormValues {
 const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormProps) => {
   const isNew = !account
   const { data: project } = useSelectedProjectQuery()
-  const { mutate: createAccount } = useAWSAccountCreateMutation()
+  const { mutate: createAccount, isLoading } = useAWSAccountCreateMutation()
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -144,7 +144,11 @@ const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormP
               <Button type="default" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              {isNew && <Button htmlType="submit">Add Account</Button>}
+              {isNew && (
+                <Button htmlType="submit" disabled={isLoading} loading={isLoading}>
+                  Add Account
+                </Button>
+              )}
             </SheetFooter>
           </form>
         </Form_Shadcn_>
