@@ -171,7 +171,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=gotrue.logs.prod'
@@ -183,7 +184,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=realtime.logs.prod'
@@ -195,7 +197,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=postgREST.logs.prod'
@@ -207,13 +210,14 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     # We must route the sink through kong because ingesting logs before logflare is fully initialised will
     # lead to broken queries from studio. This works by the assumption that containers are started in the
     # following order: vector > db > logflare > kong
-    uri: 'http://kong:8000/analytics/v1/api/logs?source_name=postgres.logs'
+    uri: 'http://analytics:4000/api/logs?source_name=postgres.logs'
   logflare_functions:
     type: 'http'
     inputs:
@@ -222,7 +226,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=deno-relay-logs'
@@ -234,7 +239,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=storage.logs.prod.2'
@@ -247,7 +253,8 @@ sinks:
       codec: 'json'
     method: 'post'
     request:
-      retry_max_duration_secs: 10
+      retry_max_duration_secs: 30
+      retry_initial_backoff_secs: 1
       headers:
         x-api-key: ${LOGFLARE_PUBLIC_ACCESS_TOKEN?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
     uri: 'http://analytics:4000/api/logs?source_name=cloudflare.logs.prod'
