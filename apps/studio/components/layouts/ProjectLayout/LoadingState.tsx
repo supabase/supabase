@@ -1,15 +1,12 @@
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
-const LoadingState = () => {
+export const LoadingState = () => {
   const { ref } = useParams()
-  const { data: allProjects, isLoading } = useProjectsQuery()
+  const { data: project, isLoading } = useProjectDetailQuery({ ref })
 
-  const projectName =
-    ref !== 'default'
-      ? allProjects?.find((project) => project.ref === ref)?.name
-      : 'Welcome to your project'
+  const projectName = ref !== 'default' ? project?.name : 'Welcome to your project'
 
   return (
     <div className="w-full mx-auto">
@@ -36,8 +33,6 @@ const LoadingState = () => {
     </div>
   )
 }
-
-export default LoadingState
 
 export const ProjectUsageLoadingState = () => {
   return (

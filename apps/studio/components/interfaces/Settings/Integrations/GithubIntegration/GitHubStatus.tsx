@@ -86,7 +86,7 @@ export const GitHubStatus = () => {
               {hasGitBranchSync ? (
                 <CheckCircle2 size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning-600" />
+                <AlertCircle size={12} className="text-warning" />
               )}
               <span>
                 {hasGitBranchSync
@@ -98,7 +98,7 @@ export const GitHubStatus = () => {
               {hasAutomaticBranching ? (
                 <CheckCircle2 size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning-600" />
+                <AlertCircle size={12} className="text-warning" />
               )}
               <span>
                 {hasAutomaticBranching

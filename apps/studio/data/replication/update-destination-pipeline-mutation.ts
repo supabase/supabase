@@ -1,15 +1,26 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import type { components } from 'api-types'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, post } from 'data/fetchers'
 
 export type BigQueryDestinationConfig = {
   projectId: string
   datasetId: string
   serviceAccountKey: string
-  maxStalenessMins: number
+  maxStalenessMins?: number
+}
+
+export type IcebergDestinationConfig = {
+  projectRef: string
+  warehouseName: string
+  namespace: string
+  catalogToken: string
+  s3AccessKeyId: string
+  s3SecretAccessKey: string
+  s3Region: string
 }
 
 export type UpdateDestinationPipelineParams = {
@@ -17,14 +28,17 @@ export type UpdateDestinationPipelineParams = {
   pipelineId: number
   projectRef: string
   destinationName: string
-  destinationConfig: {
-    bigQuery: BigQueryDestinationConfig
-  }
+  destinationConfig:
+    | {
+        bigQuery: BigQueryDestinationConfig
+      }
+    | {
+        iceberg: IcebergDestinationConfig
+      }
   sourceId: number
   pipelineConfig: {
     publicationName: string
-    batch: {
-      maxSize: number
+    batch?: {
       maxFillMs: number
     }
   }
@@ -36,49 +50,71 @@ async function updateDestinationPipeline(
     pipelineId,
     projectRef,
     destinationName: destinationName,
-    destinationConfig: {
-      bigQuery: { projectId, datasetId, serviceAccountKey, maxStalenessMins },
-    },
-    pipelineConfig: {
-      publicationName,
-      batch: { maxSize, maxFillMs },
-    },
+    destinationConfig,
+    pipelineConfig: { publicationName, batch },
     sourceId,
   }: UpdateDestinationPipelineParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
+  // Build destination_config based on the type
+  let destination_config: components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+
+  if ('bigQuery' in destinationConfig) {
+    const { projectId, datasetId, serviceAccountKey, maxStalenessMins } = destinationConfig.bigQuery
+    destination_config = {
+      big_query: {
+        project_id: projectId,
+        dataset_id: datasetId,
+        service_account_key: serviceAccountKey,
+        ...(maxStalenessMins !== null ? { max_staleness_mins: maxStalenessMins } : {}),
+      },
+    }
+  } else if ('iceberg' in destinationConfig) {
+    const {
+      projectRef: icebergProjectRef,
+      warehouseName,
+      namespace,
+      catalogToken,
+      s3AccessKeyId,
+      s3SecretAccessKey,
+      s3Region,
+    } = destinationConfig.iceberg
+    destination_config = {
+      iceberg: {
+        supabase: {
+          project_ref: icebergProjectRef,
+          warehouse_name: warehouseName,
+          namespace: namespace,
+          catalog_token: catalogToken,
+          s3_access_key_id: s3AccessKeyId,
+          s3_secret_access_key: s3SecretAccessKey,
+          s3_region: s3Region,
+        },
+      },
+    }
+  } else {
+    throw new Error('Invalid destination config: must specify either bigQuery or iceberg')
+  }
+
   const { data, error } = await post(
     '/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}',
     {
       params: { path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId } },
       body: {
+        destination_config,
+        source_id: sourceId,
         destination_name: destinationName,
-        destination_config: {
-          big_query: {
-            project_id: projectId,
-            dataset_id: datasetId,
-            service_account_key: serviceAccountKey,
-            max_staleness_mins: maxStalenessMins,
-          },
-        },
         pipeline_config: {
           publication_name: publicationName,
-          batch: {
-            max_size: maxSize,
-            max_fill_ms: maxFillMs,
-          },
+          ...(!!batch ? { batch: { max_fill_ms: batch.maxFillMs } } : {}),
         },
-        source_id: sourceId,
       },
       signal,
     }
   )
-  if (error) {
-    handleError(error)
-  }
-
+  if (error) handleError(error)
   return data
 }
 
@@ -95,12 +131,24 @@ export const useUpdateDestinationPipelineMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<UpdateDestinationPipelineData, ResponseError, UpdateDestinationPipelineParams>(
-    (vars) => updateDestinationPipeline(vars),
     {
+      mutationFn: (vars) => updateDestinationPipeline(vars),
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(replicationKeys.destinations(projectRef))
-        await queryClient.invalidateQueries(replicationKeys.pipelines(projectRef))
+        const { projectRef, destinationId, pipelineId } = variables
+
+        await Promise.all([
+          // Invalidate lists
+          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
+          // Invalidate item-level caches used by the editor panel
+          queryClient.invalidateQueries({
+            queryKey: replicationKeys.destinationById(projectRef, destinationId),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: replicationKeys.pipelineById(projectRef, pipelineId),
+          }),
+        ])
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

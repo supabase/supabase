@@ -1,12 +1,12 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { useFlag } from 'common'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
   AWS_REGIONS_COORDINATES,
   FLY_REGIONS_COORDINATES,
 } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { fetchHandler } from 'data/fetchers'
-import { useFlag } from 'hooks/ui/useFlag'
 import { getDistanceLatLonKM, tryParseJson } from 'lib/helpers'
 import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
@@ -76,16 +76,14 @@ export const useDefaultRegionQuery = <TData = DefaultRegionData>(
   const restrictedPoolFlag = useFlag('defaultRegionRestrictedPool')
   const restrictedPool = tryParseJson(restrictedPoolFlag)
 
-  return useQuery<DefaultRegionData, DefaultRegionError, TData>(
-    miscKeys.defaultRegion(cloudProvider, useRestrictedPool ?? true),
-    () => getDefaultRegionOption({ cloudProvider, restrictedPool, useRestrictedPool }),
-    {
-      enabled:
-        enabled && typeof cloudProvider !== 'undefined' && typeof restrictedPool !== 'undefined',
-      retry(failureCount) {
-        return failureCount < 1
-      },
-      ...options,
-    }
-  )
+  return useQuery<DefaultRegionData, DefaultRegionError, TData>({
+    queryKey: miscKeys.defaultRegion(cloudProvider, useRestrictedPool ?? true),
+    queryFn: () => getDefaultRegionOption({ cloudProvider, restrictedPool, useRestrictedPool }),
+    enabled:
+      enabled && typeof cloudProvider !== 'undefined' && typeof restrictedPool !== 'undefined',
+    retry(failureCount) {
+      return failureCount < 1
+    },
+    ...options,
+  })
 }

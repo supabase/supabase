@@ -21,23 +21,21 @@ export const useAddLoginEvent = ({
   UseMutationOptions<AddLoginEventData, ResponseError, AddLoginEventVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<AddLoginEventData, ResponseError, AddLoginEventVariables>(
-    (vars) => addLoginEvent(),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        Sentry.captureException(
-          new Error("Failed to add login event to user's audit log", { cause: data })
-        )
-        if (onError === undefined) {
-          toast.error(`Failed to add login event: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<AddLoginEventData, ResponseError, AddLoginEventVariables>({
+    mutationFn: (vars) => addLoginEvent(),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      Sentry.captureException(
+        new Error("Failed to add login event to user's audit log", { cause: data })
+      )
+      if (onError === undefined) {
+        toast.error(`Failed to add login event: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

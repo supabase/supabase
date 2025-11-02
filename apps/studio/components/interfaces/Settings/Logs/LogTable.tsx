@@ -1,19 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isEqual } from 'lodash'
-import { Clipboard, Eye, EyeOff, Play } from 'lucide-react'
+import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { createPortal } from 'react-dom'
+import { toast } from 'sonner'
 
 import { IS_PLATFORM, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
-import { toast } from 'sonner'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import {
   Button,
   ResizableHandle,
@@ -94,7 +94,7 @@ const LogTable = ({
   const [selectionOpen, setSelectionOpen] = useState(false)
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
 
-  const { can: canCreateLogQuery } = useAsyncCheckProjectPermissions(
+  const { can: canCreateLogQuery } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
     {
@@ -437,13 +437,14 @@ const LogTable = ({
             createPortal(
               <Menu id={LOGS_EXPLORER_CONTEXT_MENU_ID} animation={false}>
                 <Item onClick={onCopyCell}>
-                  <Clipboard size={14} />
+                  <Copy size={14} />
                   <span className="ml-2 text-xs">Copy event message</span>
                 </Item>
               </Menu>,
               document.body
             )}
         </ResizablePanel>
+
         <ResizableHandle withHandle />
 
         {selectionOpen && (

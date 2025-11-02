@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -9,7 +10,7 @@ import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Dialog,
@@ -39,7 +40,10 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const isProjectActive = useIsProjectActive()
   const [showSuccess, setShowSuccess] = useState(false)
 
-  const canCreateCredentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { can: canCreateCredentials } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_WRITE,
+    '*'
+  )
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef })
   const isS3ConnectionEnabled = config?.features.s3Protocol.enabled
@@ -83,7 +87,12 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button type="default" disabled={disableCreation} className="pointer-events-auto">
+            <Button
+              type="default"
+              icon={<Plus size={14} />}
+              disabled={disableCreation}
+              className="pointer-events-auto"
+            >
               New access key
             </Button>
           </DialogTrigger>

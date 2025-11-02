@@ -31,6 +31,13 @@ import {
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
 
+const getProviderName = (provider: string) =>
+  provider === 'github'
+    ? 'GitHub'
+    : provider.startsWith('sso')
+      ? 'SSO'
+      : provider.replaceAll('_', ' ')
+
 export const AccountIdentities = () => {
   const router = useRouter()
 
@@ -53,9 +60,6 @@ export const AccountIdentities = () => {
   })
 
   const [_, message] = router.asPath.split('#message=')
-
-  const getProviderName = (provider: string) =>
-    provider === 'github' ? 'GitHub' : provider.startsWith('sso') ? 'SSO' : provider
 
   const onConfirmUnlinkIdentity = async () => {
     const identity = identities.find((i) => i.provider === selectedProviderUnlink)
@@ -115,7 +119,7 @@ export const AccountIdentities = () => {
                     </div>
                     <p className="text-sm text-foreground-lighter">
                       {!!username ? <span>{username} • </span> : null}
-                      {(identity as any).email}
+                      {identity.email}
                     </p>
                   </div>
                 </div>

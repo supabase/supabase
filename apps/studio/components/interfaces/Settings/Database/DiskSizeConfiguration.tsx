@@ -12,10 +12,12 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsAwsNimbusCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, InfoIcon } from 'ui'
 
@@ -28,6 +30,9 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
+  const { reportsAll } = useIsFeatureEnabled(['reports:all'])
+
   const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
   const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
   const setShowIncreaseDiskSizeModal = (value: SetStateAction<boolean>) => {
@@ -35,7 +40,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     setUrlParams({ show_increase_disk_size_modal: show ? 'true' : undefined })
   }
 
-  const { can: canUpdateDiskSizeConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {
@@ -79,9 +84,10 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       Supabase employs auto-scaling storage and allows for manual disk size
                       adjustments when necessary
                     </p>
-                    <div className="flex items-end justify-end">
+                    {!isAwsNimbus && (
                       <ButtonTooltip
                         type="default"
+                        className="w-min ml-auto"
                         disabled={!canUpdateDiskSizeConfig || disabled}
                         onClick={() => setShowIncreaseDiskSizeModal(true)}
                         tooltip={{
@@ -95,7 +101,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       >
                         Increase disk size
                       </ButtonTooltip>
-                    </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-12 gap-2 mt-12 items-start">
@@ -111,15 +117,17 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                         <span className="text-lg">{currentDiskSize} GB</span>
                       </div>
 
-                      <div className="col-span-2 mt-4">
-                        <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                          <Link
-                            href={`/project/${projectRef}/reports/database#database-size-report`}
-                          >
-                            View detailed summary
-                          </Link>
-                        </Button>
-                      </div>
+                      {reportsAll && (
+                        <div className="col-span-2 mt-4">
+                          <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                            <Link
+                              href={`/project/${projectRef}/reports/database#database-size-report`}
+                            >
+                              View detailed summary
+                            </Link>
+                          </Button>
+                        </div>
+                      )}
                     </div>
 
                     <div className="col-span-8">
@@ -135,7 +143,7 @@ If you upload more than 1.5x the current size of your storage, your database wil
 into read-only mode. If you know how big your database is going to be, you can
 manually increase the size here.
 
-Read more about [disk management](https://supabase.com/docs/guides/platform/database-size#disk-management) and how to [free up storage space](https://supabase.com/docs/guides/platform/database-size#vacuum-operations).
+Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk-management) and how to [free up storage space](${DOCS_URL}/guides/platform/database-size#vacuum-operations).
 `}
                           />
                         </AlertDescription_Shadcn_>

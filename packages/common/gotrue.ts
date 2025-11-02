@@ -115,13 +115,112 @@ const logIndexedDB = (message: string, ...args: any[]) => {
   })()
 }
 
+/**
+ * Reference to a function that captures exceptions for debugging purposes to be sent to Sentry.
+ */
+let captureException: ((e: any) => any) | null = null
+
+export function setCaptureException(fn: typeof captureException) {
+  captureException = fn
+}
+
+async function debuggableNavigatorLock<R>(
+  name: string,
+  acquireTimeout: number,
+  fn: () => Promise<R>
+): Promise<R> {
+  let stackException: any
+
+  try {
+    throw new Error('Lock is being held for over 10s here')
+  } catch (e: any) {
+    stackException = e
+  }
+
+  const debugTimeout = setTimeout(() => {
+    ;(async () => {
+      const bc = new BroadcastChannel('who-is-holding-the-lock')
+      try {
+        bc.postMessage({})
+      } finally {
+        bc.close()
+      }
+
+      console.error(
+        `Waited for over 10s to acquire an Auth client lock, will steal the lock to unblock`,
+        await navigator.locks.query(),
+        stackException
+      )
+
+      // quickly steal the lock and release it so that others can acquire it,
+      // while leaving the code that was holding it to continue running
+      navigator.locks
+        .request(
+          name,
+          {
+            steal: true,
+          },
+          async () => {
+            await new Promise((accept) => {
+              setTimeout(accept, 0)
+            })
+
+            console.error('Lock was stolen and now released', stackException)
+          }
+        )
+        .catch((e: any) => {
+          if (captureException) {
+            captureException(e)
+          }
+        })
+    })()
+  }, 10000)
+
+  try {
+    return await navigatorLock(name, acquireTimeout, async () => {
+      clearTimeout(debugTimeout)
+
+      const bc = new BroadcastChannel('who-is-holding-the-lock')
+      bc.addEventListener('message', () => {
+        console.error('Lock is held here', stackException)
+
+        if (captureException) {
+          captureException(stackException)
+        }
+      })
+
+      try {
+        return await fn()
+      } finally {
+        bc.close()
+      }
+    })
+  } finally {
+    clearTimeout(debugTimeout)
+  }
+}
+
+// Wrap fetch with 30-second timeout to prevent indefinite hangs
+const fetchWithTimeout: typeof fetch = async (input, init) => {
+  const timeoutSignal = AbortSignal.timeout(30000) // 30 seconds
+  const existingSignal = init?.signal
+  const combinedSignal = existingSignal
+    ? AbortSignal.any([existingSignal, timeoutSignal])
+    : timeoutSignal
+
+  return fetch(input, {
+    ...init,
+    signal: combinedSignal,
+  })
+}
+
 export const gotrueClient = new AuthClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
   detectSessionInUrl: shouldDetectSessionInUrl,
   debug: debug ? (persistedDebug ? logIndexedDB : true) : false,
-  lock: navigatorLockEnabled ? navigatorLock : undefined,
-
+  lock: navigatorLockEnabled ? debuggableNavigatorLock : undefined,
+  fetch: fetchWithTimeout,
   ...('localStorage' in globalThis
     ? { storage: globalThis.localStorage, userStorage: globalThis.localStorage }
     : null),

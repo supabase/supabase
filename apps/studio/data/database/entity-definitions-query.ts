@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
+import { CREATE_PG_GET_TABLEDEF_SQL } from './database-table-definition'
 import { databaseKeys } from './keys'
 
 export const getEntityDefinitionsSql = ({
@@ -111,11 +111,10 @@ export const useEntityDefinitionsQuery = <TData = EntityDefinitionsData>(
     ...options
   }: UseQueryOptions<EntityDefinitionsData, EntityDefinitionsError, TData> = {}
 ) =>
-  useQuery<EntityDefinitionsData, EntityDefinitionsError, TData>(
-    databaseKeys.entityDefinitions(projectRef, schemas),
-    ({ signal }) => getEntityDefinitions({ projectRef, connectionString, schemas, limit }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && schemas.length > 0,
-      ...options,
-    }
-  )
+  useQuery<EntityDefinitionsData, EntityDefinitionsError, TData>({
+    queryKey: databaseKeys.entityDefinitions(projectRef, schemas),
+    queryFn: ({ signal }) =>
+      getEntityDefinitions({ projectRef, connectionString, schemas, limit }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && schemas.length > 0,
+    ...options,
+  })

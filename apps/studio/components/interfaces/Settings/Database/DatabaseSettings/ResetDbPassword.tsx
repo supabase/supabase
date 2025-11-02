@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { debounce } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -9,10 +8,10 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import passwordStrength from 'lib/password-strength'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { Button, Input, Modal } from 'ui'
 
@@ -21,7 +20,7 @@ const ResetDbPassword = ({ disabled = false }) => {
   const isProjectActive = useIsProjectActive()
   const { data: project } = useSelectedProjectQuery()
 
-  const { can: canResetDbPassword } = useAsyncCheckProjectPermissions(
+  const { can: canResetDbPassword } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
     {
@@ -62,17 +61,13 @@ const ResetDbPassword = ({ disabled = false }) => {
     setPasswordStrengthMessage(message)
   }
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value) => checkPasswordStrength(value), 300)
-  ).current
-
   const onDbPassChange = (e: any) => {
     const value = e.target.value
     setPassword(value)
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
+    } else checkPasswordStrength(value)
   }
 
   const confirmResetDbPass = async () => {
@@ -86,7 +81,7 @@ const ResetDbPassword = ({ disabled = false }) => {
   function generatePassword() {
     const password = generateStrongPassword()
     setPassword(password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   return (

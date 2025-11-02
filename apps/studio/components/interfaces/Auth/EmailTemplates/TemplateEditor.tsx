@@ -11,7 +11,7 @@ import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -38,9 +38,9 @@ interface TemplateEditorProps {
   template: FormSchema
 }
 
-const TemplateEditor = ({ template }: TemplateEditorProps) => {
+export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -76,7 +76,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
@@ -384,5 +383,3 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     </Form_Shadcn_>
   )
 }
-
-export default TemplateEditor

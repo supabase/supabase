@@ -1,3 +1,23 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { cn } from '@ui/lib/utils'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { RadioGroupCard, RadioGroupCardItem } from '@ui/components/radio-group-card'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrganizationLinkAwsMarketplaceMutation } from 'data/organizations/organization-link-aws-marketplace-mutation'
+import { DOCS_URL } from 'lib/constants'
+import type { Organization } from 'types'
 import {
   Button,
   Collapsible_Shadcn_,
@@ -7,33 +27,14 @@ import {
   FormField_Shadcn_,
   Skeleton,
 } from 'ui'
-import { RadioGroupCard, RadioGroupCardItem } from '@ui/components/radio-group-card'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { cn } from '@ui/lib/utils'
-import { ActionCard } from '../../../ui/ActionCard'
-import { Boxes, ChevronRight } from 'lucide-react'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '../../../layouts/Scaffold'
-import { ButtonTooltip } from '../../../ui/ButtonTooltip'
-import { z } from 'zod'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo, useState } from 'react'
-import { Organization } from '../../../../types'
-import { useProjectsQuery } from '../../../../data/projects/projects-query'
-import { useOrganizationLinkAwsMarketplaceMutation } from '../../../../data/organizations/organization-link-aws-marketplace-mutation'
-import { toast } from 'sonner'
-import AwsMarketplaceOnboardingSuccessModal from './AwsMarketplaceOnboardingSuccessModal'
-import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
-import { useRouter } from 'next/router'
+import { OrganizationCard } from '../OrganizationCard'
 import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
+import AwsMarketplaceOnboardingSuccessModal from './AwsMarketplaceOnboardingSuccessModal'
 import { CloudMarketplaceOnboardingInfo } from './cloud-marketplace-query'
-import Link from 'next/link'
+import NewAwsMarketplaceOrgModal from './NewAwsMarketplaceOrgModal'
 
-interface Props {
+interface AwsMarketplaceLinkExistingOrgProps {
   organizations?: Organization[] | undefined
   onboardingInfo?: CloudMarketplaceOnboardingInfo | undefined
   isLoadingOnboardingInfo: boolean
@@ -43,13 +44,13 @@ const FormSchema = z.object({
   orgSlug: z.string(),
 })
 
-export type LinkExistingOrgForm = z.infer<typeof FormSchema>
+type LinkExistingOrgForm = z.infer<typeof FormSchema>
 
-const AwsMarketplaceLinkExistingOrg = ({
+export const AwsMarketplaceLinkExistingOrg = ({
   organizations,
   onboardingInfo,
   isLoadingOnboardingInfo,
-}: Props) => {
+}: AwsMarketplaceLinkExistingOrgProps) => {
   const router = useRouter()
   const {
     query: { buyer_id: buyerId },
@@ -92,8 +93,6 @@ const AwsMarketplaceLinkExistingOrg = ({
     return { orgsLinkable: linkable, orgsNotLinkable: notLinkable }
   }, [sortedOrganizations, onboardingInfo?.organization_linking_eligibility])
 
-  const { data: projects = [] } = useProjectsQuery()
-
   const [isNotLinkableOrgListOpen, setIsNotLinkableOrgListOpen] = useState(false)
   const [orgLinkedSuccessfully, setOrgLinkedSuccessfully] = useState(false)
   const [showOrgCreationDialog, setShowOrgCreationDialog] = useState(false)
@@ -119,12 +118,14 @@ const AwsMarketplaceLinkExistingOrg = ({
 
   return (
     <>
-      {onboardingInfo && !onboardingInfo.aws_contract_auto_renewal && (
-        <AwsMarketplaceAutoRenewalWarning
-          awsContractEndDate={onboardingInfo.aws_contract_end_date}
-          awsContractSettingsUrl={onboardingInfo.aws_contract_settings_url}
-        />
-      )}
+      {onboardingInfo &&
+        !onboardingInfo.aws_contract_auto_renewal &&
+        !onboardingInfo.aws_contract_is_private_offer && (
+          <AwsMarketplaceAutoRenewalWarning
+            awsContractEndDate={onboardingInfo.aws_contract_end_date}
+            awsContractSettingsUrl={onboardingInfo.aws_contract_settings_url}
+          />
+        )}
       <ScaffoldSection>
         <ScaffoldSectionDetail className="text-base">
           <>
@@ -137,9 +138,8 @@ const AwsMarketplaceLinkExistingOrg = ({
 
             <p>
               You can read more on billing through AWS in our {''}
-              {/*TODO(thomas): Update docs link once the new docs exist*/}
               <Link
-                href="https://supabase.com/docs/guides/platform"
+                href={`${DOCS_URL}/guides/platform/aws-marketplace`}
                 target="_blank"
                 className="underline"
               >
@@ -201,39 +201,24 @@ const AwsMarketplaceLinkExistingOrg = ({
                                 subscription at the moment.
                               </p>
                             ) : (
-                              <>
-                                {orgsLinkable.map((org) => {
-                                  const numProjects = projects.filter(
-                                    (p) => p.organization_slug === org.slug
-                                  ).length
-                                  return (
-                                    <RadioGroupCardItem
-                                      id={org.slug}
-                                      key={org.slug}
-                                      showIndicator={false}
-                                      value={org.slug}
-                                      className={cn(
-                                        'relative text-sm text-left flex flex-col gap-0 p-0 [&_label]:w-full group] w-full'
-                                      )}
-                                      label={
-                                        <ActionCard
-                                          className="[&>div]:items-center border-0 bg-surface-0 group-data-[state=checked]:opacity-100"
-                                          key={org.id}
-                                          icon={
-                                            <Boxes
-                                              size={18}
-                                              strokeWidth={1}
-                                              className="text-foreground"
-                                            />
-                                          }
-                                          title={org.name}
-                                          description={`${org.plan.name} Plan • ${numProjects > 0 ? `${numProjects} Project${numProjects > 1 ? 's' : ''}` : '0 Projects'}`}
-                                        />
-                                      }
+                              orgsLinkable.map((org) => (
+                                <RadioGroupCardItem
+                                  id={org.slug}
+                                  key={org.slug}
+                                  showIndicator={false}
+                                  value={org.slug}
+                                  className={cn(
+                                    'relative text-sm text-left flex flex-col gap-0 p-0 [&_label]:w-full group w-full'
+                                  )}
+                                  label={
+                                    <OrganizationCard
+                                      key={org.id}
+                                      isLink={false}
+                                      organization={org}
                                     />
-                                  )
-                                })}
-                              </>
+                                  }
+                                />
+                              ))
                             )}
                           </>
                         )}
@@ -275,20 +260,14 @@ const AwsMarketplaceLinkExistingOrg = ({
                   the organization to link it.
                 </p>
                 <div className="text-sm text-left flex flex-col gap-4 p-0 [&_label]:w-full group] w-full opacity-60">
-                  {orgsNotLinkable.map((org) => {
-                    const numProjects = projects.filter(
-                      (p) => p.organization_slug === org.slug
-                    ).length
-                    return (
-                      <ActionCard
-                        className="[&>div]:items-center cursor-not-allowed"
-                        key={org.id}
-                        icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
-                        title={org.name}
-                        description={`${org.plan.name} Plan • ${numProjects > 0 ? `${numProjects} Project${numProjects > 1 ? 's' : ''}` : '0 Projects'}`}
-                      />
-                    )
-                  })}
+                  {orgsNotLinkable.map((org) => (
+                    <OrganizationCard
+                      isLink={false}
+                      key={org.id}
+                      organization={org}
+                      className="cursor-not-allowed"
+                    />
+                  ))}
                 </div>
               </CollapsibleContent_Shadcn_>
             </Collapsible_Shadcn_>
@@ -338,5 +317,3 @@ const AwsMarketplaceLinkExistingOrg = ({
     </>
   )
 }
-
-export default AwsMarketplaceLinkExistingOrg

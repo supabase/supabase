@@ -6,14 +6,14 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
-export type BucketCreateVariables = Omit<CreateStorageBucketBody, 'public'> & {
+type BucketCreateVariables = Omit<CreateStorageBucketBody, 'public'> & {
   projectRef: string
   isPublic: boolean
 }
 
 type CreateStorageBucketBody = components['schemas']['CreateStorageBucketBody']
 
-export async function createBucket({
+async function createBucket({
   projectRef,
   id,
   type,
@@ -51,22 +51,20 @@ export const useBucketCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketCreateData, ResponseError, BucketCreateVariables>(
-    (vars) => createBucket(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create bucket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BucketCreateData, ResponseError, BucketCreateVariables>({
+    mutationFn: (vars) => createBucket(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create bucket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

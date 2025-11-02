@@ -4,7 +4,6 @@ import { ref as valtioRef } from 'valtio'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
-import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -17,6 +16,7 @@ import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
+import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
 
 const rowKeyGetter = (row: SupaRow) => {
@@ -72,6 +72,7 @@ export const Grid = memo(
         snap.setSelectedCellPosition({ idx: args.column.idx, rowIdx: args.rowIdx })
       }
 
+      const page = snap.page
       const table = snap.table
       const tableEntityType = snap.originalTable?.entity_type
       const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
@@ -128,9 +129,7 @@ export const Grid = memo(
         }
       }
 
-      const removeAllFilters = () => {
-        onApplyFilters([])
-      }
+      const removeAllFilters = () => onApplyFilters([])
 
       return (
         <div
@@ -151,23 +150,25 @@ export const Grid = memo(
               className="absolute top-9 p-2 w-full z-[1] pointer-events-none"
             >
               {isLoading && <GenericSkeletonLoader />}
-              {isError && (
-                <AlertError
-                  className="pointer-events-auto"
-                  error={error}
-                  subject="Failed to retrieve rows from table"
-                >
-                  {filters.length > 0 && (
-                    <p>
-                      Verify that the filter values are correct, as the error may stem from an
-                      incorrectly applied filter
-                    </p>
-                  )}
-                </AlertError>
-              )}
+
+              {isError && <GridError error={error} />}
+
               {isSuccess && (
                 <>
-                  {(filters ?? []).length === 0 ? (
+                  {page > 1 ? (
+                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                      <p className="text-sm text-light">This page does not have any data</p>
+                      <div className="flex items-center space-x-2 mt-4">
+                        <Button
+                          type="default"
+                          className="pointer-events-auto"
+                          onClick={() => snap.setPage(1)}
+                        >
+                          Head back to first page
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (filters ?? []).length === 0 ? (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
                       <p className="text-sm text-light">
                         {isDraggedOver ? 'Drop your CSV file here' : 'This table is empty'}
@@ -207,7 +208,7 @@ export const Grid = memo(
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center col-span-full">
+                    <div className="flex flex-col items-center justify-center col-span-full h-full">
                       <p className="text-sm text-light">
                         The filters applied have returned no results from this table
                       </p>

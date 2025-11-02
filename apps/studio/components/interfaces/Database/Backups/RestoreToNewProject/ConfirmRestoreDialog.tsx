@@ -61,7 +61,6 @@ export const ConfirmRestoreDialog = ({
               <li>Storage objects & settings</li>
               <li>Edge Functions</li>
               <li>Auth settings & API keys</li>
-              <li>Realtime settings</li>
               <li>Database extensions and settings</li>
               <li>Read replicas</li>
             </ul>

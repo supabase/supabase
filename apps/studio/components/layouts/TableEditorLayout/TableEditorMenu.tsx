@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Filter, Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
@@ -11,12 +11,12 @@ import { ProtectedSchemaWarning } from 'components/interfaces/Database/Protected
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import InfiniteList from 'components/ui/InfiniteList'
+import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -85,9 +85,12 @@ export const TableEditorMenu = () => {
     [data?.pages]
   )
 
-  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canCreateTables } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
-  const { isSchemaLocked, reason } = useIsProtectedSchema({ schema: selectedSchema })
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -95,23 +98,42 @@ export const TableEditorMenu = () => {
     id,
   })
 
-  const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
-
-  const onSelectExportCLI = async (id: number) => {
-    const table = await getTableEditor({
-      id: id,
-      projectRef,
-      connectionString: project?.connectionString,
-    })
-    const supaTable = table && parseSupaTable(table)
-    setTableToExport(supaTable)
+  if (selectedTable?.schema && !selectedSchema) {
+    setSelectedSchema(selectedTable.schema)
   }
 
-  useEffect(() => {
-    if (selectedTable?.schema) {
-      setSelectedSchema(selectedTable.schema)
-    }
-  }, [selectedTable?.schema])
+  const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
+
+  const onSelectExportCLI = useCallback(
+    async (id: number) => {
+      const table = await getTableEditor({
+        id: id,
+        projectRef,
+        connectionString: project?.connectionString,
+      })
+      const supaTable = table && parseSupaTable(table)
+      setTableToExport(supaTable)
+    },
+    [project?.connectionString, projectRef]
+  )
+
+  const getItemKey = useCallback(
+    (index: number) => {
+      const item = entityTypes?.[index]
+      return item?.id ? String(item.id) : `table-editor-entity-${index}`
+    },
+    [entityTypes]
+  )
+
+  const entityProps = useMemo(
+    () => ({
+      projectRef: project?.ref!,
+      id: Number(id),
+      isLocked: isSchemaLocked,
+      onExportCLI: () => onSelectExportCLI(Number(id)),
+    }),
+    [project?.ref, id, isSchemaLocked, onSelectExportCLI]
+  )
 
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
@@ -132,6 +154,7 @@ export const TableEditorMenu = () => {
               setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
+            portal={!isMobile}
           />
 
           <div className="grid gap-3 mx-4">
@@ -145,7 +168,7 @@ export const TableEditorMenu = () => {
                 icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
                 type="default"
                 className="justify-start"
-                onClick={snap.onAddTable}
+                onClick={() => snap.onAddTable()}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -162,7 +185,7 @@ export const TableEditorMenu = () => {
             )}
           </div>
         </div>
-        <div className="flex flex-auto flex-col gap-2 pb-4">
+        <div className="grow min-h-0 flex flex-col gap-2 pb-4">
           <InnerSideBarFilters className="mx-2">
             <InnerSideBarFilterSearchInput
               autoFocus={!isMobile}
@@ -259,21 +282,20 @@ export const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1 flex-grow" data-testid="tables-list">
-                  <InfiniteList
-                    items={entityTypes}
-                    // @ts-expect-error
+                <div className="flex flex-1 min-h-0 w-full" data-testid="tables-list">
+                  <InfiniteListDefault
+                    className="h-full w-full"
+                    items={entityTypes!}
                     ItemComponent={EntityListItem}
-                    itemProps={{
-                      projectRef: project?.ref!,
-                      id: Number(id),
-                      isSchemaLocked,
-                      onExportCLI: () => onSelectExportCLI(Number(id)),
-                    }}
-                    getItemSize={() => 28}
+                    LoaderComponent={LoaderForIconMenuItems}
+                    itemProps={entityProps}
+                    getItemKey={getItemKey}
+                    getItemSize={(index) =>
+                      index !== 0 && index === entityTypes!.length ? 85 : 28
+                    }
                     hasNextPage={hasNextPage}
                     isLoadingNextPage={isFetchingNextPage}
-                    onLoadNextPage={() => fetchNextPage()}
+                    onLoadNextPage={fetchNextPage}
                   />
                 </div>
               )}

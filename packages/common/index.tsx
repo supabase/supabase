@@ -1,4 +1,5 @@
 export * from './auth'
+export * from './configcat'
 export * from './consent-state'
 export * from './constants'
 export * from './database-types'
