@@ -9,7 +9,7 @@ import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations
 import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { isEqual } from 'lodash'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -27,7 +27,7 @@ interface AddPaymentMethodFormProps {
 // Small UX annoyance here, that the page will be refreshed
 
 const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps) => {
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { data: customerProfile, isLoading: customerProfileLoading } =
     useOrganizationCustomerProfileQuery({

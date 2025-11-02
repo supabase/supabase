@@ -1,6 +1,7 @@
-import { Clipboard, Edit, Trash } from 'lucide-react'
+import { ChevronRight, Clipboard, Edit, Trash } from 'lucide-react'
 import { useCallback } from 'react'
-import { Item, ItemParams, Menu } from 'react-contexify'
+import { Item, ItemParams, Menu, Separator, Submenu } from 'react-contexify'
+import { toast } from 'sonner'
 
 import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -48,27 +49,50 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       const text = formatClipboardValue(value)
 
       copyToClipboard(text)
+      toast.success('Copied cell value to clipboard')
     },
     [rows, snap.gridColumns, snap.selectedCellPosition]
   )
 
+  const onCopyRowContent = useCallback(
+    (p: ItemParams) => {
+      const { props } = p
+      const { rowIdx } = props
+      const row = rows[rowIdx]
+      copyToClipboard(JSON.stringify(row))
+      toast.success('Copied row to clipboard')
+    },
+    [rows]
+  )
+
   return (
-    <>
-      <Menu id={ROW_CONTEXT_MENU_ID} animation={false}>
+    <Menu id={ROW_CONTEXT_MENU_ID} animation={false} className="!min-w-36">
+      <Submenu
+        label={
+          <div className="flex items-center space-x-2">
+            <Clipboard size={12} />
+            <span className="text-xs">Copy</span>
+          </div>
+        }
+        arrow={<ChevronRight size={12} />}
+      >
         <Item onClick={onCopyCellContent}>
-          <Clipboard size={14} />
-          <span className="ml-2 text-xs">Copy cell content</span>
+          <span className="ml-2 text-xs">Copy cell</span>
         </Item>
-        <Item onClick={onEditRowClick} hidden={!snap.editable} data="edit">
-          <Edit size={14} />
-          <span className="ml-2 text-xs">Edit row</span>
+        <Item onClick={onCopyRowContent}>
+          <span className="ml-2 text-xs">Copy row</span>
         </Item>
-        <Item onClick={onDeleteRow} hidden={!snap.editable} data="delete">
-          <Trash size={14} stroke="red" />
-          <span className="ml-2 text-xs">Delete row</span>
-        </Item>
-      </Menu>
-    </>
+      </Submenu>
+      <Item onClick={onEditRowClick} hidden={!snap.editable} data="edit">
+        <Edit size={12} />
+        <span className="ml-2 text-xs">Edit row</span>
+      </Item>
+      <Separator />
+      <Item onClick={onDeleteRow} hidden={!snap.editable} data="delete">
+        <Trash size={12} />
+        <span className="ml-2 text-xs">Delete row</span>
+      </Item>
+    </Menu>
   )
 }
 export default RowContextMenu

@@ -9,16 +9,16 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { isAnyone } from '@/access/isAnyone'
-import { isAuthenticated } from '@/access/isAuthenticated'
+import { isAnyone } from '../../access/isAnyone.ts'
+import { isAuthenticated } from '../../access/isAuthenticated.ts'
 
-import { Banner } from '@/blocks/Banner/config'
-import { Code } from '@/blocks/Code/config'
-import { MediaBlock } from '@/blocks/MediaBlock/config'
-import { Quote } from '@/blocks/Quote/config'
-import { YouTube } from '@/blocks/YouTube/config'
-import { populateAuthors } from './hooks/populateAuthors'
-import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
+import { Banner } from '../../blocks/Banner/config.ts'
+import { Code } from '../../blocks/Code/config.ts'
+import { MediaBlock } from '../../blocks/MediaBlock/config.ts'
+import { Quote } from '../../blocks/Quote/config.ts'
+import { YouTube } from '../../blocks/YouTube/config.ts'
+import { populateAuthors } from './hooks/populateAuthors.ts'
+import { revalidateDelete, revalidatePost } from './hooks/revalidatePost.ts'
 
 import {
   MetaDescriptionField,
@@ -27,7 +27,7 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-import { slugField } from '@/fields/slug'
+import { slugField } from '../../fields/slug/index.ts'
 
 const launchweekOptions = [
   { label: '6', value: '6' },

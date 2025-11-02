@@ -18,6 +18,7 @@ Bo Lu
 Bobbie Soedirgo
 Brent Newson
 Carel de Waal
+Cameron Blackwood
 Cemal Kılıç
 Chandana Anumula
 Charis Lam
@@ -26,6 +27,7 @@ Chris Caruso
 Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Martin
 Chris Stockton
 Chris Ward
 Craig Cannon
@@ -37,13 +39,16 @@ Deepthi Sigireddi
 Deji I
 Div Arora
 Divit D
+Douglas Hunley
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
+Emmett Folger
 Etienne Stalmans
 Fabrizio Fenoglio
 Felipe Stival
 Francesco Sansalvadore
+Greg Kress
 Greg P
 Greg Richardson
 Guilherme Souza
@@ -82,7 +87,9 @@ Luca Forstner
 Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
+Matt Rossman
 Monica Khoury
+Mykhailo Mischa Lieibenson
 Nyannyacha
 Oli R
 Pamela Chia
@@ -93,7 +100,9 @@ Pavel Borisov
 Paweł Gulbinowicz
 Peter Lyn
 Qiao Han
+Rafael Chacón
 Raminder Singh
+Raúl Barroso
 Riccardo Busetti
 Rodrigo Mansueli
 Ronan Lehane
@@ -106,6 +115,7 @@ Stanislav M
 Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
+Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taryn King
 Terry Sutton

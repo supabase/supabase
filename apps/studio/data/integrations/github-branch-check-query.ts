@@ -48,7 +48,7 @@ export const useCheckGithubBranchValidity = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to check Github branch: ${data.message}`)
+          toast.error(`Failed to check GitHub branch: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

@@ -9,7 +9,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, cn, CodeBlock, CodeBlockLang } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -47,7 +47,7 @@ export const EdgeFunctionBlock = ({
   const { data: existingFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionName })
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {

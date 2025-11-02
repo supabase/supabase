@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Button, cn } from 'ui'
 import { ButtonTooltip } from './ButtonTooltip'
@@ -28,8 +28,8 @@ const UpgradeToPro = ({
   source = 'upgrade',
   disabled = false,
 }: UpgradeToProProps) => {
-  const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const plan = organization?.plan?.id
 
   const canUpdateSubscription = useCheckPermissions(

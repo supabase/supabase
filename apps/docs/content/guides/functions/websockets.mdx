@@ -32,7 +32,7 @@ Here are some basic examples of setting up WebSocket servers using Deno and Node
 Deno.serve((req) => {
   const upgrade = req.headers.get('upgrade') || ''
 
-  if (upgrade.toLowerCase() != 'WebSocket') {
+  if (upgrade.toLowerCase() != 'websocket') {
     return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 })
   }
 

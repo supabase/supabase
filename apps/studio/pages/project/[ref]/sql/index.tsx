@@ -6,7 +6,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
-import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
@@ -26,10 +25,13 @@ const TableEditorPage: NextPageWithLayout = () => {
     } else if (lastTabId) {
       const lastTab = store.tabsMap[lastTabId]
       if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+    } else {
+      router.push(`/project/${projectRef}/sql/new`)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <NewTab />
+  return null
 }
 
 TableEditorPage.getLayout = (page) => (

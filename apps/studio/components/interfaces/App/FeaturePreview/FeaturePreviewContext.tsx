@@ -11,7 +11,7 @@ import {
 } from 'react'
 
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { EMPTY_OBJ } from 'lib/void'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
@@ -92,14 +92,13 @@ export const useIsInlineEditorEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
-  const organization = useSelectedOrganization()
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
 
-  const isTeamsOrEnterprise = ['team', 'enterprise'].includes(organization?.plan.id ?? '')
-  const isEnabled = isTeamsOrEnterprise && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
+
   return { isEnabled, enable, disable }
 }
 

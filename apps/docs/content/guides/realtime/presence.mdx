@@ -27,7 +27,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
 import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = 'https://<project>.supabase.co'
-const SUPABASE_KEY = '<your-anon-key>'
+const SUPABASE_KEY = '<sb_publishable_... or anon key>'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 ```
@@ -39,7 +39,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 void main() {
   Supabase.initialize(
     url: 'https://<project>.supabase.co',
-    anonKey: '<your-anon-key>',
+    anonKey: '<sb_publishable_... or anon key>',
   );
 
   runApp(MyApp());
@@ -53,7 +53,7 @@ final supabase = Supabase.instance.client;
 
 ```swift
 let supabaseURL = "https://<project>.supabase.co"
-let supabaseKey = "<your-anon-key>"
+let supabaseKey = "<sb_publishable_... or anon key>"
 let supabase = SupabaseClient(supabaseURL: URL(string: supabaseURL)!, supabaseKey: supabaseKey)
 
 let realtime = supabase.realtime
@@ -64,7 +64,7 @@ let realtime = supabase.realtime
 
 ```kotlin
 val supabaseUrl = "https://<project>.supabase.co"
-val supabaseKey = "<your-anon-key>"
+val supabaseKey = "<sb_publishable_... or anon key>"
 val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
     install(Realtime)
 }
@@ -77,7 +77,7 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 from supabase import create_client
 
 SUPABASE_URL = 'https://<project>.supabase.co'
-SUPABASE_KEY = '<your-anon-key>'
+SUPABASE_KEY = '<sb_publishable_... or anon key>'
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 ```
@@ -397,7 +397,7 @@ By default, Presence will generate a unique `UUIDv1` key on the server to track 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('SUPABASE_URL', 'SUPABASE_ANON_KEY')
+const supabase = createClient('SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY')
 
 const channelC = supabase.channel('test', {
   config: {

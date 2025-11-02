@@ -16,7 +16,7 @@ Projects need to be at least on Postgres 13.3.0 to enable SSL enforcement. You c
 
 ## Manage SSL enforcement via the dashboard
 
-SSL enforcement can be configured via the "Enforce SSL on incoming connections" setting under the SSL Configuration section in [Database Settings page](https://supabase.com/dashboard/project/_/settings/database) of the dashboard.
+SSL enforcement can be configured via the "Enforce SSL on incoming connections" setting under the SSL Configuration section in [Database Settings page](https://supabase.com/dashboard/project/_/database/settings) of the dashboard.
 
 ## Manage SSL enforcement via the Management API
 
@@ -98,7 +98,7 @@ supabase ssl-enforcement --project-ref {ref} update --disable-db-ssl-enforcement
 
 Postgres supports [multiple SSL modes](https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION) on the client side. These modes provide different levels of protection. Depending on your needs, it is important to verify that the SSL mode in use is performing the required level of enforcement and verification of SSL connections.
 
-The strongest mode offered by Postgres is `verify-full` and this is the mode you most likely want to use when SSL enforcement is enabled. To use `verify-full` you will need to download the Supabase CA certificate for your database. The certificate is available through the dashboard under the SSL Configuration section in the [Database Settings page](/dashboard/project/_/settings/database).
+The strongest mode offered by Postgres is `verify-full` and this is the mode you most likely want to use when SSL enforcement is enabled. To use `verify-full` you will need to download the Supabase CA certificate for your database. The certificate is available through the dashboard under the SSL Configuration section in the [Database Settings page](/dashboard/project/_/database/settings).
 
 Once the CA certificate has been downloaded, add it to the certificate authority list used by Postgres.
 

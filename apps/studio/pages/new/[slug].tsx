@@ -23,6 +23,7 @@ import {
   PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { smartRegionToExactRegion } from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
@@ -38,6 +39,7 @@ import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import {
@@ -47,8 +49,9 @@ import {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
@@ -57,6 +60,7 @@ import {
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
   FLY_REGIONS_DEFAULT,
+  MANAGED_BY,
   PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
@@ -90,18 +94,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-const sizes: DesiredInstanceSize[] = [
-  'micro',
-  'small',
-  'medium',
-  'large',
-  'xlarge',
-  '2xlarge',
-  '4xlarge',
-  '8xlarge',
-  '12xlarge',
-  '16xlarge',
-]
+const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
@@ -111,6 +104,7 @@ const FormSchema = z.object({
   }),
   projectName: z
     .string()
+    .trim()
     .min(1, 'Please enter a project name.') // Required field check
     .min(3, 'Project name must be at least 3 characters long.') // Minimum length check
     .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
@@ -139,12 +133,14 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
-  const currentOrg = useSelectedOrganization()
+  const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
+
+  const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
@@ -157,6 +153,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -219,23 +216,18 @@ const Wizard: NextPageWithLayout = () => {
     components['schemas']['ProjectInfo'][] | undefined
   >(undefined)
 
-  useEffect(() => {
-    // Only set once to ensure compute credits dont change while project is being created
-    if (allProjectsFromApi && !allProjects) {
-      setAllProjects(allProjectsFromApi)
-    }
-  }, [allProjectsFromApi, allProjects, setAllProjects])
-
   const organizationProjects =
     allProjects?.filter(
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
-  const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+
+  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
     },
     {
+      enabled: !smartRegionEnabled,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
@@ -243,6 +235,26 @@ const Wizard: NextPageWithLayout = () => {
       retry: false,
     }
   )
+
+  const { data: availableRegionsData, error: availableRegionsError } =
+    useOrganizationAvailableRegionsQuery(
+      {
+        slug: slug,
+        cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+      },
+      {
+        enabled: smartRegionEnabled,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchInterval: false,
+        refetchOnReconnect: false,
+      }
+    )
+
+  const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
+  const defaultRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.specific[0]?.name
+    : _defaultRegion
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
@@ -306,14 +318,15 @@ const Wizard: NextPageWithLayout = () => {
   })
 
   const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
+  const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
     {
       cloudProvider: cloudProvider as CloudProvider,
-      dbRegion,
+      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion,
       organizationSlug: organization,
     },
-    { enabled: currentOrg != null && !isManagedByVercel }
+    { enabled: currentOrg !== null && !isManagedByVercel }
   )
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
@@ -378,12 +391,16 @@ const Wizard: NextPageWithLayout = () => {
     const { postgresEngine, releaseChannel } =
       extractPostgresVersionDetails(postgresVersionSelection)
 
+    const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+    const selectedRegion = smartRegionEnabled
+      ? smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
+      : undefined
+
     const data: ProjectCreateVariables = {
-      cloudProvider: cloudProvider,
+      dbPass,
+      cloudProvider,
       organizationSlug: currentOrg.slug,
       name: projectName,
-      dbPass: dbPass,
-      dbRegion: dbRegion,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
@@ -392,6 +409,7 @@ const Wizard: NextPageWithLayout = () => {
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
     }
 
     if (postgresVersion) {
@@ -408,6 +426,13 @@ const Wizard: NextPageWithLayout = () => {
 
     createProject(data)
   }
+
+  useEffect(() => {
+    // Only set once to ensure compute credits dont change while project is being created
+    if (allProjectsFromApi && !allProjects) {
+      setAllProjects(allProjectsFromApi)
+    }
+  }, [allProjectsFromApi, allProjects, setAllProjects])
 
   useEffect(() => {
     // Handle no org: redirect to new org route
@@ -430,10 +455,10 @@ const Wizard: NextPageWithLayout = () => {
   }, [defaultRegion])
 
   useEffect(() => {
-    if (defaultRegionError) {
+    if (regionError) {
       form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
     }
-  }, [defaultRegionError])
+  }, [regionError])
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
@@ -782,7 +807,7 @@ const Wizard: NextPageWithLayout = () => {
                                                   CPU
                                                 </span>
                                                 <p
-                                                  className="text-xs text-muted instance-details"
+                                                  className="text-xs text-foreground-light instance-details"
                                                   translate="no"
                                                 >
                                                   ${instanceSizeSpecs[option].priceHourly}/hour (~$
@@ -793,6 +818,15 @@ const Wizard: NextPageWithLayout = () => {
                                           </SelectItem_Shadcn_>
                                         )
                                       })}
+                                    <SelectItem_Shadcn_
+                                      key={'disabled'}
+                                      value={'disabled'}
+                                      disabled
+                                    >
+                                      <div className="flex items-center justify-center w-full">
+                                        <span>Larger instance sizes available after creation</span>
+                                      </div>
+                                    </SelectItem_Shadcn_>
                                   </SelectGroup_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
@@ -909,7 +943,9 @@ const Wizard: NextPageWithLayout = () => {
                     )}
 
                     <SecurityOptions form={form} />
-                    {!!availableOrioleVersion && <AdvancedConfiguration form={form} />}
+                    {showAdvancedConfig && !!availableOrioleVersion && (
+                      <AdvancedConfiguration form={form} />
+                    )}
                   </>
                 )}
 
@@ -926,7 +962,7 @@ const Wizard: NextPageWithLayout = () => {
                 ) : isManagedByVercel ? (
                   <Panel.Content>
                     <PartnerManagedResource
-                      partner="vercel-marketplace"
+                      managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
                       resource="Projects"
                       cta={{
                         installationId: currentOrg?.partner_id,

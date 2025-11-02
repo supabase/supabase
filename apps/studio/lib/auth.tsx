@@ -8,6 +8,7 @@ import {
 import { PropsWithChildren, useCallback, useEffect } from 'react'
 import { toast } from 'sonner'
 
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 
 const AuthErrorToaster = ({ children }: PropsWithChildren) => {
@@ -42,12 +43,15 @@ export { useAuth, useIsLoggedIn, useSession, useUser } from 'common'
 
 export function useSignOut() {
   const queryClient = useQueryClient()
+  const { clearStorage: clearAssistantStorage } = useAiAssistantStateSnapshot()
 
   return useCallback(async () => {
     const result = await gotrueClient.signOut()
     clearLocalStorage()
+    // Clear Assistant IndexedDB
+    await clearAssistantStorage()
     await queryClient.clear()
 
     return result
-  }, [queryClient])
+  }, [queryClient, clearAssistantStorage])
 }

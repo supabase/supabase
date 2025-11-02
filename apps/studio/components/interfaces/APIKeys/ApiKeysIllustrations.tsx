@@ -160,12 +160,10 @@ export const ApiKeysCreateCallout = () => {
  * Feedback banner for users who have API keys and the feature is rolled out to them
  */
 export const ApiKeysFeedbackBanner = () => {
-  const { hasApiKeys, isInRollout } = useApiKeysVisibility()
+  const { hasApiKeys } = useApiKeysVisibility()
 
   // Don't show anything if not in rollout or if keys don't exist
-  if (!isInRollout || !hasApiKeys) {
-    return null
-  }
+  if (!hasApiKeys) return null
 
   return (
     <FeatureBanner

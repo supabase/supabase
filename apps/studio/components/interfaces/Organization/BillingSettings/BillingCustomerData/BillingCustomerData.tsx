@@ -118,7 +118,7 @@ export const BillingCustomerData = () => {
         {selectedOrganization?.managed_by !== undefined &&
         selectedOrganization?.managed_by !== 'supabase' ? (
           <PartnerManagedResource
-            partner={selectedOrganization?.managed_by}
+            managedBy={selectedOrganization?.managed_by}
             resource="Billing Addresses"
             cta={{
               installationId: selectedOrganization?.partner_id,

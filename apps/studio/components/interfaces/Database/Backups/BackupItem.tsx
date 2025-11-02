@@ -6,7 +6,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import type { DatabaseBackup } from 'data/database/backups-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
@@ -17,9 +17,9 @@ interface BackupItemProps {
   onSelectBackup: () => void
 }
 
-const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProps) => {
+export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProps) => {
   const { ref: projectRef } = useParams()
-  const canTriggerScheduledBackups = useCheckPermissions(
+  const { can: canTriggerScheduledBackups } = useAsyncCheckProjectPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
@@ -38,8 +38,7 @@ const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProp
   })
 
   const generateSideButtons = (backup: DatabaseBackup) => {
-    // [Joshen] API typing is incorrect here, status is getting typed as Record<string, never>
-    if ((backup as any).status === 'COMPLETED')
+    if (backup.status === 'COMPLETED')
       return (
         <div className="flex space-x-4">
           <ButtonTooltip
@@ -123,5 +122,3 @@ const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProp
     </div>
   )
 }
-
-export default BackupItem

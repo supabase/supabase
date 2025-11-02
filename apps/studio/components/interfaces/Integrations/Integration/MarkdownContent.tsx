@@ -42,7 +42,7 @@ export const MarkdownContent = ({ integrationId }: { integrationId: string }) =>
           />
         )}
         {supportExpanding && (
-          <div className={cn('bottom-0 z-10', !isExpanded ? 'absolute' : 'relative mt-3')}>
+          <div className={cn('bottom-0', !isExpanded ? 'absolute' : 'relative mt-3')}>
             <button
               className="text-foreground-light hover:text-foreground underline text-sm"
               onClick={() => setIsExpanded(!isExpanded)}

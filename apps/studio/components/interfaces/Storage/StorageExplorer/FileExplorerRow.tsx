@@ -22,7 +22,6 @@ import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { toast } from 'sonner'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
@@ -51,7 +50,6 @@ import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
 import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
-import { useSelectedBucket } from './useSelectedBucket'
 
 export const RowIcon = ({
   view,
@@ -104,7 +102,6 @@ export interface FileExplorerRowProps {
   view: STORAGE_VIEWS
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
-  openedFolders: StorageItem[]
 }
 
 const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
@@ -113,16 +110,14 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
   selectedItems = [],
-  openedFolders = [],
 }) => {
   const { ref: projectRef, bucketId } = useParams()
-  const { bucket } = useSelectedBucket()
 
   const {
     selectedBucket,
     selectedFilePreview,
+    openedFolders,
     popColumnAtIndex,
-    pushOpenedFolderAtIndex,
     popOpenedFoldersAtIndex,
     clearSelectedItems,
     setSelectedFilePreview,
@@ -131,42 +126,26 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     setSelectedItemsToDelete,
     setSelectedItemToRename,
     setSelectedItemsToMove,
-    fetchFolderContents,
+    openFolder,
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
+  const { show } = useContextMenu()
   const { onCopyUrl } = useCopyUrl()
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
   const isSelected = !!selectedItems.find((i) => i.id === item.id)
   const isOpened =
-    openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
+    openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-
-  const { show } = useContextMenu()
 
   const onSelectFile = async (columnIndex: number, file: StorageItem) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
     setSelectedFilePreview(itemWithColumnIndex)
     clearSelectedItems()
-  }
-
-  const onSelectFolder = async (columnIndex: number, folder: StorageItem) => {
-    if (!bucket) return toast.error('Unable to retrieve bucket details')
-
-    setSelectedFilePreview(undefined)
-    clearSelectedItems(columnIndex + 1)
-    popOpenedFoldersAtIndex(columnIndex - 1)
-    pushOpenedFolderAtIndex(folder, columnIndex)
-    await fetchFolderContents({
-      bucketId: bucket.id,
-      folderId: folder.id,
-      folderName: folder.name,
-      index: columnIndex,
-    })
   }
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
@@ -346,7 +325,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           event.preventDefault()
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
             item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
-              ? onSelectFolder(columnIndex, item)
+              ? openFolder(columnIndex, item)
               : onSelectFile(columnIndex, item)
           }
         }}

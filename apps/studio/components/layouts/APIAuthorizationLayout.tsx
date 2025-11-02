@@ -14,7 +14,7 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
       <Head>
         <title>Authorize API access | Supabase</title>
       </Head>
-      <main className="flex-grow flex flex-col w-full h-full overflow-y-auto">
+      <main className="h-screen flex flex-col w-full h-full overflow-y-auto">
         <div>
           <div className="mx-auto px-4 sm:px-6">
             <div className="max-w-xl flex justify-between items-center mx-auto py-4">

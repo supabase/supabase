@@ -11,6 +11,14 @@ export const AWS_REGIONS_DEFAULT =
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
+export const MANAGED_BY = {
+  VERCEL_MARKETPLACE: 'vercel-marketplace',
+  AWS_MARKETPLACE: 'aws-marketplace',
+  SUPABASE: 'supabase',
+}
+
+export type ManagedBy = (typeof MANAGED_BY)[keyof typeof MANAGED_BY]
+
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',
   PRO: 'Pro - $25/month',

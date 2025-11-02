@@ -17,7 +17,7 @@ export const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
     <div className="px-6 flex flex-col gap-y-4">
       <div className="space-y-2">
         <p className="text-sm text-foreground-light">
-          Found an issue or a bug? Try searching our Github issues or submit a new one.
+          Found an issue or a bug? Try searching our GitHub issues or submit a new one.
         </p>
       </div>
       <div className="flex items-center space-x-4 overflow-x-auto">
@@ -37,7 +37,7 @@ export const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
               <div>
                 <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
                   <Link href={lib.url} target="_blank" rel="noreferrer">
-                    View Github issues
+                    View GitHub issues
                   </Link>
                 </Button>
               </div>
@@ -57,7 +57,7 @@ export const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
           <div>
             <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
               <Link href="https://github.com/supabase/supabase" target="_blank" rel="noreferrer">
-                View Github issues
+                View GitHub issues
               </Link>
             </Button>
           </div>

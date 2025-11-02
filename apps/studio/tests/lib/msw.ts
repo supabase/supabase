@@ -44,11 +44,14 @@ export const addAPIMock = <P extends Endpoints | `${Endpoints}?${string}`, M ext
   method,
   path,
   response,
-}: {
-  method: M
-  path: P
-  response: SuccessResponse<TrimQueryParams<P>, M> | HttpResponseResolver
-}) => {
+}: SuccessResponse<TrimQueryParams<P>, M> extends never
+  ? // Don't require a mocked response when the API doesn't return one
+    { method: M; path: P; response?: never }
+  : {
+      method: M
+      path: P
+      response: SuccessResponse<TrimQueryParams<P>, M> | HttpResponseResolver
+    }) => {
   const fullPath = `${API_URL}${path}`
   console.log('[MSW] Adding mock:', method.toUpperCase(), fullPath)
 

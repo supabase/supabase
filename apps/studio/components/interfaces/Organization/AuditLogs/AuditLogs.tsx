@@ -31,8 +31,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { formatSelectedDateRange } from './AuditLogs.utils'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -69,14 +68,7 @@ const AuditLogs = () => {
       },
       {
         enabled: canReadAuditLogs,
-        retry(_failureCount, error) {
-          if (error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.')) {
-            return false
-          }
-          return true
-        },
-        retryOnMount: false,
-        refetchOnWindowFocus: false,
+        retry: false,
       }
     )
 
@@ -139,6 +131,77 @@ const AuditLogs = () => {
     <>
       <ScaffoldContainerLegacy>
         <div className="space-y-4 flex flex-col">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <p className="text-xs prose">Filter by</p>
+              <FilterPopover
+                name="Users"
+                options={activeMembers}
+                labelKey="username"
+                valueKey="gotrue_id"
+                activeOptions={filters.users}
+                onSaveFilters={(values) => setFilters({ ...filters, users: values })}
+              />
+              <FilterPopover
+                name="Projects"
+                options={
+                  projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
+                }
+                labelKey="name"
+                valueKey="ref"
+                activeOptions={filters.projects}
+                onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+              />
+              <LogsDatePicker
+                hideWarnings
+                value={dateRange}
+                onSubmit={(value) => setDateRange(value)}
+                helpers={[
+                  {
+                    text: 'Last 1 hour',
+                    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
+                    calcTo: () => dayjs().toISOString(),
+                  },
+                  {
+                    text: 'Last 3 hours',
+                    calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
+                    calcTo: () => dayjs().toISOString(),
+                  },
+
+                  {
+                    text: 'Last 6 hours',
+                    calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
+                    calcTo: () => dayjs().toISOString(),
+                  },
+                  {
+                    text: 'Last 12 hours',
+                    calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
+                    calcTo: () => dayjs().toISOString(),
+                  },
+                  {
+                    text: 'Last 24 hours',
+                    calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
+                    calcTo: () => dayjs().toISOString(),
+                  },
+                ]}
+              />
+              {isSuccess && (
+                <>
+                  <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
+                  <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
+                </>
+              )}
+            </div>
+            <Button
+              type="default"
+              disabled={isLoading || isRefetching}
+              icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+              onClick={() => refetch()}
+            >
+              {isRefetching ? 'Refreshing' : 'Refresh'}
+            </Button>
+          </div>
+
           {isLoading && (
             <div className="space-y-2">
               <ShimmeringLoader />
@@ -176,6 +239,15 @@ const AuditLogs = () => {
                   </div>
                 </div>
               </Alert_Shadcn_>
+            ) : error.message.includes('range exceeded') ? (
+              <Alert_Shadcn_ variant="destructive" title="Date range too large">
+                <WarningIcon />
+                <AlertTitle_Shadcn_>Date range too large</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  The selected date range exceeds the maximum allowed period. Please select a
+                  smaller time range.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
             ) : (
               <AlertError error={error} subject="Failed to retrieve audit logs" />
             )
@@ -183,79 +255,6 @@ const AuditLogs = () => {
 
           {isSuccess && (
             <>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <p className="text-xs prose">Filter by</p>
-                  <FilterPopover
-                    name="Users"
-                    options={activeMembers}
-                    labelKey="username"
-                    valueKey="gotrue_id"
-                    activeOptions={filters.users}
-                    onSaveFilters={(values) => setFilters({ ...filters, users: values })}
-                  />
-                  <FilterPopover
-                    name="Projects"
-                    options={
-                      projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
-                    }
-                    labelKey="name"
-                    valueKey="ref"
-                    activeOptions={filters.projects}
-                    onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
-                  />
-                  <DatePicker
-                    hideTime
-                    hideClear
-                    triggerButtonType="dashed"
-                    triggerButtonTitle=""
-                    from={dateRange.from}
-                    to={dateRange.to}
-                    minDate={minDate.toDate()}
-                    maxDate={maxDate.toDate()}
-                    onChange={(value) => {
-                      if (value.from !== null && value.to !== null) {
-                        const { from, to } = formatSelectedDateRange(value)
-                        setDateRange({ from, to })
-                      }
-                    }}
-                    renderFooter={() => {
-                      return (
-                        <Admonition
-                          showIcon={false}
-                          type="default"
-                          className="w-auto mx-2 px-3 py-2"
-                        >
-                          <div className="text-xs text-foreground-light">
-                            Your organization has a log retention period of{' '}
-                            <span className="text-brand">
-                              {retentionPeriod} day
-                              {retentionPeriod > 1 ? 's' : ''}
-                            </span>
-                            . You may only view logs from{' '}
-                            {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
-                            earliest date.
-                          </div>
-                        </Admonition>
-                      )
-                    }}
-                  />
-                  {isSuccess && (
-                    <>
-                      <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
-                      <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
-                    </>
-                  )}
-                </div>
-                <Button
-                  type="default"
-                  disabled={isLoading || isRefetching}
-                  icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
-                  onClick={() => refetch()}
-                >
-                  {isRefetching ? 'Refreshing' : 'Refresh'}
-                </Button>
-              </div>
               {logs.length === 0 ? (
                 <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
                   <p className="prose text-sm">

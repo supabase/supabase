@@ -2,12 +2,12 @@ import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
 import { Info } from 'lucide-react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useTableRolesAccessQuery } from 'data/tables/table-roles-access-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import PolicyRow from './PolicyRow'
@@ -40,7 +40,7 @@ export const PolicyTableRow = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   // [Joshen] Changes here are so that warnings are more accurate and granular instead of purely relying if RLS is disabled or enabled
   // The following scenarios are technically okay if the table has RLS disabled, in which it won't be publicly readable / writable

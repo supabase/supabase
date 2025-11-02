@@ -90,6 +90,7 @@
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
+        "NEXT_PUBLIC_SENTRY_DSN",
         "AWS_BEDROCK_PROFILE",
         "AWS_BEDROCK_ROLE_ARN",
         "AWS_ACCESS_KEY_ID",
@@ -102,7 +103,7 @@
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL"
       ],
-      "passThroughEnv": ["CURRENT_CLI_VERSION"],
+      "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "www#build": {
@@ -123,6 +124,7 @@
         "NEXT_PUBLIC_HCAPTCHA_SITE_KEY",
         "HCAPTCHA_SECRET_KEY",
         "NODE_ENV",
+        "NEXT_PUBLIC_SENTRY_DSN",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",

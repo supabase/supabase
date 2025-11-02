@@ -33,9 +33,7 @@ function useSingleLog({
 
   const params: LogsEndpointParams = { ...paramsToMerge, sql }
 
-  const isWarehouseQuery = queryType === 'warehouse'
-  // Warehouse queries are handled differently
-  const enabled = Boolean(id && table && !isWarehouseQuery)
+  const enabled = Boolean(id && table)
 
   const {
     data,

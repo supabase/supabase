@@ -45,7 +45,9 @@ Now you can access these schemas from data APIs:
 ```js
 // Initialize the JS client
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { db: { schema: 'myschema' } })
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  db: { schema: 'myschema' },
+})
 
 // Make a request
 const { data: todos, error } = await supabase.from('todos').select('*')
@@ -81,14 +83,14 @@ final data = await supabase.schema('myschema').from('todos').select();
 
 # for GET or HEAD request use Accept-Profile
 curl '<SUPABASE_URL>/rest/v1/todos' \
-  -H "apikey: <SUPABASE_ANON_KEY>" \
-  -H "Authorization: Bearer <SUPABASE_ANON_KEY>" \
+  -H "apikey: <SUPABASE_PUBLISHABLE_KEY>" \
+  -H "Authorization: Bearer <SUPABASE_PUBLISHABLE_KEY>" \
   -H "Accept-Profile: myschema"
 
 # for POST, PATCH, PUT and DELETE Request use Content-Profile
 curl -X POST '<SUPABASE_URL>/rest/v1/todos' \
-  -H "apikey: <SUPABASE_ANON_KEY>" \
-  -H "Authorization: Bearer <SUPABASE_ANON_KEY>" \
+  -H "apikey: <SUPABASE_PUBLISHABLE_KEY>" \
+  -H "Authorization: Bearer <SUPABASE_PUBLISHABLE_KEY>" \
   -H "Content-Type: application/json" \
   -H "Content-Profile: myschema" \
   -d '{"column_name": "value"}'

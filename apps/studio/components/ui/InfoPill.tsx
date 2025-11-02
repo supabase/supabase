@@ -39,7 +39,7 @@ export const InfoPill = ({ label, icon, title, description, links }: InfoPillPro
           })}
         </div>
         <div className="flex-1">
-          <h4 className="text-sm font-semibold truncate">{title}</h4>
+          <h4 className="font-semibold truncate">{title}</h4>
           <p className="text-xs text-foreground-light">{description}</p>
           {links && links.length > 0 && (
             <div className="space-y-1 mt-2">

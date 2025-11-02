@@ -24,10 +24,10 @@ import { ProviderForm } from './ProviderForm'
 export const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
   const {
-    isLoading,
-    error: authConfigError,
-    isError,
     data: authConfig,
+    error: authConfigError,
+    isLoading,
+    isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
 

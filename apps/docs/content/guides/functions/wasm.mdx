@@ -122,7 +122,8 @@ Before deploying, ensure the Wasm module is bundled with your function by defini
 
 <Admonition type="note">
 
-You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
+- You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
+- Static files cannot be deployed using the `--use-api` API flag. You need to build them with [Docker on the CLI](/docs/guides/functions/quickstart#step-6-deploy-to-production).
 
 </Admonition>
 

@@ -1,11 +1,10 @@
-import React from 'react'
-import Link from 'next/link'
 import { useParams } from 'common'
-import { BookOpen } from 'lucide-react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, AlertDescription_Shadcn_, cn, Button } from 'ui'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
+import { BookOpen } from 'lucide-react'
+import Link from 'next/link'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
 const GrafanaPromoBanner = () => (
   <Alert_Shadcn_ className="relative overflow-hidden">
@@ -52,7 +51,7 @@ const GrafanaPromoBanner = () => (
 
 const GrafanaBannerActions = ({ className }: { className?: string }) => {
   const { ref } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   return (

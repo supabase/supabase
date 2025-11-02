@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight, CircleHelpIcon, FilePlus, Plus } from 'lucide-react'
+import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -9,32 +8,22 @@ import {
   useFeaturePreviewModal,
   useUnifiedLogsPreview,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
-import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
-import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 import { useContentQuery } from 'data/content/content-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
   Badge,
   Button,
+  cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Separator,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -90,35 +79,41 @@ export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
 
-  const warehouseEnabled = useFlag('warehouse')
   const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
   const { selectFeaturePreview } = useFeaturePreviewModal()
   const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
-  const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
-  const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
-
-  const { data: tenantData } = useWarehouseTenantQuery({ projectRef: ref })
 
   const {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
     realtimeAll: realtimeEnabled,
-  } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
+    logsTemplates: templatesEnabled,
+    logsCollections: collectionsEnabled,
+  } = useIsFeatureEnabled([
+    'project_storage:all',
+    'project_auth:all',
+    'realtime:all',
+    'logs:templates',
+    'logs:collections',
+  ])
 
-  const { data: whCollections, isLoading: whCollectionsLoading } = useWarehouseCollectionsQuery(
-    { projectRef: ref },
-    { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
+  const enablePgReplicate = useFlag('enablePgReplicate')
+  const { data: etlData, isLoading: isETLLoading } = useReplicationSourcesQuery(
+    {
+      projectRef: ref,
+    },
+    {
+      enabled: enablePgReplicate,
+    }
   )
 
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+  // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
+  const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
-  const isUnifiedLogsPreviewAvailable =
-    unifiedLogsFlagEnabled &&
-    !isOrgPlanLoading &&
-    ['team', 'enterprise'].includes(orgPlan?.id ?? '')
+  const { plan: orgPlan } = useCurrentOrgPlan()
+  const isFreePlan = orgPlan?.id === 'free'
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -204,6 +199,14 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
+    showETLLogs
+      ? {
+          name: 'ETL Replication',
+          key: 'etl_replication_logs',
+          url: `/project/${ref}/logs/etl-replication-logs`,
+          items: [],
+        }
+      : null,
   ].filter((x) => x !== null)
 
   const OPERATIONAL_COLLECTIONS = IS_PLATFORM
@@ -223,13 +226,10 @@ export function LogsSidebarMenuV2() {
   const filteredOperationalLogs = OPERATIONAL_COLLECTIONS.filter((collection) => {
     return collection?.name.toLowerCase().includes(searchText.toLowerCase())
   })
-  const filteredWarehouse = whCollections?.filter((collection) => {
-    return collection.name.toLowerCase().includes(searchText.toLowerCase())
-  })
 
   return (
     <div className="pb-12 relative">
-      {IS_PLATFORM && (
+      {IS_PLATFORM && !unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           illustration={<Badge variant="default">Coming soon</Badge>}
@@ -244,7 +244,7 @@ export function LogsSidebarMenuV2() {
           }
         />
       )}
-      {isUnifiedLogsPreviewAvailable && (
+      {unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           title="New Logs Interface"
@@ -274,7 +274,12 @@ export function LogsSidebarMenuV2() {
         />
       )}
 
-      <div className="flex gap-2 p-4 items-center sticky top-0 bg-background-200 z-[1]">
+      <div
+        className={cn(
+          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-[1] px-4',
+          !templatesEnabled ? 'pt-4' : 'py-4'
+        )}
+      >
         <InnerSideBarFilters className="w-full p-0 gap-0">
           <InnerSideBarFilterSearchInput
             name="search-collections"
@@ -285,111 +290,61 @@ export function LogsSidebarMenuV2() {
           ></InnerSideBarFilterSearchInput>
         </InnerSideBarFilters>
 
-        {warehouseEnabled ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                icon={<Plus className="text-foreground" />}
-                className="w-[26px]"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem className="gap-x-2" asChild>
-                <Link href={`/project/${ref}/logs/explorer`}>
-                  <FilePlus size={14} />
-                  Create query
-                </Link>
-              </DropdownMenuItem>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuItem className="gap-x-2" asChild>
-                    <button
-                      onClick={() => setCreateCollectionOpen(true)}
-                      className="w-full flex items-center text-xs px-2 py-1"
-                      disabled={!canCreateCollection}
-                    >
-                      <Plus size={14} />
-                      Create collection
-                    </button>
-                  </DropdownMenuItem>
-                </TooltipTrigger>
-                {!canCreateCollection && (
-                  <TooltipContent>
-                    You need additional permissions to create a collection
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <Button
-            type="default"
-            icon={<Plus className="text-foreground" />}
-            className="w-[26px]"
-            onClick={() => router.push(`/project/${ref}/logs/explorer`)}
-          />
-        )}
-
-        <CreateWarehouseCollectionModal
-          open={createCollectionOpen}
-          onOpenChange={setCreateCollectionOpen}
+        <Button
+          type="default"
+          icon={<Plus className="text-foreground" />}
+          className="w-[26px]"
+          onClick={() => router.push(`/project/${ref}/logs/explorer`)}
         />
       </div>
-      <div className="px-2">
-        <InnerSideMenuItem
-          title="Templates"
-          isActive={isActive(`/project/${ref}/logs/explorer/templates`)}
-          href={`/project/${ref}/logs/explorer/templates`}
-        >
-          Templates
-        </InnerSideMenuItem>
-      </div>
-      <Separator className="my-4" />
-
-      <SidebarCollapsible title="Collections" defaultOpen={true}>
-        {filteredLogs.map((collection) => {
-          const isItemActive = isActive(collection.url)
-          return (
-            <LogsSidebarItem
-              key={collection.key}
-              isActive={isItemActive}
-              href={collection.url}
-              icon={<SupaIcon className="text-foreground-light" />}
-              label={collection.name}
-            />
-          )
-        })}
-        {whCollectionsLoading && warehouseEnabled ? (
-          <div className="p-4">
-            <GenericSkeletonLoader />
-          </div>
-        ) : filteredWarehouse?.length ? (
-          <div>
-            {filteredWarehouse.map((collection) => (
-              <WarehouseMenuItem item={collection} key={collection.token}></WarehouseMenuItem>
-            ))}
-          </div>
-        ) : null}
-      </SidebarCollapsible>
-      {OPERATIONAL_COLLECTIONS.length > 0 && (
-        <>
-          <Separator className="my-4" />
-          <SidebarCollapsible title="Database operations" defaultOpen={true}>
-            {filteredOperationalLogs.map((collection) => (
-              <LogsSidebarItem
-                key={collection.key}
-                isActive={isActive(collection.url)}
-                href={collection.url}
-                icon={<SupaIcon className="text-foreground-light" />}
-                label={collection.name}
-              />
-            ))}
-          </SidebarCollapsible>
-        </>
+      {templatesEnabled && (
+        <div className="px-2">
+          <InnerSideMenuItem
+            title="Templates"
+            isActive={isActive(`/project/${ref}/logs/explorer/templates`)}
+            href={`/project/${ref}/logs/explorer/templates`}
+          >
+            Templates
+          </InnerSideMenuItem>
+        </div>
       )}
       <Separator className="my-4" />
+
+      {collectionsEnabled && (
+        <>
+          <SidebarCollapsible title="Collections" defaultOpen={true}>
+            {filteredLogs.map((collection) => {
+              const isItemActive = isActive(collection.url)
+              return (
+                <LogsSidebarItem
+                  key={collection.key}
+                  isActive={isItemActive}
+                  href={collection.url}
+                  icon={<SupaIcon className="text-foreground-light" />}
+                  label={collection.name}
+                />
+              )
+            })}
+          </SidebarCollapsible>
+          {OPERATIONAL_COLLECTIONS.length > 0 && (
+            <>
+              <Separator className="my-4" />
+              <SidebarCollapsible title="Database operations" defaultOpen={true}>
+                {filteredOperationalLogs.map((collection) => (
+                  <LogsSidebarItem
+                    key={collection.key}
+                    isActive={isActive(collection.url)}
+                    href={collection.url}
+                    icon={<SupaIcon className="text-foreground-light" />}
+                    label={collection.name}
+                  />
+                ))}
+              </SidebarCollapsible>
+            </>
+          )}
+          <Separator className="my-4" />
+        </>
+      )}
       <SidebarCollapsible title="Queries" defaultOpen={true}>
         {savedQueriesLoading && (
           <div className="p-4">

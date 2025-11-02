@@ -23,16 +23,17 @@ import {
   useAsyncCheckProjectPermissions,
   useCheckPermissions,
 } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getURL } from 'lib/helpers'
 import { Alert, Button } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [selectedMethodForUse, setSelectedMethodForUse] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
@@ -66,9 +67,9 @@ const PaymentMethods = () => {
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           {selectedOrganization?.managed_by !== undefined &&
-          selectedOrganization?.managed_by !== 'supabase' ? (
+          selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE ? (
             <PartnerManagedResource
-              partner={selectedOrganization?.managed_by}
+              managedBy={selectedOrganization?.managed_by}
               resource="Payment Methods"
               cta={{
                 installationId: selectedOrganization?.partner_id,

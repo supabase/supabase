@@ -31,16 +31,20 @@ const auth0 = new Auth0Client({
   },
 })
 
-const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
-  accessToken: async () => {
-    const accessToken = await auth0.getTokenSilently()
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      const accessToken = await auth0.getTokenSilently()
 
-    // Alternatively you can use (await auth0.getIdTokenClaims()).__raw to
-    // use an ID token instead.
+      // Alternatively you can use (await auth0.getIdTokenClaims()).__raw to
+      // use an ID token instead.
 
-    return accessToken
-  },
-})
+      return accessToken
+    },
+  }
+)
 ```
 
 </TabPanel>
@@ -57,7 +61,7 @@ extension CredentialsManager {
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
-  supabaseKey: "SUPABASE_ANON_KEY",
+  supabaseKey: "SUPABASE_PUBLISHABLE_KEY",
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {
@@ -81,7 +85,7 @@ Future<void> main() async {
   final auth0 = Auth0('AUTH0_DOMAIN', 'AUTH0_CLIENT_ID');
   await Supabase.initialize(
     url: 'https://<supabase-project>.supabase.co',
-    anonKey: 'SUPABASE_ANON_KEY',
+    anonKey: 'SUPABASE_PUBLISHABLE_KEY',
     accessToken: () async {
       final credentials = await auth0.credentialsManager.credentials();
       return credentials.accessToken;
@@ -100,7 +104,7 @@ import com.auth0.android.result.Credentials
 
 val supabase = createSupabaseClient(
     "https://<supabase-project>.supabase.co",
-    "SUPABASE_ANON_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
 ) {
     accessToken = {
         val credentials: Credentials = ...; // Get credentials from Auth0

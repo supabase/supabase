@@ -14,16 +14,17 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import { ConnectionType } from './Connect.constants'
 import { ConnectionIcon } from './ConnectionIcon'
 
 interface ConnectDropdownProps {
   state: string
   updateState: (state: string) => void
   label: string
-  items: any[]
+  items: ConnectionType[]
 }
 
-const ConnectDropdown = ({
+export const ConnectDropdown = ({
   state,
   updateState,
   label,
@@ -53,11 +54,7 @@ const ConnectDropdown = ({
             iconRight={<ChevronDown strokeWidth={1.5} />}
           >
             <div className="flex items-center gap-2">
-              {selectedItem?.icon ? (
-                <ConnectionIcon connection={selectedItem.icon} />
-              ) : (
-                <Box size={12} />
-              )}
+              {selectedItem?.icon ? <ConnectionIcon icon={selectedItem.icon} /> : <Box size={12} />}
               {selectedItem?.label}
             </div>
           </Button>
@@ -79,7 +76,7 @@ const ConnectDropdown = ({
                   }}
                   className="flex gap-2 items-center"
                 >
-                  {item.icon ? <ConnectionIcon connection={item.icon} /> : <Box size={12} />}
+                  {item.icon ? <ConnectionIcon icon={item.icon} /> : <Box size={12} />}
                   {item.label}
                   <Check
                     size={15}
@@ -94,5 +91,3 @@ const ConnectDropdown = ({
     </Popover_Shadcn_>
   )
 }
-
-export default ConnectDropdown

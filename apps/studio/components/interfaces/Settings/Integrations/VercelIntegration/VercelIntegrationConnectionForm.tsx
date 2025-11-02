@@ -10,6 +10,8 @@ import type {
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import Link from 'next/link'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -24,8 +26,6 @@ import {
   Input_Shadcn_,
   Switch,
 } from 'ui'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import Link from 'next/link'
 
 const VercelIntegrationConnectionForm = ({
   disabled,
@@ -38,7 +38,7 @@ const VercelIntegrationConnectionForm = ({
 }) => {
   // NOTE(kamil): Ignore sync targets for Vercel Marketplace as it's not synchronized using integration,
   // but through a separate marketplace mechanism. It's not theoretically necessary, but we might have some stale data.
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const envSyncTargets =
     org?.managed_by === 'vercel-marketplace' ? [] : connection.env_sync_targets ?? []
 
@@ -120,7 +120,7 @@ const VercelIntegrationConnectionForm = ({
               </Alert_Shadcn_>
             ) : (
               <div>
-                <h5 className="text-foreground text-sm">
+                <h5 className="text-foreground ">
                   Sync environment variables for selected target environments
                 </h5>
 
@@ -193,9 +193,7 @@ const VercelIntegrationConnectionForm = ({
               </div>
             )}
           </div>
-          <h5 className="mt-2 text-foreground text-sm">
-            Customize public environment variable prefix
-          </h5>
+          <h5 className="mt-2 text-foreground">Customize public environment variable prefix</h5>
           <div className="flex flex-col gap-4">
             <FormField_Shadcn_
               control={form.control}

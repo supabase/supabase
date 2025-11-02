@@ -10,7 +10,6 @@ import {
   formatWrapperTables,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -28,6 +27,7 @@ import { Bucket } from 'data/storage/buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -50,7 +50,7 @@ import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: extensionsData } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -127,7 +127,6 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
       }
     })
   }, [wrapperTables, namespacesData])
-  const excludedSchemas = uniq(namespaces.map((n) => n.schema))
 
   const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
 
@@ -196,10 +195,10 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-center">Namespace</TableHead>
-                        <TableHead className="text-center">Schema</TableHead>
-                        <TableHead className="text-center">Tables</TableHead>
-                        <TableHead className="text-center">Actions</TableHead>
+                        <TableHead>Namespace</TableHead>
+                        <TableHead>Schema</TableHead>
+                        <TableHead>Tables</TableHead>
+                        <TableHead />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -209,11 +208,11 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                           bucketName={bucket.name}
                           namespace={namespace}
                           schema={schema}
-                          excludedSchemas={excludedSchemas}
                           tables={tables as any}
                           token={token!}
                           wrapperInstance={wrapperInstance}
                           wrapperValues={wrapperValues}
+                          wrapperMeta={wrapperMeta}
                         />
                       ))}
                     </TableBody>

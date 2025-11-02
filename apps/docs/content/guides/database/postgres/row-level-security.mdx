@@ -104,7 +104,7 @@ Let's say you have a table called `profiles` in the public schema and you want t
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -425,7 +425,7 @@ $$;
 create policy "rls_test_select"
 on test_table
 to authenticated
-using ( private.has_good_role() );
+using ( (select private.has_good_role()) );
 ```
 
 <Admonition type="caution">

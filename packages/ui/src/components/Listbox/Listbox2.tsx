@@ -38,7 +38,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
 }
 
 /**
- * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
+ * @deprecated Use `import { Select_shadcn_ } from "ui"` or follow ComboBox convention or use ./ui-patterns/multi-select
  */
 function Listbox({
   children,

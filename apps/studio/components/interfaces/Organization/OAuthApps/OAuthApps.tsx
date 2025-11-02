@@ -23,7 +23,7 @@ import { RevokeAppModal } from './RevokeAppModal'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
-// to prevent any confusion (case study: Github). Authorized apps could be in the "integrations" tab, but let's
+// to prevent any confusion (case study: GitHub). Authorized apps could be in the "integrations" tab, but let's
 // check in again after we wrap up Vercel integration
 
 const OAuthApps = () => {

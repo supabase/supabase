@@ -58,7 +58,7 @@ These variables are safe to expose in your Expo app since Supabase has
     import { createClient } from '@supabase/supabase-js'
 
     const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
-    const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
+    const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_PUBLISHABLE_KEY
 
     export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
@@ -150,7 +150,7 @@ These variables are safe to expose in your Expo app since Supabase has
     }
 
     const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
-    const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
+    const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_PUBLISHABLE_KEY
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {

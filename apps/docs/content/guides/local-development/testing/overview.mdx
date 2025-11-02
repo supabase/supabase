@@ -141,7 +141,7 @@ describe('Todos RLS', () => {
   const USER_1_ID = crypto.randomUUID()
   const USER_2_ID = crypto.randomUUID()
 
-  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
+  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!)
 
   beforeAll(async () => {
     // Setup test data specific to this test suite

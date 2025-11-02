@@ -81,7 +81,7 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<your-anon-key>')
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
 
 // ---cut---
 async function signInWithLinkedIn() {
@@ -136,7 +136,7 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<your-anon-key>')
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
 
 // ---cut---
 async function signOut() {
@@ -188,4 +188,4 @@ Do reach out to support if you have any concerns around this change.
 
 - [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [LinkedIn Developer Dashboard](https://api.LinkedIn.com/apps)
+- [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps)

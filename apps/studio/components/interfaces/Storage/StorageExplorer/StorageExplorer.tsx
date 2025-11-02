@@ -167,7 +167,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   return (
     <div
       ref={storageExplorerRef}
-      className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col m-4"
+      className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col"
     >
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
@@ -181,7 +181,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
       <div className="flex h-full" style={{ height: fileExplorerHeight }}>
         <FileExplorer
           columns={columns}
-          openedFolders={openedFolders}
           selectedItems={selectedItems}
           itemSearchString={itemSearchString}
           onFilesUpload={onFilesUpload}

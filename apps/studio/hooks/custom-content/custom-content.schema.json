@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+
+    "organization:legal_documents": {
+      "type": ["array", "null"],
+      "description": "Renders a provided set of documents under the organization legal documents page",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "action": {
+            "type": "object",
+            "properties": {
+              "text": { "type": "string" },
+              "url": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "project_homepage:example_projects": {
+      "type": ["array", "null"],
+      "description": "Renders a provided set of example projects under the project's home page",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "iconUrl": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+
+    "logs:default_query": {
+      "type": ["string", "null"],
+      "description": "Renders a default query when landing on the logs explorer"
+    },
+
+    "connect:frameworks": {
+      "type": ["object", "null"],
+      "description": "Replaces the frameworks tab in the Connect modal when a defined set of frameworks",
+      "properties": {
+        "key": { "type": "string" },
+        "label": { "type": "string" },
+        "obj": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": { "type": "string" },
+              "icon": { "type": "string" },
+              "label": { "type": "string" },
+              "guideLink": { "type": "string" },
+              "children": { "type": "array" },
+              "files": {
+                "type": "array",
+                "properties": {
+                  "name": { "type": "string" },
+                  "content": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "organization:legal_documents",
+    "project_homepage:example_projects",
+    "logs:default_query",
+    "connect:frameworks"
+  ],
+  "additionalProperties": false
+}

@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge, Sheet, SheetContent, TableCell, TableRow } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import DeleteWrapperModal from './DeleteWrapperModal'
@@ -20,7 +20,10 @@ interface WrapperRowProps {
 
 const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   const { ref, id } = useParams()
-  const canManageWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+  const { can: canManageWrappers } = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'wrappers'
+  )
 
   const [editWrapperShown, setEditWrapperShown] = useState(false)
   const [isClosingEditWrapper, setIsClosingEditWrapper] = useState(false)
@@ -107,37 +110,39 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
             </div>
           ))}
         </TableCell>
-        <TableCell className="space-x-2 flex-nowrap">
-          <ButtonTooltip
-            disabled={!canManageWrappers}
-            type="default"
-            icon={<Edit strokeWidth={1.5} />}
-            className="px-1.5"
-            onClick={() => setEditWrapperShown(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canManageWrappers
-                  ? 'You need additional permissions to edit wrappers'
-                  : 'Edit wrapper',
-              },
-            }}
-          />
-          <ButtonTooltip
-            type="default"
-            disabled={!canManageWrappers}
-            icon={<Trash strokeWidth={1.5} />}
-            className="px-1.5"
-            onClick={() => setDeleteWrapperShown(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canManageWrappers
-                  ? 'You need additional permissions to delete wrappers'
-                  : 'Delete wrapper',
-              },
-            }}
-          />
+        <TableCell className="flex-nowrap">
+          <div className="flex items-center gap-x-2">
+            <ButtonTooltip
+              disabled={!canManageWrappers}
+              type="default"
+              icon={<Edit strokeWidth={1.5} />}
+              className="px-1.5"
+              onClick={() => setEditWrapperShown(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canManageWrappers
+                    ? 'You need additional permissions to edit wrappers'
+                    : 'Edit wrapper',
+                },
+              }}
+            />
+            <ButtonTooltip
+              type="default"
+              disabled={!canManageWrappers}
+              icon={<Trash strokeWidth={1.5} />}
+              className="px-1.5"
+              onClick={() => setDeleteWrapperShown(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canManageWrappers
+                    ? 'You need additional permissions to delete wrappers'
+                    : 'Delete wrapper',
+                },
+              }}
+            />
+          </div>
         </TableCell>
       </TableRow>
       <Sheet open={editWrapperShown} onOpenChange={() => setIsClosingEditWrapper(true)}>

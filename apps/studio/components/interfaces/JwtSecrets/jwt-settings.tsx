@@ -15,7 +15,7 @@ import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutati
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -73,12 +73,18 @@ const JWTSettings = () => {
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
 
-  const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
-  const canGenerateNewJWTSecret = useCheckPermissions(
+  const { can: canReadJWTSecret } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'field.jwt_secret'
+  )
+  const { can: canGenerateNewJWTSecret } = useAsyncCheckProjectPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.projects.update_jwt'
   )
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })

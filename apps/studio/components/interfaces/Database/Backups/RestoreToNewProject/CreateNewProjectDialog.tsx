@@ -5,11 +5,11 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectCloneMutation } from 'data/projects/clone-mutation'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { passwordStrength } from 'lib/helpers'
 import { generateStrongPassword } from 'lib/project'
 import {
@@ -48,8 +48,8 @@ export const CreateNewProjectDialog = ({
   onCloneSuccess,
   additionalMonthlySpend,
 }: CreateNewProjectDialogProps) => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')

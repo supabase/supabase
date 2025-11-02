@@ -2,20 +2,20 @@ import { useParams } from 'common'
 import { useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 /**
  * Acts as a container component for the entire log display
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
-  const org = useSelectedOrganization()
-  const [sendMessageShown, setSendMessageShown] = useState(false)
+  const { data: org } = useSelectedOrganizationQuery()
 
+  const [sendMessageShown, setSendMessageShown] = useState(false)
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
     enabled: false,
     projectRef: ref!,

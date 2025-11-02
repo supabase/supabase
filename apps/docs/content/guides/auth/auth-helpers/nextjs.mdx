@@ -55,7 +55,7 @@ Retrieve your project's URL and anon key from your [API settings](https://supaba
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-key
 ```
 
 ## Managing session with middleware
@@ -1172,7 +1172,7 @@ import { createClient } from '@supabase/supabase-js'
 export default async function Page() {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   )
 
   const { data } = await supabase.from('todos').select()
@@ -1192,7 +1192,7 @@ import type { Database } from '@/lib/database.types'
 export default async function Page() {
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
   )
 
   const { data } = await supabase.from('todos').select()
@@ -1229,7 +1229,7 @@ export async function POST(request) {
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   )
 
   const { data } = await supabase.from('todos').insert({ title }).select()
@@ -1252,7 +1252,7 @@ export async function POST(request: Request) {
 
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
   )
 
   const { data } = await supabase.from('todos').insert({ title }).select()

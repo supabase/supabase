@@ -22,14 +22,18 @@ Amazon Cognito User Pools (via AWS Amplify or on its own) can be used as a third
 ```typescript
 import { fetchAuthSession, Hub } from 'aws-amplify/auth'
 
-const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
-  accessToken: async () => {
-    const tokens = await fetchAuthSession()
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      const tokens = await fetchAuthSession()
 
-    // Alternatively you can use tokens?.idToken instead.
-    return tokens?.accessToken
-  },
-})
+      // Alternatively you can use tokens?.idToken instead.
+      return tokens?.accessToken
+    },
+  }
+)
 
 // if you're using Realtime you also need to set up a listener for Cognito auth changes
 Hub.listen('auth', () => {
@@ -49,7 +53,7 @@ struct UnexpectedAuthSessionError: Error {}
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
-  supabaseKey: "SUPABASE_ANON_KEY",
+  supabaseKey: "SUPABASE_PUBLISHABLE_KEY",
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {
@@ -80,7 +84,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   await Supabase.initialize(
     url: 'https://<supabase-project>.supabase.co',
-    anonKey: 'SUPABASE_ANON_KEY',
+    anonKey: 'SUPABASE_PUBLISHABLE_KEY',
     accessToken: () async {
       final session = await Amplify.Auth.fetchAuthSession();
       final cognitoSession = session as CognitoAuthSession;
@@ -102,7 +106,7 @@ import com.amplifyframework.core.Amplify
 
 val supabase = createSupabaseClient(
     "https://<supabase-project>.supabase.co",
-    "SUPABASE_ANON_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
 ) {
     accessToken = {
         getAccessToken()

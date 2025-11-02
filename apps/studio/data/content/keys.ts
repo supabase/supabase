@@ -5,13 +5,13 @@ export const contentKeys = {
   allContentLists: (projectRef: string | undefined) => ['projects', projectRef, 'content'] as const,
   infiniteList: (
     projectRef: string | undefined,
-    options: {
+    options?: {
       type: ContentType | undefined
       name: string | undefined
       limit?: number
       sort?: string
     }
-  ) => ['projects', projectRef, 'content-infinite', options] as const,
+  ) => ['projects', projectRef, 'content-infinite', options].filter(Boolean),
   list: (
     projectRef: string | undefined,
     options: { type?: ContentType; name?: string; limit?: number }
@@ -35,7 +35,7 @@ export const contentKeys = {
     options?: { sort?: 'inserted_at' | 'name'; name?: string }
   ) => ['projects', projectRef, 'content', 'folders', id, options].filter(Boolean),
   resource: (projectRef: string | undefined, id?: string) =>
-    ['projects', projectRef, 'content', id] as const,
+    ['projects', projectRef, 'content-id', id] as const,
   count: (
     projectRef: string | undefined,
     type?: string,

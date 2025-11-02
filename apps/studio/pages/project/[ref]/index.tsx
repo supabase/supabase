@@ -1,11 +1,13 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
-import { ClientLibrary, ExampleProject, NewProjectPanel } from 'components/interfaces/Home'
+import { ClientLibrary } from 'components/interfaces/Home'
 import { AdvisorWidget } from 'components/interfaces/Home/AdvisorWidget'
+import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
+import { NewProjectPanel } from 'components/interfaces/Home/NewProjectPanel/NewProjectPanel'
 import { ProjectUsageSection } from 'components/interfaces/Home/ProjectUsageSection'
 import { ServiceStatus } from 'components/interfaces/Home/ServiceStatus'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -14,11 +16,18 @@ import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectL
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDb, useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsOrioleDb,
+  useProjectByRefQuery,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
@@ -34,15 +43,33 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { useBranchesQuery } from 'data/branches/branches-query'
 
 const Home: NextPageWithLayout = () => {
-  const organization = useSelectedOrganization()
-  const project = useSelectedProject()
-  const parentProject = useProjectByRef(project?.parent_project_ref)
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { ref, enableBranching } = useParams()
+
+  const { projectHomepageExampleProjects } = useCustomContent(['project_homepage:example_projects'])
+
+  const {
+    projectHomepageShowAllClientLibraries: showAllClientLibraries,
+    projectHomepageShowInstanceSize: showInstanceSize,
+    projectHomepageShowExamples: showExamples,
+  } = useIsFeatureEnabled([
+    'project_homepage:show_all_client_libraries',
+    'project_homepage:show_instance_size',
+    'project_homepage:show_examples',
+  ])
+
+  const clientLibraries = useMemo(() => {
+    if (showAllClientLibraries) {
+      return CLIENT_LIBRARIES
+    }
+    return CLIENT_LIBRARIES.filter((library) => library.language === 'JavaScript')
+  }, [showAllClientLibraries])
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
@@ -89,8 +116,8 @@ const Home: NextPageWithLayout = () => {
   const replicasCount = Math.max(0, (replicasData?.length ?? 1) - 1)
 
   return (
-    <div className="w-full">
-      <div className={cn('py-16 px-8', !isPaused && 'border-b border-muted ')}>
+    <div className="w-full px-4">
+      <div className={cn('py-16 ', !isPaused && 'border-b border-muted ')}>
         <div className="mx-auto max-w-7xl flex flex-col gap-y-4">
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between w-full">
             <div className="flex flex-col md:flex-row md:items-end gap-3 w-full">
@@ -121,14 +148,16 @@ const Home: NextPageWithLayout = () => {
                     </TooltipContent>
                   </Tooltip>
                 )}
-                <ComputeBadgeWrapper
-                  project={{
-                    ref: project?.ref,
-                    organization_slug: organization?.slug,
-                    cloud_provider: project?.cloud_provider,
-                    infra_compute_size: project?.infra_compute_size,
-                  }}
-                />
+                {showInstanceSize && (
+                  <ComputeBadgeWrapper
+                    project={{
+                      ref: project?.ref,
+                      organization_slug: organization?.slug,
+                      cloud_provider: project?.cloud_provider,
+                      infra_compute_size: project?.infra_compute_size,
+                    }}
+                  />
+                )}
               </div>
             </div>
             <div className="flex items-center">
@@ -141,13 +170,12 @@ const Home: NextPageWithLayout = () => {
                     >
                       Tables
                     </Link>
-                    <p className="text-2xl tabular-nums">
-                      {isLoadingTables ? (
-                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                      ) : (
-                        tablesCount
-                      )}
-                    </p>
+
+                    {isLoadingTables ? (
+                      <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                    ) : (
+                      <p className="text-2xl tabular-nums">{tablesCount}</p>
+                    )}
                   </div>
 
                   {IS_PLATFORM && (
@@ -158,13 +186,11 @@ const Home: NextPageWithLayout = () => {
                       >
                         Functions
                       </Link>
-                      <p className="text-2xl tabular-nums">
-                        {isLoadingFunctions ? (
-                          <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                        ) : (
-                          functionsCount
-                        )}
-                      </p>
+                      {isLoadingFunctions ? (
+                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                      ) : (
+                        <p className="text-2xl tabular-nums">{functionsCount}</p>
+                      )}
                     </div>
                   )}
 
@@ -176,13 +202,11 @@ const Home: NextPageWithLayout = () => {
                       >
                         Replicas
                       </Link>
-                      <p className="text-2xl tabular-nums">
-                        {isLoadingReplicas ? (
-                          <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                        ) : (
-                          replicasCount
-                        )}
-                      </p>
+                      {isLoadingReplicas ? (
+                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                      ) : (
+                        <p className="text-2xl tabular-nums">{replicasCount}</p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -201,7 +225,7 @@ const Home: NextPageWithLayout = () => {
 
       {!isPaused && (
         <>
-          <div className="py-16 border-b border-muted px-8">
+          <div className="py-16 border-b border-muted">
             <div className="mx-auto max-w-7xl space-y-16">
               {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
                 <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
@@ -217,42 +241,54 @@ const Home: NextPageWithLayout = () => {
                   <div className="space-y-8">
                     <h2 className="text-lg">Client libraries</h2>
                     <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mb-12 md:grid-cols-3">
-                      {CLIENT_LIBRARIES.map((library) => (
+                      {clientLibraries.map((library) => (
                         <ClientLibrary key={library.language} {...library} />
                       ))}
                     </div>
                   </div>
-                  <div className="space-y-8">
-                    <h4 className="text-lg">Example projects</h4>
-                    <div className="flex justify-center">
-                      <Tabs_Shadcn_ defaultValue="app" className="w-full">
-                        <TabsList_Shadcn_ className="flex gap-4 mb-8">
-                          <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
-                          <TabsTrigger_Shadcn_ value="mobile">
-                            Mobile Frameworks
-                          </TabsTrigger_Shadcn_>
-                        </TabsList_Shadcn_>
-                        <TabsContent_Shadcn_ value="app">
-                          <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
-                              .sort((a, b) => a.title.localeCompare(b.title))
-                              .map((project) => (
-                                <ExampleProject key={project.url} {...project} />
-                              ))}
-                          </div>
-                        </TabsContent_Shadcn_>
-                        <TabsContent_Shadcn_ value="mobile">
-                          <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
-                              .sort((a, b) => a.title.localeCompare(b.title))
-                              .map((project) => (
-                                <ExampleProject key={project.url} {...project} />
-                              ))}
-                          </div>
-                        </TabsContent_Shadcn_>
-                      </Tabs_Shadcn_>
+                  {showExamples && (
+                    <div className="flex flex-col gap-y-8">
+                      <h4 className="text-lg">Example projects</h4>
+                      {!!projectHomepageExampleProjects ? (
+                        <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                          {projectHomepageExampleProjects
+                            .sort((a, b) => a.title.localeCompare(b.title))
+                            .map((project) => (
+                              <ExampleProject key={project.url} {...project} />
+                            ))}
+                        </div>
+                      ) : (
+                        <div className="flex justify-center">
+                          <Tabs_Shadcn_ defaultValue="app" className="w-full">
+                            <TabsList_Shadcn_ className="flex gap-4 mb-8">
+                              <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
+                              <TabsTrigger_Shadcn_ value="mobile">
+                                Mobile Frameworks
+                              </TabsTrigger_Shadcn_>
+                            </TabsList_Shadcn_>
+                            <TabsContent_Shadcn_ value="app">
+                              <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                                {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
+                                  .sort((a, b) => a.title.localeCompare(b.title))
+                                  .map((project) => (
+                                    <ExampleProject key={project.url} {...project} />
+                                  ))}
+                              </div>
+                            </TabsContent_Shadcn_>
+                            <TabsContent_Shadcn_ value="mobile">
+                              <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                                {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
+                                  .sort((a, b) => a.title.localeCompare(b.title))
+                                  .map((project) => (
+                                    <ExampleProject key={project.url} {...project} />
+                                  ))}
+                              </div>
+                            </TabsContent_Shadcn_>
+                          </Tabs_Shadcn_>
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </>
               )}
             </div>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { useChartSync } from './useChartSync'
 import ChartHeader from './ChartHeader'
 import {
   CHART_COLORS,
@@ -32,6 +33,7 @@ interface Props extends CommonChartProps<any> {
   hideLegend?: boolean
   hideHeader?: boolean
   stackColors?: ValidStackColor[]
+  syncId?: string
 }
 const StackedBarChart: React.FC<Props> = ({
   size,
@@ -53,8 +55,14 @@ const StackedBarChart: React.FC<Props> = ({
   hideLegend = false,
   hideHeader = false,
   stackColors = DEFAULT_STACK_COLORS,
+  syncId,
 }) => {
   const { Container } = useChartSize(size)
+  const {
+    updateState: updateSyncState,
+    clearState: clearSyncState,
+    state: syncState,
+  } = useChartSync(syncId)
   const { dataKeys, stackedData, percentagesStackedData } = useStacked({
     data,
     xAxisKey,
@@ -91,6 +99,14 @@ const StackedBarChart: React.FC<Props> = ({
               : resolvedHighlightedValue
           }
           highlightedLabel={resolvedHighlightedLabel}
+          syncId={syncId}
+          data={data}
+          xAxisKey={xAxisKey}
+          yAxisKey={yAxisKey}
+          xAxisIsDate={xAxisFormatAsDate}
+          displayDateInUtc={displayDateInUtc}
+          valuePrecision={valuePrecision}
+          attributes={[]}
         />
       )}
       <Container>
@@ -108,8 +124,23 @@ const StackedBarChart: React.FC<Props> = ({
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
+
+            if (syncId) {
+              updateSyncState({
+                activeIndex: e.activeTooltipIndex,
+                activePayload: e.activePayload,
+                activeLabel: e.activeLabel,
+                isHovering: true,
+              })
+            }
           }}
-          onMouseLeave={() => setFocusDataIndex(null)}
+          onMouseLeave={() => {
+            setFocusDataIndex(null)
+
+            if (syncId) {
+              clearSyncState()
+            }
+          }}
         >
           {!hideLegend && (
             <Legend
@@ -174,6 +205,7 @@ const StackedBarChart: React.FC<Props> = ({
               fontSize: '12px',
             }}
             wrapperClassName="bg-gray-600 rounded min-w-md"
+            active={!!syncId && syncState.isHovering}
           />
         </BarChart>
       </Container>

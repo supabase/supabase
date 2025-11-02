@@ -1,6 +1,8 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { Check } from 'lucide-react'
 
+import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
+
 export interface AuthorizeRequesterDetailsProps {
   icon: string | null
   name: string
@@ -48,7 +50,7 @@ export const ScopeSection = ({
   return null
 }
 
-const AuthorizeRequesterDetails = ({
+export const AuthorizeRequesterDetails = ({
   icon,
   name,
   domain,
@@ -79,57 +81,57 @@ const AuthorizeRequesterDetails = ({
         </p>
         <div className="pt-2">
           <ScopeSection
-            description="access to analytics logs."
+            description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
             hasReadScope={scopes.includes(OAuthScope.ANALYTICS_READ)}
             hasWriteScope={scopes.includes(OAuthScope.ANALYTICS_WRITE)}
           />
           <ScopeSection
-            description="access to auth configurations and SSO providers."
+            description={PERMISSIONS_DESCRIPTIONS.AUTH}
             hasReadScope={scopes.includes(OAuthScope.AUTH_READ)}
             hasWriteScope={scopes.includes(OAuthScope.AUTH_WRITE)}
           />
           <ScopeSection
-            description="access to Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types."
+            description={PERMISSIONS_DESCRIPTIONS.DATABASE}
             hasReadScope={scopes.includes(OAuthScope.DATABASE_READ)}
             hasWriteScope={scopes.includes(OAuthScope.DATABASE_WRITE)}
           />
           <ScopeSection
-            description="access to custom domains and vanity subdomains."
+            description={PERMISSIONS_DESCRIPTIONS.DOMAINS}
             hasReadScope={scopes.includes(OAuthScope.DOMAINS_READ)}
             hasWriteScope={scopes.includes(OAuthScope.DOMAINS_WRITE)}
           />
           <ScopeSection
-            description="access to edge functions."
+            description={PERMISSIONS_DESCRIPTIONS.EDGE_FUNCTIONS}
             hasReadScope={scopes.includes(OAuthScope.EDGE_FUNCTIONS_READ)}
             hasWriteScope={scopes.includes(OAuthScope.EDGE_FUNCTIONS_WRITE)}
           />
           <ScopeSection
-            description="access to environments/branches."
+            description={PERMISSIONS_DESCRIPTIONS.ENVIRONMENT}
             hasReadScope={scopes.includes(OAuthScope.ENVIRONMENT_READ)}
             hasWriteScope={scopes.includes(OAuthScope.ENVIRONMENT_WRITE)}
           />
           <ScopeSection
-            description="access to the organization and all its members."
+            description={PERMISSIONS_DESCRIPTIONS.ORGANIZATIONS}
             hasReadScope={scopes.includes(OAuthScope.ORGANIZATIONS_READ)}
             hasWriteScope={scopes.includes(OAuthScope.ORGANIZATIONS_WRITE)}
           />
           <ScopeSection
-            description="access to metadata, its upgrade status, network restrictions and network bans."
+            description={PERMISSIONS_DESCRIPTIONS.PROJECTS}
             hasReadScope={scopes.includes(OAuthScope.PROJECTS_READ)}
             hasWriteScope={scopes.includes(OAuthScope.PROJECTS_WRITE)}
           />
           <ScopeSection
-            description="access to PostgREST configurations."
+            description={PERMISSIONS_DESCRIPTIONS.REST}
             hasReadScope={scopes.includes(OAuthScope.REST_READ)}
             hasWriteScope={scopes.includes(OAuthScope.REST_WRITE)}
           />
           <ScopeSection
-            description="access to API keys, secrets and pgsodium configurations."
+            description={PERMISSIONS_DESCRIPTIONS.SECRETS}
             hasReadScope={scopes.includes(OAuthScope.SECRETS_READ)}
             hasWriteScope={scopes.includes(OAuthScope.SECRETS_WRITE)}
           />
           <ScopeSection
-            description="access to storage buckets and files."
+            description={PERMISSIONS_DESCRIPTIONS.STORAGE}
             hasReadScope={scopes.includes(OAuthScope.STORAGE_READ)}
             hasWriteScope={scopes.includes(OAuthScope.STORAGE_WRITE)}
           />
@@ -138,5 +140,3 @@ const AuthorizeRequesterDetails = ({
     </div>
   )
 }
-
-export default AuthorizeRequesterDetails

@@ -1,0 +1,11 @@
+{
+  "$schema": "./custom-content.schema.json",
+
+  "organization:legal_documents": null,
+
+  "project_homepage:example_projects": null,
+
+  "logs:default_query": null,
+
+  "connect:frameworks": null
+}

@@ -9,7 +9,7 @@ import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-statu
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +25,7 @@ import Panel from '../Panel'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)

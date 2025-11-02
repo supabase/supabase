@@ -6,7 +6,7 @@ import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 // mdx2 needs self-closing tags.
-// dragging an image onto a Github discussion creates an <img>
+// dragging an image onto a GitHub discussion creates an <img>
 // we need to fix this before running them through mdx
 // also checks for <br> and <hr>
 function addSelfClosingTags(htmlString: string): string {

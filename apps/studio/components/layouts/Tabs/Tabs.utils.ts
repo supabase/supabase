@@ -31,7 +31,7 @@ export function useTableEditorTabsCleanUp() {
       tabsFilteredToSchemas.push(
         ...openTabsRef.current.filter((tabId) => {
           const tab = tabMapRef.current[tabId]
-          return tab.metadata?.schema === schema
+          return tab?.metadata?.schema === schema
         })
       )
     }

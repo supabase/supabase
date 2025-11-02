@@ -1,4 +1,3 @@
-import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
@@ -14,17 +13,18 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
+import { AuthenticatedDropdownMenu } from 'ui-patterns'
 
-import ScrollProgress from '~/components/ScrollProgress'
-import { getMenu } from '~/data/nav'
+import ScrollProgress from 'components/ScrollProgress'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import MenuItem from './MenuItem'
 import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import useDropdownMenu from './useDropdownMenu'
-import { AnnouncementBanner, AuthenticatedDropdownMenu } from 'ui-patterns'
+
+import { getMenu } from 'data/nav'
 
 interface Props {
   hideNavbar: boolean
@@ -32,7 +32,6 @@ interface Props {
 }
 
 const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
-  const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
@@ -42,7 +41,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const user = useUser()
   const userMenu = useDropdownMenu(user)
 
-  const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
   const isGAWeekSection = router.pathname.startsWith('/ga-week')
@@ -67,11 +65,8 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
     return null
   }
 
-  // const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
-
   return (
     <>
-      <AnnouncementBanner />
       <div
         className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}

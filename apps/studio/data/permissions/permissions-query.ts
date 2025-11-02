@@ -31,7 +31,7 @@ export const usePermissionsQuery = <TData = PermissionsData>({
     {
       ...options,
       enabled: IS_PLATFORM && enabled && isLoggedIn,
-      staleTime: 30 * 60 * 1000,
+      staleTime: 5 * 60 * 1000,
     }
   )
 }

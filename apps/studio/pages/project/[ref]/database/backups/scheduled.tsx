@@ -14,7 +14,7 @@ import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
@@ -26,9 +26,9 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
   const isOrioleDbInAws = useIsOrioleDbInAws()
   const isPitrEnabled = backups?.pitr_enabled
-  const isPermissionsLoaded = usePermissionsLoaded()
 
-  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
+  const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckProjectPermissions(PermissionAction.READ, 'back_ups')
 
   return (
     <ScaffoldContainer>

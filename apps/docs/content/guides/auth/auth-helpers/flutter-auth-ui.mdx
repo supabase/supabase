@@ -27,7 +27,7 @@ import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 void main() async {
   await Supabase.initialize(
     url: dotenv.get('SUPABASE_URL'),
-    anonKey: dotenv.get('SUPABASE_ANON_KEY'),
+    anonKey: dotenv.get('SUPABASE_PUBLISHABLE_KEY'),
   );
 
   runApp(const MyApp());

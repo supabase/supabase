@@ -48,8 +48,8 @@ const FORM_ID = 'credit-top-up'
 const FormSchema = z.object({
   amount: z.coerce
     .number()
-    .gte(100, 'Amount must be between $100 - $999.')
-    .lte(999, 'Amount must be between $100 - $999.')
+    .gte(100, 'Amount must be between $100 - $2000.')
+    .lte(2000, 'Amount must be between $100 - $2000.')
     .int('Amount must be a whole number.'),
   paymentMethod: z.string(),
 })

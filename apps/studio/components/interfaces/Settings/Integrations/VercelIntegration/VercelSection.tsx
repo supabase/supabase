@@ -18,6 +18,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
@@ -26,8 +27,8 @@ import type {
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
@@ -36,12 +37,15 @@ import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
 
 const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
-  const project = useSelectedProject()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
   const isBranch = project?.parent_project_ref !== undefined
 
+  // placeholder for isLoading state when a useAsyncCheckOrgPermissions hook is added
+  // This component in used both in /org/[slug]/integrations and /project/[slug]/settings/integrations
+  const isLoadingPermissions = false
   const canReadVercelConnection = useCheckPermissions(
     PermissionAction.READ,
     'integrations.vercel_connections'
@@ -162,7 +166,9 @@ You can change the scope of the access for Supabase by configuring
           <IntegrationImageHandler title="vercel" />
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadVercelConnection ? (
+          {isLoadingPermissions ? (
+            <GenericSkeletonLoader />
+          ) : !canReadVercelConnection ? (
             <NoPermission resourceText="view this organization's Vercel connections" />
           ) : (
             <>

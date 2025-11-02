@@ -136,7 +136,7 @@ Rotating a secret key (`sb_secret_...`) is easy and painless. Use the [API Keys]
 If you are still using the JWT-based `service_role` key, there are two options.
 
 1. **Strongly recommended:** Replace the `service_role` key with a new secret key instead. Follow the guide from above as if you are rotating an existing secret key.
-2. [Rotate your project's JWT secret.](/dashboard/project/_/settings/api) This operation is only recommended if you suspect that the JWT secret has leaked itself. Consider switching your `anon` JWT-based key to the publishable key, and all `service_role` JWT-based keys to secret keys. Only then rotate the JWT secret. Check the FAQ below if you use the JWT-based keys in mobile, desktop or CLI applications!
+2. [Rotate your project's JWT secret.](/dashboard/project/_/settings/jwt) This operation is only recommended if you suspect that the JWT secret has leaked itself. Consider switching your `anon` JWT-based key to the publishable key, and all `service_role` JWT-based keys to secret keys. Only then rotate the JWT secret. Check the FAQ below if you use the JWT-based keys in mobile, desktop or CLI applications!
 
 ## Known limitations and compatibility differences
 

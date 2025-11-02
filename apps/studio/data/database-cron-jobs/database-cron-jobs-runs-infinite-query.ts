@@ -51,17 +51,17 @@ export async function getDatabaseCronJobRuns({
   return result
 }
 
-export type DatabaseCronJobData = CronJobRun[]
-export type DatabaseCronJobError = ResponseError
+type DatabaseCronJobRunData = CronJobRun[]
+type DatabaseCronJobError = ResponseError
 
-export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobData>(
+export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
   { projectRef, connectionString, jobId }: DatabaseCronJobRunsVariables,
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
+  }: UseInfiniteQueryOptions<DatabaseCronJobRunData, DatabaseCronJobError, TData> = {}
 ) =>
-  useInfiniteQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
+  useInfiniteQuery<DatabaseCronJobRunData, DatabaseCronJobError, TData>(
     databaseCronJobsKeys.runsInfinite(projectRef, jobId, { status }),
     ({ pageParam }) => {
       return getDatabaseCronJobRuns({

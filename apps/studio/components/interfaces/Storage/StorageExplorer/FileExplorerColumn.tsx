@@ -19,7 +19,7 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
 } from '../Storage.constants'
-import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
+import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRow from './FileExplorerRow'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
@@ -60,7 +60,6 @@ export interface FileExplorerColumnProps {
   index: number
   column: StorageColumn
   fullWidth?: boolean
-  openedFolders?: StorageItem[]
   selectedItems: StorageItemWithColumn[]
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
@@ -73,7 +72,6 @@ const FileExplorerColumn = ({
   index = 0,
   column,
   fullWidth = false,
-  openedFolders = [],
   selectedItems = [],
   itemSearchString,
   onFilesUpload = noop,
@@ -221,7 +219,6 @@ const FileExplorerColumn = ({
           view: snap.view,
           columnIndex: index,
           selectedItems,
-          openedFolders,
         }}
         ItemComponent={FileExplorerRow}
         getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}

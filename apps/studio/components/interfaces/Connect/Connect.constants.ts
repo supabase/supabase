@@ -64,6 +64,10 @@ export type ConnectionType = {
   label: string
   guideLink?: string
   children: ConnectionType[]
+  files?: {
+    name: string
+    content: string
+  }[]
 }
 
 export const FRAMEWORKS: ConnectionType[] = [

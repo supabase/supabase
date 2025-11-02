@@ -1,44 +1,44 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useSchemasQuery } from 'data/database/schemas-query'
 import {
   EnumeratedType,
   useEnumeratedTypesQuery,
 } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
+  Card,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
 import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
 
 const EnumeratedTypes = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [search, setSearch] = useState('')
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [showCreateTypePanel, setShowCreateTypePanel] = useState(false)
   const [selectedTypeToEdit, setSelectedTypeToEdit] = useState<EnumeratedType>()
   const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
-
-  const { data: schemas } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
   const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -52,11 +52,7 @@ const EnumeratedTypes = () => {
         )
       : enumeratedTypes.filter((x) => x.schema === selectedSchema)
 
-  const protectedSchemas = (schemas ?? []).filter((schema) =>
-    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   return (
     <div className="space-y-4">
@@ -81,7 +77,7 @@ const EnumeratedTypes = () => {
 
         <div className="flex items-center gap-2">
           <DocsButton href="https://www.postgresql.org/docs/current/datatype-enum.html" />
-          {!isLocked && (
+          {!isSchemaLocked && (
             <Button
               className="ml-auto flex-1"
               type="primary"
@@ -93,7 +89,9 @@ const EnumeratedTypes = () => {
         </div>
       </div>
 
-      {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="enumerated types" />}
+      {isSchemaLocked && (
+        <ProtectedSchemaWarning schema={selectedSchema} entity="enumerated types" />
+      )}
 
       {isLoading && <GenericSkeletonLoader />}
 
@@ -102,75 +100,79 @@ const EnumeratedTypes = () => {
       )}
 
       {isSuccess && (
-        <Table
-          head={[
-            <Table.th key="schema">Schema</Table.th>,
-            <Table.th key="name">Name</Table.th>,
-            <Table.th key="values">Values</Table.th>,
-            <Table.th key="actions" />,
-          ]}
-          body={
-            <>
-              {filteredEnumeratedTypes.length === 0 && search.length === 0 && (
-                <Table.tr>
-                  <Table.td colSpan={4}>
-                    <p className="text-sm text-foreground">No enumerated types created yet</p>
-                    <p className="text-sm text-foreground-light">
-                      There are no enumerated types found in the schema "{selectedSchema}"
-                    </p>
-                  </Table.td>
-                </Table.tr>
-              )}
-              {filteredEnumeratedTypes.length === 0 && search.length > 0 && (
-                <Table.tr>
-                  <Table.td colSpan={4}>
-                    <p className="text-sm text-foreground">No results found</p>
-                    <p className="text-sm text-foreground-light">
-                      Your search for "{search}" did not return any results
-                    </p>
-                  </Table.td>
-                </Table.tr>
-              )}
-              {filteredEnumeratedTypes.length > 0 &&
-                filteredEnumeratedTypes.map((type) => (
-                  <Table.tr key={type.id}>
-                    <Table.td className="w-20">
-                      <p className="w-20 truncate">{type.schema}</p>
-                    </Table.td>
-                    <Table.td>{type.name}</Table.td>
-                    <Table.td>{type.enums.join(', ')}</Table.td>
-                    <Table.td>
-                      {!isLocked && (
-                        <div className="flex justify-end items-center space-x-2">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1" icon={<MoreVertical />} />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent side="bottom" align="end" className="w-32">
-                              <DropdownMenuItem
-                                className="space-x-2"
-                                onClick={() => setSelectedTypeToEdit(type)}
-                              >
-                                <Edit size={14} />
-                                <p>Update type</p>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="space-x-2"
-                                onClick={() => setSelectedTypeToDelete(type)}
-                              >
-                                <Trash size={14} />
-                                <p>Delete type</p>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      )}
-                    </Table.td>
-                  </Table.tr>
-                ))}
-            </>
-          }
-        />
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead key="schema">Schema</TableHead>
+                <TableHead key="name">Name</TableHead>
+                <TableHead key="values">Values</TableHead>
+                <TableHead key="actions" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <>
+                {filteredEnumeratedTypes.length === 0 && search.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p className="text-sm text-foreground">No enumerated types created yet</p>
+                      <p className="text-sm text-foreground-light">
+                        There are no enumerated types found in the schema "{selectedSchema}"
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                )}
+                {filteredEnumeratedTypes.length === 0 && search.length > 0 && (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p className="text-sm text-foreground">No results found</p>
+                      <p className="text-sm text-foreground-light">
+                        Your search for "{search}" did not return any results
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                )}
+                {filteredEnumeratedTypes.length > 0 &&
+                  filteredEnumeratedTypes.map((type) => (
+                    <TableRow key={type.id}>
+                      <TableCell className="w-20">
+                        <p className="w-20 truncate">{type.schema}</p>
+                      </TableCell>
+                      <TableCell>{type.name}</TableCell>
+                      <TableCell>{type.enums.join(', ')}</TableCell>
+                      <TableCell>
+                        {!isSchemaLocked && (
+                          <div className="flex justify-end items-center space-x-2">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button type="default" className="px-1" icon={<MoreVertical />} />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent side="bottom" align="end" className="w-32">
+                                <DropdownMenuItem
+                                  className="space-x-2"
+                                  onClick={() => setSelectedTypeToEdit(type)}
+                                >
+                                  <Edit size={14} />
+                                  <p>Update type</p>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="space-x-2"
+                                  onClick={() => setSelectedTypeToDelete(type)}
+                                >
+                                  <Trash size={14} />
+                                  <p>Delete type</p>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </>
+            </TableBody>
+          </Table>
+        </Card>
       )}
 
       <CreateEnumeratedTypeSidePanel

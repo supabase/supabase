@@ -15,7 +15,6 @@ import {
   DrawerTrigger,
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from 'ui'
 import { useMediaQuery } from '../hooks/useMediaQuery'
@@ -32,26 +31,24 @@ export function DataTableFilterControlsDrawer() {
 
   return (
     <Drawer>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DrawerTrigger asChild>
-              <Button className="h-9 w-9" ref={isMobile ? triggerButtonRef : null}>
-                <FilterIcon className="w-4 h-4" />
-              </Button>
-            </DrawerTrigger>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            <p>
-              Toggle controls with{' '}
-              <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
-                <span className="mr-1">⌘</span>
-                <span>B</span>
-              </Kbd>
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DrawerTrigger asChild>
+            <Button className="h-9 w-9" ref={isMobile ? triggerButtonRef : null}>
+              <FilterIcon className="w-4 h-4" />
+            </Button>
+          </DrawerTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          <p>
+            Toggle controls with{' '}
+            <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
+              <span className="mr-1">⌘</span>
+              <span>B</span>
+            </Kbd>
+          </p>
+        </TooltipContent>
+      </Tooltip>
       <DrawerContent className="max-h-[calc(100dvh-4rem)]">
         <VisuallyHidden>
           <DrawerHeader>

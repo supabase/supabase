@@ -1,38 +1,60 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
 import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { object, string } from 'yup'
+import z from 'zod'
 
 import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
-import { Button, Form, Input } from 'ui'
+import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { LastSignInWrapper } from './LastSignInWrapper'
 
-const signInSchema = object({
-  email: string().email('Must be a valid email').required('Email is required'),
-  password: string().required('Password is required'),
+const schema = z.object({
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
+  password: z.string().min(1, 'Password is required'),
 })
 
-const SignInForm = () => {
+const formId = 'sign-in-form'
+
+export const SignInForm = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [_, setLastSignIn] = useLastSignIn()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+  const [returnTo, setReturnTo] = useState<string | null>(null)
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '', password: '' },
+  })
+  const isSubmitting = form.formState.isSubmitting
+
+  useEffect(() => {
+    // Only call getReturnToPath after component mounts client-side
+    setReturnTo(getReturnToPath())
+  }, [])
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
-  const onSignIn = async ({ email, password }: { email: string; password: string }) => {
+  let forgotPasswordUrl = `/forgot-password`
+
+  if (returnTo && !returnTo.includes('/forgot-password')) {
+    forgotPasswordUrl = `${forgotPasswordUrl}?returnTo=${encodeURIComponent(returnTo)}`
+  }
+
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ email, password }) => {
     const toastId = toast.loading('Signing in...')
 
     let token = captchaToken
@@ -68,9 +90,12 @@ const SignInForm = () => {
         addLoginEvent({})
 
         await queryClient.resetQueries()
-        const returnTo = getReturnToPath()
         // since we're already on the /sign-in page, prevent redirect loops
-        router.push(returnTo === '/sign-in' ? '/organizations' : returnTo)
+        let redirectPath = '/organizations'
+        if (returnTo && returnTo !== '/sign-in') {
+          redirectPath = returnTo
+        }
+        router.push(redirectPath)
       } catch (error: any) {
         toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
         Sentry.captureMessage('[CRITICAL] Failed to sign in via EP: ' + error.message)
@@ -91,77 +116,78 @@ const SignInForm = () => {
   }
 
   return (
-    <Form
-      validateOnBlur
-      id="signIn-form"
-      initialValues={{ email: '', password: '' }}
-      validationSchema={signInSchema}
-      onSubmit={onSignIn}
-    >
-      {({ isSubmitting }: { isSubmitting: boolean }) => {
-        return (
-          <div className="flex flex-col gap-4">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="you@example.com"
-              disabled={isSubmitting}
-              autoComplete="email"
-            />
+    <Form_Shadcn_ {...form}>
+      <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField_Shadcn_
+          key="email"
+          name="email"
+          control={form.control}
+          render={({ field }) => (
+            <FormItemLayout name="email" label="Email">
+              <FormControl_Shadcn_>
+                <Input_Shadcn_
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  {...field}
+                  placeholder="you@example.com"
+                  disabled={isSubmitting}
+                />
+              </FormControl_Shadcn_>
+            </FormItemLayout>
+          )}
+        />
 
-            <div className="relative">
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                label="Password"
-                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                disabled={isSubmitting}
-                autoComplete="current-password"
-              />
+        <div className="relative">
+          <FormField_Shadcn_
+            key="password"
+            name="password"
+            control={form.control}
+            render={({ field }) => (
+              <FormItemLayout name="password" label="Password">
+                <FormControl_Shadcn_>
+                  <Input_Shadcn_
+                    id="password"
+                    type="password"
+                    autoComplete="current-password"
+                    {...field}
+                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                    disabled={isSubmitting}
+                  />
+                </FormControl_Shadcn_>
+              </FormItemLayout>
+            )}
+          />
 
-              {/* positioned using absolute instead of labelOptional prop so tabbing between inputs works smoothly */}
-              <Link
-                href="/forgot-password"
-                className="absolute top-0 right-0 text-sm text-foreground-lighter"
-              >
-                Forgot Password?
-              </Link>
-            </div>
+          {/* positioned using absolute instead of labelOptional prop so tabbing between inputs works smoothly */}
+          <Link
+            href={forgotPasswordUrl}
+            className="absolute top-0 right-0 text-sm text-foreground-lighter"
+          >
+            Forgot Password?
+          </Link>
+        </div>
 
-            <div className="self-center">
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            </div>
+        <div className="self-center">
+          <HCaptcha
+            ref={captchaRef}
+            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+            size="invisible"
+            onVerify={(token) => {
+              setCaptchaToken(token)
+            }}
+            onExpire={() => {
+              setCaptchaToken(null)
+            }}
+          />
+        </div>
 
-            <LastSignInWrapper type="email">
-              <Button
-                block
-                form="signIn-form"
-                htmlType="submit"
-                size="large"
-                disabled={isSubmitting}
-                loading={isSubmitting}
-              >
-                Sign In
-              </Button>
-            </LastSignInWrapper>
-          </div>
-        )
-      }}
-    </Form>
+        <LastSignInWrapper type="email">
+          <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
+            Sign In
+          </Button>
+        </LastSignInWrapper>
+      </form>
+    </Form_Shadcn_>
   )
 }
-
-export default SignInForm

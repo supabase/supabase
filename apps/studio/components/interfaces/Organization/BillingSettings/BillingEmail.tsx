@@ -22,7 +22,7 @@ import {
   useAsyncCheckProjectPermissions,
   useCheckPermissions,
 } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { FormMessage_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -41,7 +41,7 @@ const formSchema = z.object({
 
 const BillingEmail = () => {
   const { slug } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { name, billing_email } = selectedOrganization ?? {}
 

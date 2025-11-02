@@ -8,6 +8,48 @@
   },
   {
     "type": "category",
+    "title": "Advisors",
+    "items": [
+      {
+        "id": "v1-get-performance-advisors",
+        "title": "Get performance advisors",
+        "slug": "v1-get-performance-advisors",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-security-advisors",
+        "title": "Get security advisors",
+        "slug": "v1-get-security-advisors",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Analytics",
+    "items": [
+      {
+        "id": "v1-get-project-logs",
+        "title": "Get project logs",
+        "slug": "v1-get-project-logs",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-usage-api-count",
+        "title": "Get project usage api count",
+        "slug": "v1-get-project-usage-api-count",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-usage-request-count",
+        "title": "Get project usage request count",
+        "slug": "v1-get-project-usage-request-count",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Auth",
     "items": [
       {
@@ -17,9 +59,33 @@
         "type": "operation"
       },
       {
+        "id": "v1-create-legacy-signing-key",
+        "title": "Create legacy signing key",
+        "slug": "v1-create-legacy-signing-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-project-signing-key",
+        "title": "Create project signing key",
+        "slug": "v1-create-project-signing-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-project-tpa-integration",
+        "title": "Create project tpa integration",
+        "slug": "v1-create-project-tpa-integration",
+        "type": "operation"
+      },
+      {
         "id": "v1-delete-a-sso-provider",
         "title": "Delete a sso provider",
         "slug": "v1-delete-a-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-project-tpa-integration",
+        "title": "Delete project tpa integration",
+        "slug": "v1-delete-project-tpa-integration",
         "type": "operation"
       },
       {
@@ -35,9 +101,45 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-legacy-signing-key",
+        "title": "Get legacy signing key",
+        "slug": "v1-get-legacy-signing-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-signing-key",
+        "title": "Get project signing key",
+        "slug": "v1-get-project-signing-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-signing-keys",
+        "title": "Get project signing keys",
+        "slug": "v1-get-project-signing-keys",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-tpa-integration",
+        "title": "Get project tpa integration",
+        "slug": "v1-get-project-tpa-integration",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-sso-provider",
         "title": "List all sso provider",
         "slug": "v1-list-all-sso-provider",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-project-tpa-integrations",
+        "title": "List project tpa integrations",
+        "slug": "v1-list-project-tpa-integrations",
+        "type": "operation"
+      },
+      {
+        "id": "v1-remove-project-signing-key",
+        "title": "Remove project signing key",
+        "slug": "v1-remove-project-signing-key",
         "type": "operation"
       },
       {
@@ -51,6 +153,36 @@
         "title": "Update auth service config",
         "slug": "v1-update-auth-service-config",
         "type": "operation"
+      },
+      {
+        "id": "v1-update-project-signing-key",
+        "title": "Update project signing key",
+        "slug": "v1-update-project-signing-key",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Billing",
+    "items": [
+      {
+        "id": "v1-apply-project-addon",
+        "title": "Apply project addon",
+        "slug": "v1-apply-project-addon",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-project-addons",
+        "title": "List project addons",
+        "slug": "v1-list-project-addons",
+        "type": "operation"
+      },
+      {
+        "id": "v1-remove-project-addon",
+        "title": "Remove project addon",
+        "slug": "v1-remove-project-addon",
+        "type": "operation"
       }
     ]
   },
@@ -62,6 +194,12 @@
         "id": "v1-apply-a-migration",
         "title": "Apply a migration",
         "slug": "v1-apply-a-migration",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-restore-point",
+        "title": "Create restore point",
+        "slug": "v1-create-restore-point",
         "type": "operation"
       },
       {
@@ -89,6 +227,18 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-database-metadata",
+        "title": "Get database metadata",
+        "slug": "v1-get-database-metadata",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-pooler-config",
+        "title": "Get pooler config",
+        "slug": "v1-get-pooler-config",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-postgres-config",
         "title": "Get postgres config",
         "slug": "v1-get-postgres-config",
@@ -104,6 +254,12 @@
         "id": "v1-get-readonly-mode-status",
         "title": "Get readonly mode status",
         "slug": "v1-get-readonly-mode-status",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-restore-point",
+        "title": "Get restore point",
+        "slug": "v1-get-restore-point",
         "type": "operation"
       },
       {
@@ -125,9 +281,9 @@
         "type": "operation"
       },
       {
-        "id": "v1-list-migrations",
-        "title": "List migrations",
-        "slug": "v1-list-migrations",
+        "id": "v1-list-migration-history",
+        "title": "List migration history",
+        "slug": "v1-list-migration-history",
         "type": "operation"
       },
       {
@@ -155,6 +311,18 @@
         "type": "operation"
       },
       {
+        "id": "v1-undo",
+        "title": "Undo",
+        "slug": "v1-undo",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-pooler-config",
+        "title": "Update pooler config",
+        "slug": "v1-update-pooler-config",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-postgres-config",
         "title": "Update postgres config",
         "slug": "v1-update-postgres-config",
@@ -164,6 +332,12 @@
         "id": "v1-update-ssl-enforcement-config",
         "title": "Update ssl enforcement config",
         "slug": "v1-update-ssl-enforcement-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-upsert-a-migration",
+        "title": "Upsert a migration",
+        "slug": "v1-upsert-a-migration",
         "type": "operation"
       }
     ]
@@ -293,9 +467,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-diff-a-branch",
+        "title": "Diff a branch",
+        "slug": "v1-diff-a-branch",
+        "type": "operation"
+      },
+      {
         "id": "v1-disable-preview-branching",
         "title": "Disable preview branching",
         "slug": "v1-disable-preview-branching",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-a-branch",
+        "title": "Get a branch",
+        "slug": "v1-get-a-branch",
         "type": "operation"
       },
       {
@@ -353,6 +539,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-oauth-authorize-project-claim",
+        "title": "Oauth authorize project claim",
+        "slug": "v1-oauth-authorize-project-claim",
+        "type": "operation"
+      },
+      {
         "id": "v1-revoke-token",
         "title": "Revoke token",
         "slug": "v1-revoke-token",
@@ -365,6 +557,12 @@
     "title": "Organizations",
     "items": [
       {
+        "id": "v1-claim-project-for-organization",
+        "title": "Claim project for organization",
+        "slug": "v1-claim-project-for-organization",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-an-organization",
         "title": "Create an organization",
         "slug": "v1-create-an-organization",
@@ -374,6 +572,12 @@
         "id": "v1-get-an-organization",
         "title": "Get an organization",
         "slug": "v1-get-an-organization",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-organization-project-claim",
+        "title": "Get organization project claim",
+        "slug": "v1-get-organization-project-claim",
         "type": "operation"
       },
       {
@@ -407,6 +611,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-create-project-claim-token",
+        "title": "Create project claim token",
+        "slug": "v1-create-project-claim-token",
+        "type": "operation"
+      },
+      {
         "id": "v1-delete-a-project",
         "title": "Delete a project",
         "slug": "v1-delete-a-project",
@@ -416,6 +626,12 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-project-claim-token",
+        "title": "Delete project claim token",
+        "slug": "v1-delete-project-claim-token",
         "type": "operation"
       },
       {
@@ -443,6 +659,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-project-claim-token",
+        "title": "Get project claim token",
+        "slug": "v1-get-project-claim-token",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-services-health",
         "title": "Get services health",
         "slug": "v1-get-services-health",
@@ -452,6 +674,12 @@
         "id": "v1-list-all-network-bans",
         "title": "List all network bans",
         "slug": "v1-list-all-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-all-network-bans-enriched",
+        "title": "List all network bans enriched",
+        "slug": "v1-list-all-network-bans-enriched",
         "type": "operation"
       },
       {
@@ -527,15 +755,39 @@
         "type": "operation"
       },
       {
+        "id": "v1-create-project-api-key",
+        "title": "Create project api key",
+        "slug": "v1-create-project-api-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-project-api-key",
+        "title": "Delete project api key",
+        "slug": "v1-delete-project-api-key",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-pgsodium-config",
         "title": "Get pgsodium config",
         "slug": "v1-get-pgsodium-config",
         "type": "operation"
       },
       {
+        "id": "v1-get-project-api-key",
+        "title": "Get project api key",
+        "slug": "v1-get-project-api-key",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-project-api-keys",
         "title": "Get project api keys",
         "slug": "v1-get-project-api-keys",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project-legacy-api-keys",
+        "title": "Get project legacy api keys",
+        "slug": "v1-get-project-legacy-api-keys",
         "type": "operation"
       },
       {
@@ -548,6 +800,18 @@
         "id": "v1-update-pgsodium-config",
         "title": "Update pgsodium config",
         "slug": "v1-update-pgsodium-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-project-api-key",
+        "title": "Update project api key",
+        "slug": "v1-update-project-api-key",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-project-legacy-api-keys",
+        "title": "Update project legacy api keys",
+        "slug": "v1-update-project-legacy-api-keys",
         "type": "operation"
       }
     ]

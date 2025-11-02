@@ -15995,239 +15995,374 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "name": "credentials",
             "type": {
               "type": "union",
-              "name": "SolanaWeb3Credentials",
+              "name": "Web3Credentials",
               "subTypes": [
                 {
-                  "type": "object",
-                  "properties": [
+                  "type": "union",
+                  "subTypes": [
                     {
-                      "name": "chain",
-                      "type": {
-                        "type": "literal",
-                        "value": "solana"
-                      }
-                    },
-                    {
-                      "name": "options",
-                      "type": {
-                        "type": "object",
-                        "properties": [
-                          {
-                            "name": "captchaToken",
-                            "type": {
-                              "type": "intrinsic",
-                              "name": "string"
-                            },
-                            "isOptional": true,
-                            "comment": {
-                              "shortText": "Verification token received when the user completes the captcha on the site."
-                            }
-                          },
-                          {
-                            "name": "signInWithSolana",
-                            "type": {
-                              "type": "nameOnly",
-                              "name": "Partial"
-                            },
-                            "isOptional": true
-                          },
-                          {
-                            "name": "url",
-                            "type": {
-                              "type": "intrinsic",
-                              "name": "string"
-                            },
-                            "isOptional": true,
-                            "comment": {
-                              "shortText": "URL to use with the wallet interface. Some wallets do not allow signing a message for URLs different from the current page."
-                            }
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "chain",
+                          "type": {
+                            "type": "literal",
+                            "value": "solana"
                           }
-                        ]
-                      },
-                      "isOptional": true
-                    },
-                    {
-                      "name": "statement",
-                      "type": {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      "isOptional": true,
-                      "comment": {
-                        "shortText": "Optional statement to include in the Sign in with Solana message. Must not include new line characters. Most wallets like Phantom **require specifying a statement!**"
-                      }
-                    },
-                    {
-                      "name": "wallet",
-                      "type": {
-                        "name": "SolanaWallet",
-                        "type": "object",
-                        "properties": [
-                          {
-                            "name": "publicKey",
-                            "type": {
-                              "type": "union",
-                              "subTypes": [
-                                {
-                                  "type": "object",
-                                  "properties": [
-                                    {
-                                      "type": "function",
-                                      "name": "toBase58",
-                                      "params": [],
-                                      "ret": {
-                                        "type": {
-                                          "type": "intrinsic",
-                                          "name": "string"
-                                        }
-                                      }
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "literal",
-                                  "value": null
-                                }
-                              ]
-                            },
-                            "isOptional": true
-                          },
-                          {
-                            "type": "function",
-                            "name": "signIn",
-                            "params": [
+                        },
+                        {
+                          "name": "options",
+                          "type": {
+                            "type": "object",
+                            "properties": [
                               {
-                                "name": "inputs",
-                                "type": {
-                                  "type": "array",
-                                  "elemType": {
-                                    "type": "nameOnly",
-                                    "name": "SolanaSignInInput"
-                                  }
-                                }
-                              }
-                            ],
-                            "ret": {
-                              "type": {
-                                "type": "promise",
-                                "name": "Promise",
-                                "awaited": {
-                                  "type": "union",
-                                  "subTypes": [
-                                    {
-                                      "type": "nameOnly",
-                                      "name": "SolanaSignInOutput"
-                                    },
-                                    {
-                                      "type": "array",
-                                      "elemType": {
-                                        "type": "nameOnly",
-                                        "name": "SolanaSignInOutput"
-                                      }
-                                    }
-                                  ]
-                                }
-                              }
-                            }
-                          },
-                          {
-                            "type": "function",
-                            "name": "signMessage",
-                            "params": [
-                              {
-                                "name": "message",
-                                "type": {
-                                  "type": "nameOnly",
-                                  "name": "Uint8Array"
-                                }
-                              },
-                              {
-                                "name": "encoding",
+                                "name": "captchaToken",
                                 "type": {
                                   "type": "intrinsic",
                                   "name": "string"
                                 },
+                                "isOptional": true,
+                                "comment": {
+                                  "shortText": "Verification token received when the user completes the captcha on the site."
+                                }
+                              },
+                              {
+                                "name": "signInWithSolana",
+                                "type": {
+                                  "type": "nameOnly",
+                                  "name": "Partial"
+                                },
                                 "isOptional": true
+                              },
+                              {
+                                "name": "url",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "isOptional": true,
+                                "comment": {
+                                  "shortText": "URL to use with the wallet interface. Some wallets do not allow signing a message for URLs different from the current page."
+                                }
                               }
-                            ],
-                            "ret": {
-                              "type": {
-                                "type": "union",
-                                "subTypes": [
+                            ]
+                          },
+                          "isOptional": true
+                        },
+                        {
+                          "name": "statement",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "isOptional": true,
+                          "comment": {
+                            "shortText": "Optional statement to include in the Sign in with Solana message. Must not include new line characters. Most wallets like Phantom **require specifying a statement!**"
+                          }
+                        },
+                        {
+                          "name": "wallet",
+                          "type": {
+                            "name": "SolanaWallet",
+                            "type": "object",
+                            "properties": [
+                              {
+                                "name": "publicKey",
+                                "type": {
+                                  "type": "union",
+                                  "subTypes": [
+                                    {
+                                      "type": "object",
+                                      "properties": [
+                                        {
+                                          "type": "function",
+                                          "name": "toBase58",
+                                          "params": [],
+                                          "ret": {
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "literal",
+                                      "value": null
+                                    }
+                                  ]
+                                },
+                                "isOptional": true
+                              },
+                              {
+                                "type": "function",
+                                "name": "signIn",
+                                "params": [
                                   {
-                                    "type": "intrinsic",
-                                    "name": "undefined"
-                                  },
-                                  {
+                                    "name": "inputs",
+                                    "type": {
+                                      "type": "array",
+                                      "elemType": {
+                                        "type": "nameOnly",
+                                        "name": "SolanaSignInInput"
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ret": {
+                                  "type": {
                                     "type": "promise",
                                     "name": "Promise",
                                     "awaited": {
+                                      "type": "union",
+                                      "subTypes": [
+                                        {
+                                          "type": "nameOnly",
+                                          "name": "SolanaSignInOutput"
+                                        },
+                                        {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "nameOnly",
+                                            "name": "SolanaSignInOutput"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "type": "function",
+                                "name": "signMessage",
+                                "params": [
+                                  {
+                                    "name": "message",
+                                    "type": {
                                       "type": "nameOnly",
                                       "name": "Uint8Array"
                                     }
+                                  },
+                                  {
+                                    "name": "encoding",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "isOptional": true
                                   }
-                                ]
+                                ],
+                                "ret": {
+                                  "type": {
+                                    "type": "union",
+                                    "subTypes": [
+                                      {
+                                        "type": "intrinsic",
+                                        "name": "undefined"
+                                      },
+                                      {
+                                        "type": "promise",
+                                        "name": "Promise",
+                                        "awaited": {
+                                          "type": "nameOnly",
+                                          "name": "Uint8Array"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
                               }
-                            }
+                            ]
+                          },
+                          "isOptional": true,
+                          "comment": {
+                            "shortText": "Wallet interface to use. If not specified will default to \`window.solana\`."
                           }
-                        ]
-                      },
-                      "isOptional": true,
-                      "comment": {
-                        "shortText": "Wallet interface to use. If not specified will default to \`window.solana\`."
-                      }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "chain",
+                          "type": {
+                            "type": "literal",
+                            "value": "solana"
+                          }
+                        },
+                        {
+                          "name": "message",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "comment": {
+                            "shortText": "Sign in with Solana compatible message. Must include \`Issued At\`, \`URI\` and \`Version\`."
+                          }
+                        },
+                        {
+                          "name": "options",
+                          "type": {
+                            "type": "object",
+                            "properties": [
+                              {
+                                "name": "captchaToken",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "isOptional": true,
+                                "comment": {
+                                  "shortText": "Verification token received when the user completes the captcha on the site."
+                                }
+                              }
+                            ]
+                          },
+                          "isOptional": true
+                        },
+                        {
+                          "name": "signature",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "Uint8Array"
+                          },
+                          "comment": {
+                            "shortText": "Ed25519 signature of the message."
+                          }
+                        }
+                      ]
                     }
                   ]
                 },
                 {
-                  "type": "object",
-                  "properties": [
+                  "type": "union",
+                  "subTypes": [
                     {
-                      "name": "chain",
-                      "type": {
-                        "type": "literal",
-                        "value": "solana"
-                      }
-                    },
-                    {
-                      "name": "message",
-                      "type": {
-                        "type": "intrinsic",
-                        "name": "string"
-                      },
-                      "comment": {
-                        "shortText": "Sign in with Solana compatible message. Must include \`Issued At\`, \`URI\` and \`Version\`."
-                      }
-                    },
-                    {
-                      "name": "options",
-                      "type": {
-                        "type": "object",
-                        "properties": [
-                          {
-                            "name": "captchaToken",
-                            "type": {
-                              "type": "intrinsic",
-                              "name": "string"
-                            },
-                            "isOptional": true,
-                            "comment": {
-                              "shortText": "Verification token received when the user completes the captcha on the site."
-                            }
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "chain",
+                          "type": {
+                            "type": "literal",
+                            "value": "ethereum"
                           }
-                        ]
-                      },
-                      "isOptional": true
+                        },
+                        {
+                          "name": "options",
+                          "type": {
+                            "type": "object",
+                            "properties": [
+                              {
+                                "name": "captchaToken",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "isOptional": true,
+                                "comment": {
+                                  "shortText": "Verification token received when the user completes the captcha on the site."
+                                }
+                              },
+                              {
+                                "name": "signInWithEthereum",
+                                "type": {
+                                  "type": "nameOnly",
+                                  "name": "Partial"
+                                },
+                                "isOptional": true
+                              },
+                              {
+                                "name": "url",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "isOptional": true,
+                                "comment": {
+                                  "shortText": "URL to use with the wallet interface. Some wallets do not allow signing a message for URLs different from the current page."
+                                }
+                              }
+                            ]
+                          },
+                          "isOptional": true
+                        },
+                        {
+                          "name": "statement",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "isOptional": true,
+                          "comment": {
+                            "shortText": "Optional statement to include in the Sign in with Solana message. Must not include new line characters. Most wallets like Phantom **require specifying a statement!**"
+                          }
+                        },
+                        {
+                          "name": "wallet",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "EthereumWallet"
+                          },
+                          "isOptional": true,
+                          "comment": {
+                            "shortText": "Wallet interface to use. If not specified will default to \`window.solana\`."
+                          }
+                        }
+                      ]
                     },
                     {
-                      "name": "signature",
-                      "type": {
-                        "type": "nameOnly",
-                        "name": "Uint8Array"
-                      },
-                      "comment": {
-                        "shortText": "Ed25519 signature of the message."
-                      }
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "chain",
+                          "type": {
+                            "type": "literal",
+                            "value": "ethereum"
+                          }
+                        },
+                        {
+                          "name": "message",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "comment": {
+                            "shortText": "Sign in with Ethereum compatible message. Must include \`Issued At\`, \`URI\` and \`Version\`."
+                          }
+                        },
+                        {
+                          "name": "options",
+                          "type": {
+                            "type": "object",
+                            "properties": [
+                              {
+                                "name": "captchaToken",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "isOptional": true,
+                                "comment": {
+                                  "shortText": "Verification token received when the user completes the captcha on the site."
+                                }
+                              }
+                            ]
+                          },
+                          "isOptional": true
+                        },
+                        {
+                          "name": "signature",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "Hex"
+                          },
+                          "comment": {
+                            "shortText": "Ed25519 signature of the message."
+                          }
+                        }
+                      ]
                     }
                   ]
                 }
@@ -17133,7 +17268,13 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Signs in a user by verifying a message signed by the user's private key.\\nOnly Solana supported at this time, using the Sign in with Solana standard."
+          "shortText": "Signs in a user by verifying a message signed by the user's private key.\\nSupports Ethereum (via Sign-In-With-Ethereum) & Solana (Sign-In-With-Solana) standards,\\nboth of which derive from the EIP-4361 standard\\nWith slight variation on Solana's side.",
+          "tags": [
+            {
+              "tag": "reference",
+              "text": "https://eips.ethereum.org/EIPS/eip-4361\\n"
+            }
+          ]
         }
       },
       "@supabase/auth-js.GoTrueClient.signOut": {
@@ -23327,19 +23468,155 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "name": "@supabase/postgrest-js.PostgrestBuilder.constructor",
         "params": [
           {
-            "name": "builder"
+            "name": "builder",
+            "type": {
+              "type": "object",
+              "properties": [
+                {
+                  "name": "body",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "unknown"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "fetch",
+                  "type": {
+                    "type": "function",
+                    "params": [
+                      {
+                        "name": "input",
+                        "type": {
+                          "type": "union",
+                          "subTypes": [
+                            {
+                              "type": "nameOnly",
+                              "name": "RequestInfo"
+                            },
+                            {
+                              "type": "nameOnly",
+                              "name": "URL"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "init",
+                        "type": {
+                          "type": "nameOnly",
+                          "name": "RequestInit"
+                        },
+                        "isOptional": true
+                      }
+                    ],
+                    "ret": {
+                      "type": {
+                        "type": "promise",
+                        "name": "Promise",
+                        "awaited": {
+                          "type": "nameOnly",
+                          "name": "Response"
+                        }
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "headers",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "HeadersInit"
+                  }
+                },
+                {
+                  "name": "isMaybeSingle",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "method",
+                  "type": {
+                    "type": "union",
+                    "subTypes": [
+                      {
+                        "type": "literal",
+                        "value": "GET"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "HEAD"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "POST"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "PATCH"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "DELETE"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "schema",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "shouldThrowOnError",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "signal",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "AbortSignal"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "url",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "URL"
+                  }
+                }
+              ]
+            }
           }
         ],
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Result"
+            "name": "ClientOptions"
           }
         }
       },
       "@supabase/postgrest-js.PostgrestBuilder.overrideTypes": {
         "name": "@supabase/postgrest-js.PostgrestBuilder.overrideTypes",
         "params": [],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "ClientOptions"
+          }
+        },
         "comment": {
           "shortText": "Override the type of the returned \`data\` field in the response.",
           "returns": "A PostgrestBuilder instance with the new type\\n",
@@ -23357,7 +23634,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "CheckMatchingArrayTypes"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -23391,7 +23668,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Result"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -23560,16 +23837,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 {
                   "name": "headers",
                   "type": {
-                    "type": "record",
-                    "name": "Record",
-                    "keyType": {
-                      "type": "intrinsic",
-                      "name": "string"
-                    },
-                    "valueType": {
-                      "type": "intrinsic",
-                      "name": "string"
-                    }
+                    "type": "nameOnly",
+                    "name": "HeadersInit"
                   },
                   "isOptional": true,
                   "comment": {
@@ -23621,7 +23890,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -23644,7 +23913,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -23737,7 +24006,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -23814,13 +24083,143 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.constructor",
         "params": [
           {
-            "name": "builder"
+            "name": "builder",
+            "type": {
+              "type": "object",
+              "properties": [
+                {
+                  "name": "body",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "unknown"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "fetch",
+                  "type": {
+                    "type": "function",
+                    "params": [
+                      {
+                        "name": "input",
+                        "type": {
+                          "type": "union",
+                          "subTypes": [
+                            {
+                              "type": "nameOnly",
+                              "name": "RequestInfo"
+                            },
+                            {
+                              "type": "nameOnly",
+                              "name": "URL"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "init",
+                        "type": {
+                          "type": "nameOnly",
+                          "name": "RequestInit"
+                        },
+                        "isOptional": true
+                      }
+                    ],
+                    "ret": {
+                      "type": {
+                        "type": "promise",
+                        "name": "Promise",
+                        "awaited": {
+                          "type": "nameOnly",
+                          "name": "Response"
+                        }
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "headers",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "HeadersInit"
+                  }
+                },
+                {
+                  "name": "isMaybeSingle",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "method",
+                  "type": {
+                    "type": "union",
+                    "subTypes": [
+                      {
+                        "type": "literal",
+                        "value": "GET"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "HEAD"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "POST"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "PATCH"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "DELETE"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "schema",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "shouldThrowOnError",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "signal",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "AbortSignal"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "url",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "URL"
+                  }
+                }
+              ]
+            }
           }
         ],
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         }
       },
@@ -23841,7 +24240,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -23899,7 +24298,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -23956,7 +24355,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -24016,7 +24415,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24073,7 +24472,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -24087,8 +24486,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "params": [],
         "ret": {
           "type": {
-            "type": "intrinsic",
-            "name": "string"
+            "type": "nameOnly",
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24118,7 +24517,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24221,23 +24620,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "union",
             "subTypes": [
               {
-                "type": "intrinsic",
-                "name": "string"
+                "type": "nameOnly",
+                "name": "ClientOptions"
               },
               {
-                "type": "array",
-                "elemType": {
-                  "type": "record",
-                  "name": "Record",
-                  "keyType": {
-                    "type": "intrinsic",
-                    "name": "string"
-                  },
-                  "valueType": {
-                    "type": "intrinsic",
-                    "name": "unknown"
-                  }
-                }
+                "type": "nameOnly",
+                "name": "ClientOptions"
               }
             ]
           }
@@ -24377,7 +24765,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24421,7 +24809,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -24436,16 +24824,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "params": [],
         "ret": {
           "type": {
-            "type": "record",
-            "name": "Record",
-            "keyType": {
-              "type": "intrinsic",
-              "name": "string"
-            },
-            "valueType": {
-              "type": "intrinsic",
-              "name": "unknown"
-            }
+            "type": "nameOnly",
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24479,7 +24859,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24512,7 +24892,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -24548,7 +24928,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24581,7 +24961,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -24617,7 +24997,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24650,7 +25030,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -24689,7 +25069,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24725,7 +25105,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -24764,7 +25144,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24800,7 +25180,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -24835,7 +25215,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24865,7 +25245,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24908,7 +25288,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -24945,7 +25325,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -24978,7 +25358,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25017,7 +25397,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25053,7 +25433,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25092,7 +25472,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25128,7 +25508,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25187,7 +25567,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25221,7 +25601,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25254,7 +25634,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25290,7 +25670,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25323,7 +25703,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25357,7 +25737,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25388,7 +25768,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25397,22 +25777,31 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         ]
       },
+      "@supabase/postgrest-js.PostgrestFilterBuilder.maxAffected": {
+        "name": "@supabase/postgrest-js.PostgrestFilterBuilder.maxAffected",
+        "params": [
+          {
+            "name": "value",
+            "type": {
+              "type": "intrinsic",
+              "name": "number"
+            },
+            "comment": {
+              "shortText": "The maximum number of rows that can be affected\\n"
+            }
+          }
+        ],
+        "comment": {
+          "shortText": "Set the maximum number of rows that can be affected by the query.\\nOnly available in PostgREST v13+ and only works with PATCH and DELETE methods."
+        }
+      },
       "@supabase/postgrest-js.PostgrestFilterBuilder.maybeSingle": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.maybeSingle",
         "params": [],
         "ret": {
           "type": {
-            "type": "union",
-            "subTypes": [
-              {
-                "type": "literal",
-                "value": null
-              },
-              {
-                "type": "nameOnly",
-                "name": "ResultOne"
-              }
-            ]
+            "type": "nameOnly",
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25443,7 +25832,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25487,7 +25876,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25531,7 +25920,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25591,7 +25980,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25661,7 +26050,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25730,7 +26119,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25790,7 +26179,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25856,7 +26245,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25911,7 +26300,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -25956,7 +26345,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -25968,6 +26357,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
       "@supabase/postgrest-js.PostgrestFilterBuilder.overrideTypes": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.overrideTypes",
         "params": [],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "ClientOptions"
+          }
+        },
         "comment": {
           "shortText": "Override the type of the returned \`data\` field in the response.",
           "returns": "A PostgrestBuilder instance with the new type\\n",
@@ -26039,7 +26434,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26073,7 +26468,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26106,7 +26501,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -26142,7 +26537,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26175,7 +26570,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -26211,7 +26606,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26244,7 +26639,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -26280,7 +26675,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26313,7 +26708,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -26349,7 +26744,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26382,7 +26777,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -26397,7 +26792,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26416,7 +26811,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26442,7 +26837,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26471,7 +26866,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26484,7 +26879,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "ResultOne"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26566,7 +26961,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -26646,7 +27041,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -26903,16 +27298,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 {
                   "name": "headers",
                   "type": {
-                    "type": "record",
-                    "name": "Record",
-                    "keyType": {
-                      "type": "intrinsic",
-                      "name": "string"
-                    },
-                    "valueType": {
-                      "type": "intrinsic",
-                      "name": "string"
-                    }
+                    "type": "nameOnly",
+                    "name": "HeadersInit"
                   },
                   "isOptional": true
                 },
@@ -26931,7 +27318,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         }
       },
@@ -26977,7 +27364,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27038,7 +27425,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27112,7 +27499,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -27186,7 +27573,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27245,7 +27632,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27328,7 +27715,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27424,7 +27811,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -27438,13 +27825,143 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "name": "@supabase/postgrest-js.PostgrestTransformBuilder.constructor",
         "params": [
           {
-            "name": "builder"
+            "name": "builder",
+            "type": {
+              "type": "object",
+              "properties": [
+                {
+                  "name": "body",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "unknown"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "fetch",
+                  "type": {
+                    "type": "function",
+                    "params": [
+                      {
+                        "name": "input",
+                        "type": {
+                          "type": "union",
+                          "subTypes": [
+                            {
+                              "type": "nameOnly",
+                              "name": "RequestInfo"
+                            },
+                            {
+                              "type": "nameOnly",
+                              "name": "URL"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "init",
+                        "type": {
+                          "type": "nameOnly",
+                          "name": "RequestInit"
+                        },
+                        "isOptional": true
+                      }
+                    ],
+                    "ret": {
+                      "type": {
+                        "type": "promise",
+                        "name": "Promise",
+                        "awaited": {
+                          "type": "nameOnly",
+                          "name": "Response"
+                        }
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "headers",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "HeadersInit"
+                  }
+                },
+                {
+                  "name": "isMaybeSingle",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "method",
+                  "type": {
+                    "type": "union",
+                    "subTypes": [
+                      {
+                        "type": "literal",
+                        "value": "GET"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "HEAD"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "POST"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "PATCH"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "DELETE"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "schema",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "shouldThrowOnError",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "signal",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "AbortSignal"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "url",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "URL"
+                  }
+                }
+              ]
+            }
           }
         ],
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         }
       },
@@ -27465,7 +27982,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27477,8 +27994,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "params": [],
         "ret": {
           "type": {
-            "type": "intrinsic",
-            "name": "string"
+            "type": "nameOnly",
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27580,23 +28097,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": "union",
             "subTypes": [
               {
-                "type": "intrinsic",
-                "name": "string"
+                "type": "nameOnly",
+                "name": "ClientOptions"
               },
               {
-                "type": "array",
-                "elemType": {
-                  "type": "record",
-                  "name": "Record",
-                  "keyType": {
-                    "type": "intrinsic",
-                    "name": "string"
-                  },
-                  "valueType": {
-                    "type": "intrinsic",
-                    "name": "unknown"
-                  }
-                }
+                "type": "nameOnly",
+                "name": "ClientOptions"
               }
             ]
           }
@@ -27611,16 +28117,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "params": [],
         "ret": {
           "type": {
-            "type": "record",
-            "name": "Record",
-            "keyType": {
-              "type": "intrinsic",
-              "name": "string"
-            },
-            "valueType": {
-              "type": "intrinsic",
-              "name": "unknown"
-            }
+            "type": "nameOnly",
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27677,11 +28175,29 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
           "shortText": "Limit the query result by \`count\`."
+        }
+      },
+      "@supabase/postgrest-js.PostgrestTransformBuilder.maxAffected": {
+        "name": "@supabase/postgrest-js.PostgrestTransformBuilder.maxAffected",
+        "params": [
+          {
+            "name": "value",
+            "type": {
+              "type": "intrinsic",
+              "name": "number"
+            },
+            "comment": {
+              "shortText": "The maximum number of rows that can be affected\\n"
+            }
+          }
+        ],
+        "comment": {
+          "shortText": "Set the maximum number of rows that can be affected by the query.\\nOnly available in PostgREST v13+ and only works with PATCH and DELETE methods."
         }
       },
       "@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle": {
@@ -27689,17 +28205,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "params": [],
         "ret": {
           "type": {
-            "type": "union",
-            "subTypes": [
-              {
-                "type": "literal",
-                "value": null
-              },
-              {
-                "type": "nameOnly",
-                "name": "ResultOne"
-              }
-            ]
+            "type": "nameOnly",
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27769,7 +28276,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -27838,7 +28345,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -27898,7 +28405,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -27964,7 +28471,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "ret": {
               "type": {
                 "type": "nameOnly",
-                "name": "Schema"
+                "name": "ClientOptions"
               }
             },
             "comment": {
@@ -27983,6 +28490,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
       "@supabase/postgrest-js.PostgrestTransformBuilder.overrideTypes": {
         "name": "@supabase/postgrest-js.PostgrestTransformBuilder.overrideTypes",
         "params": [],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "ClientOptions"
+          }
+        },
         "comment": {
           "shortText": "Override the type of the returned \`data\` field in the response.",
           "returns": "A PostgrestBuilder instance with the new type\\n",
@@ -28054,7 +28567,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -28067,7 +28580,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -28086,7 +28599,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -28112,7 +28625,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -28141,7 +28654,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "Schema"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -28154,7 +28667,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "ret": {
           "type": {
             "type": "nameOnly",
-            "name": "ResultOne"
+            "name": "ClientOptions"
           }
         },
         "comment": {
@@ -28412,6 +28925,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         "type": {
                           "type": "object",
                           "properties": [
+                            {
+                              "name": "enabled",
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              },
+                              "isOptional": true
+                            },
                             {
                               "name": "key",
                               "type": {
@@ -29446,6 +29967,19 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "shortText": "Subscribe registers your client with the server"
         }
       },
+      "@supabase/realtime-js.RealtimeChannel.teardown": {
+        "name": "@supabase/realtime-js.RealtimeChannel.teardown",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          }
+        },
+        "comment": {
+          "shortText": "Teardown the channel.\\n\\nDestroys and stops related timers."
+        }
+      },
       "@supabase/realtime-js.RealtimeChannel.track": {
         "name": "@supabase/realtime-js.RealtimeChannel.track",
         "params": [
@@ -29851,6 +30385,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           "type": "object",
                           "properties": [
                             {
+                              "name": "enabled",
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "boolean"
+                              },
+                              "isOptional": true
+                            },
+                            {
                               "name": "key",
                               "type": {
                                 "type": "intrinsic",
@@ -30041,6 +30583,38 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Logs the message.\\n\\nFor customized logging, \`this.logger\` can be overridden."
+        }
+      },
+      "@supabase/realtime-js.RealtimeClient.onHeartbeat": {
+        "name": "@supabase/realtime-js.RealtimeClient.onHeartbeat",
+        "params": [
+          {
+            "name": "callback",
+            "type": {
+              "type": "function",
+              "params": [
+                {
+                  "name": "status",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "HeartbeatStatus"
+                  }
+                }
+              ],
+              "ret": {
+                "type": {
+                  "type": "intrinsic",
+                  "name": "void"
+                }
+              }
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          }
         }
       },
       "@supabase/realtime-js.RealtimeClient.push": {
@@ -30288,6 +30862,13 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "type": "intrinsic",
               "name": "number"
             }
+          },
+          {
+            "name": "statusCode",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
           }
         ],
         "ret": {
@@ -30323,6 +30904,13 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 "type": {
                   "type": "intrinsic",
                   "name": "number"
+                }
+              },
+              {
+                "name": "statusCode",
+                "type": {
+                  "type": "intrinsic",
+                  "name": "string"
                 }
               }
             ]
@@ -30384,6 +30972,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               }
+            },
+            "isOptional": true
+          },
+          {
+            "name": "opts",
+            "type": {
+              "type": "nameOnly",
+              "name": "StorageClientOptions"
             },
             "isOptional": true
           }
@@ -30469,6 +31065,27 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "comment": {
                     "shortText": "The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private."
                   }
+                },
+                {
+                  "name": "type",
+                  "type": {
+                    "type": "union",
+                    "name": "BucketType",
+                    "subTypes": [
+                      {
+                        "type": "literal",
+                        "value": "STANDARD"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "ANALYTICS"
+                      }
+                    ]
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "(private-beta) specifies the bucket type. see \`BucketType\` for more details.\\n  - default bucket type is \`STANDARD\`\\n"
+                  }
                 }
               ]
             }
@@ -30528,7 +31145,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Creates a new Storage bucket",
-          "returns": "newly created bucket id\\n"
+          "returns": "newly created bucket id"
         }
       },
       "@supabase/storage-js.index.StorageClient.deleteBucket": {
@@ -30784,6 +31401,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             }
                           },
                           {
+                            "name": "type",
+                            "type": {
+                              "type": "union",
+                              "name": "BucketType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "STANDARD"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "ANALYTICS"
+                                }
+                              ]
+                            },
+                            "isOptional": true
+                          },
+                          {
                             "name": "updated_at",
                             "type": {
                               "type": "intrinsic",
@@ -30903,6 +31538,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 "type": "intrinsic",
                                 "name": "boolean"
                               }
+                            },
+                            {
+                              "name": "type",
+                              "type": {
+                                "type": "union",
+                                "name": "BucketType",
+                                "subTypes": [
+                                  {
+                                    "type": "literal",
+                                    "value": "STANDARD"
+                                  },
+                                  {
+                                    "type": "literal",
+                                    "value": "ANALYTICS"
+                                  }
+                                ]
+                              },
+                              "isOptional": true
                             },
                             {
                               "name": "updated_at",
@@ -31191,6 +31844,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               }
             },
             "isOptional": true
+          },
+          {
+            "name": "opts",
+            "type": {
+              "type": "nameOnly",
+              "name": "StorageClientOptions"
+            },
+            "isOptional": true
           }
         ]
       },
@@ -31268,6 +31929,27 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "comment": {
                     "shortText": "The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private."
                   }
+                },
+                {
+                  "name": "type",
+                  "type": {
+                    "type": "union",
+                    "name": "BucketType",
+                    "subTypes": [
+                      {
+                        "type": "literal",
+                        "value": "STANDARD"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "ANALYTICS"
+                      }
+                    ]
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "(private-beta) specifies the bucket type. see \`BucketType\` for more details.\\n  - default bucket type is \`STANDARD\`\\n"
+                  }
                 }
               ]
             }
@@ -31327,7 +32009,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Creates a new Storage bucket",
-          "returns": "newly created bucket id\\n"
+          "returns": "newly created bucket id"
         }
       },
       "@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket": {
@@ -31565,6 +32247,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             }
                           },
                           {
+                            "name": "type",
+                            "type": {
+                              "type": "union",
+                              "name": "BucketType",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "STANDARD"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "ANALYTICS"
+                                }
+                              ]
+                            },
+                            "isOptional": true
+                          },
+                          {
                             "name": "updated_at",
                             "type": {
                               "type": "intrinsic",
@@ -31684,6 +32384,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 "type": "intrinsic",
                                 "name": "boolean"
                               }
+                            },
+                            {
+                              "name": "type",
+                              "type": {
+                                "type": "union",
+                                "name": "BucketType",
+                                "subTypes": [
+                                  {
+                                    "type": "literal",
+                                    "value": "STANDARD"
+                                  },
+                                  {
+                                    "type": "literal",
+                                    "value": "ANALYTICS"
+                                  }
+                                ]
+                              },
+                              "isOptional": true
                             },
                             {
                               "name": "updated_at",
@@ -32955,7 +33673,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             },
             "isOptional": true,
             "comment": {
-              "shortText": "The folder path.\\n"
+              "shortText": "The folder path."
             }
           },
           {
@@ -32972,7 +33690,13 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   },
                   "isOptional": true,
                   "comment": {
-                    "shortText": " The number of files you want to be returned."
+                    "shortText": "The number of files you want to be returned.",
+                    "tags": [
+                      {
+                        "tag": "default",
+                        "text": "100\\n"
+                      }
+                    ]
                   }
                 },
                 {
@@ -33028,7 +33752,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 }
               ]
             },
-            "isOptional": true
+            "isOptional": true,
+            "comment": {
+              "shortText": "Search options including limit (defaults to 100), offset, sortBy, and search\\n"
+            }
           },
           {
             "name": "parameters",
@@ -33136,6 +33863,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                       "type": "intrinsic",
                                       "name": "boolean"
                                     }
+                                  },
+                                  {
+                                    "name": "type",
+                                    "type": {
+                                      "type": "union",
+                                      "name": "BucketType",
+                                      "subTypes": [
+                                        {
+                                          "type": "literal",
+                                          "value": "STANDARD"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "ANALYTICS"
+                                        }
+                                      ]
+                                    },
+                                    "isOptional": true
                                   },
                                   {
                                     "name": "updated_at",
@@ -33451,6 +34196,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                       "type": "intrinsic",
                                       "name": "boolean"
                                     }
+                                  },
+                                  {
+                                    "name": "type",
+                                    "type": {
+                                      "type": "union",
+                                      "name": "BucketType",
+                                      "subTypes": [
+                                        {
+                                          "type": "literal",
+                                          "value": "STANDARD"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "ANALYTICS"
+                                        }
+                                      ]
+                                    },
+                                    "isOptional": true
                                   },
                                   {
                                     "name": "updated_at",
@@ -34180,8 +34943,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     {
                       "name": "error",
                       "type": {
-                        "type": "intrinsic",
-                        "name": "any"
+                        "type": "nameOnly",
+                        "name": "StorageError"
                       }
                     }
                   ]

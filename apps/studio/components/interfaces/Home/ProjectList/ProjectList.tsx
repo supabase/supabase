@@ -9,7 +9,7 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import type { Organization, ResponseError } from 'types'
@@ -32,7 +32,7 @@ const ProjectList = ({
   filterStatus,
   resetFilterStatus,
 }: ProjectListProps) => {
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const organization = organization_ ?? selectedOrganization
 
   const {

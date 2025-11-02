@@ -23,7 +23,7 @@ import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -169,8 +169,14 @@ const PreviewBranchActions = ({
   const queryClient = useQueryClient()
   const projectRef = branch.parent_project_ref ?? branch.project_ref
 
-  const canDeleteBranches = useCheckPermissions(PermissionAction.DELETE, 'preview_branches')
-  const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
+  const { can: canDeleteBranches } = useAsyncCheckProjectPermissions(
+    PermissionAction.DELETE,
+    'preview_branches'
+  )
+  const { can: canUpdateBranches } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'preview_branches'
+  )
 
   const { data } = useBranchQuery({ projectRef, id: branch.id })
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
@@ -381,7 +387,10 @@ const PreviewBranchActions = ({
 // Actions for main (production) branch
 const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) => {
   const { ref: projectRef } = useParams()
-  const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
+  const { can: canUpdateBranches } = useAsyncCheckProjectPermissions(
+    PermissionAction.UPDATE,
+    'preview_branches'
+  )
   const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
   return (

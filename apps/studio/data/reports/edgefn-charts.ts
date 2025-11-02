@@ -12,7 +12,7 @@ export const getEdgeFunctionReportAttributes = (): ReportAttributes[] => [
     hideChartType: false,
     defaultChartStyle: 'bar',
     titleTooltip: 'The total number of edge function executions by status code.',
-    availableIn: ['free', 'pro', 'team'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
     attributes: [
       {
         attribute: 'ExecutionStatusCodes',
@@ -32,7 +32,7 @@ export const getEdgeFunctionReportAttributes = (): ReportAttributes[] => [
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
-    availableIn: ['free', 'pro', 'team'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
     format: 'ms',
     YAxisProps: {
       width: 50,
@@ -58,7 +58,7 @@ export const getEdgeFunctionReportAttributes = (): ReportAttributes[] => [
     hideChartType: false,
     defaultChartStyle: 'bar',
     titleTooltip: 'The total number of edge function invocations by region.',
-    availableIn: ['pro', 'team'],
+    availableIn: ['pro', 'team', 'enterprise'],
     attributes: [
       {
         attribute: 'InvocationsByRegion',
