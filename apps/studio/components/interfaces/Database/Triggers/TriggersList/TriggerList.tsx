@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
 import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import Link from 'next/link'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -61,6 +62,7 @@ const TriggerList = ({
     filteredTriggers.filter((x) => x.schema == schema),
     (trigger) => trigger.name.toLocaleLowerCase()
   )
+  const projectRef = project?.ref
   const { can: canUpdateTriggers } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'triggers'
@@ -111,15 +113,33 @@ const TriggerList = ({
           </TableCell>
 
           <TableCell className="break-all">
-            <p title={x.table} className="truncate">
-              {x.table}
-            </p>
+            {x.table_id ? (
+              <Link
+                href={`/project/${projectRef}/editor/${x.table_id}`}
+                className="truncate text-link"
+                title={x.table}
+              >
+                {x.table}
+              </Link>
+            ) : (
+              <p title={x.table} className="truncate">
+                {x.table}
+              </p>
+            )}
           </TableCell>
 
           <TableCell className="space-x-2">
-            <p title={x.function_name} className="truncate">
-              {x.function_name}
-            </p>
+            {x.function_name ? (
+              <Link
+                href={`/project/${projectRef}/database/functions?search=${x.function_name}`}
+                className="truncate text-link"
+                title={x.function_name}
+              >
+                {x.function_name}
+              </Link>
+            ) : (
+              <p className="truncate text-foreground-light">-</p>
+            )}
           </TableCell>
 
           <TableCell>
@@ -176,7 +196,7 @@ const TriggerList = ({
                           const sql = generateTriggerCreateSQL(x)
                           openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                           aiSnap.newChat({
-                            name: `Update trigger ${X.name}`,
+                            name: `Update trigger ${x.name}`,
                             initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
                             suggestions: {
                               title:
