@@ -123,7 +123,7 @@ const UtilityPanel = ({
             <DownloadResultsButton
               type="text"
               results={result.rows as any[]}
-              fileName={`Supabase Snippet ${snippet.name}`}
+              fileName={`Supabase Snippet ${snippet?.name ?? ''}`}
               onDownloadAsCSV={() =>
                 sendEvent({
                   action: 'sql_editor_result_download_csv_clicked',
