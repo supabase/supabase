@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restriction.constants'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useIsFeatureEnabled } from './useIsFeatureEnabled'
 
 export type WarningBannerProps = {
   type: 'danger' | 'warning' | 'note'
@@ -14,13 +14,17 @@ export type WarningBannerProps = {
 }
 
 export function useOrganizationRestrictions() {
-  const org = useSelectedOrganization()
-  const isNewLayout = useNewLayout()
+  const { data: org } = useSelectedOrganizationQuery()
 
   const { data: overdueInvoices } = useOverdueInvoicesQuery()
   const { data: organizations } = useOrganizationsQuery()
 
   const warnings: WarningBannerProps[] = []
+
+  const billingEnabled = useIsFeatureEnabled('billing:all')
+  if (!billingEnabled) {
+    return { warnings, org }
+  }
 
   const overdueInvoicesFromOtherOrgs = overdueInvoices?.filter(
     (invoice) => invoice.organization_id !== org?.id
@@ -29,21 +33,30 @@ export function useOrganizationRestrictions() {
     (invoice) => invoice.organization_id === org?.id
   )
 
+  if (org && org.organization_missing_address && !org.billing_partner) {
+    warnings.push({
+      type: 'danger',
+      title: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.title,
+      message: RESTRICTION_MESSAGES.MISSING_BILLING_INFO.message,
+      link: `/org/${org?.slug}/billing#address`,
+    })
+  }
+
   if (thisOrgHasOverdueInvoices?.length) {
     warnings.push({
       type: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES.title,
       message: RESTRICTION_MESSAGES.OVERDUE_INVOICES.message,
-      link: `/org/${org?.slug}/invoices`,
+      link: `/org/${org?.slug}/billing#invoices`,
     })
   }
 
-  if (overdueInvoicesFromOtherOrgs?.length && isNewLayout) {
+  if (overdueInvoicesFromOtherOrgs?.length) {
     warnings.push({
       type: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
       message: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.message,
-      link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/invoices`,
+      link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/billing#invoices`,
     })
   }
 

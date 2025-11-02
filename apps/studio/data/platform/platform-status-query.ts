@@ -19,8 +19,8 @@ export type PlatformStatusError = unknown
 export const usePlatformStatusQuery = <TData = PlatformStatusData>(
   options: UseQueryOptions<PlatformStatusData, PlatformStatusError, TData> = {}
 ) =>
-  useQuery<PlatformStatusData, PlatformStatusError, TData>(
-    platformKeys.status(),
-    ({ signal }) => getPlatformStatus(signal),
-    options
-  )
+  useQuery<PlatformStatusData, PlatformStatusError, TData>({
+    queryKey: platformKeys.status(),
+    queryFn: ({ signal }) => getPlatformStatus(signal),
+    ...options,
+  })

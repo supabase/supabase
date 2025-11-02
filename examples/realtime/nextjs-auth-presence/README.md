@@ -42,7 +42,7 @@ Create a .env.local file and add following environment variables.
 ```
 NEXT_PUBLIC_SUPABASE_URL=<<insert-your-db-url-here>>
 
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<<insert-your-anon-key-here>>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<<insert-your-publishable-key-here>>
 ```
 
 ### 5. Now run the development server!

@@ -6,7 +6,7 @@ import { databaseKeys } from './keys'
 
 export type GetInvolvedIndexesFromSelectQueryVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   query: string
 }
 
@@ -149,19 +149,17 @@ export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelec
     GetInvolvedIndexesFromSelectQueryData,
     GetInvolvedIndexesFromSelectQueryError,
     TData
-  >(
-    databaseKeys.indexesFromQuery(projectRef, query),
-    () => getInvolvedIndexesInSelectQuery({ projectRef, connectionString, query }),
-    {
-      retry: false,
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof query !== 'undefined' &&
-        isValidQueryForIndexing,
-      ...options,
-    }
-  )
+  >({
+    queryKey: databaseKeys.indexesFromQuery(projectRef, query),
+    queryFn: () => getInvolvedIndexesInSelectQuery({ projectRef, connectionString, query }),
+    retry: false,
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof query !== 'undefined' &&
+      isValidQueryForIndexing,
+    ...options,
+  })
 }
 
 // Helper functions

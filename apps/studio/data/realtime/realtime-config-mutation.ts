@@ -8,7 +8,7 @@ import { realtimeKeys } from './keys'
 
 export type RealtimeConfigurationUpdateVariables = {
   ref: string
-} & components['schemas']['UpdateRealtimeConfigBodyDto']
+} & components['schemas']['UpdateRealtimeConfigBody']
 
 export async function updateRealtimeConfiguration({
   ref,
@@ -19,6 +19,9 @@ export async function updateRealtimeConfiguration({
   max_bytes_per_second,
   max_channels_per_client,
   max_joins_per_second,
+  max_presence_events_per_second,
+  max_payload_size_in_kb,
+  suspend,
 }: RealtimeConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
@@ -32,6 +35,9 @@ export async function updateRealtimeConfiguration({
       max_bytes_per_second,
       max_channels_per_client,
       max_joins_per_second,
+      max_presence_events_per_second,
+      max_payload_size_in_kb,
+      suspend,
     },
   })
 
@@ -59,10 +65,11 @@ export const useRealtimeConfigurationUpdateMutation = ({
     RealtimeConfigurationUpdateData,
     ResponseError,
     RealtimeConfigurationUpdateVariables
-  >((vars) => updateRealtimeConfiguration(vars), {
+  >({
+    mutationFn: (vars) => updateRealtimeConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
-      await queryClient.invalidateQueries(realtimeKeys.configuration(ref))
+      await queryClient.invalidateQueries({ queryKey: realtimeKeys.configuration(ref) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

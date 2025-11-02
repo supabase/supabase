@@ -66,7 +66,7 @@ const Announcement = ({
       <div className={cn('relative z-40 w-full', className)}>
         {dismissable && !isLaunchWeekSection && (
           <div
-            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-foreground transition-opacity hover:opacity-100"
+            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-foreground-contrast dark:text-foreground transition-opacity hover:opacity-80 hover:cursor-pointer"
             onClick={handleClose}
           >
             <X size={16} />

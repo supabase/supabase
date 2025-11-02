@@ -2,13 +2,13 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import minify from 'pg-minify'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { QUEUES_SCHEMA } from './database-queues-toggle-postgrest-mutation'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 // [Joshen] Check if all the relevant functions exist to indicate whether PGMQ has been exposed through PostgREST
@@ -37,11 +37,9 @@ export const useQueuesExposePostgrestStatusQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,
   { enabled = true, ...options }: UseQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
 ) =>
-  useQuery<DatabaseQueueData, DatabaseQueueError, TData>(
-    databaseQueuesKeys.exposePostgrestStatus(projectRef),
-    () => getDatabaseQueuesExposePostgrestStatus({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseQueueData, DatabaseQueueError, TData>({
+    queryKey: databaseQueuesKeys.exposePostgrestStatus(projectRef),
+    queryFn: () => getDatabaseQueuesExposePostgrestStatus({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

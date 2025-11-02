@@ -39,27 +39,24 @@ export const useUserCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UserCreateData, ResponseError, UserCreateVariables>(
-    (vars) => createUser(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<UserCreateData, ResponseError, UserCreateVariables>({
+    mutationFn: (vars) => createUser(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-          queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: authKeys.usersInfinite(projectRef) }),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create user: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create user: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

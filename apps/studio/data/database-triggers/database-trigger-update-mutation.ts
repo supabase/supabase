@@ -1,38 +1,39 @@
+import pgMeta from '@supabase/pg-meta'
+import { PGTriggerUpdate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-
-import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggerUpdateVariables = {
-  id: number
+  originalTrigger: {
+    id: number
+    name: string
+    schema: string
+    table: string
+  }
   projectRef: string
-  connectionString?: string
-  payload: any
+  connectionString?: string | null
+  payload: PGTriggerUpdate
 }
 
 export async function updateDatabaseTrigger({
-  id,
+  originalTrigger,
   projectRef,
   connectionString,
   payload,
 }: DatabaseTriggerUpdateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql } = pgMeta.triggers.update(originalTrigger, payload)
 
-  const { data, error } = await patch('/platform/pg-meta/{ref}/triggers', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    body: payload,
-    headers,
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['trigger', 'update', originalTrigger.id],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type DatabaseTriggerUpdateData = Awaited<ReturnType<typeof updateDatabaseTrigger>>
@@ -47,22 +48,20 @@ export const useDatabaseTriggerUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerUpdateData, ResponseError, DatabaseTriggerUpdateVariables>(
-    (vars) => updateDatabaseTrigger(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update database trigger: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseTriggerUpdateData, ResponseError, DatabaseTriggerUpdateVariables>({
+    mutationFn: (vars) => updateDatabaseTrigger(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseTriggerKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update database trigger: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

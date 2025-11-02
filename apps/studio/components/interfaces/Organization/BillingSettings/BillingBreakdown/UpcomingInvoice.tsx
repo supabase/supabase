@@ -1,31 +1,52 @@
-import { ChevronRight, Info } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import {
+  UpcomingInvoiceResponse,
+  useOrgUpcomingInvoiceQuery,
+} from 'data/invoices/org-invoice-upcoming-query'
+import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import { Button, cn, Collapsible, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import React from 'react'
+import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { billingMetricUnit, formatUsage } from '../helpers'
 
 export interface UpcomingInvoiceProps {
   slug?: string
 }
 
-interface TooltipData {
-  identifier: string
-  text: string
-  linkRef?: string
-}
+const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
+  [PricingMetric.MONTHLY_ACTIVE_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users`,
+  [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-sso`,
+  [PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`,
+  [PricingMetric.AUTH_MFA_PHONE]: `${DOCS_URL}/guides/platform/manage-your-usage/advanced-mfa-phone`,
 
-const feeTooltipData: TooltipData[] = [
-  {
-    identifier: 'COMPUTE',
-    text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the compute size of your project. Paused projects do not incur compute costs.',
-    linkRef: 'https://supabase.com/docs/guides/platform/manage-your-usage/compute',
-  },
-]
+  [PricingMetric.EGRESS]: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
+  [PricingMetric.CACHED_EGRESS]: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
+
+  [PricingMetric.FUNCTION_INVOCATIONS]: `${DOCS_URL}/guides/platform/manage-your-usage/edge-function-invocations`,
+
+  [PricingMetric.STORAGE_SIZE]: `${DOCS_URL}/guides/platform/manage-your-usage/storage-size`,
+  [PricingMetric.STORAGE_IMAGES_TRANSFORMED]: `${DOCS_URL}/guides/platform/manage-your-usage/storage-image-transformations`,
+
+  [PricingMetric.REALTIME_MESSAGE_COUNT]: `${DOCS_URL}/guides/platform/manage-your-usage/realtime-messages`,
+  [PricingMetric.REALTIME_PEAK_CONNECTIONS]: `${DOCS_URL}/guides/platform/manage-your-usage/realtime-peak-connections`,
+
+  [PricingMetric.CUSTOM_DOMAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/custom-domains`,
+  [PricingMetric.IPV4]: `${DOCS_URL}/guides/platform/manage-your-usage/ipv4`,
+  [PricingMetric.PITR_7]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
+  [PricingMetric.PITR_14]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
+  [PricingMetric.PITR_28]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
+  [PricingMetric.DISK_SIZE_GB_HOURS_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
+  [PricingMetric.DISK_SIZE_GB_HOURS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
+  [PricingMetric.DISK_IOPS_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
+  [PricingMetric.DISK_IOPS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
+  [PricingMetric.DISK_THROUGHPUT_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-throughput`,
+  [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
+}
 
 const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const {
@@ -36,48 +57,33 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
     isSuccess,
   } = useOrgUpcomingInvoiceQuery({ orgSlug: slug })
 
-  const [usageFeesExpanded, setUsageFeesExpanded] = useState<string[]>([])
+  const computeItems =
+    upcomingInvoice?.lines?.filter(
+      (item) =>
+        item.description?.toLowerCase().includes('compute') &&
+        item.breakdown &&
+        item.breakdown?.length > 0
+    ) || []
 
-  const computeCredits = useMemo(() => {
-    return (upcomingInvoice?.lines || []).find((item) =>
-      item.description.startsWith('Compute Credits')
-    )
-  }, [upcomingInvoice])
+  const computeCreditsItem =
+    upcomingInvoice?.lines?.find((item) => item.description.startsWith('Compute Credits')) ?? null
 
-  const fixedFees = useMemo(() => {
-    return (upcomingInvoice?.lines || [])
-      .filter((item) => item !== computeCredits && (!item.breakdown || !item.breakdown.length))
-      .sort((a, b) => {
-        // Prorations should be below regular usage fees
-        return Number(a.proration) - Number(b.proration)
-      })
-  }, [upcomingInvoice, computeCredits])
+  const planItem = upcomingInvoice?.lines?.find((item) =>
+    item.description?.toLowerCase().includes('plan')
+  )
 
-  const feesWithBreakdown = useMemo(() => {
-    return (upcomingInvoice?.lines || [])
-      .filter((item) => item.breakdown?.length)
-      .sort((a, b) => Number(a.usage_based) - Number(b.usage_based) || b.amount - a.amount)
-  }, [upcomingInvoice])
+  const regularComputeItems = computeItems.filter(
+    (it) => !it.metadata?.is_branch && !it.metadata?.is_read_replica
+  )
+  const branchingComputeItems = computeItems.filter((it) => it.metadata?.is_branch)
+  const replicaComputeItems = computeItems.filter((it) => it.metadata?.is_read_replica)
 
-  const expandUsageFee = (fee: string) => {
-    setUsageFeesExpanded([...usageFeesExpanded, fee])
-  }
-
-  const collapseUsageFee = (fee: string) => {
-    setUsageFeesExpanded(usageFeesExpanded.filter((item) => item !== fee))
-  }
-
-  const allFeesExpanded = useMemo(() => {
-    return feesWithBreakdown.length === usageFeesExpanded.length
-  }, [feesWithBreakdown, usageFeesExpanded])
-
-  const toggleAllFees = () => {
-    if (allFeesExpanded) {
-      setUsageFeesExpanded([])
-    } else {
-      setUsageFeesExpanded(feesWithBreakdown.map((item) => item.description))
-    }
-  }
+  const otherItems =
+    upcomingInvoice?.lines?.filter(
+      (item) =>
+        !item.description?.toLowerCase().includes('compute') &&
+        !item.description?.toLowerCase().includes('plan')
+    ) || []
 
   return (
     <>
@@ -93,218 +99,306 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
       {isSuccess && (
         <div>
-          {feesWithBreakdown.length > 0 && (
-            <div className="mb-2">
-              <Button size="tiny" type="default" onClick={toggleAllFees}>
-                {allFeesExpanded ? 'Collapse All' : 'Expand All'}
-              </Button>
-            </div>
-          )}
+          <div>
+            <Table className="w-full text-sm">
+              <TableBody>
+                <TableRow>
+                  <TableCell className="!py-2 px-0">{planItem?.description}</TableCell>
+                  <TableCell className="text-right py-2 px-0">
+                    {planItem == null ? (
+                      '-'
+                    ) : (
+                      <InvoiceLineItemAmount
+                        amount={planItem.amount}
+                        amountBeforeDiscount={planItem.amount_before_discount}
+                      />
+                    )}
+                  </TableCell>
+                </TableRow>
 
-          <table className="w-full">
-            <thead>
-              <tr className="border-b">
-                <th className="py-2 font-medium text-left text-sm text-foreground-light max-w-[200px]">
-                  Item
-                </th>
-                <th className="py-2 font-medium text-right text-sm text-foreground-light pr-4">
-                  Usage
-                </th>
-                <th className="py-2 pr-2 font-medium text-left text-sm text-foreground-light max-w-[200px]">
-                  Unit price
-                </th>
-                <th className="py-2 font-medium text-right text-sm text-foreground-light">Cost</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fixedFees.map((item) => (
-                <tr key={item.description} className="border-b">
-                  <td className="py-2 text-sm max-w-[200px]" colSpan={item.proration ? 3 : 1}>
-                    {item.description ?? 'Unknown'}
-                    {item.usage_metric &&
-                      billingMetricUnit(item.usage_metric) &&
-                      ` (${billingMetricUnit(item.usage_metric)})`}
-                  </td>
-                  {!item.proration && (
-                    <td className="py-2 text-sm text-right pr-4">
-                      {item.quantity?.toLocaleString()}
-                    </td>
-                  )}
-                  {!item.proration && (
-                    <td className="py-2 pr-2 text-sm max-w-[200px]">
-                      {item.unit_price === 0
-                        ? 'FREE'
-                        : item.unit_price
-                          ? formatCurrency(item.unit_price)
-                          : `${item.unit_price_desc}`}
-                    </td>
-                  )}
-                  <td className="py-2 text-sm text-right">{formatCurrency(item.amount)}</td>
-                </tr>
-              ))}
-            </tbody>
-
-            {feesWithBreakdown.length > 0 &&
-              feesWithBreakdown.map((fee) => (
-                <Collapsible
-                  asChild
-                  open={usageFeesExpanded.includes(fee.description)}
-                  onOpenChange={(open) =>
-                    open ? expandUsageFee(fee.description) : collapseUsageFee(fee.description)
-                  }
-                  key={fee.description}
-                >
-                  <tbody>
-                    <Collapsible.Trigger asChild>
-                      <tr
-                        className={usageFeesExpanded.includes(fee.description) ? '' : 'border-b'}
-                        key={fee.description}
-                        style={{ WebkitAppearance: 'initial' }}
+                {/* Compute section */}
+                <ComputeLineItem
+                  computeItems={regularComputeItems}
+                  title="Compute"
+                  computeCredits={computeCreditsItem}
+                  tooltip={
+                    <p className="prose text-xs">
+                      The first project is covered by Compute Credits. Additional projects incur
+                      compute costs starting at <span translate="no">$10</span>/month, independent
+                      of activity. See{' '}
+                      <Link
+                        href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
+                        target="_blank"
                       >
-                        <td className="py-2 text-sm max-w-[200px]">
-                          <Button
-                            type="text"
-                            className="!px-1"
-                            icon={
-                              <ChevronRight
-                                className={cn(
-                                  'transition',
-                                  usageFeesExpanded.includes(fee.description) && 'rotate-90'
-                                )}
-                              />
-                            }
-                          />{' '}
-                          <span className="mr-2">
-                            {fee.description}
-                            {fee.usage_metric &&
-                              billingMetricUnit(fee.usage_metric) &&
-                              ` (${billingMetricUnit(fee.usage_metric)})`}
-                          </span>
-                          {(() => {
-                            const matchingTooltipData = feeTooltipData.find((it) =>
-                              fee.usage_metric?.startsWith(it.identifier)
-                            )
-                            return matchingTooltipData ? (
-                              <InvoiceTooltip
-                                text={matchingTooltipData.text}
-                                linkRef={matchingTooltipData.linkRef}
-                              />
-                            ) : null
-                          })()}
-                        </td>
-                        <td className="py-2 pr-4 text-sm text-right tabular-nums max-w-[100px]">
-                          {fee.usage_original
-                            ? `${formatUsage(fee.usage_metric!, { usage: fee.usage_original })}`
-                            : fee.quantity
-                              ? fee.quantity
-                              : null}
-                        </td>
-                        <td className="py-2 text-sm">
-                          {fee.unit_price_desc
-                            ? `${fee.unit_price_desc}`
-                            : fee.unit_price
-                              ? formatCurrency(fee.unit_price)
-                              : null}
-                        </td>
-                        <td className="py-2 text-sm text-right max-w-[70px]">
-                          {formatCurrency(fee.amount) ?? formatCurrency(0)}
-                        </td>
-                      </tr>
-                    </Collapsible.Trigger>
+                        docs
+                      </Link>
+                      .
+                    </p>
+                  }
+                />
 
-                    <Collapsible.Content asChild>
-                      <>
-                        {fee.breakdown?.map((breakdown) => (
-                          <tr
-                            className="last:border-b cursor-pointer"
-                            style={{ WebkitAppearance: 'initial' }}
-                            key={breakdown.project_ref}
-                          >
-                            <td className="pb-1 text-xs pl-8 max-w-[200px]">
-                              {breakdown.project_name}
-                            </td>
-                            <td className="pb-1 text-xs tabular-nums text-right pr-4">
-                              {formatUsage(fee.usage_metric!, breakdown)}
-                            </td>
-                            <td />
-                            <td />
-                          </tr>
-                        ))}
-                      </>
-                    </Collapsible.Content>
-                  </tbody>
-                </Collapsible>
-              ))}
+                {/* Read Replica compute */}
+                <ComputeLineItem
+                  title="Replica Compute"
+                  computeItems={replicaComputeItems}
+                  tooltip={
+                    <p className="prose text-xs">
+                      Each Read Replica is a dedicated database. You are charged for its resources:
+                      Compute, Disk Size, provisioned Disk IOPS, provisioned Disk Throughput, and
+                      IPv4. See{' '}
+                      <Link
+                        href={`${DOCS_URL}/guides/platform/manage-your-usage/read-replicas`}
+                        target="_blank"
+                      >
+                        docs
+                      </Link>
+                      .
+                    </p>
+                  }
+                />
 
-            {computeCredits && (
-              <tbody>
-                <tr className="border-b">
-                  <td className="py-2 text-sm max-w-[200px]">
-                    <span className="mr-2">{computeCredits.description}</span>
-                    <InvoiceTooltip
-                      text="Paid plans come with $10 in Compute Credits to cover one Micro instance or parts of any other instance. Compute Credits are given to you every month and do not stack up while you are on a paid plan."
-                      linkRef="https://supabase.com/docs/guides/platform/manage-your-usage/compute#compute-credits"
-                    />
-                  </td>
-                  <td className="py-2 text-sm text-right" colSpan={3}>
-                    {formatCurrency(computeCredits.amount)}
-                  </td>
-                </tr>
-              </tbody>
-            )}
+                {/* Branching compute */}
+                {branchingComputeItems.length > 0 && (
+                  <TableRow>
+                    <TableCell className="py-2 px-0">
+                      <div className="flex items-center gap-1">
+                        <span>Branching</span>
+                        <InfoTooltip className="max-w-sm">
+                          <ul className="ml-6 list-disc">
+                            {branchingComputeItems
+                              .flatMap((it) => it.breakdown)
+                              .map((breakdown) => (
+                                <li key={`branching-breakdown-${breakdown!.project_ref}`}>
+                                  {breakdown!.project_name} ({breakdown!.usage} Hours)
+                                </li>
+                              ))}
+                          </ul>
 
-            <tfoot>
-              <tr>
-                <td className="py-4 text-sm font-medium">
-                  <span className="mr-2">Current Costs</span>
-                  <InvoiceTooltip text="Costs accumulated from the beginning of the billing cycle up to now." />
-                </td>
-                <td className="py-4 text-sm text-right font-medium" colSpan={3}>
-                  {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
-                </td>
-              </tr>
-              <tr>
-                <td className="text-sm font-medium">
-                  <span className="mr-2">Projected Costs</span>
-                  <InvoiceTooltip text="Projected costs at the end of the billing cycle. Includes predictable costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no costs for metrics like MAU, storage or function invocations. Final amounts may vary depending on your usage." />
-                </td>
-                <td className="text-sm text-right font-medium" colSpan={3}>
-                  {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+                          <p className="mt-2">
+                            See{' '}
+                            <Link
+                              className="underline"
+                              href={`${DOCS_URL}/guides/platform/manage-your-usage/branching`}
+                              target="_blank"
+                            >
+                              docs
+                            </Link>{' '}
+                            on how billing for Branching works.
+                          </p>
+                        </InfoTooltip>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right py-2 px-0">
+                      <InvoiceLineItemAmount
+                        amount={branchingComputeItems.reduce((prev, cur) => prev + cur.amount, 0)}
+                        amountBeforeDiscount={branchingComputeItems.reduce(
+                          (prev, cur) => prev + (cur.amount_before_discount ?? 0),
+                          0
+                        )}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {/* Non-compute items */}
+                {otherItems.map((item) => (
+                  <TableRow key={item.description}>
+                    <TableCell className="py-2 px-0">
+                      <div className="gap-1 flex items-center">
+                        <span>{item.description ?? 'Unknown'}</span>
+                        {((item.breakdown && item.breakdown.length > 0) ||
+                          item.usage_metric != null) && (
+                          <InfoTooltip className="max-w-sm">
+                            {item.unit_price_desc && (
+                              <p className="mb-2" translate="no">
+                                Pricing: {item.unit_price_desc}
+                              </p>
+                            )}
+
+                            {item.breakdown && item.breakdown.length > 0 && (
+                              <>
+                                <p>Projects using {item.description}:</p>
+                                <ul className="ml-6 list-disc">
+                                  {item.breakdown.map((breakdown) => (
+                                    <li
+                                      key={`${item.description}-breakdown-${breakdown.project_ref}`}
+                                    >
+                                      <Link
+                                        className="underline"
+                                        href={`/project/${breakdown.project_ref}`}
+                                        target="_blank"
+                                      >
+                                        {breakdown.project_name}
+                                      </Link>{' '}
+                                      {item.usage_metric && (
+                                        <span>
+                                          ({formatUsage(item.usage_metric, breakdown)}{' '}
+                                          {billingMetricUnit(item.usage_metric)})
+                                        </span>
+                                      )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </>
+                            )}
+
+                            {item.usage_metric &&
+                              usageBillingDocsLink[item.usage_metric] != null && (
+                                <p className="mt-2">
+                                  See{' '}
+                                  <Link
+                                    className="underline"
+                                    href={usageBillingDocsLink[item.usage_metric]!}
+                                    target="_blank"
+                                  >
+                                    docs
+                                  </Link>{' '}
+                                  on how billing for {item.description} works and{' '}
+                                  <Link className="underline" href={`/organization/${slug}/usage`}>
+                                    usage page
+                                  </Link>{' '}
+                                  for a detailed breakdown.
+                                </p>
+                              )}
+                          </InfoTooltip>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right py-2 px-0">
+                      <InvoiceLineItemAmount
+                        amount={item.amount}
+                        amountBeforeDiscount={item.amount_before_discount}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+
+              <TableFooter>
+                <TableRow>
+                  <TableCell className="font-medium py-2 px-0 flex items-center">
+                    <span className="mr-2">Current Costs</span>
+                    <InfoTooltip>
+                      Costs accumulated from the beginning of the billing cycle up to now.
+                    </InfoTooltip>
+                  </TableCell>
+                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
+                    {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium py-2 px-0 flex items-center">
+                    <span className="mr-2">Projected Costs</span>
+                    <InfoTooltip className="max-w-xs">
+                      Projected costs at the end of the billing cycle. Includes predictable costs
+                      for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no
+                      costs for metrics like MAU, storage or function invocations. Final amounts may
+                      vary depending on your usage.
+                    </InfoTooltip>
+                  </TableCell>
+                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
+                    {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </div>
         </div>
       )}
     </>
   )
 }
 
-const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) => {
+function InvoiceLineItemAmount({
+  amountBeforeDiscount,
+  amount,
+}: {
+  amountBeforeDiscount?: number
+  amount: number
+}) {
+  if (amountBeforeDiscount && amount < amountBeforeDiscount) {
+    return (
+      <div>
+        <span className="text-foreground-light line-through mr-2" translate="no">
+          {formatCurrency(amountBeforeDiscount)}
+        </span>
+        <span translate="no">{formatCurrency(amount)}</span>
+      </div>
+    )
+  } else {
+    return <span translate="no">{formatCurrency(amount)}</span>
+  }
+}
+
+function ComputeLineItem({
+  computeItems,
+  tooltip,
+  title,
+  computeCredits,
+}: {
+  title: string
+  tooltip: React.ReactElement
+  computeItems: UpcomingInvoiceResponse['lines']
+  computeCredits?: UpcomingInvoiceResponse['lines'][number] | null
+}) {
+  const computeProjects = computeItems
+    .flatMap((item) =>
+      item.breakdown!.map((project) => ({
+        ...project,
+        computeType: item.description,
+        computeCosts: project.amount!,
+      }))
+    )
+    // descending by cost
+    .sort((a, b) => b.computeCosts - a.computeCosts)
+
+  const computeCosts = Math.max(
+    0,
+    computeItems.reduce((prev, cur) => prev + cur.amount_before_discount, 0)
+  )
+
+  const discountedComputeCosts = Math.max(
+    0,
+    computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0) + (computeCredits?.amount ?? 0)
+  )
+
+  if (!computeItems.length) return null
+
   return (
-    <Tooltip>
-      <TooltipTrigger>
-        <Info size={12} strokeWidth={2} />
-      </TooltipTrigger>
-      <TooltipContent
-        side="bottom"
-        className="min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto"
-      >
-        <p>
-          {text}{' '}
-          {linkRef && (
-            <Link
-              href={linkRef}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition text-brand hover:text-brand-600 underline"
-            >
-              Read more
-            </Link>
-          )}
-        </p>
-      </TooltipContent>
-    </Tooltip>
+    <>
+      <TableRow>
+        <TableCell className="!py-2 px-0 flex items-center gap-1">
+          <span>{title}</span>
+          <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>
+        </TableCell>
+        <TableCell className="text-right py-2 px-0">
+          <InvoiceLineItemAmount
+            amount={discountedComputeCosts}
+            amountBeforeDiscount={computeCosts}
+          />
+        </TableCell>
+      </TableRow>
+      {computeProjects.map((project) => (
+        <TableRow key={project.project_ref} className="text-foreground-light text-xs">
+          <TableCell className="!py-2 px-0 pl-6">
+            {project.project_name} ({project.computeType} - {project.usage} Hours)
+          </TableCell>
+
+          <TableCell className="!py-2 px-0 text-right" translate="no">
+            {formatCurrency(project.computeCosts)}
+          </TableCell>
+        </TableRow>
+      ))}
+
+      {computeCredits && (
+        <TableRow className="text-foreground-light text-xs">
+          <TableCell className="!py-2 px-0 pl-6">Compute Credits</TableCell>
+          <TableCell className="!py-2 px-0 text-right" translate="no">
+            {formatCurrency(computeCredits.amount)}
+          </TableCell>
+        </TableRow>
+      )}
+    </>
   )
 }
 

@@ -1,35 +1,39 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
 export type DatabasePolicyDeleteVariables = {
   projectRef: string
-  connectionString?: string
-  id: number
+  connectionString?: string | null
+  originalPolicy: {
+    id: number
+    name: string
+    schema: string
+    table: string
+  }
 }
 
 export async function deleteDatabasePolicy({
   projectRef,
   connectionString,
-  id,
+  originalPolicy,
 }: DatabasePolicyDeleteVariables) {
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { data, error } = await del('/platform/pg-meta/{ref}/policies', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    headers,
+  const { sql } = pgMeta.policies.remove(originalPolicy)
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['policy', 'delete', originalPolicy.id],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type DatabasePolicyDeleteData = Awaited<ReturnType<typeof deleteDatabasePolicy>>
@@ -44,22 +48,20 @@ export const useDatabasePolicyDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabasePolicyDeleteData, ResponseError, DatabasePolicyDeleteVariables>(
-    (vars) => deleteDatabasePolicy(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databasePoliciesKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete database policy: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabasePolicyDeleteData, ResponseError, DatabasePolicyDeleteVariables>({
+    mutationFn: (vars) => deleteDatabasePolicy(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete database policy: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

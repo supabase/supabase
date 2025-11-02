@@ -6,7 +6,7 @@ import {
   ConnectTabTrigger,
   ConnectTabContent,
 } from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -25,7 +25,7 @@ import Supabase
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "${projectKeys.apiUrl ?? 'your-project-url'}")!,
-  supabaseKey: "${projectKeys.anonKey ?? 'your-anon-key'}"
+  supabaseKey: "${projectKeys.publishableKey ?? '<prefer publishable key for native apps instead of anon key>'}"
 )
         `}
         </SimpleCodeBlock>

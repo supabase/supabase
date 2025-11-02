@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export type GitHubAuthorizationCreateVariables = {
   code: string
@@ -48,7 +48,8 @@ export const useGitHubAuthorizationCreateMutation = ({
     GitHubAuthorizationCreateData,
     ResponseError,
     GitHubAuthorizationCreateVariables
-  >((vars) => createGitHubAuthorization(vars), {
+  >({
+    mutationFn: (vars) => createGitHubAuthorization(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

@@ -9,7 +9,7 @@ import { invalidateSchemasQuery } from './schemas-query'
 export type SchemaCreateVariables = {
   name: string
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function createSchema({ name, projectRef, connectionString }: SchemaCreateVariables) {
@@ -34,22 +34,20 @@ export const useSchemaCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<SchemaCreateData, ResponseError, SchemaCreateVariables>(
-    (vars) => createSchema(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await invalidateSchemasQuery(queryClient, projectRef)
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create schema: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SchemaCreateData, ResponseError, SchemaCreateVariables>({
+    mutationFn: (vars) => createSchema(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await invalidateSchemasQuery(queryClient, projectRef)
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create schema: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

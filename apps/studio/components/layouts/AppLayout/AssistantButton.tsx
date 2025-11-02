@@ -1,25 +1,48 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useAppStateSnapshot } from 'state/app-state'
-import { AiIconAnimation, Button } from 'ui'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiIconAnimation, cn, KeyboardShortcut } from 'ui'
 
-const AssistantButton = () => {
-  const snap = useAiAssistantStateSnapshot()
-  const { setEditorPanel } = useAppStateSnapshot()
+export const AssistantButton = () => {
+  const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
+  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
+    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
+    true
+  )
+
+  const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
 
   return (
-    <Button
-      type="text"
+    <ButtonTooltip
+      type="outline"
       size="tiny"
       id="assistant-trigger"
-      className="w-[24px] h-[24px] flex items-center justify-center p-0"
+      className={cn(
+        'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0',
+        isOpen && 'bg-foreground text-background'
+      )}
       onClick={() => {
-        snap.toggleAssistant()
-        setEditorPanel({ open: false })
+        toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+      }}
+      tooltip={{
+        content: {
+          text: (
+            <div className="flex items-center gap-4">
+              <span>AI Assistant</span>
+              {isAIAssistantHotkeyEnabled && <KeyboardShortcut keys={['Meta', 'i']} />}
+            </div>
+          ),
+        },
       }}
     >
-      <AiIconAnimation allowHoverEffect size={16} />
-    </Button>
+      <AiIconAnimation
+        allowHoverEffect={false}
+        size={16}
+        className={cn(isOpen && 'text-background')}
+      />
+    </ButtonTooltip>
   )
 }
-
-export default AssistantButton

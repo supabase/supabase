@@ -10,7 +10,7 @@ export const getMaxConnectionsSql = () => {
 
 export type MaxConnectionsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   table?: string
   schema?: string
 }
@@ -41,11 +41,9 @@ export const useMaxConnectionsQuery = <TData = MaxConnectionsData>(
     ...options
   }: UseQueryOptions<MaxConnectionsData, MaxConnectionsError, TData> = {}
 ) =>
-  useQuery<MaxConnectionsData, MaxConnectionsError, TData>(
-    databaseKeys.maxConnections(projectRef),
-    ({ signal }) => getMaxConnections({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<MaxConnectionsData, MaxConnectionsError, TData>({
+    queryKey: databaseKeys.maxConnections(projectRef),
+    queryFn: ({ signal }) => getMaxConnections({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

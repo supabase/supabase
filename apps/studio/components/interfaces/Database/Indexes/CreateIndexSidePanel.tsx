@@ -1,17 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import { DocsButton } from 'components/ui/DocsButton'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { databaseKeys } from 'data/database/keys'
+import { useDatabaseIndexCreateMutation } from 'data/database-indexes/index-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -33,13 +33,11 @@ import {
   SidePanel,
   cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
-import { Admonition } from 'ui-patterns'
-import { DocsButton } from 'components/ui/DocsButton'
 
 interface CreateIndexSidePanelProps {
   visible: boolean
@@ -47,8 +45,7 @@ interface CreateIndexSidePanelProps {
 }
 
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = useIsOrioleDb()
 
   const [selectedSchema, setSelectedSchema] = useState('public')
@@ -81,14 +78,10 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     connectionString: project?.connectionString,
   })
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: async () => {
-      await queryClient.invalidateQueries(databaseKeys.indexes(project?.ref, selectedSchema))
+  const { mutate: createIndex, isLoading: isExecuting } = useDatabaseIndexCreateMutation({
+    onSuccess: () => {
       onClose()
       toast.success(`Successfully created index`)
-    },
-    onError: (error) => {
-      toast.error(`Failed to create index: ${error.message}`)
     },
   })
 
@@ -119,11 +112,17 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
 
   const onSaveIndex = () => {
     if (!project) return console.error('Project is required')
+    if (!selectedEntity) return console.error('Entity is required')
 
-    execute({
+    createIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      sql: generatedSQL,
+      payload: {
+        schema: selectedSchema,
+        entity: selectedEntity,
+        type: selectedIndexType,
+        columns: selectedColumns,
+      },
     })
   }
 
@@ -381,7 +380,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   description="More index types may be supported when OrioleDB is no longer in preview"
                 >
                   {/* [Joshen Oriole] Hook up proper docs URL */}
-                  <DocsButton className="mt-2" abbrev={false} href="https://supabase.com/docs" />
+                  <DocsButton className="mt-2" abbrev={false} href={`${DOCS_URL}`} />
                 </Admonition>
               )}
             </SidePanel.Content>

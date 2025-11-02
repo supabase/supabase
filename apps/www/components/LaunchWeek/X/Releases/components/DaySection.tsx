@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { cn } from 'ui'
 
 import { DayLink } from '.'
-import CountdownComponent from '../../Countdown'
 import { WeekDayProps } from '../data'
 import { Edit2 } from 'lucide-react'
 
@@ -117,7 +116,6 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
                   />
                 </g>
               </svg>
-              {day.hasCountdown && <CountdownComponent date={day.published_at} showCard={false} />}
             </div>
           </div>
         )}

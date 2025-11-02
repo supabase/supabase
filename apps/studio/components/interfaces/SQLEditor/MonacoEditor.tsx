@@ -1,21 +1,22 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef } from 'react'
+import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
-import { useParams } from 'common'
+import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
-import { makeActiveTabPermanent } from 'state/tabs'
 
 export type MonacoEditorProps = {
   id: string
@@ -25,6 +26,7 @@ export type MonacoEditorProps = {
   autoFocus?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
+  onMount?: (editor: IStandaloneCodeEditor) => void
   onPrompt?: (value: {
     selection: string
     beforeSelection: string
@@ -32,6 +34,7 @@ export type MonacoEditorProps = {
     startLineNumber: number
     endLineNumber: number
   }) => void
+  placeholder?: string
 }
 
 const MonacoEditor = ({
@@ -39,23 +42,31 @@ const MonacoEditor = ({
   editorRef,
   monacoRef,
   autoFocus = true,
+  placeholder = '',
   className,
   executeQuery,
   onHasSelection,
   onPrompt,
+  onMount,
 }: MonacoEditorProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, content } = useParams()
-  const project = useSelectedProject()
-  const snapV2 = useSqlEditorV2StateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
 
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
+
+  // [Joshen] Lodash debounce doesn't seem to be working here, so opting to use useDebounce
+  const [value, setValue] = useState('')
+  const debouncedValue = useDebounce(value, 1000)
 
   const snippet = snapV2.snippets[id]
   const disableEdit =
@@ -85,6 +96,17 @@ const MonacoEditor = ({
     })
 
     editor.addAction({
+      id: 'save-query',
+      label: 'Save Query',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyS],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: () => {
+        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+      },
+    })
+
+    editor.addAction({
       id: 'explain-code',
       label: 'Explain Code',
       contextMenuGroupId: 'operation',
@@ -93,9 +115,9 @@ const MonacoEditor = ({
         const selectedValue = (editorRef?.current as any)
           .getModel()
           .getValueInRange((editorRef?.current as any)?.getSelection())
+        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         aiSnap.newChat({
           name: 'Explain code section',
-          open: true,
           sqlSnippets: [selectedValue],
           initialInput: 'Can you explain this section to me in more detail?',
         })
@@ -143,35 +165,35 @@ const MonacoEditor = ({
       if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
       editor.focus()
     }
+
+    onMount?.(editor)
   }
 
-  const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
-
   function handleEditorChange(value: string | undefined) {
-    // make active tab permanent
-    makeActiveTabPermanent(ref)
-
-    const snippetCheck = snapV2.snippets[id]
-
+    tabsSnap.makeActiveTabPermanent()
     if (id && value) {
-      if (snippetCheck) {
-        debouncedSetSql(id, value)
-      } else {
-        if (ref && profile !== undefined && project !== undefined) {
-          const snippet = createSqlSnippetSkeletonV2({
-            id,
-            name: untitledSnippetTitle,
-            sql: value,
-            owner_id: profile?.id,
-            project_id: project?.id,
-          })
-          snapV2.addSnippet({ projectRef: ref, snippet })
-          snapV2.addNeedsSaving(snippet.id)
-          router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-        }
+      if (!!snippet) {
+        setValue(value)
+      } else if (ref && !!profile && !!project) {
+        const snippet = createSqlSnippetSkeletonV2({
+          id,
+          name: untitledSnippetTitle,
+          sql: value,
+          owner_id: profile?.id,
+          project_id: project?.id,
+        })
+        snapV2.addSnippet({ projectRef: ref, snippet })
+        router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
       }
     }
   }
+
+  useEffect(() => {
+    if (debouncedValue.length > 0 && snippet) {
+      snapV2.setSql(id, value)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedValue])
 
   // if an SQL query is passed by the content parameter, set the editor value to its content. This
   // is usually used for sending the user to SQL editor from other pages with SQL.
@@ -200,6 +222,7 @@ const MonacoEditor = ({
         options={{
           tabSize: 2,
           fontSize: 13,
+          placeholder,
           lineDecorationsWidth: 0,
           readOnly: disableEdit,
           minimap: { enabled: false },

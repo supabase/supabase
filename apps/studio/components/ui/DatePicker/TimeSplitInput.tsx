@@ -1,10 +1,20 @@
 import { format } from 'date-fns'
 import { Clock } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
+import {
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import { cn } from 'ui'
 import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
 
-const TimeSplitInput = ({
+const inputStyle = cn(
+  'w-6 p-0 text-center text-xs text-foreground outline-none cursor-text',
+  'ring-0 focus:ring-0 ring-none border-none bg-transparent'
+)
+
+export const TimeSplitInput = ({
   type,
   time,
   setTime,
@@ -150,10 +160,70 @@ const TimeSplitInput = ({
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select()
     setFocus(true)
+    // Prevent parent dialog from stealing focus
+    event.stopPropagation()
+  }
+
+  const handleClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    event.stopPropagation()
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    // Allow only numbers and navigation keys
+    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter']
+    const isNumber = /^[0-9]$/.test(event.key)
+
+    if (!isNumber && !allowedKeys.includes(event.key)) {
+      event.preventDefault()
+    }
+
+    // Prevent parent dialog from stealing focus on keydown
+    event.stopPropagation()
+  }
+
+  const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
+    // Prevent parent dialog from stealing focus on input
+    event.stopPropagation()
+  }
+
+  function handlePaste(event: ClipboardEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    navigator.clipboard.readText().then((text) => {
+      let date: null | Date = null
+      if (isUnixMicro(text)) {
+        date = new Date(unixMicroToIsoTimestamp(text))
+      } else {
+        date = new Date(Number(text))
+      }
+
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date or timestamp in clipboard')
+        return
+      }
+
+      if (date) {
+        // Offset the date by 1s to make sure it will find the logs in that second
+        if (type === 'start') {
+          date.setSeconds(date.getSeconds() - 1)
+        }
+        if (type === 'end') {
+          date.setSeconds(date.getSeconds() + 1)
+        }
+
+        setTime({
+          HH: date.getHours().toString().padStart(2, '0'),
+          mm: date.getMinutes().toString().padStart(2, '0'),
+          ss: date.getSeconds().toString().padStart(2, '0'),
+        })
+      }
+    })
   }
 
   useEffect(() => {
-    handleOnBlur()
+    document.addEventListener('paste', handlePaste)
+    return () => document.removeEventListener('paste', handlePaste)
   }, [startDate, endDate])
 
   return (
@@ -162,6 +232,7 @@ const TimeSplitInput = ({
         flex h-7 items-center justify-center
         gap-0 rounded border border-strong bg-surface-100 text-xs text-foreground-light
         ${focus && ' border-stronger outline outline-2 outline-border'}
+        hover:border-stronger transition-colors
     `}
     >
       <div className="mr-1 text-foreground-lighter">
@@ -172,21 +243,14 @@ const TimeSplitInput = ({
         type="text"
         onBlur={() => handleOnBlur()}
         onFocus={handleFocus}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        onInput={handleInput}
         pattern="[0-23]*"
         placeholder="00"
         onChange={(e) => handleOnChange(e.target.value, 'HH')}
         aria-label="Hours"
-        className="
-            ring-none
-            w-4
-            border-none
-            bg-transparent
-            p-0 text-center text-xs
-            text-foreground
-            outline-none
-            ring-0
-            focus:ring-0
-        "
+        className={inputStyle}
         value={time.HH}
       />
       <span className="text-foreground-lighter">:</span>
@@ -194,21 +258,14 @@ const TimeSplitInput = ({
         type="text"
         onBlur={() => handleOnBlur()}
         onFocus={handleFocus}
-        pattern="[0-12]*"
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        onInput={handleInput}
+        pattern="[0-59]*"
         placeholder="00"
         onChange={(e) => handleOnChange(e.target.value, 'mm')}
         aria-label="Minutes"
-        className="
-            ring-none
-            w-4
-            border-none
-            bg-transparent
-            p-0 text-center text-xs
-            text-foreground
-            outline-none
-            ring-0
-            focus:ring-0
-        "
+        className={inputStyle}
         value={time.mm}
       />
       <span className="text-foreground-lighter">:</span>
@@ -216,25 +273,16 @@ const TimeSplitInput = ({
         type="text"
         onBlur={() => handleOnBlur()}
         onFocus={handleFocus}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        onInput={handleInput}
         pattern="[0-59]*"
         placeholder="00"
         onChange={(e) => handleOnChange(e.target.value, 'ss')}
         aria-label="Seconds"
-        className="
-            ring-none
-            w-4
-            border-none
-            bg-transparent
-            p-0 text-center text-xs
-            text-foreground
-            outline-none
-            ring-0
-            focus:ring-0
-        "
+        className={inputStyle}
         value={time.ss}
       />
     </div>
   )
 }
-
-export default TimeSplitInput

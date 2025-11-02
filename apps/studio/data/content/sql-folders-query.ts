@@ -2,12 +2,14 @@ import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { contentKeys } from './keys'
 
 export type SnippetFolderResponse = components['schemas']['GetUserContentFolderResponse']['data']
-export type SnippetFolder = components['schemas']['UserContentFolder']
-export type Snippet = components['schemas']['UserContentObjectMeta']
+export type SnippetFolder =
+  components['schemas']['GetUserContentFolderResponse']['data']['folders'][number]
+export type Snippet =
+  components['schemas']['GetUserContentFolderResponse']['data']['contents'][number]
 
 export type SQLSnippetFolderVariables = {
   projectRef?: string
@@ -60,15 +62,13 @@ export const useSQLSnippetFoldersQuery = <TData = SQLSnippetFoldersData>(
     ...options
   }: UseInfiniteQueryOptions<SQLSnippetFoldersData, SQLSnippetFoldersError, TData> = {}
 ) =>
-  useInfiniteQuery<SQLSnippetFoldersData, SQLSnippetFoldersError, TData>(
-    contentKeys.folders(projectRef, { name, sort }),
-    ({ signal, pageParam }) =>
+  useInfiniteQuery<SQLSnippetFoldersData, SQLSnippetFoldersError, TData>({
+    queryKey: contentKeys.folders(projectRef, { name, sort }),
+    queryFn: ({ signal, pageParam }) =>
       getSQLSnippetFolders({ projectRef, cursor: pageParam, name, sort }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam(lastPage) {
-        return lastPage.cursor
-      },
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    getNextPageParam(lastPage) {
+      return lastPage.cursor
+    },
+    ...options,
+  })

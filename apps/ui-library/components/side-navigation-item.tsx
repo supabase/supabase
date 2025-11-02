@@ -7,7 +7,7 @@ import React from 'react'
 import { useFramework } from '@/context/framework-context'
 import { useMobileMenu } from '@/hooks/use-mobile-menu'
 import { SidebarNavItem } from '@/types/nav'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
 // We extend:
 // 1. LinkProps - for Next.js Link component props (prefetch, etc)
@@ -89,7 +89,7 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
       className={cn(
         'relative',
         'flex',
-        'items-center',
+        'items-center justify-between',
         'h-6',
         'text-sm',
         'text-foreground-lighter px-6',
@@ -106,8 +106,13 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
           'absolute left-0 w-1 h-full bg-foreground',
           isActive ? 'opacity-100' : 'opacity-0'
         )}
-      ></div>
+      />
       {item.title}
+      {item.new && (
+        <Badge variant="brand" className="capitalize">
+          NEW
+        </Badge>
+      )}
     </Link>
   )
 }

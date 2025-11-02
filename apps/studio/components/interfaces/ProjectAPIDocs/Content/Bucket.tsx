@@ -8,7 +8,7 @@ import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
 
-const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
+export const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const { data } = useBucketsQuery({ projectRef: ref })
@@ -25,7 +25,7 @@ const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
     <div className="divide-y">
       <div className="space-y-1 px-4 py-4">
         <div className="flex items-center space-x-2">
-          <h2 className="text-xl">{bucket.name}</h2>
+          <h2>{bucket.name}</h2>
           <Badge variant={bucket.public ? 'warning' : 'default'}>
             {bucket.public ? 'Public' : 'Private'}
           </Badge>
@@ -106,5 +106,3 @@ const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
     </div>
   )
 }
-
-export default Bucket

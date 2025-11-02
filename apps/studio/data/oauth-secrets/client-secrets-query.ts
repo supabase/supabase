@@ -1,17 +1,17 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { clientSecretKeys } from './keys'
 
 import { components } from 'api-types'
 
 export type Secret =
-  components['schemas']['ListOAuthAppClientSecretsResponseDto']['client_secrets'][0] & {
-    client_secret?: components['schemas']['CreateOAuthAppClientSecretResponseDto']['client_secret']
+  components['schemas']['ListOAuthAppClientSecretsResponse']['client_secrets'][0] & {
+    client_secret?: components['schemas']['CreateOAuthAppClientSecretResponse']['client_secret']
   }
 
-export type CreatedSecret = components['schemas']['CreateOAuthAppClientSecretResponseDto']
+export type CreatedSecret = components['schemas']['CreateOAuthAppClientSecretResponse']
 
 export interface SecretRowProps {
   secret: Secret
@@ -51,11 +51,9 @@ export const useClientSecretsQuery = <TData = ClientSecretsData>(
   { slug, appId }: ClientSecretsVariables,
   { enabled = true, ...options }: UseQueryOptions<ClientSecretsData, ClientSecretsError, TData> = {}
 ) =>
-  useQuery<ClientSecretsData, ClientSecretsError, TData>(
-    clientSecretKeys.list(slug, appId),
-    ({ signal }) => getClientSecrets({ slug, appId }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined' && typeof appId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ClientSecretsData, ClientSecretsError, TData>({
+    queryKey: clientSecretKeys.list(slug, appId),
+    queryFn: ({ signal }) => getClientSecrets({ slug, appId }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && typeof appId !== 'undefined',
+    ...options,
+  })

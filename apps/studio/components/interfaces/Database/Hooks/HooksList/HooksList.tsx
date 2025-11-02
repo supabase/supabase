@@ -1,29 +1,35 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
-import { BookOpen, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Input } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { noop } from 'lib/void'
-import HooksListEmpty from './HooksListEmpty'
-import SchemaTable from './SchemaTable'
-import { DocsButton } from 'components/ui/DocsButton'
+import { Input } from 'ui'
+import { HooksListEmpty } from './HooksListEmpty'
+import { SchemaTable } from './SchemaTable'
 
 export interface HooksListProps {
   createHook: () => void
-  editHook: (hook: any) => void
-  deleteHook: (hook: any) => void
+  editHook: (hook: PostgresTrigger) => void
+  deleteHook: (hook: PostgresTrigger) => void
 }
 
-const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: HooksListProps) => {
-  const { project } = useProjectContext()
+export const HooksList = ({
+  createHook = noop,
+  editHook = noop,
+  deleteHook = noop,
+}: HooksListProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const {
     data: hooks,
     isLoading,
@@ -41,8 +47,10 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
 
-  const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canCreateWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
 
   return (
     <div className="w-full space-y-4">
@@ -56,7 +64,7 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
           onChange={(e) => setFilterString(e.target.value)}
         />
         <div className="flex items-center gap-x-2">
-          <DocsButton href="https://supabase.com/docs/guides/database/webhooks" />
+          <DocsButton href={`${DOCS_URL}/guides/database/webhooks`} />
           <ButtonTooltip
             onClick={() => createHook()}
             disabled={!isPermissionsLoaded || !canCreateWebhooks}
@@ -108,5 +116,3 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
     </div>
   )
 }
-
-export default HooksList

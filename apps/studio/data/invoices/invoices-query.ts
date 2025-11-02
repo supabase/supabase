@@ -18,7 +18,7 @@ export async function getInvoices(
   const { data, error } = await get(`/platform/organizations/{slug}/billing/invoices`, {
     params: {
       path: { slug },
-      query: { offset: offset.toString(), limit: limit.toString() },
+      query: { offset, limit },
     },
     signal,
   })
@@ -35,11 +35,9 @@ export const useInvoicesQuery = <TData = InvoicesData>(
   { enabled = true, ...options }: UseQueryOptions<InvoicesData, InvoicesError, TData> = {}
 ) =>
   // [Joshen] Switch to useInfiniteQuery
-  useQuery<InvoicesData, InvoicesError, TData>(
-    invoicesKeys.list(slug, offset),
-    ({ signal }) => getInvoices({ slug, offset, limit }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<InvoicesData, InvoicesError, TData>({
+    queryKey: invoicesKeys.list(slug, offset),
+    queryFn: ({ signal }) => getInvoices({ slug, offset, limit }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

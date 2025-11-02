@@ -38,13 +38,13 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Color usage',
-          href: '/docs/color-usage',
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
           items: [],
         },
         {
-          title: 'Tailwind classes',
-          href: '/docs/tailwind-classes',
+          title: 'Color Usage',
+          href: '/docs/color-usage',
           items: [],
         },
         {
@@ -65,6 +65,16 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Changelog',
           href: '/docs/changelog',
+          items: [],
+        },
+      ],
+    },
+    {
+      title: 'UI Patterns',
+      items: [
+        {
+          title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
       ],
@@ -108,6 +118,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Data Input',
+          href: '/docs/fragments/data-input',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
@@ -115,6 +130,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Multi Select',
           href: '/docs/fragments/multi-select',
+          items: [],
+        },
+        {
+          title: 'Filter Bar',
+          href: '/docs/fragments/filter-bar',
           items: [],
         },
         {
@@ -285,6 +305,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'NavMenu',
+          href: '/docs/components/nav-menu',
+          items: [],
+        },
+        {
           title: 'Navigation Menu',
           href: '/docs/components/navigation-menu',
           items: [],
@@ -382,11 +407,6 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Textarea',
           href: '/docs/components/textarea',
-          items: [],
-        },
-        {
-          title: 'Toast',
-          href: '/docs/components/toast',
           items: [],
         },
         {

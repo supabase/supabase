@@ -162,6 +162,7 @@ export function getTableEditorSql(id?: number) {
                 conkey[1] as ordinal_position
             from pg_catalog.pg_constraint
             where contype = 'u' and cardinality(conkey) = 1
+            group by conrelid, conkey[1]
         ) as uniques on uniques.table_id = a.attrelid and uniques.ordinal_position = a.attnum
         left join (
             select distinct on (conrelid, conkey[1])

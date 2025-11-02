@@ -18,7 +18,7 @@ export type NotificationVariables = {
   }
 }
 
-export type Notification = components['schemas']['NotificationResponseV2']
+export type Notification = components['schemas']['NotificationResponse']
 
 /**
  * Notification Data - This is not typed from the API end as it's meant to be open-ended
@@ -40,8 +40,8 @@ export async function getNotifications(options: NotificationVariables, signal?: 
   const { data, error } = await get('/platform/notifications', {
     params: {
       query: {
-        offset: String(page * limit),
-        limit: String(limit),
+        offset: page * limit,
+        limit,
         // [Alaister]: 'as any' is needed because the API types don't reflect an array of strings
         ...(status !== undefined ? { status } : { status: ['new', 'seen'].join(',') as any }),
         ...(filters.priority.length > 0 ? { priority: filters.priority.join(',') as any } : {}),
@@ -68,18 +68,16 @@ export const useNotificationsV2Query = <TData = NotificationsData>(
     ...options
   }: UseInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
 ) => {
-  return useInfiniteQuery<NotificationsData, NotificationsError, TData>(
-    notificationKeys.listV2({ status, filters, limit }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery<NotificationsData, NotificationsError, TData>({
+    queryKey: notificationKeys.listV2({ status, filters, limit }),
+    queryFn: ({ signal, pageParam }) =>
       getNotifications({ status, filters, limit, page: pageParam }, signal),
-    {
-      enabled: enabled,
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        if ((lastPage ?? []).length < limit) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
+    enabled: enabled,
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      if ((lastPage ?? []).length < limit) return undefined
+      return page
+    },
+    ...options,
+  })
 }

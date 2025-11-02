@@ -5,12 +5,12 @@ import { del, handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
-export type BucketDeleteVariables = {
+type BucketDeleteVariables = {
   projectRef: string
   id: string
 }
 
-export async function deleteBucket({ projectRef, id }: BucketDeleteVariables) {
+async function deleteBucket({ projectRef, id }: BucketDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!id) throw new Error('Bucket name is requried')
 
@@ -21,7 +21,8 @@ export async function deleteBucket({ projectRef, id }: BucketDeleteVariables) {
 
   const { data, error: deleteBucketError } = await del('/platform/storage/{ref}/buckets/{id}', {
     params: { path: { ref: projectRef, id } },
-  })
+  } as any)
+
   if (deleteBucketError) handleError(deleteBucketError)
   return data
 }
@@ -38,22 +39,20 @@ export const useBucketDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketDeleteData, ResponseError, BucketDeleteVariables>(
-    (vars) => deleteBucket(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete bucket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BucketDeleteData, ResponseError, BucketDeleteVariables>({
+    mutationFn: (vars) => deleteBucket(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete bucket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -12,7 +12,7 @@ select sum(pg_database_size(pg_database.datname))::bigint as db_size from pg_dat
 
 export type DatabaseSizeVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabaseSize(
@@ -46,11 +46,9 @@ export const useDatabaseSizeQuery = <TData = DatabaseSizeData>(
   { projectRef, connectionString }: DatabaseSizeVariables,
   { enabled = true, ...options }: UseQueryOptions<DatabaseSizeData, DatabaseSizeError, TData> = {}
 ) =>
-  useQuery<DatabaseSizeData, DatabaseSizeError, TData>(
-    databaseKeys.databaseSize(projectRef),
-    ({ signal }) => getDatabaseSize({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseSizeData, DatabaseSizeError, TData>({
+    queryKey: databaseKeys.databaseSize(projectRef),
+    queryFn: ({ signal }) => getDatabaseSize({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

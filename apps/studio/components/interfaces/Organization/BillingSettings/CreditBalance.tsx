@@ -11,15 +11,13 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { CreditTopUp } from './CreditTopUp'
 
 const CreditBalance = () => {
   const { slug } = useParams()
-  const creditTopUpEnabled = useFlag('creditTopUp')
 
-  const canReadSubscriptions = useCheckPermissions(
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
@@ -54,35 +52,35 @@ const CreditBalance = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadSubscriptions ? (
+        {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's credits" />
         ) : (
-          <>
-            <FormPanel footer={creditTopUpEnabled ? <CreditTopUp slug={slug} /> : null}>
-              <FormSection>
-                <FormSectionContent fullWidth loading={isLoading}>
-                  {isError && (
-                    <AlertError
-                      subject="Failed to retrieve organization customer profile"
-                      error={error}
-                    />
-                  )}
+          <FormPanel
+            footer={subscription?.billing_via_partner ? undefined : <CreditTopUp slug={slug} />}
+          >
+            <FormSection>
+              <FormSectionContent fullWidth loading={isLoading}>
+                {isError && (
+                  <AlertError
+                    subject="Failed to retrieve organization customer profile"
+                    error={error}
+                  />
+                )}
 
-                  {isSuccess && (
-                    <div className="flex w-full justify-between items-center">
-                      <span>Balance</span>
-                      <div className="flex items-center space-x-1">
-                        {isDebt && <h4 className="opacity-50">-</h4>}
-                        <h4 className="opacity-50">$</h4>
-                        <h2 className="text-2xl relative">{balance}</h2>
-                        {isCredit && <h4 className="opacity-50">/credits</h4>}
-                      </div>
+                {isSuccess && (
+                  <div className="flex w-full justify-between items-center">
+                    <span>Balance</span>
+                    <div className="flex items-center space-x-1">
+                      {isDebt && <h4 className="opacity-50">-</h4>}
+                      <h4 className="opacity-50">$</h4>
+                      <h1 className="relative">{balance}</h1>
+                      {isCredit && <h4 className="opacity-50">/credits</h4>}
                     </div>
-                  )}
-                </FormSectionContent>
-              </FormSection>
-            </FormPanel>
-          </>
+                  </div>
+                )}
+              </FormSectionContent>
+            </FormSection>
+          </FormPanel>
         )}
       </ScaffoldSectionContent>
     </ScaffoldSection>

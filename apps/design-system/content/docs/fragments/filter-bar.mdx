@@ -1,0 +1,214 @@
+---
+title: Filter Bar
+description: An advanced filtering component with support for multiple conditions and operators.
+component: true
+fragment: true
+---
+
+<ComponentPreview
+  name="filter-bar-demo"
+  description="An advanced filtering component with support for multiple conditions and operators."
+  peekCode
+  showDottedGrid
+  wide
+/>
+
+## Usage
+
+The Filter Bar component provides advanced filtering capabilities with support for multiple conditions, operators, and different field types. It can be used with both static and async options.
+
+```tsx
+const filterProperties = [
+  {
+    label: 'Name',
+    name: 'name',
+    type: 'string',
+    operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+  },
+  {
+    label: 'Status',
+    name: 'status',
+    type: 'string',
+    options: ['active', 'inactive', 'pending'],
+    operators: ['=', '!='],
+  },
+]
+
+export function FilterDemo() {
+  const [filters, setFilters] = useState<FilterGroup>(initialFilters)
+  const [freeformText, setFreeformText] = useState('')
+
+  return (
+    <FilterBar
+      filterProperties={filterProperties}
+      freeformText={freeformText}
+      onFreeformTextChange={setFreeformText}
+      filters={filters}
+      onFilterChange={setFilters}
+    />
+  )
+}
+```
+
+## API Reference
+
+### FilterProperty
+
+```tsx
+interface FilterProperty {
+  label: string
+  name: string
+  type: 'string' | 'number' | 'date' | 'boolean'
+  operators: string[]
+  options?: string[] | ((search?: string) => Promise<string[]> | string[])
+}
+```
+
+### FilterGroup
+
+```tsx
+interface FilterGroup {
+  logicalOperator: 'AND' | 'OR'
+  conditions: (FilterCondition | FilterGroup)[]
+}
+```
+
+### FilterCondition
+
+```tsx
+interface FilterCondition {
+  propertyName: string
+  value: string | number | boolean | Date
+  operator: string
+}
+```
+
+### Component Props
+
+| Prop                 | Type                           | Description                              |
+| -------------------- | ------------------------------ | ---------------------------------------- |
+| filterProperties     | FilterProperty[]               | Array of properties that can be filtered |
+| filters              | FilterGroup                    | Current filter state                     |
+| onFilterChange       | (filters: FilterGroup) => void | Callback when filters change             |
+| freeformText         | string                         | Current free-form search text            |
+| onFreeformTextChange | (text: string) => void         | Callback when free-form text changes     |
+| aiApiUrl             | string?                        | Optional URL for AI-powered filtering    |
+
+## AI Integration
+
+The Filter Bar component supports AI-powered filtering through an optional API endpoint. When `aiApiUrl` is provided, the component will send natural language queries to be converted into structured filters.
+
+### API Endpoint
+
+The AI API endpoint should accept POST requests with the following structure:
+
+```typescript
+// Request body
+interface AIFilterRequest {
+  prompt: string // Natural language query
+  filterProperties: FilterProperty[] // Available filter properties
+}
+
+// Response body
+interface AIFilterResponse {
+  logicalOperator: 'AND' | 'OR'
+  conditions: (FilterCondition | FilterGroup)[]
+}
+```
+
+### Example API Implementation
+
+```typescript
+import { generateObject } from 'ai'
+import { openai } from '@ai-sdk/openai'
+import { z } from 'zod'
+
+// Define schemas for validation
+const FilterProperty = z.object({
+  label: z.string(),
+  name: z.string(),
+  type: z.enum(['string', 'number', 'date', 'boolean']),
+  options: z.array(z.string()).optional(),
+  operators: z.array(z.string()).optional(),
+})
+
+const FilterCondition = z.object({
+  propertyName: z.string(),
+  value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
+  operator: z.string(),
+})
+
+type FilterGroupType = {
+  logicalOperator: 'AND' | 'OR'
+  conditions: Array<z.infer<typeof FilterCondition> | FilterGroupType>
+}
+
+const FilterGroup: z.ZodType<FilterGroupType> = z.lazy(() =>
+  z.object({
+    logicalOperator: z.enum(['AND', 'OR']),
+    conditions: z.array(z.union([FilterCondition, FilterGroup])),
+  })
+)
+
+export async function POST(req: Request) {
+  const { prompt, filterProperties } = await req.json()
+  const filterPropertiesString = JSON.stringify(filterProperties)
+
+  try {
+    const { object } = await generateObject({
+      model: openai('gpt-4-mini'),
+      schema: FilterGroup,
+      prompt: `Generate a filter group based on the following prompt: "${prompt}". 
+              Use only these filter properties: ${filterPropertiesString}. 
+              Each property has its own set of valid operators defined in the operators field. 
+              Return a filter group with a logical operator ('AND'/'OR') and an array of conditions. 
+              Each condition can be either a filter condition or another filter group. 
+              Filter conditions should have the structure: { propertyName: string, value: string | number | boolean | null, operator: string }. 
+              Ensure that the generated filters use only the provided property names and their corresponding operators.`,
+    })
+
+    // Validate that all propertyNames exist in filterProperties
+    const validatePropertyNames = (group: FilterGroupType): boolean => {
+      return group.conditions.every((condition) => {
+        if ('logicalOperator' in condition) {
+          return validatePropertyNames(condition as FilterGroupType)
+        }
+        const property = filterProperties.find(
+          (p: z.infer<typeof FilterProperty>) => p.name === condition.propertyName
+        )
+        if (!property) return false
+        // Validate operator is valid for this property
+        return property.operators?.includes(condition.operator) ?? false
+      })
+    }
+
+    if (!validatePropertyNames(object)) {
+      throw new Error('Invalid property names or operators in generated filter')
+    }
+
+    // Zod will throw an error if the object doesn't match the schema
+    const validatedFilters = FilterGroup.parse(object)
+    return Response.json(validatedFilters)
+  } catch (error: any) {
+    console.error('Error in AI filtering:', error)
+    return Response.json({ error: error.message || 'AI filtering failed' }, { status: 500 })
+  }
+}
+```
+
+### Usage with AI
+
+```tsx
+export function FilterDemoWithAI() {
+  const [filters, setFilters] = useState<FilterGroup>(initialFilters)
+
+  return (
+    <FilterBar
+      filterProperties={filterProperties}
+      filters={filters}
+      onFilterChange={setFilters}
+      aiApiUrl="/api/filter-ai" // Enable AI filtering
+    />
+  )
+}
+```

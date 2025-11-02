@@ -14,11 +14,11 @@ import {
 
 export const dynamicParams = false
 
-export default async function ReferencePage({
-  params: { slug },
-}: {
-  params: { slug: Array<string> }
-}) {
+export default async function ReferencePage(props: { params: Promise<{ slug: Array<string> }> }) {
+  const params = await props.params
+
+  const { slug } = params
+
   if (!Object.keys(REFERENCES).includes(slug[0].replaceAll('-', '_'))) {
     notFound()
   }
@@ -33,6 +33,10 @@ export default async function ReferencePage({
     const { sdkId, maybeVersion, path } = parsedPath
 
     const sdkData = REFERENCES[sdkId]
+    if (sdkData.enabled === false) {
+      notFound()
+    }
+
     const latestVersion = sdkData.versions[0]
     const version = maybeVersion ?? latestVersion
 

@@ -50,13 +50,36 @@ hideToc: true
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Create the Supabase client">
+    <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project URL and public API (anon) key:
+    Create a `.env.local` file and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      <$CodeTabs>
+
+        ```text name=.env.local
+        VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+        ```
+
+      </$CodeTabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Create the Supabase client">
+
+    Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client:
 
     </StepHikeCompact.Details>
 
@@ -65,14 +88,17 @@ hideToc: true
       ```js name=src/lib/supabaseClient.js
       import { createClient } from '@supabase/supabase-js'
 
-      export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+
+      export const supabase = createClient(supabaseUrl, supabasePublishableKey)
       ```
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Query data from the app">
 
     Replace the existing content in your `App.vue` file with the following code.
@@ -109,7 +135,7 @@ hideToc: true
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={6}>
+  <StepHikeCompact.Step step={7}>
     <StepHikeCompact.Details title="Start the app">
 
     Start the app and go to http://localhost:5173 in a browser and you should see the list of instruments.

@@ -17,6 +17,7 @@ import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
+import dayjs from 'dayjs'
 
 interface ChartHandlerProps {
   id?: string
@@ -33,6 +34,7 @@ interface ChartHandlerProps {
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
+  syncId?: string
 }
 
 /**
@@ -59,6 +61,8 @@ const ChartHandler = ({
   isLoading,
   format,
   highlightedValue,
+  syncId,
+  ...otherProps
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -72,10 +76,8 @@ const ChartHandler = ({
     {
       projectRef: ref as string,
       attribute: attribute as ProjectDailyStatsAttribute,
-      startDate,
-      endDate,
-      interval: interval as AnalyticsInterval,
-      databaseIdentifier,
+      startDate: dayjs(startDate).format('YYYY-MM-DD'),
+      endDate: dayjs(endDate).format('YYYY-MM-DD'),
     },
     { enabled: provider === 'daily-stats' && data === undefined }
   )
@@ -148,7 +150,7 @@ const ChartHandler = ({
 
   return (
     <div className="h-full w-full">
-      <div className="absolute right-6 z-50 flex justify-between">
+      <div className="absolute right-6 z-10 flex justify-between">
         {!hideChartType && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -168,7 +170,6 @@ const ChartHandler = ({
       </div>
       {chartStyle === 'bar' ? (
         <BarChart
-          YAxisProps={{ width: 1 }}
           data={(chartData?.data ?? []) as any}
           format={format || chartData?.format}
           xAxisKey={'period_start'}
@@ -176,6 +177,8 @@ const ChartHandler = ({
           highlightedValue={_highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
+          syncId={syncId}
+          {...otherProps}
         />
       ) : (
         <AreaChart
@@ -186,6 +189,8 @@ const ChartHandler = ({
           highlightedValue={_highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
+          syncId={syncId}
+          {...otherProps}
         />
       )}
     </div>

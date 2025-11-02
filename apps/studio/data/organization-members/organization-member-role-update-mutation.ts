@@ -25,7 +25,7 @@ export async function assignOrganizationMemberRole({
   const { data, error } = await put(
     '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}',
     {
-      params: { path: { slug, gotrue_id: gotrueId, role_id: roleId.toString() } },
+      params: { path: { slug, gotrue_id: gotrueId, role_id: roleId } },
       body: { name: roleName, role_scoped_projects: projects },
     }
   )
@@ -54,14 +54,15 @@ export const useOrganizationMemberUpdateRoleMutation = ({
     OrganizationMemberAssignData,
     ResponseError,
     OrganizationMemberUpdateRoleVariables
-  >((vars) => assignOrganizationMemberRole(vars), {
+  >({
+    mutationFn: (vars) => assignOrganizationMemberRole(vars),
     async onSuccess(data, variables, context) {
       const { slug, skipInvalidation } = variables
 
       if (!skipInvalidation) {
         await Promise.all([
-          queryClient.invalidateQueries(organizationKeys.rolesV2(slug)),
-          queryClient.invalidateQueries(organizationKeysV1.members(slug)),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
+          queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
         ])
       }
 

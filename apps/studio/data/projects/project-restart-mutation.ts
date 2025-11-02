@@ -34,20 +34,18 @@ export const useProjectRestartMutation = ({
   UseMutationOptions<ProjectRestartData, ResponseError, ProjectRestartVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectRestartData, ResponseError, ProjectRestartVariables>(
-    (vars) => restartProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to restart project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectRestartData, ResponseError, ProjectRestartVariables>({
+    mutationFn: (vars) => restartProject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to restart project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

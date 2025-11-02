@@ -7,7 +7,7 @@
 		"dev": "vite",
 		"build": "vite build",
 		"serve": "vite preview",
-		"format": "prettier --write \"src/*.{js,json,ts,tsx,jsx}\""
+		"format": "prettier --cache --write \"src/*.{js,json,ts,tsx,jsx}\""
 	},
 	"license": "MIT",
 	"devDependencies": {

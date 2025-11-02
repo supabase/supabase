@@ -1,16 +1,12 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { components } from 'api-types'
 
-export type ReleaseChannel = components['schemas']['ReleaseChannel']
-
-export type ProjectUpgradeVariables = {
+export type ProjectUpgradeVariables = components['schemas']['UpgradeDatabaseBody'] & {
   ref: string
-  target_version: string
-  release_channel: ReleaseChannel
 }
 
 export async function upgradeProject({
@@ -36,20 +32,18 @@ export const useProjectUpgradeMutation = ({
   UseMutationOptions<ProjectUpgradeData, ResponseError, ProjectUpgradeVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectUpgradeData, ResponseError, ProjectUpgradeVariables>(
-    (vars) => upgradeProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to upgrade project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectUpgradeData, ResponseError, ProjectUpgradeVariables>({
+    mutationFn: (vars) => upgradeProject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to upgrade project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

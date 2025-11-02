@@ -2,13 +2,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Button, cn } from 'ui'
 import { ScaffoldContainerLegacy } from '../Scaffold'
 
-const AccountSettingsLayout = ({ children }: PropsWithChildren) => {
-  const newLayoutPreview = useNewLayout()
-
+export const AccountSettingsLayout = ({ children }: PropsWithChildren) => {
   const pathname = usePathname()
   const links = [
     {
@@ -31,10 +28,6 @@ const AccountSettingsLayout = ({ children }: PropsWithChildren) => {
       key: `/account/security`,
     },
   ]
-
-  if (!newLayoutPreview) {
-    return children
-  }
 
   return (
     <ScaffoldContainerLegacy className="flex flex-row py-8 gap-20">
@@ -63,5 +56,3 @@ const AccountSettingsLayout = ({ children }: PropsWithChildren) => {
     </ScaffoldContainerLegacy>
   )
 }
-
-export default AccountSettingsLayout

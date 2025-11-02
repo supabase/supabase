@@ -22,9 +22,11 @@ export const useGitHubAuthorizationQuery = <TData = GitHubAuthorizationData>({
   enabled = true,
   ...options
 }: UseQueryOptions<GitHubAuthorizationData, GitHubAuthorizationError, TData> = {}) => {
-  return useQuery<GitHubAuthorizationData, GitHubAuthorizationError, TData>(
-    integrationKeys.githubAuthorization(),
-    ({ signal }) => getGitHubAuthorization(signal),
-    { enabled, staleTime: 0, ...options }
-  )
+  return useQuery<GitHubAuthorizationData, GitHubAuthorizationError, TData>({
+    queryKey: integrationKeys.githubAuthorization(),
+    queryFn: ({ signal }) => getGitHubAuthorization(signal),
+    enabled,
+    staleTime: 0,
+    ...options,
+  })
 }

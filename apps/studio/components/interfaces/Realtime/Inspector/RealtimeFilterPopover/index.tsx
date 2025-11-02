@@ -1,10 +1,11 @@
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useState, useEffect } from 'react'
 
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -34,8 +35,13 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
   const [tempConfig, setTempConfig] = useState(config)
 
   const { ref } = useParams()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  // Update tempConfig when config changes to ensure consistency
+  useEffect(() => {
+    setTempConfig(config)
+  }, [config])
 
   const onOpen = (v: boolean) => {
     // when opening, copy the outside config into the intermediate one
@@ -69,7 +75,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             )}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-[365px]" align="start">
+        <PopoverContent_Shadcn_ className="p-0 w-[365px]" align="start" portal={true}>
           <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
             Listen to event types
           </div>
@@ -126,9 +132,15 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               <div className="flex gap-2.5 items-center">
                 <IconDatabaseChanges
                   size="xlarge"
-                  className="bg-foreground rounded text-background-muted"
+                  className={cn(
+                    'rounded text-background-muted',
+                    config.enableDbChanges ? 'bg-foreground' : 'bg-foreground-lighter'
+                  )}
                 />
-                <label htmlFor="toggle-db-changes" className="text-sm">
+                <label
+                  htmlFor="toggle-db-changes"
+                  className={cn('text-sm', !config.enableDbChanges && 'text-foreground-lighter')}
+                >
                   Database changes
                 </label>
               </div>
@@ -136,17 +148,20 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 id="toggle-db-changes"
                 size="tiny"
                 checked={tempConfig.enableDbChanges}
+                disabled={!config.enableDbChanges}
                 onChange={() =>
                   setTempConfig({ ...tempConfig, enableDbChanges: !tempConfig.enableDbChanges })
                 }
               />
             </div>
             <p className="text-xs text-foreground-light pt-1">
-              Listen for Database inserts, updates, deletes and more
+              {config.enableDbChanges
+                ? 'Listen for Database inserts, updates, deletes and more'
+                : 'Enable realtime publications to listen for database changes'}
             </p>
           </div>
 
-          {tempConfig.enableDbChanges && (
+          {tempConfig.enableDbChanges && config.enableDbChanges && (
             <>
               <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
                 Filter messages from database changes
@@ -180,7 +195,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                     className="underline"
                     target="_blank"
                     rel="noreferrer"
-                    href="https://supabase.com/docs/guides/realtime/postgres-changes#available-filters"
+                    href={`${DOCS_URL}/guides/realtime/postgres-changes#available-filters`}
                   >
                     our docs
                   </Link>

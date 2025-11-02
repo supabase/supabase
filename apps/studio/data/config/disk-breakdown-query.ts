@@ -6,7 +6,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DiskBreakdownVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 type DiskBreakdownResult = {
@@ -52,8 +52,9 @@ export const useDiskBreakdownQuery = <TData = DiskBreakdownData>(
   { projectRef, connectionString }: DiskBreakdownVariables,
   { enabled = true, ...options }: UseQueryOptions<DiskBreakdownData, DiskBreakdownError, TData> = {}
 ) =>
-  useQuery<DiskBreakdownData, DiskBreakdownError, TData>(
-    configKeys.diskBreakdown(projectRef),
-    ({ signal }) => getDiskBreakdown({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DiskBreakdownData, DiskBreakdownError, TData>({
+    queryKey: configKeys.diskBreakdown(projectRef),
+    queryFn: ({ signal }) => getDiskBreakdown({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

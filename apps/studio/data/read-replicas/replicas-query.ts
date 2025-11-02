@@ -1,6 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { IS_PLATFORM } from 'common'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -34,12 +33,22 @@ export const useReadReplicasQuery = <TData = ReadReplicasData>(
   { projectRef }: ReadReplicasVariables,
   { enabled = true, ...options }: UseQueryOptions<ReadReplicasData, ReadReplicasError, TData> = {}
 ) => {
-  return useQuery<ReadReplicasData, ReadReplicasError, TData>(
-    replicaKeys.list(projectRef),
-    ({ signal }) => getReadReplicas({ projectRef }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<ReadReplicasData, ReadReplicasError, TData>({
+    queryKey: replicaKeys.list(projectRef),
+    queryFn: ({ signal }) => getReadReplicas({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
+}
+
+export const usePrimaryDatabase = ({ projectRef }: { projectRef?: string }) => {
+  const {
+    data: databases = [],
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useReadReplicasQuery({ projectRef })
+  const primaryDatabase = databases.find((x) => x.identifier === projectRef)
+  return { database: primaryDatabase, error, isLoading, isError, isSuccess }
 }

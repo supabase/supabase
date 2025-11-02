@@ -8,7 +8,7 @@
 #    docker builder prune
 #    docker build . -f apps/studio/Dockerfile --target production -t studio:latest --no-cache
 
-FROM node:20-slim AS base
+FROM node:22-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
@@ -23,7 +23,7 @@ RUN apt-get update -qq && \
   rm -rf /var/lib/apt/lists/* && \
   update-ca-certificates
 
-RUN npm install -g pnpm@9.15.5
+RUN npm install -g pnpm@10.16.1
 
 WORKDIR /app
 

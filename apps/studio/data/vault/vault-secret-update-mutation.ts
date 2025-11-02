@@ -8,7 +8,7 @@ import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
 } & Partial<VaultSecret>
 
@@ -18,14 +18,13 @@ export async function updateVaultSecret({
   id,
   ...payload
 }: VaultSecretUpdateVariables) {
-  const { name, description, secret, key_id } = payload
+  const { name, description, secret } = payload
   const sql = /* SQL */ `
 select vault.update_secret(
     secret_id := ${quoteLiteral(id)}
   ${secret ? `, new_secret := ${quoteLiteral(secret)}` : ''}
   ${name ? `, new_name := ${quoteLiteral(name)}` : ''}
   ${description ? `, new_description := ${quoteLiteral(description)}` : ''}
-  ${key_id ? `, new_key_id := ${quoteLiteral(key_id)}` : ''}
 )
 `
 
@@ -45,25 +44,23 @@ export const useVaultSecretUpdateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>(
-    (vars) => updateVaultSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { id, projectRef } = variables
-        await Promise.all([
-          queryClient.removeQueries(vaultSecretsKeys.getDecryptedValue(projectRef, id)),
-          queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>({
+    mutationFn: (vars) => updateVaultSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { id, projectRef } = variables
+      await Promise.all([
+        queryClient.removeQueries({ queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id) }),
+        queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

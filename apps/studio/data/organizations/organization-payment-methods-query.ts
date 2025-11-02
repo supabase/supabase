@@ -3,7 +3,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
@@ -44,13 +44,14 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
     ...options
   }: UseQueryOptions<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData> = {}
 ) => {
-  const canReadSubscriptions = useCheckPermissions(
+  const { can: canReadSubscriptions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.payment_methods'
   )
-  return useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>(
-    organizationKeys.paymentMethods(slug),
-    ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
-    { enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions, ...options }
-  )
+  return useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>({
+    queryKey: organizationKeys.paymentMethods(slug),
+    queryFn: ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions,
+    ...options,
+  })
 }

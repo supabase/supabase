@@ -1,93 +1,69 @@
 ---
-id: 'replication'
-title: 'Replication'
-slug: 'replication'
+title: 'Replication and change data capture'
+description: 'An introduction to logical replication and change data capture'
 ---
 
-Replication is a technique for copying the data from one database to another. Supabase uses replication functionality to provide a real-time API. Replication is useful for:
+Replication is the process of copying changes from your database to another location. It's also referred to as change data capture (CDC): capturing all the changes that occur to your data.
 
-- Spreading out the "load." For example, if your database has a lot of reads, you might want to split it between two databases.
-- Reducing latency. For example, you may want one database in London to serve your European customers, and one in New York to serve the US.
+## Use cases
 
-Replication is done through _publications_, a method of choosing which changes to send to other systems (usually another Postgres database). Publications can be managed in the [Dashboard](https://supabase.com/dashboard) or with SQL.
+You might use replication for:
 
-## Manage publications in the dashboard
+- **Analytics and Data Warehousing**: Replicate your operational database to analytics platforms like BigQuery for complex analysis without impacting your application's performance.
+- **Data Integration**: Keep your data synchronized across different systems and services in your tech stack.
+- **Backup and Disaster Recovery**: Maintain up-to-date copies of your data in different locations.
+- **Read Scaling**: Distribute read operations across multiple database instances to improve performance.
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
-2. Click on **Publications** in the sidebar.
-3. Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
-4. Control which tables broadcast changes by selecting **Source** and toggling each table.
+## Replication in Postgres
 
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
-    type="video/mp4"
-  />
-</video>
+Postgres comes with built-in support for replication via publications and replication slots. Refer to the [Concepts and terms](#concepts-and-terms) section to learn how replication works.
 
-## Create a publication
+## Setting up and monitoring replication in Supabase
 
-This publication contains changes to all tables.
+- [Setting up replication](/docs/guides/database/replication/setting-up-replication)
+- [Monitoring replication](/docs/guides/database/replication/monitoring-replication)
 
-```sql
-create publication publication_name
-for all tables;
-```
+<Admonition type="tip">
 
-## Create a publication to listen to individual tables
+If you want to set up a read replica, see [Read Replicas](/docs/guides/platform/read-replicas) instead. If you want to sync your data in real time to a client such as a browser or mobile app, see [Realtime](/docs/guides/realtime) instead. For configuring replication to an ETL destination, use the [Dashboard](/dashboard/project/_/database/replication).
 
-```sql
-create publication publication_name
-for table table_one, table_two;
-```
+</Admonition>
 
-## Add tables to an existing publication
+## Concepts and terms
 
-```sql
-alter publication publication_name
-add table table_name;
-```
+### Write-Ahead Log (WAL)
 
-## Listen to `insert`
+Postgres uses a system called the Write-Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL (which is a series of files (also called "segments"), where the file size can be specified). Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
 
-```sql
-create publication publication_name
-for all tables
-with (publish = 'insert');
-```
+### Logical replication and WAL
 
-## Listen to `update`
+Logical replication is a method of replication where Postgres uses the WAL files and transmit those changes to another Postgres database, or a system that supports reading WAL files.
 
-```sql
-create publication publication_name
-for all tables
-with (publish = 'update');
-```
+### LSN
 
-## Listen to `delete`
+LSN is a Log Sequence Number that is used to identify the position of a WAL file in the WAL directory. It is often used to determine the progress of replication in subscribers and calculate the lag of a replication slot.
 
-```sql
-create publication publication_name
-for all tables
-with (publish = 'delete');
-```
+## Logical replication architecture
 
-## Remove a publication
+When setting up logical replication, three key components are involved:
 
-```sql
-drop publication if exists publication_name;
-```
+- `publication` - A set of tables on your primary database that will be `published`
+- `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
+- `subscription` - A subscription is created from an external system (i.e. another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
 
-## Recreate a publication
+## Logical replication output format
 
-If you're recreating a publication, it's best to do it in a transaction to ensure the operation succeeds.
+Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgres sends changes to any active replication slot.
 
-```sql
-begin;
-  -- remove the realtime publication
-  drop publication if exists publication_name;
+## Logical replication configuration
 
-  -- re-create the publication but don't enable it for any tables
-  create publication publication_name;
-commit;
-```
+When using logical replication, Postgres is then configured to keep WAL files around for longer than it needs them. If the files are removed too quickly, then your `replication slot` will become inactive and, if the database receives a large number of changes in a short time, then the `replication slot` can become lost as it was not able to keep up.
+
+In order to mitigate this, Postgres has many options and settings that can be [tweaked](/docs/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
+
+| Setting                                                                                  | Description                                            | User-facing | Default |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------- | ------- |
+| [`max_replication_slots`](https://postgresqlco.nf/doc/en/param/max_replication_slots/)   | Max count of replication slots allowed                 | No          |         |
+| [`wal_keep_size`](https://postgresqlco.nf/doc/en/param/wal_keep_size/)                   | Minimum size of WAL files to keep for replication      | No          |         |
+| [`max_slot_wal_keep_size`](https://postgresqlco.nf/doc/en/param/max_slot_wal_keep_size/) | Max WAL size that can be reserved by replication slots | No          |         |
+| [`checkpoint_timeout`](https://postgresqlco.nf/doc/en/param/checkpoint_timeout/)         | Max time between WAL checkpoints                       | No          |         |

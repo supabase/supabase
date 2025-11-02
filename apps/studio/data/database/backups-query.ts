@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
 import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
@@ -32,11 +32,12 @@ export const useBackupsQuery = <TData = BackupsData>(
   { enabled = true, ...options }: UseQueryOptions<BackupsData, BackupsError, TData> = {}
 ) => {
   // [Joshen] Check for specifically false to account for project not loaded yet
-  const isOrioleDb = useIsOrioleDb()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
 
-  return useQuery<BackupsData, BackupsError, TData>(
-    databaseKeys.backups(projectRef),
-    ({ signal }) => getBackups({ projectRef }, signal),
-    { enabled: enabled && isOrioleDb === false && typeof projectRef !== 'undefined', ...options }
-  )
+  return useQuery<BackupsData, BackupsError, TData>({
+    queryKey: databaseKeys.backups(projectRef),
+    queryFn: ({ signal }) => getBackups({ projectRef }, signal),
+    enabled: enabled && !isOrioleDbInAws && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }

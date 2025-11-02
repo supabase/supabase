@@ -1,57 +1,18 @@
 import { noop } from 'lodash'
+import { useQueryState } from 'nuqs'
+import {
+  PropsWithChildren,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { EMPTY_OBJ } from 'lib/void'
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
-import { APISidePanelPreview } from './APISidePanelPreview'
-import { CLSPreview } from './CLSPreview'
-import { InlineEditorPreview } from './InlineEditorPreview'
-import { LayoutUpdatePreview } from './LayoutUpdatePreview'
-import { SqlEditorTabsPreview } from './SqlEditorTabs'
-import { TableEditorTabsPreview } from './TableEditorTabs'
-
-export const FEATURE_PREVIEWS = [
-  {
-    key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
-    name: 'Layout Update for Organizations',
-    content: <LayoutUpdatePreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    isNew: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    name: 'Inline SQL Editor',
-    content: <InlineEditorPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
-    isNew: true,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
-    name: 'Table Editor Tabs',
-    content: <TableEditorTabsPreview />,
-    isNew: true,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
-    name: 'SQL Editor Tabs',
-    content: <SqlEditorTabsPreview />,
-    isNew: true,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-    name: 'Project API documentation',
-    content: <APISidePanelPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    isNew: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
-    name: 'Column-level privileges',
-    content: <CLSPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
-    isNew: false,
-  },
-]
+import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -66,6 +27,16 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
+  const { hasLoaded } = useContext(FeatureFlagContext)
+
+  // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
+  const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
+    switch (feature.key) {
+      default:
+        return false
+    }
+  }
+
   const [flags, setFlags] = useState(() =>
     FEATURE_PREVIEWS.reduce((a, b) => {
       return { ...a, [b.key]: false }
@@ -76,11 +47,16 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     if (typeof window !== 'undefined') {
       setFlags(
         FEATURE_PREVIEWS.reduce((a, b) => {
-          return { ...a, [b.key]: localStorage.getItem(b.key) === 'true' }
+          const defaultOptIn = isDefaultOptIn(b)
+          const localStorageValue = localStorage.getItem(b.key)
+          return {
+            ...a,
+            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+          }
         }, {})
       )
     }
-  }, [])
+  }, [hasLoaded])
 
   const value = {
     flags,
@@ -113,17 +89,123 @@ export const useIsInlineEditorEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
 }
 
-export const useIsTableEditorTabsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
+export const useUnifiedLogsPreview = () => {
+  const { flags, onUpdateFlag } = useFeaturePreviewContext()
+
+  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+
+  const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
+  const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
+
+  return { isEnabled, enable, disable }
 }
 
-export const useIsSQLEditorTabsEnabled = () => {
+export const useIsBranching2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
 }
 
-export const useNewLayout = (): boolean => {
+export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+}
+
+export const useIsNewStorageUIEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]
+}
+
+export const useIsSecurityNotificationsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]
+}
+
+export const useFeaturePreviewModal = () => {
+  const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
+
+  const gitlessBranchingEnabled = useFlag('gitlessBranching')
+  const advisorRulesEnabled = useFlag('advisorRules')
+  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const isNewStorageUIAvailable = useFlag('storageAnalyticsVector')
+  const isSecurityNotificationsAvailable = useFlag('securityNotifications')
+
+  const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
+  const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
+
+  // [Joshen] Use this if we want to feature flag previews
+  const isFeaturePreviewReleasedToPublic = useCallback(
+    (feature: (typeof FEATURE_PREVIEWS)[number]) => {
+      switch (feature.key) {
+        case 'supabase-ui-branching-2-0':
+          return gitlessBranchingEnabled
+        case 'supabase-ui-advisor-rules':
+          return advisorRulesEnabled
+        case 'supabase-ui-preview-unified-logs':
+          return isUnifiedLogsPreviewAvailable
+        case 'new-storage-ui':
+          return isNewStorageUIAvailable
+        case 'security-notifications':
+          return isSecurityNotificationsAvailable
+        default:
+          return true
+      }
+    },
+    [
+      gitlessBranchingEnabled,
+      advisorRulesEnabled,
+      isUnifiedLogsPreviewAvailable,
+      isNewStorageUIAvailable,
+      isSecurityNotificationsAvailable,
+    ]
+  )
+
+  const selectedFeatureKey = (
+    !selectedFeatureKeyFromQuery
+      ? FEATURE_PREVIEWS.filter((feature) => isFeaturePreviewReleasedToPublic(feature))[0].key
+      : selectedFeatureKeyFromQuery
+  ) as (typeof FEATURE_PREVIEWS)[number]['key']
+
+  const selectFeaturePreview = useCallback(
+    (featureKey: (typeof FEATURE_PREVIEWS)[number]['key']) => {
+      setFeaturePreviewModal(featureKey)
+    },
+    [setFeaturePreviewModal]
+  )
+
+  const openFeaturePreviewModal = useCallback(() => {
+    selectFeaturePreview(selectedFeatureKey)
+  }, [selectFeaturePreview, selectedFeatureKey])
+
+  const closeFeaturePreviewModal = useCallback(() => {
+    setFeaturePreviewModal(null)
+  }, [setFeaturePreviewModal])
+
+  const toggleFeaturePreviewModal = useCallback(() => {
+    if (showFeaturePreviewModal) {
+      closeFeaturePreviewModal()
+    } else {
+      openFeaturePreviewModal()
+    }
+  }, [showFeaturePreviewModal, openFeaturePreviewModal, closeFeaturePreviewModal])
+
+  return useMemo(
+    () => ({
+      showFeaturePreviewModal,
+      selectedFeatureKey,
+      selectFeaturePreview,
+      openFeaturePreviewModal,
+      closeFeaturePreviewModal,
+      toggleFeaturePreviewModal,
+      isFeaturePreviewReleasedToPublic,
+    }),
+    [
+      showFeaturePreviewModal,
+      selectedFeatureKey,
+      selectFeaturePreview,
+      openFeaturePreviewModal,
+      closeFeaturePreviewModal,
+      toggleFeaturePreviewModal,
+      isFeaturePreviewReleasedToPublic,
+    ]
+  )
 }

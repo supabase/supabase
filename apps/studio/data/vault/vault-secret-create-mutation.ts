@@ -8,7 +8,7 @@ import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
 } & Partial<VaultSecret>
 
 export async function createVaultSecret({
@@ -16,13 +16,12 @@ export async function createVaultSecret({
   connectionString,
   ...newSecret
 }: VaultSecretCreateVariables) {
-  const { name, description, secret, key_id } = newSecret
+  const { name, description, secret } = newSecret
   const sql = /* SQL */ `
 select vault.create_secret(
     new_secret := ${quoteLiteral(secret)}
   ${name ? `, new_name := ${quoteLiteral(name)}` : ''}
   ${description ? `, new_description := ${quoteLiteral(description)}` : ''}
-  ${key_id ? `, new_key_id := ${quoteLiteral(key_id)}` : ''}
 )
 `
 
@@ -42,22 +41,20 @@ export const useVaultSecretCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VaultSecretCreateData, ResponseError, VaultSecretCreateVariables>(
-    (vars) => createVaultSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create secret: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<VaultSecretCreateData, ResponseError, VaultSecretCreateVariables>({
+    mutationFn: (vars) => createVaultSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create secret: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

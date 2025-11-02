@@ -7,7 +7,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueMessageSendVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   queueName: string
   payload: string
   delay: number
@@ -50,12 +50,13 @@ export const useDatabaseQueueMessageSendMutation = ({
     DatabaseQueueMessageSendData,
     ResponseError,
     DatabaseQueueMessageSendVariables
-  >((vars) => sendDatabaseQueueMessage(vars), {
+  >({
+    mutationFn: (vars) => sendDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queueName } = variables
-      await queryClient.invalidateQueries(
-        databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

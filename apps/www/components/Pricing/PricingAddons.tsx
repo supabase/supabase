@@ -83,7 +83,9 @@ const AddonCard = ({ addon }: any) => {
 
       <div className="p-4 gap-4 flex flex-col justify-center">
         <div className="flex flex-col gap-2">
-          <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
+          <p className="text-[13px] text-foreground-lighter" translate="no">
+            {addon.price}
+          </p>
           <div className="flex items-center gap-2">
             <h3 className="text-foreground text-2xl">{addon.name}</h3>
           </div>
@@ -126,7 +128,9 @@ const AddonCard = ({ addon }: any) => {
       </div>
       <div className="p-4 lg:pl-0 lg:-ml-2 xl:ml-0 gap-4 col-span-2">
         <div className="flex flex-col gap-2">
-          <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
+          <p className="text-[13px] text-foreground-lighter" translate="no">
+            {addon.price}
+          </p>
           <div className="flex items-center gap-2">
             <Image
               src={`${basePath}/images/pricing/${addon.icon}${

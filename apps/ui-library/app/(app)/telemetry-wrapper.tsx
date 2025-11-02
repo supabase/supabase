@@ -2,10 +2,10 @@
 
 import { API_URL } from '@/lib/constants'
 import { IS_PLATFORM, PageTelemetry } from 'common'
-import { useConsent } from 'ui-patterns/ConsentToast'
+import { useConsentToast } from 'ui-patterns/consent'
 
 export const TelemetryWrapper = () => {
-  const { hasAcceptedConsent } = useConsent()
+  const { hasAcceptedConsent } = useConsentToast()
   return (
     <PageTelemetry
       API_URL={API_URL}
