@@ -23,7 +23,7 @@ content_path = "./supabase/templates/invite.html"
 <html>
   <body>
     <h2>Confirm your sign up</h2>
-    <p><a href="{{ .ConfirmationURL }}">Confirm your email</a></p>
+    <p><a href="{{ .ConfirmationURL }}">Confirm your sign up</a></p>
   </body>
 </html>
 ```
@@ -50,14 +50,14 @@ There are several Auth email templates which can be configured. Each template se
 
 ### `auth.email.template.recovery`
 
-**Default subject**: "Reset Your Password"
+**Default subject**: "Reset your password"
 **When sent**: When a user requests a password reset
 **Purpose**: Password recovery flow for users who forgot their password
 **Content**: Contains a link to reset the user's password
 
 ### `auth.email.template.magic_link`
 
-**Default subject**: "Your Magic Link"
+**Default subject**: "Your magic link"
 **When sent**: When a user requests a magic link for passwordless authentication
 **Purpose**: Passwordless login using email links
 **Content**: Contains a secure link that automatically logs the user in when clicked
@@ -111,10 +111,10 @@ Contains a hashed version of the `Token`. This is useful for constructing your o
 **Usage**
 
 ```html
-<p>Follow this link to confirm your user:</p>
+<p>Follow this link to confirm your sign up:</p>
 <p>
   <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
-    >Confirm your email</a
+    >Confirm your sign up</a
   >
 </p>
 ```

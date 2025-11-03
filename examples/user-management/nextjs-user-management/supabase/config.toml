@@ -91,7 +91,7 @@ subject = "Confirm Your Email"
 content_path = "./supabase/auth/email/confirmation.html"
 
 [auth.email.template.magic_link]
-subject = "Your Magic Link"
+subject = "Your magic link"
 content_path = "./supabase/auth/email/magic-link.html"
 
 [storage.buckets.avatars]

@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Code, Monitor } from 'lucide-react'
 import { editor } from 'monaco-editor'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -6,9 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
@@ -23,6 +22,10 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -61,8 +64,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
   const { id, properties } = template
 
-  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
-
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as keyof typeof authConfig
   const messageProperty = properties[messageSlug]
   const builtInSMTP =
@@ -74,7 +75,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
-  const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
@@ -142,7 +142,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               {
                 onSuccess: () => {
                   setIsSavingTemplate(false)
-                  toast.success('Successfully updated email template')
+                  toast.success('Successfully updated settings')
                   setHasUnsavedChanges(false) // Reset the unsaved changes state
                 },
               }
@@ -254,10 +254,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   name={x}
                   render={({ field }) => (
                     <FormItemLayout
-                      className={
-                        isSecurityNotificationsEnabled ? 'md:py-2 md:items-center' : 'gap-y-3'
-                      }
-                      layout={isSecurityNotificationsEnabled ? 'flex-row-reverse' : 'flex-col'}
                       label={property.title}
                       description={
                         property.description ? (
@@ -275,12 +271,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       }
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          id={x}
-                          {...field}
-                          disabled={!canUpdateConfig}
-                          className={`w-full ${isSecurityNotificationsEnabled && 'md:min-w-[300px] lg:min-w-[512px]'}`}
-                        />
+                        <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -293,80 +284,76 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
         {messageProperty && (
           <>
-            <CardContent className="flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-2">
-                <Label_Shadcn_>Body</Label_Shadcn_>
-                <TwoOptionToggle
-                  width={60}
-                  options={['preview', 'source']}
-                  activeOption={activeView}
-                  onClickOption={(option: 'source' | 'preview') => setActiveView(option)}
-                  borderOverride="border-muted"
-                />
-              </div>
-              {activeView === 'source' ? (
-                <>
-                  <div className="overflow-hidden rounded-md border dark:border-control overflow-hidden [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:!bg-surface-200/30 [&_.monaco-editor_.margin]:!bg-surface-200/30 dark:[&_.monaco-editor-background]:!bg-surface-300 dark:[&_.monaco-editor_.margin]:!bg-surface-300">
-                    <CodeEditor
-                      id="code-id"
-                      language="html"
-                      isReadOnly={!canUpdateConfig}
-                      className="!mb-0 relative h-96 outline-none outline-offset-0 outline-width-0 outline-0"
-                      onInputChange={(e: string | undefined) => {
-                        setBodyValue(e ?? '')
-                        if (bodyValue !== e) setHasUnsavedChanges(true)
-                      }}
-                      options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
-                      value={bodyValue}
-                      editorRef={editorRef}
-                    />
-                  </div>
+            <CardContent className="p-0">
+              <Label_Shadcn_ className="p-6 pb-4 block">Message body</Label_Shadcn_>
+              <Tabs_Shadcn_ defaultValue="source">
+                <TabsList_Shadcn_ className="gap-3 px-6">
+                  <TabsTrigger_Shadcn_ value="source" className="gap-2">
+                    <Code size={14} />
+                    Source
+                  </TabsTrigger_Shadcn_>
+                  <TabsTrigger_Shadcn_ value="preview" className="gap-2">
+                    <Monitor size={14} />
+                    Preview
+                  </TabsTrigger_Shadcn_>
+                </TabsList_Shadcn_>
+                <TabsContent_Shadcn_ value="source" className="p-0 mt-0">
+                  <CodeEditor
+                    id="code-id"
+                    language="html"
+                    isReadOnly={!canUpdateConfig}
+                    className="!mb-0 relative h-96 overflow-hidden p-0"
+                    onInputChange={(e: string | undefined) => {
+                      setBodyValue(e ?? '')
+                      if (bodyValue !== e) setHasUnsavedChanges(true)
+                    }}
+                    options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
+                    value={bodyValue}
+                    editorRef={editorRef}
+                  />
                   {messageVariables.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {messageVariables.map(({ variable, description }) => (
-                        <Tooltip key={variable}>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="outline"
-                              size="tiny"
-                              className="rounded-full"
-                              onClick={() => insertTextAtCursor(variable)}
-                            >
-                              {variable}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">
-                            <p>{description || 'Variable description not available'}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      ))}
+                    <div className="px-6 py-3 border-t bg-surface-200">
+                      <div className="flex flex-wrap gap-1">
+                        {messageVariables.map(({ variable, description }) => (
+                          <Tooltip key={variable}>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="outline"
+                                size="tiny"
+                                className="rounded-full"
+                                onClick={() => insertTextAtCursor(variable)}
+                              >
+                                {variable}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              <p>{description || 'Variable description not available'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ))}
+                      </div>
                     </div>
                   )}
-                </>
-              ) : (
-                <>
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_ value="preview" className="pt-0 mt-0">
                   <iframe
-                    className="!mb-0 mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
+                    className="!mb-0 mt-0 overflow-hidden h-96 w-full"
                     title={id}
                     srcDoc={bodyValue}
                     sandbox="allow-scripts allow-forms"
                   />
                   <Admonition
                     type="default"
-                    title="Email rendering may differ"
-                    description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
+                    title="The preview may differ slightly from the actual rendering in the email client"
+                    className="rounded-none border-0 mb-0"
                   />
-                </>
-              )}
+                </TabsContent_Shadcn_>
+              </Tabs_Shadcn_>
             </CardContent>
-
-            {spamRules.length > 0 && (
-              <CardContent>
-                <SpamValidation validationResult={validationResult} />
-              </CardContent>
-            )}
-
-            <CardFooter className="flex flex-row justify-end gap-2">
+            <CardContent>
+              <SpamValidation validationResult={validationResult} />
+            </CardContent>
+            <CardFooter className="justify-end space-x-2">
               {hasChanges && (
                 <Button
                   type="default"

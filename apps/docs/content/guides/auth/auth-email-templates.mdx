@@ -49,15 +49,15 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   -H "Content-Type: application/json" \
   -d '{
       "mailer_subjects_confirmation": "Confirm your sign up",
-      "mailer_templates_confirmation_content": "<h2>Confirm your sign up</h2><p>Follow this link to confirm your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm your email</a></p>",
-      "mailer_subjects_magic_link": "Your Magic Link",
-      "mailer_templates_magic_link_content": "<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href=\"{{ .ConfirmationURL }}\">Log In</a></p>",
-      "mailer_subjects_recovery": "Rest Your Password",
-      "mailer_templates_recovery_content": "<h2>Reset Password</h2><p>Follow this link to reset the password for your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Reset Password</a></p>",
+      "mailer_templates_confirmation_content": "<h2>Confirm your sign up</h2><p>Follow this link to confirm your sign up:</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm your sign up</a></p>",
+      "mailer_subjects_magic_link": "Your magic link",
+      "mailer_templates_magic_link_content": "<h2>Magic link</h2><p>Follow this link to login:</p><p><a href=\"{{ .ConfirmationURL }}\">Log in</a></p>",
+      "mailer_subjects_recovery": "Reset your password",
+      "mailer_templates_recovery_content": "<h2>Reset password</h2><p>Follow this link to reset your password:</p><p><a href=\"{{ .ConfirmationURL }}\">Reset password</a></p>",
       "mailer_subjects_invite": "You have been invited",
-      "mailer_templates_invite_content": "<h2>You have been invited</h2><p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p><p><a href=\"{{ .ConfirmationURL }}\">Accept the invite</a></p>",
-      "mailer_subjects_email_change": "Confirm email change",
-      "mailer_templates_email_change_content": "<h2>Confirm email change</h2><p>Follow this link to confirm the update of your email:</p><p><a href=\"{{ .ConfirmationURL }}\">Change email</a></p>",
+      "mailer_templates_invite_content": "<h2>You have been invited</h2><p>You have been invited to create an account on {{ .SiteURL }}. Follow this link to accept the invite:</p><p><a href=\"{{ .ConfirmationURL }}\">Accept the invite</a></p>",
+      "mailer_subjects_email_change": "Confirm your email address change",
+      "mailer_templates_email_change_content": "<h2>Confirm email change</h2><p>Follow this link to confirm that you would like to change your email address:</p><p><a href=\"{{ .ConfirmationURL }}\">Change email address</a></p>",
   }'
 ```
 
@@ -79,7 +79,7 @@ To guard against this there are the options below:
 - Create your own custom email link to redirect the user to a page where they can enter with their email and token to login
 
 ```html
-<a href="{{ .SiteURL }}/confirm-signup">Confirm your sign up</a>
+<a href="{{ .SiteURL }}/confirm-sign-up">Confirm your sign up</a>
 ```
 
 - Log them in by verifying the OTP token value with their email e.g. with [`supabase.auth.verifyOtp`](/docs/reference/javascript/auth-verifyotp) show below
@@ -93,7 +93,7 @@ const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'ema
 - Create your own custom email link to redirect the user to a page where they can click on a button to confirm the action
 
 ```html
-<a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}"
+<a href="{{ .SiteURL }}/confirm-sign-up?confirmation_url={{ .ConfirmationURL }}"
   >Confirm your sign up</a
 >
 ```
