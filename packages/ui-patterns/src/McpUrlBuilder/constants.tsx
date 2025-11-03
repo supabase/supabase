@@ -119,7 +119,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'claude-code',
     label: 'Claude Code',
     icon: 'claude',
-    configFile: '~/.claude.json',
+    configFile: '.mcp.json',
     externalDocsUrl: 'https://docs.anthropic.com/en/docs/claude-code/mcp',
     transformConfig: (config): ClaudeCodeMcpConfig => {
       return {
@@ -133,11 +133,11 @@ export const MCP_CLIENTS: McpClient[] = [
     },
     alternateInstructions: (_config) => {
       const config = _config as ClaudeCodeMcpConfig
-      const command = `claude mcp add --transport http supabase "${config.mcpServers.supabase.url}"`
+      const command = `claude mcp add --scope project --transport http supabase "${config.mcpServers.supabase.url}"`
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
-            Alternatively, add the MCP server using the command line:
+            Alternatively, add the MCP server to your project config using the command line:
           </p>
           <CodeBlock
             value={command}
