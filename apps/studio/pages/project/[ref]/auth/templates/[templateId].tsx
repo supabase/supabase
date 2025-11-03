@@ -44,34 +44,6 @@ const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
 }
 
-interface OverridingSettingAdmonitionProps {
-  relatedSetting: {
-    name: string
-    path: string
-  }
-  projectRef: string
-  inline?: boolean
-}
-
-const OverridingSettingAdmonition = ({
-  relatedSetting,
-  projectRef,
-  inline = false,
-}: OverridingSettingAdmonitionProps) => {
-  return (
-    <Admonition
-      type="warning"
-      title="Overriding setting"
-      description={`This email will not be sent to users as ${inline ? '' : 'the '}"${relatedSetting.name}"${inline ? '' : ' setting'} is disabled.`}
-      className={`bg-warning-200 border-warning-400 ${inline ? 'm-0 border-none rounded-none' : ''}`}
-    >
-      <Button asChild type="default" className="mt-2">
-        <Link href={`/project/${projectRef}/${relatedSetting.path}`}>Edit setting</Link>
-      </Button>
-    </Admonition>
-  )
-}
-
 const RedirectToTemplates = () => {
   const router = useRouter()
   const { templateId, ref } = router.query
@@ -104,9 +76,6 @@ const RedirectToTemplates = () => {
     templateId && typeof templateId === 'string'
       ? TEMPLATES_SCHEMAS.find((template) => slugifyTitle(template.title) === templateId)
       : null
-
-  // Temporarily hardcoded to just check the hardcoded setting name, in the future we will check the actual setting of this value
-  const hasOverridingRelatedSetting = Boolean(template?.misc?.relatedSetting)
 
   // Convert templateId slug to one lowercase word to match docs anchor tag
   const templateIdForDocs =
@@ -239,15 +208,6 @@ const RedirectToTemplates = () => {
                           )}
                         />
                       </CardContent>
-                      {hasOverridingRelatedSetting && (
-                        <CardContent className="p-0">
-                          <OverridingSettingAdmonition
-                            relatedSetting={template.misc.relatedSetting}
-                            projectRef={ref as string}
-                            inline
-                          />
-                        </CardContent>
-                      )}
                       <CardFooter className="justify-end space-x-2">
                         {templateForm.formState.isDirty && (
                           <Button type="default" onClick={() => templateForm.reset()}>
@@ -270,16 +230,9 @@ const RedirectToTemplates = () => {
                 </Form_Shadcn_>
               </ScaffoldSection>
             )}
-            {!showConfigurationSection && hasOverridingRelatedSetting && (
-              <ScaffoldSection isFullWidth>
-                <OverridingSettingAdmonition
-                  relatedSetting={template.misc.relatedSetting}
-                  projectRef={ref as string}
-                />
-              </ScaffoldSection>
-            )}
+
             <ScaffoldSection isFullWidth>
-              {/* Only show title if there is an overriding related setting, as that causes multiple sections to be shown */}
+              {/* Only show title if there is an another section above */}
               {showConfigurationSection && (
                 <ScaffoldSectionTitle className="mb-4">Contents</ScaffoldSectionTitle>
               )}

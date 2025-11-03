@@ -34,10 +34,6 @@ const CONFIRMATION: FormSchema = {
   }),
   misc: {
     emailTemplateType: 'authentication',
-    relatedSetting: {
-      name: 'Confirm email',
-      path: 'auth/providers',
-    },
   },
 }
 
