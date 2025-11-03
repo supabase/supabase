@@ -193,7 +193,7 @@ const RedirectToTemplates = () => {
                             <FormItemLayout
                               layout="flex-row-reverse"
                               label="Enable this template"
-                              description="Control whether users will receive this email notification."
+                              description="Control if users receive this email when the corresponding event is triggered."
                             >
                               <FormControl_Shadcn_>
                                 <Switch
@@ -209,8 +209,8 @@ const RedirectToTemplates = () => {
                       <CardContent className="p-0">
                         <Admonition
                           type="warning"
-                          title="Ignored until the corresponding setting is enabled"
-                          description={`This email notification will not be sent until the “${template.title}” setting is enabled.`}
+                          title="Overriding setting"
+                          description={`This email will not be sent to users as “${template.title}” is disabled.`}
                           className="bg-warning-200 border-warning-400 m-0 border-none rounded-none"
                         >
                           <Button asChild type="default" className="mt-2">
