@@ -1,12 +1,12 @@
-import { useIsLoggedIn, useParams } from 'common'
 import jsonLogic from 'json-logic-js'
+import { useMemo } from 'react'
 
+import { useIsLoggedIn, useParams } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
 import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import { useSelectedProjectQuery } from './useSelectedProject'
-import { useMemo } from 'react'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`

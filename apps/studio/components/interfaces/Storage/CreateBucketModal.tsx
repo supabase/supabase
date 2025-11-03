@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { snakeCase } from 'lodash'
-import { Edit } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
+import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticsBucketDetails/useIcebergWrapper'
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -51,7 +51,9 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
+import { BUCKET_TYPES } from './Storage.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
 const FormSchema = z
@@ -95,10 +97,23 @@ const formId = 'create-storage-bucket-form'
 
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
-export const CreateBucketModal = () => {
+interface CreateBucketModalProps {
+  buttonSize?: 'tiny' | 'small'
+  buttonType?: 'default' | 'primary'
+  buttonClassName?: string
+  label?: string
+}
+
+export const CreateBucketModal = ({
+  buttonSize = 'tiny',
+  buttonType = 'default',
+  buttonClassName,
+  label = 'New bucket',
+}: CreateBucketModalProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
+  const isStorageV2 = useIsNewStorageUIEnabled()
 
   const [visible, setVisible] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
@@ -116,6 +131,8 @@ export const CreateBucketModal = () => {
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
+
+  const config = BUCKET_TYPES['files']
 
   const form = useForm<CreateBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -135,7 +152,7 @@ export const CreateBucketModal = () => {
   const isStandardBucket = form.watch('type') === 'STANDARD'
   const hasFileSizeLimit = form.watch('has_file_size_limit')
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
-  const icebergWrapperExtensionState = useIcebergWrapperExtension()
+  const { state: icebergWrapperExtensionState } = useIcebergWrapperExtension()
   const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
@@ -189,7 +206,7 @@ export const CreateBucketModal = () => {
 
       setSelectedUnit(StorageSizeUnits.MB)
       setVisible(false)
-      router.push(`/project/${ref}/storage/buckets/${values.name}`)
+      if (!isStorageV2) router.push(`/project/${ref}/storage/buckets/${values.name}`)
     } catch (error: any) {
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''
@@ -228,8 +245,10 @@ export const CreateBucketModal = () => {
       <DialogTrigger asChild>
         <ButtonTooltip
           block
-          type="default"
-          icon={<Edit />}
+          size={buttonSize}
+          type={buttonType}
+          className={buttonClassName}
+          icon={<Plus size={14} />}
           disabled={!canCreateBuckets}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
@@ -242,13 +261,13 @@ export const CreateBucketModal = () => {
             },
           }}
         >
-          New bucket
+          {label}
         </ButtonTooltip>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Create storage bucket</DialogTitle>
+          <DialogTitle>Create a {isStorageV2 ? config.singularName : 'storage'} bucket</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
@@ -263,8 +282,8 @@ export const CreateBucketModal = () => {
                 render={({ field }) => (
                   <FormItemLayout
                     name="name"
-                    label="Name of bucket"
-                    labelOptional="Buckets cannot be renamed once created."
+                    label="Bucket name"
+                    labelOptional="Cannot be changed after creation"
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
@@ -281,59 +300,61 @@ export const CreateBucketModal = () => {
                 )}
               />
 
-              <FormField_Shadcn_
-                key="type"
-                name="type"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout label="Bucket type">
-                    <FormControl_Shadcn_>
-                      <RadioGroupStacked
-                        id="type"
-                        value={field.value}
-                        onValueChange={(v) => field.onChange(v)}
-                      >
-                        <RadioGroupStackedItem
-                          id="STANDARD"
-                          value="STANDARD"
-                          label="Standard bucket"
-                          description="Compatible with S3 buckets."
-                          showIndicator={false}
-                        />
-                        {IS_PLATFORM && (
+              {!isStorageV2 && (
+                <FormField_Shadcn_
+                  key="type"
+                  name="type"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout label="Bucket type">
+                      <FormControl_Shadcn_>
+                        <RadioGroupStacked
+                          id="type"
+                          value={field.value}
+                          onValueChange={(v) => field.onChange(v)}
+                        >
                           <RadioGroupStackedItem
-                            id="ANALYTICS"
-                            value="ANALYTICS"
-                            label="Analytics bucket"
+                            id="STANDARD"
+                            value="STANDARD"
+                            label="Standard bucket"
+                            description="Compatible with S3 buckets."
                             showIndicator={false}
-                            disabled={!icebergCatalogEnabled}
-                          >
-                            <>
-                              <p className="text-foreground-light text-left">
-                                Stores Iceberg files and is optimized for analytical workloads.
-                              </p>
+                          />
+                          {IS_PLATFORM && (
+                            <RadioGroupStackedItem
+                              id="ANALYTICS"
+                              value="ANALYTICS"
+                              label="Analytics bucket"
+                              showIndicator={false}
+                              disabled={!icebergCatalogEnabled}
+                            >
+                              <>
+                                <p className="text-foreground-light text-left">
+                                  Stores Iceberg files and is optimized for analytical workloads.
+                                </p>
 
-                              {icebergCatalogEnabled ? null : (
-                                <div className="w-full flex gap-x-2 py-2 items-center">
-                                  <WarningIcon />
-                                  <span className="text-xs text-left">
-                                    This feature is currently in alpha and not yet enabled for your
-                                    project. Sign up{' '}
-                                    <InlineLink href="https://forms.supabase.com/analytics-buckets">
-                                      here
-                                    </InlineLink>
-                                    .
-                                  </span>
-                                </div>
-                              )}
-                            </>
-                          </RadioGroupStackedItem>
-                        )}
-                      </RadioGroupStacked>
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
+                                {icebergCatalogEnabled ? null : (
+                                  <div className="w-full flex gap-x-2 py-2 items-center">
+                                    <WarningIcon />
+                                    <span className="text-xs text-left">
+                                      This feature is currently in alpha and not yet enabled for
+                                      your project. Sign up{' '}
+                                      <InlineLink href="https://forms.supabase.com/analytics-buckets">
+                                        here
+                                      </InlineLink>
+                                      .
+                                    </span>
+                                  </div>
+                                )}
+                              </>
+                            </RadioGroupStackedItem>
+                          )}
+                        </RadioGroupStacked>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
             </DialogSection>
 
             <DialogSectionSeparator />
@@ -529,59 +550,61 @@ export const CreateBucketModal = () => {
             ) : (
               <>
                 {icebergWrapperExtensionState === 'installed' ? (
-                  <Label_Shadcn_ className="text-foreground-lighter leading-1 flex flex-col gap-y-2">
-                    <p>
-                      <span>Supabase will setup a </span>
-                      <a
-                        href={`${BASE_PATH}/project/${ref}/integrations/iceberg_wrapper/overview`}
-                        target="_blank"
-                        className="underline text-foreground-light"
-                      >
-                        foreign data wrapper
-                        {bucketName && <span className="text-brand"> {`${bucketName}_fdw`}</span>}
-                      </a>
-                      <span>
-                        {' '}
-                        for easier access to the data. This action will also create{' '}
+                  <DialogSection>
+                    <Label_Shadcn_ className="text-foreground-lighter leading-1 flex flex-col gap-y-2">
+                      <p>
+                        <span>Supabase will setup a </span>
                         <a
-                          href={`${BASE_PATH}/project/${ref}/storage/access-keys`}
+                          href={`${BASE_PATH}/project/${ref}/integrations/iceberg_wrapper/overview`}
                           target="_blank"
                           className="underline text-foreground-light"
                         >
-                          S3 Access Keys
-                          {bucketName && (
-                            <>
-                              {' '}
-                              named <span className="text-brand"> {`${bucketName}_keys`}</span>
-                            </>
-                          )}
+                          foreign data wrapper
+                          {bucketName && <span className="text-brand"> {`${bucketName}_fdw`}</span>}
                         </a>
-                        <span> and </span>
-                        <a
-                          href={`${BASE_PATH}/project/${ref}/integrations/vault/secrets`}
-                          target="_blank"
-                          className="underline text-foreground-light"
-                        >
-                          four Vault Secrets
-                          {bucketName && (
-                            <>
-                              {' '}
-                              prefixed with{' '}
-                              <span className="text-brand"> {`${bucketName}_vault_`}</span>
-                            </>
-                          )}
-                        </a>
-                        .
-                      </span>
-                    </p>
-                    <p>
-                      As a final step, you'll need to create an{' '}
-                      <span className="text-foreground-light">Iceberg namespace</span> before you
-                      connect the Iceberg data to your database.
-                    </p>
-                  </Label_Shadcn_>
+                        <span>
+                          {' '}
+                          for easier access to the data. This action will also create{' '}
+                          <a
+                            href={`${BASE_PATH}/project/${ref}/storage/access-keys`}
+                            target="_blank"
+                            className="underline text-foreground-light"
+                          >
+                            S3 Access Keys
+                            {bucketName && (
+                              <>
+                                {' '}
+                                named <span className="text-brand"> {`${bucketName}_keys`}</span>
+                              </>
+                            )}
+                          </a>
+                          <span> and </span>
+                          <a
+                            href={`${BASE_PATH}/project/${ref}/integrations/vault/secrets`}
+                            target="_blank"
+                            className="underline text-foreground-light"
+                          >
+                            four Vault Secrets
+                            {bucketName && (
+                              <>
+                                {' '}
+                                prefixed with{' '}
+                                <span className="text-brand"> {`${bucketName}_vault_`}</span>
+                              </>
+                            )}
+                          </a>
+                          .
+                        </span>
+                      </p>
+                      <p>
+                        As a final step, you'll need to create an{' '}
+                        <span className="text-foreground-light">Iceberg namespace</span> before you
+                        connect the Iceberg data to your database.
+                      </p>
+                    </Label_Shadcn_>
+                  </DialogSection>
                 ) : (
-                  <Alert_Shadcn_ variant="warning">
+                  <Alert_Shadcn_ variant="warning" className="rounded-none border-0">
                     <WarningIcon />
                     <AlertTitle_Shadcn_>
                       You need to install the Iceberg wrapper extension to connect your Analytic

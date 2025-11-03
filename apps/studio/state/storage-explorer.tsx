@@ -1198,6 +1198,9 @@ function createStorageExplorerState({
                 try {
                   const data = await getTemporaryAPIKey({ projectRef: state.projectRef })
                   req.setHeader('apikey', data.api_key)
+                  if (!IS_PLATFORM) {
+                    req.setHeader('Authorization', `Bearer ${data.api_key}`)
+                  }
                 } catch (error) {
                   throw error
                 }

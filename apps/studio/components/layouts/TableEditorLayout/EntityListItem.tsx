@@ -1,5 +1,5 @@
 import saveAs from 'file-saver'
-import { Clipboard, Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
+import { Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -15,7 +15,6 @@ import {
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getTableDefinition } from 'data/database/table-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -28,6 +27,7 @@ import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
+import type { CSSProperties } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
@@ -52,8 +52,10 @@ import {
 export interface EntityListItemProps {
   id: number | string
   projectRef: string
+  item: Entity
   isLocked: boolean
   isActive?: boolean
+  style?: CSSProperties
   onExportCLI: () => void
 }
 
@@ -62,14 +64,15 @@ function isTableLikeEntityListItem(entity: { type?: string }) {
   return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
 }
 
-const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
+const EntityListItem = ({
   id,
   projectRef,
   item: entity,
   isLocked,
   isActive: _isActive,
+  style,
   onExportCLI,
-}) => {
+}: EntityListItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
@@ -236,6 +239,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   return (
     <EditorTablePageLink
       title={entity.name}
+      style={style}
       id={String(entity.id)}
       href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`}
       role="button"
@@ -309,7 +313,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                   copyToClipboard(entity.name)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} />
                 <span>Copy name</span>
               </DropdownMenuItem>
 
@@ -341,7 +345,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                     }
                   }}
                 >
-                  <Clipboard size={12} />
+                  <Copy size={12} />
                   <span>Copy table schema</span>
                 </DropdownMenuItem>
               )}

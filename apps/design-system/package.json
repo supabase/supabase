@@ -6,10 +6,11 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --turbopack --port 3003",
+    "dev:full": "concurrently \"pnpm dev\" \"pnpm content:dev\"",
     "build": "pnpm run content:build && pnpm run build:registry && next build --turbopack",
     "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "content:dev": "contentlayer2 dev",
     "content:build": "contentlayer2 build",
     "clean": "rimraf node_modules .next .turbo",
@@ -28,6 +29,7 @@
     "next-contentlayer2": "0.4.6",
     "next-themes": "^0.3.0",
     "react": "catalog:",
+    "react-day-picker": "^9.11.1",
     "react-docgen": "^7.0.3",
     "react-dom": "catalog:",
     "react-hook-form": "^7.45.0",
@@ -52,6 +54,7 @@
     "@types/lodash.template": "4.5.0",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "concurrently": "^8.2.2",
     "config": "workspace:^",
     "mdast-util-toc": "^6.1.1",
     "postcss": "^8.5.3",
@@ -59,7 +62,7 @@
     "shiki": "^1.1.7",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "tsx": "^4.19.3",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "unist-builder": "3.0.0"
   }

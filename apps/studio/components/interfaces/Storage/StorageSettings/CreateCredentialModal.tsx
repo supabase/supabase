@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -86,7 +87,12 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button type="default" disabled={disableCreation} className="pointer-events-auto">
+            <Button
+              type="default"
+              icon={<Plus size={14} />}
+              disabled={disableCreation}
+              className="pointer-events-auto"
+            >
               New access key
             </Button>
           </DialogTrigger>

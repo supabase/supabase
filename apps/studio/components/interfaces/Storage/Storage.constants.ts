@@ -65,20 +65,28 @@ export const CONTEXT_MENU_KEYS = {
 export const BUCKET_TYPES = {
   files: {
     displayName: 'Files',
+    singularName: 'file',
+    article: 'a',
     description: 'General file storage for most types of digital content.',
+    valueProp: 'Store images, videos, documents, and any other file type.',
     docsUrl: `${DOCS_URL}/guides/storage/buckets/fundamentals`,
   },
   analytics: {
     displayName: 'Analytics',
+    singularName: 'analytics',
+    article: 'an',
     description: 'Purpose-built storage for analytical workloads.',
+    valueProp: 'Store large datasets for analytics and reporting.',
     docsUrl: `${DOCS_URL}/guides/storage/analytics/introduction`,
   },
   vectors: {
     displayName: 'Vectors',
+    singularName: 'vector',
+    article: 'a',
     description: 'Purpose-built storage for vector data.',
+    valueProp: 'Store, index, and query your vector embeddings at scale.',
     docsUrl: `${DOCS_URL}/guides/storage/vectors`,
   },
 }
-
 export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
 export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'files'

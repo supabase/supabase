@@ -4,7 +4,7 @@ import { FlagValues } from 'flags/react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
 import { components } from 'api-types'
-import { useUser } from './auth'
+import { useAuth } from './auth'
 import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
@@ -72,7 +72,8 @@ export const FeatureFlagProvider = ({
     userEmail?: string
   ) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
 }>) => {
-  const user = useUser()
+  const { session, isLoading } = useAuth()
+  const userEmail = session?.user?.email
 
   const [store, setStore] = useState<FeatureFlagContextType>({
     API_URL,
@@ -85,7 +86,7 @@ export const FeatureFlagProvider = ({
     let mounted = true
 
     async function processFlags() {
-      if (!enabled) return
+      if (!enabled || isLoading) return
 
       const loadPHFlags =
         (enabled === true || (typeof enabled === 'object' && enabled.ph)) && !!API_URL
@@ -98,8 +99,8 @@ export const FeatureFlagProvider = ({
         loadPHFlags ? getFeatureFlags(API_URL) : Promise.resolve({}),
         loadCCFlags
           ? typeof getConfigCatFlags === 'function'
-            ? getConfigCatFlags(user?.email)
-            : getDefaultConfigCatFlags(user?.email)
+            ? getConfigCatFlags(userEmail)
+            : getDefaultConfigCatFlags(userEmail)
           : Promise.resolve([]),
       ])
 
@@ -139,7 +140,7 @@ export const FeatureFlagProvider = ({
     return () => {
       mounted = false
     }
-  }, [enabled, user?.email])
+  }, [enabled, isLoading, userEmail])
 
   return (
     <FeatureFlagContext.Provider value={store}>

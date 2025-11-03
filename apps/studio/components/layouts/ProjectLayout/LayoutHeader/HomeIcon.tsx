@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -7,10 +6,13 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 
 export const HomeIcon = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: organizations } = useOrganizationsQuery()
+
+  const largeLogo = useIsFeatureEnabled('branding:large_logo')
 
   const router = useRouter()
   const [lastVisitedOrganization] = useLocalStorageQuery(
@@ -29,12 +31,10 @@ export const HomeIcon = () => {
 
   return (
     <Link href={href} className="items-center justify-center flex-shrink-0 hidden md:flex">
-      <Image
+      <img
         alt="Supabase"
         src={`${router.basePath}/img/supabase-logo.svg`}
-        width={18}
-        height={18}
-        className="w-[18px] h-[18px]"
+        className={largeLogo ? 'h-[20px]' : 'h-[18px]'}
       />
     </Link>
   )

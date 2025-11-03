@@ -1,10 +1,11 @@
+import type { ComponentProps } from 'react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 import { ShadowScrollArea } from '../../ShadowScrollArea'
 
 interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
-  containerProps?: React.HTMLAttributes<HTMLDivElement>
+  containerProps?: Partial<ComponentProps<typeof ShadowScrollArea>>
 }
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(

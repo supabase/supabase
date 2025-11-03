@@ -194,6 +194,12 @@ const additionalResources = [
     href: 'https://supabase.com/ui',
     external: true,
   },
+  {
+    title: 'Troubleshooting',
+    description: 'Our troubleshooting guide for solutions to common Supabase issues.',
+    icon: 'troubleshooting',
+    href: '/guides/troubleshooting',
+  },
 ]
 
 const HomePage = () => (

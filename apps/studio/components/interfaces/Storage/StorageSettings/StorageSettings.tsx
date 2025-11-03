@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -42,12 +42,17 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
+  StorageListV2MigratingCallout,
+  StorageListV2MigrationCallout,
+} from './StorageListV2MigrationCallout'
+import {
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED,
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN,
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
   StorageSizeUnits,
 } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const formId = 'storage-settings-form'
 
@@ -59,6 +64,8 @@ interface StorageSettingsState {
 
 export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
+  const showMigrationCallout = useFlag('storageMigrationCallout')
+
   const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_READ,
     '*'
@@ -75,8 +82,14 @@ export const StorageSettings = () => {
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
+  const isListV2UpgradeAvailable =
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'main'
+  const isListV2Upgrading =
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'canary'
 
   const { data: organization } = useSelectedOrganizationQuery()
+  const { getEntitlementNumericValue, isEntitlementUnlimited } =
+    useCheckEntitlements('storage.max_file_size')
   const isFreeTier = organization?.plan.id === 'free'
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
@@ -99,14 +112,12 @@ export const StorageSettings = () => {
   })
 
   const maxBytes = useMemo(() => {
-    if (organization?.plan.id === 'free') {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN
-    } else if (organization?.usage_billing_enabled) {
+    if (organization?.usage_billing_enabled || isEntitlementUnlimited()) {
       return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
     } else {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
+      return getEntitlementNumericValue() ?? STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
     }
-  }, [organization])
+  }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
 
   const FormSchema = z
     .object({
@@ -222,6 +233,12 @@ export const StorageSettings = () => {
                 error={error}
                 subject="Failed to retrieve project's storage configuration"
               />
+            )}
+            {isSuccess && showMigrationCallout && (
+              <>
+                {isListV2UpgradeAvailable && <StorageListV2MigrationCallout />}
+                {isListV2Upgrading && <StorageListV2MigratingCallout />}
+              </>
             )}
             {isSuccess && (
               <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
@@ -448,5 +465,3 @@ export const StorageSettings = () => {
     </ScaffoldSection>
   )
 }
-
-export default StorageSettings

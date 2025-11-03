@@ -1,17 +1,18 @@
-import { NextPageWithLayout } from '../types'
+import { useRouter } from 'next/router'
+
+import type { NextPageWithLayout } from 'types'
+import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
+import { AwsMarketplaceLinkExistingOrg } from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceLinkExistingOrg'
+import AwsMarketplaceOnboardingPlaceholder from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboardingPlaceholder'
+import { useCloudMarketplaceOnboardingInfoQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
+import LinkAwsMarketplaceLayout from '../components/layouts/LinkAwsMarketplaceLayout'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
   ScaffoldHeader,
   ScaffoldTitle,
 } from '../components/layouts/Scaffold'
-import LinkAwsMarketplaceLayout from '../components/layouts/LinkAwsMarketplaceLayout'
 import { useOrganizationsQuery } from '../data/organizations/organizations-query'
-import AwsMarketplaceLinkExistingOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceLinkExistingOrg'
-import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
-import { useCloudMarketplaceOnboardingInfoQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
-import { useRouter } from 'next/router'
-import AwsMarketplaceOnboardingPlaceholder from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboardingPlaceholder'
 
 const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
   const {

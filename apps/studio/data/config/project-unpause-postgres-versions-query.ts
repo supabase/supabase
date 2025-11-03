@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectUnpausePostgresVersionsVariables = {
@@ -33,18 +33,16 @@ export const useProjectUnpausePostgresVersionsQuery = <TData = ProjectUnpausePos
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     ProjectUnpausePostgresVersionData,
     ProjectUnpausePostgresVersionError,
     TData
   > = {}
 ) => {
-  return useQuery<ProjectUnpausePostgresVersionData, ProjectUnpausePostgresVersionError, TData>(
-    configKeys.projectUnpausePostgresVersions(projectRef),
-    ({ signal }) => getPostgresUnpauseVersions({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<ProjectUnpausePostgresVersionData, ProjectUnpausePostgresVersionError, TData>({
+    queryKey: configKeys.projectUnpausePostgresVersions(projectRef),
+    queryFn: ({ signal }) => getPostgresUnpauseVersions({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 }

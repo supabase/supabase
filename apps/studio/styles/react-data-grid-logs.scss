@@ -1,9 +1,16 @@
 .data-grid--simple-logs {
+  .rdg {
+    overflow-x: auto;
+    min-width: 0;
+  }
+
   .rdg-cell,
   .rdg-cell span {
     @apply text-foreground-light font-normal;
     border-left: none;
     border-right: none;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .rdg-cell:first-child {
@@ -27,11 +34,18 @@
 }
 
 .data-grid--logs-explorer {
-  @apply overflow-x-scroll pb-12;
+  @apply pb-12;
+
+  .rdg {
+    overflow-x: auto;
+    min-width: 0;
+  }
 
   .rdg-cell,
   .rdg-cell span {
     @apply text-foreground-light font-normal #{!important};
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .rdg-cell:first-child {

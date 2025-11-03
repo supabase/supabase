@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Clipboard, Trash, UserIcon } from 'lucide-react'
+import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 
 import { User } from 'data/auth/users-infinite-query'
@@ -250,6 +250,7 @@ export function getAvatarUrl(user: User): string | undefined {
 }
 
 export const formatUserColumns = ({
+  specificFilterColumn,
   columns,
   config,
   users,
@@ -257,6 +258,7 @@ export const formatUserColumns = ({
   setSortByValue,
   onSelectDeleteUser,
 }: {
+  specificFilterColumn: string
   columns: UsersTableColumn[]
   config: ColumnConfiguration[]
   users: User[]
@@ -283,7 +285,13 @@ export const formatUserColumns = ({
         // to support - the component is ready as such: Just pass selectedUsers and allRowsSelected as props from parent
         // <SelectHeaderCell selectedUsers={selectedUsers} allRowsSelected={allRowsSelected} />
         if (col.id === 'img') return undefined
-        return <HeaderCell col={col} setSortByValue={setSortByValue} />
+        return (
+          <HeaderCell
+            col={col}
+            specificFilterColumn={specificFilterColumn}
+            setSortByValue={setSortByValue}
+          />
+        )
       },
       renderCell: ({ row }) => {
         // This is actually a valid React component, so we can use hooks here
@@ -386,7 +394,7 @@ export const formatUserColumns = ({
                   copyToClipboard(value)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
               </ContextMenuItem_Shadcn_>
               <ContextMenuSeparator_Shadcn_ />

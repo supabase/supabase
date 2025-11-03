@@ -4,18 +4,11 @@ import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getPipelineStateMessages } from './Pipeline.utils'
-
-export enum PipelineStatusName {
-  FAILED = 'failed',
-  STARTING = 'starting',
-  STARTED = 'started',
-  STOPPED = 'stopped',
-  UNKNOWN = 'unknown',
-}
+import { PipelineStatusName } from './Replication.constants'
 
 interface PipelineStatusProps {
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined
