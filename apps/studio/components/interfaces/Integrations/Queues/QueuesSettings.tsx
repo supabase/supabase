@@ -35,6 +35,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { IS_PLATFORM } from 'lib/constants'
 
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
@@ -86,18 +87,20 @@ export const QueuesSettings = () => {
 
   const { mutateAsync: updateTable } = useTableUpdateMutation()
 
+  const onPostgrestConfigUpdateSuccess = () => {
+    if (enable) {
+      toast.success('Queues can now be managed through client libraries or PostgREST endpoints!')
+    } else {
+      toast.success(
+        'Queues can no longer be managed through client libraries or PostgREST endpoints'
+      )
+    }
+    setIsToggling(false)
+    form.reset({ enable })
+  }
+
   const { mutate: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation({
-    onSuccess: () => {
-      if (enable) {
-        toast.success('Queues can now be managed through client libraries or PostgREST endpoints!')
-      } else {
-        toast.success(
-          'Queues can no longer be managed through client libraries or PostgREST endpoints'
-        )
-      }
-      setIsToggling(false)
-      form.reset({ enable })
-    },
+    onSuccess: onPostgrestConfigUpdateSuccess,
     onError: (error) => {
       setIsToggling(false)
       toast.error(`Failed to toggle queue exposure via PostgREST: ${error.message}`)
@@ -106,6 +109,7 @@ export const QueuesSettings = () => {
 
   const { mutate: toggleExposeQueuePostgrest } = useDatabaseQueueToggleExposeMutation({
     onSuccess: (_, values) => {
+      if (!IS_PLATFORM) return onPostgrestConfigUpdateSuccess()
       if (project && config) {
         if (values.enable) {
           const updatedSchemas = schemas.concat([QUEUES_SCHEMA])
