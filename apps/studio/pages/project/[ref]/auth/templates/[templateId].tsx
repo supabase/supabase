@@ -44,6 +44,31 @@ const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
 }
 
+interface OverridingSettingAdmonitionProps {
+  relatedSetting: string
+  projectRef: string
+  inline?: boolean
+}
+
+const OverridingSettingAdmonition = ({
+  relatedSetting,
+  projectRef,
+  inline = false,
+}: OverridingSettingAdmonitionProps) => {
+  return (
+    <Admonition
+      type="warning"
+      title="Overriding setting"
+      description={`This email will not be sent to users as ${inline ? '' : 'the '}"${relatedSetting}"${inline ? '' : ' setting'} is disabled.`}
+      className={`bg-warning-200 border-warning-400 ${inline ? 'm-0 border-none rounded-none' : ''}`}
+    >
+      <Button asChild type="default" className="mt-2">
+        <Link href={`/project/${projectRef}/auth/providers`}>Edit setting</Link>
+      </Button>
+    </Admonition>
+  )
+}
+
 const RedirectToTemplates = () => {
   const router = useRouter()
   const { templateId, ref } = router.query
@@ -77,6 +102,9 @@ const RedirectToTemplates = () => {
       ? TEMPLATES_SCHEMAS.find((template) => slugifyTitle(template.title) === templateId)
       : null
 
+  // Temporarily hardcoded to just check the hardcoded setting name, in the future we will check the actual setting of this value
+  const hasOverridingRelatedSetting = Boolean(template?.misc?.relatedSetting)
+
   // Convert templateId slug to one lowercase word to match docs anchor tag
   const templateIdForDocs =
     typeof templateId === 'string' ? templateId.replace(/-/g, '').toLowerCase() : ''
@@ -88,6 +116,8 @@ const RedirectToTemplates = () => {
   const templateEnabledKey = isSecurityTemplate
     ? (`MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as string)
     : null
+
+  const showConfigurationSection = isSecurityTemplate && templateEnabledKey
 
   // Create form schema for security templates
   const TemplateFormSchema = templateEnabledKey
@@ -179,7 +209,7 @@ const RedirectToTemplates = () => {
           </ScaffoldSection>
         ) : (
           <>
-            {isSecurityTemplate && templateEnabledKey ? (
+            {showConfigurationSection ? (
               <ScaffoldSection isFullWidth>
                 <ScaffoldSectionTitle className="mb-4">Configuration</ScaffoldSectionTitle>
                 <Form_Shadcn_ {...templateForm}>
@@ -206,18 +236,15 @@ const RedirectToTemplates = () => {
                           )}
                         />
                       </CardContent>
-                      <CardContent className="p-0">
-                        <Admonition
-                          type="warning"
-                          title="Overriding setting"
-                          description={`This email will not be sent to users as “${template.title}” is disabled.`}
-                          className="bg-warning-200 border-warning-400 m-0 border-none rounded-none"
-                        >
-                          <Button asChild type="default" className="mt-2">
-                            <Link href={`/project/${ref}/auth/providers`}>Go to Settings</Link>
-                          </Button>
-                        </Admonition>
-                      </CardContent>
+                      {hasOverridingRelatedSetting && (
+                        <CardContent className="p-0">
+                          <OverridingSettingAdmonition
+                            relatedSetting={template.misc.relatedSetting}
+                            projectRef={ref as string}
+                            inline
+                          />
+                        </CardContent>
+                      )}
                       <CardFooter className="justify-end space-x-2">
                         {templateForm.formState.isDirty && (
                           <Button type="default" onClick={() => templateForm.reset()}>
@@ -240,22 +267,22 @@ const RedirectToTemplates = () => {
                 </Form_Shadcn_>
               </ScaffoldSection>
             ) : (
-              <ScaffoldSection isFullWidth>
-                <ScaffoldSectionTitle className="mb-4">Configuration</ScaffoldSectionTitle>
-                <Admonition
-                  type="warning"
-                  title="Enable the corresponding setting"
-                  description='This email notification will not be sent until the "confirm email" setting is enabled.'
-                  className="bg-warning-200 border-warning-400"
-                >
-                  <Button asChild type="default" className="mt-2">
-                    <Link href={`/project/${ref}/auth/providers`}>Go to Settings</Link>
-                  </Button>
-                </Admonition>
-              </ScaffoldSection>
+              <>
+                {hasOverridingRelatedSetting && (
+                  <ScaffoldSection isFullWidth>
+                    <OverridingSettingAdmonition
+                      relatedSetting={template.misc.relatedSetting}
+                      projectRef={ref as string}
+                    />
+                  </ScaffoldSection>
+                )}
+              </>
             )}
             <ScaffoldSection isFullWidth>
-              <ScaffoldSectionTitle className="mb-4">Contents</ScaffoldSectionTitle>
+              {/* Only show title if there is an overriding related setting, as that causes multiple sections to be shown */}
+              {showConfigurationSection && (
+                <ScaffoldSectionTitle className="mb-4">Contents</ScaffoldSectionTitle>
+              )}
               <Card>
                 <TemplateEditor template={template} />
               </Card>
