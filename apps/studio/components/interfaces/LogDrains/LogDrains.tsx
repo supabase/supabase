@@ -121,62 +121,65 @@ export function LogDrains({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {logDrains?.map((drain) => (
-              <TableRow key={drain.id}>
-                <TableCell className="font-medium truncate max-w-72" title={drain.name}>
-                  {drain.name}
-                </TableCell>
-                <TableCell
-                  className={cn(
-                    'truncate max-w-96',
-                    drain.description ? 'text-foreground-light' : 'text-foreground-muted'
-                  )}
-                  title={drain.description}
-                >
-                  {drain.description || '-'}
-                </TableCell>
-                <TableCell className="text-foreground-light">
-                  <div className="flex items-center gap-2">
-                    {React.cloneElement(
-                      LOG_DRAIN_TYPES.find((t) => t.value === drain.type)
-                        ?.icon as React.ReactElement,
-                      { width: 16, height: 16 }
+            {logDrains
+              ?.slice()
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((drain) => (
+                <TableRow key={drain.id}>
+                  <TableCell className="font-medium truncate max-w-72" title={drain.name}>
+                    {drain.name}
+                  </TableCell>
+                  <TableCell
+                    className={cn(
+                      'truncate max-w-96',
+                      drain.description ? 'text-foreground-light' : 'text-foreground-muted'
                     )}
-                    <span>{LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        type="text"
-                        className="px-1 opacity-50 hover:opacity-100 !bg-transparent flex-shrink-0"
-                        icon={<MoreHorizontal />}
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="max-w-[140px]" align="end">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          onUpdateDrainClick(drain)
-                        }}
-                      >
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Update
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedLogDrain(drain)
-                          setIsDeleteModalOpen(true)
-                        }}
-                      >
-                        <TrashIcon className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                    title={drain.description}
+                  >
+                    {drain.description || '-'}
+                  </TableCell>
+                  <TableCell className="text-foreground-light">
+                    <div className="flex items-center gap-2">
+                      {React.cloneElement(
+                        LOG_DRAIN_TYPES.find((t) => t.value === drain.type)
+                          ?.icon as React.ReactElement,
+                        { width: 16, height: 16 }
+                      )}
+                      <span>{LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          type="text"
+                          className="px-1 opacity-50 hover:opacity-100 !bg-transparent flex-shrink-0"
+                          icon={<MoreHorizontal />}
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="max-w-[140px]" align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            onUpdateDrainClick(drain)
+                          }}
+                        >
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Update
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedLogDrain(drain)
+                            setIsDeleteModalOpen(true)
+                          }}
+                        >
+                          <TrashIcon className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
 
           <ConfirmationModal
