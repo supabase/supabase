@@ -149,6 +149,18 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
+    alternateInstructions: () => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          After configuring the MCP server, you need to authenticate. In a regular terminal (not the
+          IDE extension) run:
+        </p>
+        <CodeBlock value="claude /mcp" language="bash" className="block" />
+        <p className="text-xs text-foreground-light">
+          Select the "supabase" server, then "Authenticate" to begin the authentication flow.
+        </p>
+      </div>
+    ),
   },
 ]
 
