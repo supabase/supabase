@@ -59,6 +59,7 @@ const BucketListVirtualized = ({ buckets, selectedBucketId, projectRef = '' }: B
       ItemComponent={VirtualizedBucketRow}
       // There is no loader because all buckets load from backend at once
       LoaderComponent={() => null}
+      className="pb-3"
     />
   )
 }
