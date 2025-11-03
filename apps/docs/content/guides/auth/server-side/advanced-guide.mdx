@@ -52,7 +52,6 @@ The `Max-Age` or `Expires` cookie parameters only control whether the browser se
 
 The only way to ensure that a user has logged out or their session has ended is to get the user's details with `getUser()`. The `getClaims()` method only checks local JWT validation (signature and expiration), but it doesn't verify with the auth server whether the session is still valid or if the user has logged out server-side.
 
-
 ### What should I use for the `SameSite` property?
 
 Make sure you [understand the behavior of the property in different situations](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite) as some properties can degrade the user experience.
