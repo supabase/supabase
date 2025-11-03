@@ -93,7 +93,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     []
   )
 
-  const { getEntitlementNumericValue } = useCheckEntitlements('security.audit_logs_days')
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const { data: content } = useContentQuery({

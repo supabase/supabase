@@ -4,7 +4,7 @@ import { useCheckEntitlements } from './useCheckEntitlements'
 
 export const useUpgradePrompt = (from: string) => {
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
-  const { getEntitlementNumericValue } = useCheckEntitlements('security.audit_logs_days')
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(from, entitledToAuditLogDays)

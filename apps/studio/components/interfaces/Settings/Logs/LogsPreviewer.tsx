@@ -207,7 +207,7 @@ export const LogsPreviewer = ({
     refresh()
   }
 
-  const { getEntitlementNumericValue } = useCheckEntitlements('security.audit_logs_days')
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
