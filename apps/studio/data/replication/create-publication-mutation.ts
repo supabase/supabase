@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type CreatePublicationParams = {
@@ -40,7 +40,7 @@ export const useCreatePublicationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CreatePublicationData, ResponseError, CreatePublicationParams>,
+  UseCustomMutationOptions<CreatePublicationData, ResponseError, CreatePublicationParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

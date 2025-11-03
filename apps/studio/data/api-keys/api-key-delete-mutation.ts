@@ -1,7 +1,7 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { del, handleError } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { apiKeysKeys } from './keys'
 
 export type APIKeyDeleteVariables = {
@@ -30,7 +30,7 @@ export const useAPIKeyDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<APIKeyDeleteData, ResponseError, APIKeyDeleteVariables>,
+  UseCustomMutationOptions<APIKeyDeleteData, ResponseError, APIKeyDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

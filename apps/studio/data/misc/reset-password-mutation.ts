@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 const WHITELIST_ERRORS = ['email must be an email']
 
@@ -30,7 +30,7 @@ export const useResetPasswordMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ResetPasswordData, ResponseError, ResetPasswordVariables>,
+  UseCustomMutationOptions<ResetPasswordData, ResponseError, ResetPasswordVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<ResetPasswordData, ResponseError, ResetPasswordVariables>({

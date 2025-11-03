@@ -1,11 +1,6 @@
 import { Query } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
-import {
-  useQuery,
-  useQueryClient,
-  type QueryClient,
-  type UseQueryOptions,
-} from '@tanstack/react-query'
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
@@ -17,10 +12,10 @@ import {
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
-import { ResponseError } from 'types'
 
 export interface GetTableRowsArgs {
   table?: SupaTable
@@ -282,7 +277,7 @@ export async function getTableRows(
 
 export const useTableRowsQuery = <TData = TableRowsData>(
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>,
-  { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
   return useQuery<TableRowsData, TableRowsError, TData>({

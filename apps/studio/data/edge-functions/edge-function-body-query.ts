@@ -1,8 +1,8 @@
 import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionBodyVariables = {
@@ -81,7 +81,7 @@ export const useEdgeFunctionBodyQuery = <TData = EdgeFunctionBodyData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<EdgeFunctionBodyData, EdgeFunctionBodyError, TData> = {}
+  }: UseCustomQueryOptions<EdgeFunctionBodyData, EdgeFunctionBodyError, TData> = {}
 ) =>
   useQuery<EdgeFunctionBodyData, EdgeFunctionBodyError, TData>({
     queryKey: edgeFunctionsKeys.body(projectRef, slug),
