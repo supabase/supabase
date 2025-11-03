@@ -13,7 +13,7 @@ describe(`CreateBucketModal`, () => {
   beforeEach(() => {
     vi.mock(`hooks/misc/useCheckPermissions`, () => ({
       useCheckPermissions: vi.fn(),
-      useAsyncCheckProjectPermissions: vi.fn().mockImplementation(() => ({ can: true })),
+      useAsyncCheckPermissions: vi.fn().mockImplementation(() => ({ can: true })),
     }))
     // useParams
     routerMock.setCurrentUrl(`/project/default/storage/buckets`)
@@ -54,7 +54,7 @@ describe(`CreateBucketModal`, () => {
       expect(screen.getByRole(`dialog`)).toBeInTheDocument()
     })
 
-    const nameInput = screen.getByLabelText(`Name of bucket`)
+    const nameInput = screen.getByLabelText(`Bucket name`)
     await userEvent.type(nameInput, `test`)
 
     const standardOption = screen.getByLabelText(`Standard bucket`)

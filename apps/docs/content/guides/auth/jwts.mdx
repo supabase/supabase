@@ -6,7 +6,7 @@ subtitle: 'Information on how best to use JSON Web Tokens with Supabase'
 
 A [JSON Web Token](https://jwt.io/introduction) is a type of data structure, represented as a string, that usually contains identity and authorization information about a user. It encodes information about its lifetime and is signed with a cryptographic key to make it tamper-resistant.
 
-Supabase Auth continuously issues a new JWT for each user session, for as long as the user remains signed in. Check the comprehensive guide on [Sessions](/docs/guides/sessions) to find out how you can tailor this process for your needs.
+Supabase Auth continuously issues a new JWT for each user session, for as long as the user remains signed in. Check the comprehensive guide on [Sessions](/docs/guides/auth/sessions) to find out how you can tailor this process for your needs.
 
 JWTs provide the foundation for [Row Level Security](/docs/guides/database/row-level-security). Each Supabase product is able to securely decode and verify the validity of a JWT it receives before using Postgres policies and roles to authorize access to the project's data.
 
@@ -165,6 +165,16 @@ val supabase = createSupabaseClient(
 </TabPanel>
 </$Show>
 
+<TabPanel id="bash" label="cURL">
+
+```bash
+curl 'https://<supabase-project>.supabase.co/rest/v1/my_table?select=id' \
+  -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+  -H "Authorization: Bearer <your JWT here>"
+```
+
+</TabPanel>
+
 </Tabs>
 
 In the past there was a recommendation to set custom headers on the Supabase client with the `Authorization` header including your custom JWT. This is no longer recommended as it's less flexible and causes confusion when combined with a user session from Supabase Auth.
@@ -179,7 +189,7 @@ Supabase Auth exposes a [JSON Web Key](https://datatracker.ietf.org/doc/html/rfc
 GET https://project-id.supabase.co/auth/v1/.well-known/jwks.json
 ```
 
-Which responds with JWKS object containing one or more asymmetric [JWT signing keys](/docs/guides/auth/signing-keys) (only their public keys).
+Which responds with JWKS object containing one or more asymmetric [JWT signing keys](/docs/guides/auth/signing-keys) (only their public keys). Be aware that this endpoint does not return any keys if you are not using asymmetric JWT signing keys.
 
 ```json
 {

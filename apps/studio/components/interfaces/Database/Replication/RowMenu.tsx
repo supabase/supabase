@@ -1,4 +1,4 @@
-import { Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -11,7 +11,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -28,7 +28,7 @@ import {
   PIPELINE_ERROR_MESSAGES,
   getStatusName,
 } from './Pipeline.utils'
-import { PipelineStatusName } from './PipelineStatus'
+import { PipelineStatusName } from './Replication.constants'
 
 interface RowMenuProps {
   pipeline: Pipeline | undefined
@@ -38,6 +38,8 @@ interface RowMenuProps {
   isError: boolean
   onEditClick: () => void
   onDeleteClick: () => void
+  hasUpdate?: boolean
+  onUpdateClick?: () => void
 }
 
 export const RowMenu = ({
@@ -48,6 +50,8 @@ export const RowMenu = ({
   isError,
   onEditClick,
   onDeleteClick,
+  hasUpdate = false,
+  onUpdateClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
   const statusName = getStatusName(pipelineStatus)
@@ -59,29 +63,21 @@ export const RowMenu = ({
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
-  const hasPipelineAction =
+  // Show actions when not in a transitional state
+  const canPerformActions =
     requestStatus === PipelineStatusRequestStatus.None &&
+    statusName !== PipelineStatusName.STARTING &&
     [PipelineStatusName.STOPPED, PipelineStatusName.STARTED, PipelineStatusName.FAILED].includes(
       statusName as PipelineStatusName
     )
 
-  const pipelineActionIcon =
-    statusName === PipelineStatusName.STOPPED ? (
-      <Play size={14} />
-    ) : statusName === PipelineStatusName.STARTED ? (
-      <Pause size={14} />
-    ) : statusName === PipelineStatusName.FAILED ? (
-      <RotateCcw size={14} />
-    ) : null
+  // Show both stop and restart for started/failed states
+  const showStopAndRestart =
+    canPerformActions &&
+    (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED)
 
-  const pipelineActionLabel =
-    statusName === PipelineStatusName.STOPPED
-      ? 'Start pipeline'
-      : statusName === PipelineStatusName.STARTED
-        ? 'Stop pipeline'
-        : statusName === PipelineStatusName.FAILED
-          ? 'Restart pipeline'
-          : null
+  // Show only start for stopped state
+  const showStart = canPerformActions && statusName === PipelineStatusName.STOPPED
 
   const onEnablePipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -138,27 +134,42 @@ export const RowMenu = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+          <div className="relative">
+            <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+            {hasUpdate && (
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand rounded-full" />
+            )}
+          </div>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="bottom" align="end" className="w-52">
-          {hasPipelineAction && (
+          {hasUpdate && (
             <>
-              <DropdownMenuItem
-                className="space-x-2"
-                disabled={!PIPELINE_ACTIONABLE_STATES.includes((statusName ?? '') as any)}
-                onClick={() => {
-                  if (statusName === PipelineStatusName.STOPPED) {
-                    onEnablePipeline()
-                  } else if (statusName === PipelineStatusName.STARTED) {
-                    onDisablePipeline()
-                  } else if (statusName === PipelineStatusName.FAILED) {
-                    onRestartPipeline()
-                  }
-                }}
-              >
-                {pipelineActionIcon}
-                <p>{pipelineActionLabel}</p>
+              <DropdownMenuItem className="space-x-2" onClick={() => onUpdateClick?.()}>
+                <ArrowUpCircle size={14} />
+                <p>Update available</p>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          {showStart && (
+            <>
+              <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
+                <Play size={14} />
+                <p>Start pipeline</p>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          {showStopAndRestart && (
+            <>
+              <DropdownMenuItem className="space-x-2" onClick={onRestartPipeline}>
+                <RotateCcw size={14} />
+                <p>Restart pipeline</p>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
+                <Pause size={14} />
+                <p>Stop pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </>

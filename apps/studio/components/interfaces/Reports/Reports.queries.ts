@@ -4,6 +4,8 @@ import { Presets } from './Reports.types'
 
 export type QueryPerformanceSort = {
   column:
+    | 'query'
+    | 'rolname'
     | 'total_time'
     | 'prop_total_time'
     | 'calls'
@@ -15,7 +17,14 @@ export type QueryPerformanceSort = {
 }
 
 export type QueryPerformanceQueryOpts = {
-  preset: 'mostFrequentlyInvoked' | 'mostTimeConsuming' | 'slowestExecutionTime' | 'queryHitRate'
+  preset:
+    | 'mostFrequentlyInvoked'
+    | 'mostTimeConsuming'
+    | 'slowestExecutionTime'
+    | 'queryHitRate'
+    | 'unified'
+    | 'slowQueriesCount'
+    | 'queryMetrics'
   searchQuery?: string
   orderBy?: QueryPerformanceSort
   roles?: string[]

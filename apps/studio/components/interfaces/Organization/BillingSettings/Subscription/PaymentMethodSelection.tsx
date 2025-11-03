@@ -28,7 +28,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
-} from '../PaymentMethods/NewPaymentMethodElement'
+} from '../../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 

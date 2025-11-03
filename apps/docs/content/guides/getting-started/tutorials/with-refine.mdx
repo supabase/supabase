@@ -63,7 +63,7 @@ Let's move ahead to understand the generated code now.
 
 ### Refine `supabaseClient`
 
-The `create refine-app` generated a Supabase client for us in the `src/utility/supabaseClient.ts` file. It has two constants: `SUPABASE_URL` and `SUPABASE_KEY`. We want to replace them as `supabaseUrl` and `supabaseAnonKey` respectively and assign them our own Supabase server's values.
+The `create refine-app` generated a Supabase client for us in the `src/utility/supabaseClient.ts` file. It has two constants: `SUPABASE_URL` and `SUPABASE_KEY`. We want to replace them as `supabaseUrl` and `supabasePublishableKey` respectively and assign them our own Supabase server's values.
 
 We'll update it with environment variables managed by Vite:
 
@@ -73,9 +73,9 @@ We'll update it with environment variables managed by Vite:
 import { createClient } from '@refinedev/supabase'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
-export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabaseClient = createClient(supabaseUrl, supabasePublishableKey, {
   db: {
     schema: 'public',
   },
@@ -87,7 +87,7 @@ export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
 
 </$CodeTabs>
 
-And then, we want to save the environment variables in a `.env.local` file. All you need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+And then, we want to save the environment variables in a `.env.local` file. All you need are the API URL and the key that you copied [earlier](#get-api-details).
 
 ```bash .env.local
 VITE_SUPABASE_URL=YOUR_SUPABASE_URL

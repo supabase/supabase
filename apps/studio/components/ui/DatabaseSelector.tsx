@@ -10,6 +10,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -37,6 +38,7 @@ interface DatabaseSelectorProps {
   onSelectId?: (id: string) => void // Optional callback
   onCreateReplicaClick?: () => void
   portal?: boolean
+  className?: string
 }
 
 const DatabaseSelector = ({
@@ -47,11 +49,14 @@ const DatabaseSelector = ({
   buttonProps,
   onCreateReplicaClick = noop,
   portal = true,
+  className,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+
+  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const state = useDatabaseSelectorStateSnapshot()
   const selectedDatabaseId = _selectedDatabaseId ?? state.selectedDatabaseId
@@ -76,7 +81,7 @@ const DatabaseSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <div className="flex cursor-pointer">
+        <div className={cn('flex cursor-pointer', className)}>
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Source
           </span>
@@ -203,7 +208,7 @@ const DatabaseSelector = ({
                 })}
               </ScrollArea>
             </CommandGroup_Shadcn_>
-            {IS_PLATFORM && (
+            {IS_PLATFORM && infrastructureReadReplicas && (
               <CommandGroup_Shadcn_ className="border-t">
                 <CommandItem_Shadcn_
                   className="cursor-pointer w-full"

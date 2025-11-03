@@ -88,7 +88,64 @@ response = supabase.auth.link_identity({'provider': 'google'})
 </$Show>
 </Tabs>
 
-In the example above, the user will be redirected to Google to complete the OAuth2.0 flow. Once the OAuth2.0 flow has completed successfully, the user will be redirected back to the application and the Google identity will be linked to the user. You can enable manual linking from your project's authentication [configuration options](/dashboard/project/_/settings/auth) or by setting the environment variable `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED: true` when self-hosting.
+In the example above, the user will be redirected to Google to complete the OAuth2.0 flow. Once the OAuth2.0 flow has completed successfully, the user will be redirected back to the application and the Google identity will be linked to the user. You can enable manual linking from your project's authentication [configuration options](/dashboard/project/_/auth/providers) or by setting the environment variable `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED: true` when self-hosting.
+
+### Link identity with native OAuth (ID token)
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+For native mobile applications, you can link an identity using an ID token obtained from a third-party OAuth provider. This is useful when you want to use native OAuth flows (like Google Sign-In or Sign in with Apple) rather than web-based OAuth redirects.
+
+```js
+// Example with Google Sign-In (using a native Google Sign-In library)
+const idToken = 'ID_TOKEN_FROM_GOOGLE'
+const accessToken = 'ACCESS_TOKEN_FROM_GOOGLE'
+
+const { data, error } = await supabase.auth.linkIdentityWithIdToken({
+  provider: 'google',
+  token: idToken,
+  access_token: accessToken,
+})
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+For Flutter applications, you can link an identity using an ID token obtained from native OAuth packages like `google_sign_in` or `sign_in_with_apple`. Call [`linkIdentityWithIdToken()`](/docs/reference/dart/auth-linkidentitywithidtoken):
+
+```dart
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+// First, obtain the ID token from the native provider
+final GoogleSignIn googleSignIn = GoogleSignIn(
+  clientId: iosClientId,
+  serverClientId: webClientId,
+);
+final googleUser = await googleSignIn.signIn();
+final googleAuth = await googleUser!.authentication;
+
+// Link the Google identity to the current user
+final response = await supabase.auth.linkIdentityWithIdToken(
+  provider: OAuthProvider.google,
+  idToken: googleAuth.idToken!,
+  accessToken: googleAuth.accessToken!,
+);
+```
+
+This method supports the same OAuth providers as `signInWithIdToken()`: Google, Apple, Facebook, Kakao, and Keycloak.
+
+</TabPanel>
+</$Show>
+</Tabs>
 
 ## Unlink an identity
 

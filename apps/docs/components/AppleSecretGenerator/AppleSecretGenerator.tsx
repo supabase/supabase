@@ -104,7 +104,7 @@ const AppleSecretGenerator = () => {
   const [error, setError] = useState('')
 
   return (
-    <>
+    <div className="flex flex-col gap-3">
       <Input
         label="Account ID"
         labelOptional="required"
@@ -186,7 +186,7 @@ const AppleSecretGenerator = () => {
           />
         </>
       )}
-    </>
+    </div>
   )
 }
 

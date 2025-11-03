@@ -8,7 +8,7 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CreateRolePanel } from './CreateRolePanel'
@@ -19,7 +19,7 @@ import { SUPABASE_ROLES } from './Roles.constants'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
-const RolesList = () => {
+export const RolesList = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
@@ -27,7 +27,7 @@ const RolesList = () => {
   const [isCreatingRole, setIsCreatingRole] = useState(false)
   const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
 
-  const { can: canUpdateRoles } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'roles'
   )
@@ -219,5 +219,3 @@ const RolesList = () => {
     </>
   )
 }
-
-export default RolesList

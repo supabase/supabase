@@ -43,7 +43,7 @@ export function useCommandMenu({
 
     if (activeInput?.type === 'group') {
       items.push(...getPropertyItems(filterProperties, inputValue))
-      
+
       if (supportsOperators) {
         items.push({
           value: 'group',
@@ -59,7 +59,16 @@ export function useCommandMenu({
         })
       }
     } else if (activeInput?.type === 'value') {
-      items.push(...getValueItems(activeInput, activeFilters, filterProperties, propertyOptionsCache, loadingOptions, inputValue))
+      items.push(
+        ...getValueItems(
+          activeInput,
+          activeFilters,
+          filterProperties,
+          propertyOptionsCache,
+          loadingOptions,
+          inputValue
+        )
+      )
     }
 
     return items
@@ -86,13 +95,17 @@ function getOperatorItems(
   const property = filterProperties.find((p) => p.name === condition?.propertyName)
   const operatorValue = condition?.operator?.toUpperCase() || ''
   const availableOperators = property?.operators || ['=']
-  
+
   return availableOperators
     .filter((op) => op.toUpperCase().includes(operatorValue))
     .map((op) => ({ value: op, label: op }))
 }
 
-function getInputValue(activeInput: ActiveInput, freeformText: string, activeFilters: FilterGroup): string {
+function getInputValue(
+  activeInput: ActiveInput,
+  freeformText: string,
+  activeFilters: FilterGroup
+): string {
   return activeInput?.type === 'group'
     ? freeformText
     : activeInput?.type === 'value'
@@ -147,7 +160,7 @@ function getValueItems(
 
 function getArrayOptionItems(options: any[], inputValue: string): CommandItem[] {
   const items: CommandItem[] = []
-  
+
   for (const option of options) {
     if (typeof option === 'string') {
       if (option.toLowerCase().includes(inputValue.toLowerCase())) {
@@ -174,7 +187,7 @@ function getArrayOptionItems(options: any[], inputValue: string): CommandItem[] 
       }
     }
   }
-  
+
   return items
 }
 

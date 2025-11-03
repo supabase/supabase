@@ -11,6 +11,7 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -61,10 +62,14 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: organization } = useSelectedOrganizationQuery()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
-  const { data } = useProjectsQuery()
+  const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
+
+  // Only need to fetch projects for organizations with access to project scoped roles
+  // which will be Team or Enterprise (and when the panel is visible)
+  // We still need to use the old projects endpoint instead of org projects due to roles depending on project ID
+  const { data } = useProjectsQuery({ enabled: isOptedIntoProjectLevelPermissions && visible })
   const projects = data?.projects ?? []
   const { data: permissions } = usePermissionsQuery()
-  const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -186,7 +191,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               <p className="truncate" title={`Manage access for ${member.username}`}>
                 Manage access for {member.username}
               </p>
-              <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
+              <DocsButton href={`${DOCS_URL}/guides/platform/access-control`} />
             </SheetHeader>
 
             <SheetSection className="h-full overflow-auto flex flex-col gap-y-4">

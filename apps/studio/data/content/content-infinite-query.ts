@@ -1,6 +1,7 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
+import { UseCustomInfiniteQueryOptions } from 'types'
 import { Content, ContentType } from './content-query'
 import { contentKeys } from './keys'
 
@@ -48,16 +49,17 @@ export type ContentError = unknown
 
 export const useContentInfiniteQuery = <TData = ContentData>(
   { projectRef, type, name, limit, sort }: GetContentVariables,
-  { enabled = true, ...options }: UseInfiniteQueryOptions<ContentData, ContentError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomInfiniteQueryOptions<ContentData, ContentError, TData> = {}
 ) => {
-  return useInfiniteQuery<ContentData, ContentError, TData>(
-    contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery<ContentData, ContentError, TData>({
+    queryKey: contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
+    queryFn: ({ signal, pageParam }) =>
       getContent({ projectRef, type, name, limit, sort, cursor: pageParam }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam: (lastPage) => lastPage.cursor,
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    getNextPageParam: (lastPage) => lastPage.cursor,
+    ...options,
+  })
 }

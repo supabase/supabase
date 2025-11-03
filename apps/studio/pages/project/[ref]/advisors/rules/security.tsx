@@ -1,6 +1,6 @@
 import { AdvisorRules } from 'components/interfaces/Advisors/AdvisorRules'
 import { AdvisorRulesLayout } from 'components/layouts/AdvisorsLayout/AdvisorRulesLayout'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const AdvisorSecurityRulesPage: NextPageWithLayout = () => {
   return <AdvisorRules category="security" />

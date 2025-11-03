@@ -1,16 +1,16 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { Download, MoreVertical, Trash } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
@@ -19,13 +19,9 @@ export const PauseFailedState = () => {
   const { data: project } = useSelectedProjectQuery()
   const [visible, setVisible] = useState(false)
 
-  const { can: canDeleteProject } = useAsyncCheckProjectPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: { project_id: project?.id },
-    }
-  )
+  const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: { project_id: project?.id },
+  })
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
@@ -73,11 +69,15 @@ export const PauseFailedState = () => {
 
             <div className="border-t border-overlay flex items-center justify-end gap-x-2 py-4 px-8">
               <Button asChild type="default">
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                <SupportLink
+                  queryParams={{
+                    category: SupportCategories.DATABASE_UNRESPONSIVE,
+                    projectRef: project?.ref,
+                    subject: 'Pausing failed for project',
+                  }}
                 >
                   Contact support
-                </Link>
+                </SupportLink>
               </Button>
               <ButtonTooltip
                 type="default"

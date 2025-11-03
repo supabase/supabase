@@ -20,6 +20,8 @@ import {
   TooltipContent,
 } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 interface EditQueryButtonProps {
   id?: string
@@ -41,7 +43,7 @@ export const EditQueryButton = ({
   const { newQuery } = useNewQuery()
 
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
-  const snap = useAiAssistantStateSnapshot()
+  const { closeSidebar } = useSidebarManagerSnapshot()
 
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
@@ -79,7 +81,7 @@ export const EditQueryButton = ({
           // This component needs to be updated to work with local EditorPanel state
           // For now, fall back to creating a new query
           if (sql) newQuery(sql, title)
-          snap.closeAssistant()
+          closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         } else {
           if (sql) newQuery(sql, title)
         }

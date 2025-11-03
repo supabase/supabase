@@ -16,8 +16,13 @@ import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import {
+  useIsAwsCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
 import { type AWS_REGIONS_KEYS } from 'shared-data'
 import {
@@ -52,6 +57,9 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   const numTransition = useRef<number>()
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
 
+  const isAws = useIsAwsCloudProvider()
+  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
+
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
   const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
@@ -60,10 +68,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
 
-  const { can: canManageReplicas } = useAsyncCheckProjectPermissions(
-    PermissionAction.CREATE,
-    'projects'
-  )
+  const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const {
     data: loadBalancers,
@@ -228,7 +233,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
         {isSuccessReplicas && !isLoadingProject && (
           <>
-            {!diagramOnly && (
+            {!diagramOnly && infrastructureReadReplicas && (
               <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
                 <div className="flex items-center justify-center">
                   <ButtonTooltip
@@ -272,7 +277,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                     </DropdownMenu>
                   )}
                 </div>
-                {project?.cloud_provider === 'AWS' && (
+                {isAws && (
                   <div className="flex items-center justify-center">
                     <Button
                       type="default"

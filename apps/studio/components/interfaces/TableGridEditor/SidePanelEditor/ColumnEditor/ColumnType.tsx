@@ -66,6 +66,7 @@ const ColumnType = ({
   description,
   showRecommendation = false,
   onOptionSelect = noop,
+  error,
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
   const availableTypes = POSTGRES_DATA_TYPES.concat(
@@ -167,7 +168,7 @@ const ColumnType = ({
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
-            type="default"
+            type={error ? 'danger' : 'default'}
             role="combobox"
             size={'small'}
             aria-expanded={open}

@@ -1,8 +1,8 @@
-import { UseInfiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { last } from 'lodash'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobRunsVariables = {
@@ -20,9 +20,9 @@ export type CronJobRun = {
   command: string
   // statuses https://github.com/citusdata/pg_cron/blob/f5d111117ddc0f4d83a1bad34d61b857681b6720/include/job_metadata.h#L20
   status: 'starting' | 'running' | 'sending' | 'connecting' | 'succeeded' | 'failed'
-  return_message: string
+  return_message: string | null
   start_time: string
-  end_time: string
+  end_time: string | null
 }
 
 export const CRON_JOB_RUNS_PAGE_SIZE = 30
@@ -59,11 +59,11 @@ export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<DatabaseCronJobRunData, DatabaseCronJobError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<DatabaseCronJobRunData, DatabaseCronJobError, TData> = {}
 ) =>
-  useInfiniteQuery<DatabaseCronJobRunData, DatabaseCronJobError, TData>(
-    databaseCronJobsKeys.runsInfinite(projectRef, jobId, { status }),
-    ({ pageParam }) => {
+  useInfiniteQuery<DatabaseCronJobRunData, DatabaseCronJobError, TData>({
+    queryKey: databaseCronJobsKeys.runsInfinite(projectRef, jobId, { status }),
+    queryFn: ({ pageParam }) => {
       return getDatabaseCronJobRuns({
         projectRef,
         connectionString,
@@ -71,15 +71,13 @@ export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
         afterTimestamp: pageParam,
       })
     },
-    {
-      staleTime: 0,
-      enabled: enabled && typeof projectRef !== 'undefined',
+    staleTime: 0,
+    enabled: enabled && typeof projectRef !== 'undefined',
 
-      getNextPageParam(lastPage) {
-        const hasNextPage = lastPage.length <= CRON_JOB_RUNS_PAGE_SIZE
-        if (!hasNextPage) return undefined
-        return last(lastPage)?.start_time
-      },
-      ...options,
-    }
-  )
+    getNextPageParam(lastPage) {
+      const hasNextPage = lastPage.length <= CRON_JOB_RUNS_PAGE_SIZE
+      if (!hasNextPage) return undefined
+      return last(lastPage)?.start_time
+    },
+    ...options,
+  })

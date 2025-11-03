@@ -1,29 +1,30 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
-import { useCreatePublicationMutation } from 'data/replication/create-publication-mutation'
-import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-  cn,
-  Button,
-  SheetFooter,
-  SheetSection,
-  Form_Shadcn_,
-  FormField_Shadcn_,
-  FormControl_Shadcn_,
-  Input_Shadcn_,
-  SheetDescription,
-} from 'ui'
-import { MultiSelector } from 'ui-patterns/multi-select'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
+
+import { useParams } from 'common'
+import { useCreatePublicationMutation } from 'data/replication/create-publication-mutation'
+import { useReplicationTablesQuery } from 'data/replication/tables-query'
+import {
+  Button,
+  cn,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { MultiSelector } from 'ui-patterns/multi-select'
 
 interface NewPublicationPanelProps {
   visible: boolean
@@ -31,7 +32,7 @@ interface NewPublicationPanelProps {
   onClose: () => void
 }
 
-const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
+export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
   const { mutateAsync: createPublication, isLoading: creatingPublication } =
     useCreatePublicationMutation()
@@ -170,5 +171,3 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
     </>
   )
 }
-
-export default NewPublicationPanel

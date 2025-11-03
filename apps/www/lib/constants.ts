@@ -34,8 +34,8 @@ export const SITE_ORIGIN =
 
 export const CMS_SITE_ORIGIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? // In production, require env or fall back to localhost to avoid hitting supabase.com
-      'http://localhost:3030'
+    ? // In production, use the actual CMS domain
+      process.env.CMS_SITE_ORIGIN || 'https://cms.supabase.com'
     : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
         typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL.replace('zone-www-dot-com-git-', 'cms-git-')}`

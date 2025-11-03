@@ -450,7 +450,7 @@
       },
       {
         "id": "sign-in-with-id-token",
-        "title": "Sign in with ID Token",
+        "title": "Sign in with ID token (native sign-in)",
         "slug": "auth-signinwithidtoken",
         "product": "auth",
         "type": "function"
@@ -487,6 +487,13 @@
         "id": "sign-in-with-sso",
         "title": "Sign in a user through SSO",
         "slug": "auth-signinwithsso",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "sign-in-with-web3",
+        "title": "Sign in a user through Web3 (Solana, Ethereum)",
+        "slug": "auth-signinwithweb3",
         "product": "auth",
         "type": "function"
       },

@@ -3,11 +3,11 @@ import Image from 'next/image'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { BASE_PATH } from 'lib/constants'
-import { useIsRealtimeSettingsEnabled } from './FeaturePreviewContext'
+import { useIsAdvisorRulesEnabled } from './FeaturePreviewContext'
 
 export const AdvisorRulesPreview = () => {
   const { ref } = useParams()
-  const isRealtimeSettingsEnabled = useIsRealtimeSettingsEnabled()
+  const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
 
   return (
     <div>
@@ -30,9 +30,9 @@ export const AdvisorRulesPreview = () => {
             Allow you to disable advisor rules for your project from the{' '}
             <InlineLink
               href={
-                isRealtimeSettingsEnabled
-                  ? `/project/${ref}/advisors/security`
-                  : `/project/${ref}/advisors/rules/security`
+                isAdvisorRulesEnabled
+                  ? `/project/${ref}/advisors/rules/security`
+                  : `/project/${ref}/advisors/security`
               }
             >
               Advisors section.

@@ -9,10 +9,11 @@ import * as yup from 'yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -27,7 +28,6 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Switch,
-  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { urlRegex } from '../Auth.constants'
@@ -53,11 +53,11 @@ export const SmtpForm = () => {
   const [enableSmtp, setEnableSmtp] = useState(false)
   const [hidden, setHidden] = useState(true)
 
-  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
@@ -179,16 +179,18 @@ export const SmtpForm = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <ScaffoldSection isFullWidth>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
     )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view SMTP settings" />
+    return (
+      <ScaffoldSection isFullWidth>
+        <NoPermission resourceText="view SMTP settings" />
+      </ScaffoldSection>
+    )
   }
 
   return (
@@ -374,8 +376,8 @@ export const SmtpForm = () => {
                         name="SMTP_MAX_FREQUENCY"
                         render={({ field }) => (
                           <FormItemLayout
-                            label="Minimum interval between emails being sent"
-                            description="How long between each email can a new email be sent via your SMTP server."
+                            label="Minimum interval between emails being sent to same user"
+                            description="How long between each email can a new email be sent via your SMTP server to the same user."
                           >
                             <FormControl_Shadcn_>
                               <PrePostTab postTab="seconds">

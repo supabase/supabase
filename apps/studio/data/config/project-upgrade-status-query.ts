@@ -1,8 +1,9 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { PROJECT_STATUS } from 'lib/constants'
 import { configKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type ProjectUpgradingStatusVariables = {
   projectRef?: string
@@ -38,37 +39,35 @@ export const useProjectUpgradingStatusQuery = <TData = ProjectUpgradingStatusDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData> = {}
+  }: UseCustomQueryOptions<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData> = {}
 ) => {
   const client = useQueryClient()
 
-  return useQuery<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData>(
-    configKeys.upgradeStatus(projectRef),
-    ({ signal }) => getProjectUpgradingStatus({ projectRef, trackingId }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      refetchInterval(data) {
-        const response = data as unknown as ProjectUpgradingStatusData
-        if (!response) return false
+  return useQuery<ProjectUpgradingStatusData, ProjectUpgradingStatusError, TData>({
+    queryKey: configKeys.upgradeStatus(projectRef),
+    queryFn: ({ signal }) => getProjectUpgradingStatus({ projectRef, trackingId }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    refetchInterval(data) {
+      const response = data as unknown as ProjectUpgradingStatusData
+      if (!response) return false
 
-        const interval =
-          // Transited to UPGRADING state via client, but job not yet picked up
-          (projectStatus === PROJECT_STATUS.UPGRADING &&
-            response.databaseUpgradeStatus?.status !== DatabaseUpgradeStatus.Upgrading) ||
-          // Project currently getting upgraded
-          response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgrading
-            ? 5000
-            : false
+      const interval =
+        // Transited to UPGRADING state via client, but job not yet picked up
+        (projectStatus === PROJECT_STATUS.UPGRADING &&
+          response.databaseUpgradeStatus?.status !== DatabaseUpgradeStatus.Upgrading) ||
+        // Project currently getting upgraded
+        response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgrading
+          ? 5000
+          : false
 
-        return interval
-      },
-      onSuccess(data) {
-        const response = data as unknown as ProjectUpgradingStatusData
-        if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
-          client.invalidateQueries(configKeys.upgradeEligibility(projectRef))
-        }
-      },
-      ...options,
-    }
-  )
+      return interval
+    },
+    onSuccess(data) {
+      const response = data as unknown as ProjectUpgradingStatusData
+      if (response.databaseUpgradeStatus?.status === DatabaseUpgradeStatus.Upgraded) {
+        client.invalidateQueries(configKeys.upgradeEligibility(projectRef))
+      }
+    },
+    ...options,
+  })
 }
