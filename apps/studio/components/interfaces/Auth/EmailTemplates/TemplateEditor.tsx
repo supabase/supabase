@@ -288,9 +288,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
         {messageProperty && (
           <>
-            <CardContent className="p-0">
-              <div className="flex items-center justify-between p-6 pb-4">
-                <Label_Shadcn_ className="block mb-0">Body</Label_Shadcn_>
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex items-center justify-between gap-2">
+                <Label_Shadcn_>Body</Label_Shadcn_>
                 <TwoOptionToggle
                   width={60}
                   options={['preview', 'source']}
@@ -301,7 +301,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               </div>
               {activeView === 'source' ? (
                 <>
-                  <div className="mx-6 mb-6 rounded-md border overflow-hidden">
+                  <div className="rounded-md border overflow-hidden">
                     <CodeEditor
                       id="code-id"
                       language="html"
@@ -317,48 +317,49 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     />
                   </div>
                   {messageVariables.length > 0 && (
-                    <div className="px-6">
-                      <div className="flex flex-wrap gap-1">
-                        {messageVariables.map(({ variable, description }) => (
-                          <Tooltip key={variable}>
-                            <TooltipTrigger asChild>
-                              <Button
-                                type="outline"
-                                size="tiny"
-                                className="rounded-full"
-                                onClick={() => insertTextAtCursor(variable)}
-                              >
-                                {variable}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top">
-                              <p>{description || 'Variable description not available'}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        ))}
-                      </div>
+                    <div className="flex flex-wrap gap-1">
+                      {messageVariables.map(({ variable, description }) => (
+                        <Tooltip key={variable}>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="outline"
+                              size="tiny"
+                              className="rounded-full"
+                              onClick={() => insertTextAtCursor(variable)}
+                            >
+                              {variable}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            <p>{description || 'Variable description not available'}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
                     </div>
                   )}
                 </>
               ) : (
                 <>
                   <iframe
-                    className="!mb-0 mt-0 overflow-hidden h-96 w-full"
+                    className="!mb-0 mt-0 overflow-hidden h-96 w-full rounded-md border"
                     title={id}
                     srcDoc={bodyValue}
                     sandbox="allow-scripts allow-forms"
                   />
                   <Admonition
                     type="default"
-                    title="The preview may differ slightly from the actual rendering in the email client"
-                    className="rounded-none border-0 mb-0"
+                    title="Email rendering may differ"
+                    description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
                   />
                 </>
               )}
             </CardContent>
-            <CardContent></CardContent>
-            <CardFooter className="justify-between space-x-2">
+
+            <CardContent>
               <SpamValidation validationResult={validationResult} />
+            </CardContent>
+
+            <CardFooter className="flex flex-row justify-end gap-2">
               {hasChanges && (
                 <Button
                   type="default"
