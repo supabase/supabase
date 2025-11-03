@@ -254,6 +254,8 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   name={x}
                   render={({ field }) => (
                     <FormItemLayout
+                      className="md:items-center"
+                      layout="flex-row-reverse"
                       label={property.title}
                       description={
                         property.description ? (
@@ -271,7 +273,12 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       }
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
+                        <Input_Shadcn_
+                          id={x}
+                          {...field}
+                          disabled={!canUpdateConfig}
+                          className="w-full md:min-w-[300px] lg:min-w-[420px]"
+                        />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -285,7 +292,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
         {messageProperty && (
           <>
             <CardContent className="p-0">
-              <Label_Shadcn_ className="p-6 pb-4 block">Message body</Label_Shadcn_>
+              <Label_Shadcn_ className="p-6 pb-4 block">Body</Label_Shadcn_>
               <Tabs_Shadcn_ defaultValue="source">
                 <TabsList_Shadcn_ className="gap-3 px-6">
                   <TabsTrigger_Shadcn_ value="source" className="gap-2">
