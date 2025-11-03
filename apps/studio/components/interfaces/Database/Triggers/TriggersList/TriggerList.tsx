@@ -1,10 +1,12 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
 import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
-import Link from 'next/link'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useParams } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -25,7 +27,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
-import { PostgresTrigger } from '@supabase/postgres-meta'
 
 interface TriggerListProps {
   schema: string
@@ -36,7 +37,7 @@ interface TriggerListProps {
   deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
-const TriggerList = ({
+export const TriggerList = ({
   schema,
   filterString,
   isLocked,
@@ -44,9 +45,15 @@ const TriggerList = ({
   duplicateTrigger,
   deleteTrigger,
 }: TriggerListProps) => {
+  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
+
+  const { can: canUpdateTriggers } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
 
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -57,15 +64,9 @@ const TriggerList = ({
       includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
       (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase()))
   )
-
   const _triggers = sortBy(
     filteredTriggers.filter((x) => x.schema == schema),
     (trigger) => trigger.name.toLocaleLowerCase()
-  )
-  const projectRef = project?.ref
-  const { can: canUpdateTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
   )
 
   if (_triggers.length === 0 && filterString.length === 0) {
@@ -96,7 +97,7 @@ const TriggerList = ({
 
   return (
     <>
-      {_triggers.map((x: any) => (
+      {_triggers.map((x) => (
         <TableRow key={x.id}>
           <TableCell className="space-x-2">
             <Tooltip>
@@ -114,13 +115,13 @@ const TriggerList = ({
 
           <TableCell className="break-all">
             {x.table_id ? (
-              <Link
-                href={`/project/${projectRef}/editor/${x.table_id}`}
-                className="truncate text-link"
+              <InlineLink
                 title={x.table}
+                href={`/project/${projectRef}/editor/${x.table_id}`}
+                className="truncate block max-w-40"
               >
                 {x.table}
-              </Link>
+              </InlineLink>
             ) : (
               <p title={x.table} className="truncate">
                 {x.table}
@@ -130,13 +131,13 @@ const TriggerList = ({
 
           <TableCell className="space-x-2">
             {x.function_name ? (
-              <Link
-                href={`/project/${projectRef}/database/functions?search=${x.function_name}`}
-                className="truncate text-link"
+              <InlineLink
                 title={x.function_name}
+                href={`/project/${projectRef}/database/functions?search=${x.function_name}&schema=${x.function_schema}`}
+                className="truncate block max-w-40"
               >
                 {x.function_name}
-              </Link>
+              </InlineLink>
             ) : (
               <p className="truncate text-foreground-light">-</p>
             )}
@@ -257,5 +258,3 @@ const TriggerList = ({
     </>
   )
 }
-
-export default TriggerList
