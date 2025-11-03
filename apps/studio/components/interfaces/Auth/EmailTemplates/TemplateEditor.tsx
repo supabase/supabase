@@ -139,7 +139,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               {
                 onSuccess: () => {
                   setIsSavingTemplate(false)
-                  toast.success('Successfully updated settings')
+                  toast.success('Successfully updated email template')
                   setHasUnsavedChanges(false) // Reset the unsaved changes state
                 },
               }

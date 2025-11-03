@@ -205,7 +205,7 @@ export const SmtpForm = () => {
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex-row-reverse"
-                    label="Enable Custom SMTP"
+                    label="Enable custom SMTP"
                     description={
                       <p className="max-w-full prose text-sm text-foreground-lighter">
                         Emails will be sent using your custom SMTP provider. Email rate limits can
