@@ -10,9 +10,9 @@ interface CommandMenuTelemetryContextValue {
 
 const CommandMenuTelemetryContext = createContext<CommandMenuTelemetryContextValue | null>(null)
 
-function useCommandMenuTelemetryContext() {
+export function useCommandMenuTelemetryContext() {
   const context = useContext(CommandMenuTelemetryContext)
   return context
 }
 
-export { CommandMenuTelemetryContext, useCommandMenuTelemetryContext }
+export { CommandMenuTelemetryContext }
