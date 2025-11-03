@@ -317,7 +317,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     />
                   </div>
                   {messageVariables.length > 0 && (
-                    <div className="px-6 py-3 border-t bg-surface-200">
+                    <div className="px-6">
                       <div className="flex flex-wrap gap-1">
                         {messageVariables.map(({ variable, description }) => (
                           <Tooltip key={variable}>
@@ -356,10 +356,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                 </>
               )}
             </CardContent>
-            <CardContent>
+            <CardContent></CardContent>
+            <CardFooter className="justify-between space-x-2">
               <SpamValidation validationResult={validationResult} />
-            </CardContent>
-            <CardFooter className="justify-end space-x-2">
               {hasChanges && (
                 <Button
                   type="default"

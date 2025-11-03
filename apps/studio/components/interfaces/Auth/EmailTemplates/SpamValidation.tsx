@@ -26,11 +26,11 @@ export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
         )}
       </div>
       <div className="flex flex-col gap-2">
-        <h5>
+        <p className={`text-sm ${hasSpamWarning ? 'text-foreground' : 'text-foreground-light'}`}>
           {hasSpamWarning
-            ? 'Email has a high probability of being marked as spam - review issues below to improve deliverability.'
-            : 'Email content is unlikely to be marked as spam'}
-        </h5>
+            ? 'High probability of being marked as spam. Review issues below'
+            : 'Not likely to be marked as spam'}
+        </p>
         {hasSpamWarning && (
           <>
             <div className="flex flex-col gap-y-3">
