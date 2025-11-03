@@ -1,6 +1,6 @@
 // @ts-nocheck
 // [Joshen] To remove after infra changes for analytics bucket is in
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
@@ -36,7 +36,7 @@ export const useAnalyticsBucketsQuery = <TData = AnalyticsBucketsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<AnalyticsBucketsData, AnalyticsBucketsError, TData> = {}
+  }: UseCustomQueryOptions<AnalyticsBucketsData, AnalyticsBucketsError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY

@@ -1,8 +1,8 @@
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 type StorageArchiveCreateVariables = {
@@ -27,7 +27,7 @@ export function useStorageArchiveCreateMutation({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>,
+  UseCustomMutationOptions<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>,
   'mutationFn'
 > = {}) {
   const queryClient = useQueryClient()

@@ -1,8 +1,8 @@
 import { toast } from 'sonner'
 
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { apiKeysKeys } from '../keys'
 
 export interface UpdateAPIKeybyIdVariables {
@@ -43,7 +43,7 @@ export const useResourceUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>,
+  UseCustomMutationOptions<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

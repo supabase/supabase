@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobsVariables = {
@@ -26,7 +26,7 @@ export type DatabaseCronJobError = ResponseError
 
 export const useCronTimezoneQuery = <TData = string>(
   { projectRef, connectionString }: DatabaseCronJobsVariables,
-  { enabled = true, ...options }: UseQueryOptions<string, DatabaseCronJobError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<string, DatabaseCronJobError, TData> = {}
 ) =>
   useQuery<string, DatabaseCronJobError, TData>({
     queryKey: databaseCronJobsKeys.timezone(projectRef),

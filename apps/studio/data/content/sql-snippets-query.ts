@@ -1,6 +1,7 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 import { get } from 'data/fetchers'
+import { UseCustomInfiniteQueryOptions } from 'types'
 import { Content } from './content-query'
 import { contentKeys } from './keys'
 import { SNIPPET_PAGE_LIMIT } from './sql-folders-query'
@@ -61,7 +62,7 @@ export const useSqlSnippetsQuery = <TData = SqlSnippetsData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<SqlSnippetsData, SqlSnippetsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<SqlSnippetsData, SqlSnippetsError, TData> = {}
 ) =>
   useInfiniteQuery<SqlSnippetsData, SqlSnippetsError, TData>({
     queryKey: contentKeys.sqlSnippets(projectRef, { sort, name, visibility, favorite }),
