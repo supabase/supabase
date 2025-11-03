@@ -47,7 +47,11 @@ const RowCountSelector = ({
   )
 }
 
-export const Pagination = () => {
+type PaginationProps = {
+  disableForeignRowsQuery?: boolean
+}
+
+export const Pagination = ({ disableForeignRowsQuery = false }: PaginationProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
 
@@ -108,7 +112,7 @@ export const Pagination = () => {
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      enabled: isForeignTableSelected,
+      enabled: isForeignTableSelected && !disableForeignRowsQuery,
     }
   )
   const isLastPage = (rowsData?.rows ?? []).length < tableEditorSnap.rowsPerPage
@@ -223,8 +227,8 @@ export const Pagination = () => {
           icon={<ArrowRight />}
           type="outline"
           className="px-1.5"
-          disabled={isLastPage}
-          loading={isLoadingRows}
+          disabled={isLastPage || disableForeignRowsQuery}
+          loading={isLoadingRows && !disableForeignRowsQuery}
           onClick={goToNextPage}
         />
         <RowCountSelector onRowsPerPageChange={onRowsPerPageChange} />

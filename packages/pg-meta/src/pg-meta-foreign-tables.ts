@@ -11,6 +11,9 @@ export const pgForeignTableZod = z.object({
   schema: z.string(),
   name: z.string(),
   comment: z.string().nullable(),
+  foreign_server_name: z.string().nullable(),
+  foreign_data_wrapper_name: z.string().nullable(),
+  foreign_data_wrapper_handler: z.string().nullable(),
   columns: pgColumnArrayZod.optional(),
 })
 
