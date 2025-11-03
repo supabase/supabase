@@ -6,7 +6,7 @@ subtitle: 'Learn how to manage the email templates in Supabase.'
 
 You can customize the email messages used for the authentication flows. You can edit the following email templates:
 
-- Confirm signup
+- Confirm sign up
 - Invite user
 - Magic Link
 - Change Email Address
@@ -48,8 +48,8 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-      "mailer_subjects_confirmation": "Confirm your signup",
-      "mailer_templates_confirmation_content": "<h2>Confirm your signup</h2><p>Follow this link to confirm your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm your email</a></p>",
+      "mailer_subjects_confirmation": "Confirm your sign up",
+      "mailer_templates_confirmation_content": "<h2>Confirm your sign up</h2><p>Follow this link to confirm your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm your email</a></p>",
       "mailer_subjects_magic_link": "Your Magic Link",
       "mailer_templates_magic_link_content": "<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href=\"{{ .ConfirmationURL }}\">Log In</a></p>",
       "mailer_subjects_recovery": "Rest Your Password",
@@ -79,7 +79,7 @@ To guard against this there are the options below:
 - Create your own custom email link to redirect the user to a page where they can enter with their email and token to login
 
 ```html
-<a href="{{ .SiteURL }}/confirm-signup">Confirm your signup</a>
+<a href="{{ .SiteURL }}/confirm-signup">Confirm your sign up</a>
 ```
 
 - Log them in by verifying the OTP token value with their email e.g. with [`supabase.auth.verifyOtp`](/docs/reference/javascript/auth-verifyotp) show below
@@ -94,7 +94,7 @@ const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'ema
 
 ```html
 <a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}"
-  >Confirm your signup</a
+  >Confirm your sign up</a
 >
 ```
 

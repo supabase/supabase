@@ -22,7 +22,7 @@ content_path = "./supabase/templates/invite.html"
 ```html name=supabase/templates/invite.html
 <html>
   <body>
-    <h2>Confirm your signup</h2>
+    <h2>Confirm your sign up</h2>
     <p><a href="{{ .ConfirmationURL }}">Confirm your email</a></p>
   </body>
 </html>
@@ -43,7 +43,7 @@ There are several Auth email templates which can be configured. Each template se
 
 ### `auth.email.template.confirmation`
 
-**Default subject**: "Confirm Your Signup"
+**Default subject**: "Confirm your sign up"
 **When sent**: When a user signs up and needs to verify their email address
 **Purpose**: Email verification for new user registrations
 **Content**: Contains a confirmation link to verify the user's email address

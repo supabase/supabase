@@ -469,7 +469,7 @@ meta="name=app/error/page.tsx"
 Before proceeding, change the email template to support support a server-side authentication flow that sends a token hash:
 
 - Go to the [Auth templates](/dashboard/project/_/auth/templates) page in your dashboard.
-- Select the **Confirm signup** template.
+- Select the **Confirm sign up** template.
 - Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 
 <Admonition type="tip">
@@ -830,7 +830,7 @@ npm run dev
 
 And then open the browser to [localhost:3000/login](http://localhost:3000/login) and you should see the completed app.
 
-When you enter your email and password, you will receive an email with the title **Confirm Your Signup**. Congrats 🎉!!!
+When you enter your email and password, you will receive an email with the title **Confirm your sign up**. Congrats 🎉!!!
 
 ## Bonus: Profile photos
 
