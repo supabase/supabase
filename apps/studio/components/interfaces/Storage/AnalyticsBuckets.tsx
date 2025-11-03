@@ -48,7 +48,7 @@ export const AnalyticsBuckets = () => {
       <Admonition
         type="warning"
         layout="horizontal"
-        className="mb-4 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
+        className="mb-12 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
         title="Analytics buckets are in alpha"
         actions={
           <Button asChild type="default" icon={<ExternalLink />}>
@@ -58,7 +58,7 @@ export const AnalyticsBuckets = () => {
         }
       >
         <p className="!leading-normal !mb-0">
-          Expect rapid changes, limited features, and possible breakig updates as we expand access.
+          Expect rapid changes, limited features, and possible breaking updates as we expand access.
         </p>
         <p className="!leading-normal !mb-0">Please share feedback as we refine the experience!</p>
       </Admonition>
