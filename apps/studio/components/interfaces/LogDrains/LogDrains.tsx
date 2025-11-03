@@ -114,7 +114,7 @@ export function LogDrains({
             <TableRow>
               <TableHead className="max-w-[200px]">Name</TableHead>
               <TableHead className="w-96">Description</TableHead>
-              <TableHead>Destination</TableHead>
+              <TableHead className="w-48">Destination</TableHead>
               <TableHead className="text-right">
                 <div className="sr-only">Actions</div>
               </TableHead>
@@ -145,7 +145,9 @@ export function LogDrains({
                           ?.icon as React.ReactElement,
                         { width: 16, height: 16 }
                       )}
-                      <span>{LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name}</span>
+                      <span className="truncate max-w-40">
+                        {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
