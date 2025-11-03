@@ -131,13 +131,13 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    alternateInstructions: (_config) => {
+    primaryInstructions: (_config) => {
       const config = _config as ClaudeCodeMcpConfig
       const command = `claude mcp add --scope project --transport http supabase "${config.mcpServers.supabase.url}"`
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
-            Alternatively, add the MCP server to your project config using the command line:
+            Add the MCP server to your project config using the command line:
           </p>
           <CodeBlock
             value={command}
