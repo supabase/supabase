@@ -17,47 +17,45 @@ export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
   const hasSpamWarning = spamRules.length > 0
 
   return (
-    <div className="flex items-start gap-2">
-      <div className="mt-0.5">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-row gap-2">
         {hasSpamWarning ? (
-          <MailWarning size={16} strokeWidth={1.5} className="text-warning" />
+          <MailWarning size={16} strokeWidth={1.5} className="text-warning mt-0.5" />
         ) : (
-          <Check size={16} strokeWidth={1.5} className="text-brand" />
+          <Check size={16} strokeWidth={1.5} className="text-brand mt-0.5" />
         )}
-      </div>
-      <div className="flex flex-col gap-4 w-full">
         <p className={`text-sm ${hasSpamWarning ? 'text-foreground' : 'text-foreground-light'}`}>
           {hasSpamWarning
             ? 'High probability of being marked as spam. Review these issues to improve deliverability:'
             : 'Not likely to be marked as spam'}
         </p>
-        {hasSpamWarning && (
-          <div className="flex flex-col gap-1">
-            <div className="w-full border rounded-md overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Warning</TableHead>
-                    <TableHead>Description</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {spamRules.map((rule) => (
-                    <TableRow key={rule.name}>
-                      <TableCell className="font-mono">{rule.name}</TableCell>
-                      <TableCell>{rule.desc}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            <Markdown
-              className="!max-w-none text-foreground-lighter text-xs mt-2"
-              content="Spam validation is powered by [SpamAssassin](https://spamassassin.apache.org/doc.html). Full list of all available warnings can be found [here](https://gist.github.com/ychaouche/a2faff159c2a1fea16019156972c7f8b)."
-            />
-          </div>
-        )}
       </div>
+      {hasSpamWarning && (
+        <div className="flex flex-col gap-1">
+          <div className="w-full border rounded-md overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Warning</TableHead>
+                  <TableHead>Description</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {spamRules.map((rule) => (
+                  <TableRow key={rule.name}>
+                    <TableCell className="font-mono">{rule.name}</TableCell>
+                    <TableCell>{rule.desc}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <Markdown
+            className="!max-w-none text-foreground-lighter text-xs mt-2"
+            content="Spam validation is powered by [SpamAssassin](https://spamassassin.apache.org/doc.html). Full list of all available warnings can be found [here](https://gist.github.com/ychaouche/a2faff159c2a1fea16019156972c7f8b)."
+          />
+        </div>
+      )}
     </div>
   )
 }
