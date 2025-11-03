@@ -1,4 +1,6 @@
+import type { OptimizedSearchColumns } from './get-users-types'
 import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from './get-count-estimate'
+import { stringRange, prefixToUUID } from './get-users-common'
 
 export const USERS_COUNT_ESTIMATE_SQL = `select reltuples as estimate from pg_class where oid = 'auth.users'::regclass`
 
@@ -7,11 +9,14 @@ export const getUsersCountSQL = ({
   keywords,
   providers,
   forceExactCount = false,
+  column,
 }: {
   filter?: 'verified' | 'unverified' | 'anonymous'
   keywords?: string
   providers?: string[]
   forceExactCount?: boolean
+  /** If set, uses optimized prefix search for the specified column */
+  column?: OptimizedSearchColumns
 }) => {
   const hasValidKeywords = keywords && keywords !== ''
 
@@ -19,33 +24,56 @@ export const getUsersCountSQL = ({
   const baseQueryCount = `select count(*) from auth.users`
   const baseQuerySelect = `select * from auth.users`
 
-  if (hasValidKeywords) {
-    // [Joshen] Escape single quotes properly
+  const optimizedSearchMode = column && hasValidKeywords
+  if (optimizedSearchMode) {
     const formattedKeywords = keywords.replaceAll("'", "''")
-    conditions.push(
-      `id::text ilike '%${formattedKeywords}%' or email ilike '%${formattedKeywords}%' or phone ilike '%${formattedKeywords}%'`
-    )
-  }
 
-  if (filter === 'verified') {
-    conditions.push(`email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL`)
-  } else if (filter === 'anonymous') {
-    conditions.push(`is_anonymous is true`)
-  } else if (filter === 'unverified') {
-    conditions.push(`email_confirmed_at IS NULL AND phone_confirmed_at IS NULL`)
-  }
+    if (column === 'email') {
+      const range = stringRange(formattedKeywords)
+      conditions.push(
+        `lower(email) >= '${range[0]}'${range[1] ? ` and lower(email) < '${range[1]}'` : ''} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid`
+      )
+    } else if (column === 'phone') {
+      const range = stringRange(formattedKeywords)
+      conditions.push(`phone >= '${range[0]}'${range[1] ? ` and phone < '${range[1]}'` : ''}`)
+    } else if (column === 'id') {
+      const isMatchingUUIDValue = prefixToUUID(formattedKeywords, false) === formattedKeywords
+      conditions.push(
+        isMatchingUUIDValue
+          ? `id = '${formattedKeywords}'`
+          : `id >= '${prefixToUUID(formattedKeywords, false)}' and id < '${prefixToUUID(formattedKeywords, true)}'`
+      )
+    }
+  } else {
+    // Unified search mode - apply all filters
+    if (hasValidKeywords) {
+      // [Joshen] Escape single quotes properly
+      const formattedKeywords = keywords.replaceAll("'", "''")
+      conditions.push(
+        `id::text ilike '%${formattedKeywords}%' or email ilike '%${formattedKeywords}%' or phone ilike '%${formattedKeywords}%'`
+      )
+    }
 
-  if (providers && providers.length > 0) {
-    // [Joshen] This is arguarbly not fully optimized, but at the same time not commonly used
-    // JFYI in case we do eventually run into performance issues here when filtering for SAML provider
-    if (providers.includes('saml 2.0')) {
-      conditions.push(
-        `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => (p === 'saml 2.0' ? `'sso'` : `'${p}'`)).join(', ')}]`.trim()
-      )
-    } else {
-      conditions.push(
-        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => `'${p}'`).join(', ')}]`
-      )
+    if (filter === 'verified') {
+      conditions.push(`email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL`)
+    } else if (filter === 'anonymous') {
+      conditions.push(`is_anonymous is true`)
+    } else if (filter === 'unverified') {
+      conditions.push(`email_confirmed_at IS NULL AND phone_confirmed_at IS NULL`)
+    }
+
+    if (providers && providers.length > 0) {
+      // [Joshen] This is arguarbly not fully optimized, but at the same time not commonly used
+      // JFYI in case we do eventually run into performance issues here when filtering for SAML provider
+      if (providers.includes('saml 2.0')) {
+        conditions.push(
+          `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => (p === 'saml 2.0' ? `'sso'` : `'${p}'`)).join(', ')}]`.trim()
+        )
+      } else {
+        conditions.push(
+          `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => `'${p}'`).join(', ')}]`
+        )
+      }
     }
   }
 

@@ -1,3 +1,6 @@
+import { stringRange, prefixToUUID } from './get-users-common'
+import { OptimizedSearchColumns } from './get-users-types'
+
 interface getPaginatedUsersSQLProps {
   page?: number
   verified?: 'verified' | 'unverified' | 'anonymous'
@@ -8,54 +11,11 @@ interface getPaginatedUsersSQLProps {
   limit?: number
 
   /** If set, uses fast queries but these don't allow any sorting so the above parameters are completely ignored. */
-  column?: 'id' | 'email' | 'phone'
+  column?: OptimizedSearchColumns
   startAt?: string
 }
 
 const DEFAULT_LIMIT = 50
-
-function prefixToUUID(prefix: string, max: boolean) {
-  const mapped = '00000000-0000-0000-0000-000000000000'
-    .split('')
-    .map((c, i) => (c === '-' ? c : prefix[i] ?? c))
-
-  if (prefix.length >= mapped.length) {
-    return mapped.join('')
-  }
-
-  if (prefix.length && prefix.length < 15) {
-    mapped[14] = '4'
-  }
-
-  if (prefix.length && prefix.length < 20) {
-    mapped[19] = max ? 'b' : '8'
-  }
-
-  if (max) {
-    for (let i = prefix.length; i < mapped.length; i += 1) {
-      if (mapped[i] === '0') {
-        mapped[i] = 'f'
-      }
-    }
-  }
-
-  return mapped.join('')
-}
-
-function stringRange(prefix: string) {
-  if (!prefix) {
-    return [prefix, undefined]
-  }
-
-  const lastChar = prefix.charCodeAt(prefix.length - 1)
-
-  if (lastChar >= `~`.charCodeAt(0)) {
-    // not ASCII
-    return [prefix, prefix]
-  }
-
-  return [prefix, prefix.substring(0, prefix.length - 1) + String.fromCharCode(lastChar + 1)]
-}
 
 export const getPaginatedUsersSQL = ({
   page = 0,

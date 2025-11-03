@@ -9,6 +9,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Filter } from './Users.constants'
+import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 
 interface UsersFooterProps {
   filter: Filter
@@ -42,6 +43,13 @@ export const UsersFooter = ({
       filter: filter === 'all' ? undefined : filter,
       providers: selectedProviders,
       forceExactCount,
+      // Force exact count for optimized search since result sets are small
+      // forceExactCount: forceExactCount || specificFilterColumn !== 'freeform',
+
+      // Use optimized search when filtering by specific column
+      ...(specificFilterColumn !== 'freeform'
+        ? { column: specificFilterColumn as OptimizedSearchColumns }
+        : { column: undefined }),
     },
     { keepPreviousData: true }
   )

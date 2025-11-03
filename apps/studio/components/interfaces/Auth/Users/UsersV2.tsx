@@ -54,6 +54,9 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+
+type SpecificFilterColumn = OptimizedSearchColumns | 'freeform'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 
@@ -91,9 +94,9 @@ export const UsersV2 = () => {
     }
   }, [showEmailPhoneColumns])
 
-  const [specificFilterColumn, setSpecificFilterColumn] = useQueryState(
+  const [specificFilterColumn, setSpecificFilterColumn] = useQueryState<SpecificFilterColumn>(
     'filter',
-    parseAsStringEnum(['id', 'email', 'phone', 'freeform']).withDefault('id')
+    parseAsStringEnum<SpecificFilterColumn>(['id', 'email', 'phone', 'freeform']).withDefault('id')
   )
   const [filterUserType, setFilterUserType] = useQueryState(
     'userType',
