@@ -10,7 +10,10 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
+import {
+  useCreateLogDrainMutation,
+  LogDrainCreateVariables,
+} from 'data/log-drains/create-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -29,6 +32,7 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ChevronDown } from 'lucide-react'
 import { cloneElement } from 'react'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -39,6 +43,9 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false)
   const { ref } = useParams() as { ref: string }
   const [selectedLogDrain, setSelectedLogDrain] = useState<Partial<LogDrainData> | null>(null)
+  const [isCreateConfirmModalOpen, setIsCreateConfirmModalOpen] = useState(false)
+  const [pendingLogDrainValues, setPendingLogDrainValues] =
+    useState<LogDrainCreateVariables | null>(null)
   const [mode, setMode] = useState<'create' | 'update'>('create')
 
   const { plan, isLoading: planLoading } = useCurrentOrgPlan()
@@ -112,7 +119,10 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             }
 
             if (mode === 'create') {
-              createLogDrain(logDrainValues)
+              // createLogDrain(logDrainValues)
+              setPendingLogDrainValues(logDrainValues)
+              // setOpen(false)
+              setIsCreateConfirmModalOpen(true)
             } else {
               if (!logDrainValues.id || !selectedLogDrain?.token) {
                 throw new Error('Log drain ID and token is required')
@@ -133,6 +143,37 @@ const LogDrainsSettings: NextPageWithLayout = () => {
           <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
         )}
       </ScaffoldContainer>
+
+      <ConfirmationModal
+        confirmLabel="Add destination"
+        variant="default"
+        title="Confirm Log Drain Creation"
+        visible={isCreateConfirmModalOpen}
+        onConfirm={() => {
+          if (pendingLogDrainValues) {
+            createLogDrain(pendingLogDrainValues)
+            setPendingLogDrainValues(null)
+          }
+          setIsCreateConfirmModalOpen(false)
+          setOpen(false)
+        }}
+        onCancel={() => {
+          setIsCreateConfirmModalOpen(false)
+          setPendingLogDrainValues(null)
+        }}
+      >
+        <div className="text-foreground-light text-sm space-y-2">
+          <p>
+            You are about to create a new log drain destination:{' '}
+            <span className="text-foreground">{pendingLogDrainValues?.name}</span>
+          </p>
+          <p>
+            This will incur an additional <span className="text-foreground">$60 per month</span>{' '}
+            charge to your subscription.
+          </p>
+          <p>Are you sure you want to proceed?</p>
+        </div>
+      </ConfirmationModal>
     </ScaffoldSection>
   )
 
