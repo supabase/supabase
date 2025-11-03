@@ -33,5 +33,9 @@ export interface FormSchema {
       description?: string
     }
     emailTemplateType?: 'authentication' | 'security'
+    relatedSetting?: {
+      name: string
+      path: string
+    }
   }
 }
