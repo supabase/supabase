@@ -1,6 +1,6 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesMetricsVariables = {
@@ -77,7 +77,7 @@ export const useQueuesMetricsQuery = <TData = DatabaseQueuesMetricsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseQueuesMetricsData, DatabaseQueuesMetricsError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseQueuesMetricsData, DatabaseQueuesMetricsError, TData> = {}
 ) =>
   useQuery<DatabaseQueuesMetricsData, DatabaseQueuesMetricsError, TData>({
     queryKey: databaseQueuesKeys.metrics(projectRef, queueName),

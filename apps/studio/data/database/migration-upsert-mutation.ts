@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseKeys } from './keys'
 
 export type MigrationUpsertVariables = {
@@ -45,7 +45,7 @@ export const useMigrationUpsertMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<MigrationUpsertData, ResponseError, MigrationUpsertVariables>,
+  UseCustomMutationOptions<MigrationUpsertData, ResponseError, MigrationUpsertVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

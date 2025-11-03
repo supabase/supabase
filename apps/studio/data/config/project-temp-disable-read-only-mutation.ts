@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import { usageKeys } from 'data/usage/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type TempDisableReadOnlyModeVariables = {
   projectRef: string
@@ -25,7 +25,11 @@ export const useDisableReadOnlyModeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DisableReadOnlyModeData, ResponseError, TempDisableReadOnlyModeVariables>,
+  UseCustomMutationOptions<
+    DisableReadOnlyModeData,
+    ResponseError,
+    TempDisableReadOnlyModeVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

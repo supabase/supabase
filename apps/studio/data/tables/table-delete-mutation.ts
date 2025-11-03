@@ -1,12 +1,12 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { viewKeys } from 'data/views/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableKeys } from './keys'
 
 export type TableDeleteVariables = {
@@ -45,7 +45,7 @@ export const useTableDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableDeleteData, ResponseError, TableDeleteVariables>,
+  UseCustomMutationOptions<TableDeleteData, ResponseError, TableDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

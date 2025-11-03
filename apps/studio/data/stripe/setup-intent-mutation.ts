@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SetupIntentVariables = {
   hcaptchaToken: string
@@ -26,7 +26,7 @@ export const useSetupIntent = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SetupIntentData, ResponseError, SetupIntentVariables>,
+  UseCustomMutationOptions<SetupIntentData, ResponseError, SetupIntentVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<SetupIntentData, ResponseError, SetupIntentVariables>({
