@@ -2,6 +2,7 @@
 title = "Why are my Supabase branches empty?"
 topics = [ "branching" ]
 keywords = [ "branching", "migrations" ]
+database_id = "c5dae428-8dd0-4879-b312-df7f7da25986"
 ---
 
 Branching in Supabase (Branching 2.0) relies on the current migration files in your project—**not** a schema dump—when creating environments from `main`. This means if your `main` branch lacks migration history, branching will not fully capture your schema. This is a known limitation highlighted in the [Branching 2.0 documentation](/blog/branching-2-0#current-limitations). Follow the steps below to generate, synchronize, and repair your migration history for smooth branching.
