@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Code, Monitor } from 'lucide-react'
 import { editor } from 'monaco-editor'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -8,6 +7,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
@@ -22,10 +22,6 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -75,6 +71,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
+  const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
@@ -292,32 +289,33 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
         {messageProperty && (
           <>
             <CardContent className="p-0">
-              <Label_Shadcn_ className="p-6 pb-4 block">Body</Label_Shadcn_>
-              <Tabs_Shadcn_ defaultValue="source">
-                <TabsList_Shadcn_ className="gap-3 px-6">
-                  <TabsTrigger_Shadcn_ value="source" className="gap-2">
-                    <Code size={14} />
-                    Source
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="preview" className="gap-2">
-                    <Monitor size={14} />
-                    Preview
-                  </TabsTrigger_Shadcn_>
-                </TabsList_Shadcn_>
-                <TabsContent_Shadcn_ value="source" className="p-0 mt-0">
-                  <CodeEditor
-                    id="code-id"
-                    language="html"
-                    isReadOnly={!canUpdateConfig}
-                    className="!mb-0 relative h-96 overflow-hidden p-0"
-                    onInputChange={(e: string | undefined) => {
-                      setBodyValue(e ?? '')
-                      if (bodyValue !== e) setHasUnsavedChanges(true)
-                    }}
-                    options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
-                    value={bodyValue}
-                    editorRef={editorRef}
-                  />
+              <div className="flex items-center justify-between p-6 pb-4">
+                <Label_Shadcn_ className="block mb-0">Body</Label_Shadcn_>
+                <TwoOptionToggle
+                  width={60}
+                  options={['preview', 'source']}
+                  activeOption={activeView}
+                  onClickOption={(option: 'source' | 'preview') => setActiveView(option)}
+                  borderOverride="border-muted"
+                />
+              </div>
+              {activeView === 'source' ? (
+                <>
+                  <div className="mx-6 mb-6 rounded-md border overflow-hidden">
+                    <CodeEditor
+                      id="code-id"
+                      language="html"
+                      isReadOnly={!canUpdateConfig}
+                      className="!mb-0 relative h-96"
+                      onInputChange={(e: string | undefined) => {
+                        setBodyValue(e ?? '')
+                        if (bodyValue !== e) setHasUnsavedChanges(true)
+                      }}
+                      options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
+                      value={bodyValue}
+                      editorRef={editorRef}
+                    />
+                  </div>
                   {messageVariables.length > 0 && (
                     <div className="px-6 py-3 border-t bg-surface-200">
                       <div className="flex flex-wrap gap-1">
@@ -341,8 +339,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       </div>
                     </div>
                   )}
-                </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_ value="preview" className="pt-0 mt-0">
+                </>
+              ) : (
+                <>
                   <iframe
                     className="!mb-0 mt-0 overflow-hidden h-96 w-full"
                     title={id}
@@ -354,8 +353,8 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     title="The preview may differ slightly from the actual rendering in the email client"
                     className="rounded-none border-0 mb-0"
                   />
-                </TabsContent_Shadcn_>
-              </Tabs_Shadcn_>
+                </>
+              )}
             </CardContent>
             <CardContent>
               <SpamValidation validationResult={validationResult} />
