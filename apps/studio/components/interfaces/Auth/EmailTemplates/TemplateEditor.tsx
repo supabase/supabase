@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -59,6 +60,8 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   })
 
   const { id, properties } = template
+
+  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
 
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as keyof typeof authConfig
   const messageProperty = properties[messageSlug]
@@ -251,8 +254,10 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   name={x}
                   render={({ field }) => (
                     <FormItemLayout
-                      className="md:items-center"
-                      layout="flex-row-reverse"
+                      className={
+                        isSecurityNotificationsEnabled ? 'md:py-2 md:items-center' : 'gap-y-3'
+                      }
+                      layout={isSecurityNotificationsEnabled ? 'flex-row-reverse' : 'flex-col'}
                       label={property.title}
                       description={
                         property.description ? (
@@ -274,7 +279,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                           id={x}
                           {...field}
                           disabled={!canUpdateConfig}
-                          className="w-full md:min-w-[300px] lg:min-w-[420px]"
+                          className={`w-full ${isSecurityNotificationsEnabled && 'md:min-w-[300px] lg:min-w-[512px]'}`}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
