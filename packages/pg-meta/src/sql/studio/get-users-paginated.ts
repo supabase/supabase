@@ -48,15 +48,20 @@ function stringRange(prefix: string): [string, string | undefined] {
   }
 
   const lastCharCode = prefix.charCodeAt(prefix.length - 1)
-  const TILDE_CHAR_CODE = 126 // '~' is the last printable ASCII character
+  const TILDE_CHAR_CODE = 126 // '~'
+  const Z_CHAR_CODE = 122 // 'z'
 
-  // Handle non-ASCII or last printable ASCII character
+  // 'z' (122): append '~' to avoid PostgreSQL collation issues with '{'
+  if (lastCharCode === Z_CHAR_CODE) {
+    return [prefix, prefix + '~']
+  }
+
+  // '~' (126) or beyond: append space since we can't increment further
   if (lastCharCode >= TILDE_CHAR_CODE) {
-    // Can't increment beyond '~', so append lowest printable char to extend range
     return [prefix, prefix + ' ']
   }
 
-  // Increment the last character to create upper bound
+  // All other characters: increment the last character
   const upperBound = prefix.substring(0, prefix.length - 1) + String.fromCharCode(lastCharCode + 1)
   return [prefix, upperBound]
 }
