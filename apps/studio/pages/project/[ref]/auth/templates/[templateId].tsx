@@ -209,7 +209,7 @@ const RedirectToTemplates = () => {
           </ScaffoldSection>
         ) : (
           <>
-            {showConfigurationSection ? (
+            {showConfigurationSection && (
               <ScaffoldSection isFullWidth>
                 <ScaffoldSectionTitle className="mb-4">Configuration</ScaffoldSectionTitle>
                 <Form_Shadcn_ {...templateForm}>
@@ -266,17 +266,14 @@ const RedirectToTemplates = () => {
                   </form>
                 </Form_Shadcn_>
               </ScaffoldSection>
-            ) : (
-              <>
-                {hasOverridingRelatedSetting && (
-                  <ScaffoldSection isFullWidth>
-                    <OverridingSettingAdmonition
-                      relatedSetting={template.misc.relatedSetting}
-                      projectRef={ref as string}
-                    />
-                  </ScaffoldSection>
-                )}
-              </>
+            )}
+            {!showConfigurationSection && hasOverridingRelatedSetting && (
+              <ScaffoldSection isFullWidth>
+                <OverridingSettingAdmonition
+                  relatedSetting={template.misc.relatedSetting}
+                  projectRef={ref as string}
+                />
+              </ScaffoldSection>
             )}
             <ScaffoldSection isFullWidth>
               {/* Only show title if there is an overriding related setting, as that causes multiple sections to be shown */}
