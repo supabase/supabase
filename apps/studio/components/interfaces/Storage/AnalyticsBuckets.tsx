@@ -1,6 +1,5 @@
-import { MoreVertical, Search, Trash2 } from 'lucide-react'
+import { ExternalLink, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -21,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
 import { DeleteBucketModal } from './DeleteBucketModal'
@@ -30,7 +29,6 @@ import { EmptyBucketState } from './EmptyBucketState'
 // [Joshen] Remove typecasts bucket: any once infra changes for analytics bucket is in
 
 export const AnalyticsBuckets = () => {
-  const router = useRouter()
   const { ref } = useParams()
 
   const [filterString, setFilterString] = useState('')
@@ -46,14 +44,31 @@ export const AnalyticsBuckets = () => {
   )
 
   return (
-    <>
+    <ScaffoldSection isFullWidth>
+      <Admonition
+        type="warning"
+        layout="horizontal"
+        className="mb-4 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
+        title="Analytics buckets are in alpha"
+        actions={
+          <Button asChild type="default" icon={<ExternalLink />}>
+            {/* [Joshen] To update with GH discussion */}
+            <Link href="/">Leave feedback</Link>
+          </Button>
+        }
+      >
+        <p className="!leading-normal !mb-0">
+          Expect rapid changes, limited features, and possible breakig updates as we expand access.
+        </p>
+        <p className="!leading-normal !mb-0">Please share feedback as we refine the experience!</p>
+      </Admonition>
+
       {!isLoadingBuckets &&
       buckets.filter((bucket: any) => !('type' in bucket) || bucket.type === 'ANALYTICS').length ===
         0 ? (
         <EmptyBucketState bucketType="analytics" />
       ) : (
-        // Override the default first:pt-12 to match other storage types
-        <ScaffoldSection isFullWidth className="gap-y-4 first:pt-8">
+        <div className="flex flex-col gap-y-4">
           <ScaffoldHeader className="py-0">
             <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
           </ScaffoldHeader>
@@ -145,7 +160,7 @@ export const AnalyticsBuckets = () => {
               </Table>
             </Card>
           )}
-        </ScaffoldSection>
+        </div>
       )}
 
       {selectedBucket && (
@@ -155,6 +170,6 @@ export const AnalyticsBuckets = () => {
           onClose={() => setModal(null)}
         />
       )}
-    </>
+    </ScaffoldSection>
   )
 }
