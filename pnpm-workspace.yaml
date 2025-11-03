@@ -55,6 +55,8 @@ onlyBuiltDependencies:
   - supabase
 
 overrides:
+  'react': ^19.0.0
+  'react-dom': ^19.0.0
   '@eslint/eslintrc>js-yaml': ^4.1.1
   '@react-router/dev>vite-node': 3.2.4
   '@redocly/respect-core>form-data': ^4.0.4
