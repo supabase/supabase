@@ -1,16 +1,26 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, Clock, XIcon } from 'lucide-react'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { ChevronLeft, ChevronRight, Clock, HistoryIcon } from 'lucide-react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
 
+import { Badge } from '@ui/components/shadcn/ui/badge'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
-import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import {
+  Button,
+  ButtonProps,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  cn,
+  copyToClipboard,
+} from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
-import { copyToClipboard } from 'lib/helpers'
 
 export type DatePickerValue = {
   to: string
@@ -19,14 +29,28 @@ export type DatePickerValue = {
   text?: string
 }
 
-interface Props {
+interface LogsDatePickerProps {
   value: DatePickerValue
-  onSubmit: (args: DatePickerValue) => void
   helpers: DatetimeHelper[]
+  onSubmit: (value: DatePickerValue) => void
+  buttonTriggerProps?: ButtonProps
+  popoverContentProps?: typeof PopoverContent_Shadcn_
+  hideWarnings?: boolean
+  align?: 'start' | 'end' | 'center'
 }
 
-export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<Props>) => {
+export const LogsDatePicker = ({
+  onSubmit,
+  helpers,
+  value,
+  buttonTriggerProps,
+  popoverContentProps,
+  hideWarnings,
+  align = 'end',
+}: PropsWithChildren<LogsDatePickerProps>) => {
   const [open, setOpen] = useState(false)
+
+  const todayButtonRef = useRef<HTMLButtonElement>(null)
 
   // Reset the state when the popover closes
   useEffect(() => {
@@ -209,10 +233,20 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
     LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const showHelperBadge = (helper?: DatetimeHelper) => {
+    if (!helper) return false
+    if (!helper.availableIn?.length) return false
+
+    if (helper.availableIn.includes('free')) return false
+    if (helper.availableIn.includes(orgPlan?.id || 'free') && !isOrgPlanLoading) return false
+    return true
+  }
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" icon={<Clock size={12} />}>
+        <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
           {value.isHelper
             ? value.text
             : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
@@ -221,8 +255,9 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
       <PopoverContent_Shadcn_
         className="flex w-full p-0"
         side="bottom"
-        align="center"
+        align={align}
         portal={true}
+        {...popoverContentProps}
       >
         <RadioGroup
           onValueChange={handleHelperChange}
@@ -233,7 +268,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
             <Label
               key={helper.text}
               className={cn(
-                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs',
+                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
                 {
                   'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
                 }
@@ -247,6 +282,15 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
                 aria-disabled={helper.disabled}
               ></RadioGroupItem>
               {helper.text}
+              {showHelperBadge(helper) ? (
+                <Badge
+                  size="small"
+                  variant="outline"
+                  className="h-5 text-[10px] text-foreground-light capitalize"
+                >
+                  {helper.availableIn?.[0] || ''}
+                </Badge>
+              ) : null}
             </Label>
           ))}
         </RadioGroup>
@@ -278,8 +322,13 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
               />
             </div>
             <div className="flex-shrink">
-              <Button
-                icon={<XIcon size={14} />}
+              <ButtonTooltip
+                tooltip={{
+                  content: {
+                    text: 'Clear time range',
+                  },
+                }}
+                icon={<HistoryIcon size={14} />}
                 type="text"
                 size="tiny"
                 className="px-1.5"
@@ -287,13 +336,20 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
                   setStartTime({ HH: '00', mm: '00', ss: '00' })
                   setEndTime({ HH: '00', mm: '00', ss: '00' })
                 }}
-              ></Button>
+              ></ButtonTooltip>
             </div>
           </div>
           <div className="p-2 border-t">
             <DatePicker
               inline
               selectsRange
+              todayButton={
+                <div className="sr-only">
+                  <Button type="text" size="tiny" ref={todayButtonRef}>
+                    Go to today
+                  </Button>
+                </div>
+              }
               onChange={(dates) => {
                 handleDatePickerChange(dates)
               }}
@@ -334,8 +390,8 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
               )}
             />
           </div>
-          {isLargeRange && (
-            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning-600">
+          {isLargeRange && !hideWarnings && (
+            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning">
               Large ranges may result in memory errors for <br /> big projects.
             </div>
           )}
@@ -356,6 +412,10 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
             <Button
               type="default"
               onClick={() => {
+                // [Jordi]: Workaround so that if the user is in a different month, the datepicker will move the view to the current month
+                if (todayButtonRef.current) {
+                  todayButtonRef.current.click()
+                }
                 setStartDate(new Date())
                 setEndDate(new Date())
               }}

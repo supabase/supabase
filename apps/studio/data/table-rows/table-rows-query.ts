@@ -1,11 +1,6 @@
 import { Query } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
-import {
-  useQuery,
-  useQueryClient,
-  type QueryClient,
-  type UseQueryOptions,
-} from '@tanstack/react-query'
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
@@ -17,9 +12,9 @@ import {
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
-import { THRESHOLD_COUNT } from './table-rows-count-query'
 import { formatFilterValue } from './utils'
 
 export interface GetTableRowsArgs {
@@ -35,10 +30,33 @@ export interface GetTableRowsArgs {
 const getDefaultOrderByColumns = (table: SupaTable) => {
   const primaryKeyColumns = table.columns.filter((col) => col?.isPrimaryKey).map((col) => col.name)
   if (primaryKeyColumns.length === 0) {
-    return [table.columns[0]?.name]
+    const eligibleColumnsForSorting = table.columns.filter((x) => !x.dataType.includes('json'))
+    if (eligibleColumnsForSorting.length > 0) return [eligibleColumnsForSorting[0]?.name]
+    else return []
   } else {
     return primaryKeyColumns
   }
+}
+
+function getErrorCode(error: any): number | undefined {
+  // Our custom ResponseError's use 'code' instead of 'status'
+  if (error instanceof ResponseError) {
+    return error.code
+  }
+  return error.status
+}
+
+function getRetryAfter(error: any): number | undefined {
+  if (error instanceof ResponseError) {
+    return error.retryAfter
+  }
+
+  const headerRetry = error.headers?.get('retry-after')
+  if (headerRetry) {
+    return parseInt(headerRetry)
+  }
+
+  return undefined
 }
 
 async function sleep(ms: number) {
@@ -48,16 +66,18 @@ async function sleep(ms: number) {
 export async function executeWithRetry<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  baseDelay: number = 500
+  baseDelay: number = 1000
 ): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn()
-    } catch (error: any) {
-      if (error?.status === 429 && attempt < maxRetries) {
+    } catch (error: unknown) {
+      const errorCode = getErrorCode(error)
+      if (errorCode === 429 && attempt < maxRetries) {
         // Get retry delay from headers or use exponential backoff (1s, then 2s, then 4s)
-        const retryAfter = error.headers?.get('retry-after')
-        const delayMs = retryAfter ? parseInt(retryAfter) * 1000 : baseDelay * Math.pow(2, attempt)
+        const retryAfter = getRetryAfter(error)
+        const delayMs = retryAfter ? retryAfter * 1000 : baseDelay * Math.pow(2, attempt)
+
         await sleep(delayMs)
         continue
       }
@@ -65,6 +85,66 @@ export async function executeWithRetry<T>(
     }
   }
   throw new Error('Max retries reached without success')
+}
+
+export const getAllTableRowsSql = ({
+  table,
+  filters = [],
+  sorts = [],
+}: {
+  table: SupaTable
+  filters?: Filter[]
+  sorts?: Sort[]
+}) => {
+  const query = new Query()
+
+  const arrayBasedColumns = table.columns
+    .filter(
+      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    )
+    .map((column) => `"${column.name}"::text[]`)
+
+  let queryChains = query
+    .from(table.name, table.schema ?? undefined)
+    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
+
+  filters
+    .filter((filter) => filter.value && filter.value !== '')
+    .forEach((filter) => {
+      const value = formatFilterValue(table, filter)
+      queryChains = queryChains.filter(filter.column, filter.operator, value)
+    })
+
+  // Always enforce deterministic ordering for pagination/export
+  const primaryKeys = getDefaultOrderByColumns(table)
+  if (sorts.length === 0) {
+    if (primaryKeys.length > 0) {
+      primaryKeys.forEach((col) => {
+        queryChains = queryChains.order(table.name, col)
+      })
+    }
+  } else {
+    sorts.forEach((sort) => {
+      queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
+    })
+
+    // Add primary keys as tie-breakers so page order doesn't shuffle
+    if (primaryKeys.length > 0) {
+      const sortedColumns = new Set(
+        sorts.filter((s) => s.table === table.name).map((s) => s.column)
+      )
+      primaryKeys
+        .filter((pk) => !sortedColumns.has(pk))
+        .forEach((pk) => {
+          queryChains = queryChains.order(table.name, pk)
+        })
+    }
+  }
+
+  // Final tie-breaker: use system column ctid to guarantee a stable, unique order
+  queryChains = queryChains.order(table.name, 'ctid')
+
+  return queryChains
 }
 
 // TODO: fetchAllTableRows is used for CSV export, but since it doesn't actually truncate anything, (compare to getTableRows)
@@ -96,38 +176,7 @@ export const fetchAllTableRows = async ({
   }
 
   const rows: any[] = []
-  const query = new Query()
-
-  const arrayBasedColumns = table.columns
-    .filter(
-      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
-    )
-    .map((column) => `"${column.name}"::text[]`)
-
-  let queryChains = query
-    .from(table.name, table.schema ?? undefined)
-    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
-
-  filters
-    .filter((filter) => filter.value && filter.value !== '')
-    .forEach((filter) => {
-      const value = formatFilterValue(table, filter)
-      queryChains = queryChains.filter(filter.column, filter.operator, value)
-    })
-
-  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
-  if (sorts.length === 0 && table.estimateRowCount <= THRESHOLD_COUNT) {
-    const primaryKeys = getDefaultOrderByColumns(table)
-    if (primaryKeys.length > 0) {
-      primaryKeys.forEach((col) => {
-        queryChains = queryChains.order(table.name, col)
-      })
-    }
-  } else {
-    sorts.forEach((sort) => {
-      queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
-    })
-  }
+  const queryChains = getAllTableRowsSql({ table, sorts, filters })
 
   const rowsPerPage = 500
   const THROTTLE_DELAY = 500
@@ -222,41 +271,37 @@ export async function getTableRows(
 
     return { rows }
   } catch (error) {
-    throw new Error(
-      `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
-    )
+    throw new Error(error instanceof Error ? error.message : 'Unknown error')
   }
 }
 
 export const useTableRowsQuery = <TData = TableRowsData>(
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>,
-  { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  return useQuery<TableRowsData, TableRowsError, TData>(
-    tableRowKeys.tableRows(projectRef, {
+  return useQuery<TableRowsData, TableRowsError, TData>({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+    ...options,
+  })
 }
 
 export function prefetchTableRows(
   client: QueryClient,
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
 ) {
-  return client.fetchQuery(
-    tableRowKeys.tableRows(projectRef, {
+  return client.fetchQuery({
+    queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       ...args,
     }),
-    ({ signal }) =>
-      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal)
-  )
+    queryFn: ({ signal }) =>
+      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal),
+  })
 }

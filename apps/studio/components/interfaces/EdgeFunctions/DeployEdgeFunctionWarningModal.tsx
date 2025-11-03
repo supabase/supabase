@@ -4,20 +4,24 @@ interface DeployEdgeFunctionWarningModalProps {
   visible: boolean
   onCancel: () => void
   onConfirm: () => void
+  isDeploying: boolean
 }
 
 export const DeployEdgeFunctionWarningModal = ({
   visible,
   onCancel,
   onConfirm,
+  isDeploying,
 }: DeployEdgeFunctionWarningModalProps) => {
   return (
     <ConfirmationModal
       visible={visible}
       size="medium"
-      title="Confirm deploying updates"
+      title="Confirm to deploy updates"
       confirmLabel="Deploy updates"
+      confirmLabelLoading="Deploying updates"
       variant="warning"
+      loading={isDeploying}
       onCancel={onCancel}
       onConfirm={onConfirm}
     >

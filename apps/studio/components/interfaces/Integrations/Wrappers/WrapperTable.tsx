@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Card,
   CardContent,
@@ -23,7 +23,7 @@ interface WrapperTableProps {
 
 export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   const { id, ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
   const { data } = useFDWsQuery({
@@ -60,7 +60,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
               <TableHead className="w-[220px]">Name</TableHead>
               <TableHead>Tables</TableHead>
               <TableHead>Encrypted key</TableHead>
-              <TableHead className="text-right"></TableHead>
+              <TableHead className="text-right w-24"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted bg-surface-100">

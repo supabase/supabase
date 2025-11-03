@@ -1,0 +1,80 @@
+name: Update JS Libraries
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to update to'
+        required: true
+        type: string
+      source:
+        description: 'Source of the update'
+        required: false
+        type: string
+        default: 'manual'
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  update-js-libs:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          ref: master
+
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Update @supabase/*-js packages in pnpm-workspace.yaml
+        run: |
+          # Update @supabase/supabase-js
+          sed -i "s/'@supabase\/supabase-js': .*/'@supabase\/supabase-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
+
+          # Update @supabase/auth-js
+          sed -i "s/'@supabase\/auth-js': .*/'@supabase\/auth-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
+
+          # Update @supabase/realtime-js
+          sed -i "s/'@supabase\/realtime-js': .*/'@supabase\/realtime-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
+
+          # Update @supabase/postgrest-js
+          sed -i "s/'@supabase\/postgrest-js': .*/'@supabase\/postgrest-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
+
+          echo "Updated pnpm-workspace.yaml:"
+          cat pnpm-workspace.yaml
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'feat: update @supabase/*-js libraries to v${{ github.event.inputs.version }}'
+          title: 'feat: update @supabase/*-js libraries to v${{ github.event.inputs.version }}'
+          body: |
+            This PR updates @supabase/*-js libraries to version ${{ github.event.inputs.version }}.
+
+            **Source**: ${{ github.event.inputs.source }}
+
+            **Changes**:
+            - Updated @supabase/supabase-js to ${{ github.event.inputs.version }}
+            - Updated @supabase/auth-js to ${{ github.event.inputs.version }}
+            - Updated @supabase/realtime-js to ${{ github.event.inputs.version }}
+            - Updated @supabase/postgest-js to ${{ github.event.inputs.version }}
+            - Refreshed pnpm-lock.yaml
+
+            This PR was created automatically.
+          branch: 'gha/auto-update-js-libs-v${{ github.event.inputs.version }}'
+          base: 'master'

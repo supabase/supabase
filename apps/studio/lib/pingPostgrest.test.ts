@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import * as fetchModule from 'data/fetchers'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import pingPostgrest from './pingPostgrest'
-import * as fetchModule from './common/fetch'
 
 vi.mock('./constants', () => ({ API_URL: 'https://api.example.com' }))
 
@@ -9,14 +9,14 @@ describe('pingPostgrest', () => {
     vi.restoreAllMocks()
   })
 
-  it('returns true if headWithTimeout returns no error', async () => {
-    vi.spyOn(fetchModule, 'headWithTimeout').mockResolvedValue({ error: undefined })
+  it('returns true if fetchHeadWithTimeout returns no error', async () => {
+    vi.spyOn(fetchModule, 'fetchHeadWithTimeout').mockResolvedValue({ error: undefined })
     const result = await pingPostgrest('my-project')
     expect(result).toBe(true)
   })
 
-  it('returns false if headWithTimeout returns an error', async () => {
-    vi.spyOn(fetchModule, 'headWithTimeout').mockResolvedValue({ error: { message: 'fail' } })
+  it('returns false if fetchHeadWithTimeout returns an error', async () => {
+    vi.spyOn(fetchModule, 'fetchHeadWithTimeout').mockResolvedValue({ error: { message: 'fail' } })
     const result = await pingPostgrest('my-project')
     expect(result).toBe(false)
   })
@@ -26,8 +26,10 @@ describe('pingPostgrest', () => {
     expect(result).toBe(false)
   })
 
-  it('passes timeout option to headWithTimeout', async () => {
-    const spy = vi.spyOn(fetchModule, 'headWithTimeout').mockResolvedValue({ error: undefined })
+  it('passes timeout option to fetchHeadWithTimeout', async () => {
+    const spy = vi
+      .spyOn(fetchModule, 'fetchHeadWithTimeout')
+      .mockResolvedValue({ error: undefined })
     await pingPostgrest('my-project', { timeout: 1234 })
     expect(spy).toHaveBeenCalledWith(
       'https://api.example.com/projects/my-project/api/rest',

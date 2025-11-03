@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type GitHubAuthorizationCreateVariables = {
   code: string
@@ -37,7 +37,7 @@ export const useGitHubAuthorizationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     GitHubAuthorizationCreateData,
     ResponseError,
     GitHubAuthorizationCreateVariables
@@ -48,7 +48,8 @@ export const useGitHubAuthorizationCreateMutation = ({
     GitHubAuthorizationCreateData,
     ResponseError,
     GitHubAuthorizationCreateVariables
-  >((vars) => createGitHubAuthorization(vars), {
+  >({
+    mutationFn: (vars) => createGitHubAuthorization(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

@@ -1,11 +1,11 @@
 import * as Sentry from '@sentry/nextjs'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
 import { PROVIDERS } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { projectKeys } from './keys'
 import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
 
@@ -19,11 +19,15 @@ const WHITELIST_ERRORS = [
   'already exists in your organization.',
 ]
 
+type CreateProjectBody = components['schemas']['CreateProjectBody']
+type CloudProvider = CreateProjectBody['cloud_provider']
+
 export type ProjectCreateVariables = {
   name: string
-  organizationId: number
+  organizationSlug: string
   dbPass: string
-  dbRegion: string
+  dbRegion?: string
+  regionSelection?: CreateProjectBody['region_selection']
   dbSql?: string
   dbPricingTierId?: string
   cloudProvider?: string
@@ -38,9 +42,10 @@ export type ProjectCreateVariables = {
 
 export async function createProject({
   name,
-  organizationId,
+  organizationSlug,
   dbPass,
   dbRegion,
+  regionSelection,
   dbSql,
   cloudProvider = PROVIDERS.AWS.id,
   authSiteUrl,
@@ -51,12 +56,13 @@ export async function createProject({
   postgresEngine,
   releaseChannel,
 }: ProjectCreateVariables) {
-  const body: components['schemas']['CreateProjectBody'] = {
-    cloud_provider: cloudProvider,
-    org_id: organizationId,
+  const body: CreateProjectBody = {
+    cloud_provider: cloudProvider as CloudProvider,
+    organization_slug: organizationSlug,
     name,
     db_pass: dbPass,
     db_region: dbRegion,
+    region_selection: regionSelection,
     db_sql: dbSql,
     auth_site_url: authSiteUrl,
     ...(customSupabaseRequest !== undefined && {
@@ -84,29 +90,32 @@ export const useProjectCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectCreateData, ResponseError, ProjectCreateVariables>,
+  UseCustomMutationOptions<ProjectCreateData, ResponseError, ProjectCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectCreateData, ResponseError, ProjectCreateVariables>(
-    (vars) => createProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(projectKeys.list()),
-          await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create new project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-        if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-          Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectCreateData, ResponseError, ProjectCreateVariables>({
+    mutationFn: (vars) => createProject(vars),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
+        queryClient.invalidateQueries({
+          queryKey: projectKeys.infiniteListByOrg(variables.organizationSlug),
+        }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create new project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+      if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
+        Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
+      }
+    },
+    ...options,
+  })
 }

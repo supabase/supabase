@@ -22,9 +22,9 @@ export function ContributingToc({ className }: { className?: string }) {
       ...document.querySelectorAll('article.prose > h2,h3:not(#feedback-title)'),
     ] as Array<HTMLHeadingElement>
     const tocItems = headings
-      .filter((heading) => !!heading.id)
+      .filter((heading) => !!heading.id && heading.textContent)
       .map((heading) => ({
-        label: heading.textContent.substring(0, heading.textContent.length - 1), // Remove ending `#`
+        label: heading.textContent!.substring(0, heading.textContent!.length - 1), // Remove ending `#`
         anchor: heading.id,
       }))
     setTocItems(tocItems)

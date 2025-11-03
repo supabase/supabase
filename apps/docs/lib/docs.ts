@@ -1,22 +1,21 @@
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
-import type { SerializeOptions } from 'next-mdx-remote/dist/types'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { basename, extname, join, sep } from 'node:path'
-import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
+import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { type SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 // MUST be process.cwd() here, not import.meta.url, or files that are added
 // with outputFileTracingIncludes (not auto-traced) will not be found at
 // runtime.
 export const DOCS_DIRECTORY = process.cwd()
+export const CONTENT_DIRECTORY = join(DOCS_DIRECTORY, 'content')
 export const EXAMPLES_DIRECTORY = join(DOCS_DIRECTORY, 'examples')
-export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
-export const PARTIALS_DIRECTORY = join(DOCS_DIRECTORY, 'content/_partials')
+export const GUIDES_DIRECTORY = join(CONTENT_DIRECTORY, 'guides')
+export const PARTIALS_DIRECTORY = join(CONTENT_DIRECTORY, '_partials')
 export const REF_DOCS_DIRECTORY = join(DOCS_DIRECTORY, 'docs/ref')
 export const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
 

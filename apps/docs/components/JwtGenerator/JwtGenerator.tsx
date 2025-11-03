@@ -59,7 +59,7 @@ export default function JwtGenerator() {
   const [jwtSecret, setJwtSecret] = useState(secret)
   const [token, setToken] = useState(anonToken)
   const [signedToken, setSignedToken] = useState('')
-  const [err, setErr] = useState<string>(null)
+  const [err, setErr] = useState<string>('')
 
   const handleKeySelection = (e: ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value
@@ -71,7 +71,7 @@ export default function JwtGenerator() {
     try {
       const newTok = JSON.parse(e.target.value)
       setToken(newTok)
-      setErr(null)
+      setErr('')
     } catch (err) {
       const errMessage =
         !!err && typeof err === 'object' && 'message' in err && typeof err.message === 'string'

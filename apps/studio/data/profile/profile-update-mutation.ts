@@ -1,18 +1,30 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { profileKeys } from './keys'
 
 export type ProfileUpdateVariables = {
   firstName: string
   lastName: string
+  username: string
+  primaryEmail: string
 }
 
-export async function updateProfile({ firstName, lastName }: ProfileUpdateVariables) {
+export async function updateProfile({
+  firstName,
+  lastName,
+  username,
+  primaryEmail,
+}: ProfileUpdateVariables) {
   const { data, error } = await patch('/platform/profile', {
-    body: { first_name: firstName, last_name: lastName },
+    body: {
+      first_name: firstName,
+      last_name: lastName,
+      username: username,
+      primary_email: primaryEmail,
+    },
   })
 
   if (error) handleError(error)
@@ -26,26 +38,24 @@ export const useProfileUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProfileUpdateData, ResponseError, ProfileUpdateVariables>,
+  UseCustomMutationOptions<ProfileUpdateData, ResponseError, ProfileUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProfileUpdateData, ResponseError, ProfileUpdateVariables>(
-    (vars) => updateProfile(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(profileKeys.profile())
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create profile: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProfileUpdateData, ResponseError, ProfileUpdateVariables>({
+    mutationFn: (vars) => updateProfile(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({ queryKey: profileKeys.profile() })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create profile: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

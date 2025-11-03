@@ -4,7 +4,6 @@ import 'react-resizable/css/styles.css'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import {
@@ -12,10 +11,11 @@ import {
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import uuidv4 from 'lib/uuid'
-import { Dashboards } from 'types'
+import type { Dashboards } from 'types'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { ReportBlock } from './ReportBlock/ReportBlock'
@@ -54,8 +54,8 @@ export const GridResize = ({
 }: GridResizeProps) => {
   const { ref } = useParams()
   const { profile } = useProfile()
-  const { project } = useProjectContext()
-  const selectedOrg = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertContent } = useContentUpsertMutation()

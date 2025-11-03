@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
-import { components } from 'api-types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectCreationPostgresVersionsQuery } from 'data/config/project-creation-postgres-versions-query'
 import { useProjectUnpausePostgresVersionsQuery } from 'data/config/project-unpause-postgres-versions-query'
+import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -16,19 +16,17 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-type ReleaseChannel = components['schemas']['ReleaseChannel']
-type PostgresEngine = components['schemas']['PostgresEngine']
+import { smartRegionToExactRegion } from './ProjectCreation.utils'
 
 interface PostgresVersionDetails {
-  postgresEngine: PostgresEngine | undefined
-  releaseChannel: ReleaseChannel | undefined
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
+  releaseChannel?: ReleaseChannel
 }
 
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
   dbRegion: string
-  organizationSlug: string | undefined
+  organizationSlug?: string
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
   type?: 'create' | 'unpause'
@@ -63,9 +61,11 @@ export const PostgresVersionSelector = ({
   form,
   type = 'create',
   layout = 'horizontal',
-  label = 'Postgres Version',
+  label = 'Postgres version',
 }: PostgresVersionSelectorProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+
+  const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const {
     data: createVersions,
@@ -74,7 +74,7 @@ export const PostgresVersionSelector = ({
   } = useProjectCreationPostgresVersionsQuery(
     {
       cloudProvider,
-      dbRegion,
+      dbRegion: dbRegionExact,
       organizationSlug,
     },
     { enabled: type === 'create' }
@@ -90,7 +90,7 @@ export const PostgresVersionSelector = ({
     type === 'create'
       ? createVersions?.available_versions ?? []
       : unpauseVersions?.available_versions ?? []
-  const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version))
+  const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
   const { postgresVersionSelection } = form.watch()
 
   useEffect(() => {

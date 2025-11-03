@@ -7,9 +7,16 @@ import z from 'zod'
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
+import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
+import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
 import {
   Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -41,9 +48,19 @@ const FormSchema = z.object({
 const defaultValues = {
   secrets: [{ name: '', value: '' }],
 }
+
+const removeWrappingQuotes = (str: string): string => {
+  if ((str.startsWith('"') && str.endsWith('"')) || (str.startsWith("'") && str.endsWith("'"))) {
+    return str.slice(1, -1)
+  }
+  return str
+}
+
 const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
   const [showSecretValue, setShowSecretValue] = useState(false)
+  const [duplicateSecretName, setDuplicateSecretName] = useState<string>('')
+  const [pendingSecrets, setPendingSecrets] = useState<z.infer<typeof FormSchema> | null>(null)
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -53,6 +70,10 @@ const AddNewSecretForm = () => {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'secrets',
+  })
+
+  const { data: existingSecrets } = useSecretsQuery({
+    projectRef: projectRef,
   })
 
   function handlePaste(e: ClipboardEvent) {
@@ -89,9 +110,10 @@ const AddNewSecretForm = () => {
       lines.forEach((line) => {
         const [key, ...valueParts] = line.split('=')
         if (key && valueParts.length) {
+          const valueStr = valueParts.join('=').trim()
           pairs.push({
             name: key.trim(),
-            value: valueParts.join('=').trim(),
+            value: removeWrappingQuotes(valueStr),
           })
         }
       })
@@ -114,95 +136,132 @@ const AddNewSecretForm = () => {
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
+    // Check for duplicate secret names
+    const existingSecretNames = existingSecrets?.map((secret) => secret.name) || []
+    const duplicateSecret = data.secrets.find((secret) => existingSecretNames.includes(secret.name))
+
+    if (duplicateSecret) {
+      setDuplicateSecretName(duplicateSecret.name)
+      setPendingSecrets(data)
+      return
+    }
+
     createSecret({ projectRef, secrets: data.secrets })
   }
 
+  const handleConfirmDuplicate = () => {
+    if (pendingSecrets) {
+      createSecret({ projectRef, secrets: pendingSecrets.secrets })
+      setDuplicateSecretName('')
+      setPendingSecrets(null)
+    }
+  }
+
+  const handleCancelDuplicate = () => {
+    setDuplicateSecretName('')
+    setPendingSecrets(null)
+  }
+
   return (
-    <Panel>
-      <Panel.Content className="grid gap-4">
-        <h2 className="text-sm">Add new secrets</h2>
-        <Form_Shadcn_ {...form}>
-          <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
-            {fields.map((fieldItem, index) => (
-              <div key={fieldItem.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
-                <FormField_Shadcn_
-                  control={form.control}
-                  name={`secrets.${index}.name`}
-                  render={({ field }) => (
-                    <FormItem_Shadcn_ className="w-full">
-                      <FormLabel_Shadcn_>Key</FormLabel_Shadcn_>
-                      <FormControl_Shadcn_>
-                        <Input
-                          {...field}
-                          placeholder="e.g. CLIENT_KEY"
-                          onPaste={(e) => handlePaste(e.nativeEvent)}
-                        />
-                      </FormControl_Shadcn_>
-                      <FormMessage_Shadcn_ />
-                    </FormItem_Shadcn_>
-                  )}
-                />
-                <FormField_Shadcn_
-                  control={form.control}
-                  name={`secrets.${index}.value`}
-                  render={({ field }) => (
-                    <FormItem_Shadcn_ className="w-full relative">
-                      <FormLabel_Shadcn_>Value</FormLabel_Shadcn_>
-                      <FormControl_Shadcn_>
-                        <Input
-                          {...field}
-                          type={showSecretValue ? 'text' : 'password'}
-                          actions={
-                            <div className="mr-1">
-                              <Button
-                                type="text"
-                                className="px-1"
-                                icon={showSecretValue ? <EyeOff /> : <Eye />}
-                                onClick={() => setShowSecretValue(!showSecretValue)}
-                              />
-                            </div>
-                          }
-                        />
-                      </FormControl_Shadcn_>
-                      <FormMessage_Shadcn_ />
-                    </FormItem_Shadcn_>
-                  )}
-                />
+    <>
+      <Form_Shadcn_ {...form}>
+        <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Add new secrets</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {fields.map((fieldItem, index) => (
+                <div key={fieldItem.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name={`secrets.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="w-full">
+                        <FormLabel_Shadcn_>Key</FormLabel_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <Input
+                            {...field}
+                            placeholder="e.g. CLIENT_KEY"
+                            onPaste={(e) => handlePaste(e.nativeEvent)}
+                          />
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name={`secrets.${index}.value`}
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="w-full relative">
+                        <FormLabel_Shadcn_>Value</FormLabel_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <Input
+                            {...field}
+                            type={showSecretValue ? 'text' : 'password'}
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            data-bwignore
+                            actions={
+                              <div className="mr-1">
+                                <Button
+                                  type="text"
+                                  className="px-1"
+                                  icon={showSecretValue ? <EyeOff /> : <Eye />}
+                                  onClick={() => setShowSecretValue(!showSecretValue)}
+                                />
+                              </div>
+                            }
+                          />
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </FormItem_Shadcn_>
+                    )}
+                  />
 
-                <Button
-                  type="default"
-                  className="h-[34px] mt-6"
-                  icon={<MinusCircle />}
-                  onClick={() => (fields.length > 1 ? remove(index) : form.reset(defaultValues))}
-                />
-              </div>
-            ))}
+                  <Button
+                    type="default"
+                    className="h-[34px] mt-6"
+                    icon={<MinusCircle />}
+                    onClick={() => (fields.length > 1 ? remove(index) : form.reset(defaultValues))}
+                  />
+                </div>
+              ))}
 
-            <Button
-              type="default"
-              onClick={() => {
-                const formValues = form.getValues('secrets')
-                const isEmptyForm = formValues.every((field) => !field.name && !field.value)
-                if (isEmptyForm) {
-                  fields.forEach((_, index) => remove(index))
-                  append({ name: '', value: '' })
-                } else {
-                  append({ name: '', value: '' })
-                }
-              }}
-            >
-              Add another
-            </Button>
-
-            <div className="flex items-center gap-2 col-span-2 -mx-6 px-6 border-t pt-4 mt-4">
+              <Button
+                type="default"
+                onClick={() => {
+                  const formValues = form.getValues('secrets')
+                  const isEmptyForm = formValues.every((field) => !field.name && !field.value)
+                  if (isEmptyForm) {
+                    fields.forEach((_, index) => remove(index))
+                    append({ name: '', value: '' })
+                  } else {
+                    append({ name: '', value: '' })
+                  }
+                }}
+              >
+                Add another
+              </Button>
+            </CardContent>
+            <CardFooter className="justify-end space-x-2">
               <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
                 {isCreating ? 'Saving...' : 'Save'}
               </Button>
-            </div>
-          </form>
-        </Form_Shadcn_>
-      </Panel.Content>
-    </Panel>
+            </CardFooter>
+          </Card>
+        </form>
+      </Form_Shadcn_>
+      <DuplicateSecretWarningModal
+        visible={!!duplicateSecretName}
+        onCancel={handleCancelDuplicate}
+        onConfirm={handleConfirmDuplicate}
+        isCreating={isCreating}
+        secretName={duplicateSecretName}
+      />
+    </>
   )
 }
 

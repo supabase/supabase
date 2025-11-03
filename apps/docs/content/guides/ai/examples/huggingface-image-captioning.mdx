@@ -6,25 +6,25 @@ video: 'https://www.youtube.com/v/OgnYxRkxEUw'
 tocVideo: 'OgnYxRkxEUw'
 ---
 
-We can combine Hugging Face with [Supabase Storage](https://supabase.com/storage) and [Database Webhooks](https://supabase.com/docs/guides/database/webhooks) to automatically caption for any image we upload to a storage bucket.
+We can combine Hugging Face with [Supabase Storage](/storage) and [Database Webhooks](/docs/guides/database/webhooks) to automatically caption for any image we upload to a storage bucket.
 
 ## About Hugging Face
 
 [Hugging Face](https://huggingface.co/) is the collaboration platform for the machine learning community.
 
-[Huggingface.js](https://huggingface.co/docs/huggingface.js/index) provides a convenient way to make calls to 100,000+ Machine Learning models, making it easy to incorporate AI functionality into your [Supabase Edge Functions](https://supabase.com/edge-functions).
+[Huggingface.js](https://huggingface.co/docs/huggingface.js/index) provides a convenient way to make calls to 100,000+ Machine Learning models, making it easy to incorporate AI functionality into your [Supabase Edge Functions](/edge-functions).
 
 ## Setup
 
-- Open your Supabase project dashboard or [create a new project](https://supabase.com/dashboard/projects).
-- [Create a new bucket](https://supabase.com/dashboard/project/_/storage/buckets) called `images`.
+- Open your Supabase project dashboard or [create a new project](/dashboard/projects).
+- [Create a new bucket](/dashboard/project/_/storage/buckets) called `images`.
 - Generate TypeScript types from remote Database.
 - Create a new Database table called `image_caption`.
   - Create `id` column of type `uuid` which references `storage.objects.id`.
   - Create a `caption` column of type `text`.
 - Regenerate TypeScript types to include new `image_caption` table.
 - Deploy the function to Supabase: `supabase functions deploy huggingface-image-captioning`.
-- Create the Database Webhook in the [Supabase Dashboard](https://supabase.com/dashboard/project/_/database/hooks) to trigger the `huggingface-image-captioning` function anytime a record is added to the `storage.objects` table.
+- Create the Database Webhook in the [Supabase Dashboard](/dashboard/project/_/database/hooks) to trigger the `huggingface-image-captioning` function anytime a record is added to the `storage.objects` table.
 
 ## Generate TypeScript types
 
@@ -41,7 +41,7 @@ Find the complete code on [GitHub](https://github.com/supabase/supabase/tree/mas
 ```ts
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2'
-import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 import { Database } from './types.ts'
 
 console.log('Hello from `huggingface-image-captioning` function!')

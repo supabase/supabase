@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type OrganizationByFlyOrgIdVariables = {
   flyOrganizationId: string
@@ -28,23 +28,25 @@ export const useOrganizationByFlyOrgIdMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationByFlyOrgIdData, ResponseError, OrganizationByFlyOrgIdVariables>,
+  UseCustomMutationOptions<
+    OrganizationByFlyOrgIdData,
+    ResponseError,
+    OrganizationByFlyOrgIdVariables
+  >,
   'mutationFn'
 > = {}) => {
-  return useMutation<OrganizationByFlyOrgIdData, ResponseError, OrganizationByFlyOrgIdVariables>(
-    (vars) => getOrganizationByFlyOrgId(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to get organization: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<OrganizationByFlyOrgIdData, ResponseError, OrganizationByFlyOrgIdVariables>({
+    mutationFn: (vars) => getOrganizationByFlyOrgId(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to get organization: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }
