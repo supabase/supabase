@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
 import Link from 'next/link'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { DOCS_URL } from 'lib/constants'
@@ -577,21 +576,6 @@ export function LogDrainDestinationSheetForm({
               `border-t bg-background-alternative-200 mt-auto py-1.5 ${!IS_PLATFORM ? 'hidden' : ''}`
             )}
           >
-            {/* <FormItemLayout
-              isReactForm={false}
-              layout="vertical"
-              label={
-                <div className="flex flex-col gap-y-2 text-foreground-light">
-                  Additional drain cost
-                  <DocsButton
-                    abbrev={false}
-                    className="w-min"
-                    href={`${DOCS_URL}/guides/platform/log-drains`}
-                  />
-                </div>
-              }
-              className="py-0"
-            > */}
             <ul className="text-right text-foreground-light divide-y divide-dashed text-sm">
               <li className="flex items-center justify-between gap-2 py-2" translate="no">
                 <span className="text-foreground-lighter">Additional drain cost</span>
