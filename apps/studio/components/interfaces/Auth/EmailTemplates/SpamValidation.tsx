@@ -19,7 +19,7 @@ export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
       <Admonition
         type="destructive"
         title="Issues to resolve"
-        description="This email is likely to be marked as spam by email servers. Please resolve these issues to improve deliverability."
+        description="This email is likely to be marked as spam by email servers. Please resolve the below issues before saving."
         className="bg-destructive-300/50 dark:bg-destructive-200 border-destructive-400"
       />
 
