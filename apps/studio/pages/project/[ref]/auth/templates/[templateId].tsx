@@ -45,7 +45,10 @@ const TemplatePage: NextPageWithLayout = () => {
 }
 
 interface OverridingSettingAdmonitionProps {
-  relatedSetting: string
+  relatedSetting: {
+    name: string
+    path: string
+  }
   projectRef: string
   inline?: boolean
 }
@@ -59,11 +62,11 @@ const OverridingSettingAdmonition = ({
     <Admonition
       type="warning"
       title="Overriding setting"
-      description={`This email will not be sent to users as ${inline ? '' : 'the '}"${relatedSetting}"${inline ? '' : ' setting'} is disabled.`}
+      description={`This email will not be sent to users as ${inline ? '' : 'the '}"${relatedSetting.name}"${inline ? '' : ' setting'} is disabled.`}
       className={`bg-warning-200 border-warning-400 ${inline ? 'm-0 border-none rounded-none' : ''}`}
     >
       <Button asChild type="default" className="mt-2">
-        <Link href={`/project/${projectRef}/auth/providers`}>Edit setting</Link>
+        <Link href={`/project/${projectRef}/${relatedSetting.path}`}>Edit setting</Link>
       </Button>
     </Admonition>
   )
