@@ -142,6 +142,7 @@ export const MCP_CLIENTS: McpClient[] = [
           <CodeBlock
             value={command}
             language="bash"
+            focusable={false}
             // This is a no-op but the CodeBlock component is designed to output
             // inline code if no className is given
             className="block"
@@ -155,7 +156,7 @@ export const MCP_CLIENTS: McpClient[] = [
           After configuring the MCP server, you need to authenticate. In a regular terminal (not the
           IDE extension) run:
         </p>
-        <CodeBlock value="claude /mcp" language="bash" className="block" />
+        <CodeBlock value="claude /mcp" language="bash" focusable={false} className="block" />
         <p className="text-xs text-foreground-light">
           Select the "supabase" server, then "Authenticate" to begin the authentication flow.
         </p>
