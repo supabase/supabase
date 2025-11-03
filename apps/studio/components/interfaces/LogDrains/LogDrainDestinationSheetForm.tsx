@@ -596,7 +596,7 @@ export function LogDrainDestinationSheetForm({
             <span className="text-sm text-foreground-light">
               <span>See full pricing breakdown</span>{' '}
               <Link
-                href={`${DOCS_URL}/guides/platform/log-drains`}
+                href={`${DOCS_URL}/guides/platform/manage-your-usage/log-drains`}
                 className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
               >
                 here
