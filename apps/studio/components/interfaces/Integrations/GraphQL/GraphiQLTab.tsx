@@ -1,4 +1,3 @@
-import '@graphiql/react/dist/style.css'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useTheme } from 'next-themes'
