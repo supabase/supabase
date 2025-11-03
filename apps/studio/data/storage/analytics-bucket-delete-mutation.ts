@@ -3,7 +3,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
@@ -36,17 +35,12 @@ export const useAnalyticsBucketDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const isStorageV2 = useIsNewStorageUIEnabled()
 
   return useMutation<AnalyticsBucketDeleteData, ResponseError, AnalyticsBucketDeleteVariables>({
     mutationFn: (vars) => deleteAnalyticsBucket(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      if (isStorageV2) {
-        await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
-      } else {
-        await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
-      }
+      await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

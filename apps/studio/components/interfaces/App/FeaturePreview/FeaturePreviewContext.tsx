@@ -111,8 +111,7 @@ export const useIsAdvisorRulesEnabled = () => {
 }
 
 export const useIsNewStorageUIEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]
+  return false
 }
 
 export const useIsSecurityNotificationsEnabled = () => {
@@ -126,7 +125,6 @@ export const useFeaturePreviewModal = () => {
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const isNewStorageUIAvailable = useFlag('storageAnalyticsVector')
   const isSecurityNotificationsAvailable = useFlag('securityNotifications')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
@@ -142,8 +140,6 @@ export const useFeaturePreviewModal = () => {
           return advisorRulesEnabled
         case 'supabase-ui-preview-unified-logs':
           return isUnifiedLogsPreviewAvailable
-        case 'new-storage-ui':
-          return isNewStorageUIAvailable
         case 'security-notifications':
           return isSecurityNotificationsAvailable
         default:
@@ -154,7 +150,6 @@ export const useFeaturePreviewModal = () => {
       gitlessBranchingEnabled,
       advisorRulesEnabled,
       isUnifiedLogsPreviewAvailable,
-      isNewStorageUIAvailable,
       isSecurityNotificationsAvailable,
     ]
   )
