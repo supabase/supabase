@@ -119,9 +119,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             }
 
             if (mode === 'create') {
-              // createLogDrain(logDrainValues)
               setPendingLogDrainValues(logDrainValues)
-              // setOpen(false)
               setIsCreateConfirmModalOpen(true)
             } else {
               if (!logDrainValues.id || !selectedLogDrain?.token) {
