@@ -206,11 +206,11 @@ const LayoutHeader = ({
           </div>
           <div className="flex items-center gap-x-2">
             {customHeaderComponents && customHeaderComponents}
-            {IS_PLATFORM ? (
+            {!IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <CommandMenuTriggerInput
                     placeholder="Search..."
                     className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
@@ -237,7 +237,7 @@ const LayoutHeader = ({
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="overflow-hidden flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
