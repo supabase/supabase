@@ -12,7 +12,6 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Check } from 'lucide-react'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -362,39 +361,29 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               </CardContent>
             )}
 
-            <CardFooter
-              className={`flex flex-row ${spamRules.length > 0 ? 'justify-end' : 'justify-between'} gap-8`}
-            >
-              {spamRules.length === 0 && (
-                <div className="flex flex-row gap-2">
-                  <Check size={16} strokeWidth={1.5} className="text-brand mt-0.5" />
-                  <p className="text-sm text-foreground-lighter">Not likely to be marked as spam</p>
-                </div>
-              )}
-              <div className="flex flex-row gap-2">
-                {hasChanges && (
-                  <Button
-                    type="default"
-                    onClick={() => {
-                      form.reset(INITIAL_VALUES)
-                      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
-                      setHasUnsavedChanges(false)
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                )}
+            <CardFooter className="flex flex-row justify-end gap-2">
+              {hasChanges && (
                 <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !canUpdateConfig || isSavingTemplate || !hasChanges || preventSaveFromSpamCheck
-                  }
-                  loading={isSavingTemplate}
+                  type="default"
+                  onClick={() => {
+                    form.reset(INITIAL_VALUES)
+                    setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+                    setHasUnsavedChanges(false)
+                  }}
                 >
-                  Save changes
+                  Cancel
                 </Button>
-              </div>
+              )}
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={
+                  !canUpdateConfig || isSavingTemplate || !hasChanges || preventSaveFromSpamCheck
+                }
+                loading={isSavingTemplate}
+              >
+                Save changes
+              </Button>
             </CardFooter>
           </>
         )}
