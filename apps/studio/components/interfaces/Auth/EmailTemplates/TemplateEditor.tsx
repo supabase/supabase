@@ -257,7 +257,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       className={
                         isSecurityNotificationsEnabled ? 'md:py-2 md:items-center' : 'gap-y-3'
                       }
-                      layout={isSecurityNotificationsEnabled ? 'flex-row-reverse' : 'flex-col'}
+                      layout={isSecurityNotificationsEnabled ? 'flex-row-reverse' : 'vertical'}
                       label={property.title}
                       description={
                         property.description ? (
