@@ -14,9 +14,6 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   cn,
 } from 'ui'
 
@@ -174,59 +171,40 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
 function CommandMenuTriggerInput({
   className,
   placeholder = 'Search...',
-  iconOnly = false,
 }: {
   className?: string
   placeholder?: string | React.ReactNode
-  iconOnly?: boolean
 }) {
   return (
     <CommandMenuTrigger>
-      {iconOnly ? (
-        <Tooltip>
-          <TooltipTrigger>
-            <button
-              type="button"
-              className={cn(
-                'flex items-center justify-center text-foreground-lighter p-2 bg-transparent border-none hover:text-foreground-light',
-                className
-              )}
-            >
-              <Search size={18} strokeWidth={2} />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>{placeholder}</TooltipContent>
-        </Tooltip>
-      ) : (
-        <button
-          type="button"
-          className={cn(
-            'group',
-            'flex-grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
-            'pl-1.5 md:pl-2 pr-1',
-            'flex items-center justify-between',
-            'bg-surface-100/75 text-foreground-lighter border',
-            'hover:bg-opacity-100 hover:border-foreground-muted',
-            'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
-            'transition',
-            className
-          )}
-        >
-          <div className="flex items-center space-x-1.5 text-foreground-lighter">
-            <Search size={16} strokeWidth={1.5} />
-            <p className="flex text-xs pr-2">{placeholder}</p>
+      <button
+        type="button"
+        className={cn(
+          'group',
+          'flex-grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
+          'pl-1.5 md:pl-2 pr-1',
+          'flex items-center justify-between',
+          'bg-surface-100/75 text-foreground-lighter border',
+          'hover:bg-opacity-100 hover:border-stronger',
+          'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
+          'transition',
+          className
+        )}
+      >
+        <div className="flex items-center space-x-1.5 text-foreground-lighter">
+          <Search size={16} strokeWidth={1.5} />
+          <p className="flex text-sm pr-2 text-foreground-muted">{placeholder}</p>
+        </div>
+        <div className="command-shortcut hidden md:flex items-center space-x-1">
+          <div
+            aria-hidden="true"
+            className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
+          >
+            <Command size={12} strokeWidth={1.5} />
+            <span className="text-[12px]">K</span>
           </div>
-          <div className="command-shortcut hidden md:flex items-center space-x-1">
-            <div
-              aria-hidden="true"
-              className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
-            >
-              <Command size={12} strokeWidth={1.5} />
-              <span className="text-[12px]">K</span>
-            </div>
-          </div>
-        </button>
-      )}
+        </div>
+      </button>
     </CommandMenuTrigger>
   )
 }
