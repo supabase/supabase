@@ -34,7 +34,7 @@ export const ScaffoldContainer = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'mx-auto w-full',
+        'mx-auto w-full @container',
         maxWidthClass,
         PADDING_CLASSES,
         bottomPadding && 'pb-16',
@@ -93,7 +93,7 @@ export const ScaffoldSection = forwardRef<
       {...props}
       className={cn(
         'flex flex-col first:pt-12 py-6',
-        isFullWidth ? 'w-full' : 'gap-3 lg:grid md:grid-cols-12',
+        isFullWidth ? 'w-full' : 'gap-3 @md:grid-cols-12 @lg:grid',
         className
       )}
     />

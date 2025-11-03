@@ -17,7 +17,7 @@ import {
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationLinkAwsMarketplaceMutation } from 'data/organizations/organization-link-aws-marketplace-mutation'
 import { DOCS_URL } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import {
   Button,
   Collapsible_Shadcn_,

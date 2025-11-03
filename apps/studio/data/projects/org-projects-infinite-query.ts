@@ -3,7 +3,7 @@ import { useInfiniteQuery, UseInfiniteQueryOptions, useQueryClient } from '@tans
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { INFINITE_PROJECTS_KEY_PREFIX, projectKeys } from './keys'
 
 // [Joshen] Try to keep this value a multiple of 6 (common denominator of 2 and 3) to fit the cards view

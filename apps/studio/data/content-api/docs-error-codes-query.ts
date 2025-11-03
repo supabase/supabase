@@ -1,6 +1,6 @@
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
-import { graphql } from 'data/graphql'
 import { executeGraphQL } from 'data/graphql/execute'
+import { graphql } from 'data/graphql/gql'
 import { Service } from 'data/graphql/graphql'
 import { contentApiKeys } from './keys'
 

@@ -1,10 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
-import { useCreatePublicationMutation } from 'data/replication/create-publication-mutation'
-import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { useParams } from 'common'
+import { useCreatePublicationMutation } from 'data/replication/create-publication-mutation'
+import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import {
   Button,
   cn,
@@ -23,7 +25,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import { z } from 'zod'
 
 interface NewPublicationPanelProps {
   visible: boolean

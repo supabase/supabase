@@ -3,7 +3,7 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { storageCredentialsKeys } from './s3-access-key-keys'
 
 type StorageCredentialsVariables = { projectRef?: string }
