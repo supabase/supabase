@@ -11,8 +11,8 @@ How you connect to your database depends on where you're connecting from:
 - For frontend applications, use the [Data API](#data-apis-and-client-libraries)
 - For Postgres clients, use a connection string
   - For single sessions (for example, database GUIs) or Postgres native commands (for example, using client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external)) use the [direct connection string](#direct-connection) if your environment supports IPv6
-  - For persistent clients, and support for both IPv4 and IPv6, use [Supavisor session mode](#supavisor-session-mode)
-  - For temporary clients (for example, serverless or edge functions) use [Supavisor transaction mode](#supavisor-transaction-mode)
+  - For persistent clients, and support for both IPv4 and IPv6, use [pooler session mode](#pooler-session-mode)
+  - For temporary clients (for example, serverless or edge functions) use [pooler transaction mode](#pooler-transaction-mode)
 
 ## Quickstarts
 
@@ -74,18 +74,18 @@ Direct connections use IPv6 by default. If your environment doesn't support IPv6
 The connection string looks like this:
 
 ```
-postgresql://postgres:[YOUR-PASSWORD]@db.apbkobhfnmcqqzqeeqss.supabase.co:5432/postgres
+postgresql://postgres:[YOUR-PASSWORD]@db.abcdefghijklmnopqrst.supabase.co:5432/postgres
 ```
 
 Get your project's direct connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true).
 
-## Shared pooler
+## Poolers
 
-Every Supabase project includes a free, shared connection pooler. This is ideal for persistent servers when IPv6 is not supported.
+Every Supabase project includes a connection pooler. This is ideal for persistent servers when IPv6 is not supported.
 
-### Supavisor session mode
+### Pooler session mode
 
-The session mode connection string connects to your Postgres instance via a proxy.
+The session mode connection string connects to your Postgres instance via a proxy. This is only recommended as an alternative to a Direct Connection, when connecting via an IPv4 network.
 
 The connection string looks like this:
 
@@ -95,7 +95,7 @@ postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.s
 
 Get your project's Session pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=session).
 
-### Supavisor transaction mode
+### Pooler transaction mode
 
 The transaction mode connection string connects to your Postgres instance via a proxy which serves as a connection pooler. This is ideal for serverless or edge functions, which require many transient connections.
 
@@ -108,7 +108,7 @@ Transaction mode does not support [prepared statements](https://postgresql.org/d
 The connection string looks like this:
 
 ```
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+postgres://postgres:[YOUR-PASSWORD]@db.abcdefghijklmnopqrst.supabase.co:6543/postgres
 ```
 
 Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction).
