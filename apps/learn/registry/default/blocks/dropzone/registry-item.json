@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dropzone",
+  "type": "registry:component",
+  "title": "Dropzone (File Upload)",
+  "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
+  "registryDependencies": ["button"],
+  "dependencies": ["react-dropzone", "lucide-react"],
+  "files": [
+    {
+      "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/dropzone/hooks/use-supabase-upload.ts",
+      "type": "registry:hook"
+    }
+  ]
+}
