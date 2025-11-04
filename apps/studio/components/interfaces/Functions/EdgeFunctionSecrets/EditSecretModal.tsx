@@ -145,6 +145,7 @@ export function EditSecretModal({ secret, visible, onClose }: EditSecretModalPro
                     <FormItemLayout
                       label="Value"
                       layout="horizontal"
+                      description="Secrets can’t be retrieved once saved. Enter a new value to overwrite the existing value."
                     >
                       <FormControl_Shadcn_>
                         <Input
