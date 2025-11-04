@@ -4,7 +4,7 @@ import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.c
 import {
   getAnalyticsBucketFDWName,
   getAnalyticsBucketS3KeyName,
-} from 'components/interfaces/Storage/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
+} from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import {
   getCatalogURI,
   getConnectionURL,

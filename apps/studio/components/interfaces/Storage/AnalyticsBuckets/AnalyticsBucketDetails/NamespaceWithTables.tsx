@@ -31,7 +31,7 @@ import {
 } from 'ui'
 
 type NamespaceWithTablesProps = {
-  bucketName: string
+  bucketName?: string
   namespace: string
   sourceType: 'replication' | 'direct'
   schema: string
@@ -324,7 +324,7 @@ export const NamespaceWithTables = ({
         </TableBody>
       </Table>
       <ImportForeignSchemaDialog
-        bucketName={bucketName}
+        bucketName={bucketName ?? ''}
         namespace={namespace}
         circumstance="clash"
         wrapperMeta={wrapperMeta}

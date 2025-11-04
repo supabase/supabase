@@ -10,15 +10,16 @@ import z from 'zod'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useIsAnalyticsBucketsEnabled } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useAnalyticsBucketCreateMutation } from 'data/storage/analytics-bucket-create-mutation'
+import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   cn,
@@ -37,9 +38,9 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { inverseValidBucketNameRegex, validBucketNameRegex } from '../CreateBucketModal.utils'
+import { BUCKET_TYPES } from '../Storage.constants'
 import { useIcebergWrapperExtension } from './AnalyticsBucketDetails/useIcebergWrapper'
-import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
-import { BUCKET_TYPES } from './Storage.constants'
 
 const FormSchema = z
   .object({
@@ -70,12 +71,11 @@ const FormSchema = z
     }
   })
 
-const formId = 'create-specialized-storage-bucket-form'
+const formId = 'create-analytics-storage-bucket-form'
 
-export type CreateSpecializedBucketForm = z.infer<typeof FormSchema>
+export type CreateAnalyticsBucketForm = z.infer<typeof FormSchema>
 
-interface CreateSpecializedBucketModalProps {
-  bucketType: 'analytics' | 'vectors'
+interface CreateAnalyticsBucketModalProps {
   buttonSize?: 'tiny' | 'small'
   buttonType?: 'default' | 'primary'
   buttonClassName?: string
@@ -88,14 +88,13 @@ interface CreateSpecializedBucketModalProps {
   }
 }
 
-export const CreateSpecializedBucketModal = ({
-  bucketType,
+export const CreateAnalyticsBucketModal = ({
   buttonSize = 'tiny',
   buttonType = 'default',
   buttonClassName,
   disabled = false,
   tooltip,
-}: CreateSpecializedBucketModalProps) => {
+}: CreateAnalyticsBucketModalProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
@@ -106,8 +105,9 @@ export const CreateSpecializedBucketModal = ({
 
   const [visible, setVisible] = useState(false)
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-  const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
+  const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
+  const icebergCatalogEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
+  const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -126,64 +126,48 @@ export const CreateSpecializedBucketModal = ({
   const config = BUCKET_TYPES['analytics']
   const isCreating = isEnablingExtension || isCreatingIcebergWrapper || isCreatingAnalyticsBucket
 
-  const form = useForm<CreateSpecializedBucketForm>({
+  const form = useForm<CreateAnalyticsBucketForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: { name: '' },
   })
 
-  const onSubmit: SubmitHandler<CreateSpecializedBucketForm> = async (values) => {
+  const onSubmit: SubmitHandler<CreateAnalyticsBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project details is required')
     if (!wrappersExtension) return console.error('Unable to find wrappers extension')
 
-    if (wrappersExtensionState === 'needs-upgrade') {
-      // [Joshen] Double check if this is the right CTA
-      return toast.error(
-        <p className="prose max-w-full text-sm">
-          Wrappers extensions needs to be updated to create an Iceberg Wrapper. Update the extension
-          by disabling and enabling the <code className="text-xs">wrappers</code> extension first in
-          the{' '}
-          <InlineLink href={`/project/${ref}/database/extensions?filter=wrappers`}>
-            database extensions page
-          </InlineLink>{' '}
-          before creating an Analytics bucket.
-        </p>
-      )
-    }
+    const hasExistingBucket = buckets.some((x) => x.id === values.name)
+    if (hasExistingBucket) return toast.error('Bucket name already exists')
 
     try {
-      if (bucketType === 'analytics') {
-        await createAnalyticsBucket({
-          projectRef: ref,
-          bucketName: values.name,
-        })
+      await createAnalyticsBucket({
+        projectRef: ref,
+        bucketName: values.name,
+      })
 
-        if (wrappersExtensionState === 'not-installed') {
-          await enableExtension({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            name: wrappersExtension.name,
-            schema: wrappersExtension.schema ?? 'extensions',
-            version: wrappersExtension.default_version,
-          })
-          await createIcebergWrapper({ bucketName: values.name })
-        } else if (wrappersExtensionState === 'installed') {
-          await createIcebergWrapper({ bucketName: values.name })
-        }
-      } else {
-        // TODO for vectors bucket
+      if (wrappersExtensionState === 'not-installed') {
+        await enableExtension({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: wrappersExtension.name,
+          schema: wrappersExtension.schema ?? 'extensions',
+          version: wrappersExtension.default_version,
+        })
+        await createIcebergWrapper({ bucketName: values.name })
+      } else if (wrappersExtensionState === 'installed') {
+        await createIcebergWrapper({ bucketName: values.name })
       }
 
       sendEvent({
         action: 'storage_bucket_created',
-        properties: { bucketType },
+        properties: { bucketType: 'analytics' },
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
 
       toast.success(`Created bucket “${values.name}”`)
       form.reset()
       setVisible(false)
-      router.push(`/project/${ref}/storage/${bucketType}/buckets/${values.name}`)
+      router.push(`/project/${ref}/storage/analytics/buckets/${values.name}`)
     } catch (error: any) {
       toast.error(`Failed to create bucket: ${error.message}`)
     }
@@ -227,7 +211,7 @@ export const CreateSpecializedBucketModal = ({
         </ButtonTooltip>
       </DialogTrigger>
 
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent size="large" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create {config.singularName} bucket</DialogTitle>
         </DialogHeader>
@@ -263,9 +247,27 @@ export const CreateSpecializedBucketModal = ({
                 )}
               />
 
-              {bucketType === 'analytics' && (
+              {wrappersExtenstionNeedsUpgrading ? (
+                <Admonition
+                  type="warning"
+                  title="Wrappers extension must be updated for Iceberg Wrapper support"
+                >
+                  <p className="prose max-w-full text-sm !leading-normal">
+                    Update the <code className="text-xs">wrappers</code> extension by disabling and
+                    enabling it in{' '}
+                    <InlineLink href={`/project/${ref}/database/extensions?filter=wrappers`}>
+                      database extensions
+                    </InlineLink>{' '}
+                    before creating an Analytics bucket.{' '}
+                    <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
+                      Learn more
+                    </InlineLink>
+                    .
+                  </p>
+                </Admonition>
+              ) : (
                 <Admonition type="default">
-                  <p>
+                  <p className="!leading-normal">
                     Supabase will install the{' '}
                     {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
                     Iceberg Wrapper integration on your behalf.{' '}
@@ -284,8 +286,13 @@ export const CreateSpecializedBucketModal = ({
           <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isCreating} disabled={isCreating}>
-            Create
+          <Button
+            form={formId}
+            htmlType="submit"
+            loading={isCreating}
+            disabled={wrappersExtenstionNeedsUpgrading || isCreating}
+          >
+            Create bucket
           </Button>
         </DialogFooter>
       </DialogContent>
