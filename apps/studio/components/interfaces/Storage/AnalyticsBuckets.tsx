@@ -50,8 +50,13 @@ export const AnalyticsBuckets = () => {
         title="Analytics buckets are in alpha"
         actions={
           <Button asChild type="default" icon={<ExternalLink />}>
-            {/* [Joshen] To update with GH discussion */}
-            <Link href="/">Leave feedback</Link>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/orgs/supabase/discussions/40116"
+            >
+              Leave feedback
+            </a>
           </Button>
         }
       >
