@@ -110,7 +110,7 @@ export const AdvisorPanel = () => {
     {
       status: notificationStatus,
       filters: notificationFilters,
-      limit: 10,
+      limit: 20,
     },
     { enabled: shouldLoadNotifications }
   )
