@@ -4,7 +4,7 @@ description: 'Learn how to manage the email templates in Supabase.'
 subtitle: 'Learn how to manage the email templates in Supabase.'
 ---
 
-You can customize the email messages used for the authentication flows. You can edit the following email templates:
+You can customize the email messages used for the authentication flows and security notifications. You can edit the following authentication-related email templates:
 
 - Confirm signup
 - Invite user
@@ -12,20 +12,33 @@ You can customize the email messages used for the authentication flows. You can 
 - Change Email Address
 - Reset Password
 
+And the following security-related email notification templates:
+
+- Password changed
+- Email changed
+- Phone changed
+- MFA factor enrolled/unenrolled
+- Identity linked/unlinked
+
 ## Terminology
 
 The templating system provides the following variables for use:
 
-| Name                     | Description                                                                                                                                                                                                                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `{{ .ConfirmationURL }}` | Contains the confirmation URL. For example, a signup confirmation URL would look like: `https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=email&redirect_to=https://example.com/path` .                                                                      |
-| `{{ .Token }}`           | Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `{{. ConfirmationURL }}` .                                                                                                                                                                                 |
-| `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                                                                                           |
-| `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                                                |
-| `{{ .RedirectTo }}`      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail` or `inviteUserByEmail` is called. The redirect URL allow list can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration). |
-| `{{ .Data }}`            | Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.                                                                                                                                                                                         |
-| `{{ .Email }}`           | Contains the original email address of the user. Empty when when trying to [link an email address to an anonymous user](/docs/guides/auth/auth-anonymous#link-an-email--phone-identity).                                                                                              |
-| `{{ .NewEmail }}`        | Contains the new email address of the user. This variable is only supported in the "Change Email Address" template.                                                                                                                                                                   |
+| Name                                                                 | Description                                                                                                                                                                                                                                                                           |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <span className="!whitespace-nowrap">`{{ .ConfirmationURL }}`</span> | Contains the confirmation URL. For example, a signup confirmation URL would look like: `https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=email&redirect_to=https://example.com/path`.                                                                       |
+| <span className="!whitespace-nowrap">`{{ .Token }}`</span>           | Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `{{. ConfirmationURL }}`.                                                                                                                                                                                  |
+| <span className="!whitespace-nowrap">`{{ .TokenHash }}`</span>       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                                                                                           |
+| <span className="!whitespace-nowrap">`{{ .SiteURL }}`</span>         | Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                                                |
+| <span className="!whitespace-nowrap">`{{ .RedirectTo }}`</span>      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail` or `inviteUserByEmail` is called. The redirect URL allow list can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration). |
+| <span className="!whitespace-nowrap">`{{ .Data }}`</span>            | Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.                                                                                                                                                                                         |
+| <span className="!whitespace-nowrap">`{{ .Email }}`</span>           | Contains the original email address of the user. Empty when when trying to [link an email address to an anonymous user](/docs/guides/auth/auth-anonymous#link-an-email--phone-identity).                                                                                              |
+| <span className="!whitespace-nowrap">`{{ .NewEmail }}`</span>        | Contains the new email address of the user. This variable is only supported in the "Change Email Address" template.                                                                                                                                                                   |
+| <span className="!whitespace-nowrap">`{{ .OldEmail }}`</span>        | Contains the old email address of the user. This variable is only supported in the "Email changed notification" template.                                                                                                                                                             |
+| <span className="!whitespace-nowrap">`{{ .Phone }}`</span>           | Contains the new phone number of the user. This variable is only supported in the "Phone changed notification" template.                                                                                                                                                              |
+| <span className="!whitespace-nowrap">`{{ .OldPhone }}`</span>        | Contains the old phone address of the user. This variable is only supported in the "Phone changed notification" template.                                                                                                                                                             |
+| <span className="!whitespace-nowrap">`{{ .Provider }}`</span>        | Contains the provider of the newly linked/unlinked identity. This variable is only supported in the "Identity linked notification" and "Identity unlinked notification" templates.                                                                                                    |
+| <span className="!whitespace-nowrap">`{{ .FactorType }}`</span>      | Contains the type of the newly enrolled/unenrolled MFA factor. This variable is only supported in the "MFA factor enrolled notification" and "MFA factor unenrolled notification" templates.                                                                                          |
 
 ## Editing email templates
 
@@ -58,6 +71,27 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
       "mailer_templates_invite_content": "<h2>You have been invited</h2><p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p><p><a href=\"{{ .ConfirmationURL }}\">Accept the invite</a></p>",
       "mailer_subjects_email_change": "Confirm email change",
       "mailer_templates_email_change_content": "<h2>Confirm email change</h2><p>Follow this link to confirm the update of your email:</p><p><a href=\"{{ .ConfirmationURL }}\">Change email</a></p>",
+      "mailer_notifications_password_changed_enabled": true,
+      "mailer_subjects_password_changed_notification": "Your password has been changed",
+      "mailer_templates_password_changed_notification_content": "<h2>Your password has been changed</h2>\n\n<p>This is a confirmation that the password for your account {{ .Email }} has just been changed.</p>\n<p>If you did not make this change, please contact support.</p>",
+      "mailer_notifications_email_changed_enabled": true,
+      "mailer_subjects_email_changed_notification": "Your email address has been changed",
+      "mailer_templates_email_changed_notification_content": "<h2>Your email address has been changed</h2>\n\n<p>The email address for your account has been changed from {{ .OldEmail }} to {{ .Email }}.</p>\n<p>If you did not make this change, please contact support.</p>",
+      "mailer_notifications_phone_changed_enabled": true,
+      "mailer_subjects_phone_changed_notification": "Your phone number has been changed",
+      "mailer_templates_phone_changed_notification_content": "<h2>Your phone number has been changed</h2>\n\n<p>The phone number for your account {{ .Email }} has been changed from {{ .OldPhone }} to {{ .Phone }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_notifications_mfa_factor_enrolled_enabled": true,
+      "mailer_subjects_mfa_factor_enrolled_notification": "A new MFA factor has been enrolled",
+      "mailer_templates_mfa_factor_enrolled_notification_content": "<h2>A new MFA factor has been enrolled</h2>\n\n<p>A new factor ({{ .FactorType }}) has been enrolled for your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_notifications_mfa_factor_unenrolled_enabled": true,
+      "mailer_subjects_mfa_factor_unenrolled_notification": "An MFA factor has been unenrolled",
+      "mailer_templates_mfa_factor_unenrolled_notification_content": "<h2>An MFA factor has been unenrolled</h2>\n\n<p>A factor ({{ .FactorType }}) has been unenrolled for your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_notifications_identity_linked_enabled": true,
+      "mailer_subjects_identity_linked_notification": "A new identity has been linked",
+      "mailer_templates_identity_linked_notification_content": "<h2>A new identity has been linked</h2>\n\n<p>A new identity ({{ .Provider }}) has been linked to your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_notifications_identity_unlinked_enabled": true,
+      "mailer_subjects_identity_unlinked_notification": "An identity has been unlinked",
+      "mailer_templates_identity_unlinked_notification_content": "<h2>An identity has been unlinked</h2>\n\n<p>An identity ({{ .Provider }}) has been unlinked from your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>"
   }'
 ```
 

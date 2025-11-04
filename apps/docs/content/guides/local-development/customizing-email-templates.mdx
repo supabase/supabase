@@ -9,7 +9,9 @@ You can customize the email templates for local development [using the `config.t
 
 ## Configuring templates
 
-You should provide a relative URL to the `content_path` parameter, pointing to an HTML file which contains the template. For example
+You should provide a relative URL to the `content_path` parameter, pointing to an HTML file which contains the template. For example:
+
+### Authentication email templates
 
 <$CodeTabs>
 
@@ -30,7 +32,31 @@ content_path = "./supabase/templates/invite.html"
 
 </$CodeTabs>
 
-## Available email templates
+### Notification email templates
+
+<$CodeTabs>
+
+```toml name=supabase/config.toml
+[auth.email.notification_template.password_changed]
+enabled = true
+subject = "Your password has been changed"
+content_path = "./supabase/templates/password_changed_notification.html"
+```
+
+```html name=supabase/templates/password_changed_notification.html
+<html>
+  <body>
+    <p>
+      This is a confirmation that the password for your account {{ .Email }} has just been changed.
+    </p>
+    <p>If you did not make this change, please contact support.</p>
+  </body>
+</html>
+```
+
+</$CodeTabs>
+
+## Available authentication email templates
 
 There are several Auth email templates which can be configured. Each template serves a specific authentication flow:
 
@@ -75,6 +101,59 @@ There are several Auth email templates which can be configured. Each template se
 **When sent**: When a user needs to re-authenticate for sensitive operations
 **Purpose**: Additional verification for sensitive actions (like changing password, deleting account)
 **Content**: Contains a 6-digit OTP code for verification
+
+## Available notification email templates
+
+There are several Auth notification email templates which can be configured. These are security-related notifications sent to users, only if they have been enabled:
+
+### `auth.email.notification_template.password_changed`
+
+**Default subject**: "Your password has been changed"
+**When sent**: When a user's password is changed
+**Purpose**: Security notification to alert users of password changes
+**Content**: Confirms that the password for the account has been changed
+
+### `auth.email.notification_template.email_changed`
+
+**Default subject**: "Your email address has been changed"
+**When sent**: When a user's email address is changed
+**Purpose**: Security notification to alert users of email changes
+**Content**: Confirms the change from the old email to the new email address
+
+### `auth.email.notification_template.phone_changed`
+
+**Default subject**: "Your phone number has been changed"
+**When sent**: When a user's phone number is changed
+**Purpose**: Security notification to alert users of phone number changes
+**Content**: Confirms the change from the old phone number to the new phone number
+
+### `auth.email.notification_template.mfa_factor_enrolled`
+
+**Default subject**: "A new MFA factor has been enrolled"
+**When sent**: When a new MFA factor is added to the user's account
+**Purpose**: Security notification about MFA enrollment
+**Content**: Confirms that a new MFA factor type has been enrolled
+
+### `auth.email.notification_template.mfa_factor_unenrolled`
+
+**Default subject**: "An MFA factor has been unenrolled"
+**When sent**: When an MFA factor is removed from the user's account
+**Purpose**: Security notification about MFA unenrollment
+**Content**: Confirms that an MFA factor type has been unenrolled
+
+### `auth.email.notification_template.identity_linked`
+
+**Default subject**: "A new identity has been linked"
+**When sent**: When a new identity is linked to the account
+**Purpose**: Security notification about identity linking
+**Content**: Confirms that a new identity has been linked
+
+### `auth.email.notification_template.identity_unlinked`
+
+**Default subject**: "An identity has been unlinked"
+**When sent**: When an identity has been unlinked from the account
+**Purpose**: Security notification about identity unlinking
+**Content**: Confirms that an identity has been unlinked
 
 ## Template variables
 
@@ -147,6 +226,56 @@ Contains the new user's email address. This is only available in the `email_chan
 
 ```html
 <p>You are requesting to update your email address to {{ .NewEmail }}.</p>
+```
+
+### `OldEmail`
+
+Contains the user's old email address. This is only available in the `email_changed_notification` email template.
+
+**Usage**
+
+```html
+<p>The email address for your account has been changed from {{ .OldEmail }} to {{ .Email }}.</p>
+```
+
+### `Phone`
+
+Contains the user's new phone number. This is only available in the `phone_changed_notification` email template.
+
+**Usage**
+
+```html
+<p>The phone number for your account has been changed from {{ .OldPhone }} to {{ .Phone }}.</p>
+```
+
+### `OldPhone`
+
+Contains the user's old phone number. This is only available in the `phone_changed_notification` email template.
+
+**Usage**
+
+```html
+<p>The phone number for your account has been changed from {{ .OldPhone }} to {{ .Phone }}.</p>
+```
+
+### `Provider`
+
+Contains the provider of the newly linked/unlinked identity. This is only available in the `identity_linked_notification` and `identity_unlinked_notification` email templates.
+
+**Usage**
+
+```html
+<p>A new identity ({{ .Provider }}) has been linked to your account.</p>
+```
+
+### `FactorType`
+
+Contains the type of the newly enrolled/unenrolled MFA factor. This is only available in the `mfa_factor_enrolled_notification` and `mfa_factor_unenrolled_notification` email templates.
+
+**Usage**
+
+```html
+<p>A new factor ({{ .FactorType }}) has been enrolled for your account.</p>
 ```
 
 ## Deploying email templates
