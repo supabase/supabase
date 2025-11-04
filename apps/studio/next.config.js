@@ -141,7 +141,17 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/storage',
-        destination: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/buckets/:bucketId',
+        destination: '/project/:ref/storage/files/buckets/:bucketId',
         permanent: true,
       },
       {
@@ -305,12 +315,17 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/query-performance',
-        destination: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/reports/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/reports/query-performance',
       },
       {
         permanent: true,
         source: '/project/:ref/database/query-performance',
-        destination: '/project/:ref/advisors/query-performance',
+        destination: '/project/:ref/reports/query-performance',
       },
       {
         permanent: true,

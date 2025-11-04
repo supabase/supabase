@@ -36,6 +36,6 @@
     "tsconfig": "workspace:*",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "^3.0.5"
+    "vitest": "catalog:"
   }
 }

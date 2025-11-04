@@ -1,5 +1,6 @@
 import { ExternalLink, Github } from 'lucide-react'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { FeatureBanner } from 'components/ui/FeatureBanner'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
@@ -15,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { SupportLink } from '../Support/SupportLink'
 import { ApiKeyPill } from './ApiKeyPill'
 import { CreateNewAPIKeysButton } from './CreateNewAPIKeysButton'
 import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
@@ -191,12 +193,17 @@ export const ApiKeysFeedbackBanner = () => {
       <div className="px-5 py-2 bg-surface-200/30">
         <p className="text-sm text-foreground-lighter">
           Having trouble with the new API keys?{' '}
-          <a
-            href="/dashboard/support/new?category=Problem&subject=Help%20with%20API%20keys&message=I'm%20experiencing%20problems%20with%20the%20new%20API%20keys%20feature.%20Please%20describe%20your%20specific%20issue%20here."
-            className="inline-flex items-center gap-1 text-foreground"
+          <SupportLink
+            className="underline"
+            queryParams={{
+              category: SupportCategories.PROBLEM,
+              subject: 'Help with API keys',
+              message:
+                "I'm experiencing problems with the new API keys feature. Please describe your specific issue here.",
+            }}
           >
             Contact support
-          </a>
+          </SupportLink>
         </p>
       </div>
     </FeatureBanner>

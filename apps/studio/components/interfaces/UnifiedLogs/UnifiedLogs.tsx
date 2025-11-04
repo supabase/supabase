@@ -44,12 +44,28 @@ import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsListPanel } from './components/LogsListPanel'
+import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
-import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
+
+export const CHART_CONFIG = {
+  success: {
+    label: <TooltipLabel level="success" />,
+    color: 'hsl(var(--foreground-muted))',
+  },
+  warning: {
+    label: <TooltipLabel level="warning" />,
+    color: 'hsl(var(--warning-default))',
+  },
+  error: {
+    label: <TooltipLabel level="error" />,
+    color: 'hsl(var(--destructive-default))',
+  },
+} satisfies ChartConfig
 
 export const UnifiedLogs = () => {
   useResetFocus()
@@ -269,7 +285,6 @@ export const UnifiedLogs = () => {
 
   useEffect(() => {
     debouncedApplyFilterSearch()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columnFilters, debouncedApplyFilterSearch])
 
   useEffect(() => {
@@ -355,9 +370,7 @@ export const UnifiedLogs = () => {
                 chartConfig={filteredChartConfig}
               />
             </DataTableHeaderLayout>
-
             <Separator />
-
             <ResizablePanelGroup direction="horizontal" className="w-full h-full">
               <ResizablePanel
                 defaultSize={selectedRowKey ? 60 : 100}
@@ -373,22 +386,24 @@ export const UnifiedLogs = () => {
                       isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                     )}
                   >
-                    <DataTableInfinite
-                      columns={UNIFIED_LOGS_COLUMNS}
-                      totalRows={totalDBRowCount}
-                      filterRows={filterDBRowCount}
-                      totalRowsFetched={totalFetched}
-                      fetchNextPage={fetchNextPage}
-                      hasNextPage={hasNextPage}
-                      renderLiveRow={(props) => {
-                        if (!liveMode.timestamp) return null
-                        if (props?.row?.original.id !== liveMode?.row?.id) return null
-                        return <LiveRow colSpan={UNIFIED_LOGS_COLUMNS.length - 1} />
-                      }}
-                      setColumnOrder={setColumnOrder}
-                      setColumnVisibility={setColumnVisibility}
-                      searchParamsParser={SEARCH_PARAMS_PARSER}
-                    />
+                    <div className="h-full overflow-auto">
+                      <DataTableInfinite
+                        columns={UNIFIED_LOGS_COLUMNS}
+                        totalRows={totalDBRowCount}
+                        filterRows={filterDBRowCount}
+                        totalRowsFetched={totalFetched}
+                        fetchNextPage={fetchNextPage}
+                        hasNextPage={hasNextPage}
+                        renderLiveRow={(props) => {
+                          if (!liveMode.timestamp) return null
+                          if (props?.row?.original.id !== liveMode?.row?.id) return null
+                          return <LiveRow colSpan={UNIFIED_LOGS_COLUMNS.length - 1} />
+                        }}
+                        setColumnOrder={setColumnOrder}
+                        setColumnVisibility={setColumnVisibility}
+                        searchParamsParser={SEARCH_PARAMS_PARSER}
+                      />
+                    </div>
                   </ResizablePanel>
                   <LogsListPanel selectedRow={selectedRow} />
                 </ResizablePanelGroup>

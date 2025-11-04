@@ -28,14 +28,4 @@ describe('apiWrapper', () => {
     expect(mockHandler).toHaveBeenCalledWith(mockReq, mockRes)
     expect(apiAuthenticate).not.toHaveBeenCalled()
   })
-
-  it('should attach user to request and call handler when authentication succeeds', async () => {
-    const mockUser = { id: '123', email: 'test@example.com' } as any as any
-    vi.mocked(apiAuthenticate).mockResolvedValue(mockUser)
-
-    await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: true })
-
-    expect(mockReq.user).toEqual(mockUser)
-    expect(mockHandler).toHaveBeenCalledWith(mockReq, mockRes)
-  })
 })

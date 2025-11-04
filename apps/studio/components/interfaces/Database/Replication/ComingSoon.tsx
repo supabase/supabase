@@ -96,7 +96,7 @@ const ReplicationStaticMockup = ({ projectRef }: { projectRef: string }) => {
       blank: BlankNode,
       cta: () => CTANode({ projectRef }),
     }),
-    []
+    [projectRef]
   )
 
   return (

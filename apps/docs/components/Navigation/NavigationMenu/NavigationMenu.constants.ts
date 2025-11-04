@@ -67,6 +67,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       icon: 'getting-started',
       href: '/guides/getting-started',
       level: 'gettingstarted',
+      enabled: frameworkQuickstartsEnabled,
     },
   ],
   [
@@ -1390,7 +1391,13 @@ export const queues: NavMenuConstant = {
     {
       name: 'Getting Started',
       url: undefined,
-      items: [{ name: 'Quickstart', url: '/guides/queues/quickstart' }],
+      items: [
+        { name: 'Quickstart', url: '/guides/queues/quickstart' },
+        {
+          name: 'Consuming Messages with Edge Functions',
+          url: '/guides/queues/consuming-messages-with-edge-functions',
+        },
+      ],
     },
     {
       name: 'References',
@@ -1633,6 +1640,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/examples/auth-send-email-hook-react-email-resend' as `/${string}`,
         },
         {
+          name: 'Building an MCP Server with mcp-lite',
+          url: '/guides/functions/examples/mcp-server-mcp-lite' as `/${string}`,
+        },
+        {
           name: 'CORS support for invoking from the browser',
           url: '/guides/functions/cors' as `/${string}`,
         },
@@ -1695,6 +1706,10 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
+        {
+          name: 'mcp-lite (Model Context Protocol)',
+          url: '/guides/functions/examples/mcp-server-mcp-lite' as `/${string}`,
+        },
         {
           name: 'Browserless.io',
           url: '/guides/functions/examples/screenshots' as `/${string}`,
@@ -2450,8 +2465,6 @@ export const platform: NavMenuConstant = {
           name: 'Manage your usage',
           url: '/guides/platform/manage-your-usage' as `/${string}`,
           items: [
-            { name: 'Usage limits', url: '/guides/platform/usage-limits' as `/${string}` },
-            { name: 'Overages', url: '/guides/platform/overages' as `/${string}` },
             {
               name: 'Compute',
               url: '/guides/platform/manage-your-usage/compute' as `/${string}`,
@@ -2547,6 +2560,32 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/credits' as `/${string}`,
         },
         {
+          name: 'AWS Marketplace',
+          url: '/guides/platform/aws-marketplace',
+          items: [
+            {
+              name: 'Getting Started',
+              url: '/guides/platform/aws-marketplace/getting-started',
+            },
+            {
+              name: 'Account Setup',
+              url: '/guides/platform/aws-marketplace/account-setup',
+            },
+            {
+              name: 'Manage your subscription',
+              url: '/guides/platform/aws-marketplace/manage-your-subscription',
+            },
+            {
+              name: 'Invoices',
+              url: '/guides/platform/aws-marketplace/invoices',
+            },
+            {
+              name: 'FAQ',
+              url: '/guides/platform/aws-marketplace/faq',
+            },
+          ],
+        },
+        {
           name: 'Billing FAQ',
           url: '/guides/platform/billing-faq' as `/${string}`,
         },
@@ -2608,6 +2647,10 @@ export const self_hosting: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker' },
+    {
+      name: 'Configuration',
+      items: [{ name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' }],
+    },
     {
       name: 'Auth Server',
       items: [

@@ -54,9 +54,16 @@ export function McpConfigurationDisplay({
         </>
       )}
 
+      {selectedClient.primaryInstructions && selectedClient.primaryInstructions(clientConfig)}
+
       {selectedClient.configFile && (
         <div className="text-xs text-foreground-light">
-          {mcpButtonData ? 'Or add' : 'Add'} this configuration to{' '}
+          {selectedClient.primaryInstructions
+            ? 'Alternatively, add'
+            : mcpButtonData
+              ? 'Or add'
+              : 'Add'}{' '}
+          this configuration to{' '}
           <code className="px-1 py-0.5 bg-surface-200 rounded">{selectedClient.configFile}</code>:
         </div>
       )}
@@ -65,6 +72,7 @@ export function McpConfigurationDisplay({
         value={JSON.stringify(clientConfig, null, 2)}
         language="json"
         className="max-h-64 overflow-y-auto"
+        focusable={false}
       />
 
       {selectedClient.alternateInstructions && selectedClient.alternateInstructions(clientConfig)}

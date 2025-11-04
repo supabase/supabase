@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
 export type ProjectPauseStatusVariables = { ref?: string }
@@ -29,13 +29,11 @@ export const useProjectPauseStatusQuery = <TData = ProjectPauseStatusData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectPauseStatusData, ProjectPauseStatusError, TData> = {}
+  }: UseCustomQueryOptions<ProjectPauseStatusData, ProjectPauseStatusError, TData> = {}
 ) =>
-  useQuery<ProjectPauseStatusData, ProjectPauseStatusError, TData>(
-    projectKeys.pauseStatus(ref),
-    ({ signal }) => getProjectPausedStatus({ ref }, signal),
-    {
-      enabled: enabled && typeof ref !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectPauseStatusData, ProjectPauseStatusError, TData>({
+    queryKey: projectKeys.pauseStatus(ref),
+    queryFn: ({ signal }) => getProjectPausedStatus({ ref }, signal),
+    enabled: enabled && typeof ref !== 'undefined',
+    ...options,
+  })

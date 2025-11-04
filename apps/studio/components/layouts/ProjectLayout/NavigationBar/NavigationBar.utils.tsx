@@ -50,7 +50,7 @@ export const generateProductRoutes = (
     edgeFunctions?: boolean
     storage?: boolean
     realtime?: boolean
-    isStorageV2?: boolean
+    authOverviewPage?: boolean
   }
 ): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -61,7 +61,7 @@ export const generateProductRoutes = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
-  const isStorageV2 = features?.isStorageV2 ?? false
+  const authOverviewPageEnabled = features?.authOverviewPage ?? false
 
   const databaseMenu = generateDatabaseMenu(project)
   const authMenu = generateAuthMenu(ref as string)
@@ -86,7 +86,13 @@ export const generateProductRoutes = (
             key: 'auth',
             label: 'Authentication',
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : authOverviewPageEnabled
+                  ? `/project/${ref}/auth/overview`
+                  : `/project/${ref}/auth/users`),
             items: authMenu,
           },
         ]
@@ -97,11 +103,7 @@ export const generateProductRoutes = (
             key: 'storage',
             label: 'Storage',
             icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link:
-              ref &&
-              (isProjectBuilding
-                ? buildingUrl
-                : `/project/${ref}/storage/${isStorageV2 ? 'files' : 'buckets'}`),
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/files`),
           },
         ]
       : []),
@@ -187,16 +189,12 @@ export const generateOtherRoutes = (
 export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
   const settingsMenu = generateSettingsMenu(ref as string)
   return [
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'settings',
-            label: 'Project Settings',
-            icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && `/project/${ref}/settings/general`,
-            items: settingsMenu,
-          },
-        ]
-      : []),
+    {
+      key: 'settings',
+      label: 'Project Settings',
+      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && `/project/${ref}/settings/general`,
+      items: settingsMenu,
+    },
   ]
 }

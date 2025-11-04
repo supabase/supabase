@@ -23,6 +23,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -55,23 +56,23 @@ const SORT_ORDER_OPTIONS = [
 const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: any) => {
   return (
     <div
-      className={`group ${!loading ? 'cursor-pointer' : ''}`}
+      className={cn('group', !loading && 'cursor-pointer')}
       onClick={() => (!loading.isLoading ? togglePathEdit() : {})}
     >
       {loading.isLoading ? (
-        <div className="ml-2 flex items-center">
-          <Loader size={16} strokeWidth={2} className="animate-spin" />
-          <p className="ml-3 text-sm">{loading.message}</p>
+        <div className="ml-2 flex items-center gap-x-3">
+          <Loader size={14} strokeWidth={2} className="animate-spin" />
+          <p className="text-sm text-foreground-light">{loading.message}</p>
         </div>
       ) : (
-        <div className="flex cursor-pointer items-center">
-          <p className="ml-3 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
+        <div className="flex cursor-pointer items-center gap-x-3">
+          {breadcrumbs.length > 1 && (
+            <p className="ml-2 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
+          )}
           {!isSearching && (
-            <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
-              <Button type="text" icon={<Edit2 />}>
-                Navigate
-              </Button>
-            </div>
+            <Button type="text" icon={<Edit2 />} className="transition opacity-0 hover:opacity-100">
+              Navigate
+            </Button>
           )}
         </div>
       )}
@@ -279,19 +280,20 @@ export const FileExplorerHeader = ({
 
   return (
     <div
-      className="
-    flex h-[40px] pl-2
-    items-center justify-between
-    rounded-t-md border-b border-overlay bg-surface-100"
+      className={cn(
+        'flex h-[40px] pl-2',
+        'items-center justify-between',
+        'rounded-t-md border-b border-overlay bg-surface-100'
+      )}
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
-        {breadcrumbs.length > 0 && (
+        {breadcrumbs.length > 1 && (
           <Button
             icon={<ChevronLeft size={16} strokeWidth={2} />}
             size="tiny"
             type="text"
-            className={`${breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'} px-1`}
+            className="opacity-100 px-1"
             disabled={backDisabled}
             onClick={() => {
               setIsEditingPath(false)
@@ -336,14 +338,14 @@ export const FileExplorerHeader = ({
             breadcrumbs={breadcrumbs}
             togglePathEdit={togglePathEdit}
           />
-        ) : (
+        ) : breadcrumbs.length > 1 ? (
           <HeaderBreadcrumbs
             loading={loading}
             isSearching={snap.isSearching}
             breadcrumbs={breadcrumbs}
             selectBreadcrumb={selectBreadcrumb}
           />
-        )}
+        ) : null}
       </div>
 
       {/* Actions */}
@@ -496,7 +498,7 @@ export const FileExplorerHeader = ({
           <>
             <div className="h-6 border-r border-control" />
             <div className="mx-2">
-              <APIDocsButton section={['storage', selectedBucket.name]} />
+              <APIDocsButton section={['storage', selectedBucket.name]} source="storage" />
             </div>
           </>
         )}
