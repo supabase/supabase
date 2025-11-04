@@ -135,13 +135,13 @@ export const generateAuthMenu = (
                 key: 'hooks',
                 url: `/project/${ref}/auth/hooks`,
                 items: [],
+                label: 'BETA',
               },
               {
                 name: 'Audit Logs',
                 key: 'audit-logs',
                 url: `/project/${ref}/auth/audit-logs`,
                 items: [],
-                label: 'BETA',
               },
               ...(authenticationAdvanced
                 ? [
