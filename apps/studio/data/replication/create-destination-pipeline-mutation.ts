@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type BigQueryDestinationConfig = {
@@ -121,7 +121,11 @@ export const useCreateDestinationPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CreateDestinationPipelineData, ResponseError, CreateDestinationPipelineParams>,
+  UseCustomMutationOptions<
+    CreateDestinationPipelineData,
+    ResponseError,
+    CreateDestinationPipelineParams
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -133,8 +137,8 @@ export const useCreateDestinationPipelineMutation = ({
         const { projectRef } = variables
 
         await Promise.all([
-          queryClient.invalidateQueries(replicationKeys.destinations(projectRef)),
-          queryClient.invalidateQueries(replicationKeys.pipelines(projectRef)),
+          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
         ])
 
         await onSuccess?.(data, variables, context)

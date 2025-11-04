@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, Clock, HistoryIcon } from 'lucide-react'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import DatePicker from 'react-datepicker'
+import { Clock, HistoryIcon } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Badge } from '@ui/components/shadcn/ui/badge'
 import { Label } from '@ui/components/shadcn/ui/label'
@@ -13,6 +12,7 @@ import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import {
   Button,
   ButtonProps,
+  Calendar,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -50,13 +50,13 @@ export const LogsDatePicker = ({
 }: PropsWithChildren<LogsDatePickerProps>) => {
   const [open, setOpen] = useState(false)
 
-  const todayButtonRef = useRef<HTMLButtonElement>(null)
-
   // Reset the state when the popover closes
   useEffect(() => {
     if (!open) {
       setStartDate(value.from ? new Date(value.from) : null)
-      setEndDate(value.to ? new Date(value.to) : new Date())
+      const defaultEndDate = value.to ? new Date(value.to) : new Date()
+      setEndDate(defaultEndDate)
+      setCurrentMonth(new Date(defaultEndDate))
 
       const fromDate = value.from ? new Date(value.from) : null
       const toDate = value.to ? new Date(value.to) : null
@@ -96,6 +96,9 @@ export const LogsDatePicker = ({
 
   const [startDate, setStartDate] = useState<Date | null>(value.from ? new Date(value.from) : null)
   const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : new Date())
+  const [currentMonth, setCurrentMonth] = useState<Date>(() =>
+    value.to ? new Date(value.to) : new Date()
+  )
 
   const [startTime, setStartTime] = useState({
     HH: startDate?.getHours().toString() || '00',
@@ -166,6 +169,7 @@ export const LogsDatePicker = ({
 
           setStartDate(fromDate)
           setEndDate(toDate)
+          setCurrentMonth(new Date(toDate))
 
           // Update time states
           setStartTime({
@@ -190,7 +194,7 @@ export const LogsDatePicker = ({
       })
   }
 
-  function handleCopy() {
+  const handleCopy = useCallback(() => {
     if (!startDate || !endDate) return
 
     const fromDate = new Date(startDate)
@@ -208,7 +212,7 @@ export const LogsDatePicker = ({
     )
 
     setCopied(true)
-  }
+  }, [startDate, endDate, startTime, endTime])
 
   useEffect(() => {
     if (pasted) {
@@ -227,7 +231,7 @@ export const LogsDatePicker = ({
       document.removeEventListener('paste', handlePaste)
       document.removeEventListener('copy', handleCopy)
     }
-  }, [open, startDate, endDate])
+  }, [open, startDate, endDate, handleCopy])
 
   const isLargeRange =
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
@@ -340,54 +344,14 @@ export const LogsDatePicker = ({
             </div>
           </div>
           <div className="p-2 border-t">
-            <DatePicker
-              inline
-              selectsRange
-              todayButton={
-                <div className="sr-only">
-                  <Button type="text" size="tiny" ref={todayButtonRef}>
-                    Go to today
-                  </Button>
-                </div>
-              }
-              onChange={(dates) => {
-                handleDatePickerChange(dates)
+            <Calendar
+              mode="range"
+              month={currentMonth}
+              onMonthChange={(month) => setCurrentMonth(new Date(month))}
+              selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
+              onSelect={(range) => {
+                handleDatePickerChange([range?.from ?? null, range?.to ?? null])
               }}
-              dateFormat="MMMM d, yyyy h:mm aa"
-              dayClassName={() => 'cursor-pointer'}
-              startDate={startDate}
-              endDate={endDate}
-              renderCustomHeader={({
-                date,
-                decreaseMonth,
-                increaseMonth,
-                prevMonthButtonDisabled,
-                nextMonthButtonDisabled,
-              }) => (
-                <div className="flex items-center justify-between">
-                  <div className="flex w-full items-center justify-between">
-                    <Button
-                      onClick={decreaseMonth}
-                      disabled={prevMonthButtonDisabled}
-                      icon={<ChevronLeft size={14} strokeWidth={2} />}
-                      type="text"
-                      size="tiny"
-                      className="px-1.5"
-                    ></Button>
-                    <span className="text-sm text-foreground-light">
-                      {dayjs(date).format('MMMM YYYY')}
-                    </span>
-                    <Button
-                      onClick={increaseMonth}
-                      disabled={nextMonthButtonDisabled}
-                      icon={<ChevronRight size={14} strokeWidth={2} />}
-                      type="text"
-                      size="tiny"
-                      className="px-1.5"
-                    ></Button>
-                  </div>
-                </div>
-              )}
             />
           </div>
           {isLargeRange && !hideWarnings && (
@@ -412,12 +376,10 @@ export const LogsDatePicker = ({
             <Button
               type="default"
               onClick={() => {
-                // [Jordi]: Workaround so that if the user is in a different month, the datepicker will move the view to the current month
-                if (todayButtonRef.current) {
-                  todayButtonRef.current.click()
-                }
-                setStartDate(new Date())
-                setEndDate(new Date())
+                const today = new Date()
+                setCurrentMonth(today)
+                setStartDate(new Date(today))
+                setEndDate(new Date(today))
               }}
             >
               Today

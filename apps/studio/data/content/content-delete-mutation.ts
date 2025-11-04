@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { contentKeys } from './keys'
 
 type DeleteContentVariables = { projectRef: string; ids: string[] }
@@ -31,7 +31,7 @@ export const useContentDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteContentData, ResponseError, DeleteContentVariables>,
+  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteContentVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -41,8 +41,8 @@ export const useContentDeleteMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries(contentKeys.allContentLists(projectRef)),
-        queryClient.invalidateQueries(contentKeys.infiniteList(projectRef)),
+        queryClient.invalidateQueries({ queryKey: contentKeys.allContentLists(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.infiniteList(projectRef) }),
       ])
 
       await onSuccess?.(data, variables, context)

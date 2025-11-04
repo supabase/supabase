@@ -211,13 +211,13 @@ export const FeedbackWidget = ({ onClose }: FeedbackWidgetProps) => {
           <p className="text-xs text-foreground-light">
             Contact{' '}
             <SupportLink>
-              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+              <span className="cursor-pointer text-brand-link transition-colors hover:text-brand-600">
                 support
               </span>
             </SupportLink>{' '}
             or{' '}
             <a href={`${DOCS_URL}`} target="_blank" rel="noreferrer">
-              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+              <span className="cursor-pointer text-brand-link transition-colors hover:text-brand-600">
                 see docs
               </span>
             </a>

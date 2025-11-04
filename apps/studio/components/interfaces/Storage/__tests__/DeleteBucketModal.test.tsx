@@ -12,15 +12,15 @@ import { routerMock } from 'tests/lib/route-mock'
 import { DeleteBucketModal } from '../DeleteBucketModal'
 
 const bucket: Bucket = {
-  id: faker.string.uuid(),
-  name: `test`,
+  id: 'test',
+  name: 'test',
   owner: faker.string.uuid(),
   public: faker.datatype.boolean(),
   allowed_mime_types: faker.helpers.multiple(() => faker.system.mimeType(), {
     count: { min: 1, max: 5 },
   }),
   file_size_limit: faker.number.int({ min: 0, max: 25165824 }),
-  type: faker.helpers.arrayElement(['STANDARD', 'ANALYTICS', undefined]),
+  type: 'STANDARD',
   created_at: faker.date.recent().toISOString(),
   updated_at: faker.date.recent().toISOString(),
 }

@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { lintKeys } from './keys'
 
 type ExceptionPayload = components['schemas']['CreateNotificationExceptionsBody']['exceptions'][0]
@@ -32,7 +32,7 @@ export const useLintRuleCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<LintRuleCreateData, ResponseError, LintRuleCreateVariables>,
+  UseCustomMutationOptions<LintRuleCreateData, ResponseError, LintRuleCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -41,8 +41,8 @@ export const useLintRuleCreateMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries(lintKeys.lintRules(projectRef)),
-        queryClient.invalidateQueries(lintKeys.lint(projectRef)),
+        queryClient.invalidateQueries({ queryKey: lintKeys.lintRules(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
     },

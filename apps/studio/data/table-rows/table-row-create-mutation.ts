@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
@@ -7,7 +7,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableRowKeys } from './keys'
 
 export type TableRowCreateVariables = {
@@ -63,7 +63,7 @@ export const useTableRowCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowCreateData, ResponseError, TableRowCreateVariables>,
+  UseCustomMutationOptions<TableRowCreateData, ResponseError, TableRowCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -93,7 +93,9 @@ export const useTableRowCreateMutation = ({
         console.error('Failed to track table data insertion event:', error)
       }
 
-      await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

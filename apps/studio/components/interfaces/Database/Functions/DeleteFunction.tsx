@@ -11,7 +11,7 @@ interface DeleteFunctionProps {
   setVisible: (value: boolean) => void
 }
 
-const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
+export const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { name, schema } = func ?? {}
 
@@ -57,5 +57,3 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
     </>
   )
 }
-
-export default DeleteFunction

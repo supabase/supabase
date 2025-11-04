@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { subscriptionKeys } from './keys'
 import type { AddonVariantId } from './types'
 
@@ -38,7 +38,7 @@ export const useProjectAddonRemoveMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectAddonRemoveData, ResponseError, ProjectAddonRemoveVariables>,
+  UseCustomMutationOptions<ProjectAddonRemoveData, ResponseError, ProjectAddonRemoveVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -49,7 +49,7 @@ export const useProjectAddonRemoveMutation = ({
       const { projectRef } = variables
       // [Joshen] Only invalidate addons, not subscriptions, as AddOn section in
       // subscription page is using AddOn react query
-      await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
+      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

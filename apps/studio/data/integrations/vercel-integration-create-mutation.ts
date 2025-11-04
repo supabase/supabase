@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { integrationKeys } from './keys'
 
 export type VercelIntegrationCreateVariables = {
@@ -48,7 +48,11 @@ export const useVercelIntegrationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>,
+  UseCustomMutationOptions<
+    VercelIntegrationCreateData,
+    ResponseError,
+    VercelIntegrationCreateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -56,9 +60,11 @@ export const useVercelIntegrationCreateMutation = ({
     mutationFn: (vars) => createVercelIntegration(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(integrationKeys.integrationsList()),
-        queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-        queryClient.invalidateQueries(integrationKeys.vercelProjectList(data.id)),
+        queryClient.invalidateQueries({ queryKey: integrationKeys.integrationsList() }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.integrationsListWithOrg(variables.orgSlug),
+        }),
+        queryClient.invalidateQueries({ queryKey: integrationKeys.vercelProjectList(data.id) }),
       ])
       await onSuccess?.(data, variables, context)
     },

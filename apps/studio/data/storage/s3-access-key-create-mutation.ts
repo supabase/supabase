@@ -1,8 +1,8 @@
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageCredentialsKeys } from './s3-access-key-keys'
 
 type CreateS3AccessKeyCredentialVariables = {
@@ -32,7 +32,11 @@ export function useS3AccessKeyCreateMutation({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<S3AccessKeyCreateData, ResponseError, CreateS3AccessKeyCredentialVariables>,
+  UseCustomMutationOptions<
+    S3AccessKeyCreateData,
+    ResponseError,
+    CreateS3AccessKeyCredentialVariables
+  >,
   'mutationFn'
 > = {}) {
   const queryClient = useQueryClient()
@@ -41,7 +45,9 @@ export function useS3AccessKeyCreateMutation({
     mutationFn: (vars) => createS3AccessKeyCredential(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(storageCredentialsKeys.credentials(projectRef))
+      await queryClient.invalidateQueries({
+        queryKey: storageCredentialsKeys.credentials(projectRef),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

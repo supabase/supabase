@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
@@ -47,7 +47,7 @@ export const useContentInsertMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<InsertContentData, ResponseError, InsertContentVariables>,
+  UseCustomMutationOptions<InsertContentData, ResponseError, InsertContentVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -56,7 +56,7 @@ export const useContentInsertMutation = ({
     mutationFn: (args) => insertContent(args),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
+      await queryClient.invalidateQueries({ queryKey: contentKeys.allContentLists(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

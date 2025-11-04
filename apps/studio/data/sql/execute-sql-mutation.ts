@@ -1,10 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { sqlEventParser } from 'lib/sql-event-parser'
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
+import { UseCustomMutationOptions } from 'types'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
 // So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better
@@ -30,7 +31,7 @@ export const useExecuteSqlMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>,
+  UseCustomMutationOptions<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -72,10 +73,12 @@ export const useExecuteSqlMutation = ({
       if (contextualInvalidation && projectRef && isMutationSQL) {
         const databaseRelatedKeys = queryClient
           .getQueryCache()
-          .findAll(['projects', projectRef])
+          .findAll({ queryKey: ['projects', projectRef] })
           .map((x) => x.queryKey)
           .filter((x) => !INVALIDATION_KEYS_IGNORE.some((a) => x.includes(a)))
-        await Promise.all(databaseRelatedKeys.map((key) => queryClient.invalidateQueries(key)))
+        await Promise.all(
+          databaseRelatedKeys.map((key) => queryClient.invalidateQueries({ queryKey: key }))
+        )
       }
       await onSuccess?.(data, variables, context)
     },

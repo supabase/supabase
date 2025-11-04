@@ -1,10 +1,9 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import pgMeta from '@supabase/pg-meta'
-import type { ResponseError } from 'types'
-import { databaseTriggerKeys } from './keys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { toast } from 'sonner'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggerDeleteVariables = {
   trigger: {
@@ -41,7 +40,11 @@ export const useDatabaseTriggerDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerDeleteData, ResponseError, DatabaseTriggerDeleteVariables>,
+  UseCustomMutationOptions<
+    DatabaseTriggerDeleteData,
+    ResponseError,
+    DatabaseTriggerDeleteVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -50,7 +53,7 @@ export const useDatabaseTriggerDeleteMutation = ({
     mutationFn: (vars) => deleteDatabaseTrigger(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: databaseTriggerKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { ResponseError } from 'types'
-import { replicationKeys } from './keys'
 import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { replicationKeys } from './keys'
 
 export type StartPipelineParams = {
   projectRef: string
@@ -34,7 +34,7 @@ export const useStartPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<StartPipelineData, ResponseError, StartPipelineParams>,
+  UseCustomMutationOptions<StartPipelineData, ResponseError, StartPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -43,7 +43,9 @@ export const useStartPipelineMutation = ({
     mutationFn: (vars) => startPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables
-      await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

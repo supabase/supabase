@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobToggleVariables = {
@@ -36,7 +36,11 @@ export const useDatabaseCronJobToggleMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseCronJobToggleData, ResponseError, DatabaseCronJobToggleVariables>,
+  UseCustomMutationOptions<
+    DatabaseCronJobToggleData,
+    ResponseError,
+    DatabaseCronJobToggleVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -45,7 +49,9 @@ export const useDatabaseCronJobToggleMutation = ({
     mutationFn: (vars) => toggleDatabaseCronJob(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, searchTerm } = variables
-      await queryClient.invalidateQueries(databaseCronJobsKeys.listInfinite(projectRef, searchTerm))
+      await queryClient.invalidateQueries({
+        queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

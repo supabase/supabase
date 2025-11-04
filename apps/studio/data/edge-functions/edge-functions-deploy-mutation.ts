@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionsDeployVariables = {
@@ -53,7 +53,7 @@ export const useEdgeFunctionDeployMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>,
+  UseCustomMutationOptions<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -63,9 +63,9 @@ export const useEdgeFunctionDeployMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, slug } = variables
       await Promise.all([
-        queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef)),
-        queryClient.invalidateQueries(edgeFunctionsKeys.detail(projectRef, slug)),
-        queryClient.invalidateQueries(edgeFunctionsKeys.body(projectRef, slug)),
+        queryClient.invalidateQueries({ queryKey: edgeFunctionsKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: edgeFunctionsKeys.detail(projectRef, slug) }),
+        queryClient.invalidateQueries({ queryKey: edgeFunctionsKeys.body(projectRef, slug) }),
       ])
       await onSuccess?.(data, variables, context)
     },

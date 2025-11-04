@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobCreateVariables = {
@@ -35,7 +35,11 @@ export const useDatabaseCronJobCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseCronJobCreateData, ResponseError, DatabaseCronJobCreateVariables>,
+  UseCustomMutationOptions<
+    DatabaseCronJobCreateData,
+    ResponseError,
+    DatabaseCronJobCreateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -46,9 +50,15 @@ export const useDatabaseCronJobCreateMutation = ({
       const { projectRef, searchTerm, identifier } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(databaseCronJobsKeys.listInfinite(projectRef, searchTerm)),
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
+        }),
         ...(!!identifier
-          ? [queryClient.invalidateQueries(databaseCronJobsKeys.job(projectRef, identifier))]
+          ? [
+              queryClient.invalidateQueries({
+                queryKey: databaseCronJobsKeys.job(projectRef, identifier),
+              }),
+            ]
           : []),
       ])
 

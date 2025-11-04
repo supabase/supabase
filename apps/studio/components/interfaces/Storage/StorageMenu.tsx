@@ -74,7 +74,11 @@ export const StorageMenu = () => {
 
   return (
     <>
-      <Menu type="pills" className="h-full flex flex-col" ulClassName="flex flex-col flex-grow">
+      <Menu
+        type="pills"
+        className="h-full flex flex-col"
+        ulClassName="flex flex-col flex-grow min-h-0"
+      >
         <div className="flex flex-col gap-y-1.5 px-5 pb-6 pt-6 sticky top-0 bg-sidebar">
           <CreateBucketModal />
 
@@ -107,12 +111,12 @@ export const StorageMenu = () => {
           </InnerSideBarFilters>
         </div>
 
-        <div className={cn('flex flex-col', isVirtualized && 'flex-grow')}>
+        <div className={cn('flex flex-col', isVirtualized && 'flex-grow min-h-0')}>
           <div
             className={cn(
               'flex flex-col mx-3',
               isVirtualized
-                ? 'flex-grow'
+                ? 'flex-grow min-h-0'
                 : isSuccess && filteredBuckets.length > 0
                   ? 'mb-3'
                   : 'mb-5'

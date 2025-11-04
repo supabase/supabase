@@ -1,11 +1,11 @@
 import * as Sentry from '@sentry/nextjs'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
 import { PROVIDERS } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { projectKeys } from './keys'
 import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
 
@@ -90,7 +90,7 @@ export const useProjectCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectCreateData, ResponseError, ProjectCreateVariables>,
+  UseCustomMutationOptions<ProjectCreateData, ResponseError, ProjectCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -99,8 +99,10 @@ export const useProjectCreateMutation = ({
     mutationFn: (vars) => createProject(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(projectKeys.list()),
-        queryClient.invalidateQueries(projectKeys.infiniteListByOrg(variables.organizationSlug)),
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
+        queryClient.invalidateQueries({
+          queryKey: projectKeys.infiniteListByOrg(variables.organizationSlug),
+        }),
       ])
       await onSuccess?.(data, variables, context)
     },
