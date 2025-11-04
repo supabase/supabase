@@ -27,7 +27,7 @@ const Globe = () => {
       dark: resolvedTheme?.includes('dark') ? 1 : 0,
       diffuse: 3,
       scale: 1,
-      opacity: 0.8,
+      opacity: 1,
       mapSamples: 20000,
       mapBrightness: 4,
       baseColor: [255 / 255, 255 / 255, 255 / 255],
