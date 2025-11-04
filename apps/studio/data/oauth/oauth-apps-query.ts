@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type OAuthAppsVariables = {
@@ -27,7 +27,7 @@ export type OAuthAppsError = ResponseError
 
 export const useOAuthAppsQuery = <TData = OAuthAppsData>(
   { slug }: OAuthAppsVariables,
-  { enabled = true, ...options }: UseQueryOptions<OAuthAppsData, OAuthAppsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<OAuthAppsData, OAuthAppsError, TData> = {}
 ) =>
   useQuery<OAuthAppsData, OAuthAppsError, TData>({
     queryKey: oauthAppKeys.oauthApps(slug),

@@ -1,10 +1,11 @@
 import { getPaginatedUsersSQL } from '@supabase/pg-meta/src/sql/studio/get-users-paginated'
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { UseCustomInfiniteQueryOptions } from 'types'
 import { authKeys } from './keys'
 
 const USERS_PAGE_LIMIT = 50
@@ -38,7 +39,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
     order,
     column,
   }: UsersVariables,
-  { enabled = true, ...options }: UseInfiniteQueryOptions<UsersData, UsersError, TData> = {}
+  { enabled = true, ...options }: UseCustomInfiniteQueryOptions<UsersData, UsersError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY

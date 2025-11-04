@@ -110,7 +110,7 @@ export const CreateBucketModal = ({
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
+  const { mutateAsync: createBucket, isLoading: isCreatingBucket } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
   })
@@ -444,10 +444,15 @@ export const CreateBucketModal = ({
         </Form_Shadcn_>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
+          <Button type="default" disabled={isCreatingBucket} onClick={() => setVisible(false)}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isCreating} disabled={isCreating}>
+          <Button
+            form={formId}
+            htmlType="submit"
+            loading={isCreatingBucket}
+            disabled={isCreatingBucket}
+          >
             Create
           </Button>
         </DialogFooter>

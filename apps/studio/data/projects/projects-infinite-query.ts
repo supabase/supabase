@@ -1,9 +1,9 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
 const DEFAULT_LIMIT = 100
@@ -50,7 +50,7 @@ export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<ProjectsInfiniteData, ProjectsInfiniteError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<ProjectsInfiniteData, ProjectsInfiniteError, TData> = {}
 ) => {
   const { profile } = useProfile()
   return useInfiniteQuery<ProjectsInfiniteData, ProjectsInfiniteError, TData>({

@@ -1,8 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
@@ -36,7 +37,7 @@ export async function getSchemas(
 
 export const useSchemasQuery = <TData = SchemasData>(
   { projectRef, connectionString }: SchemasVariables,
-  { enabled = true, ...options }: UseQueryOptions<SchemasData, SchemasError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<SchemasData, SchemasError, TData> = {}
 ) =>
   useQuery<SchemasData, SchemasError, TData>({
     queryKey: databaseKeys.schemas(projectRef),

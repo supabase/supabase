@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { clientSecretKeys } from './keys'
 
 import { components } from 'api-types'
@@ -49,7 +49,10 @@ export type ClientSecretsError = ResponseError
 
 export const useClientSecretsQuery = <TData = ClientSecretsData>(
   { slug, appId }: ClientSecretsVariables,
-  { enabled = true, ...options }: UseQueryOptions<ClientSecretsData, ClientSecretsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ClientSecretsData, ClientSecretsError, TData> = {}
 ) =>
   useQuery<ClientSecretsData, ClientSecretsError, TData>({
     queryKey: clientSecretKeys.list(slug, appId),

@@ -1,7 +1,7 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicationKeys } from './keys'
 
 type ReplicationPipelinesStatusParams = { projectRef?: string; pipelineId?: number }
@@ -33,7 +33,7 @@ export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineSta
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ReplicationPipelineStatusData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationPipelineStatusData, ResponseError, TData> = {}
 ) =>
   useQuery<ReplicationPipelineStatusData, ResponseError, TData>({
     queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),

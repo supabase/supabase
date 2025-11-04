@@ -1,7 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { handleError, post } from 'data/fetchers'
 import { projectKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type ProjectTransferPreviewVariables = {
   projectRef?: string
@@ -35,7 +36,7 @@ export const useProjectTransferPreviewQuery = <TData = ProjectTransferPreviewDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectTransferPreviewData, ProjectTransferPreviewError, TData> = {}
+  }: UseCustomQueryOptions<ProjectTransferPreviewData, ProjectTransferPreviewError, TData> = {}
 ) =>
   useQuery<ProjectTransferPreviewData, ProjectTransferPreviewError, TData>({
     queryKey: projectKeys.projectTransferPreview(projectRef, targetOrganizationSlug),

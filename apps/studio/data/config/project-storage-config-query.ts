@@ -1,9 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectStorageConfigVariables = {
@@ -43,7 +43,7 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectStorageConfigData, ProjectStorageConfigError, TData> = {}
+  }: UseCustomQueryOptions<ProjectStorageConfigData, ProjectStorageConfigError, TData> = {}
 ) =>
   useQuery<ProjectStorageConfigData, ProjectStorageConfigError, TData>({
     queryKey: configKeys.storage(projectRef),
