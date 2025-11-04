@@ -42,8 +42,7 @@ export const UsersFooter = ({
       keywords: filterKeywords,
       filter: filter === 'all' ? undefined : filter,
       providers: selectedProviders,
-      // Force exact count for optimized search since result sets are small
-      forceExactCount: forceExactCount || specificFilterColumn !== 'freeform',
+      forceExactCount,
       // Use optimized search when filtering by specific column
       ...(specificFilterColumn !== 'freeform'
         ? { column: specificFilterColumn as OptimizedSearchColumns }
