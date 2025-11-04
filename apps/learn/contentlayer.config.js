@@ -16,7 +16,7 @@ const computedFields = {
   },
   slugAsParams: {
     type: 'string',
-    resolve: (doc) => doc._raw.flattenedPath.split('/').slice(1).join('/'),
+    resolve: (doc) => doc._raw.flattenedPath,
   },
 }
 
@@ -55,7 +55,7 @@ const NestedProperties = defineNestedType(() => ({
 
 export const Doc = defineDocumentType(() => ({
   name: 'Doc',
-  filePathPattern: `docs/**/*.mdx`,
+  filePathPattern: `**/*.mdx`,
   contentType: 'mdx',
   fields: {
     title: {

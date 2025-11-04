@@ -1,5 +1,4 @@
 import { metadata as mainMetadata } from '@/app/layout'
-import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
 import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
@@ -87,7 +86,6 @@ export default async function DocPage(props: DocPageProps) {
               </p>
             )}
           </div>
-          <FrameworkSelector />
         </div>
         <SourcePanel doc={doc} />
         <div className="pb-12">

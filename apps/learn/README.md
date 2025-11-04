@@ -1,5 +1,8 @@
 Plan:
 Course 1: Supabase Foundations Learn the basics of Supabase: database, auth, and RLS. 5 chapters.
+
+-
+
 Course 2: Project: OpenDesk 15 Build a realtime room-booking dashboard using Supabase. 15 chapters.
 Course 3: Supabase Internals: Performance & Scaling. Learn how to profile queries, tune indexes, and scale Postgres with Supabase. 20 chapters.
 Course 4: Supabase Internals: Debugging & Operations. Understand how to diagnose slow queries, use read replicas, and manage production workloads. 20 chapters.
