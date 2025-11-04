@@ -110,7 +110,7 @@ interface UseAiChatOptions {
 }
 
 const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: UseAiChatOptions) => {
-  const eventSourceRef = useRef<SSE>()
+  const eventSourceRef = useRef<SSE>(null)
   const messageIdempotencyKey = useRef(0)
 
   const [isResponding, setIsResponding] = useState(false)
@@ -222,7 +222,7 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
 
   function reset() {
     eventSourceRef.current?.close()
-    eventSourceRef.current = undefined
+    eventSourceRef.current = null
     setIsResponding(false)
     setHasError(false)
     setCurrentMessageIndex(1)

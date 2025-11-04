@@ -1,7 +1,7 @@
 'use client'
 
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 
 import { useBreakpoint, useDebounce } from 'common'
 import { CommandInput_Shadcn_, cn } from 'ui'
@@ -16,7 +16,7 @@ function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) 
   const isBelowSmSynchronous = useRef(isBelowSm)
   isBelowSmSynchronous.current = isBelowSm
 
-  const internalRef = useRef<HTMLInputElement>()
+  const internalRef = useRef<HTMLInputElement>(null)
   const combinedRef = (element: HTMLInputElement) => {
     if (ref instanceof Function) {
       ref(element)

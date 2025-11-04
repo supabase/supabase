@@ -1,5 +1,5 @@
 import { LazyMotion, m } from 'framer-motion'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, ReactElement } from 'react'
 import { SyntaxHighlighterProps, createElement } from 'react-syntax-highlighter'
 
 // Make sure to return the specific export containing the feature bundle.
@@ -7,7 +7,7 @@ const loadFramerFeatures = () => import('./framer-features').then((res) => res.d
 
 type RendererElementNode = {
   type: 'element'
-  tagName: keyof JSX.IntrinsicElements | React.ComponentType<any>
+  tagName: React.ComponentType<any>
   properties: { className: any[]; [key: string]: any }
   children: RendererNode[]
 }
@@ -25,7 +25,7 @@ export type WrapperProps = PropsWithChildren<{
 
 export type TransformRendererProps = {
   search: (text: string) => boolean
-  wrapper: ({ children, text }: WrapperProps) => JSX.Element
+  wrapper: ({ children, text }: WrapperProps) => ReactElement
 }
 
 /**
@@ -235,13 +235,13 @@ function splitSpaceElements(nodes: RendererNode[]) {
  * that the syntax highlighter can work with.
  */
 function elementToRendererElementNode(
-  element: ({ children, text }: WrapperProps) => JSX.Element,
+  element: ({ children, text }: WrapperProps) => ReactElement,
   text: string
 ): RendererElementNode {
   const {
     type,
     props: { children, className, ...props },
-  } = element({ children: [], text })
+  } = element({ children: [], text }) as any
 
   return {
     type: 'element',

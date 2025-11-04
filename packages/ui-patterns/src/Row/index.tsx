@@ -29,7 +29,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   const childrenArray = useMemo(() => (Array.isArray(children) ? children : [children]), [children])
 
   const [scrollPosition, setScrollPosition] = useState(0)
-  const measuredWidth = useMeasuredWidth(containerRef)
+  const measuredWidth = useMeasuredWidth<HTMLDivElement>(containerRef)
 
   const resolveColumnsForWidth = (width: number): number => {
     if (!Array.isArray(columns)) return columns

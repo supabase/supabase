@@ -4,10 +4,10 @@ import { isEqual } from 'lodash'
 import { useEffect, useMemo, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
-import type { ICommand, CommandOptions } from '../types'
 import { useCommandContext } from '../../internal/Context'
-import { useCurrentPage } from './pagesHooks'
 import { PageDefinition, isCommandsPage } from '../../internal/state/pagesState'
+import type { CommandOptions, ICommand } from '../types'
+import { useCurrentPage } from './pagesHooks'
 
 const useCommands = () => {
   const { commandsState } = useCommandContext()
@@ -32,7 +32,7 @@ const useRegisterCommands = (
   options.enabled ??= true
   const prevEnabled = useRef<boolean | undefined>(options.enabled)
 
-  const unsubscribe = useRef<() => void>()
+  const unsubscribe = useRef<() => void>(null)
 
   /**
    * useEffect handles the registration on first render, since React runs the
@@ -48,9 +48,7 @@ const useRegisterCommands = (
     if (!isEqual(prevDeps.current, options.deps) || prevEnabled.current !== options.enabled) {
       unsubscribe.current?.()
 
-      unsubscribe.current = options.enabled
-        ? registerSection(sectionName, commands, options)
-        : undefined
+      unsubscribe.current = options.enabled ? registerSection(sectionName, commands, options) : null
 
       prevDeps.current = options.deps
       prevEnabled.current = options.enabled
@@ -58,9 +56,7 @@ const useRegisterCommands = (
   }, [registerSection, sectionName, commands, options])
 
   useEffect(() => {
-    unsubscribe.current = options.enabled
-      ? registerSection(sectionName, commands, options)
-      : undefined
+    unsubscribe.current = options.enabled ? registerSection(sectionName, commands, options) : null
 
     return () => unsubscribe.current?.()
   }, [])
