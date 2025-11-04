@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
+import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -34,8 +36,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import { convertKVStringArrayToJson } from '../../../Integrations/Wrappers/Wrappers.utils'
-import { getCatalogURI } from '../../StorageSettings/StorageSettings.utils'
 import { getAnalyticsBucketPublicationName } from './AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 

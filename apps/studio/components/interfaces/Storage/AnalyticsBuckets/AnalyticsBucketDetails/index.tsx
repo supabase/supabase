@@ -11,6 +11,7 @@ import {
   convertKVStringArrayToJson,
   formatWrapperTables,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -33,7 +34,6 @@ import { DOCS_URL } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { useSelectedBucket } from '../../StorageExplorer/useSelectedBucket'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'

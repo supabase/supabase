@@ -169,7 +169,7 @@ export const AnalyticsBuckets = () => {
       {selectedBucket && (
         <DeleteAnalyticsBucketModal
           visible={modal === 'delete'}
-          bucket={selectedBucket}
+          bucketId={selectedBucket.id}
           onClose={() => setModal(null)}
         />
       )}
