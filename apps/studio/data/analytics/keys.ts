@@ -121,6 +121,28 @@ export const analyticsKeys = {
       'infra-monitoring',
       { attribute, startDate, endDate, interval, databaseIdentifier },
     ] as const,
+  projectMetrics: (
+    projectRef: string | undefined,
+    {
+      startDate,
+      endDate,
+      interval,
+    }: {
+      startDate?: string
+      endDate?: string
+      interval?: string
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'project.metrics',
+      {
+        startDate,
+        endDate,
+        interval,
+      },
+    ] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
 

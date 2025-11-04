@@ -8,7 +8,6 @@ import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -33,6 +32,7 @@ import {
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { useServiceStats } from './ProjectUsageSection.utils'
+import type { StatsLike } from './ProjectUsageSection.utils'
 import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 import {
   toLogsBarChartData,
@@ -90,7 +90,7 @@ type ServiceComputed = ServiceEntry & {
   total: number
   warn: number
   err: number
-  stats: ReturnType<typeof useProjectUsageStats>
+  stats: StatsLike
 }
 
 export const ProjectUsageSection = () => {
