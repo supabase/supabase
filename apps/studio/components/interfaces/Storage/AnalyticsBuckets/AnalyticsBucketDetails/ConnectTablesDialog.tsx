@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { snakeCase } from 'lodash'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -6,6 +7,8 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
+import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -13,12 +16,10 @@ import { useCreateDestinationPipelineMutation } from 'data/replication/create-de
 import { useCreatePublicationMutation } from 'data/replication/create-publication-mutation'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { snakeCase } from 'lodash'
 import {
   Button,
   Dialog,
@@ -35,8 +36,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import { convertKVStringArrayToJson } from '../../Integrations/Wrappers/Wrappers.utils'
-import { getCatalogURI } from '../StorageSettings/StorageSettings.utils'
 import { getAnalyticsBucketPublicationName } from './AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 
@@ -62,7 +61,7 @@ const isEnabled = false // Kill switch if we wanna hold off supporting connectin
 
 type ConnectTablesForm = z.infer<typeof FormSchema>
 
-export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => {
+export const ConnectTablesDialog = ({ bucketId }: { bucketId?: string }) => {
   const form = useForm<ConnectTablesForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: { tables: [] },
@@ -72,7 +71,7 @@ export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => 
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { data: wrapperInstance } = useAnalyticsBucketWrapperInstance({ bucketId: bucket.id })
+  const { data: wrapperInstance } = useAnalyticsBucketWrapperInstance({ bucketId: bucketId })
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
@@ -106,14 +105,15 @@ export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => 
   const onSubmit: SubmitHandler<ConnectTablesForm> = async (values) => {
     // [Joshen] Currently creates the destination for the analytics bucket here
     // Which also involves creating a namespace + publication
-    // Publication name is automatically generated as {bucket.id}_publication
-    // Destination name is automatically generated as {bucket.id}_destination
+    // Publication name is automatically generated as {bucketId}_publication
+    // Destination name is automatically generated as {bucketId}_destination
 
     if (!projectRef) return console.error('Project ref is required')
     if (!sourceId) return toast.error('Source ID is required')
+    if (!bucketId) return toast.error('Bucket ID is required')
 
     try {
-      const publicationName = getAnalyticsBucketPublicationName(bucket.id)
+      const publicationName = getAnalyticsBucketPublicationName(bucketId)
       await createPublication({
         projectRef,
         sourceId,
@@ -135,7 +135,7 @@ export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => 
         ids: keysToDecrypt,
       })
 
-      const warehouseName = bucket.id
+      const warehouseName = bucketId
       const catalogToken = serviceKey?.api_key ?? ''
       const s3AccessKeyId = decryptedValues[wrapperValues['vault_aws_access_key_id']]
       const s3SecretAccessKey = decryptedValues[wrapperValues['vault_aws_secret_access_key']]
@@ -145,7 +145,7 @@ export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => 
       const endpoint =
         projectSettings?.app_config?.storage_endpoint || projectSettings?.app_config?.endpoint
       const catalogUri = getCatalogURI(project?.ref ?? '', protocol, endpoint)
-      const namespace = `${bucket.id}_namespace`
+      const namespace = `${bucketId}_namespace`
       await createNamespace({
         catalogUri,
         warehouse: warehouseName,
@@ -162,7 +162,7 @@ export const ConnectTablesDialog = ({ bucket }: { bucket: AnalyticsBucket }) => 
         s3SecretAccessKey,
         s3Region,
       }
-      const destinationName = `${snakeCase(bucket.id)}_destination`
+      const destinationName = `${snakeCase(bucketId)}_destination`
 
       const { pipeline_id: pipelineId } = await createDestinationPipeline({
         projectRef,

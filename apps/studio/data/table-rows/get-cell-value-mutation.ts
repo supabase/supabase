@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type GetCellValueVariables = {
   projectRef: string
@@ -44,7 +44,7 @@ export const useGetCellValueMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowCreateData, ResponseError, GetCellValueVariables>,
+  UseCustomMutationOptions<TableRowCreateData, ResponseError, GetCellValueVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<TableRowCreateData, ResponseError, GetCellValueVariables>({

@@ -1,9 +1,9 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type OAuthAppUpdateVariables = {
@@ -52,7 +52,7 @@ export const useOAuthAppUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>,
+  UseCustomMutationOptions<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

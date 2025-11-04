@@ -1,7 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-table-definition'
 import { databaseKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export const getEntityDefinitionsSql = ({
   schemas,
@@ -109,7 +110,7 @@ export const useEntityDefinitionsQuery = <TData = EntityDefinitionsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<EntityDefinitionsData, EntityDefinitionsError, TData> = {}
+  }: UseCustomQueryOptions<EntityDefinitionsData, EntityDefinitionsError, TData> = {}
 ) =>
   useQuery<EntityDefinitionsData, EntityDefinitionsError, TData>({
     queryKey: databaseKeys.entityDefinitions(projectRef, schemas),

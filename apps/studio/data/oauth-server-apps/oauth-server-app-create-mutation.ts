@@ -1,9 +1,9 @@
 import { CreateOAuthClientParams, SupabaseClient } from '@supabase/supabase-js'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { oauthServerAppKeys } from './keys'
 
 export type OAuthServerAppCreateVariables = CreateOAuthClientParams & {
@@ -32,7 +32,7 @@ export const useOAuthServerAppCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>,
+  UseCustomMutationOptions<OAuthAppCreateData, ResponseError, OAuthServerAppCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
