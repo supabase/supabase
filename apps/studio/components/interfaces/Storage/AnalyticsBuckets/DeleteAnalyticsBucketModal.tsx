@@ -1,10 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
+import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
+import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
+import { Bucket } from 'data/storage/buckets-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Dialog,
@@ -21,27 +25,33 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  useAnalyticsBucketAssociatedEntities,
+  useAnalyticsBucketDeleteCleanUp,
+} from './AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 
-export interface DeleteVectorBucketModalProps {
+export interface DeleteAnalyticsBucketModalProps {
   visible: boolean
-  bucketName?: string
-  onCancel: () => void
+  bucket: Bucket | AnalyticsBucket
+  onClose: () => void
   onSuccess?: () => void
 }
 
-const formId = `delete-storage-vector-bucket-form`
+const formId = `delete-analytics-bucket-form`
 
-export const DeleteVectorBucketModal = ({
+export const DeleteAnalyticsBucketModal = ({
   visible,
-  bucketName,
-  onCancel,
+  bucket,
+  onClose,
   onSuccess,
-}: DeleteVectorBucketModalProps) => {
-  const { ref: projectRef } = useParams()
+}: DeleteAnalyticsBucketModalProps) => {
+  const router = useRouter()
+  const { ref: projectRef, bucketId } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
   const schema = z.object({
-    confirm: z.literal(bucketName, {
-      errorMap: () => ({ message: `Please enter "${bucketName}" to confirm` }),
+    confirm: z.literal(bucket.id, {
+      errorMap: () => ({ message: `Please enter "${bucket.id}" to confirm` }),
     }),
   })
 
@@ -49,30 +59,50 @@ export const DeleteVectorBucketModal = ({
     resolver: zodResolver(schema),
   })
 
-  const { mutate: deleteBucket, isLoading } = useVectorBucketDeleteMutation({
-    onSuccess: async () => {
-      toast.success(`Bucket "${bucketName}" deleted successfully`)
-      onCancel()
-      onSuccess?.()
-    },
-  })
+  const { icebergWrapper, icebergWrapperMeta, s3AccessKey, publication } =
+    useAnalyticsBucketAssociatedEntities({ projectRef, bucketId: bucket.id })
+
+  const { mutateAsync: deleteAnalyticsBucketCleanUp, isLoading: isCleaningUpAnalyticsBucket } =
+    useAnalyticsBucketDeleteCleanUp()
+
+  const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
+    useAnalyticsBucketDeleteMutation({
+      onSuccess: async () => {
+        if (project?.connectionString) {
+          await deleteAnalyticsBucketCleanUp({
+            projectRef,
+            connectionString: project.connectionString,
+            bucketId: bucket.id,
+            icebergWrapper,
+            icebergWrapperMeta,
+            s3AccessKey,
+            publication,
+          })
+        }
+        toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
+        onClose()
+        onSuccess?.()
+      },
+    })
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!bucketName) return console.error('No bucket is selected')
-    deleteBucket({ projectRef, bucketName })
+    if (!bucket) return console.error('No bucket is selected')
+    deleteAnalyticsBucket({ projectRef, id: bucket.id })
   }
+
+  const isDeleting = isDeletingAnalyticsBucket || isCleaningUpAnalyticsBucket
 
   return (
     <Dialog
       open={visible}
       onOpenChange={(open) => {
-        if (!open) onCancel()
+        if (!open) onClose()
       }}
     >
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Confirm deletion of {bucketName}</DialogTitle>
+          <DialogTitle>Confirm deletion of {bucket.id}</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
@@ -86,7 +116,7 @@ export const DeleteVectorBucketModal = ({
 
         <DialogSection>
           <p className="text-sm">
-            Your bucket <span className="font-bold text-foreground">{bucketName}</span> and all its
+            Your bucket <span className="font-bold text-foreground">{bucket.id}</span> and all its
             contents will be permanently deleted.
           </p>
         </DialogSection>
@@ -103,7 +133,7 @@ export const DeleteVectorBucketModal = ({
                     name="confirm"
                     label={
                       <>
-                        Type <span className="font-bold text-foreground">{bucketName}</span> to
+                        Type <span className="font-bold text-foreground">{bucket.id}</span> to
                         confirm.
                       </>
                     }
@@ -123,10 +153,10 @@ export const DeleteVectorBucketModal = ({
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={onCancel}>
+          <Button type="default" disabled={isDeleting} onClick={onClose}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" type="danger" loading={isLoading}>
+          <Button form={formId} htmlType="submit" type="danger" loading={isDeleting}>
             Delete bucket
           </Button>
         </DialogFooter>

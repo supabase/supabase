@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBucketDetails'
+import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import DefaultLayout from 'components/layouts/DefaultLayout'

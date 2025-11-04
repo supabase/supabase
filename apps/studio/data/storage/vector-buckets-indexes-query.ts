@@ -1,11 +1,14 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
+export type VectorBucketIndex =
+  components['schemas']['StorageVectorBucketListIndexesResponse']['indexes'][number]
 export type GetVectorBucketsIndexesVariables = { projectRef?: string; vectorBucketName?: string }
 
 export async function getVectorBucketsIndexes(
@@ -21,15 +24,7 @@ export async function getVectorBucketsIndexes(
   })
 
   if (error) handleError(error)
-  return data as {
-    indexes: {
-      indexName: string
-      creationTime?: string
-      dimension?: number
-      distanceMetric?: string
-    }[]
-    nextToken?: string
-  }
+  return data
 }
 
 export type VectorBucketsIndexesData = Awaited<ReturnType<typeof getVectorBucketsIndexes>>
@@ -48,7 +43,11 @@ export const useVectorBucketsIndexesQuery = <TData = VectorBucketsIndexesData>(
   return useQuery<VectorBucketsIndexesData, VectorBucketsIndexesError, TData>({
     queryKey: storageKeys.vectorBucketsIndexes(projectRef, vectorBucketName),
     queryFn: ({ signal }) => getVectorBucketsIndexes({ projectRef, vectorBucketName }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    enabled:
+      enabled &&
+      isActive &&
+      typeof projectRef !== 'undefined' &&
+      typeof vectorBucketName !== 'undefined',
     ...options,
     retry: (failureCount, error) => {
       if (

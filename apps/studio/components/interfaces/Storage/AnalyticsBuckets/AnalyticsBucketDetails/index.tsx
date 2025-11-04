@@ -3,6 +3,7 @@ import { SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
+import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
@@ -30,10 +31,11 @@ import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-cr
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { useRouter } from 'next/router'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { DeleteBucketModal } from '../DeleteBucketModal'
+import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
@@ -45,9 +47,12 @@ import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) => {
   const config = BUCKET_TYPES.analytics
-  const [modal, setModal] = useState<'delete' | null>(null)
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { state: extensionState } = useIcebergWrapperExtension()
+
+  const [modal, setModal] = useState<'delete' | null>(null)
 
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
   const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance({
@@ -261,10 +266,11 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
         </ScaffoldContainer>
       </PageLayout>
 
-      <DeleteBucketModal
+      <DeleteAnalyticsBucketModal
         visible={modal === `delete`}
         bucket={bucket}
         onClose={() => setModal(null)}
+        onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />
     </>
   )

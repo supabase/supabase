@@ -1,10 +1,15 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
+
+export type VectorBucket = components['schemas']['StorageVectorBucketResponse'] & {
+  creationTime: string
+}
 
 export type VectorBucketVariables = { projectRef?: string; vectorBucketName?: string }
 
@@ -21,7 +26,7 @@ export async function getVectorBucket(
   })
 
   if (error) handleError(error)
-  return data as { vectorBucketName: string; creationTime: string }
+  return data as VectorBucket
 }
 
 export type VectorBucketData = Awaited<ReturnType<typeof getVectorBucket>>

@@ -2,10 +2,8 @@ import { Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -13,9 +11,12 @@ import {
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useVectorBucketIndexDeleteMutation } from 'data/storage/vector-bucket-index-delete-mutation'
-import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
+import AlertError from 'components/ui/AlertError'
+import { useVectorBucketQuery } from 'data/storage/vector-bucket-query'
+import {
+  useVectorBucketsIndexesQuery,
+  VectorBucketIndex,
+} from 'data/storage/vector-buckets-indexes-query'
 import {
   Button,
   Card,
@@ -33,53 +34,47 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { BUCKET_TYPES } from '../Storage.constants'
 import { CreateVectorTableSheet } from './CreateVectorTableSheet'
 import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
+import { DeleteVectorTableModal } from './DeleteVectorTableModal'
 
-interface VectorBucketDetailsProps {
-  bucket: { vectorBucketName: string; creationTime: string }
-}
-
-export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const { ref: projectRef } = useParams()
+export const VectorBucketDetails = () => {
   const router = useRouter()
+  const { ref: projectRef, bucketId } = useParams()
 
-  // Use the correct query for bucket contents
-  const {
-    data,
-    isLoading: isLoadingIndexes,
-    error,
-  } = useVectorBucketsIndexesQuery({
-    projectRef,
-    vectorBucketName: bucket.vectorBucketName,
-  })
-
-  const { mutate: deleteIndex } = useVectorBucketIndexDeleteMutation({
-    onSuccess: (_, vars) => {
-      toast.success(`Table "${vars.indexName}" deleted successfully`)
-    },
-  })
-
-  const allIndexes = data?.indexes ?? []
-  const config = BUCKET_TYPES['vectors']
   const [filterString, setFilterString] = useState('')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedTableToDelete, setSelectedTableToDelete] = useState<VectorBucketIndex>()
 
-  // Filter indexes based on search string
-  const filteredList = allIndexes.filter((index) =>
+  const {
+    data: bucket,
+    error: bucketError,
+    isSuccess: isSuccessBucket,
+    isError: isErrorBucket,
+  } = useVectorBucketQuery({ projectRef, vectorBucketName: bucketId })
+
+  const { data, isLoading: isLoadingIndexes } = useVectorBucketsIndexesQuery({
+    projectRef,
+    vectorBucketName: bucket?.vectorBucketName,
+  })
+  const allIndexes = data?.indexes ?? []
+
+  const filteredList =
     filterString.length === 0
-      ? true
-      : index.indexName.toLowerCase().includes(filterString.toLowerCase())
-  )
+      ? allIndexes
+      : allIndexes.filter((index) =>
+          index.indexName.toLowerCase().includes(filterString.toLowerCase())
+        )
 
   return (
     <>
-      <PageLayout
-        title={bucket.vectorBucketName}
-        breadcrumbs={[{ label: 'Vectors', href: `/project/${projectRef}/storage/vectors` }]}
-        secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
-      >
+      {isErrorBucket ? (
+        <ScaffoldContainer bottomPadding>
+          <ScaffoldSection isFullWidth>
+            <AlertError subject="Failed to fetch vector buckets" error={bucketError} />
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      ) : (
         <ScaffoldContainer bottomPadding>
           <ScaffoldSection isFullWidth className="gap-y-4">
             <ScaffoldHeader className="pt-0 pb-3">
@@ -97,7 +92,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                 icon={<Search size={12} />}
                 className="w-48"
               />
-              <CreateVectorTableSheet bucketName={bucket.vectorBucketName} />
+              <CreateVectorTableSheet bucketName={bucket?.vectorBucketName} />
             </div>
 
             {isLoadingIndexes ? (
@@ -150,8 +145,6 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                       filteredList.map((index, idx: number) => {
                         const id = `index-${idx}`
                         const name = index.indexName
-                        // the creation time is in seconds, convert it to milliseconds
-                        // const created = +index.creationTime * 1000
 
                         return (
                           <TableRow key={id}>
@@ -171,7 +164,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                                 >
                                   {/* TODO: Proper URL for table editor */}
                                   <Link
-                                    href={`/project/${projectRef}/editor/${encodeURIComponent(name)}`}
+                                    href={`/project/${projectRef}/editor/${encodeURIComponent(name)}?schema=${bucketId}`}
                                   >
                                     Table Editor
                                   </Link>
@@ -190,11 +183,7 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                                       className="flex items-center space-x-2"
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        deleteIndex({
-                                          projectRef: projectRef!,
-                                          bucketName: bucket.vectorBucketName,
-                                          indexName: index.indexName,
-                                        })
+                                        setSelectedTableToDelete(index)
                                       }}
                                     >
                                       <Trash2 size={12} />
@@ -227,24 +216,30 @@ export const VectorBucketDetails = ({ bucket }: VectorBucketDetailsProps) => {
                     you want to keep your data.
                   </p>
                 </div>
-                <Button type="danger" onClick={() => setShowDeleteModal(true)}>
+                <Button
+                  type="danger"
+                  disabled={!isSuccessBucket}
+                  onClick={() => setShowDeleteModal(true)}
+                >
                   Delete bucket
                 </Button>
               </CardContent>
             </Card>
           </ScaffoldSection>
         </ScaffoldContainer>
-      </PageLayout>
+      )}
+
+      <DeleteVectorTableModal
+        visible={!!selectedTableToDelete}
+        table={selectedTableToDelete}
+        onClose={() => setSelectedTableToDelete(undefined)}
+      />
 
       <DeleteVectorBucketModal
         visible={showDeleteModal}
-        bucketName={bucket.vectorBucketName}
+        bucketName={bucket?.vectorBucketName}
         onCancel={() => setShowDeleteModal(false)}
-        onSuccess={() => {
-          setShowDeleteModal(false)
-          toast.success(`Bucket "${bucket.vectorBucketName}" deleted successfully`)
-          router.push(`/project/${projectRef}/storage/vectors`)
-        }}
+        onSuccess={() => router.push(`/project/${projectRef}/storage/vectors`)}
       />
     </>
   )

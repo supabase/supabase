@@ -22,9 +22,9 @@ import {
 } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
-import { DeleteBucketModal } from './DeleteBucketModal'
-import { EmptyBucketState } from './EmptyBucketState'
+import { CreateSpecializedBucketModal } from '../CreateSpecializedBucketModal'
+import { EmptyBucketState } from '../EmptyBucketState'
+import { DeleteAnalyticsBucketModal } from './DeleteAnalyticsBucketModal'
 
 export const AnalyticsBuckets = () => {
   const { ref } = useParams()
@@ -167,7 +167,7 @@ export const AnalyticsBuckets = () => {
       )}
 
       {selectedBucket && (
-        <DeleteBucketModal
+        <DeleteAnalyticsBucketModal
           visible={modal === 'delete'}
           bucket={selectedBucket}
           onClose={() => setModal(null)}

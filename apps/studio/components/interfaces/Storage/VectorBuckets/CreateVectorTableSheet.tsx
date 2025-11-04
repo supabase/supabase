@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, Lock, Plus, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+import { Lock, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -9,8 +8,10 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useVectorBucketIndexCreateMutation } from 'data/storage/vector-bucket-index-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Form_Shadcn_,
@@ -30,8 +31,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
+
+const isStagingLocal = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
 const BUCKET_INDEX_NAME_REGEX = /^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$/
 
@@ -94,11 +98,37 @@ const formId = 'create-vector-table-form'
 export type CreateVectorTableForm = z.infer<typeof FormSchema>
 
 interface CreateVectorTableSheetProps {
-  bucketName: string
+  bucketName?: string
 }
 
 export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
   const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const [visible, setVisible] = useState(false)
+  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
+  // [Joshen] Can remove this once this restriction is removed
+  const showIndexCreationNotice = isStagingLocal && !!project && project?.region !== 'us-east-1'
+
+  const defaultValues = {
+    name: '',
+    targetSchema: bucketName,
+    dimension: undefined,
+    distanceMetric: 'cosine' as 'cosine' | 'euclidean',
+    metadataKeys: [],
+  }
+  const form = useForm<CreateVectorTableForm>({
+    resolver: zodResolver(FormSchema),
+    defaultValues,
+    values: defaultValues as any,
+  })
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'metadataKeys',
+  })
+
   const { mutate: createVectorBucketTable, isLoading: isCreating } =
     useVectorBucketIndexCreateMutation({
       onSuccess: (values) => {
@@ -113,26 +143,9 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
       },
     })
 
-  const [visible, setVisible] = useState(false)
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-  const form = useForm<CreateVectorTableForm>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      name: '',
-      targetSchema: bucketName,
-      dimension: undefined,
-      distanceMetric: 'cosine',
-      metadataKeys: [],
-    },
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'metadataKeys',
-  })
-
   const onSubmit: SubmitHandler<CreateVectorTableForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
+
     createVectorBucketTable({
       projectRef: ref,
       bucketName: values.targetSchema,
@@ -179,6 +192,15 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           <SheetTitle>Create vector table</SheetTitle>
         </SheetHeader>
 
+        {showIndexCreationNotice && (
+          <Admonition
+            type="warning"
+            className="mb-0 border-x-0 border-t-0 rounded-none"
+            title="Vector table creation is currently only supported for projects in us-east-1"
+            description={`This is only applicable to projects on local/staging (Project is currently in ${project.region})`}
+          />
+        )}
+
         <Form_Shadcn_ {...form}>
           <form
             id={formId}
@@ -205,7 +227,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                         data-form-type="other"
                         data-bwignore
                         {...field}
-                        placeholder=""
+                        placeholder="Enter a table name"
                       />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
@@ -228,7 +250,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                         <Input_Shadcn_
                           id="targetSchema"
                           {...field}
-                          value={bucketName}
+                          value={field.value}
                           disabled
                           className="pr-10"
                         />
@@ -316,15 +338,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
             <SheetSection className="space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm text-foreground">Metadata keys</label>
-                <Link
-                  href="https://supabase.com/docs/guides/storage/vector"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-link text-foreground-light hover:text-foreground inline-flex items-center gap-x-1.5"
-                >
-                  <span>About keys</span>
-                  <ExternalLink className="text-foreground-lighter" size={14} />
-                </Link>
+                <DocsButton href="https://supabase.com/docs/guides/storage/vector" />
               </div>
 
               <div className="space-y-2">
