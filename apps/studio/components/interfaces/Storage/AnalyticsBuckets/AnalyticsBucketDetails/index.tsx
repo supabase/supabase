@@ -36,9 +36,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
-import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
-import { CopyEnvButton } from './CopyEnvButton'
-import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
@@ -199,44 +196,7 @@ export const AnalyticBucketDetails = () => {
                 )}
               </ScaffoldSection>
 
-              <ScaffoldSection isFullWidth>
-                <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
-                  <div>
-                    <ScaffoldSectionTitle>Connection details</ScaffoldSectionTitle>
-                    <ScaffoldSectionDescription>
-                      Connect an Iceberg client to this bucket.{' '}
-                      <InlineLink
-                        href={`${DOCS_URL}/guides/storage/analytics/connecting-to-analytics-bucket`}
-                      >
-                        Learn more
-                      </InlineLink>
-                    </ScaffoldSectionDescription>
-                  </div>
-                  <CopyEnvButton
-                    serverOptions={wrapperMeta.server.options.filter(
-                      (option) => !option.hidden && wrapperValues[option.name]
-                    )}
-                    values={wrapperValues}
-                  />
-                </ScaffoldHeader>
-
-                <Card>
-                  {wrapperMeta.server.options
-                    .filter((option) => !option.hidden && wrapperValues[option.name])
-                    .sort((a, b) => OPTION_ORDER.indexOf(a.name) - OPTION_ORDER.indexOf(b.name))
-                    .map((option) => {
-                      return (
-                        <DecryptedReadOnlyInput
-                          key={option.name}
-                          label={LABELS[option.name]}
-                          value={wrapperValues[option.name]}
-                          secureEntry={option.secureEntry}
-                          descriptionText={DESCRIPTIONS[option.name]}
-                        />
-                      )
-                    })}
-                </Card>
-              </ScaffoldSection>
+              <SimpleConfigurationDetails bucketName={bucket?.id} />
             </>
           )}
           {state === 'missing' && <WrapperMissing bucketName={bucket?.id} />}
