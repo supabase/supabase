@@ -46,7 +46,7 @@ const Page = ({ onClose }: { onClose: () => void }) => {
 describe(`DeleteBucketModal`, () => {
   beforeEach(() => {
     // useParams
-    routerMock.setCurrentUrl(`/project/default/storage/buckets/test`)
+    routerMock.setCurrentUrl(`/project/default/storage/files`)
     // useProjectContext
     addAPIMock({
       method: `get`,
@@ -117,7 +117,7 @@ describe(`DeleteBucketModal`, () => {
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
-    expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets`)
+    expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`)
   })
 
   it(`prevents submission when the input doesn't match the bucket name`, async () => {
