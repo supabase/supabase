@@ -239,7 +239,10 @@ export const VectorBucketDetails = () => {
         visible={showDeleteModal}
         bucketName={bucket?.vectorBucketName}
         onCancel={() => setShowDeleteModal(false)}
-        onSuccess={() => router.push(`/project/${projectRef}/storage/vectors`)}
+        onSuccess={() => {
+          setShowDeleteModal(false)
+          router.push(`/project/${projectRef}/storage/vectors`)
+        }}
       />
     </>
   )

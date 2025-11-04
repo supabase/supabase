@@ -177,6 +177,7 @@ export const VectorsBuckets = () => {
         visible={!!bucketForDeletion}
         bucketName={bucketForDeletion?.vectorBucketName!}
         onCancel={() => setBucketForDeletion(null)}
+        onSuccess={() => setBucketForDeletion(null)}
       />
     </ScaffoldSection>
   )

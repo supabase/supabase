@@ -11,7 +11,7 @@ type VectorBucketIndexDeleteVariables = {
   indexName: string
 }
 
-async function deleteVectorBucketIndex({
+export async function deleteVectorBucketIndex({
   projectRef,
   bucketName,
   indexName,

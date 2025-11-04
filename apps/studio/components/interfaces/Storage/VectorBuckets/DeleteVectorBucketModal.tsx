@@ -5,6 +5,8 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
+import { deleteVectorBucketIndex } from 'data/storage/vector-bucket-index-delete-mutation'
+import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
 import {
   Button,
   Dialog,
@@ -19,14 +21,14 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export interface DeleteVectorBucketModalProps {
   visible: boolean
   bucketName?: string
   onCancel: () => void
-  onSuccess?: () => void
+  onSuccess: () => void
 }
 
 const formId = `delete-storage-vector-bucket-form`
@@ -54,15 +56,36 @@ export const DeleteVectorBucketModal = ({
   const { mutate: deleteBucket, isLoading } = useVectorBucketDeleteMutation({
     onSuccess: async () => {
       toast.success(`Bucket "${bucketName}" deleted successfully`)
-      onCancel()
-      onSuccess?.()
+      onSuccess()
     },
+  })
+
+  const { data: { indexes = [] } = {} } = useVectorBucketsIndexesQuery({
+    projectRef,
+    vectorBucketName: bucketName,
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucketName) return console.error('No bucket is selected')
-    deleteBucket({ projectRef, bucketName })
+
+    try {
+      // delete all indexes from the bucket first
+      const promises = indexes.map((index) =>
+        deleteVectorBucketIndex({
+          projectRef,
+          bucketName: bucketName,
+          indexName: index.indexName,
+        })
+      )
+      await Promise.all(promises)
+
+      deleteBucket({ projectRef, bucketName })
+    } catch (error) {
+      toast.error(
+        `Failed to delete bucket: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
+    }
   }
 
   return (
