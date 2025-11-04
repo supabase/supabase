@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
 import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggerCreateVariables = {
@@ -36,7 +36,11 @@ export const useDatabaseTriggerCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerCreateData, ResponseError, DatabaseTriggerCreateVariables>,
+  UseCustomMutationOptions<
+    DatabaseTriggerCreateData,
+    ResponseError,
+    DatabaseTriggerCreateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

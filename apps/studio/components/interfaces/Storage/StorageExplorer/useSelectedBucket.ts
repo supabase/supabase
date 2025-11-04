@@ -1,22 +1,22 @@
 import { useParams } from 'common'
-import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useStorageV2Page } from '../Storage.utils'
 
-// [Joshen] Adding isStorageV2 checks here to support the existing UI while API changes are not on prod just yet
-
 export const useSelectedBucket = () => {
   const { ref, bucketId } = useParams()
-  const isStorageV2 = useIsNewStorageUIEnabled()
   const page = useStorageV2Page()
+
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const hasIcebergEnabled = data?.features.icebergCatalog?.enabled
 
   const {
     data: analyticsBuckets = [],
     isSuccess: isSuccessAnalyticsBuckets,
     isError: isErrorAnalyticsBuckets,
     error: errorAnalyticsBuckets,
-  } = useAnalyticsBucketsQuery({ projectRef: ref }, { enabled: isStorageV2 })
+  } = useAnalyticsBucketsQuery({ projectRef: ref })
 
   const {
     data: buckets = [],
@@ -25,9 +25,11 @@ export const useSelectedBucket = () => {
     error: errorBuckets,
   } = useBucketsQuery({ projectRef: ref })
 
-  const isSuccess = isStorageV2 ? isSuccessBuckets && isSuccessAnalyticsBuckets : isSuccessBuckets
-  const isError = isStorageV2 ? isErrorBuckets || isErrorAnalyticsBuckets : isErrorBuckets
-  const error = isStorageV2 ? errorBuckets || errorAnalyticsBuckets : errorBuckets
+  const isSuccess = hasIcebergEnabled
+    ? isSuccessBuckets && isSuccessAnalyticsBuckets
+    : isSuccessBuckets
+  const isError = hasIcebergEnabled ? isErrorBuckets || isErrorAnalyticsBuckets : isErrorBuckets
+  const error = hasIcebergEnabled ? errorBuckets || errorAnalyticsBuckets : errorBuckets
 
   const bucket =
     page === 'files'

@@ -1,7 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { getAccessToken } from 'common'
 import { authKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export async function getSessionAccessToken() {
   // ignore if server-side
@@ -21,7 +22,7 @@ export type SessionAccessTokenError = unknown
 export const useSessionAccessTokenQuery = <TData = SessionAccessTokenData>({
   enabled = true,
   ...options
-}: UseQueryOptions<SessionAccessTokenData, SessionAccessTokenError, TData> = {}) =>
+}: UseCustomQueryOptions<SessionAccessTokenData, SessionAccessTokenError, TData> = {}) =>
   useQuery<SessionAccessTokenData, SessionAccessTokenError, TData>({
     queryKey: authKeys.accessToken(),
     queryFn: () => getSessionAccessToken(),

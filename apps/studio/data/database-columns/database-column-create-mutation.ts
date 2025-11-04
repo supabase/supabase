@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type CreateColumnBody = {
   schema: string
@@ -65,7 +65,7 @@ export const useDatabaseColumnCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>,
+  UseCustomMutationOptions<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>({

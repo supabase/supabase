@@ -26,9 +26,9 @@ export const IntegrationLoadingCard = () => {
         <ShimmeringLoader className="w-full h-full bg-white border rounded-md" />
       </div>
       <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-y-2">
-        <div className="flex-col justify-start items-start gap-y-1 flex">
-          <ShimmeringLoader className="w-20 py-2.5" />
-          <ShimmeringLoader className="w-56 py-2.5" />
+        <div className="w-full flex-col justify-start items-start gap-y-1 flex">
+          <ShimmeringLoader className="w-3/4 py-2.5" />
+          <ShimmeringLoader className="w-full py-2.5" />
         </div>
       </div>
     </div>

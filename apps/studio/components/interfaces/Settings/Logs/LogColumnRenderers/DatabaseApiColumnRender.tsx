@@ -8,6 +8,7 @@ const columns: Column<LogData>[] = [
   {
     name: 'database-api-first-column',
     key: 'database-api-first-column',
+    renderHeaderCell: () => null,
     renderCell: (props) => {
       if (!props.row.status_code && !props.row.method && !props.row.path) {
         return defaultRenderCell(props)

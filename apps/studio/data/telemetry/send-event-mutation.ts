@@ -1,11 +1,11 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 
 import { sendTelemetryEvent } from 'common'
 import { TelemetryEvent } from 'common/telemetry-constants'
 import { handleError } from 'data/fetchers'
 import { API_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 interface SendEventVariables {
   event: TelemetryEvent
@@ -26,7 +26,10 @@ export const useSendEventMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<UseMutationOptions<SendEventData, ResponseError, TelemetryEvent>, 'mutationFn'> = {}) => {
+}: Omit<
+  UseCustomMutationOptions<SendEventData, ResponseError, TelemetryEvent>,
+  'mutationFn'
+> = {}) => {
   const router = useRouter()
 
   return useMutation<SendEventData, ResponseError, TelemetryEvent>({

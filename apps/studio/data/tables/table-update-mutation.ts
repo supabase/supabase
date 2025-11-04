@@ -1,11 +1,11 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { lintKeys } from 'data/lint/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableKeys } from './keys'
 import { CreateTableBody } from './table-create-mutation'
 
@@ -53,7 +53,7 @@ export const useTableUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableUpdateData, ResponseError, TableUpdateVariables>,
+  UseCustomMutationOptions<TableUpdateData, ResponseError, TableUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

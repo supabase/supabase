@@ -1640,6 +1640,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/examples/auth-send-email-hook-react-email-resend' as `/${string}`,
         },
         {
+          name: 'Building an MCP Server with mcp-lite',
+          url: '/guides/functions/examples/mcp-server-mcp-lite' as `/${string}`,
+        },
+        {
           name: 'CORS support for invoking from the browser',
           url: '/guides/functions/cors' as `/${string}`,
         },
@@ -1702,6 +1706,10 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
+        {
+          name: 'mcp-lite (Model Context Protocol)',
+          url: '/guides/functions/examples/mcp-server-mcp-lite' as `/${string}`,
+        },
         {
           name: 'Browserless.io',
           url: '/guides/functions/examples/screenshots' as `/${string}`,

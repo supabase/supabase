@@ -15,7 +15,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { Dashboards } from 'types'
+import type { Dashboards } from 'types'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { ReportBlock } from './ReportBlock/ReportBlock'

@@ -20,7 +20,7 @@ const bucket: Bucket = {
     count: { min: 1, max: 5 },
   }),
   file_size_limit: faker.number.int({ min: 0, max: 25165824 }),
-  type: faker.helpers.arrayElement(['STANDARD', 'ANALYTICS', undefined]),
+  type: 'STANDARD',
   created_at: faker.date.recent().toISOString(),
   updated_at: faker.date.recent().toISOString(),
 }
