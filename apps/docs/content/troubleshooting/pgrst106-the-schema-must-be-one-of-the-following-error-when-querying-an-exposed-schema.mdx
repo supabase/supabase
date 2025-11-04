@@ -20,6 +20,6 @@ To fix this, you need to update the `pgrst.db_schemas` setting for the `authenti
   If you want to add your specific schema (e.g., `your_schema_name`) alongside existing schemas (like `public`), use the following command. Remember to replace `your_schema_name` with your actual schema name and include all other necessary schemas already defined.
   `ALTER ROLE authenticator SET pgrst.db_schemas = 'public, your_schema_name';`
 
-- **To reset to [dashboard configuration](https://supabase.com/dashboard/project/_/settings/api):**
+- **To reset to [dashboard configuration](/dashboard/project/_/settings/api):**
   Alternatively, you can reset this setting to allow the Supabase dashboard's configuration to take effect automatically.
   `ALTER ROLE authenticator RESET pgrst.db_schemas;`
