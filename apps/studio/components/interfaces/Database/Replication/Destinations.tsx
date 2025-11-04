@@ -129,9 +129,10 @@ export const Destinations = () => {
         {replicationNotEnabled ? (
           <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-1">
-              <h3>Run analysis on your data via integrations with Replication</h3>
+              <h3>Stream data to external destinations in real-time</h3>
               <p className="text-sm text-foreground-light">
-                Enable replication on your project to send data to your first destination
+                Enable replication to start sending your database changes to data warehouses and
+                analytics platforms
               </p>
             </div>
             <div className="flex gap-x-2">
@@ -189,10 +190,11 @@ export const Destinations = () => {
                 'flex flex-col px-10 rounded-lg justify-center items-center py-8 mt-4'
               )}
             >
-              <h4>Send data to your first destination</h4>
+              <h4>Create your first destination</h4>
               <p className="prose text-sm text-center mt-1 max-w-full">
-                Use destinations to improve performance or run analysis on your data via
-                integrations like BigQuery
+                Destinations are external platforms where your database changes are automatically
+                sent. Connect to data warehouses like BigQuery or analytics buckets to enable
+                real-time data pipelines.
               </p>
               <Button
                 icon={<Plus />}

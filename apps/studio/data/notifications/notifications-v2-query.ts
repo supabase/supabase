@@ -1,8 +1,8 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 
 import type { components } from 'data/api'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { notificationKeys } from './keys'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10
@@ -66,7 +66,7 @@ export const useNotificationsV2Query = <TData = NotificationsData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
 ) => {
   return useInfiniteQuery<NotificationsData, NotificationsError, TData>({
     queryKey: notificationKeys.listV2({ status, filters, limit }),

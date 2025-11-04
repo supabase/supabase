@@ -66,7 +66,7 @@
     "react": "catalog:",
     "react-accessible-treeview": "^2.11.2",
     "react-copy-to-clipboard": "^5.1.0",
-    "react-day-picker": "^8.8.0",
+    "react-day-picker": "^9.11.1",
     "react-dom": "catalog:",
     "react-hook-form": "^7.45.0",
     "react-intersection-observer": "^9.8.2",

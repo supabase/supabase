@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { EnvironmentTargets } from './integrations.types'
 import { integrationKeys } from './keys'
 
@@ -40,7 +40,7 @@ export const useVercelConnectionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>,
+  UseCustomMutationOptions<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

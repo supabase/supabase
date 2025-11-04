@@ -14,6 +14,7 @@ import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useAnalyticsBucketCreateMutation } from 'data/storage/analytics-bucket-create-mutation'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -121,10 +122,15 @@ export const CreateBucketModal = ({
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
+  const { mutateAsync: createBucket, isLoading: isCreatingBucket } = useBucketCreateMutation({
     // [Joshen] Silencing the error here as it's being handled in onSubmit
     onError: () => {},
   })
+  const { mutateAsync: createAnalyticsBucket, isLoading: isCreatingAnalyticsBucket } =
+    useAnalyticsBucketCreateMutation({
+      // [Joshen] Silencing the error here as it's being handled in onSubmit
+      onError: () => {},
+    })
   const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
@@ -133,6 +139,7 @@ export const CreateBucketModal = ({
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
   const config = BUCKET_TYPES['files']
+  const isCreating = isCreatingBucket || isCreatingAnalyticsBucket
 
   const form = useForm<CreateBucketForm>({
     resolver: zodResolver(FormSchema),
@@ -183,23 +190,30 @@ export const CreateBucketModal = ({
         })
       }
 
-      await createBucket({
-        projectRef: ref,
-        id: values.name,
-        type: values.type,
-        isPublic: values.public,
-        file_size_limit: fileSizeLimit,
-        allowed_mime_types: allowedMimeTypes,
-      })
+      if (values.type === 'STANDARD') {
+        await createBucket({
+          projectRef: ref,
+          id: values.name,
+          type: 'STANDARD',
+          isPublic: values.public,
+          file_size_limit: fileSizeLimit,
+          allowed_mime_types: allowedMimeTypes,
+        })
+      } else if (values.type === 'ANALYTICS') {
+        await createAnalyticsBucket({
+          projectRef: ref,
+          bucketName: values.name,
+        })
+        if (icebergWrapperExtensionState === 'installed') {
+          await createIcebergWrapper({ bucketName: values.name })
+        }
+      }
+
       sendEvent({
         action: 'storage_bucket_created',
         properties: { bucketType: values.type },
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
-
-      if (values.type === 'ANALYTICS' && icebergWrapperExtensionState === 'installed') {
-        await createIcebergWrapper({ bucketName: values.name })
-      }
 
       toast.success(`Successfully created bucket ${values.name}`)
       form.reset()

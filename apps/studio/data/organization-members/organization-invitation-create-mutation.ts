@@ -1,10 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationCreateInvitationVariables = {
@@ -39,7 +39,7 @@ export const useOrganizationCreateInvitationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationCreateInvitationVariables

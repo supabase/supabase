@@ -43,7 +43,7 @@ export const StorageBucketsLayout = ({
       navigationItems={navigationItems}
       secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
     >
-      <ScaffoldContainer>{children}</ScaffoldContainer>
+      <ScaffoldContainer className="min-h-0">{children}</ScaffoldContainer>
     </PageLayout>
   )
 }

@@ -1,10 +1,10 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { getUnifiedLogsQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
 
 export type getUnifiedLogsVariables = {
@@ -69,7 +69,7 @@ export const useGetUnifiedLogsMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>,
+  UseCustomMutationOptions<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>({

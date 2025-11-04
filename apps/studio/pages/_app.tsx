@@ -1,7 +1,6 @@
 import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
-import 'styles/date-picker.scss'
 import 'styles/editor.scss'
 import 'styles/graphiql-base.scss'
 import 'styles/grid.scss'
@@ -57,7 +56,7 @@ import { AuthProvider } from 'lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
-import { AppPropsWithLayout } from 'types'
+import type { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
 
 dayjs.extend(customParseFormat)

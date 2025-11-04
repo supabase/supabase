@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { handleError, post } from 'data/fetchers'
 import type { SubscriptionTier } from 'data/subscriptions/types'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationBillingSubscriptionPreviewVariables = {
@@ -81,7 +81,7 @@ export const useOrganizationBillingSubscriptionPreview = <
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationBillingSubscriptionPreviewData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationBillingSubscriptionPreviewData, ResponseError, TData> = {}
 ) =>
   useQuery<OrganizationBillingSubscriptionPreviewData, ResponseError, TData>({
     queryKey: organizationKeys.subscriptionPreview(organizationSlug, tier),

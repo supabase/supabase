@@ -3870,6 +3870,41 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/storage/{ref}/analytics-buckets': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets list of analytics buckets */
+    get: operations['StorageAnalyticsBucketsController_getBuckets']
+    put?: never
+    /** Create an analytics bucket */
+    post: operations['StorageAnalyticsBucketsController_createBucket']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/analytics-buckets/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Deletes an analytics bucket */
+    delete: operations['StorageAnalyticsBucketIdController_deleteBucket']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/storage/{ref}/archive': {
     parameters: {
       query?: never
@@ -4125,6 +4160,77 @@ export interface paths {
     post?: never
     /** Deletes project storage credential */
     delete: operations['StorageS3CredentialsController_deleteCredential']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/vector-buckets': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets list of vector buckets */
+    get: operations['StorageVectorBucketsController_getBuckets']
+    put?: never
+    /** Create vector bucket */
+    post: operations['StorageVectorBucketsController_createBucket']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/vector-buckets/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets bucket */
+    get: operations['StorageVectorBucketIdController_getBucket']
+    put?: never
+    post?: never
+    /** Deletes bucket */
+    delete: operations['StorageVectorBucketIdController_deleteBucket']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/vector-buckets/{id}/indexes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets bucket indexes */
+    get: operations['StorageVectorBucketIdIndexesController_getBucketIndexes']
+    put?: never
+    /** Create index in vector bucket */
+    post: operations['StorageVectorBucketIdIndexesController_createBucketIndex']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/storage/{ref}/vector-buckets/{id}/indexes/{indexName}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Deletes bucket index */
+    delete: operations['StorageVectorBucketIdIndexesController_deleteBucketIndex']
     options?: never
     head?: never
     patch?: never
@@ -4699,6 +4805,16 @@ export interface components {
         | 'loki'
         | 'sentry'
         | 's3'
+    }
+    CreateBucketIndexBody: {
+      /** @enum {string} */
+      dataType: 'float32'
+      dimension: number
+      /** @enum {string} */
+      distanceMetric: 'cosine' | 'euclidean' | 'dotproduct'
+      indexName: string
+      /** @default [] */
+      metadataKeys?: string[]
     }
     CreateCliLoginSessionBody: {
       public_key: string
@@ -5449,6 +5565,9 @@ export interface components {
           metadata_xml_url: string
           user_name_mapping?: string[]
         }
+    CreateStorageAnalyticsBucketBody: {
+      bucketName: string
+    }
     CreateStorageBucketBody: {
       allowed_mime_types?: string[]
       file_size_limit?: number
@@ -8955,6 +9074,27 @@ export interface components {
       /** Format: uri */
       redirectTo?: string
     }
+    StorageAnalyticsBucketDeleteResponse: {
+      message: string
+    }
+    StorageAnalyticsBucketResponse: {
+      created_at: string
+      format: string
+      id: string
+      /** @enum {string} */
+      type: 'ANALYTICS'
+      updated_at: string
+    }
+    StorageAnalyticsBucketsResponse: {
+      data: {
+        created_at: string
+        format: string
+        id: string
+        /** @enum {string} */
+        type: 'ANALYTICS'
+        updated_at: string
+      }[]
+    }
     StorageBucketResponse: {
       allowed_mime_types?: string[]
       created_at: string
@@ -9040,6 +9180,31 @@ export interface components {
       name: string
       owner: string
       updated_at: string
+    }
+    StorageVectorBucketListIndexesResponse: {
+      indexes: {
+        creationTime?: number
+        /** @enum {string} */
+        dataType: 'float32'
+        dimension: number
+        /** @enum {string} */
+        distanceMetric: 'cosine' | 'euclidean' | 'dotproduct'
+        indexName: string
+        metadataConfiguration?: {
+          nonFilterableMetadataKeys?: string[]
+        }
+        vectorBucketName: string
+      }[]
+      nextToken?: string
+    }
+    StorageVectorBucketResponse: {
+      vectorBucketName: string
+    }
+    StorageVectorBucketsResponse: {
+      nextToken?: string
+      vectorBuckets: {
+        vectorBucketName: string
+      }[]
     }
     StreamableFile: Record<string, never>
     SupavisorConfigResponse: {
@@ -23886,6 +24051,173 @@ export interface operations {
       }
     }
   }
+  StorageAnalyticsBucketsController_getBuckets: {
+    parameters: {
+      query?: {
+        /** @description Number of buckets to return per page */
+        limit?: number
+        /** @description Number of buckets to skip */
+        offset?: number
+        /** @description Search buckets by name */
+        search?: string
+        /** @description Sort column for buckets */
+        sortColumn?: 'id' | 'name' | 'created_at' | 'updated_at'
+        /** @description Sort order for buckets */
+        sortOrder?: 'asc' | 'desc'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StorageAnalyticsBucketsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get list of analytics buckets */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageAnalyticsBucketsController_createBucket: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateStorageAnalyticsBucketBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StorageAnalyticsBucketResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create analytics bucket */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageAnalyticsBucketIdController_deleteBucket: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Storage bucket id */
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StorageAnalyticsBucketDeleteResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete analytics bucket */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   StorageArchiveController_getArchive: {
     parameters: {
       query?: never
@@ -24938,6 +25270,360 @@ export interface operations {
         content?: never
       }
       /** @description Failed to delete project storage credential */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageVectorBucketsController_getBuckets: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StorageVectorBucketsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get list of vector buckets */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageVectorBucketsController_createBucket: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create vector bucket */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageVectorBucketIdController_getBucket: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StorageVectorBucketResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get bucket */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageVectorBucketIdController_deleteBucket: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete bucket */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageVectorBucketIdIndexesController_getBucketIndexes: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StorageVectorBucketListIndexesResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get bucket indexes */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageVectorBucketIdIndexesController_createBucketIndex: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateBucketIndexBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create vector bucket index */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageVectorBucketIdIndexesController_deleteBucketIndex: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Vector storage bucket name */
+        id: string
+        /** @description Vector storage bucket index name */
+        indexName: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete bucket index */
       500: {
         headers: {
           [name: string]: unknown

@@ -7,12 +7,12 @@ import { toast } from 'sonner'
 import { getAccessToken, useParams } from 'common'
 import { SignInMfaForm } from 'components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
-import { Loading } from 'components/ui/Loading'
 import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import useLatest from 'hooks/misc/useLatest'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
+import { LogoLoader } from 'ui'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -90,7 +90,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
   if (loading) {
     return (
       <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
-        <Loading />
+        <LogoLoader />
       </div>
     )
   }

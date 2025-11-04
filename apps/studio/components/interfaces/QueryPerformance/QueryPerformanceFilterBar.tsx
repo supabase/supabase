@@ -1,25 +1,49 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { Search, X } from 'lucide-react'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
 
+import { FilterPopover } from 'components/ui/FilterPopover'
+import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
-export const QueryPerformanceFilterBar = ({ actions }: { actions?: ReactNode }) => {
+export const QueryPerformanceFilterBar = ({
+  actions,
+  showRolesFilter = false,
+}: {
+  actions?: ReactNode
+  showRolesFilter?: boolean
+}) => {
+  const { data: project } = useSelectedProjectQuery()
   const { sort, clearSort } = useQueryPerformanceSort()
 
-  const [{ search: searchQuery }, setSearchParams] = useQueryStates({
+  const [{ search: searchQuery, roles: defaultFilterRoles }, setSearchParams] = useQueryStates({
     search: parseAsString.withDefault(''),
+    roles: parseAsArrayOf(parseAsString).withDefault([]),
   })
+  const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
 
+  const [filters, setFilters] = useState<{ roles: string[] }>({
+    roles: defaultFilterRoles,
+  })
   const [inputValue, setInputValue] = useState(searchQuery)
   const debouncedInputValue = useDebounce(inputValue, 500)
   const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
 
   const onSearchQueryChange = (value: string) => {
     setSearchParams({ search: value || '' })
+  }
+
+  const onFilterRolesChange = (roles: string[]) => {
+    setFilters({ ...filters, roles })
+    setSearchParams({ roles })
   }
 
   useEffect(() => {
@@ -53,6 +77,18 @@ export const QueryPerformanceFilterBar = ({ actions }: { actions?: ReactNode }) 
               ),
             ]}
           />
+
+          {showRolesFilter && (
+            <FilterPopover
+              name="Roles"
+              options={roles}
+              labelKey="name"
+              valueKey="name"
+              activeOptions={isLoadingRoles ? [] : filters.roles}
+              onSaveFilters={onFilterRolesChange}
+              className="w-56"
+            />
+          )}
 
           {sort && (
             <div className="text-xs border rounded-md px-1.5 md:px-2.5 py-1 h-[26px] flex items-center gap-x-2">
