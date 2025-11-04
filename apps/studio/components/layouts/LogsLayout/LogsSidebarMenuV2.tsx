@@ -373,7 +373,7 @@ export function LogsSidebarMenuV2() {
 
       <FeaturePreviewSidebarPanel
         className="mx-4 mt-4"
-        title="Own your logs"
+        title="Capture your logs"
         description="Send logs to your preferred observability or storage platform."
         illustration={
           <div className="flex items-center gap-4">
