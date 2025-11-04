@@ -4,7 +4,7 @@ export const gettingStarted: SidebarNavGroup = {
   title: 'Courses',
   items: [
     {
-      title: 'Supabase Foundations',
+      title: 'Foundations',
       href: '/foundations',
       items: [
         {
@@ -23,7 +23,7 @@ export const gettingStarted: SidebarNavGroup = {
           items: [],
         },
       ],
-      commandItemLabel: 'Supabase Foundations',
+      commandItemLabel: 'Foundations',
     },
     {
       title: 'Project: OpenDesk',

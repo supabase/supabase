@@ -66,13 +66,15 @@ function SideNavigation() {
         {/* <TopNavigationSearch /> */}
         <CommandMenu />
       </div>
-      <div className="pb-6 space-y-0.5">
-        <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
+      <div className="pb-6 px-6">
+        <h3 className="text-xs font-semibold text-foreground-lighter/75 uppercase tracking-wider mb-3">
           {gettingStarted.title}
-        </div>
-        {gettingStarted.items.map((item, i) => (
-          <NavigationItem item={item} key={`${item.href}-${i}`} />
-        ))}
+        </h3>
+        <ul className="space-y-1">
+          {gettingStarted.items.map((item, i) => (
+            <NavigationItem item={item} key={`${item.href}-${i}`} />
+          ))}
+        </ul>
       </div>
     </nav>
   )
