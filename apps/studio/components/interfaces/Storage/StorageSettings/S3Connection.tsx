@@ -153,7 +153,7 @@ export const S3Connection = () => {
                       <FormItemLayout
                         layout="horizontal"
                         className="[&>*>label]:text-foreground"
-                        label="Enable connection via S3 protocol"
+                        label="S3 protocol connection"
                         description="Allow clients to connect to Supabase Storage via the S3 protocol"
                       >
                         <FormControl_Shadcn_>
