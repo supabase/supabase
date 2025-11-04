@@ -60,8 +60,6 @@ export const CONTEXT_MENU_KEYS = {
   STORAGE_FOLDER: 'STORAGE_FOLDER',
 }
 
-// New bucket types configuration
-
 export const BUCKET_TYPES = {
   files: {
     displayName: 'Files',
