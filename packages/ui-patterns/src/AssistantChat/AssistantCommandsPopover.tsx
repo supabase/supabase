@@ -17,7 +17,7 @@ type AssistantCommandsPopoverProps = ComponentPropsWithoutRef<typeof Popover> & 
   /* The children to render - this is where the AssistantChatForm should be placed */
   children: React.ReactNode
   /* The ref for the textarea - used with the AssistantChatForm */
-  textAreaRef: React.RefObject<HTMLTextAreaElement>
+  textAreaRef: React.RefObject<HTMLTextAreaElement | null>
   /* The function to handle the value change */
   setValue: (value: string) => void
   /* The value of the textarea */
