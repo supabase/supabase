@@ -353,7 +353,9 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
         )}
       </div>
       {param.description && (
-        <ReactMarkdown className="prose break-words text-sm">{param.description}</ReactMarkdown>
+        <div className="prose break-words text-sm">
+          <ReactMarkdown>{param.description}</ReactMarkdown>
+        </div>
       )}
       {param.schema && <ApiSchemaParamSubdetails schema={param.schema} />}
     </li>

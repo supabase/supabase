@@ -1,4 +1,5 @@
 import matter from 'gray-matter'
+import { MDXRemoteProps } from 'next-mdx-remote/rsc'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { type ComponentProps } from 'react'
@@ -43,7 +44,7 @@ interface MDXRemoteRefsProps {
 }
 
 function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
-  const refComponents = {
+  const refComponents: MDXRemoteProps = {
     ...components,
     // Override the CodeBlock used for normal guides to skip type generation
     // because it is too resource-intensive
