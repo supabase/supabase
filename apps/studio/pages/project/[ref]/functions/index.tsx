@@ -11,14 +11,13 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { IS_PLATFORM } from 'lib/constants'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
+import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -33,7 +32,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   const hasFunctions = (functions ?? []).length > 0
 
   const secondaryActions = [
-    <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
+    <DocsButton key="docs" href={`${DOCS_URL}/guides/functions`} />,
     <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
       <a
         target="_blank"
@@ -62,25 +61,28 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
               {isSuccess && (
                 <>
                   {hasFunctions ? (
-                    <Table
-                      head={
-                        <>
-                          <Table.th>Name</Table.th>
-                          <Table.th>URL</Table.th>
-                          <Table.th className="hidden 2xl:table-cell">Created</Table.th>
-                          <Table.th className="lg:table-cell">Last updated</Table.th>
-                          <Table.th className="lg:table-cell">Deployments</Table.th>
-                        </>
-                      }
-                      body={
-                        <>
-                          {functions.length > 0 &&
-                            functions.map((item) => (
-                              <EdgeFunctionsListItem key={item.id} function={item} />
-                            ))}
-                        </>
-                      }
-                    />
+                    <Card>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>URL</TableHead>
+                            <TableHead className="hidden 2xl:table-cell">Created</TableHead>
+                            <TableHead className="lg:table-cell">Last updated</TableHead>
+                            <TableHead className="lg:table-cell">Deployments</TableHead>
+                          </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                          <>
+                            {functions.length > 0 &&
+                              functions.map((item) => (
+                                <EdgeFunctionsListItem key={item.id} function={item} />
+                              ))}
+                          </>
+                        </TableBody>
+                      </Table>
+                    </Card>
                   ) : (
                     <FunctionsEmptyState />
                   )}

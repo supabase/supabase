@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode, useMemo, useState } from 'react'
+import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -12,22 +13,23 @@ import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
 import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
-import EditorPanel from 'components/ui/EditorPanel/EditorPanel'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { IS_PLATFORM } from 'lib/constants'
+import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import { BreadcrumbsView } from './BreadcrumbsView'
-import { FeedbackDropdown } from './FeedbackDropdown'
+import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
 import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -52,28 +54,24 @@ interface LayoutHeaderProps {
   breadcrumbs?: any[]
   headerTitle?: string
   showProductMenu?: boolean
+  backToDashboardURL?: string
 }
 
-const LayoutHeader = ({
+export const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerTitle,
   showProductMenu,
+  backToDashboardURL,
 }: LayoutHeaderProps) => {
   const { ref: projectRef, slug } = useParams()
+  const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
 
-  const [showEditorPanel, setShowEditorPanel] = useState(false)
-  useHotKey(
-    () => {
-      if (projectRef) setShowEditorPanel(!showEditorPanel)
-    },
-    'e',
-    [showEditorPanel, projectRef]
-  )
+  const isAccountPage = router.pathname.startsWith('/account')
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -95,7 +93,17 @@ const LayoutHeader = ({
   return (
     <>
       <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
-        {showProductMenu && (
+        {backToDashboardURL && isAccountPage && (
+          <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
+            <Link
+              href={backToDashboardURL}
+              className="flex items-center justify-center border-none !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px] text-foreground-lighter hover:text-foreground transition-colors"
+            >
+              <ChevronLeft strokeWidth={1.5} size={16} />
+            </Link>
+          </div>
+        )}
+        {(showProductMenu || isAccountPage) && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <button
               title="Menu dropdown button"
@@ -202,13 +210,14 @@ const LayoutHeader = ({
               <>
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="overflow-hidden flex items-center gap-2">
                   <HelpPopover />
                   <NotificationsPopoverV2 />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <AdvisorButton />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -219,11 +228,12 @@ const LayoutHeader = ({
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="overflow-hidden flex items-center rounded-full border">
+                <div className="overflow-hidden flex items-center gap-2">
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <InlineEditorButton onClick={() => setShowEditorPanel(true)} />
+                        <AdvisorButton />
+                        <InlineEditorButton />
                         <AssistantButton />
                       </>
                     )}
@@ -235,9 +245,6 @@ const LayoutHeader = ({
           </div>
         </div>
       </header>
-      <EditorPanel open={showEditorPanel} onClose={() => setShowEditorPanel(false)} />
     </>
   )
 }
-
-export default LayoutHeader

@@ -1,5 +1,4 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
-import { useCompletion } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
 import { editor as monacoEditor } from 'monaco-editor'
@@ -28,6 +27,7 @@ interface AIEditorProps {
   options?: monacoEditor.IStandaloneEditorConstructionOptions
   onChange?: (value: string) => void
   onClose?: () => void
+  closeShortcutEnabled?: boolean
   executeQuery?: () => void
 }
 
@@ -48,11 +48,14 @@ const AIEditor = ({
   options = {},
   onChange,
   onClose,
+  closeShortcutEnabled = true,
   executeQuery,
 }: AIEditorProps) => {
   const os = detectOS()
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<monacoEditor.IStandaloneDiffEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
+  const closeActionDisposableRef = useRef<{ dispose: () => void } | null>(null)
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
@@ -71,26 +74,64 @@ const AIEditor = ({
   })
   const [promptInput, setPromptInput] = useState(initialPrompt || '')
 
-  const {
-    complete,
-    completion,
-    isLoading: isCompletionLoading,
-    setCompletion,
-  } = useCompletion({
-    api: aiEndpoint || '',
-    body: aiMetadata,
-    onError: (error) => {
-      toast.error(`Failed to generate: ${error.message}`)
+  const [isCompletionLoading, setIsCompletionLoading] = useState(false)
+
+  const complete = useCallback(
+    async (
+      prompt: string,
+      options?: {
+        headers?: Record<string, string>
+        body?: { completionMetadata?: any }
+      }
+    ) => {
+      try {
+        if (!aiEndpoint) throw new Error('AI endpoint is not configured')
+        setIsCompletionLoading(true)
+
+        const response = await fetch(aiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(options?.headers ?? {}),
+          },
+          body: JSON.stringify({
+            ...(aiMetadata ?? {}),
+            ...(options?.body ?? {}),
+          }),
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(errorText || 'Failed to generate completion')
+        }
+
+        const text: string = await response.json()
+
+        const meta = options?.body?.completionMetadata ?? {}
+        const beforeSelection: string = meta.textBeforeCursor ?? ''
+        const afterSelection: string = meta.textAfterCursor ?? ''
+        const selection: string = meta.selection ?? ''
+
+        const original = beforeSelection + selection + afterSelection
+        const modified = beforeSelection + text + afterSelection
+
+        setDiffValue({ original, modified })
+        setIsDiffMode(true)
+      } catch (error: any) {
+        toast.error(`Failed to generate: ${error?.message ?? 'Unknown error'}`)
+      } finally {
+        setIsCompletionLoading(false)
+      }
     },
-  })
+    [aiEndpoint, aiMetadata]
+  )
 
   const handleReset = useCallback(() => {
-    setCompletion('')
     setIsDiffMode(false)
     setPromptState((prev) => ({ ...prev, isOpen: false }))
     setPromptInput('')
     editorRef.current?.focus()
-  }, [setCompletion])
+  }, [])
 
   const handleAcceptDiff = useCallback(() => {
     if (diffValue.modified) {
@@ -105,11 +146,33 @@ const AIEditor = ({
     handleReset()
   }
 
+  const refreshCloseAction = useCallback(() => {
+    closeActionDisposableRef.current?.dispose()
+    closeActionDisposableRef.current = null
+
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+
+    if (!editor || !monaco || !onClose || !closeShortcutEnabled) return
+
+    const action = editor.addAction({
+      id: 'close-editor',
+      label: 'Close editor',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyE],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: onClose,
+    })
+
+    closeActionDisposableRef.current = action ?? null
+  }, [closeShortcutEnabled, onClose])
+
   const handleEditorOnMount: OnMount = (
     editor: monacoEditor.IStandaloneCodeEditor,
     monaco: Monaco
   ) => {
     editorRef.current = editor
+    monacoRef.current = monaco
     // Set prompt state to open if promptInput exists
     if (promptInput) {
       const model = editor.getModel()
@@ -125,6 +188,12 @@ const AIEditor = ({
         })
       }
     }
+
+    // [Joshen] Opting to ignore "Cannot find module" errors here as users are getting
+    // confused with the error highlighting when importing external modules
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      diagnosticCodesToIgnore: [2792],
+    })
 
     fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/lib.deno.d.ts`)
       .then((response) => response.text())
@@ -150,16 +219,7 @@ const AIEditor = ({
       })
     }
 
-    if (!!onClose) {
-      editor.addAction({
-        id: 'close-editor',
-        label: 'Close editor',
-        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyE],
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 0,
-        run: () => onClose(),
-      })
-    }
+    refreshCloseAction()
 
     editor.addAction({
       id: 'generate-ai',
@@ -268,20 +328,6 @@ const AIEditor = ({
       setIsDiffEditorMounted(false)
     }
   }, [isDiffMode])
-
-  useEffect(() => {
-    if (!completion) {
-      setIsDiffMode(false)
-      return
-    }
-
-    const original =
-      promptState.beforeSelection + promptState.selection + promptState.afterSelection
-    const modified = promptState.beforeSelection + completion + promptState.afterSelection
-
-    setDiffValue({ original, modified })
-    setIsDiffMode(true)
-  }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
 
   useEffect(() => {
     const handleKeyboard = (event: KeyboardEvent) => {

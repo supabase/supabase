@@ -1,21 +1,21 @@
 import saveAs from 'file-saver'
-import { Clipboard, Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
+import { Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import {
   MAX_EXPORT_ROW_COUNT,
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
-import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { LOAD_TAB_FROM_CACHE_PARAM, parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { InlineLink } from 'components/ui/InlineLink'
 import { getTableDefinition } from 'data/database/table-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
@@ -27,6 +27,7 @@ import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
+import type { CSSProperties } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
@@ -51,8 +52,10 @@ import {
 export interface EntityListItemProps {
   id: number | string
   projectRef: string
+  item: Entity
   isLocked: boolean
   isActive?: boolean
+  style?: CSSProperties
   onExportCLI: () => void
 }
 
@@ -61,14 +64,15 @@ function isTableLikeEntityListItem(entity: { type?: string }) {
   return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
 }
 
-const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
+const EntityListItem = ({
   id,
   projectRef,
   item: entity,
   isLocked,
   isActive: _isActive,
+  style,
   onExportCLI,
-}) => {
+}: EntityListItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
@@ -209,11 +213,13 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         connectionString: project?.connectionString,
         table: supaTable,
       })
+
       const formattedRows = rows.map((row) => {
-        const formattedRow = row
-        Object.keys(row).map((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null)
-            formattedRow[column] = JSON.stringify(formattedRow[column])
+        const formattedRow = { ...row }
+        Object.keys(row).forEach((column) => {
+          if (typeof row[column] === 'object' && row[column] !== null) {
+            formattedRow[column] = JSON.stringify(row[column])
+          }
         })
         return formattedRow
       })
@@ -233,8 +239,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   return (
     <EditorTablePageLink
       title={entity.name}
+      style={style}
       id={String(entity.id)}
-      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}`}
+      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(
@@ -306,7 +313,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                   copyToClipboard(entity.name)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} />
                 <span>Copy name</span>
               </DropdownMenuItem>
 
@@ -338,7 +345,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                     }
                   }}
                 >
-                  <Clipboard size={12} />
+                  <Copy size={12} />
                   <span>Copy table schema</span>
                 </DropdownMenuItem>
               )}
@@ -453,28 +460,53 @@ const EntityTooltipTrigger = ({
   materializedViewHasLints: boolean
   foreignTableHasLints: boolean
 }) => {
-  let tooltipContent = ''
+  const { ref } = useParams()
+
+  let tooltipContent = null
   const accessWarning = 'Data is publicly accessible via API'
+  const learnMoreCTA = (
+    <InlineLink
+      href={`/project/${ref}/editor/${entity.id}?schema=${entity.schema}&showWarning=true`}
+    >
+      Learn more
+    </InlineLink>
+  )
 
   switch (entity.type) {
     case ENTITY_TYPE.TABLE:
       if (tableHasLints) {
-        tooltipContent = `${accessWarning} as RLS is disabled`
+        tooltipContent = (
+          <>
+            {accessWarning} as RLS is disabled. {learnMoreCTA}.
+          </>
+        )
       }
       break
     case ENTITY_TYPE.VIEW:
       if (viewHasLints) {
-        tooltipContent = `${accessWarning} as this is a Security definer view`
+        tooltipContent = (
+          <>
+            {accessWarning} as this is a Security definer view. {learnMoreCTA}.
+          </>
+        )
       }
       break
     case ENTITY_TYPE.MATERIALIZED_VIEW:
       if (materializedViewHasLints) {
-        tooltipContent = `${accessWarning} Security definer view`
+        tooltipContent = (
+          <>
+            {accessWarning} as this is a Security definer view {learnMoreCTA}.
+          </>
+        )
       }
       break
     case ENTITY_TYPE.FOREIGN_TABLE:
       if (foreignTableHasLints) {
-        tooltipContent = `${accessWarning} as RLS is not enforced on foreign tables`
+        tooltipContent = (
+          <>
+            {accessWarning} as RLS is not enforced on foreign tables. {learnMoreCTA}.
+          </>
+        )
       }
       break
     default:
@@ -483,12 +515,12 @@ const EntityTooltipTrigger = ({
 
   if (tooltipContent) {
     return (
-      <Tooltip disableHoverableContent={true}>
+      <Tooltip>
         <TooltipTrigger className="min-w-4">
           <Badge variant="destructive">Unrestricted</Badge>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-44 text-center">
-          <span>{tooltipContent}</span>
+        <TooltipContent side="right" className="max-w-52 text-center">
+          {tooltipContent}
         </TooltipContent>
       </Tooltip>
     )

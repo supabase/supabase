@@ -13,7 +13,7 @@ interface PolicyRolesProps {
 }
 type SystemRole = (typeof SYSTEM_ROLES)[number]
 
-const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
+export const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { data, error, isLoading, isError, isSuccess } = useDatabaseRolesQuery({
     projectRef: project?.ref,
@@ -34,7 +34,7 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
   })
 
   return (
-    <div className="flex flex-col md:flew-row gap-4 md:gap-12">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-12">
       <div className="flex md:w-1/3 flex-col space-y-2">
         <label className="text-foreground-light text-base" htmlFor="policy-name">
           Target roles
@@ -57,5 +57,3 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
     </div>
   )
 }
-
-export default PolicyRoles

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { NextRequest, NextResponse } from 'next/server'
 
 export interface LumaGeoAddressJson {
@@ -115,6 +116,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
+    Sentry.captureException(error)
     console.error('Error fetching meetups from Luma:', error)
     return NextResponse.json(
       {

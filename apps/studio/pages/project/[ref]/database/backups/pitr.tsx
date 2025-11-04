@@ -3,7 +3,8 @@ import { AlertCircle } from 'lucide-react'
 
 import { useParams } from 'common'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
-import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
+import { PITRNotice } from 'components/interfaces/Database/Backups/PITR/PITRNotice'
+import { PITRSelection } from 'components/interfaces/Database/Backups/PITR/PITRSelection'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -14,10 +15,10 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -57,8 +58,10 @@ const PITR = () => {
   const isEnabled = backups?.pitr_enabled
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
+  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'physical_backups'
+  )
 
   if (isPermissionsLoaded && !canReadPhysicalBackups) {
     return <NoPermission resourceText="view PITR backups" />
@@ -71,7 +74,7 @@ const PITR = () => {
         title="Database backups are not available for OrioleDB"
         description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
       >
-        <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+        <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
       </Admonition>
     )
   }

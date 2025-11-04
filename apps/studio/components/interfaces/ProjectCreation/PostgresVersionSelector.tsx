@@ -16,16 +16,17 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { smartRegionToExactRegion } from './ProjectCreation.utils'
 
 interface PostgresVersionDetails {
-  postgresEngine: PostgresEngine | undefined
-  releaseChannel: ReleaseChannel | undefined
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
+  releaseChannel?: ReleaseChannel
 }
 
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
   dbRegion: string
-  organizationSlug: string | undefined
+  organizationSlug?: string
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
   type?: 'create' | 'unpause'
@@ -60,9 +61,11 @@ export const PostgresVersionSelector = ({
   form,
   type = 'create',
   layout = 'horizontal',
-  label = 'Postgres Version',
+  label = 'Postgres version',
 }: PostgresVersionSelectorProps) => {
   const { data: project } = useSelectedProjectQuery()
+
+  const dbRegionExact = smartRegionToExactRegion(dbRegion)
 
   const {
     data: createVersions,
@@ -71,7 +74,7 @@ export const PostgresVersionSelector = ({
   } = useProjectCreationPostgresVersionsQuery(
     {
       cloudProvider,
-      dbRegion,
+      dbRegion: dbRegionExact,
       organizationSlug,
     },
     { enabled: type === 'create' }

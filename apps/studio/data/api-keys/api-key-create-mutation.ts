@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { apiKeysKeys } from './keys'
 
 export type APIKeyCreateVariables = {
@@ -58,29 +58,27 @@ export const useAPIKeyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<APIKeyCreateData, ResponseError, APIKeyCreateVariables>,
+  UseCustomMutationOptions<APIKeyCreateData, ResponseError, APIKeyCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<APIKeyCreateData, ResponseError, APIKeyCreateVariables>(
-    (vars) => createAPIKey(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<APIKeyCreateData, ResponseError, APIKeyCreateVariables>({
+    mutationFn: (vars) => createAPIKey(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: apiKeysKeys.list(projectRef) })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create API key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create API key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

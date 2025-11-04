@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { ModelMessage, stepCountIs, streamText } from 'ai'
+import { generateText, ModelMessage, stepCountIs } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -16,8 +16,9 @@ import {
 } from 'lib/ai/prompts'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { executeQuery } from 'lib/api/self-hosted/query'
 import { NextApiRequest, NextApiResponse } from 'next'
+import z from 'zod'
 
 export const maxDuration = 60
 
@@ -62,7 +63,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       aiOptInLevel = orgAIOptInLevel
     }
 
-    const { model, error: modelError } = await getModel(projectRef)
+    // For code completion, we always use the limited model
+    const {
+      model,
+      error: modelError,
+      promptProviderOptions,
+    } = await getModel({
+      provider: 'openai',
+      routingKey: projectRef,
+    })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
@@ -70,10 +79,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Get a list of all schemas to add to context
     const pgMetaSchemasList = pgMeta.schemas.list()
+    type Schemas = z.infer<(typeof pgMetaSchemasList)['zod']>
 
     const { result: schemas } =
       aiOptInLevel !== 'disabled'
-        ? await executeSql(
+        ? await executeSql<Schemas>(
             {
               projectRef,
               connectionString,
@@ -84,7 +94,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
               'Content-Type': 'application/json',
               ...(authorization && { Authorization: authorization }),
             },
-            IS_PLATFORM ? undefined : queryPgMetaSelfHosted
+            IS_PLATFORM ? undefined : executeQuery
           )
         : { result: [] }
 
@@ -108,12 +118,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        providerOptions: {
-          bedrock: {
-            // Always cache the system prompt (must not contain dynamic content)
-            cachePoint: { type: 'default' },
-          },
-        },
+        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
       },
       {
         role: 'assistant',
@@ -148,14 +153,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       accessToken,
     })
 
-    const result = streamText({
+    const { text } = await generateText({
       model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools,
     })
 
-    return result.pipeUIMessageStreamToResponse(res)
+    return res.status(200).json(text)
   } catch (error) {
     console.error('Completion error:', error)
     return res.status(500).json({

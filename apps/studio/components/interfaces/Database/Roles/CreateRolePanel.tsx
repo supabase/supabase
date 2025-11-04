@@ -44,7 +44,7 @@ const initialValues = {
   canBypassRls: false,
 }
 
-const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
+export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
 
   const { data: project } = useSelectedProjectQuery()
@@ -187,5 +187,3 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
     </SidePanel>
   )
 }
-
-export default CreateRolePanel

@@ -18,7 +18,7 @@ interface AddNewFactorModalProps {
   onClose: () => void
 }
 
-const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
+export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
   // Generate a name with a number between 0 and 1000
   const [name, setName] = useState(`App ${Math.floor(Math.random() * 1000)}`)
   const { data, mutate: enroll, isLoading: isEnrolling, reset } = useMfaEnrollMutation()
@@ -128,7 +128,9 @@ const SecondStep = ({
     },
     onSuccess: async () => {
       if (lastVisitedOrganization) {
-        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+        await queryClient.invalidateQueries({
+          queryKey: organizationKeys.members(lastVisitedOrganization),
+        })
       }
       toast.success(`Successfully added a second factor authentication`)
       onClose()
@@ -216,5 +218,3 @@ const SecondStep = ({
     </ConfirmationModal>
   )
 }
-
-export default AddNewFactorModal

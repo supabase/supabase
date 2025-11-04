@@ -3,18 +3,19 @@ import { Loader, Shield, Users, Wrench } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useFlag } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { DOCS_URL } from 'lib/constants'
 import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-const TransferProjectButton = () => {
+export const TransferProjectButton = () => {
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
@@ -58,7 +59,10 @@ const TransferProjectButton = () => {
     }
   }, [isOpen])
 
-  const canTransferProject = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { can: canTransferProject } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
   const toggle = () => {
     setIsOpen(!isOpen)
@@ -162,7 +166,7 @@ const TransferProjectButton = () => {
           <DocsButton
             abbrev={false}
             className="mt-6"
-            href="https://supabase.com/docs/guides/platform/project-transfer"
+            href={`${DOCS_URL}/guides/platform/project-transfer`}
           />
         </Modal.Content>
 
@@ -240,17 +244,17 @@ const TransferProjectButton = () => {
                 {transferPreviewData &&
                   (transferPreviewData.warnings.length > 0 ||
                     transferPreviewData.info.length > 0) && (
-                    <Admonition type={'caution'} showIcon={false} className="mt-3">
-                      <div className="space-y-1">
+                    <Admonition type="caution" showIcon={false} className="mt-3">
+                      <div className="flex flex-col gap-y-2">
                         {transferPreviewData.warnings.map((warning) => (
                           <div key={warning.key} className="flex items-center gap-2">
-                            <WarningIcon className="flex-shrink-0 mt-0.25" />
+                            <WarningIcon className="flex-shrink-0" />
                             <p className="mb-0.5">{warning.message}</p>
                           </div>
                         ))}
                         {transferPreviewData.info.map((info) => (
-                          <div key={info.key} className="flex items-center gap-2">
-                            <InfoIcon className="flex-shrink-0 mt-0.25" />
+                          <div key={info.key} className="flex items-start gap-2">
+                            <InfoIcon className="flex-shrink-0 mt-0.5" />
                             <p className="mb-0.5">{info.message}</p>
                           </div>
                         ))}
@@ -287,5 +291,3 @@ const TransferProjectButton = () => {
     </>
   )
 }
-
-export default TransferProjectButton

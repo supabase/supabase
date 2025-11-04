@@ -1,17 +1,18 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, Clock, XIcon } from 'lucide-react'
-import { PropsWithChildren, useEffect, useState } from 'react'
-import DatePicker from 'react-datepicker'
+import { Clock, HistoryIcon } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { Label } from '@ui/components/shadcn/ui/label'
 import { Badge } from '@ui/components/shadcn/ui/badge'
+import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
-import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import {
   Button,
   ButtonProps,
+  Calendar,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -28,12 +29,14 @@ export type DatePickerValue = {
   text?: string
 }
 
-interface Props {
+interface LogsDatePickerProps {
   value: DatePickerValue
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
   popoverContentProps?: typeof PopoverContent_Shadcn_
+  hideWarnings?: boolean
+  align?: 'start' | 'end' | 'center'
 }
 
 export const LogsDatePicker = ({
@@ -42,14 +45,18 @@ export const LogsDatePicker = ({
   value,
   buttonTriggerProps,
   popoverContentProps,
-}: PropsWithChildren<Props>) => {
+  hideWarnings,
+  align = 'end',
+}: PropsWithChildren<LogsDatePickerProps>) => {
   const [open, setOpen] = useState(false)
 
   // Reset the state when the popover closes
   useEffect(() => {
     if (!open) {
       setStartDate(value.from ? new Date(value.from) : null)
-      setEndDate(value.to ? new Date(value.to) : new Date())
+      const defaultEndDate = value.to ? new Date(value.to) : new Date()
+      setEndDate(defaultEndDate)
+      setCurrentMonth(new Date(defaultEndDate))
 
       const fromDate = value.from ? new Date(value.from) : null
       const toDate = value.to ? new Date(value.to) : null
@@ -89,6 +96,9 @@ export const LogsDatePicker = ({
 
   const [startDate, setStartDate] = useState<Date | null>(value.from ? new Date(value.from) : null)
   const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : new Date())
+  const [currentMonth, setCurrentMonth] = useState<Date>(() =>
+    value.to ? new Date(value.to) : new Date()
+  )
 
   const [startTime, setStartTime] = useState({
     HH: startDate?.getHours().toString() || '00',
@@ -159,6 +169,7 @@ export const LogsDatePicker = ({
 
           setStartDate(fromDate)
           setEndDate(toDate)
+          setCurrentMonth(new Date(toDate))
 
           // Update time states
           setStartTime({
@@ -183,7 +194,7 @@ export const LogsDatePicker = ({
       })
   }
 
-  function handleCopy() {
+  const handleCopy = useCallback(() => {
     if (!startDate || !endDate) return
 
     const fromDate = new Date(startDate)
@@ -201,7 +212,7 @@ export const LogsDatePicker = ({
     )
 
     setCopied(true)
-  }
+  }, [startDate, endDate, startTime, endTime])
 
   useEffect(() => {
     if (pasted) {
@@ -220,7 +231,7 @@ export const LogsDatePicker = ({
       document.removeEventListener('paste', handlePaste)
       document.removeEventListener('copy', handleCopy)
     }
-  }, [open, startDate, endDate])
+  }, [open, startDate, endDate, handleCopy])
 
   const isLargeRange =
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
@@ -248,7 +259,7 @@ export const LogsDatePicker = ({
       <PopoverContent_Shadcn_
         className="flex w-full p-0"
         side="bottom"
-        align="end"
+        align={align}
         portal={true}
         {...popoverContentProps}
       >
@@ -315,8 +326,13 @@ export const LogsDatePicker = ({
               />
             </div>
             <div className="flex-shrink">
-              <Button
-                icon={<XIcon size={14} />}
+              <ButtonTooltip
+                tooltip={{
+                  content: {
+                    text: 'Clear time range',
+                  },
+                }}
+                icon={<HistoryIcon size={14} />}
                 type="text"
                 size="tiny"
                 className="px-1.5"
@@ -324,55 +340,22 @@ export const LogsDatePicker = ({
                   setStartTime({ HH: '00', mm: '00', ss: '00' })
                   setEndTime({ HH: '00', mm: '00', ss: '00' })
                 }}
-              ></Button>
+              ></ButtonTooltip>
             </div>
           </div>
           <div className="p-2 border-t">
-            <DatePicker
-              inline
-              selectsRange
-              onChange={(dates) => {
-                handleDatePickerChange(dates)
+            <Calendar
+              mode="range"
+              month={currentMonth}
+              onMonthChange={(month) => setCurrentMonth(new Date(month))}
+              selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
+              onSelect={(range) => {
+                handleDatePickerChange([range?.from ?? null, range?.to ?? null])
               }}
-              dateFormat="MMMM d, yyyy h:mm aa"
-              dayClassName={() => 'cursor-pointer'}
-              startDate={startDate}
-              endDate={endDate}
-              renderCustomHeader={({
-                date,
-                decreaseMonth,
-                increaseMonth,
-                prevMonthButtonDisabled,
-                nextMonthButtonDisabled,
-              }) => (
-                <div className="flex items-center justify-between">
-                  <div className="flex w-full items-center justify-between">
-                    <Button
-                      onClick={decreaseMonth}
-                      disabled={prevMonthButtonDisabled}
-                      icon={<ChevronLeft size={14} strokeWidth={2} />}
-                      type="text"
-                      size="tiny"
-                      className="px-1.5"
-                    ></Button>
-                    <span className="text-sm text-foreground-light">
-                      {dayjs(date).format('MMMM YYYY')}
-                    </span>
-                    <Button
-                      onClick={increaseMonth}
-                      disabled={nextMonthButtonDisabled}
-                      icon={<ChevronRight size={14} strokeWidth={2} />}
-                      type="text"
-                      size="tiny"
-                      className="px-1.5"
-                    ></Button>
-                  </div>
-                </div>
-              )}
             />
           </div>
-          {isLargeRange && (
-            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning-600">
+          {isLargeRange && !hideWarnings && (
+            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning">
               Large ranges may result in memory errors for <br /> big projects.
             </div>
           )}
@@ -393,8 +376,10 @@ export const LogsDatePicker = ({
             <Button
               type="default"
               onClick={() => {
-                setStartDate(new Date())
-                setEndDate(new Date())
+                const today = new Date()
+                setCurrentMonth(today)
+                setStartDate(new Date(today))
+                setEndDate(new Date(today))
               }}
             >
               Today

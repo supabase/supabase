@@ -2,13 +2,13 @@ import { Transition } from '@headlessui/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { get, noop, sum } from 'lodash'
 import { Upload } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useContextMenu } from 'react-contexify'
 import { toast } from 'sonner'
 
-import InfiniteList from 'components/ui/InfiniteList'
+import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -20,7 +20,7 @@ import {
   STORAGE_VIEWS,
 } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
-import FileExplorerRow from './FileExplorerRow'
+import { FileExplorerRow } from './FileExplorerRow'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
   return (
@@ -68,7 +68,7 @@ export interface FileExplorerColumnProps {
   onColumnLoadMore: (index: number, column: StorageColumn) => void
 }
 
-const FileExplorerColumn = ({
+export const FileExplorerColumn = ({
   index = 0,
   column,
   fullWidth = false,
@@ -83,7 +83,7 @@ const FileExplorerColumn = ({
   const fileExplorerColumnRef = useRef<any>(null)
 
   const snap = useStorageExplorerStateSnapshot()
-  const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
     if (fileExplorerColumnRef) {
@@ -144,6 +144,23 @@ const FileExplorerColumn = ({
       disabled={columnFiles.length === 0}
       onChange={() => onSelectAllItemsInColumn(index)}
     />
+  )
+
+  const getItemKey = useCallback(
+    (index: number) => {
+      const item = columnItems[index]
+      return item?.id || `file-explorer-item-${index}`
+    },
+    [columnItems]
+  )
+
+  const itemProps = useMemo(
+    () => ({
+      view: snap.view,
+      columnIndex: index,
+      selectedItems,
+    }),
+    [snap.view, index, selectedItems]
   )
 
   return (
@@ -213,19 +230,20 @@ const FileExplorerColumn = ({
       )}
 
       {/* Column Interface */}
-      <InfiniteList
-        items={columnItems}
-        itemProps={{
-          view: snap.view,
-          columnIndex: index,
-          selectedItems,
-        }}
-        ItemComponent={FileExplorerRow}
-        getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
-        hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
-        isLoadingNextPage={column.isLoadingMoreItems}
-        onLoadNextPage={() => onColumnLoadMore(index, column)}
-      />
+      {columnItems.length > 0 && (
+        <InfiniteListDefault
+          className="h-full"
+          items={columnItems}
+          itemProps={itemProps}
+          getItemKey={getItemKey}
+          getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
+          ItemComponent={FileExplorerRow}
+          LoaderComponent={LoaderForIconMenuItems}
+          hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
+          isLoadingNextPage={column.isLoadingMoreItems}
+          onLoadNextPage={() => onColumnLoadMore(index, column)}
+        />
+      )}
 
       {/* Drag drop upload CTA for when column is empty */}
       {!(snap.isSearching && itemSearchString.length > 0) &&
@@ -275,5 +293,3 @@ const FileExplorerColumn = ({
     </div>
   )
 }
-
-export default FileExplorerColumn

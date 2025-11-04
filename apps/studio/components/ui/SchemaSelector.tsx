@@ -3,7 +3,7 @@ import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
@@ -35,6 +35,7 @@ interface SchemaSelectorProps {
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   portal?: boolean
+  align?: 'start' | 'end'
 }
 
 const SchemaSelector = ({
@@ -48,9 +49,13 @@ const SchemaSelector = ({
   onSelectSchema,
   onSelectCreateSchema,
   portal = true,
+  align = 'start',
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
-  const canCreateSchemas = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'schemas')
+  const { can: canCreateSchemas } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'schemas'
+  )
 
   const { data: project } = useSelectedProjectQuery()
   const {
@@ -119,7 +124,7 @@ const SchemaSelector = ({
                 </div>
               ) : (
                 <div className="w-full flex gap-1">
-                  <p className="text-foreground-lighter">Choose a schema…</p>
+                  <p className="text-foreground-lighter">Choose a schema...</p>
                 </div>
               )}
             </Button>
@@ -127,7 +132,7 @@ const SchemaSelector = ({
           <PopoverContent_Shadcn_
             className="p-0 min-w-[200px] pointer-events-auto"
             side="bottom"
-            align="start"
+            align={align}
             portal={portal}
             sameWidthAsTrigger
           >

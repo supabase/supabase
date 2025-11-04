@@ -1,3 +1,5 @@
+'use client'
+
 import { PropsWithChildren } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'

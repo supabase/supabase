@@ -1,11 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { compact, debounce, isEqual, noop } from 'lodash'
-import { useCallback, useEffect, useRef, useState } from 'react'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import APIDocsButton from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Check,
   ChevronLeft,
@@ -20,9 +14,16 @@ import {
   Upload,
   X,
 } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -55,23 +56,23 @@ const SORT_ORDER_OPTIONS = [
 const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: any) => {
   return (
     <div
-      className={`group ${!loading ? 'cursor-pointer' : ''}`}
+      className={cn('group', !loading && 'cursor-pointer')}
       onClick={() => (!loading.isLoading ? togglePathEdit() : {})}
     >
       {loading.isLoading ? (
-        <div className="ml-2 flex items-center">
-          <Loader size={16} strokeWidth={2} className="animate-spin" />
-          <p className="ml-3 text-sm">{loading.message}</p>
+        <div className="ml-2 flex items-center gap-x-3">
+          <Loader size={14} strokeWidth={2} className="animate-spin" />
+          <p className="text-sm text-foreground-light">{loading.message}</p>
         </div>
       ) : (
-        <div className="flex cursor-pointer items-center">
-          <p className="ml-3 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
+        <div className="flex cursor-pointer items-center gap-x-3">
+          {breadcrumbs.length > 1 && (
+            <p className="ml-2 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
+          )}
           {!isSearching && (
-            <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
-              <Button type="text" icon={<Edit2 />}>
-                Navigate
-              </Button>
-            </div>
+            <Button type="text" icon={<Edit2 />} className="transition opacity-0 hover:opacity-100">
+              Navigate
+            </Button>
           )}
         </div>
       )}
@@ -137,10 +138,10 @@ const HeaderBreadcrumbs = ({
 interface FileExplorerHeader {
   itemSearchString: string
   setItemSearchString: (value: string) => void
-  onFilesUpload: (event: any, columnIndex: number) => void
+  onFilesUpload: (event: any, columnIndex?: number) => void
 }
 
-const FileExplorerHeader = ({
+export const FileExplorerHeader = ({
   itemSearchString = '',
   setItemSearchString = noop,
   onFilesUpload = noop,
@@ -179,7 +180,7 @@ const FileExplorerHeader = ({
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
-  const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)
@@ -279,19 +280,20 @@ const FileExplorerHeader = ({
 
   return (
     <div
-      className="
-    flex h-[40px] pl-2
-    items-center justify-between
-    rounded-t-md border-b border-overlay bg-surface-100"
+      className={cn(
+        'flex h-[40px] pl-2',
+        'items-center justify-between',
+        'rounded-t-md border-b border-overlay bg-surface-100'
+      )}
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
-        {breadcrumbs.length > 0 && (
+        {breadcrumbs.length > 1 && (
           <Button
             icon={<ChevronLeft size={16} strokeWidth={2} />}
             size="tiny"
             type="text"
-            className={`${breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'} px-1`}
+            className="opacity-100 px-1"
             disabled={backDisabled}
             onClick={() => {
               setIsEditingPath(false)
@@ -336,14 +338,14 @@ const FileExplorerHeader = ({
             breadcrumbs={breadcrumbs}
             togglePathEdit={togglePathEdit}
           />
-        ) : (
+        ) : breadcrumbs.length > 1 ? (
           <HeaderBreadcrumbs
             loading={loading}
             isSearching={snap.isSearching}
             breadcrumbs={breadcrumbs}
             selectBreadcrumb={selectBreadcrumb}
           />
-        )}
+        ) : null}
       </div>
 
       {/* Actions */}
@@ -423,7 +425,6 @@ const FileExplorerHeader = ({
         <div className="h-6 border-r border-control" />
         <div className="flex items-center space-x-1 px-2">
           <div className="hidden">
-            {/* @ts-ignore */}
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
           </div>
           <ButtonTooltip
@@ -497,7 +498,7 @@ const FileExplorerHeader = ({
           <>
             <div className="h-6 border-r border-control" />
             <div className="mx-2">
-              <APIDocsButton section={['storage', selectedBucket.name]} />
+              <APIDocsButton section={['storage', selectedBucket.name]} source="storage" />
             </div>
           </>
         )}
@@ -505,5 +506,3 @@ const FileExplorerHeader = ({
     </div>
   )
 }
-
-export default FileExplorerHeader

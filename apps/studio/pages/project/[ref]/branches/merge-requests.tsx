@@ -24,9 +24,10 @@ import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import {
   Button,
@@ -49,7 +50,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
+  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'preview_branches'
+  )
 
   const {
     data: connections,
@@ -64,6 +68,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     error: branchesError,
     isLoading: isLoadingBranches,
     isError: isErrorBranches,
+    isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
@@ -92,62 +97,65 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     },
   })
 
-  const handleMarkBranchForReview = (branch: Branch) => {
-    if (branch.id && projectRef) {
-      updateBranch(
-        {
-          id: branch.id,
-          projectRef,
-          requestReview: true,
+  const handleMarkBranchForReview = ({
+    project_ref: branchRef,
+    parent_project_ref: projectRef,
+    persistent,
+  }: Branch) => {
+    updateBranch(
+      {
+        branchRef,
+        projectRef,
+        requestReview: true,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Merge request created')
+
+          // Track merge request creation
+          sendEvent({
+            action: 'branch_create_merge_request_button_clicked',
+            properties: {
+              branchType: persistent ? 'persistent' : 'preview',
+              origin: 'merge_page',
+            },
+            groups: {
+              project: projectRef ?? 'Unknown',
+              organization: selectedOrg?.slug ?? 'Unknown',
+            },
+          })
+
+          router.push(`/project/${branchRef}/merge`)
         },
-        {
-          onSuccess: () => {
-            toast.success('Merge request created')
-
-            // Track merge request creation
-            sendEvent({
-              action: 'branch_create_merge_request_button_clicked',
-              properties: {
-                branchType: branch.persistent ? 'persistent' : 'preview',
-                origin: 'merge_page',
-              },
-              groups: {
-                project: projectRef ?? 'Unknown',
-                organization: selectedOrg?.slug ?? 'Unknown',
-              },
-            })
-
-            router.push(`/project/${branch.project_ref}/merge`)
-          },
-        }
-      )
-    }
+      }
+    )
   }
 
-  const handleCloseMergeRequest = (branch: Branch) => {
-    if (branch.id && projectRef) {
-      updateBranch(
-        {
-          id: branch.id,
-          projectRef,
-          requestReview: false,
-        },
-        {
-          onSuccess: () => {
-            toast.success('Merge request closed')
+  const handleCloseMergeRequest = ({
+    project_ref: branchRef,
+    parent_project_ref: projectRef,
+  }: Branch) => {
+    updateBranch(
+      {
+        branchRef,
+        projectRef,
+        requestReview: false,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Merge request closed')
 
-            // Track merge request closed
-            sendEvent({
-              action: 'branch_close_merge_request_button_clicked',
-              groups: {
-                project: projectRef ?? 'Unknown',
-                organization: selectedOrg?.slug ?? 'Unknown',
-              },
-            })
-          },
-        }
-      )
-    }
+          // Track merge request closed
+          sendEvent({
+            action: 'branch_close_merge_request_button_clicked',
+            groups: {
+              project: projectRef ?? 'Unknown',
+              organization: selectedOrg?.slug ?? 'Unknown',
+            },
+          })
+        },
+      }
+    )
   }
 
   const generateCreatePullRequestURL = (branch?: string) => {
@@ -163,7 +171,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-4">
-            {!canReadBranches ? (
+            {isPermissionsLoaded && !canReadBranches ? (
               <NoPermission resourceText="view this project's branches" />
             ) : (
               <>
@@ -208,12 +216,11 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                     <BranchManagementSection
                       header={`${mergeRequestBranches.length} merge requests`}
                     >
-                      {isLoadingBranches && (
+                      {isLoadingBranches ? (
                         <div className="p-4">
                           <GenericSkeletonLoader />
                         </div>
-                      )}
-                      {mergeRequestBranches.length > 0 ? (
+                      ) : mergeRequestBranches.length > 0 ? (
                         mergeRequestBranches.map((branch) => {
                           const isPR = branch.pr_number !== undefined
                           const rowLink = isPR
@@ -251,7 +258,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                               rowLink={rowLink}
                               external={isPR}
                               rowActions={
-                                !isPR && (
+                                // We always want to show the action button to close a merge request
+                                // when user has requested review from dashboard. It doesn't matter
+                                // whether the branch is linked to a GitHub PR.
+                                branch.review_requested_at && (
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button
@@ -326,36 +336,38 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
     },
   })
 
-  const handleMarkBranchForReview = (branch: Branch) => {
-    if (branch.id && projectRef) {
-      updateBranch(
-        {
-          id: branch.id,
-          projectRef,
-          requestReview: true,
+  const handleMarkBranchForReview = ({
+    project_ref: branchRef,
+    parent_project_ref: projectRef,
+    persistent,
+  }: Branch) => {
+    updateBranch(
+      {
+        branchRef,
+        projectRef,
+        requestReview: true,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Merge request created')
+
+          // Track merge request creation
+          sendEvent({
+            action: 'branch_create_merge_request_button_clicked',
+            properties: {
+              branchType: persistent ? 'persistent' : 'preview',
+              origin: 'branch_selector',
+            },
+            groups: {
+              project: projectRef ?? 'Unknown',
+              organization: selectedOrg?.slug ?? 'Unknown',
+            },
+          })
+
+          router.push(`/project/${branchRef}/merge`)
         },
-        {
-          onSuccess: () => {
-            toast.success('Merge request created')
-
-            // Track merge request creation
-            sendEvent({
-              action: 'branch_create_merge_request_button_clicked',
-              properties: {
-                branchType: branch.persistent ? 'persistent' : 'preview',
-                origin: 'branch_selector',
-              },
-              groups: {
-                project: projectRef ?? 'Unknown',
-                organization: selectedOrg?.slug ?? 'Unknown',
-              },
-            })
-
-            router.push(`/project/${branch.project_ref}/merge`)
-          },
-        }
-      )
-    }
+      }
+    )
   }
 
   const primaryActions = gitlessBranching ? (
@@ -378,7 +390,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
           Branching Feedback
         </a>
       </Button>
-      <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
+      <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
     </div>
   )
 

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { contentKeys } from './keys'
 
 type DeleteContentVariables = { projectRef: string; ids: string[] }
@@ -15,7 +15,7 @@ export async function deleteContents(
     headers: { Version: '2' },
     params: {
       path: { ref: projectRef },
-      query: { ids },
+      query: { ids: ids.join(',') },
     },
     signal,
   })
@@ -31,28 +31,29 @@ export const useContentDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteContentData, ResponseError, DeleteContentVariables>,
+  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteContentVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteContentData, ResponseError, DeleteContentVariables>(
-    (args) => deleteContents(args),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
+  return useMutation<DeleteContentData, ResponseError, DeleteContentVariables>({
+    mutationFn: (args) => deleteContents(args),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: contentKeys.allContentLists(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.infiniteList(projectRef) }),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete contents: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete contents: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

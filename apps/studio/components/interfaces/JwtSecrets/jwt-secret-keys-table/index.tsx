@@ -3,7 +3,7 @@ import { RotateCw, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
@@ -12,7 +12,6 @@ import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -48,7 +47,7 @@ import { SigningKeyRow } from './signing-key-row'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
-export default function JWTSecretKeysTable() {
+export const JWTSecretKeysTable = () => {
   const { ref: projectRef } = useParams()
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
 

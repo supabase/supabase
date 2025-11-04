@@ -1,4 +1,3 @@
-import { useCompletion } from '@ai-sdk/react'
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { ChevronUp, Loader2 } from 'lucide-react'
@@ -9,6 +8,7 @@ import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -29,6 +29,7 @@ import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   isRoleImpersonationEnabled,
   useGetImpersonatedRoleState,
@@ -87,6 +88,7 @@ export const SQLEditor = () => {
   const queryClient = useQueryClient()
   const tabs = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
@@ -163,7 +165,7 @@ export const SQLEditor = () => {
       refetchEntityDefinitions()
 
       // revalidate lint query
-      queryClient.invalidateQueries(lintKeys.lint(ref))
+      queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
     },
     onError(error: any, vars) {
       if (id) {
@@ -381,9 +383,9 @@ export const SQLEditor = () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
+      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       aiSnap.newChat({
         name: 'Debug SQL snippet',
-        open: true,
         sqlSnippets: [
           (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
         ],
@@ -453,22 +455,70 @@ export const SQLEditor = () => {
     closeDiff()
   }, [closeDiff, resetPrompt, sendEvent])
 
-  const {
-    complete,
-    completion,
-    isLoading: isCompletionLoading,
-  } = useCompletion({
-    api: `${BASE_PATH}/api/ai/code/complete`,
-    body: {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      language: 'sql',
-      orgSlug: org?.slug,
+  const [isCompletionLoading, setIsCompletionLoading] = useState<boolean>(false)
+
+  const complete = useCallback(
+    async (
+      prompt: string,
+      options?: {
+        headers?: Record<string, string>
+        body?: { completionMetadata?: any }
+      }
+    ) => {
+      try {
+        setIsCompletionLoading(true)
+
+        const response = await fetch(`${BASE_PATH}/api/ai/code/complete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(options?.headers ?? {}),
+          },
+          body: JSON.stringify({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            language: 'sql',
+            orgSlug: org?.slug,
+            ...(options?.body ?? {}),
+          }),
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(errorText || 'Failed to generate completion')
+        }
+
+        // API returns a JSON-encoded string
+        const text: string = await response.json()
+
+        const meta = options?.body?.completionMetadata ?? {}
+        const beforeSelection: string = meta.textBeforeCursor ?? ''
+        const afterSelection: string = meta.textAfterCursor ?? ''
+        const selection: string = meta.selection ?? ''
+
+        const original = beforeSelection + selection + afterSelection
+        const modified = beforeSelection + text + afterSelection
+
+        const formattedModified = formatSql(modified)
+        setSourceSqlDiff({ original, modified: formattedModified })
+        setSelectedDiffType(DiffType.Modification)
+        setPromptState((prev) => ({ ...prev, isLoading: false }))
+        setIsCompletionLoading(false)
+      } catch (error: any) {
+        toast.error(`Failed to generate SQL: ${error?.message ?? 'Unknown error'}`)
+        setIsCompletionLoading(false)
+        throw error
+      }
     },
-    onError: (error) => {
-      toast.error(`Failed to generate SQL: ${error.message}`)
-    },
-  })
+    [
+      org?.slug,
+      project?.connectionString,
+      project?.ref,
+      setPromptState,
+      setSelectedDiffType,
+      setSourceSqlDiff,
+    ]
+  )
 
   const handlePrompt = async (
     prompt: string,
@@ -593,35 +643,6 @@ export const SQLEditor = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snapV2.diffContent])
 
-  useEffect(() => {
-    if (!completion) {
-      return
-    }
-
-    const original =
-      promptState.beforeSelection + promptState.selection + promptState.afterSelection
-    const modified = promptState.beforeSelection + completion + promptState.afterSelection
-
-    if (isCompletionLoading) {
-      // Attempt to format the modified SQL in case the LLM left out indentation, etc
-      let formattedModified = formatSql(modified)
-
-      setSourceSqlDiff({
-        original,
-        modified: formattedModified,
-      })
-      setSelectedDiffType(DiffType.Modification)
-      setPromptState((prev) => ({ ...prev, isLoading: false }))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    completion,
-    promptState.beforeSelection,
-    promptState.selection,
-    promptState.afterSelection,
-    isCompletionLoading,
-  ])
-
   // We want to check if the diff editor is mounted and if it is, we want to show the widget
   // We also want to cleanup the widget when the diff editor is closed
   useEffect(() => {
@@ -658,7 +679,7 @@ export const SQLEditor = () => {
           direction="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <ResizablePanel maxSize={70}>
+          <ResizablePanel defaultSize={50} maxSize={70}>
             <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
@@ -687,6 +708,11 @@ export const SQLEditor = () => {
                           padding: { top: 4 },
                           lineNumbersMinChars: 3,
                         }}
+                        // [Joshen] These ones are meant to solve a UI issue that seems to only be happening locally
+                        // Happens when you use the inline assistant in the SQL Editor and accept the suggestion
+                        // Error: TextModel got disposed before DiffEditorWidget model got reset
+                        keepCurrentModifiedModel={true}
+                        keepCurrentOriginalModel={true}
                       />
                       {showWidget && (
                         <ResizableAIWidget
@@ -775,7 +801,7 @@ export const SQLEditor = () => {
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel maxSize={70}>
+          <ResizablePanel defaultSize={50} maxSize={70}>
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="animate-spin text-brand" />
@@ -793,7 +819,7 @@ export const SQLEditor = () => {
             )}
           </ResizablePanel>
 
-          <div className="max-h-9">
+          <div className="h-9">
             {results?.rows !== undefined && !isExecuting && (
               <GridFooter className="flex items-center justify-between gap-2">
                 <Tooltip>

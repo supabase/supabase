@@ -29,6 +29,8 @@ Reports can be filtered by time range to focus your analysis on specific periods
 
 ---
 
+<$Show if="billing:all">
+
 ## Database
 
 The Database report provides the most comprehensive view into your Postgres instance's health and performance characteristics. These charts help you identify performance bottlenecks, resource constraints, and optimization opportunities at a glance.
@@ -43,6 +45,8 @@ The following charts are available for Free and Pro plans:
 | Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                    |
 | Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                  |
 | Dedicated Pooler connections | All             | Client connections to PgBouncer              | Dedicated pooler connection monitoring        |
+
+</$Show>
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -77,12 +81,12 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                                                          | Description                                    |
-| ----------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| [Upgrade compute size](https://supabase.com/docs/guides/platform/compute-and-disk#compute-size) | Increase available memory resources            |
-| Optimize queries                                                                                | Reduce memory consumption of expensive queries |
-| Tune Postgres configuration                                                                     | Improve memory management settings             |
-| Implement application caching                                                                   | Add query result caching to reduce memory load |
+| Action                                                                      | Description                                    |
+| --------------------------------------------------------------------------- | ---------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size) | Increase available memory resources            |
+| Optimize queries                                                            | Reduce memory consumption of expensive queries |
+| Tune Postgres configuration                                                 | Improve memory management settings             |
+| Implement application caching                                               | Add query result caching to reduce memory load |
 
 ### CPU usage
 
@@ -143,12 +147,12 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                                             | Description                                               |
-| ---------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| Optimize indexing                                                                  | Reduce high read IOPS through better query indexing       |
-| Consider read replicas                                                             | Distribute read-heavy workloads across multiple instances |
-| Batch write operations                                                             | Reduce write IOPS by grouping database writes             |
-| [Upgrade compute size](https://supabase.com/docs/guides/platform/compute-and-disk) | Increase IOPS limits with larger compute instances        |
+| Action                                                         | Description                                               |
+| -------------------------------------------------------------- | --------------------------------------------------------- |
+| Optimize indexing                                              | Reduce high read IOPS through better query indexing       |
+| Consider read replicas                                         | Distribute read-heavy workloads across multiple instances |
+| Batch write operations                                         | Reduce write IOPS by grouping database writes             |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase IOPS limits with larger compute instances        |
 
 ### Disk IO Usage
 
@@ -173,12 +177,12 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                                             | Description                                        |
-| ---------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Optimize disk-intensive queries                                                    | Reduce queries that perform excessive reads/writes |
-| Add strategic indexes                                                              | Reduce sequential scans with appropriate indexing  |
-| [Upgrade compute size](https://supabase.com/docs/guides/platform/compute-and-disk) | Increase IOPS limits with larger compute instances |
-| Review database design                                                             | Optimize schema and query patterns for efficiency  |
+| Action                                                         | Description                                        |
+| -------------------------------------------------------------- | -------------------------------------------------- |
+| Optimize disk-intensive queries                                | Reduce queries that perform excessive reads/writes |
+| Add strategic indexes                                          | Reduce sequential scans with appropriate indexing  |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk) | Increase IOPS limits with larger compute instances |
+| Review database design                                         | Optimize schema and query patterns for efficiency  |
 
 ### Disk size
 
@@ -212,7 +216,7 @@ Actions you can take:
 | Run [VACUUM](https://www.postgresql.org/docs/current/sql-vacuum.html) operations | Reclaim dead tuple space and optimize storage                        |
 | Analyze large tables                                                             | Use CLI commands like `table-sizes` to identify optimization targets |
 | Implement data archival                                                          | Archive historical data to reduce active storage needs               |
-| [Upgrade disk size](https://supabase.com/docs/guides/platform/database-size)     | Increase storage capacity when approaching limits                    |
+| [Upgrade disk size](/docs/guides/platform/database-size)                         | Increase storage capacity when approaching limits                    |
 
 ### Database connections
 
@@ -244,11 +248,11 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                                                                         | Description                                                     |
-| -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| [Upgrade compute size](https://supabase.com/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
-| Implement [connection pooling](https://supabase.com/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
-| Review application code                                                                                        | Ensure proper connection handling and cleanup                   |
+| Action                                                                                     | Description                                                     |
+| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
+| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
+| Review application code                                                                    | Ensure proper connection handling and cleanup                   |
 
 ## Auth
 
@@ -270,7 +274,7 @@ The Storage report provides visibility into how your Supabase Storage is being u
 | --------------- | ------------------------------------------ | ------------------------------------------------------ |
 | Total Requests  | Overall request volume to Storage          | Traffic patterns and usage trends                      |
 | Response Speed  | Average response time for storage requests | Performance bottlenecks and optimization opportunities |
-| Network Traffic | Ingress and egress bandwidth usage         | Data transfer costs and CDN effectiveness              |
+| Network Traffic | Ingress and egress usage                   | Data transfer costs and CDN effectiveness              |
 | Request Caching | Cache hit rates and miss patterns          | CDN performance and cost optimization                  |
 | Top Routes      | Most frequently accessed storage paths     | Popular content and usage patterns                     |
 
@@ -305,5 +309,5 @@ The API Gateway report analyzes traffic patterns and performance characteristics
 | Total Requests  | Overall API request volume                | Traffic patterns and growth trends               |
 | Response Errors | Error rates with 4XX and 5XX status codes | API reliability and user experience issues       |
 | Response Speed  | Average API response times                | Performance bottlenecks and optimization targets |
-| Network Traffic | Request and response bandwidth usage      | Data transfer patterns and cost implications     |
+| Network Traffic | Request and response egress usage         | Data transfer patterns and cost implications     |
 | Top Routes      | Most frequently accessed API endpoints    | Usage patterns and optimization priorities       |

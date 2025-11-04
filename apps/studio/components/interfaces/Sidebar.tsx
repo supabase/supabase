@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
-import { LOCAL_STORAGE_KEYS, useIsMFAEnabled, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import {
   generateOtherRoutes,
   generateProductRoutes,
@@ -13,6 +13,7 @@ import {
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
@@ -41,14 +42,17 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
-import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useUnifiedLogsPreview,
+} from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
 export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
 export const DEFAULT_SIDEBAR_BEHAVIOR = 'expandable'
 
-const SidebarMotion = motion(SidebarPrimitive) as FC<
+const SidebarMotion = motion.create(SidebarPrimitive) as FC<
   ComponentProps<typeof SidebarPrimitive> & {
     transition?: MotionProps['transition']
   }
@@ -218,9 +222,14 @@ const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const snap = useAppStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
+  const showReports = useIsFeatureEnabled('reports:all')
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -236,14 +245,20 @@ const ProjectLinks = () => {
     'realtime:all',
   ])
 
+  const authOverviewPageEnabled = useFlag('authOverviewPage')
+
   const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
+    authOverviewPage: authOverviewPageEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project)
+  const otherRoutes = generateOtherRoutes(ref, project, {
+    unifiedLogs: isUnifiedLogsEnabled,
+    showReports,
+  })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
   return (
@@ -254,7 +269,7 @@ const ProjectLinks = () => {
           active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
             key: 'HOME',
-            label: 'Project overview',
+            label: 'Project Overview',
             icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: `/project/${ref}`,
             linkElement: <ProjectIndexPageLink projectRef={ref} />,
@@ -281,18 +296,37 @@ const ProjectLinks = () => {
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {otherRoutes.map((route, i) => {
-          if (route.key === 'api' && isNewAPIDocsEnabled) {
+          if (route.key === 'api') {
+            const handleApiClick = () => {
+              if (isNewAPIDocsEnabled) {
+                snap.setShowProjectApiDocs(true)
+              }
+              sendEvent({
+                action: 'api_docs_opened',
+                properties: {
+                  source: 'sidebar',
+                },
+                groups: {
+                  project: ref ?? 'Unknown',
+                  organization: org?.slug ?? 'Unknown',
+                },
+              })
+            }
+
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={{
-                  label: route.label,
-                  icon: route.icon,
-                  key: route.key,
-                }}
-                onClick={() => {
-                  snap.setShowProjectApiDocs(true)
-                }}
+                route={
+                  isNewAPIDocsEnabled
+                    ? {
+                        label: route.label,
+                        icon: route.icon,
+                        key: route.key,
+                      }
+                    : route
+                }
+                active={activeRoute === route.key}
+                onClick={handleApiClick}
               />
             )
           } else if (route.key === 'advisors') {
@@ -347,6 +381,8 @@ const OrganizationLinks = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
+  const showBilling = useIsFeatureEnabled('billing:all')
+
   const activeRoute = router.pathname.split('/')[3]
 
   const navMenuItems = [
@@ -374,12 +410,16 @@ const OrganizationLinks = () => {
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
-    {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-      key: 'billing',
-      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
+    ...(showBilling
+      ? [
+          {
+            label: 'Billing',
+            href: `/org/${slug}/billing`,
+            key: 'billing',
+            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+          },
+        ]
+      : []),
     {
       label: 'Organization settings',
       href: `/org/${slug}/general`,
