@@ -2,7 +2,8 @@
 
 import Link, { LinkProps } from 'next/link'
 import { usePathname } from 'next/navigation'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { ChevronRight } from 'lucide-react'
 
 import { useFramework } from '@/context/framework-context'
 import { useMobileMenu } from '@/hooks/use-mobile-menu'
@@ -18,12 +19,14 @@ interface NavigationItemProps
     Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   item: SidebarNavItem
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
+  level?: number
 }
 
-const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props }) => {
+const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, level = 0, ...props }) => {
   const { setOpen } = useMobileMenu()
   const { framework } = useFramework()
   const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false)
 
   const pathParts = pathname.split('/')
   const slug = pathParts[pathParts.length - 1]
@@ -39,6 +42,34 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
     return !hasFrameworkRestrictions || supportedFrameworks.includes(framework as any)
   }
 
+  const hasChildren = item.items && item.items.length > 0
+
+  // Auto-expand if any child is active
+  useEffect(() => {
+    if (hasChildren) {
+      const hasActiveChild = item.items?.some((child) => {
+        let childHref = child.href
+        if (child.supportedFrameworks && childHref && childHref.startsWith('/docs/')) {
+          const hrefParts = childHref.split('/').filter(Boolean)
+          if (
+            hrefParts.length >= 3 &&
+            framework &&
+            isFrameworkSupported(child, String(framework))
+          ) {
+            const pathSegment = hrefParts[2]
+            if (pathSegment) {
+              childHref = `/docs/${String(framework)}/${pathSegment}`
+            }
+          }
+        }
+        return pathname === childHref
+      })
+      if (hasActiveChild) {
+        setIsOpen(true)
+      }
+    }
+  }, [hasChildren, item.items, pathname, framework])
+
   // Build URL with priority:
   // 1. item.href if available (replacing any existing framework with current one)
   // 2. Computed from current path considering framework support
@@ -47,12 +78,11 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
   // Only modify URLs for items that explicitly support frameworks
   if (item.supportedFrameworks) {
     if (href && href.startsWith('/docs/')) {
-      const hrefParts = href.split('/')
-      if (hrefParts.length >= 3) {
-        if (framework && isFrameworkSupported(item, framework)) {
-          if (hrefParts.length >= 4) {
-            href = `/docs/${framework}/${hrefParts[3]}`
-          }
+      const hrefParts = href.split('/').filter(Boolean)
+      if (hrefParts.length >= 3 && framework && isFrameworkSupported(item, String(framework))) {
+        const pathSegment = hrefParts[2]
+        if (pathSegment) {
+          href = `/docs/${String(framework)}/${pathSegment}`
         }
       }
     }
@@ -60,8 +90,8 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
   // Handle component items with slug but no href
   else if (!href && slug) {
     // Build the URL using the current framework if it's supported
-    if (framework && isFrameworkSupported(item, framework)) {
-      href = `/docs/${framework}/${slug}`
+    if (framework && isFrameworkSupported(item, String(framework))) {
+      href = `/docs/${String(framework)}/${slug}`
     } else {
       // Fall back to framework-agnostic URL when framework not supported
       href = `/docs/${slug}`
@@ -72,6 +102,13 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
   const isActive = pathname === href
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // If item has children, toggle open/close instead of navigating
+    if (hasChildren) {
+      e.preventDefault()
+      setIsOpen(!isOpen)
+      return
+    }
+
     // Close the mobile menu when navigating
     setOpen(false)
 
@@ -81,39 +118,61 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
     }
   }
 
+  const paddingLeft = level > 0 ? 6 + level * 12 : 6
+
   return (
-    <Link
-      href={href || '#'}
-      {...props}
-      onClick={handleClick}
-      className={cn(
-        'relative',
-        'flex',
-        'items-center justify-between',
-        'h-6',
-        'text-sm',
-        'text-foreground-lighter px-6',
-        !isActive && 'hover:bg-surface-100 hover:text-foreground',
-        isActive && 'bg-surface-200 text-foreground',
-        'transition-all',
-        props.className
-      )}
-    >
-      {/* Active indicator bar */}
-      <div
+    <div>
+      <Link
+        href={hasChildren ? '#' : href || '#'}
+        {...props}
+        onClick={handleClick}
         className={cn(
-          'transition',
-          'absolute left-0 w-1 h-full bg-foreground',
-          isActive ? 'opacity-100' : 'opacity-0'
+          'relative',
+          'flex',
+          'items-center justify-between',
+          'h-6',
+          'text-sm',
+          'text-foreground-lighter',
+          !isActive && 'hover:bg-surface-100 hover:text-foreground',
+          isActive && 'bg-surface-200 text-foreground',
+          'transition-all',
+          props.className
         )}
-      />
-      {item.title}
-      {item.new && (
-        <Badge variant="brand" className="capitalize">
-          NEW
-        </Badge>
+        style={{ paddingLeft: `${paddingLeft}px` }}
+      >
+        {/* Active indicator bar */}
+        <div
+          className={cn(
+            'transition',
+            'absolute left-0 w-1 h-full bg-foreground',
+            isActive ? 'opacity-100' : 'opacity-0'
+          )}
+        />
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {hasChildren && (
+            <ChevronRight
+              className={cn(
+                'h-4 w-4 transition-transform flex-shrink-0',
+                isOpen && 'transform rotate-90'
+              )}
+            />
+          )}
+          <span className="truncate">{item.title}</span>
+        </div>
+        {item.new && (
+          <Badge variant="brand" className="capitalize flex-shrink-0">
+            NEW
+          </Badge>
+        )}
+      </Link>
+      {hasChildren && isOpen && (
+        <div className="mt-0.5">
+          {item.items?.map((childItem, i) => (
+            <NavigationItem item={childItem} key={`${childItem.href}-${i}`} level={level + 1} />
+          ))}
+        </div>
       )}
-    </Link>
+    </div>
   )
 }
 

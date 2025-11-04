@@ -6,7 +6,23 @@ export const gettingStarted: SidebarNavGroup = {
     {
       title: 'Supabase Foundations',
       href: '/foundations',
-      items: [],
+      items: [
+        {
+          title: 'Introduction',
+          href: '/foundations/introduction',
+          items: [],
+        },
+        {
+          title: 'Quickstart',
+          href: '/foundations/quickstart',
+          items: [],
+        },
+        {
+          title: 'FAQ',
+          href: '/foundations/faq',
+          items: [],
+        },
+      ],
       commandItemLabel: 'Supabase Foundations',
     },
     {
