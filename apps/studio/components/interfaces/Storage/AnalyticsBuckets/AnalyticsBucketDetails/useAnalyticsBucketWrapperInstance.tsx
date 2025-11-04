@@ -10,17 +10,18 @@ import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export const useAnalyticsBucketWrapperInstance = (
-  { bucketId }: { bucketId: string },
+  { bucketId }: { bucketId?: string },
   options?: { enabled?: boolean }
 ) => {
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
 
+  const defaultEnabled = options?.enabled ?? true
   const { data, isLoading: isLoadingFDWs } = useFDWsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    options
+    { enabled: defaultEnabled && !!bucketId }
   )
 
   const icebergWrapper = useMemo(() => {

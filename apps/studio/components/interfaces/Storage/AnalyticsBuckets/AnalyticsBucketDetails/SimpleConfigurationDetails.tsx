@@ -24,7 +24,7 @@ const wrapperMeta = {
   ],
 }
 
-export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string }) => {
+export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string }) => {
   const { data: project } = useSelectedProjectQuery()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
@@ -37,7 +37,7 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
 
   const values: Record<string, string> = {
     vault_token: serviceApiKey,
-    warehouse: bucketName,
+    warehouse: bucketName ?? '',
     's3.endpoint': getConnectionURL(project?.ref ?? '', protocol, endpoint),
     catalog_uri: getCatalogURI(project?.ref ?? '', protocol, endpoint),
   }

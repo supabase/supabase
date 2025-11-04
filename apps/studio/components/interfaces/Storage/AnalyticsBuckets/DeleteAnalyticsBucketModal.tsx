@@ -1,13 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
 import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
-import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
-import { Bucket } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -32,7 +29,7 @@ import {
 
 export interface DeleteAnalyticsBucketModalProps {
   visible: boolean
-  bucket: Bucket | AnalyticsBucket
+  bucketId?: string
   onClose: () => void
   onSuccess?: () => void
 }
@@ -41,17 +38,16 @@ const formId = `delete-analytics-bucket-form`
 
 export const DeleteAnalyticsBucketModal = ({
   visible,
-  bucket,
+  bucketId,
   onClose,
   onSuccess,
 }: DeleteAnalyticsBucketModalProps) => {
-  const router = useRouter()
-  const { ref: projectRef, bucketId } = useParams()
+  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const schema = z.object({
-    confirm: z.literal(bucket.id, {
-      errorMap: () => ({ message: `Please enter "${bucket.id}" to confirm` }),
+    confirm: z.literal(bucketId, {
+      errorMap: () => ({ message: `Please enter "${bucketId}" to confirm` }),
     }),
   })
 
@@ -60,7 +56,7 @@ export const DeleteAnalyticsBucketModal = ({
   })
 
   const { icebergWrapper, icebergWrapperMeta, s3AccessKey, publication } =
-    useAnalyticsBucketAssociatedEntities({ projectRef, bucketId: bucket.id })
+    useAnalyticsBucketAssociatedEntities({ projectRef, bucketId: bucketId })
 
   const { mutateAsync: deleteAnalyticsBucketCleanUp, isLoading: isCleaningUpAnalyticsBucket } =
     useAnalyticsBucketDeleteCleanUp()
@@ -72,14 +68,14 @@ export const DeleteAnalyticsBucketModal = ({
           await deleteAnalyticsBucketCleanUp({
             projectRef,
             connectionString: project.connectionString,
-            bucketId: bucket.id,
+            bucketId: bucketId,
             icebergWrapper,
             icebergWrapperMeta,
             s3AccessKey,
             publication,
           })
         }
-        toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
+        toast.success(`Successfully deleted analytics bucket ${bucketId}`)
         onClose()
         onSuccess?.()
       },
@@ -87,8 +83,8 @@ export const DeleteAnalyticsBucketModal = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!bucket) return console.error('No bucket is selected')
-    deleteAnalyticsBucket({ projectRef, id: bucket.id })
+    if (!bucketId) return console.error('No bucket is selected')
+    deleteAnalyticsBucket({ projectRef, id: bucketId })
   }
 
   const isDeleting = isDeletingAnalyticsBucket || isCleaningUpAnalyticsBucket
@@ -102,7 +98,7 @@ export const DeleteAnalyticsBucketModal = ({
     >
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Confirm deletion of {bucket.id}</DialogTitle>
+          <DialogTitle>Confirm deletion of {bucketId}</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
@@ -116,7 +112,7 @@ export const DeleteAnalyticsBucketModal = ({
 
         <DialogSection>
           <p className="text-sm">
-            Your bucket <span className="font-bold text-foreground">{bucket.id}</span> and all its
+            Your bucket <span className="font-bold text-foreground">{bucketId}</span> and all its
             contents will be permanently deleted.
           </p>
         </DialogSection>
@@ -133,7 +129,7 @@ export const DeleteAnalyticsBucketModal = ({
                     name="confirm"
                     label={
                       <>
-                        Type <span className="font-bold text-foreground">{bucket.id}</span> to
+                        Type <span className="font-bold text-foreground">{bucketId}</span> to
                         confirm.
                       </>
                     }
