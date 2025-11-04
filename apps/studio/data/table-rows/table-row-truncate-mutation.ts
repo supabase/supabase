@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableRowKeys } from './keys'
 
 export type TableRowTruncateVariables = {
@@ -41,7 +41,7 @@ export const useTableRowTruncateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowTruncateData, ResponseError, TableRowTruncateVariables>,
+  UseCustomMutationOptions<TableRowTruncateData, ResponseError, TableRowTruncateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -50,7 +50,9 @@ export const useTableRowTruncateMutation = ({
     mutationFn: (vars) => truncateTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables
-      await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

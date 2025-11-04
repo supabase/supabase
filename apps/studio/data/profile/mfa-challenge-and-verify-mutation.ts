@@ -1,10 +1,11 @@
 import * as Sentry from '@sentry/nextjs'
 import type { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supabase/supabase-js'
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
+import { UseCustomMutationOptions } from 'types'
 
 const WHITELIST_ERRORS = ['Invalid TOTP code entered']
 
@@ -26,7 +27,11 @@ export const useMfaChallengeAndVerifyMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CustomMFAVerifyResponse, CustomMFAVerifyError, MFAChallengeAndVerifyVariables>,
+  UseCustomMutationOptions<
+    CustomMFAVerifyResponse,
+    CustomMFAVerifyError,
+    MFAChallengeAndVerifyVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -41,8 +46,10 @@ export const useMfaChallengeAndVerifyMutation = ({
       const refreshFactors = variables.refreshFactors ?? true
 
       await Promise.all([
-        ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.mfaFactors())] : []),
-        queryClient.invalidateQueries(profileKeys.aaLevel()),
+        ...(refreshFactors
+          ? [queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors() })]
+          : []),
+        queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() }),
       ])
 
       await onSuccess?.(data, variables, context)

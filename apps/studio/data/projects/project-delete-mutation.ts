@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
 import { organizationKeys } from 'data/organizations/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { projectKeys } from './keys'
 
 export type ProjectDeleteVariables = {
@@ -27,7 +27,7 @@ export const useProjectDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectDeleteData, ResponseError, ProjectDeleteVariables>,
+  UseCustomMutationOptions<ProjectDeleteData, ResponseError, ProjectDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -36,19 +36,25 @@ export const useProjectDeleteMutation = ({
     mutationFn: (vars) => deleteProject(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(projectKeys.list()),
-        queryClient.invalidateQueries(projectKeys.detail(data.ref)),
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: projectKeys.detail(data.ref) }),
       ])
 
       if (variables.organizationSlug) {
         await Promise.all([
-          queryClient.invalidateQueries(projectKeys.infiniteListByOrg(variables.organizationSlug)),
-          queryClient.invalidateQueries(organizationKeys.detail(variables.organizationSlug)),
-          queryClient.invalidateQueries(projectKeys.orgProjects(variables.organizationSlug)),
+          queryClient.invalidateQueries({
+            queryKey: projectKeys.infiniteListByOrg(variables.organizationSlug),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: organizationKeys.detail(variables.organizationSlug),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: projectKeys.orgProjects(variables.organizationSlug),
+          }),
 
-          queryClient.invalidateQueries(
-            organizationKeys.freeProjectLimitCheck(variables.organizationSlug)
-          ),
+          queryClient.invalidateQueries({
+            queryKey: organizationKeys.freeProjectLimitCheck(variables.organizationSlug),
+          }),
         ])
       }
 

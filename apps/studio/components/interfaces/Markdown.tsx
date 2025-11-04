@@ -10,7 +10,7 @@ interface Props extends Omit<ReactMarkdownOptions, 'children' | 'node'> {
   extLinks?: boolean
 }
 
-const Markdown = ({ className, content = '', extLinks = false, ...props }: Props) => {
+export const Markdown = ({ className, content = '', extLinks = false, ...props }: Props) => {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -25,5 +25,3 @@ const Markdown = ({ className, content = '', extLinks = false, ...props }: Props
     </ReactMarkdown>
   )
 }
-
-export { Markdown }

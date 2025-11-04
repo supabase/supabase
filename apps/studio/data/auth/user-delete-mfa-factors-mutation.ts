@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type UserDeleteMFAFactorsVariables = {
   projectRef: string
@@ -26,7 +26,7 @@ export const useUserDeleteMFAFactorsMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UserDeleteMFAFactorsData, ResponseError, UserDeleteMFAFactorsVariables>,
+  UseCustomMutationOptions<UserDeleteMFAFactorsData, ResponseError, UserDeleteMFAFactorsVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<UserDeleteMFAFactorsData, ResponseError, UserDeleteMFAFactorsVariables>({

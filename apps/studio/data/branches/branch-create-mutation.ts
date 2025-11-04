@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchCreateVariables = {
@@ -48,7 +48,7 @@ export const useBranchCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BranchCreateData, ResponseError, BranchCreateVariables>,
+  UseCustomMutationOptions<BranchCreateData, ResponseError, BranchCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -56,7 +56,7 @@ export const useBranchCreateMutation = ({
     mutationFn: (vars) => createBranch(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(branchKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

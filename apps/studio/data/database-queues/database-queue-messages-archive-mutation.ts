@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueMessageArchiveVariables = {
@@ -35,7 +35,7 @@ export const useDatabaseQueueMessageArchiveMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     DatabaseQueueMessageArchiveData,
     ResponseError,
     DatabaseQueueMessageArchiveVariables
@@ -52,9 +52,9 @@ export const useDatabaseQueueMessageArchiveMutation = ({
     mutationFn: (vars) => archiveDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queryName } = variables
-      await queryClient.invalidateQueries(
-        databaseQueuesKeys.getMessagesInfinite(projectRef, queryName)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queryName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

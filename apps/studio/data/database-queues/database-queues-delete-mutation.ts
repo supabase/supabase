@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueDeleteVariables = {
@@ -33,7 +33,7 @@ export const useDatabaseQueueDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>,
+  UseCustomMutationOptions<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -42,7 +42,7 @@ export const useDatabaseQueueDeleteMutation = ({
     mutationFn: (vars) => deleteDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

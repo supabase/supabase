@@ -1,9 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { usageKeys } from './keys'
 
 export type ResourceWarningsVariables = {
@@ -38,7 +38,7 @@ export const useResourceWarningsQuery = <TData = ResourceWarningsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ResourceWarningsData, ResourceWarningsError, TData> = {}
+  }: UseCustomQueryOptions<ResourceWarningsData, ResourceWarningsError, TData> = {}
 ) =>
   useQuery<ResourceWarningsData, ResourceWarningsError, TData>({
     queryKey: usageKeys.resourceWarnings(variables.slug, variables.ref),

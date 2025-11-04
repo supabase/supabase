@@ -7,7 +7,7 @@ import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer
 import { StorageMenu } from 'components/interfaces/Storage/StorageMenu'
 import { StorageMenuV2 } from 'components/interfaces/Storage/StorageMenuV2'
 import { withAuth } from 'hooks/misc/withAuth'
-import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout'
 
 export interface StorageLayoutProps {
   title: string
@@ -24,6 +24,8 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   useEffect(() => {
     const { pathname } = router
     const suffix = !!featurePreviewModal ? `?featurePreviewModal=${featurePreviewModal}` : ''
+
+    if (!ref) return
 
     if (isStorageV2) {
       // From old UI to new UI
@@ -58,7 +60,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStorageV2])
+  }, [ref, isStorageV2])
 
   return (
     <ProjectLayout

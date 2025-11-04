@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { realtimeKeys } from './keys'
 
 export type RealtimeConfigurationUpdateVariables = {
@@ -52,7 +52,7 @@ export const useRealtimeConfigurationUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     RealtimeConfigurationUpdateData,
     ResponseError,
     RealtimeConfigurationUpdateVariables
@@ -69,7 +69,7 @@ export const useRealtimeConfigurationUpdateMutation = ({
     mutationFn: (vars) => updateRealtimeConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
-      await queryClient.invalidateQueries(realtimeKeys.configuration(ref))
+      await queryClient.invalidateQueries({ queryKey: realtimeKeys.configuration(ref) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

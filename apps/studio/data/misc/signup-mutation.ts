@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 const WHITELIST_ERRORS = [
   'A user with this email already exists',
@@ -36,7 +36,10 @@ export const useSignUpMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<UseMutationOptions<SignUpData, ResponseError, SignUpVariables>, 'mutationFn'> = {}) => {
+}: Omit<
+  UseCustomMutationOptions<SignUpData, ResponseError, SignUpVariables>,
+  'mutationFn'
+> = {}) => {
   return useMutation<SignUpData, ResponseError, SignUpVariables>({
     mutationFn: (vars) => signup(vars),
     async onSuccess(data, variables, context) {

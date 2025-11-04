@@ -1,11 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableRowKeys } from './keys'
 
 export type TableRowUpdateVariables = {
@@ -69,7 +69,7 @@ export const useTableRowUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowUpdateData, ResponseError, TableRowUpdateVariables>,
+  UseCustomMutationOptions<TableRowUpdateData, ResponseError, TableRowUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -78,9 +78,9 @@ export const useTableRowUpdateMutation = ({
     mutationFn: (vars) => updateTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables
-      await queryClient.invalidateQueries(
-        tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
-      )
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRows(projectRef, { table: { id: table.id } }),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
