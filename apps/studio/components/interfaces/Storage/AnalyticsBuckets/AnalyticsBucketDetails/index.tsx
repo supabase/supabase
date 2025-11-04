@@ -1,16 +1,17 @@
 import { uniq } from 'lodash'
 import { SquarePlus } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 
+import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -18,7 +19,7 @@ import {
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
+import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import {
   DatabaseExtension,
@@ -33,7 +34,7 @@ import { DOCS_URL } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { DeleteBucketModal } from '../DeleteBucketModal'
+import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
@@ -43,15 +44,24 @@ import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
-export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) => {
-  const config = BUCKET_TYPES.analytics
-  const [modal, setModal] = useState<'delete' | null>(null)
+export const AnalyticBucketDetails = () => {
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { state: extensionState } = useIcebergWrapperExtension()
+  const {
+    bucket: _bucket,
+    error: bucketError,
+    isSuccess: isSuccessBucket,
+    isError: isErrorBucket,
+  } = useSelectedBucket()
+  const bucket = _bucket as undefined | AnalyticsBucket
+
+  const [modal, setModal] = useState<'delete' | null>(null)
 
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
   const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance({
-    bucketId: bucket.id,
+    bucketId: bucket?.id,
   })
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
@@ -113,16 +123,13 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
 
   return (
     <>
-      <PageLayout
-        title={bucket.id}
-        breadcrumbs={[
-          {
-            label: 'Analytics',
-            href: `/project/${project?.ref}/storage/analytics`,
-          },
-        ]}
-        secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
-      >
+      {isErrorBucket ? (
+        <ScaffoldContainer bottomPadding>
+          <ScaffoldSection isFullWidth>
+            <AlertError subject="Failed to fetch analytics buckets" error={bucketError} />
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      ) : (
         <ScaffoldContainer bottomPadding>
           {state === 'loading' && (
             <ScaffoldSection isFullWidth>
@@ -131,7 +138,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
           )}
           {state === 'not-installed' && (
             <ExtensionNotInstalled
-              bucketName={bucket.id}
+              bucketName={bucket?.id}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
@@ -139,7 +146,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
           )}
           {state === 'needs-upgrade' && (
             <ExtensionNeedsUpgrade
-              bucketName={bucket.id}
+              bucketName={bucket?.id}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
@@ -156,7 +163,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
                       Analytics tables stored in this bucket
                     </ScaffoldSectionDescription>
                   </div>
-                  {namespaces.length > 0 && <ConnectTablesDialog bucket={bucket} />}
+                  {namespaces.length > 0 && <ConnectTablesDialog bucketId={bucket?.id} />}
                 </ScaffoldHeader>
 
                 {isLoadingNamespaces || isLoading ? (
@@ -170,14 +177,14 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
                         Stream data from tables for archival, backups, or analytical queries.
                       </p>
                     </div>
-                    <ConnectTablesDialog bucket={bucket} />
+                    <ConnectTablesDialog bucketId={bucket?.id} />
                   </aside>
                 ) : (
                   <div className="flex flex-col gap-y-10">
                     {namespaces.map(({ namespace, schema, tables }) => (
                       <NamespaceWithTables
                         key={namespace}
-                        bucketName={bucket.id}
+                        bucketName={bucket?.id}
                         namespace={namespace}
                         sourceType="direct"
                         schema={schema}
@@ -232,7 +239,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
               </ScaffoldSection>
             </>
           )}
-          {state === 'missing' && <WrapperMissing bucketName={bucket.id} />}
+          {state === 'missing' && <WrapperMissing bucketName={bucket?.id} />}
 
           <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
             <header>
@@ -249,9 +256,8 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
                 </div>
                 <Button
                   type="danger"
-                  onClick={() => {
-                    setModal('delete')
-                  }}
+                  disabled={!isSuccessBucket}
+                  onClick={() => setModal('delete')}
                 >
                   Delete bucket
                 </Button>
@@ -259,12 +265,13 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
             </Card>
           </ScaffoldSection>
         </ScaffoldContainer>
-      </PageLayout>
+      )}
 
-      <DeleteBucketModal
+      <DeleteAnalyticsBucketModal
         visible={modal === `delete`}
-        bucket={bucket}
+        bucketId={bucket?.id}
         onClose={() => setModal(null)}
+        onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />
     </>
   )
@@ -276,7 +283,7 @@ const ExtensionNotInstalled = ({
   wrapperMeta,
   wrappersExtension,
 }: {
-  bucketName: string
+  bucketName?: string
   projectRef: string
   wrapperMeta: WrapperMeta
   wrappersExtension: DatabaseExtension
@@ -325,7 +332,7 @@ const ExtensionNeedsUpgrade = ({
   wrapperMeta,
   wrappersExtension,
 }: {
-  bucketName: string
+  bucketName?: string
   projectRef: string
   wrapperMeta: WrapperMeta
   wrappersExtension: DatabaseExtension
@@ -368,11 +375,12 @@ const ExtensionNeedsUpgrade = ({
   )
 }
 
-const WrapperMissing = ({ bucketName }: { bucketName: string }) => {
+const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
   const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
   const onSetupWrapper = async () => {
+    if (!bucketName) return console.error('Bucket name is required')
     await createIcebergWrapper({ bucketName })
   }
 
