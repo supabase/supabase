@@ -99,16 +99,16 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-36">
+          <DropdownMenuItem asChild className="gap-x-2">
+            <Link href={`/project/${ref}/settings/log-drains`}>
+              <p>Add a Log Drain</p>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSelectedFormat('csv')}>
             <p>Download as CSV</p>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSelectedFormat('json')}>
             <p>Download as JSON</p>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className="gap-x-2">
-            <Link href={`/project/${ref}/settings/log-drains`}>
-              <p>Add a Log Drain</p>
-            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
