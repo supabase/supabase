@@ -8,6 +8,7 @@
     "build": "next build && ./../../scripts/upload-static-assets.sh",
     "start": "next start",
     "lint": "eslint .",
+	"lint:ratchet": "node scripts/ratchet-eslint-rules.js --rule react-hooks/exhaustive-deps",
     "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
     "test": "vitest --run --coverage",
     "test:watch": "vitest watch",
