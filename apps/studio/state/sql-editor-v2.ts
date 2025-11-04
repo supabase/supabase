@@ -299,9 +299,9 @@ async function upsertSnippet(
     if (shouldInvalidate) {
       const queryClient = getQueryClient()
       await Promise.all([
-        queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql')),
-        queryClient.invalidateQueries(contentKeys.sqlSnippets(projectRef)),
-        queryClient.invalidateQueries(contentKeys.folders(projectRef)),
+        queryClient.invalidateQueries({ queryKey: contentKeys.count(projectRef, 'sql') }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.sqlSnippets(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) }),
       ])
     }
 

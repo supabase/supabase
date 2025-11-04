@@ -29,6 +29,7 @@ export type QueryPerformanceQueryOpts = {
   orderBy?: QueryPerformanceSort
   roles?: string[]
   runIndexAdvisor?: boolean
+  minCalls?: number
 }
 
 export const useQueryPerformanceQuery = ({
@@ -37,6 +38,7 @@ export const useQueryPerformanceQuery = ({
   searchQuery = '',
   roles,
   runIndexAdvisor = false,
+  minCalls,
 }: QueryPerformanceQueryOpts) => {
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
@@ -46,6 +48,7 @@ export const useQueryPerformanceQuery = ({
       ? `auth.rolname in (${roles.map((r) => `'${r}'`).join(', ')})`
       : '',
     searchQuery.length > 0 ? `statements.query ~* '${searchQuery}'` : '',
+    typeof minCalls === 'number' && minCalls > 0 ? `statements.calls >= ${minCalls}` : '',
   ]
     .filter((x) => x.length > 0)
     .join(' AND ')

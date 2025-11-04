@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
-import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { getCatalogURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -124,7 +123,6 @@ export const AnalyticsBucketFields = ({
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 
   const { ref: projectRef } = useParams()
-  const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
@@ -447,13 +445,7 @@ export const AnalyticsBucketFields = ({
               <p className="!leading-normal">
                 Please select another key or create a new set, as this destination will not work
                 otherwise. S3 access keys can be managed in your{' '}
-                <InlineLink
-                  href={
-                    isStorageV2
-                      ? `/project/${projectRef}/storage/files/settings`
-                      : `/project/${projectRef}/storage/settings`
-                  }
-                >
+                <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
                   storage settings
                 </InlineLink>
               </p>
@@ -466,13 +458,7 @@ export const AnalyticsBucketFields = ({
             <Admonition type="default" title="A new set of S3 access keys will be created">
               <p className="!leading-normal">
                 S3 access keys can be managed in your{' '}
-                <InlineLink
-                  href={
-                    isStorageV2
-                      ? `/project/${projectRef}/storage/files/settings`
-                      : `/project/${projectRef}/storage/settings`
-                  }
-                >
+                <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
                   storage settings
                 </InlineLink>
                 .
