@@ -224,6 +224,8 @@ allow_list = [
     "LlamaIndex",
     "Llamafile",
     "Logflare",
+    "Lovable",
+    "Lovable Cloud",
     "Lua",
     "Mailgun",
     "Mailpit",
