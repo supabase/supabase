@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useStorageV2Page } from '../Storage.utils'
@@ -6,6 +7,9 @@ import { useStorageV2Page } from '../Storage.utils'
 export const useSelectedBucket = () => {
   const { ref, bucketId } = useParams()
   const page = useStorageV2Page()
+
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const hasIcebergEnabled = data?.features.icebergCatalog?.enabled
 
   const {
     data: analyticsBuckets = [],
@@ -21,9 +25,11 @@ export const useSelectedBucket = () => {
     error: errorBuckets,
   } = useBucketsQuery({ projectRef: ref })
 
-  const isSuccess = isSuccessBuckets && isSuccessAnalyticsBuckets
-  const isError = isErrorBuckets || isErrorAnalyticsBuckets
-  const error = errorBuckets || errorAnalyticsBuckets
+  const isSuccess = hasIcebergEnabled
+    ? isSuccessBuckets && isSuccessAnalyticsBuckets
+    : isSuccessBuckets
+  const isError = hasIcebergEnabled ? isErrorBuckets || isErrorAnalyticsBuckets : isErrorBuckets
+  const error = hasIcebergEnabled ? errorBuckets || errorAnalyticsBuckets : errorBuckets
 
   const bucket =
     page === 'files'
