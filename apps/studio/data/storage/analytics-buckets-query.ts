@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useIsAnalyticsBucketsEnabled } from 'data/config/project-storage-config-query'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -39,9 +39,7 @@ export const useAnalyticsBucketsQuery = <TData = AnalyticsBucketsData>(
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-
-  const { data } = useProjectStorageConfigQuery({ projectRef: project?.ref })
-  const hasIcebergEnabled = data?.features.icebergCatalog?.enabled
+  const hasIcebergEnabled = useIsAnalyticsBucketsEnabled({ projectRef: project?.ref })
 
   return useQuery<AnalyticsBucketsData, AnalyticsBucketsError, TData>({
     queryKey: storageKeys.analyticsBuckets(projectRef),
