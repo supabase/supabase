@@ -34,7 +34,7 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
               className="max-w-md"
               type="default"
               title="Unable to find bucket"
-              description={`${bucketId ? `The template "${bucketId}"` : 'This template'} doesn’t seem to exist.`}
+              description={`${bucketId ? `The bucket "${bucketId}"` : 'This bucket'} doesn’t seem to exist.`}
             >
               <Button asChild type="default" className="mt-2">
                 <Link href={`/project/${projectRef}/storage/analytics`}>Head back</Link>

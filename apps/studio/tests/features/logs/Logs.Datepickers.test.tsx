@@ -99,7 +99,7 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
 
   // Find and click on first date
   const day15Element = await screen.findByText(day15.format('D'))
-  userEvent.click(day15Element)
+  userEvent.dblClick(day15Element)
 
   // Find and click on second date
   const day16Element = await screen.findByText(day16.format('D'))

@@ -1,13 +1,16 @@
 import Link from 'next/link'
 
 import { IS_PLATFORM, useParams } from 'common'
-import { Menu } from 'ui'
+import { useIsAnalyticsBucketsEnabled } from 'data/config/project-storage-config-query'
+import { Badge, Menu } from 'ui'
 import { BUCKET_TYPES, BUCKET_TYPE_KEYS } from './Storage.constants'
 import { useStorageV2Page } from './Storage.utils'
 
 export const StorageMenuV2 = () => {
   const { ref } = useParams()
   const page = useStorageV2Page()
+
+  const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
 
   return (
     <Menu type="pills" className="my-6 flex flex-grow flex-col">
@@ -22,7 +25,12 @@ export const StorageMenuV2 = () => {
             return (
               <Link key={bucketTypeKey} href={`/project/${ref}/storage/${bucketTypeKey}`}>
                 <Menu.Item rounded active={isSelected}>
-                  <p className="truncate">{config.displayName}</p>
+                  <div className="flex items-center justify-between">
+                    <p className="truncate">{config.displayName}</p>
+                    {bucketTypeKey === 'analytics' && isAnalyticsBucketsEnabled && (
+                      <Badge variant="warning">ALPHA</Badge>
+                    )}
+                  </div>
                 </Menu.Item>
               </Link>
             )
