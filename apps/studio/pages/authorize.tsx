@@ -282,11 +282,13 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
               render={({ field }) => (
                 <FormItem_Shadcn_>
                   <FormLayout
-                    label={
+                    label="Organization to grant API access to"
+                    description={
                       organization_slug
-                        ? 'API access will be granted to pre-selected organization'
-                        : 'Organization to grant API access to'
+                        ? `'This organization has been pre-selected by ${requester?.name}.`
+                        : undefined
                     }
+                    isReactForm
                   >
                     <FormControl_Shadcn_>
                       <Select_Shadcn_
