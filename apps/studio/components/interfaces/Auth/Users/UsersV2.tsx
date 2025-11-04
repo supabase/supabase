@@ -141,7 +141,7 @@ export const UsersV2 = () => {
   )
 
   const [columns, setColumns] = useState<Column<any>[]>([])
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(filterKeywords)
   const [selectedUser, setSelectedUser] = useState<string>()
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
