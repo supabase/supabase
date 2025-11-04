@@ -1,4 +1,4 @@
-import { stringRange, prefixToUUID } from './get-users-common'
+import { prefixToUUID, stringRange } from './get-users-common'
 import { OptimizedSearchColumns } from './get-users-types'
 
 interface getPaginatedUsersSQLProps {
