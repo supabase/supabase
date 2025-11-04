@@ -1,38 +1,35 @@
 import { useParams } from 'common'
-import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails'
 import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
+import { VectorBucketDetails } from 'components/interfaces/Storage/VectorBuckets/VectorBucketDetails'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
 
-const AnalyticsBucketPage: NextPageWithLayout = () => {
-  const config = BUCKET_TYPES.analytics
+const VectorsBucketPage: NextPageWithLayout = () => {
+  const config = BUCKET_TYPES['vectors']
   const { bucketId } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { projectRef } = useStorageExplorerStateSnapshot()
 
   return (
     <PageLayout
       title={bucketId}
-      breadcrumbs={[
-        {
-          label: 'Analytics',
-          href: `/project/${project?.ref}/storage/analytics`,
-        },
-      ]}
+      breadcrumbs={[{ label: 'Vectors', href: `/project/${projectRef}/storage/vectors` }]}
       secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
     >
-      <AnalyticBucketDetails />
+      <div className="storage-container flex flex-grow">
+        <VectorBucketDetails />
+      </div>
     </PageLayout>
   )
 }
 
-AnalyticsBucketPage.getLayout = (page) => (
+VectorsBucketPage.getLayout = (page) => (
   <DefaultLayout>
     <StorageLayout title="Buckets">{page}</StorageLayout>
   </DefaultLayout>
 )
 
-export default AnalyticsBucketPage
+export default VectorsBucketPage

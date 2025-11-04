@@ -1,4 +1,8 @@
 import {
+  getCatalogURI,
+  getConnectionURL,
+} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import {
   ScaffoldHeader,
   ScaffoldSection,
   ScaffoldSectionDescription,
@@ -10,7 +14,6 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Card } from 'ui'
-import { getCatalogURI, getConnectionURL } from '../StorageSettings/StorageSettings.utils'
 import { DESCRIPTIONS } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
@@ -24,7 +27,7 @@ const wrapperMeta = {
   ],
 }
 
-export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string }) => {
+export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string }) => {
   const { data: project } = useSelectedProjectQuery()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
@@ -37,7 +40,7 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
 
   const values: Record<string, string> = {
     vault_token: serviceApiKey,
-    warehouse: bucketName,
+    warehouse: bucketName ?? '',
     's3.endpoint': getConnectionURL(project?.ref ?? '', protocol, endpoint),
     catalog_uri: getCatalogURI(project?.ref ?? '', protocol, endpoint),
   }

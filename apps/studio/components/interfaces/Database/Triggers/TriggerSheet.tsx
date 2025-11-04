@@ -412,7 +412,7 @@ export const TriggerSheet = ({
                       <FormItemLayout layout="vertical" className="px-5">
                         <FormControl_Shadcn_>
                           <div className="flex flex-col gap-y-2">
-                            <p className="text-smn">Function to trigger</p>
+                            <p className="text-sm">Function to trigger</p>
                             {function_name.length === 0 ? (
                               <button
                                 type="button"

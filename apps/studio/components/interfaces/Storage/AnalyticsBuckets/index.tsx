@@ -22,9 +22,9 @@ import {
 } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
-import { DeleteBucketModal } from './DeleteBucketModal'
-import { EmptyBucketState } from './EmptyBucketState'
+import { EmptyBucketState } from '../EmptyBucketState'
+import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
+import { DeleteAnalyticsBucketModal } from './DeleteAnalyticsBucketModal'
 
 export const AnalyticsBuckets = () => {
   const { ref } = useParams()
@@ -84,11 +84,7 @@ export const AnalyticsBuckets = () => {
               onChange={(e) => setFilterString(e.target.value)}
               icon={<Search size={12} />}
             />
-            <CreateSpecializedBucketModal
-              buttonType="primary"
-              buttonClassName="w-fit"
-              bucketType="analytics"
-            />
+            <CreateAnalyticsBucketModal buttonType="primary" buttonClassName="w-fit" />
           </div>
 
           {isLoadingBuckets ? (
@@ -167,9 +163,9 @@ export const AnalyticsBuckets = () => {
       )}
 
       {selectedBucket && (
-        <DeleteBucketModal
+        <DeleteAnalyticsBucketModal
           visible={modal === 'delete'}
-          bucket={selectedBucket}
+          bucketId={selectedBucket.id}
           onClose={() => setModal(null)}
         />
       )}
