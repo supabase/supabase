@@ -21,6 +21,20 @@ jobs:
         with:
           persist-credentials: true
 
+      - name: Install pnpm 
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
       - name: Decode the GitHub App Private Key
         id: decode
         run: |
@@ -58,6 +72,7 @@ jobs:
           fi
           git checkout -b $BRANCH_NAME
           rsync --archive --verbose --ignore-existing ./troubleshooting-upstream/guides/ ./apps/docs/content/troubleshooting/
+          pnpm format
           git add apps/docs/content/troubleshooting/
           if git diff --quiet --cached; then
             echo "No changes to sync"
