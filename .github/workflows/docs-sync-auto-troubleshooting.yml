@@ -3,6 +3,9 @@
 name: Sync from supabase/troubleshooting
 
 on:
+  push:
+    branches:
+      - charis/ci/sync-auto-troubleshooting
   repository_dispatch:
     types: [sync_from_upstream]
   workflow_dispatch:
