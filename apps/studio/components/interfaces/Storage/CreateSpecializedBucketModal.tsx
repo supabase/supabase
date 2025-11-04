@@ -10,7 +10,7 @@ import z from 'zod'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useIsAnalyticsBucketsEnabled } from 'data/config/project-storage-config-query'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useAnalyticsBucketCreateMutation } from 'data/storage/analytics-bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
@@ -18,7 +18,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   cn,
@@ -106,8 +106,7 @@ export const CreateSpecializedBucketModal = ({
 
   const [visible, setVisible] = useState(false)
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-  const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
+  const icebergCatalogEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
   const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
   const { mutate: sendEvent } = useSendEventMutation()
