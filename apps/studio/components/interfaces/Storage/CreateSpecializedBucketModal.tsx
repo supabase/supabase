@@ -108,6 +108,7 @@ export const CreateSpecializedBucketModal = ({
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
+  const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -135,21 +136,6 @@ export const CreateSpecializedBucketModal = ({
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project details is required')
     if (!wrappersExtension) return console.error('Unable to find wrappers extension')
-
-    if (wrappersExtensionState === 'needs-upgrade') {
-      // [Joshen] Double check if this is the right CTA
-      return toast.error(
-        <p className="prose max-w-full text-sm">
-          Wrappers extensions needs to be updated to create an Iceberg Wrapper. Update the extension
-          by disabling and enabling the <code className="text-xs">wrappers</code> extension first in
-          the{' '}
-          <InlineLink href={`/project/${ref}/database/extensions?filter=wrappers`}>
-            database extensions page
-          </InlineLink>{' '}
-          before creating an Analytics bucket.
-        </p>
-      )
-    }
 
     try {
       if (bucketType === 'analytics') {
@@ -227,7 +213,7 @@ export const CreateSpecializedBucketModal = ({
         </ButtonTooltip>
       </DialogTrigger>
 
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent size="large" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create {config.singularName} bucket</DialogTitle>
         </DialogHeader>
@@ -264,17 +250,43 @@ export const CreateSpecializedBucketModal = ({
               />
 
               {bucketType === 'analytics' && (
-                <Admonition type="default">
-                  <p>
-                    Supabase will install the{' '}
-                    {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
-                    Iceberg Wrapper integration on your behalf.{' '}
-                    <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
-                      Learn more
-                    </InlineLink>
-                    .
-                  </p>
-                </Admonition>
+                <>
+                  {wrappersExtenstionNeedsUpgrading ? (
+                    <Admonition
+                      type="warning"
+                      title="Wrappers extension must be updated for Iceberg Wrapper support"
+                    >
+                      <p className="prose max-w-full text-sm !leading-normal">
+                        Update the <code className="text-xs">wrappers</code> extension by disabling
+                        and enabling it in{' '}
+                        <InlineLink href={`/project/${ref}/database/extensions?filter=wrappers`}>
+                          database extensions
+                        </InlineLink>{' '}
+                        before creating an Analytics bucket.{' '}
+                        <InlineLink
+                          href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+                        >
+                          Learn more
+                        </InlineLink>
+                        .
+                      </p>
+                    </Admonition>
+                  ) : (
+                    <Admonition type="default">
+                      <p className="!leading-normal">
+                        Supabase will install the{' '}
+                        {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
+                        Iceberg Wrapper integration on your behalf.{' '}
+                        <InlineLink
+                          href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
+                        >
+                          Learn more
+                        </InlineLink>
+                        .
+                      </p>
+                    </Admonition>
+                  )}
+                </>
               )}
             </DialogSection>
           </form>
@@ -284,8 +296,13 @@ export const CreateSpecializedBucketModal = ({
           <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isCreating} disabled={isCreating}>
-            Create
+          <Button
+            form={formId}
+            htmlType="submit"
+            loading={isCreating}
+            disabled={wrappersExtenstionNeedsUpgrading || isCreating}
+          >
+            Create bucket
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { FDW } from 'data/fdw/fdws-query'
@@ -26,10 +25,6 @@ export const useAnalyticsBucketAssociatedEntities = (
   { projectRef, bucketId }: { projectRef?: string; bucketId: string },
   options: { enabled: boolean } = { enabled: true }
 ) => {
-  // [Joshen] Opting to skip cleaning up ETL related entities within old UI
-  // Also to prevent an unnecessary call to /sources for existing UI
-  const isStorageV2 = useIsNewStorageUIEnabled()
-
   const { can: canReadS3Credentials } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_READ,
     '*'
@@ -50,7 +45,7 @@ export const useAnalyticsBucketAssociatedEntities = (
 
   const { data: sourcesData } = useReplicationSourcesQuery(
     { projectRef },
-    { enabled: isStorageV2 && options.enabled }
+    { enabled: options.enabled }
   )
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
