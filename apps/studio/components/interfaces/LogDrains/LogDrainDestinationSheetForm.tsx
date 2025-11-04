@@ -46,7 +46,13 @@ const FORM_ID = 'log-drain-destination-form'
 const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('webhook'),
-    url: z.string().regex(urlRegex(), 'Endpoint URL is required and must be a valid URL'),
+    url: z
+      .string()
+      .regex(urlRegex(), 'Endpoint URL is required and must be a valid URL')
+      .refine(
+        (url) => url.startsWith('http://') || url.startsWith('https://'),
+        'Endpoint URL must start with http:// or https://'
+      ),
     http: z.enum(['http1', 'http2']),
     gzip: z.boolean(),
     headers: z.record(z.string(), z.string()).optional(),
@@ -58,7 +64,13 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('loki'),
-    url: z.string().min(1, { message: 'Loki URL is required' }),
+    url: z
+      .string()
+      .min(1, { message: 'Loki URL is required' })
+      .refine(
+        (url) => url.startsWith('http://') || url.startsWith('https://'),
+        'Loki URL must start with http:// or https://'
+      ),
     headers: z.record(z.string(), z.string()),
     username: z.string().optional(),
     password: z.string().optional(),
@@ -81,7 +93,10 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('sentry'),
-    dsn: z.string().min(1, { message: 'Sentry DSN is required' }),
+    dsn: z
+      .string()
+      .min(1, { message: 'Sentry DSN is required' })
+      .refine((dsn) => dsn.startsWith('https://'), 'Sentry DSN must start with https://'),
   }),
 ])
 
