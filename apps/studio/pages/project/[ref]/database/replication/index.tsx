@@ -26,7 +26,11 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
           <ScaffoldContainer>
             <ScaffoldSection>
               <div className="col-span-12">
-                <FormHeader title="Replication" />
+                <FormHeader
+                  className="[&>div>p]:max-w-full"
+                  title="Replication"
+                  description="Automatically replicate your database changes to external data warehouses and analytics platforms in real-time"
+                />
                 <Destinations />
               </div>
             </ScaffoldSection>

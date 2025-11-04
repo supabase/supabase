@@ -1,11 +1,9 @@
-// @ts-nocheck
-// [Joshen] To remove after infra changes for analytics bucket is in
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 type AnalyticsBucketCreateVariables = CreateAnalyticsBucketBody & {
@@ -34,7 +32,11 @@ export const useAnalyticsBucketCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AnalyticsBucketCreateData, ResponseError, AnalyticsBucketCreateVariables>,
+  UseCustomMutationOptions<
+    AnalyticsBucketCreateData,
+    ResponseError,
+    AnalyticsBucketCreateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

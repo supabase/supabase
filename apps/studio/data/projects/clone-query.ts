@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
 export async function getCloneBackups(projectRef?: string) {
@@ -25,7 +25,7 @@ export const useCloneBackupsQuery = <
   },
 >(
   { projectRef }: { projectRef?: string },
-  options: UseQueryOptions<CloneBackupsData, CloneBackupsError, TData> = {}
+  options: UseCustomQueryOptions<CloneBackupsData, CloneBackupsError, TData> = {}
 ) => {
   return useQuery<CloneBackupsData, CloneBackupsError, TData>({
     queryKey: projectKeys.listCloneBackups(projectRef),

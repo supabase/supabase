@@ -1,9 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { oauthServerAppKeys } from './keys'
 
 export type OAuthServerAppsVariables = {
@@ -41,7 +41,7 @@ export const useOAuthServerAppsQuery = <TData = OAuthServerAppsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OAuthServerAppsData, OAuthServerAppsError, TData> = {}
+  }: UseCustomQueryOptions<OAuthServerAppsData, OAuthServerAppsError, TData> = {}
 ) => {
   return useQuery({
     queryKey: oauthServerAppKeys.list(projectRef),

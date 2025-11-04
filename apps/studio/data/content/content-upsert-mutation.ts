@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
@@ -39,7 +39,7 @@ export const useContentUpsertMutation = ({
   invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
-  UseMutationOptions<UpsertContentData, ResponseError, UpsertContentVariables>,
+  UseCustomMutationOptions<UpsertContentData, ResponseError, UpsertContentVariables>,
   'mutationFn'
 > & {
   invalidateQueriesOnSuccess?: boolean

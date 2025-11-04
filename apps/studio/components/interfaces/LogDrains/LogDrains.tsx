@@ -1,11 +1,8 @@
 import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { toast } from 'sonner'
-
 import { useFlag, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import CardButton from 'components/ui/CardButton'
-import Panel from 'components/ui/Panel'
 import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
@@ -21,11 +18,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Card,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
+import { LogDrainsCard } from './LogDrainsCard'
+import { VoteLink } from './VoteLink'
 
 export function LogDrains({
   onNewDrainClick,
@@ -81,19 +82,23 @@ export function LogDrains({
 
   if (!isLoading && !hasLogDrains) {
     return (
-      <div className="grid lg:grid-cols-2 gap-3">
-        {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
-          <CardButton
-            key={src.value}
-            title={src.name}
-            description={src.description}
-            icon={src.icon}
-            onClick={() => {
-              onNewDrainClick(src.value)
-            }}
-          />
-        ))}
-      </div>
+      <>
+        <div className="grid lg:grid-cols-2 gap-4">
+          {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
+            <LogDrainsCard
+              key={src.value}
+              title={src.name}
+              description={src.description}
+              icon={src.icon}
+              rightLabel="Additional $60"
+              onClick={() => {
+                onNewDrainClick(src.value)
+              }}
+            />
+          ))}
+        </div>
+        <VoteLink />
+      </>
     )
   }
 
@@ -103,63 +108,80 @@ export function LogDrains({
 
   return (
     <>
-      <Panel className="">
+      <Card>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="max-w-[200px]">Name</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead className="text-right">Destination</TableHead>
+              <TableHead className="w-96">Description</TableHead>
+              <TableHead className="w-48">Destination</TableHead>
               <TableHead className="text-right">
                 <div className="sr-only">Actions</div>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {logDrains?.map((drain) => (
-              <TableRow key={drain.id}>
-                <TableCell className="font-medium truncate max-w-72" title={drain.name}>
-                  {drain.name}
-                </TableCell>
-                <TableCell
-                  className="text-foreground-light truncate max-w-72"
-                  title={drain.description}
-                >
-                  {drain.description}
-                </TableCell>
-                <TableCell className="text-right font-mono">{drain.type}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        type="text"
-                        className="px-1 opacity-50 hover:opacity-100 !bg-transparent"
-                        icon={<MoreHorizontal />}
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="max-w-[140px]" align="end">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          onUpdateDrainClick(drain)
-                        }}
-                      >
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Update
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedLogDrain(drain)
-                          setIsDeleteModalOpen(true)
-                        }}
-                      >
-                        <TrashIcon className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+            {logDrains
+              ?.slice()
+              .sort((a, b) => b.id - a.id)
+              .map((drain) => (
+                <TableRow key={drain.id}>
+                  <TableCell className="font-medium truncate max-w-72" title={drain.name}>
+                    {drain.name}
+                  </TableCell>
+                  <TableCell
+                    className={cn(
+                      'truncate max-w-96',
+                      drain.description ? 'text-foreground-light' : 'text-foreground-muted'
+                    )}
+                    title={drain.description}
+                  >
+                    {drain.description || '-'}
+                  </TableCell>
+                  <TableCell className="text-foreground-light">
+                    <div className="flex items-center gap-2">
+                      {React.cloneElement(
+                        LOG_DRAIN_TYPES.find((t) => t.value === drain.type)
+                          ?.icon as React.ReactElement,
+                        { width: 16, height: 16 }
+                      )}
+                      <span className="truncate max-w-40">
+                        {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          type="text"
+                          className="px-1 opacity-50 hover:opacity-100 !bg-transparent flex-shrink-0"
+                          icon={<MoreHorizontal />}
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="max-w-[140px]" align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            onUpdateDrainClick(drain)
+                          }}
+                        >
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Update
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedLogDrain(drain)
+                            setIsDeleteModalOpen(true)
+                          }}
+                        >
+                          <TrashIcon className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
 
           <ConfirmationModal
@@ -183,7 +205,7 @@ export function LogDrains({
             </div>
           </ConfirmationModal>
         </Table>
-      </Panel>
+      </Card>
     </>
   )
 }

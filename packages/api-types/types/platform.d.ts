@@ -2029,23 +2029,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/profile/password-check': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Check password strength */
-    post: operations['PasswordCheckController_checkPassword']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/profile/permissions': {
     parameters: {
       query?: never
@@ -5232,7 +5215,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -5308,7 +5291,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -7537,18 +7520,6 @@ export interface components {
       organization_id: number
       overdue_invoice_count: number
     }
-    PasswordCheckBody: {
-      password: string
-    }
-    PasswordCheckResponse: {
-      result: {
-        feedback: {
-          suggestions: string[]
-          warning: string
-        }
-        score: number
-      }
-    }
     PauseStatusResponse: {
       can_restore: boolean
       last_paused_on: string | null
@@ -8329,7 +8300,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -8417,7 +8388,7 @@ export interface components {
                    * @description Namespace
                    * @example my-namespace
                    */
-                  namespace: string
+                  namespace?: string
                   /**
                    * @description Project ref
                    * @example abcdefghijklmnopqrst
@@ -9115,6 +9086,7 @@ export interface components {
         iceberg_catalog: boolean
         list_v2: boolean
       }
+      databasePoolMode: string
       external: {
         /** @enum {string} */
         upstreamTarget: 'main' | 'canary'
@@ -9132,6 +9104,7 @@ export interface components {
       }
       /** Format: int64 */
       fileSizeLimit: number
+      migrationVersion: string
     }
     StorageListResponseV2: {
       folders: {
@@ -10057,7 +10030,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -10133,7 +10106,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -17002,36 +16975,6 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  PasswordCheckController_checkPassword: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PasswordCheckBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PasswordCheckResponse']
-        }
-      }
-      /** @description Failed to check password strength */
-      500: {
         headers: {
           [name: string]: unknown
         }

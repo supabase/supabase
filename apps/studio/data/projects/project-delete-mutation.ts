@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
 import { organizationKeys } from 'data/organizations/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { projectKeys } from './keys'
 
 export type ProjectDeleteVariables = {
@@ -27,7 +27,7 @@ export const useProjectDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectDeleteData, ResponseError, ProjectDeleteVariables>,
+  UseCustomMutationOptions<ProjectDeleteData, ResponseError, ProjectDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

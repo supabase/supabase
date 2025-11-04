@@ -1,8 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
 import { databaseRoleKeys } from './keys'
 
 export type DatabaseRolesVariables = {
@@ -31,7 +32,10 @@ export type DatabaseRolesError = ExecuteSqlError
 
 export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
   { projectRef, connectionString }: DatabaseRolesVariables,
-  { enabled = true, ...options }: UseQueryOptions<DatabaseRolesData, DatabaseRolesError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DatabaseRolesData, DatabaseRolesError, TData> = {}
 ) =>
   useQuery<DatabaseRolesData, DatabaseRolesError, TData>({
     queryKey: databaseRoleKeys.databaseRoles(projectRef),

@@ -1,0 +1,38 @@
+---
+title: Empty states
+description: Convey the absence of data and provide clear instruction for what to do about it.
+---
+
+At a minimum, empty states convey the fact that there is nothing to list, perform, or display on the current page. They should also provide a clear call to action for the user to take.
+
+## Missing route
+
+Users may accidentally navigate to a non-existent dynamic route, such as a non-existent bucket in [Storage](https://supabase.com/dashboard/project/_/storage) or a non-existent table in the [Table Editor](https://supabase.com/dashboard/project/_/editor). In these cases, follow the pattern of a centered [Admonition](../fragments/admonition) as shown below..
+
+<ComponentPreview name="empty-state-missing-route" peekCode wide />
+
+## Zero results
+
+Tabular information without results—or perhaps no data to begin with—should have an empty state that matches the larger presentation.
+
+For instance, a [Table](../components/table) may just display a single row just like it would if it had data. Dulling the TableHead text color and removing the TableCell hover state can further reinforce the lack of usable data.
+
+<ComponentPreview name="empty-state-zero-items-table" peekCode wide />
+
+The treatment for other layouts, such as the list of users in [Authentication](https://supabase.com/dashboard/project/_/auth/users), should match their own general styling.
+
+## Initial state
+
+Perhaps the user has not yet created any data yet. They might be a feature for the first time. In these cases, the empty state should provide the briefest information about the lack of data, putting more focus on the value proposition and primary action.
+
+<ComponentPreview name="empty-state-initial-state" peekCode wide />
+
+Keep in mind that this empty state will likely appear after a visual loading state. Consider layout shift and button placement during and after the transition.
+
+## Components
+
+There is not yet a shared empty state UI component. The context and needs for each placement differ enough to warrant custom components for each placement. That said, we should aim to make these as consistent as possible over time. See the below examples that might share common logic in a future centralized component.
+
+## External references
+
+- [_Empty States_ on GitHub Primer](https://primer.style/product/ui-patterns/empty-states/)

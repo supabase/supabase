@@ -3,7 +3,6 @@ import { SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
-import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
@@ -31,17 +30,7 @@ import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-cr
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import {
-  Button,
-  Card,
-  CardContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteBucketModal } from '../DeleteBucketModal'
@@ -49,7 +38,6 @@ import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
-import { NamespaceRow } from './NamespaceRow'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
@@ -58,7 +46,6 @@ import { useIcebergWrapperExtension } from './useIcebergWrapper'
 export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) => {
   const config = BUCKET_TYPES.analytics
   const [modal, setModal] = useState<'delete' | null>(null)
-  const isStorageV2 = useIsNewStorageUIEnabled()
   const { data: project } = useSelectedProjectQuery()
   const { state: extensionState } = useIcebergWrapperExtension()
 
@@ -128,16 +115,12 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
     <>
       <PageLayout
         title={bucket.id}
-        breadcrumbs={
-          isStorageV2
-            ? [
-                {
-                  label: 'Analytics',
-                  href: `/project/${project?.ref}/storage/analytics`,
-                },
-              ]
-            : []
-        }
+        breadcrumbs={[
+          {
+            label: 'Analytics',
+            href: `/project/${project?.ref}/storage/analytics`,
+          },
+        ]}
         secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
       >
         <ScaffoldContainer bottomPadding>
@@ -165,117 +148,49 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: AnalyticsBucket }) =
 
           {state === 'added' && wrapperInstance && (
             <>
-              {isStorageV2 ? (
-                <ScaffoldSection isFullWidth>
-                  <ScaffoldHeader className="pt-0 flex flex-row justify-between items-end gap-x-8">
-                    <div>
-                      <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
-                      <ScaffoldSectionDescription>
-                        Analytics tables stored in this bucket
-                      </ScaffoldSectionDescription>
-                    </div>
-                    {namespaces.length > 0 && <ConnectTablesDialog bucket={bucket} />}
-                  </ScaffoldHeader>
-
-                  {isLoadingNamespaces || isLoading ? (
-                    <GenericSkeletonLoader />
-                  ) : namespaces.length === 0 ? (
-                    <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
-                      <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
-                      <div className="flex flex-col items-center text-center">
-                        <h3>Connect database tables</h3>
-                        <p className="text-foreground-light text-sm">
-                          Stream data from tables for archival, backups, or analytical queries.
-                        </p>
-                      </div>
-                      <ConnectTablesDialog bucket={bucket} />
-                    </aside>
-                  ) : (
-                    <div className="flex flex-col gap-y-10">
-                      {namespaces.map(({ namespace, schema, tables }) => (
-                        <NamespaceWithTables
-                          key={namespace}
-                          bucketName={bucket.id}
-                          namespace={namespace}
-                          sourceType="direct"
-                          schema={schema}
-                          tables={tables as any}
-                          token={token!}
-                          wrapperInstance={wrapperInstance}
-                          wrapperValues={wrapperValues}
-                          wrapperMeta={wrapperMeta}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </ScaffoldSection>
-              ) : (
-                <ScaffoldSection isFullWidth>
-                  <ScaffoldHeader>
-                    <ScaffoldSectionTitle>Namespaces</ScaffoldSectionTitle>
+              <ScaffoldSection isFullWidth>
+                <ScaffoldHeader className="pt-0 flex flex-row justify-between items-end gap-x-8">
+                  <div>
+                    <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
                     <ScaffoldSectionDescription>
-                      Connected namespaces and tables.
+                      Analytics tables stored in this bucket
                     </ScaffoldSectionDescription>
-                  </ScaffoldHeader>
+                  </div>
+                  {namespaces.length > 0 && <ConnectTablesDialog bucket={bucket} />}
+                </ScaffoldHeader>
 
-                  {isLoadingNamespaces || isLoading ? (
-                    <GenericSkeletonLoader />
-                  ) : namespaces.length === 0 ? (
-                    <Card>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-foreground-muted">Namespace</TableHead>
-                            <TableHead className="text-foreground-muted">Schema</TableHead>
-                            <TableHead className="text-foreground-muted">Tables</TableHead>
-                            <TableHead />
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell colSpan={4}>
-                              <p className="text-sm text-foreground">
-                                No namespaces in this bucket
-                              </p>
-                              <p className="text-sm text-foreground-lighter">
-                                Create a namespace and add some data
-                              </p>
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </Card>
-                  ) : (
-                    <Card>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Namespace</TableHead>
-                            <TableHead>Schema</TableHead>
-                            <TableHead>Tables</TableHead>
-                            <TableHead />
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {namespaces.map(({ namespace, schema, tables }) => (
-                            <NamespaceRow
-                              key={namespace}
-                              bucketName={bucket.id}
-                              namespace={namespace}
-                              schema={schema}
-                              tables={tables as any}
-                              token={token!}
-                              wrapperInstance={wrapperInstance}
-                              wrapperValues={wrapperValues}
-                              wrapperMeta={wrapperMeta}
-                            />
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </Card>
-                  )}
-                </ScaffoldSection>
-              )}
+                {isLoadingNamespaces || isLoading ? (
+                  <GenericSkeletonLoader />
+                ) : namespaces.length === 0 ? (
+                  <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
+                    <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
+                    <div className="flex flex-col items-center text-center">
+                      <h3>Connect database tables</h3>
+                      <p className="text-foreground-light text-sm">
+                        Stream data from tables for archival, backups, or analytical queries.
+                      </p>
+                    </div>
+                    <ConnectTablesDialog bucket={bucket} />
+                  </aside>
+                ) : (
+                  <div className="flex flex-col gap-y-10">
+                    {namespaces.map(({ namespace, schema, tables }) => (
+                      <NamespaceWithTables
+                        key={namespace}
+                        bucketName={bucket.id}
+                        namespace={namespace}
+                        sourceType="direct"
+                        schema={schema}
+                        tables={tables as any}
+                        token={token!}
+                        wrapperInstance={wrapperInstance}
+                        wrapperValues={wrapperValues}
+                        wrapperMeta={wrapperMeta}
+                      />
+                    ))}
+                  </div>
+                )}
+              </ScaffoldSection>
 
               <ScaffoldSection isFullWidth>
                 <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">

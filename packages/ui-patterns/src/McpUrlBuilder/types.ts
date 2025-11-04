@@ -13,6 +13,7 @@ export interface McpClient {
   configFile?: string
   generateDeepLink?: (config: McpClientConfig) => string | null
   transformConfig?: (config: McpClientBaseConfig) => McpClientConfig
+  primaryInstructions?: (config: McpClientConfig) => React.ReactNode
   alternateInstructions?: (config: McpClientConfig) => React.ReactNode
 }
 
