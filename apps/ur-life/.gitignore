@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env*.local
+
+# Supabase
+.supabase/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Cache
+.cache/
+.vite/
+.turbo/
+
+# Test coverage
+coverage/
+
+# Temporary files
+*.tmp
+temp/

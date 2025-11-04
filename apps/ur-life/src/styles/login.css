@@ -1,0 +1,325 @@
+/* UR Life Login Page Styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #5B9BD5 0%, #3A7BAF 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 450px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  animation: slideDown 0.6s ease-out;
+}
+
+.logo {
+  margin-bottom: 15px;
+}
+
+.ur-logo {
+  width: 80px;
+  height: 80px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.university-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.university-name .of {
+  font-size: 18px;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Login Card */
+.login-card {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.6s ease-out;
+}
+
+.login-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Form Styles */
+.login-form {
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #5B9BD5;
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.1);
+}
+
+.error-message {
+  display: none;
+  background: #fee;
+  color: #c33;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  border-left: 4px solid #c33;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #5B9BD5 0%, #3A7BAF 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(91, 155, 213, 0.3);
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(91, 155, 213, 0.4);
+}
+
+.btn-login:active {
+  transform: translateY(0);
+}
+
+/* Demo Accounts */
+.demo-accounts {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 24px;
+  margin-bottom: 20px;
+}
+
+.demo-title {
+  font-size: 13px;
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.demo-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.demo-card {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.demo-card:hover {
+  border-color: #5B9BD5;
+  background: #f0f7ff;
+  transform: translateX(4px);
+}
+
+.demo-emoji {
+  font-size: 32px;
+  margin-right: 12px;
+}
+
+.demo-info {
+  flex: 1;
+}
+
+.demo-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 2px;
+}
+
+.demo-details {
+  font-size: 13px;
+  color: #7f8c8d;
+}
+
+/* Sign Up Link */
+.signup-link {
+  text-align: center;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.signup-link a {
+  color: #5B9BD5;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.signup-link a:hover {
+  color: #3A7BAF;
+  text-decoration: underline;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 24px;
+  color: white;
+  font-size: 13px;
+  opacity: 0.9;
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-overlay p {
+  color: white;
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 20px;
+  }
+
+  .login-title {
+    font-size: 28px;
+  }
+
+  .university-name {
+    font-size: 20px;
+  }
+
+  .demo-emoji {
+    font-size: 28px;
+  }
+}
