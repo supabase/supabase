@@ -22,8 +22,8 @@ import {
 } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { CreateSpecializedBucketModal } from '../CreateSpecializedBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
+import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
 import { DeleteAnalyticsBucketModal } from './DeleteAnalyticsBucketModal'
 
 export const AnalyticsBuckets = () => {
@@ -84,11 +84,7 @@ export const AnalyticsBuckets = () => {
               onChange={(e) => setFilterString(e.target.value)}
               icon={<Search size={12} />}
             />
-            <CreateSpecializedBucketModal
-              buttonType="primary"
-              buttonClassName="w-fit"
-              bucketType="analytics"
-            />
+            <CreateAnalyticsBucketModal buttonType="primary" buttonClassName="w-fit" />
           </div>
 
           {isLoadingBuckets ? (

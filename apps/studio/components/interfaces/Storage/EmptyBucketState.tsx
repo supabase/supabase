@@ -1,7 +1,7 @@
 import { BucketAdd } from 'icons'
 import { cn } from 'ui'
+import { CreateAnalyticsBucketModal } from './AnalyticsBuckets/CreateAnalyticsBucketModal'
 import { CreateBucketModal } from './CreateBucketModal'
-import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
 import { BUCKET_TYPES } from './Storage.constants'
 import { CreateVectorBucketDialog } from './VectorBuckets/CreateVectorBucketDialog'
 
@@ -33,8 +33,7 @@ export const EmptyBucketState = ({ bucketType, className }: EmptyBucketStateProp
         <CreateBucketModal buttonSize="tiny" buttonType="primary" buttonClassName="w-fit" />
       )}
       {bucketType === 'analytics' && (
-        <CreateSpecializedBucketModal
-          bucketType={bucketType}
+        <CreateAnalyticsBucketModal
           buttonSize="tiny"
           buttonType="primary"
           buttonClassName="w-fit"
