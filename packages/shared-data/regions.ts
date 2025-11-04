@@ -81,5 +81,5 @@ export const FLY_REGIONS = {
 export const SMART_REGION_TO_EXACT_REGION_MAP = new Map([
   ['Americas', 'East US (North Virginia)'],
   ['Europe', 'Central EU (Frankfurt)'],
-  ['Asia-Pacific', 'Southeast Asia (Singapore)'],
+  ['APAC', 'Southeast Asia (Singapore)'],
 ])
