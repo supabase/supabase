@@ -1,12 +1,11 @@
-// @ts-nocheck
-// [Joshen] To remove after infra changes for analytics bucket is in
 import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 export type AnalyticsBucketsVariables = { projectRef?: string }
@@ -41,26 +40,13 @@ export const useAnalyticsBucketsQuery = <TData = AnalyticsBucketsData>(
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
+  const { data } = useProjectStorageConfigQuery({ projectRef: project?.ref })
+  const hasIcebergEnabled = data?.features.icebergCatalog?.enabled
+
   return useQuery<AnalyticsBucketsData, AnalyticsBucketsError, TData>({
     queryKey: storageKeys.analyticsBuckets(projectRef),
     queryFn: ({ signal }) => getAnalyticsBuckets({ projectRef }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive && hasIcebergEnabled,
     ...options,
-    retry: (failureCount, error) => {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        error.message.startsWith('Tenant config') &&
-        error.message.endsWith('not found')
-      ) {
-        return false
-      }
-
-      if (failureCount < 3) {
-        return true
-      }
-
-      return false
-    },
   })
 }
