@@ -1,6 +1,5 @@
-import { MoreVertical, Search, Trash2 } from 'lucide-react'
+import { ExternalLink, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -21,16 +20,13 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { CreateSpecializedBucketModal } from './CreateSpecializedBucketModal'
-import { DeleteBucketModal } from './DeleteBucketModal'
-import { EmptyBucketState } from './EmptyBucketState'
-
-// [Joshen] Remove typecasts bucket: any once infra changes for analytics bucket is in
+import { EmptyBucketState } from '../EmptyBucketState'
+import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
+import { DeleteAnalyticsBucketModal } from './DeleteAnalyticsBucketModal'
 
 export const AnalyticsBuckets = () => {
-  const router = useRouter()
   const { ref } = useParams()
 
   const [filterString, setFilterString] = useState('')
@@ -41,19 +37,41 @@ export const AnalyticsBuckets = () => {
     projectRef: ref,
   })
 
-  const analyticsBuckets = buckets.filter((bucket: any) =>
+  const analyticsBuckets = buckets.filter((bucket) =>
     filterString.length === 0 ? true : bucket.id.toLowerCase().includes(filterString.toLowerCase())
   )
 
   return (
-    <>
+    <ScaffoldSection isFullWidth>
+      <Admonition
+        type="warning"
+        layout="horizontal"
+        className="mb-12 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
+        title="Analytics buckets are in alpha"
+        actions={
+          <Button asChild type="default" icon={<ExternalLink />}>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/orgs/supabase/discussions/40116"
+            >
+              Leave feedback
+            </a>
+          </Button>
+        }
+      >
+        <p className="!leading-normal !mb-0">
+          Expect rapid changes, limited features, and possible breaking updates as we expand access.
+        </p>
+        <p className="!leading-normal !mb-0">Please share feedback as we refine the experience!</p>
+      </Admonition>
+
       {!isLoadingBuckets &&
-      buckets.filter((bucket: any) => !('type' in bucket) || bucket.type === 'ANALYTICS').length ===
+      buckets.filter((bucket) => !('type' in bucket) || bucket.type === 'ANALYTICS').length ===
         0 ? (
         <EmptyBucketState bucketType="analytics" />
       ) : (
-        // Override the default first:pt-12 to match other storage types
-        <ScaffoldSection isFullWidth className="gap-y-4 first:pt-8">
+        <div className="flex flex-col gap-y-4">
           <ScaffoldHeader className="py-0">
             <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
           </ScaffoldHeader>
@@ -66,11 +84,7 @@ export const AnalyticsBuckets = () => {
               onChange={(e) => setFilterString(e.target.value)}
               icon={<Search size={12} />}
             />
-            <CreateSpecializedBucketModal
-              buttonType="primary"
-              buttonClassName="w-fit"
-              bucketType="analytics"
-            />
+            <CreateAnalyticsBucketModal buttonType="primary" buttonClassName="w-fit" />
           </div>
 
           {isLoadingBuckets ? (
@@ -96,7 +110,7 @@ export const AnalyticsBuckets = () => {
                       </TableCell>
                     </TableRow>
                   )}
-                  {analyticsBuckets.map((bucket: any) => (
+                  {analyticsBuckets.map((bucket) => (
                     <TableRow key={bucket.id}>
                       <TableCell>
                         <p className="text-foreground">{bucket.id}</p>
@@ -145,16 +159,16 @@ export const AnalyticsBuckets = () => {
               </Table>
             </Card>
           )}
-        </ScaffoldSection>
+        </div>
       )}
 
       {selectedBucket && (
-        <DeleteBucketModal
+        <DeleteAnalyticsBucketModal
           visible={modal === 'delete'}
-          bucket={selectedBucket}
+          bucketId={selectedBucket.id}
           onClose={() => setModal(null)}
         />
       )}
-    </>
+    </ScaffoldSection>
   )
 }
