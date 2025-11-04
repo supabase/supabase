@@ -622,7 +622,7 @@
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "dayjs": "^1.11.13",
-    "framer-motion": "^11.1.9",
+    "framer-motion": "^11.18.2",
     "github-slugger": "^2.0.0",
     "icons": "workspace:*",
     "js-yaml": "^3.14.1",

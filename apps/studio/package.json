@@ -87,7 +87,7 @@
     "dayjs": "^1.11.10",
     "dnd-core": "^16.0.1",
     "file-saver": "^2.0.5",
-    "framer-motion": "^11.11.17",
+    "framer-motion": "^11.18.2",
     "generate-password-browser": "^1.1.0",
     "html-to-image": "^1.10.8",
     "http-status": "^2.1.0",
