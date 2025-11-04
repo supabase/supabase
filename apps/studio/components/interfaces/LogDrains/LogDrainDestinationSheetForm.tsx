@@ -93,7 +93,10 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('sentry'),
-    dsn: z.string().min(1, { message: 'Sentry DSN is required' }),
+    dsn: z
+      .string()
+      .min(1, { message: 'Sentry DSN is required' })
+      .refine((dsn) => dsn.startsWith('https://'), 'Sentry DSN must start with https://'),
   }),
 ])
 
