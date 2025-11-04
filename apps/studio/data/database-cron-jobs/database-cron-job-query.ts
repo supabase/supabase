@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { CronJob } from './database-cron-jobs-infinite-query'
 import { databaseCronJobsKeys } from './keys'
 
@@ -40,7 +40,7 @@ export const useCronJobQuery = <TData = DatabaseCronJobData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
 ) =>
   useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>({
     queryKey: databaseCronJobsKeys.job(projectRef, id ?? name),

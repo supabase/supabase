@@ -1,9 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
 type PaginatedProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
@@ -32,7 +32,7 @@ export type ProjectsError = ResponseError
 export const useProjectsQuery = <TData = ProjectsData>({
   enabled = true,
   ...options
-}: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
+}: UseCustomQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
   const { profile } = useProfile()
   return useQuery<ProjectsData, ProjectsError, TData>({
     queryKey: projectKeys.list(),

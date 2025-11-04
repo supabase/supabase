@@ -6,7 +6,7 @@ import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePrevi
 import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
 import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { generateTriggerCreateSQL } from 'components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
-import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
+import { TriggersList } from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
