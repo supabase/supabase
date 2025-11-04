@@ -94,6 +94,10 @@ export const Doc = defineDocumentType(() => ({
       default: true,
       required: false,
     },
+    chapterNumber: {
+      type: 'number',
+      required: false,
+    },
     source: {
       type: 'nested',
       of: NestedProperties,

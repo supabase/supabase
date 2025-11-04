@@ -10,17 +10,18 @@ export const gettingStarted: SidebarNavGroup = {
         {
           title: 'Introduction',
           href: '/foundations/introduction',
-          items: [],
         },
         {
-          title: 'Quickstart',
-          href: '/foundations/quickstart',
-          items: [],
+          title: 'Architecture',
+          href: '/foundations/architecture',
         },
         {
-          title: 'FAQ',
-          href: '/foundations/faq',
-          items: [],
+          title: 'Data Fundamentals',
+          href: '/foundations/data-fundamentals',
+        },
+        {
+          title: 'Authentication',
+          href: '/foundations/authentication',
         },
       ],
       commandItemLabel: 'Foundations',
@@ -28,19 +29,16 @@ export const gettingStarted: SidebarNavGroup = {
     {
       title: 'Project: OpenDesk',
       href: '/projects/open-desk',
-      items: [],
       commandItemLabel: 'Project: OpenDesk',
     },
     {
       title: 'Performance & Scaling',
       href: '/internals/performance-scaling',
-      items: [],
       commandItemLabel: 'Supabase Internals: Performance & Scaling',
     },
     {
       title: 'Debugging & Operations',
       href: '/internals/debugging-operations',
-      items: [],
       commandItemLabel: 'Supabase Internals: Debugging & Operations',
     },
   ],

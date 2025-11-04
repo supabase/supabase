@@ -11,7 +11,7 @@ export interface NavItem {
 }
 
 export interface NavItemWithChildren extends NavItem {
-  items: NavItemWithChildren[]
+  items?: NavItemWithChildren[]
 }
 
 export interface MainNavItem extends NavItem {}

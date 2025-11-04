@@ -1,8 +1,12 @@
 import { metadata as mainMetadata } from '@/app/layout'
+import { ChapterCompletion } from '@/components/chapter-completion'
 import { Mdx } from '@/components/mdx-components'
+import { NextUp } from '@/components/next-up'
 import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { getTableOfContents } from '@/lib/toc'
+import { getCurrentChapter } from '@/lib/get-current-chapter'
+import { getNextPage } from '@/lib/get-next-page'
 import { absoluteUrl, cn } from '@/lib/utils'
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
@@ -68,7 +72,9 @@ export default async function DocPage(props: DocPageProps) {
   }
 
   const toc = await getTableOfContents(doc.body.raw)
-
+  const nextPage = getNextPage(doc.slugAsParams)
+  const currentChapter = getCurrentChapter(doc.slugAsParams)
+console.log({currentChapter})
   return (
     <main className="relative lg:gap-10 xl:grid xl:grid-cols-[1fr_200px] px-8 md:px-16 py-20">
       <div className="mx-auto w-full min-w-0 max-w-4xl">
@@ -91,6 +97,22 @@ export default async function DocPage(props: DocPageProps) {
         <div className="pb-12">
           <Mdx code={doc.body.code} />
         </div>
+        {currentChapter && nextPage && (
+          <ChapterCompletion
+            chapterNumber={currentChapter.chapterNumber!}
+            completionMessage={currentChapter.completionMessage}
+          />
+        )}
+        {nextPage && (
+          <div className="flex w-2xl grow">
+            <NextUp
+              title={nextPage.title}
+              description={nextPage.description || ''}
+              href={nextPage.href}
+              chapterNumber={nextPage.chapterNumber}
+            />
+          </div>
+        )}
       </div>
       {doc.toc && (
         <div className="hidden text-sm xl:block">
