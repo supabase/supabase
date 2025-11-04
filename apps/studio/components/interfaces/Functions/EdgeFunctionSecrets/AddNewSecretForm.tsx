@@ -247,7 +247,7 @@ const AddNewSecretForm = () => {
               </Button>
             </CardContent>
             <CardFooter className="justify-between space-x-2">
-              <p className="text-sm text-foreground-light">Upsert multiple secrets at once by pasting key-value pairs in bulk</p>
+              <p className="text-sm text-foreground-light">Insert or update multiple secrets at once by pasting key–value pairs.</p>
 
               <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
                 {isCreating ? 'Saving...' : (fields.length > 1 ? 'Bulk save' : 'Save')}
