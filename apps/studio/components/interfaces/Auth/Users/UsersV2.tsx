@@ -5,6 +5,7 @@ import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
+import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
@@ -54,7 +55,6 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
-import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 
 type SpecificFilterColumn = OptimizedSearchColumns | 'freeform'
 
@@ -190,7 +190,7 @@ export const UsersV2 = () => {
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
       ...(specificFilterColumn !== 'freeform'
-        ? { column: specificFilterColumn }
+        ? { column: specificFilterColumn as OptimizedSearchColumns }
         : { column: undefined }),
     },
     {
