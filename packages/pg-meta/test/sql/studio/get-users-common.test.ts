@@ -166,19 +166,19 @@ describe('stringRange', () => {
     expect(result).toEqual(['ABC', 'ABD'])
   })
 
-  test('returns same string twice for tilde character', () => {
+  test('appends space for tilde character to avoid collation issues', () => {
     const result = stringRange('test~')
-    expect(result).toEqual(['test~', 'test~'])
+    expect(result).toEqual(['test~', 'test~ '])
   })
 
-  test('returns same string twice for characters beyond tilde in ASCII', () => {
+  test('appends space for characters beyond tilde in ASCII', () => {
     const result = stringRange('test\x7F') // DEL character
-    expect(result).toEqual(['test\x7F', 'test\x7F'])
+    expect(result).toEqual(['test\x7F', 'test\x7F '])
   })
 
   test('increments last character correctly for various ASCII characters', () => {
     expect(stringRange('a')).toEqual(['a', 'b'])
-    expect(stringRange('z')).toEqual(['z', '{'])
+    expect(stringRange('z')).toEqual(['z', 'z~']) // Special case: appends '~' to avoid collation issues
     expect(stringRange('A')).toEqual(['A', 'B'])
     expect(stringRange('Z')).toEqual(['Z', '['])
     expect(stringRange('0')).toEqual(['0', '1'])
@@ -204,5 +204,19 @@ describe('stringRange', () => {
   test('handles space correctly', () => {
     const result = stringRange('test ')
     expect(result).toEqual(['test ', 'test!'])
+  })
+
+  test('appends tilde for strings ending with lowercase z', () => {
+    expect(stringRange('xyz')).toEqual(['xyz', 'xyz~'])
+    expect(stringRange('jazz')).toEqual(['jazz', 'jazz~'])
+  })
+
+  test('handles mixed case strings ending with uppercase Z', () => {
+    expect(stringRange('testZ')).toEqual(['testZ', 'test['])
+  })
+
+  test('handles strings ending with tilde', () => {
+    expect(stringRange('test~')).toEqual(['test~', 'test~ '])
+    expect(stringRange('~~~')).toEqual(['~~~', '~~~ '])
   })
 })
