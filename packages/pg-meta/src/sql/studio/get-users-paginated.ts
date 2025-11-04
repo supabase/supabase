@@ -42,19 +42,28 @@ function prefixToUUID(prefix: string, max: boolean) {
   return mapped.join('')
 }
 
-function stringRange(prefix: string) {
+function stringRange(prefix: string): [string, string | undefined] {
   if (!prefix) {
     return [prefix, undefined]
   }
 
-  const lastChar = prefix.charCodeAt(prefix.length - 1)
+  const lastCharCode = prefix.charCodeAt(prefix.length - 1)
+  const TILDE_CHAR_CODE = 126 // '~'
+  const Z_CHAR_CODE = 122 // 'z'
 
-  if (lastChar >= `~`.charCodeAt(0)) {
-    // not ASCII
-    return [prefix, prefix]
+  // 'z' (122): append '~' to avoid PostgreSQL collation issues with '{'
+  if (lastCharCode === Z_CHAR_CODE) {
+    return [prefix, prefix + '~']
   }
 
-  return [prefix, prefix.substring(0, prefix.length - 1) + String.fromCharCode(lastChar + 1)]
+  // '~' (126) or beyond: append space since we can't increment further
+  if (lastCharCode >= TILDE_CHAR_CODE) {
+    return [prefix, prefix + ' ']
+  }
+
+  // All other characters: increment the last character
+  const upperBound = prefix.substring(0, prefix.length - 1) + String.fromCharCode(lastCharCode + 1)
+  return [prefix, upperBound]
 }
 
 export const getPaginatedUsersSQL = ({
