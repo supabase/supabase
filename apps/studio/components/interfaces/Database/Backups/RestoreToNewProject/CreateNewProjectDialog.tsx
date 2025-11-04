@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { debounce } from 'lodash'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -10,7 +9,7 @@ import { useProjectCloneMutation } from 'data/projects/clone-mutation'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { passwordStrength } from 'lib/helpers'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import {
   Button,
@@ -86,10 +85,6 @@ export const CreateNewProjectDialog = ({
     },
   })
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value: string) => checkPasswordStrength(value), 300)
-  ).current
-
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
@@ -99,7 +94,7 @@ export const CreateNewProjectDialog = ({
   const generatePassword = () => {
     const password = generateStrongPassword()
     form.setValue('password', password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   return (
@@ -173,7 +168,7 @@ export const CreateNewProjectDialog = ({
                           if (value == '') {
                             setPasswordStrengthScore(-1)
                             setPasswordStrengthMessage('')
-                          } else delayedCheckPasswordStrength(value)
+                          } else checkPasswordStrength(value)
                         }}
                         descriptionText={
                           <PasswordStrengthBar

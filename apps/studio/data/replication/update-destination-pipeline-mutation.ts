@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type BigQueryDestinationConfig = {
@@ -125,24 +125,32 @@ export const useUpdateDestinationPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateDestinationPipelineData, ResponseError, UpdateDestinationPipelineParams>,
+  UseCustomMutationOptions<
+    UpdateDestinationPipelineData,
+    ResponseError,
+    UpdateDestinationPipelineParams
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation<UpdateDestinationPipelineData, ResponseError, UpdateDestinationPipelineParams>(
-    (vars) => updateDestinationPipeline(vars),
     {
+      mutationFn: (vars) => updateDestinationPipeline(vars),
       async onSuccess(data, variables, context) {
         const { projectRef, destinationId, pipelineId } = variables
 
         await Promise.all([
           // Invalidate lists
-          queryClient.invalidateQueries(replicationKeys.destinations(projectRef)),
-          queryClient.invalidateQueries(replicationKeys.pipelines(projectRef)),
+          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
           // Invalidate item-level caches used by the editor panel
-          queryClient.invalidateQueries(replicationKeys.destinationById(projectRef, destinationId)),
-          queryClient.invalidateQueries(replicationKeys.pipelineById(projectRef, pipelineId)),
+          queryClient.invalidateQueries({
+            queryKey: replicationKeys.destinationById(projectRef, destinationId),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: replicationKeys.pipelineById(projectRef, pipelineId),
+          }),
         ])
 
         await onSuccess?.(data, variables, context)

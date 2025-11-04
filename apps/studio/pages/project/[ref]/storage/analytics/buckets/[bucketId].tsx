@@ -1,41 +1,31 @@
 import { useParams } from 'common'
-
-import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticBucketDetails'
-import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
-import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
+import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails'
+import { BUCKET_TYPES } from 'components/interfaces/Storage/Storage.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
 
 const AnalyticsBucketPage: NextPageWithLayout = () => {
+  const config = BUCKET_TYPES.analytics
   const { bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { projectRef } = useStorageExplorerStateSnapshot()
-  const { bucket, error, isSuccess, isError } = useSelectedBucket()
-
-  // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
-  if (!project || !projectRef) return null
 
   return (
-    <div className="storage-container flex flex-grow p-4">
-      {isError && <StorageBucketsError error={error as any} />}
-
-      {isSuccess ? (
-        !bucket ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
-          </div>
-        ) : bucket.type === 'ANALYTICS' ? (
-          <AnalyticBucketDetails bucket={bucket} />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <p className="text-sm text-foreground-light">This bucket is not an analytics bucket</p>
-          </div>
-        )
-      ) : null}
-    </div>
+    <PageLayout
+      title={bucketId}
+      breadcrumbs={[
+        {
+          label: 'Analytics',
+          href: `/project/${project?.ref}/storage/analytics`,
+        },
+      ]}
+      secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
+    >
+      <AnalyticBucketDetails />
+    </PageLayout>
   )
 }
 

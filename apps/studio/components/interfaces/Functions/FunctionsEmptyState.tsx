@@ -8,11 +8,13 @@ import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -38,6 +40,7 @@ export const FunctionsEmptyState = () => {
   const { ref } = useParams()
   const router = useRouter()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
@@ -95,9 +98,9 @@ export const FunctionsEmptyState = () => {
             <Button
               type="default"
               onClick={() => {
+                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                 aiSnap.newChat({
                   name: 'Create new edge function',
-                  open: true,
                   initialInput: 'Create a new edge function that ...',
                   suggestions: {
                     title:

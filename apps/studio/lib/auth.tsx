@@ -1,13 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { PropsWithChildren, useCallback, useEffect } from 'react'
+import { toast } from 'sonner'
+
 import {
   AuthProvider as AuthProviderInternal,
   clearLocalStorage,
   gotrueClient,
   useAuthError,
 } from 'common'
-import { PropsWithChildren, useCallback, useEffect } from 'react'
-import { toast } from 'sonner'
-
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 
@@ -38,8 +38,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     </AuthProviderInternal>
   )
 }
-
-export { useAuth, useIsLoggedIn, useSession, useUser } from 'common'
 
 export function useSignOut() {
   const queryClient = useQueryClient()

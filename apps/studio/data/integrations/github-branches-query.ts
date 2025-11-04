@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { integrationKeys } from './keys'
 
 export type GitHubBranchesVariables = {
@@ -30,13 +30,11 @@ export const useGitHubBranchesQuery = <TData = GitHubBranchesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<GitHubBranchesData, GitHubBranchesError, TData> = {}
+  }: UseCustomQueryOptions<GitHubBranchesData, GitHubBranchesError, TData> = {}
 ) =>
-  useQuery<GitHubBranchesData, GitHubBranchesError, TData>(
-    integrationKeys.githubBranchesList(connectionId),
-    ({ signal }) => getGitHubBranches({ connectionId }, signal),
-    {
-      enabled: enabled && typeof connectionId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<GitHubBranchesData, GitHubBranchesError, TData>({
+    queryKey: integrationKeys.githubBranchesList(connectionId),
+    queryFn: ({ signal }) => getGitHubBranches({ connectionId }, signal),
+    enabled: enabled && typeof connectionId !== 'undefined',
+    ...options,
+  })

@@ -9,7 +9,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { getPITRRetentionDuration } from './PITR.utils'
 
-const PITRNotice = ({}) => {
+export const PITRNotice = () => {
   const { ref: projectRef } = useParams()
   const { data: addonsResponse } = useProjectAddonsQuery({ projectRef })
   const retentionPeriod = getPITRRetentionDuration(addonsResponse?.selected_addons ?? [])
@@ -63,5 +63,3 @@ const PITRNotice = ({}) => {
     </FormPanel>
   )
 }
-
-export default PITRNotice

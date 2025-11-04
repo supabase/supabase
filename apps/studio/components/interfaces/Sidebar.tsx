@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
-import { LOCAL_STORAGE_KEYS, useIsMFAEnabled, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import {
   generateOtherRoutes,
   generateProductRoutes,
@@ -44,10 +44,8 @@ import {
 } from 'ui'
 import {
   useIsAPIDocsSidePanelEnabled,
-  useIsNewStorageUIEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
-import { useFlag } from 'common'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -231,7 +229,6 @@ const ProjectLinks = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const isStorageV2 = useIsNewStorageUIEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
@@ -257,7 +254,6 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
-    isStorageV2,
   })
   const otherRoutes = generateOtherRoutes(ref, project, {
     unifiedLogs: isUnifiedLogsEnabled,

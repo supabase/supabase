@@ -71,20 +71,34 @@ For mobile applications, you might need to link or redirect to a specific page w
 
 Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails (e.g. [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-about?view=o365-worldwide)).
 In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "Token has expired or is invalid" error.
-To guard against this:
+To guard against this there are the options below:
 
-- Use an email OTP instead by including `{{ .Token }}` in the email template.
-- Create your own custom email link to redirect the user to a page where they can click on a button to confirm the action.
-  For example, you can include the following in your email template:
+**Option 1**
 
-  ```html
-  <a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}"
-    >Confirm your signup
-  </a>
-  ```
+- Use an email OTP instead by including `{{ .Token }}` in the email template
+- Create your own custom email link to redirect the user to a page where they can enter with their email and token to login
 
-  The user should be brought to a page on your site where they can confirm the action by clicking a button.
-  The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
+```html
+<a href="{{ .SiteURL }}/confirm-signup">Confirm your signup</a>
+```
+
+- Log them in by verifying the OTP token value with their email e.g. with [`supabase.auth.verifyOtp`](/docs/reference/javascript/auth-verifyotp) show below
+
+```ts
+const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
+```
+
+**Option 2**
+
+- Create your own custom email link to redirect the user to a page where they can click on a button to confirm the action
+
+```html
+<a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}"
+  >Confirm your signup</a
+>
+```
+
+- The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
 
 ### Email tracking
 

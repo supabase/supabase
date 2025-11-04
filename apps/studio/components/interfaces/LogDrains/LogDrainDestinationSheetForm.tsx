@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
+import Link from 'next/link'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { DOCS_URL } from 'lib/constants'
 import {
@@ -34,6 +34,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
+  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -56,6 +57,14 @@ const formUnion = z.discriminatedUnion('type', [
     region: z.string().min(1, { message: 'Region is required' }),
   }),
   z.object({
+    type: z.literal('loki'),
+    url: z.string().min(1, { message: 'Loki URL is required' }),
+    headers: z.record(z.string(), z.string()),
+    username: z.string().optional(),
+    password: z.string().optional(),
+  }),
+  // [Joshen] To fix API types, not supported in the UI
+  z.object({
     type: z.literal('elastic'),
   }),
   z.object({
@@ -65,11 +74,14 @@ const formUnion = z.discriminatedUnion('type', [
     type: z.literal('bigquery'),
   }),
   z.object({
-    type: z.literal('loki'),
-    url: z.string().min(1, { message: 'Loki URL is required' }),
-    headers: z.record(z.string(), z.string()),
-    username: z.string().optional(),
-    password: z.string().optional(),
+    type: z.literal('clickhouse'),
+  }),
+  z.object({
+    type: z.literal('s3'),
+  }),
+  z.object({
+    type: z.literal('sentry'),
+    dsn: z.string().min(1, { message: 'Sentry DSN is required' }),
   }),
 ])
 
@@ -146,6 +158,8 @@ export function LogDrainDestinationSheetForm({
   }
   const DEFAULT_HEADERS = mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultConfig?.headers || {}
 
+  const sentryEnabled = useFlag('SentryLogDrain')
+
   const { ref } = useParams()
   const { data: logDrains } = useLogDrainsQuery({
     ref,
@@ -153,6 +167,11 @@ export function LogDrainDestinationSheetForm({
 
   const defaultType = defaultValues?.type || 'webhook'
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
+
+  const baseValues = {
+    name: defaultValues?.name || '',
+    description: defaultValues?.description || '',
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -168,6 +187,7 @@ export function LogDrainDestinationSheetForm({
       region: defaultConfig?.region || '',
       username: defaultConfig?.username || '',
       password: defaultConfig?.password || '',
+      dsn: defaultConfig?.dsn || '',
     },
   })
 
@@ -246,7 +266,8 @@ export function LogDrainDestinationSheetForm({
 
                 // Temp check to make sure the name is unique
                 const logDrainName = form.getValues('name')
-                const logDrainExists = logDrains?.find((drain) => drain.name === logDrainName)
+                const logDrainExists =
+                  !!logDrains?.length && logDrains?.find((drain) => drain.name === logDrainName)
                 if (logDrainExists && mode === 'create') {
                   toast.error('Log drain name already exists')
                   return
@@ -264,7 +285,7 @@ export function LogDrainDestinationSheetForm({
                 />
                 <LogDrainFormItem
                   value="description"
-                  placeholder="My Destination"
+                  placeholder="Optional description"
                   label="Description"
                   formControl={form.control}
                 />
@@ -283,16 +304,18 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.map((type) => (
-                          <SelectItem_Shadcn_
-                            value={type.value}
-                            key={type.value}
-                            id={type.value}
-                            className="text-left"
-                          >
-                            {type.name}
-                          </SelectItem_Shadcn_>
-                        ))}
+                        {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map(
+                          (type) => (
+                            <SelectItem_Shadcn_
+                              value={type.value}
+                              key={type.value}
+                              id={type.value}
+                              className="text-left"
+                            >
+                              {type.name}
+                            </SelectItem_Shadcn_>
+                          )
+                        )}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                   </FormItemLayout>
@@ -446,6 +469,31 @@ export function LogDrainDestinationSheetForm({
                     />
                   </div>
                 )}
+                {type === 'sentry' && (
+                  <div className="grid gap-4 px-content">
+                    <LogDrainFormItem
+                      type="text"
+                      value="dsn"
+                      label="DSN"
+                      placeholder="https://<project_id>@o<organization_id>.ingest.sentry.io/<project_id>"
+                      formControl={form.control}
+                      description={
+                        <>
+                          The DSN obtained from the Sentry dashboard. Read more about DSNs{' '}
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm underline transition hover:text-foreground"
+                            href="https://docs.sentry.io/concepts/key-terms/dsn-explainer/"
+                          >
+                            here
+                          </a>
+                          .
+                        </>
+                      }
+                    />
+                  </div>
+                )}
                 <FormMessage_Shadcn_ />
               </div>
             </form>
@@ -523,32 +571,37 @@ export function LogDrainDestinationSheetForm({
         </SheetSection>
 
         <div className="mt-auto">
-          <SheetSection className="border-t bg-background-alternative-200 mt-auto">
-            <FormItemLayout
-              isReactForm={false}
-              layout="horizontal"
-              label={
-                <div className="flex flex-col gap-y-2 text-foreground-light">
-                  Additional drain cost
-                  <DocsButton
-                    abbrev={false}
-                    className="w-min"
-                    href={`${DOCS_URL}/guides/platform/log-drains`}
-                  />
-                </div>
-              }
-            >
-              <ul className="text-right text-foreground-light">
-                <li className="text-brand-link text-base" translate="no">
-                  $60 per drain per month
-                </li>
-                <li translate="no">+ $0.20 per million events</li>
-                <li translate="no">+ $0.09 per GB egress</li>
-              </ul>
-            </FormItemLayout>
+          <SheetSection
+            className={cn(
+              `border-t bg-background-alternative-200 mt-auto py-1.5 ${!IS_PLATFORM ? 'hidden' : ''}`
+            )}
+          >
+            <ul className="text-right text-foreground-light divide-y divide-dashed text-sm">
+              <li className="flex items-center justify-between gap-2 py-2" translate="no">
+                <span className="text-foreground-lighter">Additional drain cost</span>
+                <span className="text-foreground">$60 per month</span>
+              </li>
+              <li className="flex items-center justify-between gap-2 py-2" translate="no">
+                <span className="text-foreground-lighter">Per million events</span>
+                <span>+$0.20</span>
+              </li>
+              <li className="flex items-center justify-between gap-2 py-2" translate="no">
+                <span className="text-foreground-lighter">Per GB egress</span>
+                <span>+$0.09</span>
+              </li>
+            </ul>
           </SheetSection>
 
-          <SheetFooter className="p-content !mt-0">
+          <SheetFooter className="p-content !mt-0 !justify-between !flex-row w-full items-center">
+            <span className="text-sm text-foreground-light">
+              <span>See full pricing breakdown</span>{' '}
+              <Link
+                href={`${DOCS_URL}/guides/platform/manage-your-usage/log-drains`}
+                className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
+              >
+                here
+              </Link>
+            </span>
             <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
               Save destination
             </Button>

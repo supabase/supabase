@@ -47,7 +47,7 @@
     "@radix-ui/react-toggle-group": "*",
     "@radix-ui/react-tooltip": "*",
     "@react-router/fs-routes": "^7.4.0",
-    "@supabase/postgrest-js": "*",
+    "@supabase/postgrest-js": "catalog:",
     "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "@tanstack/react-query": "^5.83.0",
     "@supabase/vue-blocks": "workspace:*",
@@ -109,7 +109,7 @@
     "shiki": "^1.1.7",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "tsx": "^4.19.3",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

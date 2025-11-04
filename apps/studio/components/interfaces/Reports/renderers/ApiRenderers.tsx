@@ -11,17 +11,17 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import BarChart from 'components/ui/Charts/BarChart'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
   Collapsible,
-  WarningIcon,
   Collapsible_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
   CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  WarningIcon,
 } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
