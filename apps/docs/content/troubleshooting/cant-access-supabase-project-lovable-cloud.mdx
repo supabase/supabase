@@ -1,0 +1,138 @@
+---
+title = "Can’t Access Supabase Project When Using Lovable Cloud"
+topics = [
+"ai",
+]
+keywords = [
+"lovable",
+"lovable cloud"
+]
+---
+
+## Problem
+
+Your Lovable project has **Lovable Cloud** enabled, and you’re trying to connect directly to your Supabase project.
+
+However, you don’t see the project listed on your [Supabase Dashboard](https://supabase.com/dashboard), or you’re unable to access it through your Supabase account.
+
+### Why this occurs
+
+When you create a project connected to **Lovable Cloud**, the underlying Supabase instance is provisioned and managed entirely by **Lovable**.
+
+These projects are not owned by your Supabase account, so they will **not appear on your Supabase Dashboard** or be accessible using your Supabase credentials.
+
+### How to diagnose
+
+You might be affected by this if:
+
+- You recently created a project on Lovable and enabled the backend from the chat interface. By default, the Lovable platform uses **Lovable Cloud** for backend hosting.
+- You see Supabase references in your project’s configuration but **can’t access the project** from your [Supabase Dashboard](https://supabase.com/dashboard).
+- The project ID or credentials used in your Lovable setup don’t match any project under your Supabase account.
+
+### How to fix
+
+There is **no automated way** to transfer a Supabase project from Lovable Cloud to your own Supabase account.
+
+However, you can manually clone your project backend and migrate your data following Lovable’s official guide:
+
+[Self-Hosting Guide (Lovable Docs)](https://docs.lovable.dev/tips-tricks/self-hosting)
+
+This process allows you to create a new Supabase project under your own account and connect it independently.
+
+> **Note:** There are certain limitations described in Lovable’s documentation, so review the guide carefully before proceeding.
+
+### How to prevent
+
+If you want direct access to your Supabase project from the start, make sure to:
+
+- Create the project directly from the [Supabase Dashboard](https://supabase.com/dashboard) instead of through Lovable.
+- Avoid enabling Lovable Cloud if you plan to manage your Supabase project independently.
+- **Manually connect your Lovable project to your Supabase project**, or **start your Lovable project already connected** to your own Supabase project from the beginning.
+
+### Additional Resources
+
+For more information, check the Lovable Cloud FAQ: [Lovable Cloud FAQ](https://docs.lovable.dev/features/cloud#faq)
+
+### Frequently Asked Questions
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Can I get direct SQL editor access at supabase.com?"
+      id="sql-editor-access"
+    >
+
+    No. Projects running on **Lovable Cloud** use a managed Supabase backend that doesn't provide direct SQL editor access through [supabase.com/dashboard](https://supabase.com/dashboard).
+
+    </AccordionItem>
+  </div>
+
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Why doesn't my Supabase project appear on my dashboard?"
+      id="project-not-showing"
+    >
+
+    Lovable Cloud projects are owned and managed by **Lovable**, not by your personal Supabase account. They won't show up on your dashboard.
+
+    </AccordionItem>
+  </div>
+
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Can I disconnect my project from Lovable Cloud and connect it to my own Supabase account?"
+      id="disconnect-project"
+    >
+
+    Once Lovable Cloud is enabled for a project, it **cannot be disconnected or switched** to an external Supabase connection.
+
+    However, you can **create a new Supabase project under your own account** and migrate your data by following Lovable's [Project Migration Guide](https://docs.lovable.dev/tips-tricks/self-hosting).
+
+    </AccordionItem>
+  </div>
+
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="I can't get my database URL to connect from an external tool (like BI tools or Postgres connectors)."
+      id="database-url"
+    >
+
+    External connections are **not supported** when your project runs on Lovable Cloud.
+
+    Since Lovable fully manages the database infrastructure, direct database URLs and connection credentials are not exposed.
+
+    </AccordionItem>
+  </div>
+
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="I can't get my service role key to integrate an external service (like n8n or Make.com)."
+      id="service-role-key"
+    >
+
+    Service role and API keys are **not accessible** for Lovable Cloud–managed projects.
+
+    If you need to integrate with external automation or API-based tools, you'll need to **create and manage your own Supabase project**, then connect Lovable to it directly.
+
+    </AccordionItem>
+  </div>
+
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="How can I prevent this in the future?"
+      id="prevent-future"
+    >
+
+    Create the project directly from the [Supabase Dashboard](https://supabase.com/dashboard) or manually connect Lovable to an existing Supabase project before enabling Lovable Cloud.
+
+    </AccordionItem>
+  </div>
+</Accordion>
+
