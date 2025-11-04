@@ -214,11 +214,7 @@ test.describe.serial('table editor', () => {
     // navigate to policies page when view policies action is clicked
     await page.getByRole('button', { name: `View ${authTableMfa}` }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=auth$/)
-    await page
-      .getByRole('button', { name: `View ${authTableMfa}` })
-      .getByRole('button')
-      .nth(1)
-      .click()
+
     await page.getByRole('menuitem', { name: 'View policies' }).click()
     await page.waitForURL(/.*\/policies\?schema=auth/)
     expect(page.url()).toContain('auth/policies?schema=auth')
