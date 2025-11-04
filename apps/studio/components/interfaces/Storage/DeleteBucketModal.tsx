@@ -29,7 +29,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import {
   useAnalyticsBucketAssociatedEntities,
   useAnalyticsBucketDeleteCleanUp,
@@ -46,9 +45,8 @@ const formId = `delete-storage-bucket-form`
 
 export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModalProps) => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isStorageV2 = useIsNewStorageUIEnabled()
 
   const isStandardBucketSelected = 'type' in bucket && bucket.type === 'STANDARD'
 
@@ -107,11 +105,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
         )
 
         toast.success(`Successfully deleted bucket ${bucket.id}`)
-        if (isStorageV2) {
-          router.push(`/project/${projectRef}/storage/files`)
-        } else {
-          router.push(`/project/${projectRef}/storage/buckets`)
-        }
+        if (!!bucketId) router.push(`/project/${projectRef}/storage/files`)
         onClose()
       } catch (error) {
         toast.success(
@@ -139,11 +133,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
           })
         }
         toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
-        if (isStorageV2) {
-          router.push(`/project/${projectRef}/storage/analytics`)
-        } else {
-          router.push(`/project/${projectRef}/storage/buckets`)
-        }
+        if (!!bucketId) router.push(`/project/${projectRef}/storage/analytics`)
         onClose()
       },
     })
