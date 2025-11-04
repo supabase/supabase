@@ -37,19 +37,7 @@ export const TopSection = () => {
         : 'Welcome to your project'
 
   if (isPaused) {
-    return (
-      <div className="w-full">
-        <div className="mb-8">
-          {!isMainBranch && (
-            <Link href={`/project/${parentProject?.ref}`} className="text-sm text-foreground-light">
-              {parentProject?.name}
-            </Link>
-          )}
-          <h1 className="text-3xl">{projectName}</h1>
-        </div>
-        <ProjectPausedState />
-      </div>
-    )
+    return <ProjectPausedState />
   }
 
   return (

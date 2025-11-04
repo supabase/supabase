@@ -81,7 +81,7 @@ export function NewTab() {
 
   /**
    * Returns:
-   * - `QuickstartVariant`: user variation (`ai`, `templates`, `assistant`)
+   * - `QuickstartVariant`: user variation (`control`, `ai`, `templates`, `assistant`)
    * - `false`: user not yet bucketed or not targeted for experiment
    * - `undefined`: PostHog still loading
    */
@@ -102,14 +102,20 @@ export function NewTab() {
       ? tableQuickstartVariant
       : null
 
+  const shouldTrackExposure =
+    editor !== 'sql' &&
+    isNewProject &&
+    tableQuickstartVariant !== false &&
+    tableQuickstartVariant !== undefined
+
   useEffect(() => {
-    if (activeQuickstartVariant && !hasTrackedExposure.current) {
+    if (shouldTrackExposure && !hasTrackedExposure.current) {
       hasTrackedExposure.current = true
       track('table_quickstart_opened', {
-        variant: activeQuickstartVariant,
+        variant: tableQuickstartVariant,
       })
     }
-  }, [activeQuickstartVariant, track])
+  }, [shouldTrackExposure, tableQuickstartVariant, track])
 
   const handleOpenAssistant = () => {
     if (isCreatingChat) return

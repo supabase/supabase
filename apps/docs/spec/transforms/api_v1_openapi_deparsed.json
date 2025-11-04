@@ -175,7 +175,14 @@
           }
         ],
         "summary": "Get database branch config",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:read"
       },
       "patch": {
         "description": "Updates the configuration of the specified database branch",
@@ -345,7 +352,14 @@
           }
         ],
         "summary": "Update database branch config",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
       },
       "delete": {
         "description": "Deletes the specified database branch",
@@ -402,7 +416,14 @@
           }
         ],
         "summary": "Delete a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/branches/{branch_id_or_ref}/push": {
@@ -479,7 +500,14 @@
           }
         ],
         "summary": "Pushes a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/branches/{branch_id_or_ref}/merge": {
@@ -556,7 +584,14 @@
           }
         ],
         "summary": "Merges a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/branches/{branch_id_or_ref}/reset": {
@@ -633,7 +668,14 @@
           }
         ],
         "summary": "Resets a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/branches/{branch_id_or_ref}/diff": {
@@ -693,7 +735,14 @@
           }
         ],
         "summary": "[Beta] Diffs a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/projects": {
@@ -797,7 +846,14 @@
           }
         ],
         "summary": "List all projects",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       },
       "post": {
         "operationId": "v1-create-a-project",
@@ -1032,7 +1088,14 @@
           }
         ],
         "summary": "Create a project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/available-regions": {
@@ -1057,6 +1120,38 @@
               "example": "NA",
               "type": "string",
               "enum": ["NA", "SA", "EU", "AF", "AS", "OC", "AN"]
+            }
+          },
+          {
+            "name": "desired_instance_size",
+            "required": false,
+            "in": "query",
+            "description": "Desired instance size",
+            "schema": {
+              "example": "nano",
+              "type": "string",
+              "enum": [
+                "pico",
+                "nano",
+                "micro",
+                "small",
+                "medium",
+                "large",
+                "xlarge",
+                "2xlarge",
+                "4xlarge",
+                "8xlarge",
+                "12xlarge",
+                "16xlarge",
+                "24xlarge",
+                "24xlarge_optimized_memory",
+                "24xlarge_optimized_cpu",
+                "24xlarge_high_memory",
+                "48xlarge",
+                "48xlarge_optimized_memory",
+                "48xlarge_optimized_cpu",
+                "48xlarge_high_memory"
+              ]
             }
           }
         ],
@@ -1225,7 +1320,14 @@
           }
         ],
         "summary": "List all organizations",
-        "tags": ["Organizations"]
+        "tags": ["Organizations"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: organizations:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "organizations:read"
       },
       "post": {
         "operationId": "v1-create-an-organization",
@@ -1769,7 +1871,14 @@
           }
         ],
         "summary": "Lists SQL snippets for the logged in user",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/snippets/{id}": {
@@ -1903,7 +2012,14 @@
           }
         ],
         "summary": "Gets a specific SQL snippet",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/actions": {
@@ -2048,7 +2164,14 @@
           }
         ],
         "summary": "List all action runs",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:read"
       },
       "head": {
         "description": "Returns the total number of action runs of the specified project.",
@@ -2100,7 +2223,14 @@
           }
         ],
         "summary": "Count the number of action runs",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:read"
       }
     },
     "/v1/projects/{ref}/actions/{run_id}": {
@@ -2233,7 +2363,14 @@
           }
         ],
         "summary": "Get the status of an action run",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:read"
       }
     },
     "/v1/projects/{ref}/actions/{run_id}/status": {
@@ -2396,7 +2533,14 @@
           }
         ],
         "summary": "Update the status of an action run",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/projects/{ref}/actions/{run_id}/logs": {
@@ -2456,7 +2600,14 @@
           }
         ],
         "summary": "Get the logs of an action run",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:read"
       }
     },
     "/v1/projects/{ref}/api-keys": {
@@ -2561,7 +2712,14 @@
           }
         ],
         "summary": "Get project api keys",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:read"
       },
       "post": {
         "operationId": "v1-create-project-api-key",
@@ -2693,7 +2851,14 @@
           }
         ],
         "summary": "Creates a new API key for the project",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/api-keys/legacy": {
@@ -2746,7 +2911,14 @@
           }
         ],
         "summary": "Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:read"
       },
       "put": {
         "operationId": "v1-update-project-legacy-api-keys",
@@ -2806,7 +2978,14 @@
           }
         ],
         "summary": "Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found.",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/api-keys/{id}": {
@@ -2944,7 +3123,14 @@
           }
         ],
         "summary": "Updates an API key for the project",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       },
       "get": {
         "operationId": "v1-get-project-api-key",
@@ -3053,7 +3239,14 @@
           }
         ],
         "summary": "Get API key",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:read"
       },
       "delete": {
         "operationId": "v1-delete-project-api-key",
@@ -3179,7 +3372,14 @@
           }
         ],
         "summary": "Deletes an API key for the project",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/branches": {
@@ -3308,7 +3508,14 @@
           }
         ],
         "summary": "List all database branches",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:read"
       },
       "post": {
         "description": "Creates a database branch from the specified project.",
@@ -3510,7 +3717,14 @@
           }
         ],
         "summary": "Create a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
       },
       "delete": {
         "description": "Disables preview branching for the specified project",
@@ -3552,7 +3766,14 @@
           }
         ],
         "summary": "Disables preview branching",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
       }
     },
     "/v1/projects/{ref}/branches/{name}": {
@@ -3686,7 +3907,14 @@
           }
         ],
         "summary": "Get a database branch",
-        "tags": ["Environments"]
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:read"
       }
     },
     "/v1/projects/{ref}/custom-hostname": {
@@ -3855,7 +4083,14 @@
           }
         ],
         "summary": "[Beta] Gets project's custom hostname config",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: domains:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "domains:read"
       },
       "delete": {
         "operationId": "v1-Delete hostname config",
@@ -3896,7 +4131,14 @@
           }
         ],
         "summary": "[Beta] Deletes a project's custom hostname configuration",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: domains:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/custom-hostname/initialize": {
@@ -4082,7 +4324,14 @@
           }
         ],
         "summary": "[Beta] Updates project's custom hostname configuration",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: domains:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/custom-hostname/reverify": {
@@ -4251,7 +4500,14 @@
           }
         ],
         "summary": "[Beta] Attempts to verify the DNS configuration for project's custom hostname configuration",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: domains:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/custom-hostname/activate": {
@@ -4420,7 +4676,14 @@
           }
         ],
         "summary": "[Beta] Activates a custom hostname for a project.",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: domains:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/network-bans/retrieve": {
@@ -4479,7 +4742,14 @@
           }
         ],
         "summary": "[Beta] Gets project's network bans",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/network-bans/retrieve/enriched": {
@@ -4550,7 +4820,14 @@
           }
         ],
         "summary": "[Beta] Gets project's network bans with additional information about which databases they affect",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/network-bans": {
@@ -4621,7 +4898,14 @@
           }
         ],
         "summary": "[Beta] Remove network bans.",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/network-restrictions": {
@@ -4726,7 +5010,14 @@
           }
         ],
         "summary": "[Beta] Gets project's network restrictions",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       },
       "patch": {
         "operationId": "v1-patch-network-restrictions",
@@ -4883,7 +5174,14 @@
           }
         ],
         "summary": "[Alpha] Updates project's network restrictions by adding or removing CIDRs",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/network-restrictions/apply": {
@@ -5012,7 +5310,14 @@
           }
         ],
         "summary": "[Beta] Updates project's network restrictions",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/pgsodium": {
@@ -5068,7 +5373,14 @@
           }
         ],
         "summary": "[Beta] Gets project's pgsodium config",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:read"
       },
       "put": {
         "operationId": "v1-update-pgsodium-config",
@@ -5138,7 +5450,14 @@
           }
         ],
         "summary": "[Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/postgrest": {
@@ -5208,7 +5527,14 @@
           }
         ],
         "summary": "Gets project's postgrest config",
-        "tags": ["Rest"]
+        "tags": ["Rest"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: rest:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "rest:read"
       },
       "patch": {
         "operationId": "v1-update-postgrest-service-config",
@@ -5301,7 +5627,14 @@
           }
         ],
         "summary": "Updates project's postgrest config",
-        "tags": ["Rest"]
+        "tags": ["Rest"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: rest:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "rest:write"
       }
     },
     "/v1/projects/{ref}": {
@@ -5426,7 +5759,14 @@
           }
         ],
         "summary": "Gets a specific project that belongs to the authenticated user",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       },
       "delete": {
         "operationId": "v1-delete-a-project",
@@ -5483,7 +5823,14 @@
           }
         ],
         "summary": "Deletes the given project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/secrets": {
@@ -5549,7 +5896,14 @@
           }
         ],
         "summary": "List all secrets",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:read"
       },
       "post": {
         "description": "Creates multiple secrets and adds them to the specified project.",
@@ -5618,7 +5972,14 @@
           }
         ],
         "summary": "Bulk create secrets",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       },
       "delete": {
         "description": "Deletes all secrets with the given names from the specified project",
@@ -5673,7 +6034,14 @@
           }
         ],
         "summary": "Bulk delete secrets",
-        "tags": ["Secrets"]
+        "tags": ["Secrets"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/ssl-enforcement": {
@@ -5738,7 +6106,14 @@
           }
         ],
         "summary": "[Beta] Get project's SSL enforcement configuration.",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       },
       "put": {
         "operationId": "v1-update-ssl-enforcement-config",
@@ -5823,7 +6198,14 @@
           }
         ],
         "summary": "[Beta] Update project's SSL enforcement configuration.",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/types/typescript": {
@@ -5889,7 +6271,14 @@
           }
         ],
         "summary": "Generate TypeScript types",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/vanity-subdomain": {
@@ -5950,7 +6339,14 @@
           }
         ],
         "summary": "[Beta] Gets current vanity subdomain config",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: domains:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "domains:read"
       },
       "delete": {
         "operationId": "v1-deactivate-vanity-subdomain-config",
@@ -5991,7 +6387,14 @@
           }
         ],
         "summary": "[Beta] Deletes a project's vanity subdomain configuration",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: domains:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/vanity-subdomain/check-availability": {
@@ -6063,7 +6466,14 @@
           }
         ],
         "summary": "[Beta] Checks vanity subdomain availability",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: domains:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/vanity-subdomain/activate": {
@@ -6135,7 +6545,14 @@
           }
         ],
         "summary": "[Beta] Activates a vanity subdomain for a project.",
-        "tags": ["Domains"]
+        "tags": ["Domains"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: domains:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "domains:write"
       }
     },
     "/v1/projects/{ref}/upgrade": {
@@ -6211,7 +6628,14 @@
           }
         ],
         "summary": "[Beta] Upgrades the project's Postgres version",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/upgrade/eligibility": {
@@ -6335,7 +6759,14 @@
           }
         ],
         "summary": "[Beta] Returns the project's eligibility for upgrades",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/upgrade/status": {
@@ -6445,7 +6876,14 @@
           }
         ],
         "summary": "[Beta] Gets the latest status of the project's upgrade",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/readonly": {
@@ -6507,7 +6945,14 @@
           }
         ],
         "summary": "Returns project's readonly mode status",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/readonly/temporary-disable": {
@@ -6550,7 +6995,14 @@
           }
         ],
         "summary": "Disables project's readonly mode for the next 15 minutes",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/read-replicas/setup": {
@@ -6803,6 +7255,15 @@
                               }
                             },
                             "required": ["healthy", "db_connected", "connected_cluster"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "db_schema": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["db_schema"]
                           }
                         ]
                       },
@@ -6835,7 +7296,14 @@
           }
         ],
         "summary": "Gets project's service health status",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/config/auth/signing-keys/legacy": {
@@ -6909,7 +7377,14 @@
           }
         ],
         "summary": "Set up the project's existing JWT secret as an in_use JWT signing key. This endpoint will be removed in the future always check for HTTP 404 Not Found.",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       },
       "get": {
         "operationId": "v1-get-legacy-signing-key",
@@ -6981,7 +7456,14 @@
           }
         ],
         "summary": "Get the signing key information for the JWT secret imported as signing key for this project. This endpoint will be removed in the future, check for HTTP 404 Not Found.",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:read"
       }
     },
     "/v1/projects/{ref}/config/auth/signing-keys": {
@@ -7280,7 +7762,14 @@
           }
         ],
         "summary": "Create a new signing key for the project in standby status",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       },
       "get": {
         "operationId": "v1-get-project-signing-keys",
@@ -7362,7 +7851,14 @@
           }
         ],
         "summary": "List all signing keys for the project",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:read"
       }
     },
     "/v1/projects/{ref}/config/auth/signing-keys/{id}": {
@@ -7526,7 +8022,14 @@
           }
         ],
         "summary": "Remove a signing key from a project. Only possible if the key has been in revoked status for a while.",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       },
       "patch": {
         "operationId": "v1-update-project-signing-key",
@@ -7625,7 +8128,14 @@
           }
         ],
         "summary": "Update a signing key, mainly its status",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: secrets:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "secrets:write"
       }
     },
     "/v1/projects/{ref}/config/storage": {
@@ -7949,6 +8459,14 @@
                     },
                     "work_mem": {
                       "type": "string"
+                    },
+                    "checkpoint_timeout": {
+                      "type": "integer",
+                      "minimum": 30,
+                      "maximum": 86400
+                    },
+                    "hot_standby_feedback": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -7974,7 +8492,14 @@
           }
         ],
         "summary": "Gets project's Postgres config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       },
       "put": {
         "operationId": "v1-update-postgres-config",
@@ -8081,6 +8606,14 @@
                   "work_mem": {
                     "type": "string"
                   },
+                  "checkpoint_timeout": {
+                    "type": "integer",
+                    "minimum": 30,
+                    "maximum": 86400
+                  },
+                  "hot_standby_feedback": {
+                    "type": "boolean"
+                  },
                   "restart_database": {
                     "type": "boolean"
                   }
@@ -8179,6 +8712,14 @@
                     },
                     "work_mem": {
                       "type": "string"
+                    },
+                    "checkpoint_timeout": {
+                      "type": "integer",
+                      "minimum": 30,
+                      "maximum": 86400
+                    },
+                    "hot_standby_feedback": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -8204,7 +8745,14 @@
           }
         ],
         "summary": "Updates project's Postgres config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/config/database/pgbouncer": {
@@ -8279,7 +8827,14 @@
           }
         },
         "summary": "Get project's pgbouncer config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/config/database/pooler": {
@@ -8389,7 +8944,14 @@
           }
         ],
         "summary": "Gets project's supavisor config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       },
       "patch": {
         "operationId": "v1-update-pooler-config",
@@ -8470,7 +9032,14 @@
           }
         ],
         "summary": "Updates project's supavisor config",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/config/auth": {
@@ -9641,7 +10210,14 @@
           }
         ],
         "summary": "Gets project's auth config",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:read"
       },
       "patch": {
         "operationId": "v1-update-auth-service-config",
@@ -11754,7 +12330,14 @@
           }
         ],
         "summary": "Updates a project's auth config",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:write"
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth": {
@@ -11854,7 +12437,14 @@
           }
         ],
         "summary": "Creates a new third-party auth integration",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:write"
       },
       "get": {
         "operationId": "v1-list-project-tpa-integrations",
@@ -11936,7 +12526,14 @@
           }
         ],
         "summary": "Lists all third-party auth integrations",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:read"
       }
     },
     "/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": {
@@ -12026,7 +12623,14 @@
           }
         ],
         "summary": "Removes a third-party auth integration",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:write"
       },
       "get": {
         "operationId": "v1-get-project-tpa-integration",
@@ -12114,7 +12718,14 @@
           }
         ],
         "summary": "Get a third-party integration",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:read"
       }
     },
     "/v1/projects/{ref}/pause": {
@@ -12154,7 +12765,14 @@
           }
         ],
         "summary": "Pauses the given project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/restore": {
@@ -12224,7 +12842,14 @@
           }
         ],
         "summary": "Lists available restore versions for the given project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       },
       "post": {
         "operationId": "v1-restore-a-project",
@@ -12262,7 +12887,14 @@
           }
         ],
         "summary": "Restores the given project",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/restore/cancel": {
@@ -12302,7 +12934,14 @@
           }
         ],
         "summary": "Cancels the given project restoration",
-        "tags": ["Projects"]
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:write"
       }
     },
     "/v1/projects/{ref}/billing/addons": {
@@ -13101,7 +13740,14 @@
           }
         ],
         "summary": "Gets project performance advisors.",
-        "tags": ["Advisors"]
+        "tags": ["Advisors"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/advisors/security": {
@@ -13279,7 +13925,14 @@
           }
         ],
         "summary": "Gets project security advisors.",
-        "tags": ["Advisors"]
+        "tags": ["Advisors"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
@@ -13411,7 +14064,14 @@
           }
         ],
         "summary": "Gets project's logs",
-        "tags": ["Analytics"]
+        "tags": ["Analytics"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: analytics:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "analytics:read"
       }
     },
     "/v1/projects/{ref}/analytics/endpoints/usage.api-counts": {
@@ -13878,7 +14538,14 @@
           }
         ],
         "summary": "[Beta] Create a login role for CLI with temporary password",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       },
       "delete": {
         "operationId": "v1-delete-login-roles",
@@ -13933,7 +14600,14 @@
           }
         ],
         "summary": "[Beta] Delete existing login roles used by CLI",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/migrations": {
@@ -13997,7 +14671,14 @@
           }
         ],
         "summary": "[Beta] List applied migration versions",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       },
       "post": {
         "description": "Only available to selected partner OAuth apps",
@@ -14068,7 +14749,14 @@
           }
         ],
         "summary": "[Beta] Apply a database migration",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       },
       "put": {
         "description": "Only available to selected partner OAuth apps",
@@ -14139,7 +14827,14 @@
           }
         ],
         "summary": "[Beta] Upsert a database migration without applying",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/query": {
@@ -14169,6 +14864,10 @@
                   "query": {
                     "type": "string",
                     "minLength": 1
+                  },
+                  "parameters": {
+                    "type": "array",
+                    "items": {}
                   },
                   "read_only": {
                     "type": "boolean"
@@ -14202,7 +14901,14 @@
           }
         ],
         "summary": "[Beta] Run sql query",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/webhooks/enable": {
@@ -14245,7 +14951,14 @@
           }
         ],
         "summary": "[Beta] Enables Database Webhooks on the project",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/context": {
@@ -14323,7 +15036,14 @@
           }
         ],
         "summary": "Gets database metadata for the given project.",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "projects:read"
       }
     },
     "/v1/projects/{ref}/database/jit": {
@@ -14426,7 +15146,14 @@
           }
         ],
         "summary": "Get user-id to role mappings for JIT access",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       },
       "post": {
         "description": "Authorizes the request to assume a role in the project database",
@@ -14545,7 +15272,14 @@
           }
         ],
         "summary": "Authorize user-id to role mappings for JIT access",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       },
       "put": {
         "description": "Modifies the roles that can be assumed and for how long",
@@ -14978,7 +15712,14 @@
           }
         ],
         "summary": "List all functions",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: edge_functions:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "edge_functions:read"
       },
       "post": {
         "deprecated": true,
@@ -15172,7 +15913,14 @@
           }
         ],
         "summary": "Create a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: edge_functions:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "edge_functions:write"
       },
       "put": {
         "description": "Bulk update functions. It will create a new function or replace existing. The operation is idempotent. NOTE: You will need to manually bump the version.",
@@ -15335,7 +16083,14 @@
           }
         ],
         "summary": "Bulk update functions",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: edge_functions:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "edge_functions:write"
       }
     },
     "/v1/projects/{ref}/functions/deploy": {
@@ -15493,7 +16248,14 @@
           }
         ],
         "summary": "Deploy a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: edge_functions:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "edge_functions:write"
       }
     },
     "/v1/projects/{ref}/functions/{function_slug}": {
@@ -15604,7 +16366,14 @@
           }
         ],
         "summary": "Retrieve a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: edge_functions:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "edge_functions:read"
       },
       "patch": {
         "description": "Updates a function with the specified slug and project.",
@@ -15799,7 +16568,14 @@
           }
         ],
         "summary": "Update a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: edge_functions:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "edge_functions:write"
       },
       "delete": {
         "description": "Deletes a function with the specified slug from the specified project.",
@@ -15851,7 +16627,14 @@
           }
         ],
         "summary": "Delete a function",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: edge_functions:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "edge_functions:write"
       }
     },
     "/v1/projects/{ref}/functions/{function_slug}/body": {
@@ -15913,7 +16696,14 @@
           }
         ],
         "summary": "Retrieve a function body",
-        "tags": ["Edge Functions"]
+        "tags": ["Edge Functions"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: edge_functions:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "edge_functions:read"
       }
     },
     "/v1/projects/{ref}/storage/buckets": {
@@ -15987,7 +16777,14 @@
           }
         ],
         "summary": "Lists all buckets",
-        "tags": ["Storage"]
+        "tags": ["Storage"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: storage:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "storage:read"
       }
     },
     "/v1/projects/{ref}/config/auth/sso/providers": {
@@ -16222,7 +17019,14 @@
           }
         ],
         "summary": "Creates a new SSO provider",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:write"
       },
       "get": {
         "operationId": "v1-list-all-sso-provider",
@@ -16382,7 +17186,14 @@
           }
         ],
         "summary": "Lists all SSO providers",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:read"
       }
     },
     "/v1/projects/{ref}/config/auth/sso/providers/{provider_id}": {
@@ -16544,7 +17355,14 @@
           }
         ],
         "summary": "Gets a SSO provider by its UUID",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:read"
       },
       "put": {
         "operationId": "v1-update-a-sso-provider",
@@ -16780,7 +17598,14 @@
           }
         ],
         "summary": "Updates a SSO provider by its UUID",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:write"
       },
       "delete": {
         "operationId": "v1-delete-a-sso-provider",
@@ -16940,7 +17765,14 @@
           }
         ],
         "summary": "Removes a SSO provider by its UUID",
-        "tags": ["Auth"]
+        "tags": ["Auth"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: auth:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "auth:write"
       }
     },
     "/v1/projects/{ref}/database/backups": {
@@ -17045,7 +17877,14 @@
           }
         ],
         "summary": "Lists all backups",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/database/backups/restore-pitr": {
@@ -17103,7 +17942,14 @@
           }
         ],
         "summary": "Restores a PITR backup for a database",
-        "tags": ["Database"]
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/database/backups/restore-point": {
@@ -17153,7 +17999,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": ["AVAILABLE", "PENDING", "REMOVED"]
+                      "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
                     }
                   },
                   "required": ["name", "status"]
@@ -17178,7 +18024,14 @@
         ],
         "summary": "Initiates a creation of a restore point for a database",
         "tags": ["Database"],
-        "x-internal": true
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-internal": true,
+        "x-oauth-scope": "database:write"
       },
       "get": {
         "operationId": "v1-get-restore-point",
@@ -17218,7 +18071,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": ["AVAILABLE", "PENDING", "REMOVED"]
+                      "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
                     }
                   },
                   "required": ["name", "status"]
@@ -17246,7 +18099,14 @@
         ],
         "summary": "Get restore points for project",
         "tags": ["Database"],
-        "x-internal": true
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-internal": true,
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/database/backups/undo": {
@@ -17304,7 +18164,14 @@
         ],
         "summary": "Initiates an undo to a given restore point",
         "tags": ["Database"],
-        "x-internal": true
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-internal": true,
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/organizations/{slug}/members": {
@@ -17370,7 +18237,14 @@
           }
         ],
         "summary": "List members of an organization",
-        "tags": ["Organizations"]
+        "tags": ["Organizations"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: organizations:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "organizations:read"
       }
     },
     "/v1/organizations/{slug}": {
@@ -17446,7 +18320,14 @@
           }
         ],
         "summary": "Gets information about the organization",
-        "tags": ["Organizations"]
+        "tags": ["Organizations"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: organizations:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "organizations:read"
       }
     },
     "/v1/organizations/{slug}/project-claim/{token}": {
@@ -17657,6 +18538,259 @@
         "summary": "Claims project for the specified organization",
         "tags": ["Organizations"],
         "x-internal": true
+      }
+    },
+    "/v1/organizations/{slug}/projects": {
+      "get": {
+        "description": "Returns a paginated list of projects for the specified organization.\n\n    This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.",
+        "operationId": "v1-get-all-projects-for-organization",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Organization slug",
+            "schema": {
+              "pattern": "^[\\w-]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Number of projects to skip",
+            "schema": {
+              "minimum": 0,
+              "default": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of projects to return per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search projects by name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort order for projects",
+            "schema": {
+              "default": "name_asc",
+              "type": "string",
+              "enum": ["name_asc", "name_desc", "created_asc", "created_desc"]
+            }
+          },
+          {
+            "name": "statuses",
+            "required": false,
+            "in": "query",
+            "description": "A comma-separated list of project statuses to filter by.\n\nThe following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`.",
+            "schema": {
+              "example": "?statuses=ACTIVE_HEALTHY,INACTIVE",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "projects": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ref": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "cloud_provider": {
+                            "type": "string"
+                          },
+                          "region": {
+                            "type": "string"
+                          },
+                          "is_branch": {
+                            "type": "boolean"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "INACTIVE",
+                              "ACTIVE_HEALTHY",
+                              "ACTIVE_UNHEALTHY",
+                              "COMING_UP",
+                              "UNKNOWN",
+                              "GOING_DOWN",
+                              "INIT_FAILED",
+                              "REMOVED",
+                              "RESTORING",
+                              "UPGRADING",
+                              "PAUSING",
+                              "RESTORE_FAILED",
+                              "RESTARTING",
+                              "PAUSE_FAILED",
+                              "RESIZING"
+                            ]
+                          },
+                          "inserted_at": {
+                            "type": "string"
+                          },
+                          "databases": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "infra_compute_size": {
+                                  "type": "string",
+                                  "enum": [
+                                    "pico",
+                                    "nano",
+                                    "micro",
+                                    "small",
+                                    "medium",
+                                    "large",
+                                    "xlarge",
+                                    "2xlarge",
+                                    "4xlarge",
+                                    "8xlarge",
+                                    "12xlarge",
+                                    "16xlarge",
+                                    "24xlarge",
+                                    "24xlarge_optimized_memory",
+                                    "24xlarge_optimized_cpu",
+                                    "24xlarge_high_memory",
+                                    "48xlarge",
+                                    "48xlarge_optimized_memory",
+                                    "48xlarge_optimized_cpu",
+                                    "48xlarge_high_memory"
+                                  ]
+                                },
+                                "region": {
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "type": "string",
+                                  "enum": [
+                                    "ACTIVE_HEALTHY",
+                                    "ACTIVE_UNHEALTHY",
+                                    "COMING_UP",
+                                    "GOING_DOWN",
+                                    "INIT_FAILED",
+                                    "REMOVED",
+                                    "RESTORING",
+                                    "UNKNOWN",
+                                    "INIT_READ_REPLICA",
+                                    "INIT_READ_REPLICA_FAILED",
+                                    "RESTARTING",
+                                    "RESIZING"
+                                  ]
+                                },
+                                "cloud_provider": {
+                                  "type": "string"
+                                },
+                                "identifier": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "enum": ["PRIMARY", "READ_REPLICA"]
+                                },
+                                "disk_volume_size_gb": {
+                                  "type": "number"
+                                },
+                                "disk_type": {
+                                  "type": "string",
+                                  "enum": ["gp3", "io2"]
+                                },
+                                "disk_throughput_mbps": {
+                                  "type": "number"
+                                },
+                                "disk_last_modified_at": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "region",
+                                "status",
+                                "cloud_provider",
+                                "identifier",
+                                "type"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "ref",
+                          "name",
+                          "cloud_provider",
+                          "region",
+                          "is_branch",
+                          "status",
+                          "inserted_at",
+                          "databases"
+                        ]
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "number",
+                          "description": "Total number of projects. Use this to calculate the total number of pages."
+                        },
+                        "limit": {
+                          "type": "number",
+                          "description": "Maximum number of projects per page"
+                        },
+                        "offset": {
+                          "type": "number",
+                          "description": "Number of projects skipped in this response"
+                        }
+                      },
+                      "required": ["count", "limit", "offset"]
+                    }
+                  },
+                  "required": ["projects", "pagination"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to retrieve projects"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Gets all projects for the given organization",
+        "tags": ["Projects"]
       }
     }
   },
@@ -17878,6 +19012,126 @@
           }
         },
         "required": ["workflow_run_id", "message"]
+      },
+      "V1ListProjectsPaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "cloud_provider": {
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "name": {
+                  "type": "string"
+                },
+                "organization_id": {
+                  "type": "number"
+                },
+                "organization_slug": {
+                  "type": "string"
+                },
+                "ref": {
+                  "type": "string"
+                },
+                "region": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subscription_id": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "is_branch_enabled": {
+                  "type": "boolean"
+                },
+                "is_physical_backups_enabled": {
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "preview_branch_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "disk_volume_size_gb": {
+                  "type": "number"
+                },
+                "infra_compute_size": {
+                  "type": "string",
+                  "enum": [
+                    "pico",
+                    "nano",
+                    "micro",
+                    "small",
+                    "medium",
+                    "large",
+                    "xlarge",
+                    "2xlarge",
+                    "4xlarge",
+                    "8xlarge",
+                    "12xlarge",
+                    "16xlarge",
+                    "24xlarge",
+                    "24xlarge_optimized_memory",
+                    "24xlarge_optimized_cpu",
+                    "24xlarge_high_memory",
+                    "48xlarge",
+                    "48xlarge_optimized_memory",
+                    "48xlarge_optimized_cpu",
+                    "48xlarge_high_memory"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "cloud_provider",
+                "inserted_at",
+                "name",
+                "organization_id",
+                "organization_slug",
+                "ref",
+                "region",
+                "status",
+                "subscription_id",
+                "is_branch_enabled",
+                "is_physical_backups_enabled",
+                "preview_branch_refs"
+              ]
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number",
+                "description": "Total number of projects. Use this to calculate the total number of pages."
+              },
+              "limit": {
+                "type": "number",
+                "description": "Maximum number of projects per page (actual number may be less)"
+              },
+              "offset": {
+                "type": "number",
+                "description": "Number of projects skipped in this response"
+              }
+            },
+            "required": ["count", "limit", "offset"]
+          }
+        },
+        "required": ["projects", "pagination"]
       },
       "V1ProjectWithDatabaseResponse": {
         "type": "object",
@@ -19758,6 +21012,15 @@
                   }
                 },
                 "required": ["healthy", "db_connected", "connected_cluster"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "db_schema": {
+                    "type": "string"
+                  }
+                },
+                "required": ["db_schema"]
               }
             ]
           },
@@ -20270,6 +21533,14 @@
           },
           "work_mem": {
             "type": "string"
+          },
+          "checkpoint_timeout": {
+            "type": "integer",
+            "minimum": 30,
+            "maximum": 86400
+          },
+          "hot_standby_feedback": {
+            "type": "boolean"
           }
         }
       },
@@ -20357,6 +21628,14 @@
           },
           "work_mem": {
             "type": "string"
+          },
+          "checkpoint_timeout": {
+            "type": "integer",
+            "minimum": 30,
+            "maximum": 86400
+          },
+          "hot_standby_feedback": {
+            "type": "boolean"
           },
           "restart_database": {
             "type": "boolean"
@@ -23343,6 +24622,10 @@
             "type": "string",
             "minLength": 1
           },
+          "parameters": {
+            "type": "array",
+            "items": {}
+          },
           "read_only": {
             "type": "boolean"
           }
@@ -24711,7 +25994,7 @@
           },
           "status": {
             "type": "string",
-            "enum": ["AVAILABLE", "PENDING", "REMOVED"]
+            "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
           }
         },
         "required": ["name", "status"]
@@ -24894,6 +26177,163 @@
           }
         },
         "required": ["project", "preview", "expires_at", "created_at", "created_by"]
+      },
+      "OrganizationProjectsResponse": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ref": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "cloud_provider": {
+                  "type": "string"
+                },
+                "region": {
+                  "type": "string"
+                },
+                "is_branch": {
+                  "type": "boolean"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "INACTIVE",
+                    "ACTIVE_HEALTHY",
+                    "ACTIVE_UNHEALTHY",
+                    "COMING_UP",
+                    "UNKNOWN",
+                    "GOING_DOWN",
+                    "INIT_FAILED",
+                    "REMOVED",
+                    "RESTORING",
+                    "UPGRADING",
+                    "PAUSING",
+                    "RESTORE_FAILED",
+                    "RESTARTING",
+                    "PAUSE_FAILED",
+                    "RESIZING"
+                  ]
+                },
+                "inserted_at": {
+                  "type": "string"
+                },
+                "databases": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "infra_compute_size": {
+                        "type": "string",
+                        "enum": [
+                          "pico",
+                          "nano",
+                          "micro",
+                          "small",
+                          "medium",
+                          "large",
+                          "xlarge",
+                          "2xlarge",
+                          "4xlarge",
+                          "8xlarge",
+                          "12xlarge",
+                          "16xlarge",
+                          "24xlarge",
+                          "24xlarge_optimized_memory",
+                          "24xlarge_optimized_cpu",
+                          "24xlarge_high_memory",
+                          "48xlarge",
+                          "48xlarge_optimized_memory",
+                          "48xlarge_optimized_cpu",
+                          "48xlarge_high_memory"
+                        ]
+                      },
+                      "region": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "ACTIVE_HEALTHY",
+                          "ACTIVE_UNHEALTHY",
+                          "COMING_UP",
+                          "GOING_DOWN",
+                          "INIT_FAILED",
+                          "REMOVED",
+                          "RESTORING",
+                          "UNKNOWN",
+                          "INIT_READ_REPLICA",
+                          "INIT_READ_REPLICA_FAILED",
+                          "RESTARTING",
+                          "RESIZING"
+                        ]
+                      },
+                      "cloud_provider": {
+                        "type": "string"
+                      },
+                      "identifier": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": ["PRIMARY", "READ_REPLICA"]
+                      },
+                      "disk_volume_size_gb": {
+                        "type": "number"
+                      },
+                      "disk_type": {
+                        "type": "string",
+                        "enum": ["gp3", "io2"]
+                      },
+                      "disk_throughput_mbps": {
+                        "type": "number"
+                      },
+                      "disk_last_modified_at": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["region", "status", "cloud_provider", "identifier", "type"]
+                  }
+                }
+              },
+              "required": [
+                "ref",
+                "name",
+                "cloud_provider",
+                "region",
+                "is_branch",
+                "status",
+                "inserted_at",
+                "databases"
+              ]
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number",
+                "description": "Total number of projects. Use this to calculate the total number of pages."
+              },
+              "limit": {
+                "type": "number",
+                "description": "Maximum number of projects per page"
+              },
+              "offset": {
+                "type": "number",
+                "description": "Number of projects skipped in this response"
+              }
+            },
+            "required": ["count", "limit", "offset"]
+          }
+        },
+        "required": ["projects", "pagination"]
       }
     }
   }

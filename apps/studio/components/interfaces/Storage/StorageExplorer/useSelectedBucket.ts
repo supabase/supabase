@@ -1,19 +1,42 @@
 import { useParams } from 'common'
+import { useIsAnalyticsBucketsEnabled } from 'data/config/project-storage-config-query'
+import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useStorageV2Page } from '../Storage.utils'
 
 export const useSelectedBucket = () => {
-  const page = useStorageV2Page()
   const { ref, bucketId } = useParams()
+  const page = useStorageV2Page()
+  const hasIcebergEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
 
-  const { data: buckets = [], isSuccess, isError, error } = useBucketsQuery({ projectRef: ref })
-  const bucketsByType =
+  const {
+    data: analyticsBuckets = [],
+    isSuccess: isSuccessAnalyticsBuckets,
+    isError: isErrorAnalyticsBuckets,
+    error: errorAnalyticsBuckets,
+  } = useAnalyticsBucketsQuery({ projectRef: ref })
+
+  const {
+    data: buckets = [],
+    isSuccess: isSuccessBuckets,
+    isError: isErrorBuckets,
+    error: errorBuckets,
+  } = useBucketsQuery({ projectRef: ref })
+
+  const isSuccess = hasIcebergEnabled
+    ? isSuccessBuckets && isSuccessAnalyticsBuckets
+    : isSuccessBuckets
+  const isError = hasIcebergEnabled ? isErrorBuckets || isErrorAnalyticsBuckets : isErrorBuckets
+  const error = hasIcebergEnabled ? errorBuckets || errorAnalyticsBuckets : errorBuckets
+
+  const bucket =
     page === 'files'
-      ? buckets.filter((b) => b.type === 'STANDARD')
+      ? buckets.find((b) => b.id === bucketId)
       : page === 'analytics'
-        ? buckets.filter((b) => b.type === 'ANALYTICS')
-        : buckets
-  const bucket = bucketsByType.find((b) => b.id === bucketId)
+        ? analyticsBuckets.find((b: any) => b.id === bucketId)
+        : // [Joshen] Remove typecasts bucket: any once infra changes for analytics bucket is in
+          // [Joshen] Temp fallback to buckets for backwards compatibility old UI
+          buckets.find((b) => b.id === bucketId)
 
   return { bucket, isSuccess, isError, error }
 }

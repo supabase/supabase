@@ -151,12 +151,16 @@ export const useRegisterSidebar = (
   )
 
   useEffect(() => {
-    const { registerSidebar, unregisterSidebar } = sidebarManagerState
+    const { registerSidebar, unregisterSidebar, sidebars } = sidebarManagerState
 
-    registerSidebar(id, component, handlers)
+    if (!sidebars[id]) {
+      registerSidebar(id, component, handlers)
+    }
 
     return () => {
-      unregisterSidebar(id)
+      if (sidebars[id]) {
+        unregisterSidebar(id)
+      }
     }
   }, [id])
 

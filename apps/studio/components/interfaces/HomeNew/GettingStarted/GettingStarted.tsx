@@ -77,9 +77,9 @@ export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
   }
 
   return (
-    <Card className="overflow-hidden">
-      <div className="flex flex-col lg:flex-row">
-        <aside className="hidden border-r lg:block lg:w-[calc(1/3*100%-16px)]">
+    <Card className="overflow-hidden @container">
+      <div className="flex flex-col @2xl:flex-row">
+        <aside className="hidden border-r @2xl:block @2xl:w-[calc(1/3*100%-16px)]">
           <ol>
             {steps.map((step, index) => {
               const isActive = step.key === activeStep.key
@@ -130,7 +130,7 @@ export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
         </aside>
 
         <CardContent className="flex flex-1 flex-col gap-0 p-0 overflow-y-auto border-b-0">
-          <div className="flex items-center justify-between gap-2 border-b px-2 py-2 lg:hidden">
+          <div className="flex items-center justify-between gap-2 border-b px-2 py-2 @2xl:hidden">
             <span className="text-xs shrink-0 font-mono text-foreground-light w-7 h-7 bg border flex items-center justify-center rounded-md">
               {activeStepIndex + 1}
             </span>
@@ -186,7 +186,7 @@ export function GettingStarted({ steps, onStepClick }: GettingStartedProps) {
               <h3>{activeStep.title}</h3>
               <Badge
                 variant={activeStep.status === 'complete' ? 'success' : 'default'}
-                className="capitalize hidden lg:inline-flex"
+                className="capitalize hidden @2xl:inline-flex"
               >
                 {activeStep.status}
               </Badge>

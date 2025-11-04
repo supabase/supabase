@@ -1,37 +1,36 @@
 import dayjs from 'dayjs'
 import { Archive, ArchiveRestoreIcon, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { Button, cn } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
+import { useVirtualizerContext } from 'components/ui/InfiniteList'
+import { NotificationData, type NotificationsData } from 'data/notifications/notifications-v2-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import type { Organization } from 'types'
 import { CriticalIcon, WarningIcon } from 'ui'
 
 interface NotificationRowProps {
-  setRowHeight: (idx: number, height: number) => void
+  index: number
+  item: NotificationsData[number]
   getOrganizationById: (id: number) => Organization
   getOrganizationBySlug: (slug: string) => Organization
   onUpdateNotificationStatus: (id: string, status: 'archived' | 'seen') => void
   queueMarkRead: (id: string) => void
 }
 
-const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
+const NotificationRow = ({
   index,
-  listRef,
   item: notification,
-  setRowHeight,
   getOrganizationById,
   getOrganizationBySlug,
   onUpdateNotificationStatus,
   queueMarkRead,
-}) => {
-  const ref = useRef<HTMLDivElement>(null)
+}: NotificationRowProps) => {
+  const { virtualizer } = useVirtualizerContext()
   const { ref: viewRef, inView } = useInView()
 
   const { status, priority } = notification
@@ -56,13 +55,6 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
   }
 
   useEffect(() => {
-    if (ref.current) {
-      listRef?.current?.resetAfterIndex(0)
-      setRowHeight(index, ref.current.clientHeight)
-    }
-  }, [ref])
-
-  useEffect(() => {
     if (inView && notification.status === 'new') {
       queueMarkRead(notification.id)
     }
@@ -70,7 +62,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
 
   return (
     <div
-      ref={ref}
+      ref={virtualizer.measureElement}
       className={cn(
         `p-4 flex justify-between gap-x-3 group`,
         index !== 0 ? 'border-t border-overlay' : '',

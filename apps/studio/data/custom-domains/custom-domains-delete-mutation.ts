@@ -1,8 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { subscriptionKeys } from 'data/subscriptions/keys'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainDeleteVariables = {
@@ -27,7 +28,7 @@ export const useCustomDomainDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>,
+  UseCustomMutationOptions<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -46,6 +47,9 @@ export const useCustomDomainDeleteMutation = ({
           status: '0_no_hostname_configured',
         }
       })
+
+      // Invalidate addons cache since the backend removes the addon when deleting the domain
+      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
 
       await onSuccess?.(data, variables, context)
     },
