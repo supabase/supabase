@@ -64,7 +64,13 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('loki'),
-    url: z.string().min(1, { message: 'Loki URL is required' }),
+    url: z
+      .string()
+      .min(1, { message: 'Loki URL is required' })
+      .refine(
+        (url) => url.startsWith('http://') || url.startsWith('https://'),
+        'Loki URL must start with http:// or https://'
+      ),
     headers: z.record(z.string(), z.string()),
     username: z.string().optional(),
     password: z.string().optional(),
