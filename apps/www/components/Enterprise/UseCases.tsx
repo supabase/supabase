@@ -1,20 +1,19 @@
 import 'swiper/css'
 
-import React, { FC } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import type { LucideIcon } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { FC, ReactElement } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 
-import type { LucideIcon } from 'lucide-react'
-import Image from 'next/image'
-
 interface Props {
   id: string
-  label?: string | JSX.Element
-  heading?: string | JSX.Element
+  label?: string | ReactElement
+  heading?: string | ReactElement
   stories?: Story[]
   highlights?: Highlight[]
 }
@@ -24,7 +23,7 @@ export type Story = {
   url: string
   target?: '_blank' | string
   heading?: string
-  subheading?: string | JSX.Element
+  subheading?: string | ReactElement
 }
 
 type Highlight = {

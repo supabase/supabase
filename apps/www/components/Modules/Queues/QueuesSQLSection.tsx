@@ -1,8 +1,8 @@
-import React, { FC } from 'react'
+import { FC, ReactElement } from 'react'
 
 import { cn, TextLink } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import CodeWindow from '~/components/CodeWindow'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const codeSnippet = `
 select pgmq.create('my_special_queue');
@@ -16,9 +16,9 @@ select * from pgmq.pop('my_special_queue');
 `
 interface Props {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  label: string | ReactElement
+  heading: string | ReactElement
+  subheading: string | ReactElement
   className?: string
   cta?: {
     label: string

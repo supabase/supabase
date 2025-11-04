@@ -1,12 +1,12 @@
-import React, { FC } from 'react'
+import { FC, ReactElement } from 'react'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import UsersGrowthChart from '~/components/UsersGrowthChart'
 
 export interface ResultsSectionProps {
   id: string
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  heading: string | ReactElement
+  subheading: string | ReactElement
   highlights: Highlight[]
 }
 

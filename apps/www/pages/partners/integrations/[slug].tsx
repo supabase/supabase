@@ -38,7 +38,7 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
     img: (
       props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
     ) => {
-      return <img {...props} onClick={() => callback(props.src!)} />
+      return <img {...props} onClick={() => callback(props.src! as string)} />
     },
   }
 

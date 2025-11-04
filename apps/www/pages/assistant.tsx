@@ -4,7 +4,7 @@ import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import { Button } from 'ui'
 import DotGrid from '~/components/AIDemo/DotGrid'
 import { AIDemoPanel } from '~/components/AIDemo/Panel'
@@ -17,9 +17,9 @@ const SectionContainer = dynamic(() => import('~/components/Layouts/SectionConta
 interface Message {
   id: string
   role: 'user' | 'assistant'
-  content: string | JSX.Element
+  content: string | ReactElement
   createdAt: Date
-  render?: JSX.Element
+  render?: ReactElement
 }
 
 const welcomeMessages = [

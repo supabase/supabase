@@ -1,14 +1,14 @@
 import 'swiper/css'
 
 import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactElement, ReactNode, useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { ArrowUpRight } from 'lucide-react'
 
 interface TabProps {
   label: string
@@ -58,7 +58,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
 interface Tab {
   label: string
   paragraph?: string
-  panel?: JSX.Element
+  panel?: ReactElement
   colabUrl: string
   code?: string
 }

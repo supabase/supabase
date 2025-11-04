@@ -1,8 +1,8 @@
 import classNames from 'classnames'
-import { Fragment, useMemo, useState } from 'react'
+import { ChevronUp } from 'lucide-react'
+import { Fragment, ReactElement, useMemo, useState } from 'react'
 import { Collapsible } from 'ui'
 import { Check } from './PricingIcons'
-import { ChevronUp } from 'lucide-react'
 
 interface PricingAddOnTableProps {
   pricing: {
@@ -16,7 +16,7 @@ interface PricingAddOnTableProps {
       }[]
     }[]
   }
-  icon: JSX.Element
+  icon: ReactElement
 }
 
 const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {

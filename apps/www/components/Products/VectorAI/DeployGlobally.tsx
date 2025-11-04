@@ -1,5 +1,5 @@
-import React from 'react'
 import { useTheme } from 'next-themes'
+import React, { useRef } from 'react'
 
 function getRandomNumber(min: number, max: number) {
   var range = max - min
@@ -10,7 +10,7 @@ function getRandomNumber(min: number, max: number) {
 
 const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
   const { resolvedTheme } = useTheme()
-  const ref = React.useRef<any>()
+  const ref = useRef<any>(null)
   const states = ['1', '2', '3']
   const colors = {
     green: resolvedTheme?.includes('dark') ? '#1CF7C3' : '#00B99F',
