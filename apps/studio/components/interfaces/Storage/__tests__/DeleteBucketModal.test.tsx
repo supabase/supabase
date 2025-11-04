@@ -116,6 +116,7 @@ describe(`DeleteBucketModal`, () => {
     const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
     fireEvent.click(confirmButton)
 
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
     expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets`)
   })
 
