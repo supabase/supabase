@@ -7,6 +7,7 @@ import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
+// [Joshen] JFYI typed incorrectly in API, to fix by adding creationTime to APi
 export type VectorBucket = components['schemas']['StorageVectorBucketResponse'] & {
   creationTime: string
 }
@@ -44,21 +45,5 @@ export const useVectorBucketQuery = <TData = VectorBucketData>(
     queryFn: ({ signal }) => getVectorBucket({ projectRef, vectorBucketName }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,
     ...options,
-    retry: (failureCount, error) => {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        error.message.startsWith('Tenant config') &&
-        error.message.endsWith('not found')
-      ) {
-        return false
-      }
-
-      if (failureCount < 3) {
-        return true
-      }
-
-      return false
-    },
   })
 }

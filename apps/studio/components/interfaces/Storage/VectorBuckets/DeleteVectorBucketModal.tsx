@@ -31,6 +31,8 @@ export interface DeleteVectorBucketModalProps {
 
 const formId = `delete-storage-vector-bucket-form`
 
+// [Joshen] Can refactor to use TextConfirmModal
+
 export const DeleteVectorBucketModal = ({
   visible,
   bucketName,

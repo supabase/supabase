@@ -20,6 +20,8 @@ async function createVectorBucket({ projectRef, bucketName }: VectorBucketCreate
   })
 
   if (error) handleError(error)
+
+  // [Joshen] JFYI typed incorrectly in API, to fix
   return data as { name: string }
 }
 

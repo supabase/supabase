@@ -36,6 +36,8 @@ export interface DeleteAnalyticsBucketModalProps {
 
 const formId = `delete-analytics-bucket-form`
 
+// [Joshen] Can refactor to use TextConfirmModal
+
 export const DeleteAnalyticsBucketModal = ({
   visible,
   bucketId,

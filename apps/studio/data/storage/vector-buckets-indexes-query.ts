@@ -49,21 +49,5 @@ export const useVectorBucketsIndexesQuery = <TData = VectorBucketsIndexesData>(
       typeof projectRef !== 'undefined' &&
       typeof vectorBucketName !== 'undefined',
     ...options,
-    retry: (failureCount, error) => {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        error.message.startsWith('Tenant config') &&
-        error.message.endsWith('not found')
-      ) {
-        return false
-      }
-
-      if (failureCount < 3) {
-        return true
-      }
-
-      return false
-    },
   })
 }

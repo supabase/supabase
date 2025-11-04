@@ -20,7 +20,9 @@ export async function getVectorBuckets(
   })
 
   if (error) handleError(error)
-  return data as unknown as { vectorBuckets: { vectorBucketName: string; creationTime: string }[] }
+
+  // [Joshen] JFYI typed incorrectly in API, to fix by adding creationTime to API
+  return data as { vectorBuckets: { vectorBucketName: string; creationTime: string }[] }
 }
 
 export type VectorBucketsData = Awaited<ReturnType<typeof getVectorBuckets>>
@@ -38,21 +40,5 @@ export const useVectorBucketsQuery = <TData = VectorBucketsData>(
     queryFn: ({ signal }) => getVectorBuckets({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,
     ...options,
-    retry: (failureCount, error) => {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        error.message.startsWith('Tenant config') &&
-        error.message.endsWith('not found')
-      ) {
-        return false
-      }
-
-      if (failureCount < 3) {
-        return true
-      }
-
-      return false
-    },
   })
 }
