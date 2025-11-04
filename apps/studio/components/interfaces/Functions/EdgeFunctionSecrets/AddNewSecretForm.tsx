@@ -167,7 +167,7 @@ const AddNewSecretForm = () => {
       <Form_Shadcn_ {...form}>
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
-            <CardHeader className='space-y-0'>
+            <CardHeader>
               <CardTitle>Add or replace secrets</CardTitle>
             </CardHeader>
             <CardContent>
