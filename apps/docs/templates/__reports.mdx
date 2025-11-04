@@ -1,0 +1,51 @@
+---
+title: '{PRODUCT_NAME} Reports'
+description: 'Reports to help debug {PRODUCT_NAME} issues'
+---
+{/* Introduction. What does this collection of reports show people? */}
+
+The {PRODUCT_NAME} reports show….
+
+{/* Overview. For reports section with multiple reports, provide an internally linked overview of each report, plus the price tiers it's available on.  */}
+
+## {PRODUCT_NAME} Reports Overview
+
+| Report                        | Available Plans | Description                                  | Key Insights                                  |
+| ---------------------------- | --------------- | -------------------------------------------- | --------------------------------------------- |
+| Memory usage                 | Free, Pro       | RAM usage percentage by the database         | Memory pressure and resource utilization      |
+| CPU usage                    | Free, Pro       | Average CPU usage percentage                 | CPU-intensive query identification            |
+| Disk IOPS                    | Free, Pro       | Read/write operations per second with limits | IO bottleneck detection and workload analysis |
+| Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                    |
+| Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                  |
+| Dedicated Pooler connections | All             | Client connections to PgBouncer              | Dedicated pooler connection monitoring        |
+
+{/* List of reports */}
+
+{/* Name of report */}
+
+## Memory usage
+{/* Start with what this report helps a user debug, then briefly describe what metrics this report measures and shows */}
+
+{/* Next add an image, ideally in dark and light mode. */}
+
+<Image
+  alt="Memory usage chart"
+  zoomable
+  src={{
+    dark: '/docs/img/database/reports/memory-usage-chart-dark.png',
+    light: '/docs/img/database/reports/memory-usage-chart-light.png',
+  }}
+/>
+
+{/* A table of actions you can take to resolve issues with metrics this report shows. Ideally link to troubleshooting guides or documentation. If no such documentation exists, provide general actions and create a docs team issue to create that documentation. */}
+
+Actions you can take:
+
+| Action                                                                      | Description                                    |
+| --------------------------------------------------------------------------- | ---------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size) | Increase available memory resources            |
+| Optimize queries                                                            | Reduce memory consumption of expensive queries |
+| Tune Postgres configuration                                                 | Improve memory management settings             |
+| Implement application caching                                               | Add query result caching to reduce memory load |
+
+{/* Next report, etc */}
