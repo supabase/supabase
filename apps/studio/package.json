@@ -124,7 +124,7 @@
     "react-hook-form": "^7.45.0",
     "react-inlinesvg": "^4.0.4",
     "react-intersection-observer": "^9.5.3",
-    "react-markdown": "^8.0.3",
+    "react-markdown": "^10.0.0",
     "react-resizable": "3.0.5",
     "react-simple-maps": "4.0.0-beta.6",
     "react-use": "^17.5.0",

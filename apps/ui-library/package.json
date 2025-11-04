@@ -70,7 +70,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "^7.45.0",
-    "react-markdown": "^10.1.0",
+    "react-markdown": "^10.0.0",
     "react-wrap-balancer": "^1.1.0",
     "recharts": "catalog:",
     "rehype-autolink-headings": "^7.1.0",

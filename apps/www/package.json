@@ -70,7 +70,7 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-countdown": "^2.3.5",
     "react-dom": "catalog:",
-    "react-markdown": "^8.0.3",
+    "react-markdown": "^10.0.0",
     "react-syntax-highlighter": "^15.6.6",
     "react-transition-group": "^4.4.1",
     "react-use": "^17.4.0",
