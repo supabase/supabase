@@ -1,5 +1,6 @@
 import saveAs from 'file-saver'
 import { Download } from 'lucide-react'
+import Link from 'next/link'
 import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -103,6 +104,11 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSelectedFormat('json')}>
             <p>Download as JSON</p>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="gap-x-2">
+            <Link href={`/project/${ref}/settings/log-drains`}>
+              <p>Add a Log Drain</p>
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
