@@ -167,8 +167,8 @@ const AddNewSecretForm = () => {
       <Form_Shadcn_ {...form}>
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
-            <CardHeader>
-              <CardTitle>Add new secrets</CardTitle>
+            <CardHeader className='space-y-0'>
+              <CardTitle>Add or replace secrets</CardTitle>
             </CardHeader>
             <CardContent>
               {fields.map((fieldItem, index) => (
@@ -246,9 +246,11 @@ const AddNewSecretForm = () => {
                 Add another
               </Button>
             </CardContent>
-            <CardFooter className="justify-end space-x-2">
+            <CardFooter className="justify-between space-x-2">
+              <p className="text-sm text-foreground-light">Upsert multiple secrets at once by pasting key-value pairs in bulk</p>
+
               <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
-                {isCreating ? 'Saving...' : 'Save'}
+                {isCreating ? 'Saving...' : (fields.length > 1 ? 'Bulk save' : 'Save')}
               </Button>
             </CardFooter>
           </Card>
