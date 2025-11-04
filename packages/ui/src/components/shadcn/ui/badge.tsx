@@ -4,13 +4,13 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils/cn'
 
 const badgeVariants = cva(
-  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-opacity-10',
+  'inline-flex items-center text-center uppercase tracking-widest px-[6px] py-[4px] rounded-full text-[10px] font-medium bg-opacity-10 leading-none',
   {
     variants: {
       variant: {
         default: 'bg-surface-200 text-foreground-light border border-strong',
         warning: 'bg-warning text-warning border border-warning-500',
-        success: 'bg-brand text-brand-600 border border-brand-500',
+        success: 'bg-brand text-brand-link border border-brand-500',
         destructive: 'bg-destructive text-destructive-600 border border-destructive-500',
         brand: 'bg-brand text-brand-600 border border-brand-500',
         secondary:
@@ -18,11 +18,11 @@ const badgeVariants = cva(
         outline: 'bg-transparent text border border-foreground-muted',
       },
       size: {
-        small: 'px-2.5 py-0.5 text-xs',
-        large: 'px-3 py-0.5 rounded-full text-sm',
+        small: '',
+        large: '',
       },
       dot: {
-        true: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
+        true: '-ml-0.5 mr-1.5 h-2 w-2',
       },
     },
     defaultVariants: {
