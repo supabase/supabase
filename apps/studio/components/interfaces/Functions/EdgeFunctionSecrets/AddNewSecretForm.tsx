@@ -178,7 +178,7 @@ const AddNewSecretForm = () => {
                     name={`secrets.${index}.name`}
                     render={({ field }) => (
                       <FormItem_Shadcn_ className="w-full">
-                        <FormLabel_Shadcn_>Key</FormLabel_Shadcn_>
+                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input
                             {...field}

@@ -122,7 +122,7 @@ export function EditSecretModal({ secret, visible, onClose }: EditSecretModalPro
                   disabled
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Key"
+                      label="Name"
                       layout="horizontal"
                     >
                       <FormControl_Shadcn_>
