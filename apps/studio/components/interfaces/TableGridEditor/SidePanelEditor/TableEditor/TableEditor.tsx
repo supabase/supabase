@@ -5,15 +5,8 @@ import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import {
-  CONSTRAINT_TYPE,
-  Constraint,
-  useTableConstraintsQuery,
-} from 'data/database/constraints-query'
-import {
-  ForeignKeyConstraint,
-  useForeignKeyConstraintsQuery,
-} from 'data/database/foreign-key-constraints-query'
+import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
@@ -24,7 +17,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import type { PlainObject } from 'lib/type-helpers'
+import { type PlainObject } from 'lib/type-helpers'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -32,6 +25,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
+import type { SaveTableParams } from '../SidePanelEditor'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
@@ -47,32 +41,21 @@ import {
   validateFields,
 } from './TableEditor.utils'
 
+type SaveTableParamsFor<Action extends SaveTableParams['action']> = Extract<
+  SaveTableParams,
+  { action: Action }
+>
+
+type SaveTablePayloadFor<Action extends SaveTableParams['action']> =
+  SaveTableParamsFor<Action>['payload']
+
 export interface TableEditorProps {
   table?: PostgresTable
   isDuplicating: boolean
   templateData?: Partial<TableField>
   visible: boolean
   closePanel: () => void
-  saveChanges: (
-    payload: {
-      name: string
-      schema: string
-      comment?: string | null
-    },
-    columns: ColumnField[],
-    foreignKeyRelations: ForeignKey[],
-    isNewRecord: boolean,
-    configuration: {
-      tableId?: number
-      importContent?: ImportContent
-      isRLSEnabled: boolean
-      isRealtimeEnabled: boolean
-      isDuplicateRows: boolean
-      existingForeignKeyRelations: ForeignKeyConstraint[]
-      primaryKey?: Constraint
-    },
-    resolve: any
-  ) => void
+  saveChanges: (params: SaveTableParams) => void
   updateEditorDirty: () => void
 }
 
@@ -209,15 +192,11 @@ export const TableEditor = ({
       }
       setErrors(errors)
 
+      const isNameChanged = tableFields.name.trim() !== table?.name
+      const isCommentChanged = tableFields.comment !== table?.comment
       const isRlsEnabledChanged = tableFields.isRLSEnabled !== (table?.rls_enabled ?? false)
 
       if (isEmpty(errors)) {
-        const payload = {
-          name: tableFields.name.trim(),
-          schema: selectedSchema,
-          comment: tableFields.comment?.trim(),
-          ...(!isNewRecord && isRlsEnabledChanged && { rls_enabled: tableFields.isRLSEnabled }),
-        }
         const configuration = {
           tableId: table?.id,
           importContent,
@@ -231,7 +210,48 @@ export const TableEditor = ({
           return { ...column, name: column.name.trim() }
         })
 
-        saveChanges(payload, columns, fkRelations, isNewRecord, configuration, resolve)
+        if (isNewRecord) {
+          const payload: SaveTablePayloadFor<'create'> = {
+            name: tableFields.name.trim(),
+            schema: selectedSchema,
+            comment: tableFields.comment?.trim(),
+          }
+          saveChanges({
+            action: 'create',
+            payload,
+            configuration,
+            columns,
+            foreignKeyRelations: fkRelations,
+            resolve,
+          })
+        } else if (isDuplicating) {
+          const payload: SaveTablePayloadFor<'duplicate'> = {
+            name: tableFields.name.trim(),
+            comment: tableFields.comment?.trim(),
+          }
+          saveChanges({
+            action: 'duplicate',
+            payload,
+            configuration,
+            columns,
+            foreignKeyRelations: fkRelations,
+            resolve,
+          })
+        } else {
+          const payload: SaveTablePayloadFor<'update'> = {
+            ...(isNameChanged && { name: tableFields.name.trim() }),
+            ...(isCommentChanged && { comment: tableFields.comment?.trim() ?? '' }),
+            ...(isRlsEnabledChanged && { rls_enabled: tableFields.isRLSEnabled }),
+          }
+          saveChanges({
+            action: 'update',
+            payload,
+            configuration,
+            columns,
+            foreignKeyRelations: fkRelations,
+            resolve,
+          })
+        }
       } else {
         resolve()
       }

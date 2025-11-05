@@ -52,6 +52,61 @@ import { SpreadsheetImport } from './SpreadsheetImport/SpreadsheetImport'
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 
+export type SaveTableParams =
+  | SaveTableParamsNew
+  | SaveTableParamsDuplicate
+  | SaveTableParamsExisting
+
+type SaveTableParamsBase = {
+  configuration: SaveTableConfiguration
+  columns: ColumnField[]
+  foreignKeyRelations: ForeignKey[]
+  resolve: () => void
+}
+
+type SaveTableParamsNew = SaveTableParamsBase & {
+  action: 'create'
+  payload: SaveTablePayloadNew
+}
+
+type SaveTableParamsDuplicate = SaveTableParamsBase & {
+  action: 'duplicate'
+  payload: SaveTablePayloadDuplicate
+}
+
+type SaveTableParamsExisting = SaveTableParamsBase & {
+  action: 'update'
+  payload: SaveTablePayloadExisting
+}
+
+type SaveTablePayloadBase = {
+  comment?: string | null
+}
+
+type SaveTablePayloadNew = SaveTablePayloadBase & {
+  name: string
+  schema: string
+}
+
+type SaveTablePayloadDuplicate = SaveTablePayloadBase & {
+  name: string
+}
+
+type SaveTablePayloadExisting = SaveTablePayloadBase & {
+  name?: string
+  rls_enabled?: boolean
+}
+
+type SaveTableConfiguration = {
+  tableId?: number
+  importContent?: ImportContent
+  isRLSEnabled: boolean
+  isRealtimeEnabled: boolean
+  isDuplicateRows: boolean
+  existingForeignKeyRelations: ForeignKeyConstraint[]
+  primaryKey?: Constraint
+}
+
 export interface SidePanelEditorProps {
   editable?: boolean
   selectedTable?: PostgresTable
@@ -106,6 +161,8 @@ export const SidePanelEditor = ({
   })
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
+
+  const isDuplicating = snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'
 
   const saveRow = async (
     payload: any,
@@ -387,26 +444,11 @@ export const SidePanelEditor = ({
     }
   }
 
-  const saveTable = async (
-    payload: {
-      name: string
-      schema: string
-      comment?: string | null
-    },
-    columns: ColumnField[],
-    foreignKeyRelations: ForeignKey[],
-    isNewRecord: boolean,
-    configuration: {
-      tableId?: number
-      importContent?: ImportContent
-      isRLSEnabled: boolean
-      isRealtimeEnabled: boolean
-      isDuplicateRows: boolean
-      existingForeignKeyRelations: ForeignKeyConstraint[]
-      primaryKey?: Constraint
-    },
-    resolve: any
-  ) => {
+  const saveTable = async (params: SaveTableParams) => {
+    // action and payload are not destructured here to preserve type
+    // narrowing later on
+    const { configuration, columns, foreignKeyRelations, resolve } = params
+
     let toastId
     let saveTableError = false
     const {
@@ -419,43 +461,14 @@ export const SidePanelEditor = ({
     } = configuration
 
     try {
-      if (
-        snap.sidePanel?.type === 'table' &&
-        snap.sidePanel.mode === 'duplicate' &&
-        selectedTable
-      ) {
-        const tableToDuplicate = selectedTable
-
-        toastId = toast.loading(`Duplicating table: ${tableToDuplicate.name}...`)
-
-        const table = await duplicateTable(project?.ref!, project?.connectionString, payload, {
-          isRLSEnabled,
-          isDuplicateRows,
-          duplicateTable: tableToDuplicate,
-          foreignKeyRelations,
-        })
-        if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
-
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
-          }),
-          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
-        ])
-
-        toast.success(
-          `Table ${tableToDuplicate.name} has been successfully duplicated into ${table.name}!`,
-          { id: toastId }
-        )
-        onTableCreated(table)
-      } else if (isNewRecord) {
-        toastId = toast.loading(`Creating new table: ${payload.name}...`)
+      if (params.action === 'create') {
+        toastId = toast.loading(`Creating new table: ${params.payload.name}...`)
 
         const table = await createTable({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
           toastId,
-          payload,
+          payload: params.payload,
           columns,
           foreignKeyRelations,
           isRLSEnabled,
@@ -473,7 +486,36 @@ export const SidePanelEditor = ({
 
         toast.success(`Table ${table.name} is good to go!`, { id: toastId })
         onTableCreated(table)
-      } else if (selectedTable) {
+      } else if (params.action === 'duplicate' && !!selectedTable) {
+        const tableToDuplicate = selectedTable
+        toastId = toast.loading(`Duplicating table: ${tableToDuplicate.name}...`)
+
+        const table = await duplicateTable(
+          project?.ref!,
+          project?.connectionString,
+          params.payload,
+          {
+            isRLSEnabled,
+            isDuplicateRows,
+            duplicateTable: tableToDuplicate,
+            foreignKeyRelations,
+          }
+        )
+        if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
+
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+          }),
+          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
+        ])
+
+        toast.success(
+          `Table ${tableToDuplicate.name} has been successfully duplicated into ${table.name}!`,
+          { id: toastId }
+        )
+        onTableCreated(table)
+      } else if (params.action === 'update' && selectedTable) {
         toastId = toast.loading(`Updating table: ${selectedTable.name}...`)
 
         const { table, hasError } = await updateTable({
@@ -481,7 +523,7 @@ export const SidePanelEditor = ({
           connectionString: project?.connectionString,
           toastId,
           table: selectedTable,
-          payload,
+          payload: params.payload,
           columns,
           foreignKeyRelations,
           existingForeignKeyRelations,
@@ -501,10 +543,10 @@ export const SidePanelEditor = ({
             `Table ${table.name} has been updated but there were some errors. Please check these errors separately.`
           )
         } else {
-          if (ref && payload.name) {
+          if (ref && params.payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
             const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
-            tabsSnap.updateTab(tabId, { label: payload.name })
+            tabsSnap.updateTab(tabId, { label: params.payload.name })
           }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
@@ -632,7 +674,7 @@ export const SidePanelEditor = ({
             ? selectedTable
             : undefined
         }
-        isDuplicating={snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'}
+        isDuplicating={isDuplicating}
         templateData={
           snap.sidePanel?.type === 'table' && snap.sidePanel.templateData
             ? {
