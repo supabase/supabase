@@ -185,11 +185,6 @@ export function LogDrainDestinationSheetForm({
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
   const track = useTrack()
 
-  const baseValues = {
-    name: defaultValues?.name || '',
-    description: defaultValues?.description || '',
-  }
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     values: {
