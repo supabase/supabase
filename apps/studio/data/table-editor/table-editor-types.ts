@@ -41,9 +41,9 @@ export interface ForeignTable {
   schema: string
   name: string
   comment: string | null
-  foreign_server_name: string | null
-  foreign_data_wrapper_name: string | null
-  foreign_data_wrapper_handler: string | null
+  foreign_server_name: string
+  foreign_data_wrapper_name: string
+  foreign_data_wrapper_handler: string
   columns: PostgresColumn[]
 }
 

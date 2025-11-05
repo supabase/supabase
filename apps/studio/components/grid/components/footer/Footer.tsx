@@ -11,9 +11,7 @@ type FooterProps = {
   enableForeignRowsQuery?: boolean
 }
 
-export const Footer: React.FC<FooterProps> = ({
-  enableForeignRowsQuery = true,
-}: FooterProps) => {
+export const Footer: React.FC<FooterProps> = ({ enableForeignRowsQuery = true }: FooterProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
