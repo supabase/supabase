@@ -1,6 +1,7 @@
 import type { OptimizedSearchColumns } from './get-users-types'
 import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from './get-count-estimate'
 import { stringRange, prefixToUUID } from './get-users-common'
+import { literal } from '../../pg-format'
 
 export const USERS_COUNT_ESTIMATE_SQL = `select reltuples as estimate from pg_class where oid = 'auth.users'::regclass`
 
