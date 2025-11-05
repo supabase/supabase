@@ -27,6 +27,7 @@ import * as z from 'zod'
 import { useParams } from 'common'
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import { Plus, ShieldCheck } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 const NAME_SCHEMA = z
   .string()
@@ -46,7 +47,10 @@ const SCHEMA = z.object({
 })
 
 const CreateSecretAPIKeyDialog = () => {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const { ref: projectRef } = useParams()
 
   const onClose = (value: boolean) => {
