@@ -1,4 +1,5 @@
 import { ExternalLink, Eye, EyeOff, Loader } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -52,16 +53,16 @@ export const DecryptedReadOnlyInput = ({
             {secureEntry && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a
+                  <Link
                     target="_blank"
                     rel="noreferrer noopener"
                     href={`/project/${ref}/integrations/vault/secrets?search=${value}`}
                   >
                     <ExternalLink
                       size={14}
-                      className="text-foreground-muted hover:text-foreground-lighter transition"
+                      className="text-foreground-lighter hover:text-foreground transition"
                     />
-                  </a>
+                  </Link>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Open in Vault</TooltipContent>
               </Tooltip>
