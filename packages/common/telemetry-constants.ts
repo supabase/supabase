@@ -2200,6 +2200,24 @@ export interface LogDrainDestinationSavedEvent {
 }
 
 /**
+ * User confirmed addition of log drain destination.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/log-drains (LogDrains)
+ */
+export interface LogDrainDestinationConfirmedEvent {
+  action: 'log_drain_destination_confirmed'
+  properties: {
+    /**
+     * Type of the destination confirmed
+     */
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2324,3 +2342,4 @@ export type TelemetryEvent =
   | CommandMenuCommandClickedEvent
   | SidebarOpenedEvent
   | LogDrainDestinationSavedEvent
+  | LogDrainDestinationConfirmedEvent
