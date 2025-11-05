@@ -5,7 +5,7 @@ description: 'Customizing local email templates using config.toml.'
 subtitle: 'Customizing local email templates using config.toml.'
 ---
 
-You can customize the email templates for local development [using the `config.toml` settings](/docs/guides/cli/config#auth-config).
+You can customize the email templates for local development [using the `config.toml` settings](/docs/guides/local-development/cli/config#auth-config).
 
 ## Configuring templates
 
@@ -64,42 +64,42 @@ There are several Auth email templates which can be configured. Each template se
 
 **Default subject**: "You have been invited"
 **When sent**: When a user is invited to join your application via email invitation
-**Purpose**: Allows administrators to invite users who don't have accounts yet
+**Purpose**: Invite users who don't yet have an account to sign up
 **Content**: Contains a link for the invited user to accept the invitation and create their account
 
 ### `auth.email.template.confirmation`
 
 **Default subject**: "Confirm Your Signup"
 **When sent**: When a user signs up and needs to verify their email address
-**Purpose**: Email verification for new user registrations
+**Purpose**: Ask users to confirm their email address after signing up
 **Content**: Contains a confirmation link to verify the user's email address
 
 ### `auth.email.template.recovery`
 
 **Default subject**: "Reset Your Password"
 **When sent**: When a user requests a password reset
-**Purpose**: Password recovery flow for users who forgot their password
+**Purpose**: Allow users to reset their password if they forget it
 **Content**: Contains a link to reset the user's password
 
 ### `auth.email.template.magic_link`
 
 **Default subject**: "Your Magic Link"
 **When sent**: When a user requests a magic link for passwordless authentication
-**Purpose**: Passwordless login using email links
+**Purpose**: Allow users to sign in via a one-time link sent to their email
 **Content**: Contains a secure link that automatically logs the user in when clicked
 
 ### `auth.email.template.email_change`
 
 **Default subject**: "Confirm Email Change"
 **When sent**: When a user requests to change their email address
-**Purpose**: Verification for email address changes
+**Purpose**: Ask users to verify their new email address after changing it
 **Content**: Contains a confirmation link to verify the new email address
 
 ### `auth.email.template.reauthentication`
 
 **Default subject**: "Confirm Reauthentication"
 **When sent**: When a user needs to re-authenticate for sensitive operations
-**Purpose**: Additional verification for sensitive actions (like changing password, deleting account)
+**Purpose**: Ask users to re-authenticate before performing a sensitive action
 **Content**: Contains a 6-digit OTP code for verification
 
 ## Available notification email templates
@@ -110,49 +110,49 @@ There are several Auth notification email templates which can be configured. The
 
 **Default subject**: "Your password has been changed"
 **When sent**: When a user's password is changed
-**Purpose**: Security notification to alert users of password changes
+**Purpose**: Notify users when their password has changed
 **Content**: Confirms that the password for the account has been changed
 
 ### `auth.email.notification.email_changed`
 
 **Default subject**: "Your email address has been changed"
 **When sent**: When a user's email address is changed
-**Purpose**: Security notification to alert users of email changes
+**Purpose**: Notify users when their email address has changed
 **Content**: Confirms the change from the old email to the new email address
 
 ### `auth.email.notification.phone_changed`
 
 **Default subject**: "Your phone number has been changed"
 **When sent**: When a user's phone number is changed
-**Purpose**: Security notification to alert users of phone number changes
+**Purpose**: Notify users when their phone number has changed
 **Content**: Confirms the change from the old phone number to the new phone number
 
 ### `auth.email.notification.mfa_factor_enrolled`
 
 **Default subject**: "A new MFA factor has been enrolled"
 **When sent**: When a new MFA factor is added to the user's account
-**Purpose**: Security notification about MFA enrollment
+**Purpose**: Notify users when a new multi-factor authentication method has been added to their account
 **Content**: Confirms that a new MFA factor type has been enrolled
 
 ### `auth.email.notification.mfa_factor_unenrolled`
 
 **Default subject**: "An MFA factor has been unenrolled"
 **When sent**: When an MFA factor is removed from the user's account
-**Purpose**: Security notification about MFA unenrollment
+**Purpose**: Notify users when a multi-factor authentication method has been removed from their account
 **Content**: Confirms that an MFA factor type has been unenrolled
 
 ### `auth.email.notification.identity_linked`
 
 **Default subject**: "A new identity has been linked"
 **When sent**: When a new identity is linked to the account
-**Purpose**: Security notification about identity linking
+**Purpose**: Notify users when a new identity has been linked to their account
 **Content**: Confirms that a new identity has been linked
 
 ### `auth.email.notification.identity_unlinked`
 
 **Default subject**: "An identity has been unlinked"
 **When sent**: When an identity has been unlinked from the account
-**Purpose**: Security notification about identity unlinking
+**Purpose**: Notify users when an identity has been unlinked from their account
 **Content**: Confirms that an identity has been unlinked
 
 ## Template variables
