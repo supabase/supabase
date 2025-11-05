@@ -10,10 +10,10 @@ select
 from
   pg_class c
   join pg_namespace n on n.oid = c.relnamespace
-  left join pg_foreign_table ft on ft.ftrelid = c.oid
-  left join pg_foreign_server fs on fs.oid = ft.ftserver
-  left join pg_foreign_data_wrapper fdw on fdw.oid = fs.srvfdw
-  left join pg_proc handler on handler.oid = fdw.fdwhandler
+  inner join pg_foreign_table ft on ft.ftrelid = c.oid
+  inner join pg_foreign_server fs on fs.oid = ft.ftserver
+  inner join pg_foreign_data_wrapper fdw on fdw.oid = fs.srvfdw
+  inner join pg_proc handler on handler.oid = fdw.fdwhandler
 where
   c.relkind = 'f'
 `
