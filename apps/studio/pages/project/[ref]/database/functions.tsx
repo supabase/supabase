@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
@@ -20,8 +21,18 @@ import type { NextPageWithLayout } from 'types'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
-  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
-  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [showEditFunctionForm, setShowEditFunctionForm] = useQueryState(
+    'edit',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useQueryState(
+    'delete',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [isDuplicating, setIsDuplicating] = useState(false)
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -71,7 +82,7 @@ $$;`)
       openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedFunction(dupFn)
-      setShowCreateFunctionForm(true)
+      setShowEditFunctionForm(dupFn.id.toString())
     }
   }
 
@@ -83,13 +94,13 @@ $$;`)
       openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
       setSelectedFunction(fn)
-      setShowCreateFunctionForm(true)
+      setShowEditFunctionForm(fn.id.toString())
     }
   }
 
   const deleteFunction = (fn: any) => {
     setSelectedFunction(fn)
-    setShowDeleteFunctionForm(true)
+    setShowDeleteFunctionForm(fn.id.toString())
   }
 
   if (isPermissionsLoaded && !canReadFunctions) {
@@ -114,6 +125,7 @@ $$;`)
           </div>
         </ScaffoldSection>
       </ScaffoldContainer>
+
       <CreateFunction
         func={selectedFunction}
         visible={showCreateFunctionForm}
@@ -123,9 +135,20 @@ $$;`)
         }}
         isDuplicating={isDuplicating}
       />
+
+      <CreateFunction
+        func={selectedFunction}
+        visible={!!showEditFunctionForm}
+        onClose={() => {
+          setShowEditFunctionForm('')
+          setIsDuplicating(false)
+        }}
+        isDuplicating={isDuplicating}
+      />
+
       <DeleteFunction
         func={selectedFunction}
-        visible={showDeleteFunctionForm}
+        visible={!!showDeleteFunctionForm}
         setVisible={setShowDeleteFunctionForm}
       />
     </>

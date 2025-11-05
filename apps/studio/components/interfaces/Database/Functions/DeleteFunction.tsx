@@ -8,7 +8,7 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 interface DeleteFunctionProps {
   func?: DatabaseFunction
   visible: boolean
-  setVisible: (value: boolean) => void
+  setVisible: (value: string) => void
 }
 
 export const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
@@ -18,7 +18,7 @@ export const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProp
   const { mutate: deleteDatabaseFunction, isLoading } = useDatabaseFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully removed function ${name}`)
-      setVisible(false)
+      setVisible('')
     },
   })
 
@@ -38,7 +38,7 @@ export const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProp
       <TextConfirmModal
         variant={'warning'}
         visible={visible}
-        onCancel={() => setVisible(!visible)}
+        onCancel={() => setVisible('')}
         onConfirm={handleDelete}
         title="Delete this function"
         loading={isLoading}
