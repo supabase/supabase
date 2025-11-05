@@ -2,10 +2,9 @@ import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { DatabaseZap, FunctionSquare, Plus, Search, Shield } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsString, useQueryState } from 'nuqs'
 
-import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -17,12 +16,10 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
-  Button,
   Card,
-  CardContent,
-  cn,
   Input,
   Table,
   TableBody,
@@ -31,24 +28,30 @@ import {
   TableRow,
 } from 'ui'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
-import TriggerList from './TriggerList'
-import Link from 'next/link'
+import { TriggerList } from './TriggerList'
 
 interface TriggersListProps {
   createTrigger: () => void
   editTrigger: (trigger: PostgresTrigger) => void
+  duplicateTrigger: (trigger: PostgresTrigger) => void
   deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
-const TriggersList = ({
+export const TriggersList = ({
   createTrigger = noop,
   editTrigger = noop,
+  duplicateTrigger = noop,
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [filterString, setFilterString] = useState<string>('')
+
+  const [filterString, setFilterString] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
+  )
 
   const { data: protectedSchemas } = useProtectedSchemas()
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -88,7 +91,7 @@ const TriggersList = ({
   return (
     <div className="space-y-4">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
           <SchemaSelector
             className="w-full lg:w-[180px]"
             size="tiny"
@@ -132,10 +135,10 @@ const TriggersList = ({
                 disabled={!hasTables || !canCreateTriggers}
                 className="px-1 pointer-events-auto"
                 icon={<AiIconAnimation size={16} />}
-                onClick={() =>
+                onClick={() => {
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                   aiSnap.newChat({
                     name: 'Create new trigger',
-                    open: true,
                     initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
                     suggestions: {
                       title:
@@ -156,7 +159,7 @@ const TriggersList = ({
                       ],
                     },
                   })
-                }
+                }}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -228,6 +231,7 @@ const TriggersList = ({
                   filterString={filterString}
                   isLocked={isSchemaLocked}
                   editTrigger={editTrigger}
+                  duplicateTrigger={duplicateTrigger}
                   deleteTrigger={deleteTrigger}
                 />
               </TableBody>
@@ -238,5 +242,3 @@ const TriggersList = ({
     </div>
   )
 }
-
-export default TriggersList

@@ -9,7 +9,7 @@ import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
 import type { AuthMFAListFactorsResponse } from '@supabase/auth-js'
 
-const TOTPFactors = ({
+export const TOTPFactors = ({
   data,
   isLoading,
   isError,
@@ -88,5 +88,3 @@ const TOTPFactors = ({
     </>
   )
 }
-
-export default TOTPFactors

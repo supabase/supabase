@@ -38,7 +38,7 @@ interface TemplateEditorProps {
   template: FormSchema
 }
 
-const TemplateEditor = ({ template }: TemplateEditorProps) => {
+export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -76,7 +76,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
@@ -384,5 +383,3 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     </Form_Shadcn_>
   )
 }
-
-export default TemplateEditor

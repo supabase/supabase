@@ -1,10 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { getLogsChartQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { handleError, post } from 'data/fetchers'
 import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { logsKeys } from './keys'
 import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
+import { UseCustomQueryOptions } from 'types'
 
 export async function getUnifiedLogsChart(
   { projectRef, search }: UnifiedLogsVariables,
@@ -148,15 +149,13 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
+  }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) =>
-  useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>(
-    logsKeys.unifiedLogsChart(projectRef, search),
-    ({ signal }) => getUnifiedLogsChart({ projectRef, search }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      keepPreviousData: true,
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+  useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
+    queryKey: logsKeys.unifiedLogsChart(projectRef, search),
+    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    keepPreviousData: true,
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })

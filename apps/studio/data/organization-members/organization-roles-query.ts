@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only']
@@ -34,21 +34,19 @@ export const useOrganizationRolesV2Query = <TData = OrganizationRolesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationRolesData, OrganizationRolesError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationRolesData, OrganizationRolesError, TData> = {}
 ) =>
-  useQuery<OrganizationRolesData, OrganizationRolesError, TData>(
-    organizationKeys.rolesV2(slug),
-    ({ signal }) => getOrganizationRoles({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      select: (data) => {
-        return {
-          ...data,
-          org_scoped_roles: data.org_scoped_roles.sort((a, b) => {
-            return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
-          }),
-        } as any
-      },
-      ...options,
-    }
-  )
+  useQuery<OrganizationRolesData, OrganizationRolesError, TData>({
+    queryKey: organizationKeys.rolesV2(slug),
+    queryFn: ({ signal }) => getOrganizationRoles({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    select: (data) => {
+      return {
+        ...data,
+        org_scoped_roles: data.org_scoped_roles.sort((a, b) => {
+          return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
+        }),
+      } as any
+    },
+    ...options,
+  })

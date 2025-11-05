@@ -1,15 +1,12 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
-// [Joshen] Try to keep this value a multiple of 6 (common denominator of 2 and 3) to fit the cards view
-// So that the last row will always be a full row of cards while there's a next page
-// API max rows is 100, I'm just choosing 96 here as the highest value thats a multiple of 6
-const DEFAULT_LIMIT = 96
+const DEFAULT_LIMIT = 100
 
 interface GetProjectsInfiniteVariables {
   limit?: number
@@ -53,24 +50,24 @@ export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<ProjectsInfiniteData, ProjectsInfiniteError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<ProjectsInfiniteData, ProjectsInfiniteError, TData> = {}
 ) => {
   const { profile } = useProfile()
-  return useInfiniteQuery<ProjectsInfiniteData, ProjectsInfiniteError, TData>(
-    projectKeys.infiniteList({ limit, sort, search }),
-    ({ signal, pageParam }) => getProjects({ limit, page: pageParam, sort, search }, signal),
-    {
-      enabled: enabled && profile !== undefined,
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        const currentTotalCount = page * limit
-        // @ts-ignore [Joshen] API type issue for Version 2 endpoints
-        const totalCount = lastPage.pagination.count
+  return useInfiniteQuery<ProjectsInfiniteData, ProjectsInfiniteError, TData>({
+    queryKey: projectKeys.infiniteList({ limit, sort, search }),
+    queryFn: ({ signal, pageParam }) =>
+      getProjects({ limit, page: pageParam, sort, search }, signal),
+    enabled: enabled && profile !== undefined,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      const currentTotalCount = page * limit
+      // @ts-ignore [Joshen] API type issue for Version 2 endpoints
+      const totalCount = lastPage.pagination.count
 
-        if (currentTotalCount >= totalCount) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
+      if (currentTotalCount >= totalCount) return undefined
+      return page
+    },
+    ...options,
+  })
 }

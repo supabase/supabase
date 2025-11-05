@@ -20,7 +20,7 @@ import { SectionContent } from './SectionContent'
 
 export interface ComputeProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   startDate: string | undefined
   endDate: string | undefined
   subscription: OrgSubscription | undefined

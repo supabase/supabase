@@ -86,7 +86,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ slug })
 
   // Move all hooks to the top to comply with Rules of Hooks
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
@@ -241,6 +241,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
           {sortedProjects?.map((project) => (
             <ProjectCard
               key={project.ref}
+              slug={slug}
               project={project}
               rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
               resourceWarnings={resourceWarnings?.find(

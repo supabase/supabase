@@ -1,10 +1,10 @@
-import { UseMutationOptions, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'data/api'
 import { fetchPost } from 'data/fetchers'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 type DownloadBucketObjectParams = {
   projectRef: string
@@ -34,23 +34,21 @@ export const useBucketObjectDownloadMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketObjectDeleteData, ResponseError, DownloadBucketObjectParams>,
+  UseCustomMutationOptions<BucketObjectDeleteData, ResponseError, DownloadBucketObjectParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BucketObjectDeleteData, ResponseError, DownloadBucketObjectParams>(
-    (vars) => downloadBucketObject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to download bucket object: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BucketObjectDeleteData, ResponseError, DownloadBucketObjectParams>({
+    mutationFn: (vars) => downloadBucketObject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to download bucket object: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

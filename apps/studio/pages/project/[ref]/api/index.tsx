@@ -1,8 +1,10 @@
 import { useParams } from 'common'
 import { useState } from 'react'
 
-import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
-import LangSelector from 'components/interfaces/Docs/LangSelector'
+import { GeneralContent } from 'components/interfaces/Docs/GeneralContent'
+import { LangSelector } from 'components/interfaces/Docs/LangSelector'
+import { ResourceContent } from 'components/interfaces/Docs/ResourceContent'
+import { RpcContent } from 'components/interfaces/Docs/RpcContent'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'

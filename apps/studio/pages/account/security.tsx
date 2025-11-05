@@ -1,10 +1,18 @@
 import dynamic from 'next/dynamic'
 import { AlertCircle, ChevronRightIcon, Fingerprint, Smartphone } from 'lucide-react'
+
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -15,21 +23,16 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 
 import type { NextPageWithLayout } from 'types'
 import { useState } from 'react'
 import { useFlag } from 'common'
 
 const TOTPFactors = dynamic(() =>
-  import('components/interfaces/Account').then((mod) => mod.TOTPFactors)
+  import('components/interfaces/Account/TOTPFactors').then((mod) => mod.TOTPFactors)
 )
 const WebAuthnFactors = dynamic(() =>
-  import('components/interfaces/Account').then((mod) => mod.WebAuthnFactors)
+  import('components/interfaces/Account/WebAuthnFactors').then((mod) => mod.WebAuthnFactors)
 )
 
 const collapsibleClasses = [
@@ -52,6 +55,11 @@ const Security: NextPageWithLayout = () => {
   const enableWebAuthnMfa = useFlag('enableWebAuthnMfa')
 
   const verifiedFactors = data?.all.filter((factor) => factor.status === 'verified')
+  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
+
+  if (!showSecuritySettings) {
+    return <UnknownInterface urlBack={`/account/me`} />
+  }
 
   return (
     <>
@@ -171,7 +179,7 @@ const Security: NextPageWithLayout = () => {
 
 Security.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout hideMobileMenu headerTitle="Account">
       <OrganizationLayout>
         <AccountLayout title="Security">{page}</AccountLayout>
       </OrganizationLayout>

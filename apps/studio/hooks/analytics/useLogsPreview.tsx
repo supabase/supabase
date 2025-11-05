@@ -100,9 +100,9 @@ function useLogsPreview({
     fetchNextPage,
     isFetchingNextPage,
     refetch,
-  } = useInfiniteQuery(
+  } = useInfiniteQuery({
     queryKey,
-    async ({ signal, pageParam }) => {
+    queryFn: async ({ signal, pageParam }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -119,19 +119,17 @@ function useLogsPreview({
 
       return data as unknown as Logs
     },
-    {
-      refetchOnWindowFocus: false,
-      getNextPageParam(lastPage) {
-        if ((lastPage.result?.length ?? 0) === 0) {
-          return undefined
-        }
-        const len = lastPage.result.length
-        const { timestamp: tsLimit }: LogData = lastPage.result[len - 1]
-        const isoTsLimit = dayjs.utc(Number(tsLimit / 1000)).toISOString()
-        return isoTsLimit
-      },
-    }
-  )
+    refetchOnWindowFocus: false,
+    getNextPageParam(lastPage) {
+      if ((lastPage.result?.length ?? 0) === 0) {
+        return undefined
+      }
+      const len = lastPage.result.length
+      const { timestamp: tsLimit }: LogData = lastPage.result[len - 1]
+      const isoTsLimit = dayjs.utc(Number(tsLimit / 1000)).toISOString()
+      return isoTsLimit
+    },
+  })
 
   const { logData, error, oldestTimestamp } = useMemo(() => {
     let logData: LogData[] = []
@@ -169,9 +167,9 @@ function useLogsPreview({
     [projectRef, countQuerySql, latestRefresh, timestampEnd, table, mergedFilters]
   )
 
-  const { data: countData } = useQuery(
-    countQueryKey,
-    async ({ signal }) => {
+  const { data: countData } = useQuery({
+    queryKey: countQueryKey,
+    queryFn: async ({ signal }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -189,12 +187,10 @@ function useLogsPreview({
 
       return data as unknown as Count
     },
-    {
-      refetchOnWindowFocus: false,
-      refetchInterval: 60000,
-      enabled: !error && data && data?.pages?.length > 0 ? true : false,
-    }
-  )
+    refetchOnWindowFocus: false,
+    refetchInterval: 60000,
+    enabled: !error && data && data?.pages?.length > 0 ? true : false,
+  })
 
   const newCount = countData?.result?.[0]?.count ?? 0
 
@@ -217,9 +213,9 @@ function useLogsPreview({
     [projectRef, chartQuery, timestampStart, timestampEnd]
   )
 
-  const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
-    chartQueryKey,
-    async ({ signal }) => {
+  const { data: eventChartResponse, refetch: refreshEventChart } = useQuery({
+    queryKey: chartQueryKey,
+    queryFn: async ({ signal }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
           path: { ref: projectRef },
@@ -237,8 +233,8 @@ function useLogsPreview({
 
       return data as unknown as EventChart
     },
-    { refetchOnWindowFocus: false }
-  )
+    refetchOnWindowFocus: false,
+  })
 
   const refresh = useCallback(async () => {
     setLatestRefresh(new Date().toISOString())

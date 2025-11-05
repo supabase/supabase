@@ -19,13 +19,13 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConnectionParameters } from './ConnectionParameters'
-import { DirectConnectionIcon, TransactionIcon } from './PoolerIcons'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
   badge?: string
   title: string
   description: string
+  contentFooter?: ReactNode
   connectionString: string
   ipv4Status: {
     type: 'error' | 'success'
@@ -106,6 +106,7 @@ export const ConnectionPanel = ({
   badge,
   title,
   description,
+  contentFooter,
   connectionString,
   ipv4Status,
   notice,
@@ -124,14 +125,24 @@ export const ConnectionPanel = ({
 
   const links = ipv4Status.links ?? []
 
+  const isTransactionDedicatedPooler = type === 'transaction' && badge === 'Dedicated Pooler'
+
   return (
-    <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
-      <div className="flex flex-col">
+    <div className="relative text-sm flex flex-col gap-5 lg:grid lg:grid-cols-12 w-full">
+      <div className="col-span-4 flex flex-col">
         <div className="flex items-center gap-x-2 mb-2">
           <h1 className="text-sm">{title}</h1>
-          {!!badge && <Badge>{badge}</Badge>}
+          {!!badge && !isTransactionDedicatedPooler && <Badge>{badge}</Badge>}
         </div>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
+        {contentFooter}
+      </div>
+      <div className="col-span-8 flex flex-col gap-2">
+        {isTransactionDedicatedPooler && (
+          <div className="text-xs flex items-center text-foreground-light">
+            Using the Dedicated Pooler:
+          </div>
+        )}
         <div className="flex flex-col -space-y-px">
           {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
           {type === 'transaction' && isSessionMode ? (
@@ -160,7 +171,7 @@ export const ConnectionPanel = ({
                 )}
                 language={lang}
                 value={connectionString}
-                className="[&_code]:text-[12px] [&_code]:text-foreground"
+                className="[&_code]:text-[12px] [&_code]:text-foreground [&_code]:!whitespace-normal"
                 hideLineNumbers
                 onCopyCallback={onCopyCallback}
               />
@@ -176,37 +187,8 @@ export const ConnectionPanel = ({
               {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
             </>
           )}
-          {children}
         </div>
-      </div>
-      <div className="flex flex-col items-end">
         <div className="flex flex-col -space-y-px w-full">
-          {type !== 'session' && (
-            <>
-              <div className="relative border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
-                <div className="absolute top-2 left-2.5">
-                  {type === 'transaction' ? <TransactionIcon /> : <DirectConnectionIcon />}
-                </div>
-                <div className="flex flex-col pl-[52px]">
-                  <span className="text-xs text-foreground">
-                    {type === 'transaction'
-                      ? 'Suitable for a large number of connected clients'
-                      : 'Suitable for long-lived, persistent connections'}
-                  </span>
-                </div>
-              </div>
-              <div className="border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
-                <div className="flex flex-col pl-[52px]">
-                  <span className="text-xs text-foreground">
-                    {type === 'transaction'
-                      ? 'Clients share a connection pool'
-                      : 'Each client has a dedicated connection to Postgres'}
-                  </span>
-                </div>
-              </div>
-            </>
-          )}
-
           {IS_PLATFORM && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
               <div className="flex items-center gap-2">
@@ -244,9 +226,10 @@ export const ConnectionPanel = ({
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-foreground">Only use on a IPv4 network</span>
-                <span className="text-xs text-foreground-lighter">
-                  Use Direct Connection if connecting via an IPv6 network
-                </span>
+                <div className="flex flex-col text-xs text-foreground-lighter">
+                  <p>Session pooler connections are IPv4 proxied for free.</p>
+                  <p>Use Direct Connection if connecting via an IPv6 network.</p>
+                </div>
               </div>
             </div>
           )}
@@ -304,6 +287,7 @@ export const ConnectionPanel = ({
             </Collapsible_Shadcn_>
           )}
         </div>
+        {children}
       </div>
     </div>
   )

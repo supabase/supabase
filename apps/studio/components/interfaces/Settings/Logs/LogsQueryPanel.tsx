@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
+import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
 
@@ -206,7 +206,6 @@ const LogsQueryPanel = ({
             hideFooter
             triggerElement={
               <Button
-                asChild // ?: we don't want a button inside a button
                 type="text"
                 onClick={() => setShowReference(true)}
                 icon={<BookOpen />}
@@ -310,7 +309,7 @@ const Field = ({
         ) : (
           <Tooltip>
             <TooltipTrigger>
-              <Clipboard size={14} strokeWidth={1.5} />
+              <Copy size={14} strokeWidth={1.5} />
             </TooltipTrigger>
             <TooltipContent side="bottom">Copy value</TooltipContent>
           </Tooltip>

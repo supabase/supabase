@@ -12,7 +12,7 @@ import { useMfaWebAuthnChallengeAndVerifyMutation } from 'data/profile/mfa-webau
 import type { AuthMFAListFactorsResponse } from '@supabase/auth-js'
 import { Loader2 } from 'lucide-react'
 
-const WebAuthnFactors = ({
+export const WebAuthnFactors = ({
   data,
   isLoading,
   isError,
