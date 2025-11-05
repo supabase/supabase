@@ -1,12 +1,13 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
 import { useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import {
-  EnumeratedType,
+  type EnumeratedType,
   useEnumeratedTypesQuery,
 } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
@@ -31,7 +32,6 @@ import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
 import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 
 export const EnumeratedTypes = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -39,9 +39,13 @@ export const EnumeratedTypes = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [showCreateTypePanel, setShowCreateTypePanel] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [selectedTypeToEdit, setSelectedTypeToEdit] = useState<EnumeratedType>()
+  const [selectedTypeToEdit, setSelectedTypeToEdit] = useQueryState(
+    'edit',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
+
   const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
 
   const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
@@ -154,7 +158,7 @@ export const EnumeratedTypes = () => {
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem
                                   className="space-x-2"
-                                  onClick={() => setSelectedTypeToEdit(type)}
+                                  onClick={() => setSelectedTypeToEdit(type.id.toString())}
                                 >
                                   <Edit size={14} />
                                   <p>Update type</p>
@@ -186,9 +190,9 @@ export const EnumeratedTypes = () => {
       />
 
       <EditEnumeratedTypeSidePanel
-        visible={selectedTypeToEdit !== undefined}
-        selectedEnumeratedType={selectedTypeToEdit}
-        onClose={() => setSelectedTypeToEdit(undefined)}
+        visible={!!selectedTypeToEdit}
+        selectedEnumeratedType={data?.find((type) => type.id.toString() === selectedTypeToEdit)}
+        onClose={() => setSelectedTypeToEdit('')}
       />
 
       <DeleteEnumeratedTypeModal
