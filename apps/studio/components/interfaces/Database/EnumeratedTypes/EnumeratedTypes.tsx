@@ -46,7 +46,10 @@ export const EnumeratedTypes = () => {
     parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
+  const [selectedTypeToDelete, setSelectedTypeToDelete] = useQueryState(
+    'delete',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -165,7 +168,7 @@ export const EnumeratedTypes = () => {
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   className="space-x-2"
-                                  onClick={() => setSelectedTypeToDelete(type)}
+                                  onClick={() => setSelectedTypeToDelete(type.id.toString())}
                                 >
                                   <Trash size={14} />
                                   <p>Delete type</p>
@@ -196,9 +199,9 @@ export const EnumeratedTypes = () => {
       />
 
       <DeleteEnumeratedTypeModal
-        visible={selectedTypeToDelete !== undefined}
-        selectedEnumeratedType={selectedTypeToDelete}
-        onClose={() => setSelectedTypeToDelete(undefined)}
+        visible={!!selectedTypeToDelete}
+        selectedEnumeratedType={data?.find((type) => type.id.toString() === selectedTypeToDelete)}
+        onClose={() => setSelectedTypeToDelete('')}
       />
     </div>
   )
