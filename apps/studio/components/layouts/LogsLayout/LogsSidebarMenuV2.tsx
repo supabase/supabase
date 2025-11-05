@@ -231,7 +231,7 @@ export function LogsSidebarMenuV2() {
   })
 
   return (
-    <div className="pb-12 relative">
+    <div className="pb-4 relative">
       {IS_PLATFORM && !unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
@@ -370,6 +370,8 @@ export function LogsSidebarMenuV2() {
           <SavedQueriesItem item={query as any} key={query.id} /> // kemal: i know, i know, temp any fix.
         ))}
       </SidebarCollapsible>
+
+      <Separator className="my-4" />
 
       <FeaturePreviewSidebarPanel
         className="mx-4 mt-4"
