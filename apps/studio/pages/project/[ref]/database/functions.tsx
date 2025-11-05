@@ -8,8 +8,9 @@ import FunctionsList from 'components/interfaces/Database/Functions/FunctionsLis
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -98,20 +99,14 @@ $$;`)
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12">
-            <FormHeader
-              title="Database Functions"
-              docsUrl={`${DOCS_URL}/guides/database/functions`}
-            />
-            <FunctionsList
-              createFunction={createFunction}
-              duplicateFunction={duplicateFunction}
-              editFunction={editFunction}
-              deleteFunction={deleteFunction}
-            />
-          </div>
+      <ScaffoldContainer size="large">
+        <ScaffoldSection isFullWidth>
+          <FunctionsList
+            createFunction={createFunction}
+            duplicateFunction={duplicateFunction}
+            editFunction={editFunction}
+            deleteFunction={deleteFunction}
+          />
         </ScaffoldSection>
       </ScaffoldContainer>
       <CreateFunction
@@ -134,7 +129,16 @@ $$;`)
 
 DatabaseFunctionsPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Database">
+      <PageLayout
+        title="Database Functions"
+        subtitle="Manage your database functions"
+        secondaryActions={<DocsButton href={`${DOCS_URL}/guides/database/functions`} />}
+        size="large"
+      >
+        {page}
+      </PageLayout>
+    </DatabaseLayout>
   </DefaultLayout>
 )
 

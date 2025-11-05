@@ -7,9 +7,11 @@ import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/Del
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DocsButton } from 'components/ui/DocsButton'
 import { Entity, isTableLike, postgresTableToEntity } from 'data/table-editor/table-editor-types'
+import { DOCS_URL } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
@@ -21,26 +23,23 @@ const DatabaseTables: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12">
-            <FormHeader title="Database Tables" />
-            <TableList
-              onAddTable={snap.onAddTable}
-              onEditTable={(table) => {
-                setSelectedTableToEdit(postgresTableToEntity(table))
-                snap.onEditTable()
-              }}
-              onDeleteTable={(table) => {
-                setSelectedTableToEdit(postgresTableToEntity(table))
-                snap.onDeleteTable()
-              }}
-              onDuplicateTable={(table) => {
-                setSelectedTableToEdit(postgresTableToEntity(table))
-                snap.onDuplicateTable()
-              }}
-            />
-          </div>
+      <ScaffoldContainer size="large">
+        <ScaffoldSection isFullWidth>
+          <TableList
+            onAddTable={snap.onAddTable}
+            onEditTable={(table) => {
+              setSelectedTableToEdit(postgresTableToEntity(table))
+              snap.onEditTable()
+            }}
+            onDeleteTable={(table) => {
+              setSelectedTableToEdit(postgresTableToEntity(table))
+              snap.onDeleteTable()
+            }}
+            onDuplicateTable={(table) => {
+              setSelectedTableToEdit(postgresTableToEntity(table))
+              snap.onDuplicateTable()
+            }}
+          />
         </ScaffoldSection>
       </ScaffoldContainer>
 
@@ -63,7 +62,11 @@ const DatabaseTables: NextPageWithLayout = () => {
 
 DatabaseTables.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Database">
+      <PageLayout title="Database Tables" size="large">
+        {page}
+      </PageLayout>
+    </DatabaseLayout>
   </DefaultLayout>
 )
 

@@ -20,7 +20,7 @@ const DatabasePublications: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer>
+    <ScaffoldContainer size="large">
       <ScaffoldSection isFullWidth>
         <PublicationsList />
       </ScaffoldSection>
@@ -31,7 +31,9 @@ const DatabasePublications: NextPageWithLayout = () => {
 DatabasePublications.getLayout = (page) => (
   <DefaultLayout>
     <DatabaseLayout title="Database">
-      <PageLayout title="Database Publications">{page}</PageLayout>
+      <PageLayout title="Database Publications" size="large">
+        {page}
+      </PageLayout>
     </DatabaseLayout>
   </DefaultLayout>
 )

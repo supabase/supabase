@@ -9,7 +9,8 @@ import { PoolingModesModal } from 'components/interfaces/Settings/Database/Pooli
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
@@ -25,28 +26,25 @@ const ProjectSettings: NextPageWithLayout = () => {
   return (
     <>
       <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Database Settings</ScaffoldTitle>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer bottomPadding>
-        <div className="space-y-10">
-          <div className="flex flex-col gap-y-10">
-            <DatabaseReadOnlyAlert />
-            <ResetDbPassword />
-            <ConnectionPooling />
-          </div>
+        <ScaffoldSection isFullWidth>
+          <div className="space-y-10">
+            <div className="flex flex-col gap-y-10">
+              <DatabaseReadOnlyAlert />
+              <ResetDbPassword />
+              <ConnectionPooling />
+            </div>
 
-          <SSLConfiguration />
-          {showNewDiskManagementUI ? (
-            // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
-            <DiskManagementPanelForm />
-          ) : (
-            <DiskSizeConfiguration />
-          )}
-          {databaseNetworkRestrictions && <NetworkRestrictions />}
-          <BannedIPs />
-        </div>
+            <SSLConfiguration />
+            {showNewDiskManagementUI ? (
+              // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
+              <DiskManagementPanelForm />
+            ) : (
+              <DiskSizeConfiguration />
+            )}
+            {databaseNetworkRestrictions && <NetworkRestrictions />}
+            <BannedIPs />
+          </div>
+        </ScaffoldSection>
       </ScaffoldContainer>
       <PoolingModesModal />
     </>
@@ -55,7 +53,9 @@ const ProjectSettings: NextPageWithLayout = () => {
 
 ProjectSettings.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Database">
+      <PageLayout title="Database Settings">{page}</PageLayout>
+    </DatabaseLayout>
   </DefaultLayout>
 )
 
