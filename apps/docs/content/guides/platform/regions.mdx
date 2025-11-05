@@ -1,18 +1,19 @@
 ---
 title: Available regions
-subtitle: Spin up Supabase projects in our global regions
 ---
 
-The following regions are available for your Supabase projects.
+Each Supabase project is deployed to one primary region. Choose the location closest to your users for the best performance.
 
-## Smart region selection
+## General regions
 
-Smart Region Selection is a feature that allows you to select from a list of broader regions. Optimizations are made to ensure that the selected region has compute capacity availability.
+For most projects, we recommend choosing a general region. Supabase will deploy your project to an available AWS region within that area based on current infrastructure capacity.
 
 <SmartRegionsList />
 
-Currently, smart region selection is not available for read replicas and project-related operations via the management API.
+Note: General regions aren’t yet supported for read replicas or management via the API.
 
-## AWS
+## Specific regions
+
+If you prefer, you can choose an exact AWS region for your project.
 
 <RegionsList />
