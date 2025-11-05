@@ -36,13 +36,13 @@ const FormSchema = z.object({
 
 type FormSchemaType = z.infer<typeof FormSchema>
 
-interface EditSecretModalProps {
+interface EditSecretSheetProps {
   secret?: ProjectSecret
   visible: boolean
   onClose: () => void
 }
 
-export function EditSecretModal({ secret, visible, onClose }: EditSecretModalProps) {
+export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetProps) {
   const { ref: projectRef } = useParams()
 
   const [isClosingPanel, setIsClosingPanel] = useState(false)

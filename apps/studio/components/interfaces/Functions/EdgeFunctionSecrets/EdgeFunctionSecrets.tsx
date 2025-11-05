@@ -15,7 +15,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddNewSecretForm from './AddNewSecretForm'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
-import { EditSecretModal } from './EditSecretModal'
+import { EditSecretSheet } from './EditSecretSheet'
 
 type SelectedProjectSecret = {
   secret: ProjectSecret
@@ -138,7 +138,7 @@ const EdgeFunctionSecrets = () => {
         </>
       )}
 
-      <EditSecretModal
+      <EditSecretSheet
         secret={selectedSecret?.secret}
         visible={selectedSecret !== undefined && selectedSecret.op === 'edit'}
         onClose={() => setSelectedSecret(undefined)}
