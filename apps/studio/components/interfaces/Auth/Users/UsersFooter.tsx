@@ -9,13 +9,13 @@ import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { Filter } from './Users.constants'
+import { Filter, SpecificFilterColumn } from './Users.constants'
 
 interface UsersFooterProps {
   filter: Filter
   filterKeywords: string
   selectedProviders: string[]
-  specificFilterColumn: string
+  specificFilterColumn: SpecificFilterColumn
 }
 
 export const UsersFooter = ({

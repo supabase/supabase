@@ -49,14 +49,13 @@ import {
   MAX_BULK_DELETE,
   PHONE_NUMBER_LEFT_PREFIX_REGEX,
   PROVIDER_FILTER_OPTIONS,
+  SpecificFilterColumn,
   USERS_TABLE_COLUMNS,
   UUIDV4_LEFT_PREFIX_REGEX,
 } from './Users.constants'
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
-
-type SpecificFilterColumn = OptimizedSearchColumns | 'freeform'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 
