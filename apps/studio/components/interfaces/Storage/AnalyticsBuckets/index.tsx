@@ -113,7 +113,13 @@ export const AnalyticsBuckets = () => {
                   {analyticsBuckets.map((bucket) => (
                     <TableRow key={bucket.id}>
                       <TableCell>
-                        <p className="text-foreground">{bucket.id}</p>
+                        <Link
+                          href={`/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`}
+                          title={bucket.id}
+                          className="text-link-table-cell"
+                        >
+                          {bucket.id}
+                        </Link>
                       </TableCell>
 
                       <TableCell>
