@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { DocsButton } from 'components/ui/DocsButton'
@@ -24,7 +24,8 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import type { PlainObject } from 'lib/type-helpers'
+import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -84,23 +85,26 @@ export const TableEditor = ({
   saveChanges = noop,
   updateEditorDirty = noop,
 }: TableEditorProps) => {
+  const tableEditorApi = useContext(TableEditorStateContext)
   const snap = useTableEditorStateSnapshot()
+
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
-  const isNewRecord = isUndefined(table)
+
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
+  const isNewRecord = isUndefined(table)
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
     if (params.create === 'table' && snap.ui.open === 'none') {
-      snap.onAddTable()
+      tableEditorApi.onAddTable()
       setParams({ ...params, create: undefined })
     }
-  }, [snap, params, setParams])
+  }, [tableEditorApi, setParams, snap.ui.open, params])
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -121,9 +125,9 @@ export const TableEditor = ({
   const realtimeEnabledTables = realtimePublication?.tables ?? []
   const isRealtimeEnabled = isNewRecord
     ? false
-    : realtimeEnabledTables.some((t: any) => t.id === table?.id)
+    : realtimeEnabledTables.some((t) => t.id === table?.id)
 
-  const [errors, setErrors] = useState<any>({})
+  const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
 
@@ -194,24 +198,25 @@ export const TableEditor = ({
     setFkRelations(relations)
   }
 
-  const onSaveChanges = (resolve: any) => {
+  const onSaveChanges = (resolve: () => void) => {
     if (tableFields) {
-      const errors: any = validateFields(tableFields)
+      const errors = validateFields(tableFields)
       if (errors.name) {
         toast.error(errors.name)
       }
-
       if (errors.columns) {
         toast.error(errors.columns)
       }
       setErrors(errors)
+
+      const isRlsEnabledChanged = tableFields.isRLSEnabled !== (table?.rls_enabled ?? false)
 
       if (isEmpty(errors)) {
         const payload = {
           name: tableFields.name.trim(),
           schema: selectedSchema,
           comment: tableFields.comment?.trim(),
-          ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
+          ...(!isNewRecord && isRlsEnabledChanged && { rls_enabled: tableFields.isRLSEnabled }),
         }
         const configuration = {
           tableId: table?.id,
@@ -295,7 +300,7 @@ export const TableEditor = ({
           label="Name"
           layout="horizontal"
           type="text"
-          error={errors.name}
+          error={errors.name ? String(errors.name) : undefined}
           value={tableFields?.name}
           onChange={(event: any) => onUpdateField({ name: event.target.value })}
         />

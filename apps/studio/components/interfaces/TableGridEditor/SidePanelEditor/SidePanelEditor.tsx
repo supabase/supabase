@@ -474,7 +474,7 @@ export const SidePanelEditor = ({
         toast.success(`Table ${table.name} is good to go!`, { id: toastId })
         onTableCreated(table)
       } else if (selectedTable) {
-        toastId = toast.loading(`Updating table: ${selectedTable?.name}...`)
+        toastId = toast.loading(`Updating table: ${selectedTable.name}...`)
 
         const { table, hasError } = await updateTable({
           projectRef: project?.ref!,

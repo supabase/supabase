@@ -10,8 +10,13 @@ import type { ColumnField } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 
-export const validateFields = (field: TableField) => {
-  const errors = {} as any
+type ValidateFieldsReturn = {
+  name?: string
+  columns?: string
+}
+
+export const validateFields = (field: TableField): ValidateFieldsReturn => {
+  const errors: ValidateFieldsReturn = {}
   if (field.name.length === 0) {
     errors['name'] = 'Please assign a name for your table'
   }
