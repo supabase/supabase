@@ -4,9 +4,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfileNameAndPicture } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -33,7 +32,6 @@ export function UserDropdown() {
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
-  const signOut = useSignOut()
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const sendTelemetry = useCommandMenuOpenedTelemetry()
   const { openFeaturePreviewModal } = useFeaturePreviewModal()
@@ -131,8 +129,8 @@ export function UserDropdown() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onSelect={async () => {
-                  await signOut()
+                onSelect={() => {
+                  router.push('/logout')
                 }}
               >
                 Log out

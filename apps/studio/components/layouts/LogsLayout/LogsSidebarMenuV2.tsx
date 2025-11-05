@@ -1,7 +1,7 @@
 import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
@@ -32,6 +32,7 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
+import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -230,7 +231,7 @@ export function LogsSidebarMenuV2() {
   })
 
   return (
-    <div className="pb-12 relative">
+    <div className="pb-4 relative">
       {IS_PLATFORM && !unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
@@ -316,14 +317,14 @@ export function LogsSidebarMenuV2() {
         <>
           <SidebarCollapsible title="Collections" defaultOpen={true}>
             {filteredLogs.map((collection) => {
-              const isItemActive = isActive(collection.url)
+              const isItemActive = isActive(collection?.url ?? '')
               return (
                 <LogsSidebarItem
-                  key={collection.key}
+                  key={collection?.key ?? ''}
                   isActive={isItemActive}
-                  href={collection.url}
+                  href={collection?.url ?? ''}
                   icon={<SupaIcon className="text-foreground-light" />}
-                  label={collection.name}
+                  label={collection?.name ?? ''}
                 />
               )
             })}
@@ -366,9 +367,29 @@ export function LogsSidebarMenuV2() {
           />
         )}
         {savedQueries.map((query) => (
-          <SavedQueriesItem item={query} key={query.id} />
+          <SavedQueriesItem item={query as any} key={query.id} /> // kemal: i know, i know, temp any fix.
         ))}
       </SidebarCollapsible>
+
+      <Separator className="my-4" />
+
+      <FeaturePreviewSidebarPanel
+        className="mx-4 mt-4"
+        title="Capture your logs"
+        description="Send logs to your preferred observability or storage platform."
+        illustration={
+          <div className="flex items-center gap-4">
+            {LOG_DRAIN_TYPES.map((type) =>
+              React.cloneElement(type.icon, { height: 20, width: 20 })
+            )}
+          </div>
+        }
+        actions={
+          <Button asChild type="default">
+            <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
+          </Button>
+        }
+      />
     </div>
   )
 }

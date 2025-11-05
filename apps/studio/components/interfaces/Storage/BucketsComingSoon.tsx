@@ -3,6 +3,7 @@ import { Bucket } from 'icons'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
+import { BUCKET_TYPES } from './Storage.constants'
 
 export const BucketsComingSoon = ({ type }: { type: 'analytics' | 'vector' }) => {
   return (
@@ -13,9 +14,9 @@ export const BucketsComingSoon = ({ type }: { type: 'analytics' | 'vector' }) =>
           <h3>Coming soon</h3>
           <p className="text-foreground-light text-sm">
             {type === 'analytics'
-              ? 'Store large datasets for analytics and reporting'
+              ? BUCKET_TYPES.analytics.valueProp
               : type === 'vector'
-                ? 'Store, index, and query your vector embeddings at scale.'
+                ? BUCKET_TYPES.vectors.valueProp
                 : undefined}
           </p>
         </div>
