@@ -23,9 +23,7 @@ function contentToCamelCase(feature: CustomContent) {
 type CustomContentResult<T extends CustomContent[]> = {
   [key in CustomContentToCamelCase<T[number]> extends keyof CustomContentTypes
     ? CustomContentToCamelCase<T[number]>
-    : never]:
-    | CustomContentTypes[key]
-    | null
+    : never]: CustomContentTypes[key] | null
 }
 
 export const getCustomContent = <T extends CustomContent[]>(
