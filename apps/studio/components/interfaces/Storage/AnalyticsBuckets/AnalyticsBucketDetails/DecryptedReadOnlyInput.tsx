@@ -1,4 +1,5 @@
 import { ExternalLink, Eye, EyeOff, Loader } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -49,21 +50,23 @@ export const DecryptedReadOnlyInput = ({
         label={
           <div className="flex items-center gap-x-2">
             <span>{label}</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  href={`/project/${ref}/integrations/vault/secrets?search=${value}`}
-                >
-                  <ExternalLink
-                    size={14}
-                    className="text-foreground-muted hover:text-foreground-lighter transition"
-                  />
-                </a>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Open in Vault</TooltipContent>
-            </Tooltip>
+            {secureEntry && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    href={`/project/${ref}/integrations/vault/secrets?search=${value}`}
+                  >
+                    <ExternalLink
+                      size={14}
+                      className="text-foreground-lighter hover:text-foreground transition"
+                    />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Open in Vault</TooltipContent>
+              </Tooltip>
+            )}
           </div>
         }
         description={descriptionText}

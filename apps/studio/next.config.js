@@ -150,13 +150,23 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/storage/policies',
+        destination: '/project/:ref/storage/files/policies',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/storage/buckets/:bucketId',
         destination: '/project/:ref/storage/files/buckets/:bucketId',
         permanent: true,
       },
       {
         source: '/project/:ref/settings/storage',
-        destination: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
         permanent: true,
       },
       {

@@ -72,7 +72,7 @@ export const QueryPerformanceGrid = ({
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
-  const { sort: urlSort, order, roles, search } = useParams()
+  const { sort: urlSort, order, roles, search, minCalls } = useParams()
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
@@ -341,6 +341,11 @@ export const QueryPerformanceGrid = ({
       data = data.filter((row) => row.rolname && roles.includes(row.rolname))
     }
 
+    const minCallsNum = Number(minCalls)
+    if (!Number.isNaN(minCallsNum) && minCallsNum > 0) {
+      data = data.filter((row) => (row.calls || 0) >= minCallsNum)
+    }
+
     if (sort?.column === 'prop_total_time') {
       data.sort((a, b) => {
         const aValue = a.prop_total_time || 0
@@ -360,7 +365,7 @@ export const QueryPerformanceGrid = ({
     }
 
     return data
-  }, [aggregatedData, sort, search, roles])
+  }, [aggregatedData, sort, search, roles, minCalls])
 
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
@@ -372,7 +377,7 @@ export const QueryPerformanceGrid = ({
 
   useEffect(() => {
     setSelectedRow(undefined)
-  }, [search, roles, urlSort, order])
+  }, [search, roles, urlSort, order, minCalls])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {

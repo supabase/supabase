@@ -22,7 +22,7 @@ import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperIn
  * Used for cleaning up analytics bucket after deletion
  */
 export const useAnalyticsBucketAssociatedEntities = (
-  { projectRef, bucketId }: { projectRef?: string; bucketId: string },
+  { projectRef, bucketId }: { projectRef?: string; bucketId?: string },
   options: { enabled: boolean } = { enabled: true }
 ) => {
   const { can: canReadS3Credentials } = useAsyncCheckPermissions(
@@ -40,7 +40,7 @@ export const useAnalyticsBucketAssociatedEntities = (
     { enabled: canReadS3Credentials && options.enabled }
   )
   const s3AccessKey = (s3AccessKeys?.data ?? []).find(
-    (x) => x.description === getAnalyticsBucketS3KeyName(bucketId)
+    (x) => x.description === getAnalyticsBucketS3KeyName(bucketId ?? '')
   )
 
   const { data: sourcesData } = useReplicationSourcesQuery(
@@ -54,7 +54,7 @@ export const useAnalyticsBucketAssociatedEntities = (
     { enabled: options.enabled }
   )
   const publication = publications.find(
-    (p) => p.name === getAnalyticsBucketPublicationName(bucketId)
+    (p) => p.name === getAnalyticsBucketPublicationName(bucketId ?? '')
   )
 
   return { icebergWrapper, icebergWrapperMeta, s3AccessKey, publication }
