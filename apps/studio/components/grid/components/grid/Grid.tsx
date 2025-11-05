@@ -136,18 +136,20 @@ export const Grid = memo(
           className={cn(
             'flex flex-col relative transition-colors',
             containerClass,
-            isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand-600'
           )}
           style={{ width: width || '100%', height: height || '50vh' }}
-          onDragOver={onDragOver}
-          onDragLeave={onDragOver}
-          onDrop={onFileDrop}
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
             <div
+              className={cn(
+                "absolute top-9 p-2 w-full z-[1]",
+                isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand-600',
+              )}
               style={{ height: `calc(100% - 35px)` }}
-              className="absolute top-9 p-2 w-full z-[1] pointer-events-none"
+              onDragOver={onDragOver}
+              onDragLeave={onDragOver}
+              onDrop={onFileDrop}
             >
               {isLoading && <GenericSkeletonLoader />}
 
