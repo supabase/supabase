@@ -1,389 +1,399 @@
-import { expect, test, describe } from 'vitest'
+import { expect, test, afterAll } from 'vitest'
+import { createTestDatabase, cleanupRoot } from '../../db/utils'
 import { getPaginatedUsersSQL } from '../../../src/sql/studio/get-users-paginated'
+import { randomUUID } from 'crypto'
 
-describe('getPaginatedUsersSQL', () => {
-  describe('basic pagination', () => {
-    test('generates default query with no filters', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-      })
+afterAll(async () => {
+  await cleanupRoot()
+})
 
-      expect(result).toContain('select')
-      expect(result).toContain('auth.users')
-      expect(result).toContain('order by')
-      expect(result).toContain('"created_at" desc nulls last')
-      expect(result).toContain('limit')
-      expect(result).toContain('50')
-      expect(result).toContain('offset')
-      expect(result).toContain('0')
-    })
+const withTestDatabase = (
+  name: string,
+  fn: (db: Awaited<ReturnType<typeof createTestDatabase>>) => Promise<void>
+) => {
+  test(name, async () => {
+    const db = await createTestDatabase()
 
-    test('respects custom limit', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        limit: 100,
-      })
+    // Initialize minimal auth schema needed for user pagination tests
+    await db.executeQuery(`
+      CREATE SCHEMA IF NOT EXISTS auth;
 
-      expect(result).toContain('100')
-    })
+      CREATE TABLE IF NOT EXISTS auth.users (
+        instance_id uuid NULL,
+        id uuid NOT NULL UNIQUE,
+        aud varchar(255) NULL,
+        "role" varchar(255) NULL,
+        email varchar(255) NULL,
+        encrypted_password varchar(255) NULL,
+        email_confirmed_at timestamptz NULL,
+        invited_at timestamptz NULL,
+        confirmation_token varchar(255) NULL,
+        confirmation_sent_at timestamptz NULL,
+        recovery_token varchar(255) NULL,
+        recovery_sent_at timestamptz NULL,
+        email_change_token varchar(255) NULL,
+        email_change varchar(255) NULL,
+        email_change_sent_at timestamptz NULL,
+        last_sign_in_at timestamptz NULL,
+        raw_app_meta_data jsonb NULL,
+        raw_user_meta_data jsonb NULL,
+        is_super_admin bool NULL,
+        created_at timestamptz NULL,
+        updated_at timestamptz NULL,
+        phone text NULL,
+        phone_confirmed_at timestamptz NULL,
+        phone_change text NULL,
+        phone_change_token varchar(255) NULL,
+        phone_change_sent_at timestamptz NULL,
+        confirmed_at timestamptz NULL,
+        email_change_token_current varchar(255) NULL,
+        email_change_confirm_status smallint NULL,
+        banned_until timestamptz NULL,
+        reauthentication_token varchar(255) NULL,
+        reauthentication_sent_at timestamptz NULL,
+        is_sso_user bool NOT NULL DEFAULT false,
+        deleted_at timestamptz NULL,
+        is_anonymous bool NOT NULL DEFAULT false,
+        CONSTRAINT users_pkey PRIMARY KEY (id)
+      );
 
-    test('calculates offset based on page and limit', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        page: 2,
-        limit: 25,
-      })
+      CREATE INDEX IF NOT EXISTS users_instance_id_idx ON auth.users USING btree (instance_id);
+      CREATE INDEX IF NOT EXISTS users_instance_id_email_idx ON auth.users USING btree (instance_id, lower(email));
 
-      expect(result).toContain('50')
-    })
+      CREATE TABLE IF NOT EXISTS auth.identities (
+        id text NOT NULL,
+        user_id uuid NOT NULL,
+        identity_data jsonb NOT NULL,
+        provider text NOT NULL,
+        last_sign_in_at timestamptz NULL,
+        created_at timestamptz NULL,
+        updated_at timestamptz NULL,
+        CONSTRAINT identities_pkey PRIMARY KEY (provider, id)
+      );
 
-    test('supports ascending order', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'email',
-        order: 'asc',
-      })
+      CREATE INDEX IF NOT EXISTS identities_user_id_idx ON auth.identities USING btree (user_id);
+    `)
 
-      expect(result).toContain('"email" asc nulls last')
-    })
-
-    test('supports different sort columns', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'last_sign_in_at',
-        order: 'desc',
-      })
-
-      expect(result).toContain('"last_sign_in_at" desc nulls last')
-    })
+    try {
+      await fn(db)
+    } finally {
+      await db.cleanup()
+    }
   })
+}
 
-  describe('keyword search', () => {
-    test('searches across multiple fields', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        keywords: 'john',
-      })
+withTestDatabase('returns paginated users with default settings', async ({ executeQuery }) => {
+  // Insert 10 users with different created_at times
+  for (let i = 0; i < 10; i++) {
+    await executeQuery(`
+      INSERT INTO auth.users (id, email, instance_id, created_at)
+      VALUES (
+        '${randomUUID()}',
+        'user${i}@supabase.io',
+        '00000000-0000-0000-0000-000000000000',
+        NOW() + INTERVAL '${i} minutes'
+      )
+    `)
+  }
 
-      expect(result).toContain("id::text like '%john%'")
-      expect(result).toContain("email like '%john%'")
-      expect(result).toContain("phone like '%john%'")
-      expect(result).toContain("raw_user_meta_data->>'full_name' ilike '%john%'")
-      expect(result).toContain("raw_user_meta_data->>'first_name' ilike '%john%'")
-      expect(result).toContain("raw_user_meta_data->>'last_name' ilike '%john%'")
-      expect(result).toContain("raw_user_meta_data->>'display_name' ilike '%john%'")
-    })
+  // Get first page (default limit 50, page 0)
+  const sql = getPaginatedUsersSQL({ sort: 'created_at', order: 'desc' })
+  const result = await executeQuery<Array<{ email: string }>>(sql)
 
-    test('escapes single quotes in keywords', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        keywords: "O'Brien",
-      })
+  expect(result.length).toBe(10)
+  // Should be ordered by created_at desc, so user9 should be first
+  expect(result[0].email).toBe('user9@supabase.io')
+  expect(result[9].email).toBe('user0@supabase.io')
+})
 
-      expect(result).toContain("O''Brien")
-      expect(result).not.toContain("O'Brien")
-    })
+withTestDatabase('respects custom limit and pagination', async ({ executeQuery }) => {
+  // Insert 30 users
+  for (let i = 0; i < 30; i++) {
+    await executeQuery(`
+      INSERT INTO auth.users (id, email, instance_id, created_at)
+      VALUES (
+        '${randomUUID()}',
+        'user${String(i).padStart(2, '0')}@supabase.io',
+        '00000000-0000-0000-0000-000000000000',
+        NOW() + INTERVAL '${i} minutes'
+      )
+    `)
+  }
 
-    test('does not add search conditions for empty keywords', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        keywords: '',
-      })
+  // Get page 1 with limit 10 (should skip first 10, get next 10)
+  const sql = getPaginatedUsersSQL({ sort: 'created_at', order: 'desc', limit: 10, page: 1 })
+  const result = await executeQuery<Array<{ email: string }>>(sql)
 
-      expect(result).not.toContain("like '%'")
-    })
+  expect(result.length).toBe(10)
+  // Page 1 should start at user19 (0-indexed, skipping first 10)
+  expect(result[0].email).toBe('user19@supabase.io')
+  expect(result[9].email).toBe('user10@supabase.io')
+})
+
+withTestDatabase('sorts by email in ascending order', async ({ executeQuery }) => {
+  await executeQuery(`
+    INSERT INTO auth.users (id, email, instance_id, created_at)
+    VALUES 
+      ('${randomUUID()}', 'charlie@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
+      ('${randomUUID()}', 'alice@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
+      ('${randomUUID()}', 'bob@supabase.io', '00000000-0000-0000-0000-000000000000', NOW())
+  `)
+
+  const sql = getPaginatedUsersSQL({ sort: 'email', order: 'asc', limit: 10 })
+  const result = await executeQuery<Array<{ email: string }>>(sql)
+
+  expect(result.length).toBe(3)
+  expect(result[0].email).toBe('alice@supabase.io')
+  expect(result[1].email).toBe('bob@supabase.io')
+  expect(result[2].email).toBe('charlie@supabase.io')
+})
+
+withTestDatabase('filters by keywords across multiple fields', async ({ executeQuery }) => {
+  const searchUserId = randomUUID()
+
+  await executeQuery(`
+    INSERT INTO auth.users (id, email, phone, instance_id, raw_user_meta_data, created_at)
+    VALUES 
+      ('${searchUserId}', 'john.doe@supabase.io', NULL, '00000000-0000-0000-0000-000000000000', '{"full_name": "John Doe"}', NOW()),
+      ('${randomUUID()}', 'jane.smith@supabase.io', '+1234567890', '00000000-0000-0000-0000-000000000000', '{"full_name": "Jane Smith"}', NOW()),
+      ('${randomUUID()}', 'bob.jones@supabase.io', '+9876543210', '00000000-0000-0000-0000-000000000000', '{"full_name": "Bob Jones"}', NOW())
+  `)
+
+  // Search by keyword "john" - should find john.doe by email
+  const emailSql = getPaginatedUsersSQL({ sort: 'created_at', order: 'desc', keywords: 'john' })
+  const emailResult = await executeQuery<Array<{ email: string }>>(emailSql)
+  expect(emailResult.length).toBe(1)
+  expect(emailResult[0].email).toBe('john.doe@supabase.io')
+
+  // Search by phone
+  const phoneSql = getPaginatedUsersSQL({ sort: 'created_at', order: 'desc', keywords: '1234' })
+  const phoneResult = await executeQuery<Array<{ phone: string }>>(phoneSql)
+  expect(phoneResult.length).toBe(1)
+  expect(phoneResult[0].phone).toBe('+1234567890')
+
+  // Search by ID prefix
+  const idPrefix = searchUserId.substring(0, 8)
+  const idSql = getPaginatedUsersSQL({ sort: 'created_at', order: 'desc', keywords: idPrefix })
+  const idResult = await executeQuery<Array<{ email: string }>>(idSql)
+  expect(idResult.length).toBe(1)
+  expect(idResult[0].email).toBe('john.doe@supabase.io')
+})
+
+withTestDatabase('filters verified and unverified users', async ({ executeQuery }) => {
+  const now = new Date().toISOString()
+
+  await executeQuery(`
+    INSERT INTO auth.users (id, email, instance_id, email_confirmed_at, created_at)
+    VALUES 
+      ('${randomUUID()}', 'verified1@supabase.io', '00000000-0000-0000-0000-000000000000', '${now}', NOW()),
+      ('${randomUUID()}', 'verified2@supabase.io', '00000000-0000-0000-0000-000000000000', '${now}', NOW()),
+      ('${randomUUID()}', 'unverified@supabase.io', '00000000-0000-0000-0000-000000000000', NULL, NOW())
+  `)
+
+  // Filter verified users
+  const verifiedSql = getPaginatedUsersSQL({
+    sort: 'created_at',
+    order: 'desc',
+    verified: 'verified',
   })
+  const verifiedResult = await executeQuery<Array<{ email: string }>>(verifiedSql)
+  expect(verifiedResult.length).toBe(2)
 
-  describe('verified filter', () => {
-    test('filters for verified users', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        verified: 'verified',
-      })
-
-      expect(result).toContain('email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL')
-    })
-
-    test('filters for unverified users', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        verified: 'unverified',
-      })
-
-      expect(result).toContain('email_confirmed_at IS NULL AND phone_confirmed_at IS NULL')
-    })
-
-    test('filters for anonymous users', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        verified: 'anonymous',
-      })
-
-      expect(result).toContain('is_anonymous is true')
-    })
+  // Filter unverified users
+  const unverifiedSql = getPaginatedUsersSQL({
+    sort: 'created_at',
+    order: 'desc',
+    verified: 'unverified',
   })
+  const unverifiedResult = await executeQuery<Array<{ email: string }>>(unverifiedSql)
+  expect(unverifiedResult.length).toBe(1)
+  expect(unverifiedResult[0].email).toBe('unverified@supabase.io')
+})
 
-  describe('provider filter', () => {
-    test('filters by single provider', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        providers: ['google'],
-      })
+withTestDatabase('filters anonymous users', async ({ executeQuery }) => {
+  await executeQuery(`
+    INSERT INTO auth.users (id, email, instance_id, is_anonymous, created_at)
+    VALUES 
+      ('${randomUUID()}', 'anon1@supabase.io', '00000000-0000-0000-0000-000000000000', true, NOW()),
+      ('${randomUUID()}', 'anon2@supabase.io', '00000000-0000-0000-0000-000000000000', true, NOW()),
+      ('${randomUUID()}', 'regular@supabase.io', '00000000-0000-0000-0000-000000000000', false, NOW())
+  `)
 
-      expect(result).toContain("(raw_app_meta_data->>'providers')::jsonb ?| array['google']")
-    })
+  const sql = getPaginatedUsersSQL({ sort: 'created_at', order: 'desc', verified: 'anonymous' })
+  const result = await executeQuery<Array<{ email: string }>>(sql)
+  expect(result.length).toBe(2)
+})
 
-    test('filters by multiple providers', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        providers: ['google', 'github'],
-      })
+withTestDatabase('filters by providers', async ({ executeQuery }) => {
+  const user1 = randomUUID()
+  const user2 = randomUUID()
+  const user3 = randomUUID()
 
-      expect(result).toContain("array['google', 'github']")
-    })
+  await executeQuery(`
+    INSERT INTO auth.users (id, email, instance_id, raw_app_meta_data, created_at)
+    VALUES 
+      ('${user1}', 'google1@supabase.io', '00000000-0000-0000-0000-000000000000', '{"providers": ["google"]}', NOW()),
+      ('${user2}', 'google2@supabase.io', '00000000-0000-0000-0000-000000000000', '{"providers": ["google"]}', NOW()),
+      ('${user3}', 'github@supabase.io', '00000000-0000-0000-0000-000000000000', '{"providers": ["github"]}', NOW())
+  `)
 
-    test('handles SAML 2.0 provider with special logic', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        providers: ['saml 2.0', 'google'],
-      })
+  // Also insert identities for the users
+  await executeQuery(`
+    INSERT INTO auth.identities (id, user_id, provider, identity_data, created_at)
+    VALUES 
+      ('google1', '${user1}', 'google', '{}', NOW()),
+      ('google2', '${user2}', 'google', '{}', NOW()),
+      ('github1', '${user3}', 'github', '{}', NOW())
+  `)
 
-      expect(result).toContain('jsonb_agg(case when value ~ ')
-      expect(result).toContain("'sso'")
-      expect(result).toContain("'google'")
-    })
-
-    test('does not add provider filter for empty array', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        providers: [],
-      })
-
-      // raw_app_meta_data is in the SELECT clause, but not in WHERE clause for filtering
-      expect(result).not.toContain("(raw_app_meta_data->>'providers')")
-    })
+  // Filter by google provider
+  const googleSql = getPaginatedUsersSQL({
+    sort: 'created_at',
+    order: 'desc',
+    providers: ['google'],
   })
+  const googleResult = await executeQuery<Array<{ email: string }>>(googleSql)
+  expect(googleResult.length).toBe(2)
 
-  describe('combined filters', () => {
-    test('combines keywords and verified filter', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        keywords: 'john',
-        verified: 'verified',
-      })
-
-      expect(result).toContain("like '%john%'")
-      expect(result).toContain('email_confirmed_at IS NOT NULL')
-      expect(result).toContain('and')
-    })
-
-    test('combines all filter types', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-        keywords: 'john',
-        verified: 'verified',
-        providers: ['google'],
-      })
-
-      expect(result).toContain("like '%john%'")
-      expect(result).toContain('email_confirmed_at IS NOT NULL')
-      expect(result).toContain('raw_app_meta_data')
-      expect(result).toContain('and')
-    })
+  // Filter by multiple providers
+  const multipleSql = getPaginatedUsersSQL({
+    sort: 'created_at',
+    order: 'desc',
+    providers: ['google', 'github'],
   })
+  const multipleResult = await executeQuery<Array<{ email: string }>>(multipleSql)
+  expect(multipleResult.length).toBe(3)
+})
 
-  describe('optimized search by column', () => {
-    describe('email search', () => {
-      test('generates optimized email search without startAt', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'email',
-          keywords: 'john',
-        })
+withTestDatabase('combines multiple filters', async ({ executeQuery }) => {
+  const now = new Date().toISOString()
 
-        expect(result).toContain("where lower(email) >= 'john'")
-        expect(result).toContain("and lower(email) < 'joho'")
-        expect(result).toContain("instance_id = '00000000-0000-0000-0000-000000000000'::uuid")
-        expect(result).toContain('order by instance_id, lower(email) asc')
-        expect(result).not.toContain('offset')
-      })
+  await executeQuery(`
+    INSERT INTO auth.users (id, email, instance_id, email_confirmed_at, raw_app_meta_data, created_at)
+    VALUES 
+      ('${randomUUID()}', 'verified.google@supabase.io', '00000000-0000-0000-0000-000000000000', '${now}', '{"providers": ["google"]}', NOW()),
+      ('${randomUUID()}', 'verified.github@supabase.io', '00000000-0000-0000-0000-000000000000', '${now}', '{"providers": ["github"]}', NOW()),
+      ('${randomUUID()}', 'unverified.google@supabase.io', '00000000-0000-0000-0000-000000000000', NULL, '{"providers": ["google"]}', NOW())
+  `)
 
-      test('generates optimized email search with startAt', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'email',
-          keywords: 'john',
-          startAt: 'john@example.com',
-        })
-
-        expect(result).toContain("where lower(email) > 'john@example.com'")
-        expect(result).toContain("and lower(email) < 'joho'")
-      })
-
-      test('handles empty keywords in email search', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'email',
-          keywords: '',
-        })
-
-        expect(result).toContain("where lower(email) >= ''")
-        expect(result).not.toContain('and lower(email) <')
-      })
-    })
-
-    describe('phone search', () => {
-      test('generates optimized phone search without startAt', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'phone',
-          keywords: '+1234',
-        })
-
-        expect(result).toContain("where phone >= '+1234'")
-        expect(result).toContain("and phone < '+1235'")
-        expect(result).toContain('order by phone asc')
-        expect(result).not.toContain('offset')
-      })
-
-      test('generates optimized phone search with startAt', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'phone',
-          keywords: '+1234',
-          startAt: '+1234567890',
-        })
-
-        expect(result).toContain("where phone > '+1234567890'")
-        expect(result).toContain("and phone < '+1235'")
-      })
-
-      test('handles empty keywords in phone search', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'phone',
-          keywords: '',
-        })
-
-        expect(result).toContain("where phone >= ''")
-        expect(result).not.toContain('and phone <')
-      })
-    })
-
-    describe('id (UUID) search', () => {
-      test('generates range query for partial UUID', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'id',
-          keywords: 'abc123',
-        })
-
-        expect(result).toContain("where id >= 'abc12300-0000-4000-8000-000000000000'")
-        expect(result).toContain("and id < 'abc123ff-ffff-4fff-bfff-ffffffffffff'")
-        expect(result).toContain('order by id asc')
-      })
-
-      test('generates exact match for complete UUID', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'id',
-          keywords: '12345678-1234-5678-9abc-def123456789',
-        })
-
-        expect(result).toContain("where id = '12345678-1234-5678-9abc-def123456789'")
-        expect(result).not.toContain('and id <')
-      })
-
-      test('handles empty keywords in id search', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'id',
-          keywords: '',
-        })
-
-        expect(result).toContain("where id >= '00000000-0000-0000-0000-000000000000'")
-        expect(result).toContain("and id < 'ffffffff-ffff-ffff-ffff-ffffffffffff'")
-      })
-
-      test('uses startAt when provided', () => {
-        const result = getPaginatedUsersSQL({
-          sort: 'created_at',
-          order: 'desc',
-          column: 'id',
-          keywords: 'abc',
-          startAt: 'abc12300-0000-4000-8000-000000000000',
-        })
-
-        expect(result).toContain("where id > 'abc12300-0000-4000-8000-000000000000'")
-      })
-    })
+  // Combine verified filter with provider and keyword
+  const sql = getPaginatedUsersSQL({
+    sort: 'created_at',
+    order: 'desc',
+    keywords: 'verified',
+    verified: 'verified',
+    providers: ['google'],
   })
+  const result = await executeQuery<Array<{ email: string }>>(sql)
+  expect(result.length).toBe(1)
+  expect(result[0].email).toBe('verified.google@supabase.io')
+})
 
-  describe('query structure', () => {
-    test('includes all required user columns', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-      })
+withTestDatabase('optimized email search works correctly', async ({ executeQuery }) => {
+  await executeQuery(`
+    INSERT INTO auth.users (id, email, instance_id, created_at)
+    VALUES 
+      ('${randomUUID()}', 'alice@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
+      ('${randomUUID()}', 'alicia@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
+      ('${randomUUID()}', 'bob@supabase.io', '00000000-0000-0000-0000-000000000000', NOW())
+  `)
 
-      expect(result).toContain('auth.users.id')
-      expect(result).toContain('auth.users.email')
-      expect(result).toContain('auth.users.banned_until')
-      expect(result).toContain('auth.users.created_at')
-      expect(result).toContain('auth.users.confirmed_at')
-      expect(result).toContain('auth.users.confirmation_sent_at')
-      expect(result).toContain('auth.users.is_anonymous')
-      expect(result).toContain('auth.users.is_sso_user')
-      expect(result).toContain('auth.users.invited_at')
-      expect(result).toContain('auth.users.last_sign_in_at')
-      expect(result).toContain('auth.users.phone')
-      expect(result).toContain('auth.users.raw_app_meta_data')
-      expect(result).toContain('auth.users.raw_user_meta_data')
-      expect(result).toContain('auth.users.updated_at')
-    })
-
-    test('includes providers aggregation from identities', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-      })
-
-      expect(result).toContain('auth.identities')
-      expect(result).toContain('array_agg(distinct i.provider)')
-      expect(result).toContain('i.user_id = users_data.id')
-      expect(result).toContain('as providers')
-    })
-
-    test('uses CTE for users_data', () => {
-      const result = getPaginatedUsersSQL({
-        sort: 'created_at',
-        order: 'desc',
-      })
-
-      expect(result).toContain('with')
-      expect(result).toContain('users_data as')
-    })
+  // Optimized search by email prefix
+  const sql = getPaginatedUsersSQL({
+    sort: 'created_at',
+    order: 'desc',
+    column: 'email',
+    keywords: 'ali',
+    limit: 10,
   })
+  const result = await executeQuery<Array<{ email: string }>>(sql)
+  expect(result.length).toBe(2)
+  expect(result[0].email).toBe('alice@supabase.io')
+  expect(result[1].email).toBe('alicia@supabase.io')
+})
+
+withTestDatabase('optimized phone search works correctly', async ({ executeQuery }) => {
+  await executeQuery(`
+    INSERT INTO auth.users (id, phone, instance_id, created_at)
+    VALUES 
+      ('${randomUUID()}', '+1234567890', '00000000-0000-0000-0000-000000000000', NOW()),
+      ('${randomUUID()}', '+1234999999', '00000000-0000-0000-0000-000000000000', NOW()),
+      ('${randomUUID()}', '+9876543210', '00000000-0000-0000-0000-000000000000', NOW())
+  `)
+
+  // Optimized search by phone prefix
+  const sql = getPaginatedUsersSQL({
+    sort: 'created_at',
+    order: 'desc',
+    column: 'phone',
+    keywords: '+1234',
+    limit: 10,
+  })
+  const result = await executeQuery<Array<{ phone: string }>>(sql)
+  expect(result.length).toBe(2)
+})
+
+withTestDatabase('optimized id search works correctly', async ({ executeQuery }) => {
+  const userId1 = 'abc12300-0000-4000-8000-000000000001'
+  const userId2 = 'abc12300-0000-4000-8000-000000000002'
+  const userId3 = 'def45600-0000-4000-8000-000000000003'
+
+  await executeQuery(`
+    INSERT INTO auth.users (id, email, instance_id, created_at)
+    VALUES 
+      ('${userId1}', 'user1@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
+      ('${userId2}', 'user2@supabase.io', '00000000-0000-0000-0000-000000000000', NOW()),
+      ('${userId3}', 'user3@supabase.io', '00000000-0000-0000-0000-000000000000', NOW())
+  `)
+
+  // Optimized search by id prefix
+  const sql = getPaginatedUsersSQL({
+    sort: 'created_at',
+    order: 'desc',
+    column: 'id',
+    keywords: 'abc123',
+    limit: 10,
+  })
+  const result = await executeQuery<Array<{ id: string }>>(sql)
+  expect(result.length).toBe(2)
+  expect(result[0].id).toBe(userId1)
+  expect(result[1].id).toBe(userId2)
+
+  // Exact UUID match
+  const exactSql = getPaginatedUsersSQL({
+    sort: 'created_at',
+    order: 'desc',
+    column: 'id',
+    keywords: userId1,
+    limit: 10,
+  })
+  const exactResult = await executeQuery<Array<{ id: string }>>(exactSql)
+  expect(exactResult.length).toBe(1)
+  expect(exactResult[0].id).toBe(userId1)
+})
+
+withTestDatabase('includes provider information from identities', async ({ executeQuery }) => {
+  const userId = randomUUID()
+
+  await executeQuery(`
+    INSERT INTO auth.users (id, email, instance_id, created_at)
+    VALUES ('${userId}', 'user@supabase.io', '00000000-0000-0000-0000-000000000000', NOW())
+  `)
+
+  // Insert multiple identities for the user
+  await executeQuery(`
+    INSERT INTO auth.identities (id, user_id, provider, identity_data, created_at)
+    VALUES 
+      ('google1', '${userId}', 'google', '{}', NOW()),
+      ('github1', '${userId}', 'github', '{}', NOW())
+  `)
+
+  const sql = getPaginatedUsersSQL({ sort: 'created_at', order: 'desc', limit: 10 })
+  const result = await executeQuery<Array<{ email: string; providers: string[] }>>(sql)
+
+  expect(result.length).toBe(1)
+  expect(result[0].email).toBe('user@supabase.io')
+  expect(result[0].providers).toHaveLength(2)
+  expect(result[0].providers).toContain('google')
+  expect(result[0].providers).toContain('github')
 })
