@@ -194,8 +194,8 @@ const RedirectToTemplates = () => {
                           render={({ field }) => (
                             <FormItemLayout
                               layout="flex-row-reverse"
-                              label="Enable this template"
-                              description="Control if users receive this email when the corresponding event is triggered."
+                              label="Enable notification"
+                              description="Send this email to users when triggered"
                             >
                               <FormControl_Shadcn_>
                                 <Switch
