@@ -94,12 +94,12 @@ const PreviewFilterPanel = ({
   return (
     <div
       className={cn(
-        'flex w-full items-center justify-between',
+        'flex w-full items-center justify-between overflow-x-scroll no-scrollbar',
         condensedLayout ? ' p-3' : '',
         className
       )}
     >
-      <div className="flex flex-row items-center gap-x-2">
+      <div className="flex flex-row items-center gap-x-2 mr-2">
         <form
           id="log-panel-search"
           onSubmit={(e) => {
