@@ -1,25 +1,30 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
-import { Check, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 
-import Table from 'components/to-be-cleaned/Table'
+import { useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  TableRow,
-  TableCell,
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
@@ -27,35 +32,41 @@ interface TriggerListProps {
   schema: string
   filterString: string
   isLocked: boolean
-  editTrigger: (trigger: any) => void
-  deleteTrigger: (trigger: any) => void
+  editTrigger: (trigger: PostgresTrigger) => void
+  duplicateTrigger: (trigger: PostgresTrigger) => void
+  deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
-const TriggerList = ({
+export const TriggerList = ({
   schema,
   filterString,
   isLocked,
   editTrigger,
+  duplicateTrigger,
   deleteTrigger,
 }: TriggerListProps) => {
+  const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
+
+  const { can: canUpdateTriggers } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
 
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter((x) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
+  const filteredTriggers = (triggers ?? []).filter(
+    (x) =>
+      includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
+      (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase()))
   )
-
   const _triggers = sortBy(
     filteredTriggers.filter((x) => x.schema == schema),
     (trigger) => trigger.name.toLocaleLowerCase()
-  )
-  const { can: canUpdateTriggers } = useAsyncCheckProjectPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
   )
 
   if (_triggers.length === 0 && filterString.length === 0) {
@@ -86,7 +97,7 @@ const TriggerList = ({
 
   return (
     <>
-      {_triggers.map((x: any) => (
+      {_triggers.map((x) => (
         <TableRow key={x.id}>
           <TableCell className="space-x-2">
             <Tooltip>
@@ -103,15 +114,33 @@ const TriggerList = ({
           </TableCell>
 
           <TableCell className="break-all">
-            <p title={x.table} className="truncate">
-              {x.table}
-            </p>
+            {x.table_id ? (
+              <InlineLink
+                title={x.table}
+                href={`/project/${projectRef}/editor/${x.table_id}`}
+                className="truncate block max-w-40"
+              >
+                {x.table}
+              </InlineLink>
+            ) : (
+              <p title={x.table} className="truncate">
+                {x.table}
+              </p>
+            )}
           </TableCell>
 
           <TableCell className="space-x-2">
-            <p title={x.function_name} className="truncate">
-              {x.function_name}
-            </p>
+            {x.function_name ? (
+              <InlineLink
+                title={x.function_name}
+                href={`/project/${projectRef}/database/functions?search=${x.function_name}&schema=${x.function_schema}`}
+                className="truncate block max-w-40"
+              >
+                {x.function_name}
+              </InlineLink>
+            ) : (
+              <p className="truncate text-foreground-light">-</p>
+            )}
           </TableCell>
 
           <TableCell>
@@ -166,9 +195,9 @@ const TriggerList = ({
                         className="space-x-2"
                         onClick={() => {
                           const sql = generateTriggerCreateSQL(x)
+                          openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                           aiSnap.newChat({
-                            name: `Update trigger ${X.name}`,
-                            open: true,
+                            name: `Update trigger ${x.name}`,
                             initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
                             suggestions: {
                               title:
@@ -196,6 +225,11 @@ const TriggerList = ({
                         <Edit size={14} />
                         <p>Edit with Assistant</p>
                       </DropdownMenuItem>
+                      <DropdownMenuItem className="space-x-2" onClick={() => duplicateTrigger(x)}>
+                        <Copy size={14} />
+                        <p>Duplicate trigger</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
                         <Trash stroke="red" size={14} />
                         <p>Delete trigger</p>
@@ -224,5 +258,3 @@ const TriggerList = ({
     </>
   )
 }
-
-export default TriggerList

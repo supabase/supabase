@@ -485,6 +485,12 @@
     "title": "Environments",
     "items": [
       {
+        "id": "v1-count-action-runs",
+        "title": "Count action runs",
+        "slug": "v1-count-action-runs",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-branch",
         "title": "Create a branch",
         "slug": "v1-create-a-branch",
@@ -521,6 +527,24 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-action-run",
+        "title": "Get action run",
+        "slug": "v1-get-action-run",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-action-run-logs",
+        "title": "Get action run logs",
+        "slug": "v1-get-action-run-logs",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-action-runs",
+        "title": "List action runs",
+        "slug": "v1-list-action-runs",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-branches",
         "title": "List all branches",
         "slug": "v1-list-all-branches",
@@ -549,6 +573,12 @@
         "title": "Update a branch config",
         "slug": "v1-update-a-branch-config",
         "type": "operation"
+      },
+      {
+        "id": "v1-update-action-run-status",
+        "title": "Update action run status",
+        "slug": "v1-update-action-run-status",
+        "type": "operation"
       }
     ]
   },
@@ -566,6 +596,12 @@
         "id": "v1-exchange-oauth-token",
         "title": "Exchange oauth token",
         "slug": "v1-exchange-oauth-token",
+        "type": "operation"
+      },
+      {
+        "id": "v1-oauth-authorize-project-claim",
+        "title": "Oauth authorize project claim",
+        "slug": "v1-oauth-authorize-project-claim",
         "type": "operation"
       },
       {
@@ -632,6 +668,18 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-all-projects-for-organization",
+        "title": "Get all projects for organization",
+        "slug": "v1-get-all-projects-for-organization",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-available-regions",
+        "title": "Get available regions",
+        "slug": "v1-get-available-regions",
         "type": "operation"
       },
       {

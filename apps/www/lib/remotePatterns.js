@@ -1,6 +1,6 @@
 const CMS_SITE_ORIGIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? 'https://supabase.com'
+    ? 'https://cms.supabase.com'
     : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
         typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
@@ -146,6 +146,12 @@ module.exports = [
     hostname: 'media.licdn.com',
     port: '',
     pathname: '/dms/image/**',
+  },
+  {
+    protocol: 'https',
+    hostname: 'cms.supabase.com',
+    port: '',
+    pathname: '**',
   },
   // Dynamically generated CMS patterns based on CMS_SITE_ORIGIN
   ...generateCMSRemotePatterns(),

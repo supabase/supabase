@@ -57,7 +57,8 @@ hideToc: true
     Create a `.env` file at the root of your project and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishableKey" />
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
@@ -66,8 +67,8 @@ hideToc: true
       <$CodeTabs>
 
         ```text name=.env
-        VITE_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+        PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
         ```
 
       </$CodeTabs>
@@ -88,17 +89,17 @@ hideToc: true
       <$CodeTabs>
 
         ```js name=src/lib/supabaseClient.js
-          import { createClient } from '@supabase/supabase-js';
-        import { VITE_PUBLIC_SUPABASE_URL, VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
+        import { createClient } from '@supabase/supabase-js';
+        import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
 
-        export const supabase = createClient(VITE_PUBLIC_SUPABASE_URL, VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+        export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY)
         ```
 
         ```ts name=src/lib/supabaseClient.ts
-          import { createClient } from '@supabase/supabase-js';
-        import { VITE_PUBLIC_SUPABASE_URL, VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
+        import { createClient } from '@supabase/supabase-js';
+        import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
 
-        export const supabase = createClient(VITE_PUBLIC_SUPABASE_URL, VITE_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+        export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY)
         ```
 
       </$CodeTabs>

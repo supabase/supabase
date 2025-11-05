@@ -6,28 +6,6 @@ interface DocsConfig {
 }
 
 export const docsConfig: DocsConfig = {
-  // mainNav: [
-  //   {
-  //     title: 'Documentation',
-  //     href: '/docs',
-  //   },
-  //   {
-  //     title: 'Components',
-  //     href: '/docs/components/accordion',
-  //   },
-  //   {
-  //     title: 'Themes',
-  //     href: '/themes',
-  //   },
-  //   {
-  //     title: 'Examples',
-  //     href: '/examples',
-  //   },
-  //   {
-  //     title: 'Blocks',
-  //     href: '/blocks',
-  //   },
-  // ],
   sidebarNav: [
     {
       title: 'Getting Started',
@@ -70,6 +48,21 @@ export const docsConfig: DocsConfig = {
       ],
     },
     {
+      title: 'UI Patterns',
+      items: [
+        {
+          title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
+          items: [],
+        },
+        {
+          title: 'Empty States',
+          href: '/docs/ui-patterns/empty-states',
+          items: [],
+        },
+      ],
+    },
+    {
       title: 'Fragment Components',
       items: [
         {
@@ -105,6 +98,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Inner Side Menu',
           href: '/docs/fragments/inner-side-menu',
+          items: [],
+        },
+        {
+          title: 'Data Input',
+          href: '/docs/fragments/data-input',
           items: [],
         },
         {
@@ -287,6 +285,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Menubar',
           href: '/docs/components/menubar',
+          items: [],
+        },
+        {
+          title: 'NavMenu',
+          href: '/docs/components/nav-menu',
           items: [],
         },
         {

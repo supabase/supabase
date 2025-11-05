@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { ResponseError } from 'types'
-import { replicationKeys } from './keys'
 import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { replicationKeys } from './keys'
 
 export type StopPipelineParams = {
   projectRef: string
@@ -31,27 +31,27 @@ export const useStopPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<StartPipelineData, ResponseError, StopPipelineParams>,
+  UseCustomMutationOptions<StartPipelineData, ResponseError, StopPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<StartPipelineData, ResponseError, StopPipelineParams>(
-    (vars) => stopPipeline(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, pipelineId } = variables
-        await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to stop pipeline: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<StartPipelineData, ResponseError, StopPipelineParams>({
+    mutationFn: (vars) => stopPipeline(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, pipelineId } = variables
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to stop pipeline: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

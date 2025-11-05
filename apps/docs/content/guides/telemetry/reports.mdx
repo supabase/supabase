@@ -29,6 +29,8 @@ Reports can be filtered by time range to focus your analysis on specific periods
 
 ---
 
+<$Show if="billing:all">
+
 ## Database
 
 The Database report provides the most comprehensive view into your Postgres instance's health and performance characteristics. These charts help you identify performance bottlenecks, resource constraints, and optimization opportunities at a glance.
@@ -43,6 +45,8 @@ The following charts are available for Free and Pro plans:
 | Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                    |
 | Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                  |
 | Dedicated Pooler connections | All             | Client connections to PgBouncer              | Dedicated pooler connection monitoring        |
+
+</$Show>
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 

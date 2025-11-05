@@ -41,10 +41,17 @@ export const generateToolRoutes = (ref?: string, project?: Project, features?: {
     },
   ]
 }
+
 export const generateProductRoutes = (
   ref?: string,
   project?: Project,
-  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
+  features?: {
+    auth?: boolean
+    edgeFunctions?: boolean
+    storage?: boolean
+    realtime?: boolean
+    authOverviewPage?: boolean
+  }
 ): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -54,6 +61,7 @@ export const generateProductRoutes = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
+  const authOverviewPageEnabled = features?.authOverviewPage ?? false
 
   const databaseMenu = generateDatabaseMenu(project)
   const authMenu = generateAuthMenu(ref as string)
@@ -78,7 +86,13 @@ export const generateProductRoutes = (
             key: 'auth',
             label: 'Authentication',
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : authOverviewPageEnabled
+                  ? `/project/${ref}/auth/overview`
+                  : `/project/${ref}/auth/users`),
             items: authMenu,
           },
         ]
@@ -89,7 +103,7 @@ export const generateProductRoutes = (
             key: 'storage',
             label: 'Storage',
             icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`),
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/files`),
           },
         ]
       : []),
@@ -175,16 +189,12 @@ export const generateOtherRoutes = (
 export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
   const settingsMenu = generateSettingsMenu(ref as string)
   return [
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'settings',
-            label: 'Project Settings',
-            icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && `/project/${ref}/settings/general`,
-            items: settingsMenu,
-          },
-        ]
-      : []),
+    {
+      key: 'settings',
+      label: 'Project Settings',
+      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && `/project/${ref}/settings/general`,
+      items: settingsMenu,
+    },
   ]
 }

@@ -11,7 +11,6 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
-import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
@@ -22,15 +21,15 @@ import {
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Dashboards } from 'types'
-import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import type { Dashboards } from 'types'
+import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
@@ -82,7 +81,7 @@ const Reports = () => {
   const currentReport = userContents?.content.find((report) => report.id === id)
   const currentReportContent = currentReport?.content as Dashboards.Content
 
-  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckProjectPermissions(
+  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'user_content',
     {
@@ -94,7 +93,7 @@ const Reports = () => {
       subject: { id: profile?.id },
     }
   )
-  const { can: canUpdateReport } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateReport } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'user_content',
     {
@@ -274,15 +273,15 @@ const Reports = () => {
       (x) => x.provider === 'infra-monitoring' || x.provider === 'daily-stats'
     )
     monitoringCharts?.forEach((x) => {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
+      queryClient.invalidateQueries({
+        queryKey: analyticsKeys.infraMonitoring(ref, {
           attribute: x.attribute,
           startDate,
           endDate,
           interval: config?.interval,
           databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
+        }),
+      })
     })
     setTimeout(() => setIsRefreshing(false), 1000)
   }
@@ -392,7 +391,7 @@ const Reports = () => {
   }, [hasEdits, confirmNavigate, router])
 
   if (isLoading || isLoadingPermissions) {
-    return <Loading />
+    return <LogoLoader />
   }
 
   if (!canReadReport) {

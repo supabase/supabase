@@ -3,7 +3,7 @@ import { useLocalStorage } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
 import { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
@@ -18,7 +18,7 @@ import {
   LogsWarning,
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
-  maybeShowUpgradePrompt,
+  maybeShowUpgradePromptIfNotEntitled,
   useEditorHints,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
@@ -37,6 +37,7 @@ import {
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { uuidv4 } from 'lib/helpers'
@@ -51,6 +52,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from 'ui'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
@@ -65,7 +67,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const { profile } = useProfile()
   const { ref, q, queryId } = useParams()
   const projectRef = ref as string
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
+
+  const allTemplates = useMemo(() => {
+    if (logsShowMetadataIpTemplate) return TEMPLATES
+    else return TEMPLATES.filter((x) => x.label !== 'Metadata IP')
+  }, [logsShowMetadataIpTemplate])
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
   const [editorId] = useState<string>(uuidv4())
@@ -85,6 +92,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     `project-content-${projectRef}-recent-log-sql`,
     []
   )
+
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const { data: content } = useContentQuery({
     projectRef: ref,
@@ -246,7 +256,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      from,
+      entitledToAuditLogDays
+    )
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)
@@ -281,12 +294,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [timestampStart, organization])
+  }, [timestampStart, entitledToAuditLogDays])
 
   return (
     <div className="w-full h-full mx-auto">
@@ -301,7 +317,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             defaultTo={timestampEnd || ''}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
-            templates={TEMPLATES.filter((template) => template.mode === 'custom')}
+            templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
           />

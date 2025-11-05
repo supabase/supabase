@@ -14,7 +14,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
 import { Bucket } from 'data/storage/buckets-query'
-import { IS_PLATFORM } from 'lib/constants'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -213,8 +213,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   <FormItemLayout
                     hideMessage
                     name="name"
-                    label="Name of bucket"
-                    labelOptional="Buckets cannot be renamed once created."
+                    label="Bucket name"
+                    labelOptional="Cannot be changed after creation"
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ id="name" {...field} disabled />
@@ -267,7 +267,9 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                             <p className="!leading-normal">
                               Assets cached in the CDN may still be publicly accessible. You can
                               consider{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/storage/cdn/smart-cdn#cache-eviction">
+                              <InlineLink
+                                href={`${DOCS_URL}/guides/storage/cdn/smart-cdn#cache-eviction`}
+                              >
                                 purging the cache
                               </InlineLink>{' '}
                               or moving your assets to a new bucket.

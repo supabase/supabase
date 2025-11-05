@@ -11,7 +11,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import type { ResponseError } from 'types'
 import {
@@ -35,7 +35,7 @@ export const OrganizationDetailsForm = () => {
   const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { can: canUpdateOrganization } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
   )
@@ -85,7 +85,7 @@ export const OrganizationDetailsForm = () => {
         onSubmit={orgDetailsForm.handleSubmit(onUpdateOrganizationDetails)}
       >
         <Card>
-          <CardContent className="pt-6">
+          <CardContent>
             <FormField_Shadcn_
               control={orgDetailsForm.control}
               name="name"
@@ -94,7 +94,7 @@ export const OrganizationDetailsForm = () => {
                   <FormControl_Shadcn_>
                     <Input
                       {...field}
-                      className="w-96 max-w-full"
+                      className="w-full max-w-full md:w-96"
                       disabled={!canUpdateOrganization || isUpdatingDetails}
                     />
                   </FormControl_Shadcn_>
@@ -105,13 +105,14 @@ export const OrganizationDetailsForm = () => {
           <CardContent>
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
               <PrePostTab
+                className="w-full [&>div:first-child]:flex-grow [&>div:last-child]:px-1.5"
                 postTab={
                   <CopyButton type="text" iconOnly text={selectedOrganization?.slug ?? ''} />
                 }
               >
                 <Input
                   disabled
-                  className="w-64 max-w-full"
+                  className="w-full max-w-full md:w-64"
                   id="slug"
                   value={selectedOrganization?.slug ?? ''}
                 />

@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -16,8 +16,10 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import {
   Button,
@@ -41,8 +43,11 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
+  StorageListV2MigratingCallout,
+  StorageListV2MigrationCallout,
+} from './StorageListV2MigrationCallout'
+import {
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED,
-  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN,
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
   StorageSizeUnits,
 } from './StorageSettings.constants'
@@ -58,9 +63,13 @@ interface StorageSettingsState {
 
 export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
-  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
-  const { can: canUpdateStorageSettings } = useAsyncCheckProjectPermissions(
+  const showMigrationCallout = useFlag('storageMigrationCallout')
+
+  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_READ,
+    '*'
+  )
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
     '*'
   )
@@ -72,8 +81,14 @@ export const StorageSettings = () => {
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
+  const isListV2UpgradeAvailable =
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'main'
+  const isListV2Upgrading =
+    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'canary'
 
   const { data: organization } = useSelectedOrganizationQuery()
+  const { getEntitlementNumericValue, isEntitlementUnlimited } =
+    useCheckEntitlements('storage.max_file_size')
   const isFreeTier = organization?.plan.id === 'free'
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
@@ -96,14 +111,12 @@ export const StorageSettings = () => {
   })
 
   const maxBytes = useMemo(() => {
-    if (organization?.plan.id === 'free') {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN
-    } else if (organization?.usage_billing_enabled) {
+    if (organization?.usage_billing_enabled || isEntitlementUnlimited()) {
       return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
     } else {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
+      return getEntitlementNumericValue() ?? STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
     }
-  }, [organization])
+  }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
 
   const FormSchema = z
     .object({
@@ -220,6 +233,12 @@ export const StorageSettings = () => {
                 subject="Failed to retrieve project's storage configuration"
               />
             )}
+            {isSuccess && showMigrationCallout && (
+              <>
+                {isListV2UpgradeAvailable && <StorageListV2MigrationCallout />}
+                {isListV2Upgrading && <StorageListV2MigratingCallout />}
+              </>
+            )}
             {isSuccess && (
               <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
                 <Card>
@@ -230,11 +249,13 @@ export const StorageSettings = () => {
                       render={({ field }) => (
                         <FormItemLayout
                           layout="flex-row-reverse"
-                          label="Enable Image Transformation"
+                          label="Enable image transformation"
                           description={
                             <>
                               Optimize and resize images on the fly.{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
+                              <InlineLink
+                                href={`${DOCS_URL}/guides/storage/serving/image-transformations`}
+                              >
                                 Learn more
                               </InlineLink>
                               .
@@ -272,7 +293,7 @@ export const StorageSettings = () => {
                                   Loading bucket information...
                                 </span>
                               )}{' '}
-                              <InlineLink href="https://supabase.com/docs/guides/storage/uploads/file-limits">
+                              <InlineLink href={`${DOCS_URL}/guides/storage/uploads/file-limits`}>
                                 Learn more
                               </InlineLink>
                               .
@@ -443,5 +464,3 @@ export const StorageSettings = () => {
     </ScaffoldSection>
   )
 }
-
-export default StorageSettings

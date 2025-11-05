@@ -3,13 +3,13 @@ import { useEffect } from 'react'
 
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Card, CardContent, CardFooter, Form_Shadcn_ } from 'ui'
 import { AIOptInLevelSelector } from './AIOptInLevelSelector'
 
 export const DataPrivacyForm = () => {
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm()
-  const { can: canUpdateOrganization } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
   )

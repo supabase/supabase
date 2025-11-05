@@ -1,9 +1,10 @@
 import dayjs from 'dayjs'
 
+import { DOCS_URL } from 'lib/constants'
 import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
+import { IS_PLATFORM } from 'common'
 
-export const LOGS_EXPLORER_DOCS_URL =
-  'https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer'
+export const LOGS_EXPLORER_DOCS_URL = `${DOCS_URL}/guides/platform/logs#querying-with-the-logs-explorer`
 
 export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 2 // IN DAYS
 
@@ -538,29 +539,33 @@ export const FILTER_OPTIONS: FilterTableSet = {
     },
   },
   // function_edge_logs
-  function_edge_logs: {
-    status_code: {
-      label: 'Status',
-      key: 'status_code',
-      options: [
-        {
-          key: 'error',
-          label: 'Error',
-          description: '500 error codes',
+  ...(IS_PLATFORM
+    ? {
+        function_edge_logs: {
+          status_code: {
+            label: 'Status',
+            key: 'status_code',
+            options: [
+              {
+                key: 'error',
+                label: 'Error',
+                description: '500 error codes',
+              },
+              {
+                key: 'success',
+                label: 'Success',
+                description: '200 codes',
+              },
+              {
+                key: 'warning',
+                label: 'Warning',
+                description: '400 codes',
+              },
+            ],
+          },
         },
-        {
-          key: 'success',
-          label: 'Success',
-          description: '200 codes',
-        },
-        {
-          key: 'warning',
-          label: 'Warning',
-          description: '400 codes',
-        },
-      ],
-    },
-  },
+      }
+    : {}),
   // function_logs
   function_logs: {
     severity: {

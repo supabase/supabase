@@ -3,6 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
@@ -12,33 +13,54 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const fullCurrentPath = useCurrentPath()
   const [currentPath] = fullCurrentPath.split('#')
 
+  const {
+    organizationShowSsoSettings: showSsoSettings,
+    organizationShowSecuritySettings: showSecuritySettings,
+    organizationShowLegalDocuments: showLegalDocuments,
+  } = useIsFeatureEnabled([
+    'organization:show_sso_settings',
+    'organization:show_security_settings',
+    'organization:show_legal_documents',
+  ])
+
   const navMenuItems = [
     {
       label: 'General',
       href: `/org/${slug}/general`,
     },
-    {
-      label: 'Security',
-      href: `/org/${slug}/security`,
-    },
+    ...(showSecuritySettings
+      ? [
+          {
+            label: 'Security',
+            href: `/org/${slug}/security`,
+          },
+        ]
+      : []),
     {
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
-
-    {
-      label: 'SSO',
-      href: `/org/${slug}/sso`,
-    },
+    ...(showSsoSettings
+      ? [
+          {
+            label: 'SSO',
+            href: `/org/${slug}/sso`,
+          },
+        ]
+      : []),
 
     {
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
     },
-    {
-      label: 'Legal Documents',
-      href: `/org/${slug}/documents`,
-    },
+    ...(showLegalDocuments
+      ? [
+          {
+            label: 'Legal Documents',
+            href: `/org/${slug}/documents`,
+          },
+        ]
+      : []),
   ]
 
   return (
@@ -53,7 +75,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
           ))}
         </NavMenu>
       </ScaffoldContainerLegacy>
-      <main className="h-full w-full overflow-y-auto">{children}</main>
+      <div className="h-full w-full overflow-y-auto">{children}</div>
     </>
   )
 }

@@ -9,8 +9,9 @@ import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { Input } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
 
 export const DisplayApiSettings = ({
@@ -36,7 +37,7 @@ export const DisplayApiSettings = ({
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )
@@ -123,12 +124,8 @@ export const DisplayApiSettings = ({
               'border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark'
             }
           >
-            <Input
-              readOnly
-              disabled
+            <FormLayout
               layout="horizontal"
-              className="input-mono"
-              // @ts-ignore
               label={
                 <>
                   {x.tags?.split(',').map((x, i: number) => (
@@ -146,19 +143,7 @@ export const DisplayApiSettings = ({
                   {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
                 </>
               }
-              copy={canReadAPIKeys && isNotUpdatingJwtSecret}
-              reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
-              value={
-                !canReadAPIKeys
-                  ? 'You need additional permissions to view API keys'
-                  : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
-                    ? 'JWT secret update failed, new API key may have issues'
-                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
-                      ? 'Updating JWT secret...'
-                      : x?.api_key ?? 'You need additional permissions to view API keys'
-              }
-              onChange={() => {}}
-              descriptionText={
+              description={
                 x.tags === 'service_role' ? (
                   <>
                     This key has the ability to bypass Row Level Security. Never share it publicly.
@@ -195,7 +180,24 @@ export const DisplayApiSettings = ({
                   </>
                 )
               }
-            />
+            >
+              <Input
+                readOnly
+                className="font-mono"
+                copy={canReadAPIKeys && isNotUpdatingJwtSecret}
+                reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
+                value={
+                  !canReadAPIKeys
+                    ? 'You need additional permissions to view API keys'
+                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
+                      ? 'JWT secret update failed, new API key may have issues'
+                      : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                        ? 'Updating JWT secret...'
+                        : x?.api_key ?? 'You need additional permissions to view API keys'
+                }
+                onChange={() => {}}
+              />
+            </FormLayout>
 
             <div
               className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"

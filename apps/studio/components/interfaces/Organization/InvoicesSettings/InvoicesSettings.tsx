@@ -11,14 +11,14 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { getInvoice } from 'data/invoices/invoice-query'
 import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { formatCurrency } from 'lib/helpers'
 import { ChevronLeft, ChevronRight, Download, FileText } from 'lucide-react'
+import { Organization } from 'types/base'
 import { Button } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import InvoicePayButton from './InvoicePayButton'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Organization } from 'types/base'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
 
 const PAGE_LIMIT = 5
 
@@ -36,7 +36,7 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
     }
   }
 }
-const InvoicesSettings = () => {
+export const InvoicesSettings = () => {
   const [page, setPage] = useState(1)
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -208,5 +208,3 @@ const InvoicesSettings = () => {
     </div>
   )
 }
-
-export default InvoicesSettings

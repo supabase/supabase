@@ -9,8 +9,9 @@ import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Card,
   Input,
@@ -51,8 +52,10 @@ export const Extensions = () => {
     (ext) => !isNull(ext.installed_version)
   )
 
-  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'extensions'
+  )
 
   useEffect(() => {
     if (filter !== undefined) setFilterString(filter as string)
@@ -70,7 +73,7 @@ export const Extensions = () => {
             className="w-52"
             icon={<Search size={14} />}
           />
-          <DocsButton href="https://supabase.com/docs/guides/database/extensions" />
+          <DocsButton href={`${DOCS_URL}/guides/database/extensions`} />
         </div>
       </div>
 

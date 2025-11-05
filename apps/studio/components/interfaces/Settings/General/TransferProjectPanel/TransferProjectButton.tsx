@@ -9,12 +9,13 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-const TransferProjectButton = () => {
+export const TransferProjectButton = () => {
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
@@ -58,7 +59,7 @@ const TransferProjectButton = () => {
     }
   }, [isOpen])
 
-  const { can: canTransferProject } = useAsyncCheckProjectPermissions(
+  const { can: canTransferProject } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
   )
@@ -165,7 +166,7 @@ const TransferProjectButton = () => {
           <DocsButton
             abbrev={false}
             className="mt-6"
-            href="https://supabase.com/docs/guides/platform/project-transfer"
+            href={`${DOCS_URL}/guides/platform/project-transfer`}
           />
         </Modal.Content>
 
@@ -290,5 +291,3 @@ const TransferProjectButton = () => {
     </>
   )
 }
-
-export default TransferProjectButton

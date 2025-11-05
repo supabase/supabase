@@ -19,9 +19,10 @@ import {
   QUEUES_SCHEMA,
   useDatabaseQueueToggleExposeMutation,
 } from 'data/database-queues/database-queues-toggle-postgrest-mutation'
+import { useDatabaseQueuesVersionQuery } from 'data/database-queues/database-queues-version-query'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -39,7 +40,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { can: canUpdatePostgrestConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
@@ -77,6 +78,11 @@ export const QueuesSettings = () => {
     connectionString: project?.connectionString,
   })
   const schemas = config?.db_schema.replace(/ /g, '').split(',') ?? []
+
+  const { data: pgmqVersion } = useDatabaseQueuesVersionQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { mutateAsync: updateTable } = useTableUpdateMutation()
 
@@ -161,12 +167,16 @@ export const QueuesSettings = () => {
         `Failed to toggle queue exposure via PostgREST: Unable to retrieve PostgREST configuration (${configError.message})`
       )
     }
+    if (!pgmqVersion) {
+      return toast.error('Unable to retrieve PGMQ version. Please try again later.')
+    }
 
     setIsToggling(true)
     toggleExposeQueuePostgrest({
       projectRef: project.ref,
       connectionString: project.connectionString,
       enable: values.enable,
+      pgmqVersion,
     })
   }
 

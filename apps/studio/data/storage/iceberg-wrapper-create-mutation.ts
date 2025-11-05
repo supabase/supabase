@@ -1,7 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { snakeCase } from 'lodash'
 
 import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import {
+  getAnalyticsBucketFDWName,
+  getAnalyticsBucketS3KeyName,
+} from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import {
   getCatalogURI,
   getConnectionURL,
@@ -9,7 +12,7 @@ import {
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 
@@ -27,7 +30,7 @@ export const useIcebergWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
-  const { can: canCreateCredentials } = useAsyncCheckProjectPermissions(
+  const { can: canCreateCredentials } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_WRITE,
     '*'
   )
@@ -40,10 +43,10 @@ export const useIcebergWrapperCreateMutation = () => {
   const mutateAsync = async ({ bucketName }: { bucketName: string }) => {
     const createS3KeyData = await createS3AccessKey({
       projectRef: project?.ref,
-      description: `${snakeCase(bucketName)}_keys`,
+      description: getAnalyticsBucketS3KeyName(bucketName),
     })
 
-    const wrapperName = `${snakeCase(bucketName)}_fdw`
+    const wrapperName = getAnalyticsBucketFDWName(bucketName)
 
     const params: FDWCreateVariables = {
       projectRef: project?.ref,

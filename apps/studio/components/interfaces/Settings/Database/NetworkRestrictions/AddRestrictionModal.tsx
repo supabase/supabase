@@ -5,6 +5,7 @@ import { Button, Form, Input, Modal, Tooltip, TooltipContent, TooltipTrigger } f
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { DOCS_URL } from 'lib/constants'
 import { HelpCircle } from 'lucide-react'
 import {
   checkIfPrivate,
@@ -165,7 +166,7 @@ const AddRestrictionModal = ({
                   title="Note: Restrictions only apply to direct connections to your database and connection pooler"
                   description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
                   urlLabel="Learn more"
-                  url="https://supabase.com/docs/guides/platform/network-restrictions#limitations"
+                  url={`${DOCS_URL}/guides/platform/network-restrictions#limitations`}
                 />
                 <div className="flex space-x-4">
                   <div className="w-[55%]">

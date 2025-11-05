@@ -4,7 +4,7 @@ import { Edit, MoreVertical, Trash } from 'lucide-react'
 import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -25,11 +25,11 @@ export interface OAuthAppRowProps {
 }
 
 export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
-  const { can: canUpdateOAuthApps } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateOAuthApps } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'approved_oauth_apps'
   )
-  const { can: canDeleteOAuthApps } = useAsyncCheckProjectPermissions(
+  const { can: canDeleteOAuthApps } = useAsyncCheckPermissions(
     PermissionAction.DELETE,
     'approved_oauth_apps'
   )

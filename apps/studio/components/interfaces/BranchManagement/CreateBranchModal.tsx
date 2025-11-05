@@ -27,7 +27,7 @@ import { projectKeys } from 'data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
@@ -72,7 +72,7 @@ export const CreateBranchModal = () => {
   const gitlessBranching = useIsBranching2Enabled()
   const allowDataBranching = useFlag('allowDataBranching')
 
-  const { can: canCreateBranch } = useAsyncCheckProjectPermissions(
+  const { can: canCreateBranch } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'preview_branches'
   )
@@ -186,7 +186,9 @@ export const CreateBranchModal = () => {
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
-        await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectRef) }),
+        ])
       }
       sendEvent({
         action: 'branch_create_button_clicked',
@@ -253,6 +255,7 @@ export const CreateBranchModal = () => {
         onOpenAutoFocus={(e) => {
           if (promptProPlanUpgrade) e.preventDefault()
         }}
+        aria-describedby={undefined}
       >
         <DialogHeader padding="small">
           <DialogTitle>Create a new preview branch</DialogTitle>
@@ -395,11 +398,9 @@ export const CreateBranchModal = () => {
                       description="Clone production data into this branch"
                     >
                       <FormControl_Shadcn_>
-                        <Switch
-                          disabled={!hasPitrEnabled}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        {hasPitrEnabled && (
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        )}
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

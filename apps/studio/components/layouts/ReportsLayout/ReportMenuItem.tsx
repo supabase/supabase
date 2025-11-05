@@ -3,9 +3,9 @@ import { ChevronDown, Edit2, Trash } from 'lucide-react'
 import Link from 'next/link'
 
 import { ContentBase } from 'data/content/content-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
-import { Dashboards } from 'types'
+import type { Dashboards } from 'types'
 import {
   Button,
   cn,
@@ -41,7 +41,7 @@ export const ReportMenuItem = ({
   onSelectDelete,
 }: ReportMenuItemProps) => {
   const { profile } = useProfile()
-  const { can: canUpdateCustomReport } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateCustomReport } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'user_content',
     {

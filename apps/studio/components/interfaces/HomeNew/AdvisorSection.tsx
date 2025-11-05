@@ -1,39 +1,36 @@
 import { BarChart, Shield } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import {
-  createLintSummaryPrompt,
-  LintCategoryBadge,
-  lintInfoMap,
-} from 'components/interfaces/Linter/Linter.utils'
+import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import {
-  AiIconAnimation,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetSection,
-  SheetTitle,
-} from 'ui'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import LintDetail from 'components/interfaces/Linter/LintDetail'
 
-export const AdvisorSection = () => {
+export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
-  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
+  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery(
+    {
+      projectRef,
+    },
+    {
+      enabled: !showEmptyState,
+    }
+  )
   const snap = useAiAssistantStateSnapshot()
-
-  const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const { setSelectedItemId } = useAdvisorStateSnapshot()
 
   const errorLints: Lint[] = useMemo(() => {
     return lints?.filter((lint) => lint.level === LINTER_LEVELS.ERROR) ?? []
@@ -53,12 +50,46 @@ export const AdvisorSection = () => {
   }, [totalErrors])
 
   const handleAskAssistant = useCallback(() => {
-    snap.toggleAssistant()
-  }, [snap])
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    if (projectRef && organization?.slug) {
+      sendEvent({
+        action: 'home_advisor_ask_assistant_clicked',
+        properties: {
+          issues_count: totalErrors,
+        },
+        groups: {
+          project: projectRef,
+          organization: organization.slug,
+        },
+      })
+    }
+  }, [sendEvent, openSidebar, projectRef, organization, totalErrors])
 
-  const handleCardClick = useCallback((lint: Lint) => {
-    setSelectedLint(lint)
-  }, [])
+  const handleCardClick = useCallback(
+    (lint: Lint) => {
+      setSelectedItemId(lint.cache_key)
+      openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
+      if (projectRef && organization?.slug) {
+        sendEvent({
+          action: 'home_advisor_issue_card_clicked',
+          properties: {
+            issue_category: lint.categories[0] || 'UNKNOWN',
+            issue_name: lint.name,
+            issues_count: totalErrors,
+          },
+          groups: {
+            project: projectRef,
+            organization: organization.slug,
+          },
+        })
+      }
+    },
+    [sendEvent, setSelectedItemId, openSidebar, projectRef, organization, totalErrors]
+  )
+
+  if (showEmptyState) {
+    return <EmptyState />
+  }
 
   return (
     <div>
@@ -85,7 +116,7 @@ export const AdvisorSection = () => {
               return (
                 <Card
                   key={lint.cache_key}
-                  className="h-full flex flex-col items-stretch cursor-pointer"
+                  className="min-h-full flex flex-col items-stretch cursor-pointer h-64"
                   onClick={() => {
                     handleCardClick(lint)
                   }}
@@ -106,11 +137,24 @@ export const AdvisorSection = () => {
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
+                        openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                         snap.newChat({
                           name: 'Summarize lint',
-                          open: true,
                           initialInput: createLintSummaryPrompt(lint),
                         })
+                        if (projectRef && organization?.slug) {
+                          sendEvent({
+                            action: 'home_advisor_fix_issue_clicked',
+                            properties: {
+                              issue_category: lint.categories[0] || 'UNKNOWN',
+                              issue_name: lint.name,
+                            },
+                            groups: {
+                              project: projectRef,
+                              organization: organization.slug,
+                            },
+                          })
+                        }
                       }}
                       tooltip={{
                         content: { side: 'bottom', text: 'Help me fix this issue' },
@@ -125,43 +169,23 @@ export const AdvisorSection = () => {
               )
             })}
           </Row>
-          <Sheet open={selectedLint !== null} onOpenChange={() => setSelectedLint(null)}>
-            <SheetContent>
-              {selectedLint && (
-                <>
-                  <SheetHeader>
-                    <div className="flex items-center gap-4">
-                      <SheetTitle>
-                        {lintInfoMap.find((item) => item.name === selectedLint.name)?.title ??
-                          'Unknown'}
-                      </SheetTitle>
-                      <LintCategoryBadge category={selectedLint.categories[0]} />
-                    </div>
-                  </SheetHeader>
-                  <SheetSection>
-                    {selectedLint && projectRef && (
-                      <LintDetail
-                        lint={selectedLint}
-                        projectRef={projectRef!}
-                        onAskAssistant={() => setSelectedLint(null)}
-                      />
-                    )}
-                  </SheetSection>
-                </>
-              )}
-            </SheetContent>
-          </Sheet>
         </>
       ) : (
-        <Card className="bg-transparent">
-          <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
-            <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
-            <p className="text-sm text-foreground-light text-center">
-              No security or performance errors found
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState />
       )}
     </div>
+  )
+}
+
+function EmptyState() {
+  return (
+    <Card className="bg-transparent">
+      <CardContent className="flex flex-col items-center justify-center gap-2 p-16">
+        <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
+        <p className="text-sm text-foreground-light text-center">
+          No security or performance errors found
+        </p>
+      </CardContent>
+    </Card>
   )
 }

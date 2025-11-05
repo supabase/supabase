@@ -4,10 +4,10 @@ import InlineSVG from 'react-inlinesvg'
 
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { OrgProject } from 'data/projects/projects-infinite-query'
+import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import { TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { inferProjectStatus } from './ProjectCard.utils'
@@ -96,12 +96,10 @@ export const ProjectTableRow = ({
         <div className="w-fit">
           {project.status !== 'INACTIVE' ? (
             <ComputeBadgeWrapper
-              project={{
-                ref: project.ref,
-                organization_slug: organization?.slug,
-                cloud_provider: infraInformation?.cloud_provider,
-                infra_compute_size: infraInformation?.infra_compute_size,
-              }}
+              slug={organization?.slug}
+              projectRef={project.ref}
+              cloudProvider={project.cloud_provider}
+              computeSize={getComputeSize(project)}
             />
           ) : (
             <span className="text-xs text-foreground-light">-</span>
@@ -110,7 +108,7 @@ export const ProjectTableRow = ({
       </TableCell>
       <TableCell>
         <span className="lowercase text-sm text-foreground-light">
-          {infraInformation?.cloud_provider} | {project.region || 'N/A'}
+          {project.cloud_provider} | {project.region || 'N/A'}
         </span>
       </TableCell>
       <TableCell>

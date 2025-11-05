@@ -2,7 +2,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, CriticalIcon } from 'ui'
-import DeleteProjectButton from './DeleteProjectButton'
+import { DeleteProjectButton } from './DeleteProjectButton'
 
 export const DeleteProjectPanel = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -25,7 +25,7 @@ export const DeleteProjectPanel = () => {
 
       <Alert_Shadcn_ variant="destructive">
         <CriticalIcon />
-        <AlertTitle_Shadcn_ className="mt-2">{title}</AlertTitle_Shadcn_>
+        <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
         <div className="mt-2">
           <DeleteProjectButton />

@@ -10,9 +10,10 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Button, Radio, SidePanel, cn } from 'ui'
@@ -25,7 +26,7 @@ const IPv4SidePanel = () => {
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 
-  const { can: canUpdateIPv4 } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateIPv4 } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -104,7 +105,7 @@ const IPv4SidePanel = () => {
           <h4>Dedicated IPv4 address</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/ipv4-address"
+              href={`${DOCS_URL}/guides/platform/ipv4-address`}
               target="_blank"
               rel="noreferrer"
             >

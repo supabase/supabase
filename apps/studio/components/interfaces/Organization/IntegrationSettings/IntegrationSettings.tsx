@@ -19,7 +19,7 @@ import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorizat
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
@@ -43,19 +43,19 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   )
 }
 
-const IntegrationSettings = () => {
+export const IntegrationSettings = () => {
   const router = useRouter()
   const { data: org } = useSelectedOrganizationQuery()
 
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
 
   const { can: canReadGithubConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'integrations.github_connections')
-  const { can: canCreateGitHubConnection } = useAsyncCheckProjectPermissions(
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
-  const { can: canUpdateGitHubConnection } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )
@@ -193,5 +193,3 @@ The GitHub app will watch for changes in your repository such as file changes, b
     </>
   )
 }
-
-export default IntegrationSettings
