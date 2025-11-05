@@ -161,7 +161,12 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/settings/storage',
-        destination: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/settings',
+        destination: '/project/:ref/storage/files/settings',
         permanent: true,
       },
       {
