@@ -292,7 +292,7 @@ export function LogDrainDestinationSheetForm({
 
                 form.handleSubmit(onSubmit)(e)
                 track('log_drain_destination_saved', {
-                  type: form.getValues('type') as Exclude<
+                  destination: form.getValues('type') as Exclude<
                     LogDrainType,
                     'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3'
                   >,

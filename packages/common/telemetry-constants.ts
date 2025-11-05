@@ -2194,7 +2194,7 @@ export interface LogDrainDestinationSavedEvent {
     /**
      * Type of the destination saved
      */
-    type: 'webhook' | 'datadog' | 'loki' | 'sentry'
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
   }
   groups: TelemetryGroups
 }
