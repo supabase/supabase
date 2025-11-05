@@ -2,6 +2,10 @@ services:
   analytics:
     scale: 0
 
+  # db:
+  #   ports:
+  #     - 9876:5432
+
   studio:
     depends_on: []
     environment:
