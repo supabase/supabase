@@ -1,11 +1,10 @@
 ---
 id: 'customizing-email-templates'
 title: 'Customizing email templates'
-description: 'Customizing local email templates using config.toml.'
-subtitle: 'Customizing local email templates using config.toml.'
+subtitle: 'Customize local email templates via the config file.'
 ---
 
-You can customize the email templates for local development [using the `config.toml` settings](/docs/guides/local-development/cli/config#auth-config).
+You can customize the email templates for local development by [editing the `config.toml` file](/docs/guides/local-development/cli/config#auth-config).
 
 ## Configuring templates
 
@@ -58,7 +57,7 @@ content_path = "./templates/password_changed_notification.html"
 
 ## Available authentication email templates
 
-There are several Auth email templates which can be configured. Each template serves a specific authentication flow:
+There are several authentication-related email templates which can be configured. Each template serves a specific authentication flow:
 
 ### `auth.email.template.invite`
 
@@ -104,7 +103,7 @@ There are several Auth email templates which can be configured. Each template se
 
 ## Available notification email templates
 
-There are several Auth notification email templates which can be configured. These are security-related notifications sent to users, only if they have been enabled:
+There are several security-related email templates which can be configured. These notifications are only sent to users if they have been enabled:
 
 ### `auth.email.notification.password_changed`
 
