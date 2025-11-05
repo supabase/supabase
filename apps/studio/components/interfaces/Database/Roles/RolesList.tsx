@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { useState } from 'react'
+import { useQueryState, parseAsBoolean, parseAsString } from 'nuqs'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -24,8 +25,14 @@ export const RolesList = () => {
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
-  const [isCreatingRole, setIsCreatingRole] = useState(false)
-  const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
+  const [isCreatingRole, setIsCreatingRole] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [selectedRoleToDelete, setSelectedRoleToDelete] = useQueryState(
+    'delete',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -212,9 +219,9 @@ export const RolesList = () => {
       <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
 
       <DeleteRoleModal
-        role={selectedRoleToDelete}
-        visible={selectedRoleToDelete !== undefined}
-        onClose={() => setSelectedRoleToDelete(undefined)}
+        role={data?.find((role) => role.id.toString() === selectedRoleToDelete)}
+        visible={!!selectedRoleToDelete}
+        onClose={() => setSelectedRoleToDelete('')}
       />
     </>
   )
