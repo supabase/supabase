@@ -105,27 +105,6 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
 
             </DropdownMenuContent>
           </DropdownMenu>
-          {
-            /*
-            <ButtonTooltip
-              type="text"
-              icon={<Trash />}
-              className="px-1"
-              disabled={!canUpdateSecrets || isReservedSecret}
-              onClick={() => onSelectDelete()}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: isReservedSecret
-                    ? 'This is a reserved secret and cannot be deleted'
-                    : !canUpdateSecrets
-                      ? 'You need additional permissions to delete edge function secrets'
-                      : undefined,
-                },
-              }}
-            />
-            */
-          }
         </div>
       </TableCell>
     </TableRow>
