@@ -33,11 +33,7 @@ export const useServiceStats = (
 ): ServiceStatsMap => {
   const durationMs = new Date(timestampEnd).getTime() - new Date(timestampStart).getTime()
   const interval: '1hr' | '1day' | '7day' =
-    durationMs <= 60 * 60 * 1000
-      ? '1hr'
-      : durationMs <= 24 * 60 * 60 * 1000
-        ? '1day'
-        : '7day'
+    durationMs <= 60 * 60 * 1000 ? '1hr' : durationMs <= 24 * 60 * 60 * 1000 ? '1day' : '7day'
 
   const { data, isLoading, refetch } = useProjectMetricsQuery({
     projectRef,
