@@ -37,7 +37,7 @@ function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
   if (!frames || frames.length === 0) return false
 
   function isSentryFrame(frame: Sentry.StackFrame, index: number) {
-    return index === 0 && frame.pre_context?.[0]?.includes('sentry.javascript')
+    return index === 0 && frame.pre_context?.some(line => line.includes('sentry.javascript'))
   }
 
   // Check if any frame is from our app (excluding Sentry's own frame)
