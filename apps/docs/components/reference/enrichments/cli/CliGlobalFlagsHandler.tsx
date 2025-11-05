@@ -2,14 +2,34 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
 import spec from '~/spec/cli_v1_commands.yaml' with { type: 'yaml' }
 import Param from '~/components/Params'
+import { isFeatureEnabled } from 'common'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+
+const { cliCustomProfiles } = isFeatureEnabled(['cli:custom_profiles'])
+const { cliProfile } = getCustomContent([
+  'cli:profile',
+])
 
 const CliGlobalFlagsHandler = () => {
+  // Transform the flags based on feature flags
+  const processedFlags = spec.flags.map((flag: any) => {
+    if (flag.id === 'profile' && cliCustomProfiles) {
+      return {
+        id: 'profile',
+        name: `--profile ${cliProfile}`,
+        description: `use ${cliProfile} profile for connecting to Supabase API`,
+        default_value: cliProfile,
+      }
+    }
+    return flag
+  })
+
   return (
     <RefSubLayout.EducationRow className="not-prose">
       <RefSubLayout.Details>
         <h3 className="text-lg text-foreground mb-3">Flags</h3>
         <ul>
-          {spec.flags.map((flag) => {
+          {processedFlags.map((flag) => {
             return (
               <Param
                 {...flag}

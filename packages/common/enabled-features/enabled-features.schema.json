@@ -99,7 +99,10 @@
       "type": "boolean",
       "description": "Show larger logo sizes throughout the apps"
     },
-
+    "cli:custom_profiles": {
+      "type": "boolean",
+      "description": "Enable custom CLI profiles feature"
+    },
     "dashboard_auth:sign_up": {
       "type": "boolean",
       "description": "Enable the sign up page in the dashboard"
