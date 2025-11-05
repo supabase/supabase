@@ -544,9 +544,16 @@ export interface paths {
     /** Get GitHub authorization */
     get: operations['GitHubAuthorizationsController_getGitHubAuthorization']
     put?: never
-    /** Create GitHub authorization */
+    /**
+     * Upsert GitHub authorization
+     * @description Creates or updates a GitHub authorization for the current user
+     */
     post: operations['GitHubAuthorizationsController_createGitHubAuthorization']
-    delete?: never
+    /**
+     * Remove GitHub authorization
+     * @description Removes the GitHub authorization for the current user
+     */
+    delete: operations['GitHubAuthorizationsController_removeGitHubAuthorization']
     options?: never
     head?: never
     patch?: never
@@ -2023,23 +2030,6 @@ export interface paths {
     put?: never
     /** Logged into account */
     post: operations['ProfileController_auditAccountLogin']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/profile/password-check': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Check password strength */
-    post: operations['PasswordCheckController_checkPassword']
     delete?: never
     options?: never
     head?: never
@@ -5232,7 +5222,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -5308,7 +5298,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -5584,6 +5574,9 @@ export interface components {
       description: string
       id: string
       secret_key: string
+    }
+    CreateStorageVectorBucketBody: {
+      bucketName: string
     }
     CreateTaxIdBody: {
       country?: string
@@ -7006,6 +6999,8 @@ export interface components {
       }[]
     }
     ListGitHubRepositoriesResponse: {
+      /** @description The authorized user may not have access to all GitHub repositories in case they haven't gone through the authorization process with SSO yet. This field will be `true` if this is the case. The calling user must reauthorize their GitHub account with SSO to see all repositories. */
+      partial_response_due_to_sso: boolean
       repositories: {
         default_branch: string
         id: number
@@ -7533,18 +7528,6 @@ export interface components {
     OverdueInvoiceCount: {
       organization_id: number
       overdue_invoice_count: number
-    }
-    PasswordCheckBody: {
-      password: string
-    }
-    PasswordCheckResponse: {
-      result: {
-        feedback: {
-          suggestions: string[]
-          warning: string
-        }
-        score: number
-      }
     }
     PauseStatusResponse: {
       can_restore: boolean
@@ -8326,7 +8309,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -8414,7 +8397,7 @@ export interface components {
                    * @description Namespace
                    * @example my-namespace
                    */
-                  namespace: string
+                  namespace?: string
                   /**
                    * @description Project ref
                    * @example abcdefghijklmnopqrst
@@ -9112,6 +9095,7 @@ export interface components {
         iceberg_catalog: boolean
         list_v2: boolean
       }
+      databasePoolMode: string
       external: {
         /** @enum {string} */
         upstreamTarget: 'main' | 'canary'
@@ -9129,6 +9113,7 @@ export interface components {
       }
       /** Format: int64 */
       fileSizeLimit: number
+      migrationVersion: string
     }
     StorageListResponseV2: {
       folders: {
@@ -10054,7 +10039,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -10130,7 +10115,7 @@ export interface components {
                  * @description Namespace
                  * @example my-namespace
                  */
-                namespace: string
+                namespace?: string
                 /**
                  * @description Project ref
                  * @example abcdefghijklmnopqrst
@@ -12146,6 +12131,37 @@ export interface operations {
         content?: never
       }
       /** @description Failed to create GitHub authorization */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GitHubAuthorizationsController_removeGitHubAuthorization: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description There was no GitHub authorization attached to the user */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to remove GitHub authorization */
       500: {
         headers: {
           [name: string]: unknown
@@ -16999,36 +17015,6 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  PasswordCheckController_checkPassword: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PasswordCheckBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PasswordCheckResponse']
-        }
-      }
-      /** @description Failed to check password strength */
-      500: {
         headers: {
           [name: string]: unknown
         }
@@ -25280,7 +25266,9 @@ export interface operations {
   }
   StorageVectorBucketsController_getBuckets: {
     parameters: {
-      query?: never
+      query?: {
+        nextToken?: string
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -25338,7 +25326,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateStorageVectorBucketBody']
+      }
+    }
     responses: {
       201: {
         headers: {

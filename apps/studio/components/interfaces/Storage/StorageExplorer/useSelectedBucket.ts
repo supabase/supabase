@@ -34,9 +34,7 @@ export const useSelectedBucket = () => {
       ? buckets.find((b) => b.id === bucketId)
       : page === 'analytics'
         ? analyticsBuckets.find((b: any) => b.id === bucketId)
-        : // [Joshen] Remove typecasts bucket: any once infra changes for analytics bucket is in
-          // [Joshen] Temp fallback to buckets for backwards compatibility old UI
-          buckets.find((b) => b.id === bucketId)
+        : buckets.find((b) => b.id === bucketId)
 
   return { bucket, isSuccess, isError, error }
 }

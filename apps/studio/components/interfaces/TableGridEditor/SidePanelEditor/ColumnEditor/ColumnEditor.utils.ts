@@ -70,7 +70,7 @@ export const generateColumnFieldFromPostgresColumn = (
     table: column.table,
     schema: column.schema,
     name: column.name,
-    comment: column?.comment ?? '',
+    comment: column?.comment,
     format: isArray ? column.format.slice(1) : column.format,
     defaultValue: column?.default_value as string | null,
     check: column.check,
