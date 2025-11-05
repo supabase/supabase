@@ -101,7 +101,7 @@ export const TriggerList = ({
               type="text"
               onClick={() => editTrigger(x)}
               title={x.name}
-              className="text-link-table-cell text-left text-sm min-w-0 p-0 hover:bg-transparent max-w-48 title"
+              className="text-link-table-cell text-left text-sm min-w-0 p-0 hover:bg-transparent font-medium max-w-48 title"
             >
               {x.name}
             </Button>
