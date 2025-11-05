@@ -56,15 +56,7 @@ Sentry.init({
   debug: false,
   // [Ali] Filter out browser extensions and user scripts (FE-2094)
   // Using denyUrls to block known third-party script patterns
-  denyUrls: [
-    /extensions?\//i,
-    /^chrome:\/\//i,
-    /^chrome-extension:\/\//i,
-    /^moz-extension:\/\//i,
-    /^safari-extension:\/\//i,
-    /^safari-web-extension:\/\//i,
-    /userscript/i,
-  ],
+  denyUrls: [/userscript/i],
   beforeBreadcrumb(breadcrumb, _hint) {
     const cleanedBreadcrumb = { ...breadcrumb }
 
