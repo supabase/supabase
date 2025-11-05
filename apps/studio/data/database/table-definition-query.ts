@@ -1,4 +1,5 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-table-definition'
 import { databaseKeys } from './keys'
@@ -68,7 +69,7 @@ export const useTableDefinitionQuery = <TData = TableDefinitionData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<TableDefinitionData, TableDefinitionError, TData> = {}
+  }: UseCustomQueryOptions<TableDefinitionData, TableDefinitionError, TData> = {}
 ) =>
   useQuery<TableDefinitionData, TableDefinitionError, TData>({
     queryKey: databaseKeys.tableDefinition(projectRef, id),

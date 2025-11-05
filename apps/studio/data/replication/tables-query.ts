@@ -1,7 +1,7 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicationKeys } from './keys'
 
 type ReplicationTablesParams = { projectRef?: string; sourceId?: number }
@@ -28,7 +28,10 @@ export type ReplicationTablesData = Awaited<ReturnType<typeof fetchReplicationTa
 
 export const useReplicationTablesQuery = <TData = ReplicationTablesData>(
   { projectRef, sourceId }: ReplicationTablesParams,
-  { enabled = true, ...options }: UseQueryOptions<ReplicationTablesData, ResponseError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ReplicationTablesData, ResponseError, TData> = {}
 ) =>
   useQuery<ReplicationTablesData, ResponseError, TData>({
     queryKey: replicationKeys.tables(projectRef, sourceId),

@@ -50,7 +50,7 @@ export function openInstallGitHubIntegrationWindow(
   } else {
     const state = makeRandomString(32)
     localStorage.setItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE, state)
-    windowUrl = `${GITHUB_INTEGRATION_AUTHORIZATION_URL}&state=${state}`
+    windowUrl = `${GITHUB_INTEGRATION_AUTHORIZATION_URL}&state=${state}&prompt=select_account`
   }
 
   const systemZoom = width / window.screen.availWidth

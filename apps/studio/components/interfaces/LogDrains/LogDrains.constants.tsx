@@ -13,7 +13,7 @@ export type LogDrainType = components['schemas']['CreateBackendParamsOpenapi']['
 export const LOG_DRAIN_TYPES = [
   {
     value: 'webhook',
-    name: 'HTTP Endpoint',
+    name: 'Custom Endpoint',
     description: 'Forward logs as a POST request to a custom HTTP endpoint',
     icon: <BracesIcon {...iconProps} />,
   },

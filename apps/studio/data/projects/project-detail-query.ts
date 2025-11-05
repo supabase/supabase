@@ -1,8 +1,8 @@
-import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError, isValidConnString } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
 import { OrgProjectsResponse } from './org-projects-infinite-query'
 
@@ -42,7 +42,10 @@ export type ProjectDetailError = ResponseError
 
 export const useProjectDetailQuery = <TData = ProjectDetailData>(
   { ref }: ProjectDetailVariables,
-  { enabled = true, ...options }: UseQueryOptions<ProjectDetailData, ProjectDetailError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ProjectDetailData, ProjectDetailError, TData> = {}
 ) =>
   useQuery<ProjectDetailData, ProjectDetailError, TData>({
     queryKey: projectKeys.detail(ref),

@@ -1,10 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 export type BucketsVariables = { projectRef?: string }
@@ -30,7 +30,7 @@ export type BucketsError = ResponseError
 
 export const useBucketsQuery = <TData = BucketsData>(
   { projectRef }: BucketsVariables,
-  { enabled = true, ...options }: UseQueryOptions<BucketsData, BucketsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<BucketsData, BucketsError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY

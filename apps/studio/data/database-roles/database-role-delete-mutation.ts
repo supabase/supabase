@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invalidateRolesQuery } from './database-roles-query'
 
 type DropRoleBody = Parameters<typeof pgMeta.roles.remove>[1]
@@ -38,7 +38,7 @@ export const useDatabaseRoleDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseRoleDeleteData, ResponseError, DatabaseRoleDeleteVariables>,
+  UseCustomMutationOptions<DatabaseRoleDeleteData, ResponseError, DatabaseRoleDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

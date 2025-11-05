@@ -57,10 +57,14 @@ const MonacoEditor = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
-  const { openSidebar } = useSidebarManagerSnapshot()
+  const { openSidebar, toggleSidebar } = useSidebarManagerSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    true
+  )
+  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
+    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
     true
   )
 
@@ -121,6 +125,17 @@ const MonacoEditor = ({
           sqlSnippets: [selectedValue],
           initialInput: 'Can you explain this section to me in more detail?',
         })
+      },
+    })
+
+    editor.addAction({
+      id: 'toggle-ai-assistant',
+      label: 'Toggle AI Assistant',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
+      run: () => {
+        if (isAIAssistantHotkeyEnabled) {
+          toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+        }
       },
     })
 

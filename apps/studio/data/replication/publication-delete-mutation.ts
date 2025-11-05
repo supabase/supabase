@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type DeletePublicationParams = {
@@ -41,7 +41,7 @@ export const useDeletePublicationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeletePublicationData, ResponseError, DeletePublicationParams>,
+  UseCustomMutationOptions<DeletePublicationData, ResponseError, DeletePublicationParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -50,7 +50,9 @@ export const useDeletePublicationMutation = ({
     mutationFn: (vars) => deletePublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, sourceId } = variables
-      await queryClient.invalidateQueries(replicationKeys.publications(projectRef, sourceId))
+      await queryClient.invalidateQueries({
+        queryKey: replicationKeys.publications(projectRef, sourceId),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

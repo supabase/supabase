@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { logDrainsKeys } from './keys'
 
 export type LogDrainsVariables = {
@@ -30,7 +30,7 @@ export type LogDrainsyError = ResponseError
 
 export const useLogDrainsQuery = <TData = LogDrainsData>(
   { ref }: LogDrainsVariables,
-  { enabled = true, ...options }: UseQueryOptions<LogDrainsData, LogDrainsyError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<LogDrainsData, LogDrainsyError, TData> = {}
 ) =>
   useQuery<LogDrainsData, LogDrainsyError, TData>({
     queryKey: logDrainsKeys.list(ref),
