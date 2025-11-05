@@ -107,7 +107,7 @@ export const SupabaseGrid = ({
               filters={filters}
               onApplyFilters={onApplyFilters}
             />
-            <Footer disableForeignRowsQuery={!tableQueriesEnabled} />
+      <Footer enableForeignRowsQuery={tableQueriesEnabled} />
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}

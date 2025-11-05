@@ -8,10 +8,12 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { Pagination } from './pagination/Pagination'
 
 type FooterProps = {
-  disableForeignRowsQuery?: boolean
+  enableForeignRowsQuery?: boolean
 }
 
-export const Footer: React.FC<FooterProps> = ({ disableForeignRowsQuery = false }: FooterProps) => {
+export const Footer: React.FC<FooterProps> = ({
+  enableForeignRowsQuery = true,
+}: FooterProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
@@ -37,7 +39,7 @@ export const Footer: React.FC<FooterProps> = ({ disableForeignRowsQuery = false 
 
   return (
     <GridFooter>
-      {selectedView === 'data' && <Pagination disableForeignRowsQuery={disableForeignRowsQuery} />}
+      {selectedView === 'data' && <Pagination enableForeignRowsQuery={enableForeignRowsQuery} />}
 
       <div className="ml-auto flex items-center gap-x-2">
         {(isViewSelected || isTableSelected) && (
