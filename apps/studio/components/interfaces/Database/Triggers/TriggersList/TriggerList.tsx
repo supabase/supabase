@@ -6,7 +6,7 @@ import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
 import { useParams } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
+import { TableLink } from 'components/ui/TableLink'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -115,13 +115,13 @@ export const TriggerList = ({
 
           <TableCell className="break-all">
             {x.table_id ? (
-              <InlineLink
-                title={x.table}
+              <TableLink
                 href={`/project/${projectRef}/editor/${x.table_id}`}
-                className="truncate block max-w-40"
+                weight="normal"
+                className="block max-w-40"
               >
                 {x.table}
-              </InlineLink>
+              </TableLink>
             ) : (
               <p title={x.table} className="truncate">
                 {x.table}
@@ -131,13 +131,13 @@ export const TriggerList = ({
 
           <TableCell className="space-x-2">
             {x.function_name ? (
-              <InlineLink
-                title={x.function_name}
+              <TableLink
                 href={`/project/${projectRef}/database/functions?search=${x.function_name}&schema=${x.function_schema}`}
-                className="truncate block max-w-40"
+                weight="normal"
+                className="block max-w-40"
               >
                 {x.function_name}
-              </InlineLink>
+              </TableLink>
             ) : (
               <p className="truncate text-foreground-light">-</p>
             )}
