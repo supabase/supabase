@@ -5,7 +5,8 @@ import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
-import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import type { SpecificFilterColumn } from './Users.constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
@@ -49,7 +50,6 @@ import {
   MAX_BULK_DELETE,
   PHONE_NUMBER_LEFT_PREFIX_REGEX,
   PROVIDER_FILTER_OPTIONS,
-  SpecificFilterColumn,
   USERS_TABLE_COLUMNS,
   UUIDV4_LEFT_PREFIX_REGEX,
 } from './Users.constants'
