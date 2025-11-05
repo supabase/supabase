@@ -79,7 +79,11 @@ export const AnalyticBucketDetails = () => {
     { enabled: wrapperValues.vault_token !== undefined }
   )
 
-  const { data: namespacesData, isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
+  const {
+    data: namespacesData,
+    isLoading: isLoadingNamespaces,
+    refetch: refetchNamespaces,
+  } = useIcebergNamespacesQuery(
     {
       catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
@@ -174,7 +178,10 @@ export const AnalyticBucketDetails = () => {
                         Stream data from tables for archival, backups, or analytical queries.
                       </p>
                     </div>
-                    <ConnectTablesDialog bucketId={bucket?.id} />
+                    <ConnectTablesDialog
+                      bucketId={bucket?.id}
+                      onSuccessConnectTables={async () => await refetchNamespaces()}
+                    />
                   </aside>
                 ) : (
                   <div className="flex flex-col gap-y-10">

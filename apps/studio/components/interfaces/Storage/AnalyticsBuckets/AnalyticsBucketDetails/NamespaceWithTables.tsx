@@ -7,6 +7,7 @@ import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappe
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { FDW } from 'data/fdw/fdws-query'
+import { useIcebergNamespaceDeleteMutation } from 'data/storage/iceberg-namespace-delete-mutation'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
@@ -158,6 +159,9 @@ export const NamespaceWithTables = ({
   const { data: project } = useSelectedProjectQuery()
   const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
 
+  const { mutateAsync: deleteNamespace, isLoading: isDeleting } =
+    useIcebergNamespaceDeleteMutation()
+
   const { data: tablesData, isLoading: isLoadingNamespaceTables } = useIcebergNamespaceTablesQuery(
     {
       catalogUri: wrapperValues.catalog_uri,
@@ -269,6 +273,31 @@ export const NamespaceWithTables = ({
               </TooltipContent>
             </Tooltip>
           )}
+          <Button
+            type="default"
+            className="ml-20"
+            loading={isDeleting}
+            onClick={async () => {
+              // Just for debugging Joshen
+              if (!bucketName) return
+
+              console.log({
+                catalogUri: '',
+                warehouse: bucketName,
+                token: '',
+                namespace,
+              })
+
+              // await deleteNamespace({
+              //   catalogUri: '',
+              //   warehouse: bucketName,
+              //   token: '',
+              //   namespace
+              // })
+            }}
+          >
+            Delete namespace
+          </Button>
         </CardTitle>
 
         <div className="flex flex-row gap-x-2">

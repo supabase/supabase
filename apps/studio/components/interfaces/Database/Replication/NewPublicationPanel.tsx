@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
-import { useCreatePublicationMutation } from 'data/replication/create-publication-mutation'
+import { useCreatePublicationMutation } from 'data/replication/publication-create-mutation'
 import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import {
   Button,

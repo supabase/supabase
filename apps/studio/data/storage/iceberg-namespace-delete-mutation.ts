@@ -5,7 +5,7 @@ import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
-type CreateIcebergNamespaceVariables = {
+type IcebergNamespaceDeleteVariables = {
   catalogUri: string
   warehouse: string
   token: string
@@ -13,12 +13,12 @@ type CreateIcebergNamespaceVariables = {
 }
 
 // [Joshen] Investigate if we can use the temp API keys here
-async function createIcebergNamespace({
+async function deleteIcebergNamespace({
   catalogUri,
   warehouse,
   token,
   namespace,
-}: CreateIcebergNamespaceVariables) {
+}: IcebergNamespaceDeleteVariables) {
   let headers = new Headers()
   // handle both secret key and service role key
   if (token.startsWith('sb_secret_')) {
@@ -34,15 +34,12 @@ async function createIcebergNamespace({
     })
   }
 
-  const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
+  const url = `${catalogUri}/v1/${warehouse}/namespaces/${namespace}`.replaceAll(/(?<!:)\/\//g, '/')
 
   try {
     const response = await fetchHandler(url, {
       headers,
-      method: 'POST',
-      body: JSON.stringify({
-        namespace: namespace,
-      }),
+      method: 'DELETE',
     })
 
     const result = await response.json()
@@ -50,7 +47,7 @@ async function createIcebergNamespace({
       if (result.error.message) {
         throw new Error(result.error.message)
       }
-      throw new Error('Failed to create Iceberg namespace')
+      throw new Error('Failed to delete Iceberg namespace')
     }
     return result
   } catch (error) {
@@ -58,24 +55,24 @@ async function createIcebergNamespace({
   }
 }
 
-type IcebergNamespaceCreateData = Awaited<ReturnType<typeof createIcebergNamespace>>
+type IcebergNamespaceDeleteData = Awaited<ReturnType<typeof deleteIcebergNamespace>>
 
-export const useIcebergNamespaceCreateMutation = ({
+export const useIcebergNamespaceDeleteMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
   UseCustomMutationOptions<
-    IcebergNamespaceCreateData,
+    IcebergNamespaceDeleteData,
     ResponseError,
-    CreateIcebergNamespaceVariables
+    IcebergNamespaceDeleteVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>({
-    mutationFn: (vars) => createIcebergNamespace(vars),
+  return useMutation<IcebergNamespaceDeleteData, ResponseError, IcebergNamespaceDeleteVariables>({
+    mutationFn: (vars) => deleteIcebergNamespace(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.icebergNamespace(
@@ -90,12 +87,8 @@ export const useIcebergNamespaceCreateMutation = ({
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
-      if (data.message === 'Request failed with status code 409') {
-        toast.error(`A namespace named ${variables.namespace} already exists in the catalog.`)
-        return
-      }
       if (onError === undefined) {
-        toast.error(`Failed to create Iceberg namespace: ${data.message}`)
+        toast.error(`Failed to delete Iceberg namespace: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
