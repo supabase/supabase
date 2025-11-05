@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
 import { Button, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -52,16 +53,16 @@ export const DecryptedReadOnlyInput = ({
             {secureEntry && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a
+                  <Link
                     target="_blank"
                     rel="noreferrer noopener"
                     href={`/project/${ref}/integrations/vault/secrets?search=${value}`}
                   >
                     <ExternalLink
                       size={14}
-                      className="text-foreground-muted hover:text-foreground-lighter transition"
+                      className="text-foreground-lighter hover:text-foreground transition"
                     />
-                  </a>
+                  </Link>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Open in Vault</TooltipContent>
               </Tooltip>
