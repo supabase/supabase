@@ -62,9 +62,7 @@ You can subscribe to webhook notifications when an action run completes on a per
 }
 ```
 
-We recommend registering a single webhooks processor that dispatches events to downstream services based on payload type.
-
-For example, you can deploy the following Edge Function to process run completed events by notifying a Slack channel.
+We recommend registering a single webhooks processor that dispatches events to downstream services based on the payload type. The easiest way to do that is by deploying an Edge Function. For example, the following Edge Function listens for run completed events to notify a Slack channel.
 
 ```typescript name=supabase/functions/notify-slack/index.ts
 // Setup type definitions for built-in Supabase Runtime APIs
@@ -166,7 +164,7 @@ Deno.serve(async (request) => {
   <StepHikeCompact.Step step={3}>
       <StepHikeCompact.Details title="Update branch notification URL" fullWidth>
 
-        Update the notification URL of your branch to point to your Edge Function.
+        Update the notification URL of your target branch to point to your Edge Function.
 
         ```markdown
         supabase branches update <branch-ref> --notify-url https://<branch-ref>.supabase.co/functions/v1/notify-slack
@@ -176,6 +174,8 @@ Deno.serve(async (request) => {
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
+
+After completing the steps above, you should receive a Slack message whenever an action run completes on your target branch.
 
 ## Migration and seeding behavior
 
