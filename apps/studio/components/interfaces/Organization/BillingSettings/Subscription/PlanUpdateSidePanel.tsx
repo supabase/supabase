@@ -199,7 +199,7 @@ export const PlanUpdateSidePanel = () => {
                     'px-4 py-4 flex flex-col items-start justify-between',
                     'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
                     shouldHighlight &&
-                      'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_2] shadow-md shadow-brand/40'
+                      'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] shadow-md shadow-brand/40'
                   )}
                 >
                   <div className="w-full">
