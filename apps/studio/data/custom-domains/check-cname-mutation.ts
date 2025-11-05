@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { fetchHandler, handleError } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'sonner'
 
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type CheckCNAMERecordVariables = {
   domain: string
@@ -47,7 +47,7 @@ export const useCheckCNAMERecordMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>,
+  UseCustomMutationOptions<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>({

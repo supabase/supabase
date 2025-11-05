@@ -1,9 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type ProjectDailyStatsAttribute =
   operations['DailyStatsController_getDailyStats']['parameters']['query']['attribute']
@@ -48,7 +49,7 @@ export const useProjectDailyStatsQuery = <TData = ProjectDailyStatsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectDailyStatsData, ProjectDailyStatsError, TData> = {}
+  }: UseCustomQueryOptions<ProjectDailyStatsData, ProjectDailyStatsError, TData> = {}
 ) =>
   useQuery<ProjectDailyStatsData, ProjectDailyStatsError, TData>({
     queryKey: analyticsKeys.infraMonitoring(projectRef, {

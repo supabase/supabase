@@ -6,7 +6,7 @@ import { ComponentPropsWithoutRef, ElementRef, forwardRef, Fragment } from 'reac
 
 import { cn } from 'ui'
 
-const Slider = forwardRef<
+export const Slider = forwardRef<
   ElementRef<typeof SliderPrimitive.Root>,
   ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
 >(({ className, ...props }, ref) => {
@@ -30,5 +30,3 @@ const Slider = forwardRef<
   )
 })
 Slider.displayName = SliderPrimitive.Root.displayName
-
-export { Slider }

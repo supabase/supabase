@@ -1,0 +1,42 @@
+---
+title = "Edge Function deploy failed due to an internal error"
+topics = [ "functions" ]
+keywords = [ "fail", "deploy" ]
+
+[[errors]]
+http_status_code = 500
+message="Function deploy failed due to an internal error"
+
+[[errors]]
+http_status_code = 500
+message="unexpected deploy status 500"
+---
+
+When encountering the `Function deploy failed due to an internal error`, try deploy the function via the [Supabase CLI](/docs/guides/local-development) with the `--debug` flag to gather extra information to identify the possible cause.
+
+You can also try [alternative bundle methods](/docs/reference/cli/supabase-functions-deploy):
+
+- `--use-api`: Use Management API to bundle functions.
+- `--use-docker`: Use Docker to bundle functions.
+
+If you're not able to run the CLI or cannot identify the cause, [open a support ticket](/dashboard/support/new).
+
+**Example error**
+
+```
+$ supabase functions deploy FUNCTION_NAME --project-ref $PROJECT_ID
+...
+unexpected deploy status 500: {"message":"Function deploy failed due to an internal error"}
+```
+
+**Example output with `--debug`**
+
+- From the details we can see it is exceeding the 20MB [Edge Function size limit](/docs/guides/functions/limits)
+
+```
+$ supabase functions deploy FUNCTION_NAME --project-ref $PROJECT_ID --debug
+...
+Deploying Function: FUNCTION_NAME (script size: 62.61MB)
+...
+unexpected update function status 413: {"message":"request entity too large"}
+```

@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invalidateSchemasQuery } from './schemas-query'
 
 export type SchemaCreateVariables = {
@@ -30,7 +30,7 @@ export const useSchemaCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SchemaCreateData, ResponseError, SchemaCreateVariables>,
+  UseCustomMutationOptions<SchemaCreateData, ResponseError, SchemaCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

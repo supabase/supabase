@@ -1,4 +1,4 @@
-import { LifeBuoy, Activity } from 'lucide-react'
+import { Activity, LifeBuoy } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { IS_PLATFORM } from 'common'
@@ -6,7 +6,7 @@ import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 
-const useSupportCommands = () => {
+export const useSupportCommands = () => {
   const commands = useMemo(
     () =>
       [
@@ -37,5 +37,3 @@ const useSupportCommands = () => {
 
   useRegisterCommands(COMMAND_MENU_SECTIONS.SUPPORT, commands, { enabled: IS_PLATFORM })
 }
-
-export { useSupportCommands }

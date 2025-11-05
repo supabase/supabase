@@ -1,4 +1,5 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
 
@@ -39,7 +40,7 @@ export const useMaxConnectionsQuery = <TData = MaxConnectionsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<MaxConnectionsData, MaxConnectionsError, TData> = {}
+  }: UseCustomQueryOptions<MaxConnectionsData, MaxConnectionsError, TData> = {}
 ) =>
   useQuery<MaxConnectionsData, MaxConnectionsError, TData>({
     queryKey: databaseKeys.maxConnections(projectRef),

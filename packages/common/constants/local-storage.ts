@@ -17,7 +17,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
   UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
-  UI_PREVIEW_NEW_STORAGE_UI: 'new-storage-ui',
   UI_PREVIEW_SECURITY_NOTIFICATIONS: 'security-notifications',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
@@ -76,7 +75,6 @@ export const LOCAL_STORAGE_KEYS = {
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
     `user-impersonation-selector-previous-searches-${ref}`,
 
-  HOTKEY_INLINE_EDITOR: 'supabase-dashboard-hotkey-inline-editor',
   HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
 
   // Project sidebar hotkeys

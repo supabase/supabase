@@ -17,7 +17,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-const ComplianceConfig = () => {
+export const ComplianceConfig = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isSensitive, setIsSensitive] = useState(false)
@@ -125,5 +125,3 @@ const ComplianceConfig = () => {
     </div>
   )
 }
-
-export default ComplianceConfig
