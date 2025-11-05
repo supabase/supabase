@@ -73,7 +73,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     else return TEMPLATES.filter((x) => x.label !== 'Metadata IP')
   }, [logsShowMetadataIpTemplate])
 
-  const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
   const [editorId] = useState<string>(uuidv4())
   const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
 

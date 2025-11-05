@@ -1,12 +1,12 @@
 import { Megaphone } from 'lucide-react'
-import { forwardRef, PropsWithChildren, ReactNode } from 'react'
+import { forwardRef, PropsWithChildren, ReactElement, ReactNode } from 'react'
 
 import { Badge, Button, cn, Loading } from 'ui'
 
 interface PanelProps {
   className?: string
   id?: string
-  footer?: JSX.Element | false
+  footer?: ReactElement | false
   loading?: boolean
   noMargin?: boolean
   title?: ReactNode | false

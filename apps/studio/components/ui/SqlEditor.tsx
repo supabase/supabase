@@ -1,5 +1,6 @@
-import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
+import Editor, { OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
+import type { editor } from 'monaco-editor'
 import { useEffect, useRef } from 'react'
 
 import { formatSql } from 'lib/formatSql'
@@ -28,7 +29,7 @@ const SqlEditor = ({
   onInputChange = noop,
 }: SqlEditorProps) => {
   const monaco = useMonaco()
-  const editorRef = useRef<any>()
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
 
   useEffect(() => {
     if (monaco) {
@@ -65,7 +66,7 @@ const SqlEditor = ({
     }
   }, [queryId])
 
-  const onMount = (editor: any, monaco: any) => {
+  const onMount: OnMount = (editor, monaco) => {
     editorRef.current = editor
 
     // Add margin above first line

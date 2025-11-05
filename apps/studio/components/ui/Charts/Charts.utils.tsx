@@ -92,7 +92,7 @@ export const useChartSize = (
           minHeight={minHeight}
           width="100%"
         >
-          {children as JSX.Element}
+          {children}
         </ResponsiveContainer>
       ),
     [size]

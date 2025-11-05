@@ -14,8 +14,8 @@ export function DebouncedComponent({
   children,
 }: DebouncedComponentProps) {
   const [shouldRender, setShouldRender] = useState(false)
-  const timeoutRef = useRef<NodeJS.Timeout>()
-  const prevValueRef = useRef(value)
+  const timeoutRef = useRef<NodeJS.Timeout>(null)
+  const prevValueRef = useRef<any>(value)
   const isInitialMount = useRef(true)
 
   useEffect(() => {

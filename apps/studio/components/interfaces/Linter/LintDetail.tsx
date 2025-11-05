@@ -48,13 +48,13 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
       </div>
 
       <h3 className="text-sm mb-2">Issue</h3>
-      <ReactMarkdown className="leading-6 text-sm text-foreground-light mb-6">
-        {lint.detail.replace(/\\`/g, '`')}
-      </ReactMarkdown>
+      <div className="leading-6 text-sm text-foreground-light mb-6">
+        <ReactMarkdown>{lint.detail.replace(/\\`/g, '`')}</ReactMarkdown>
+      </div>
       <h3 className="text-sm mb-2">Description</h3>
-      <ReactMarkdown className="text-sm text-foreground-light mb-6">
-        {lint.description.replace(/\\`/g, '`')}
-      </ReactMarkdown>
+      <div className="text-sm text-foreground-light mb-6">
+        <ReactMarkdown>{lint.description.replace(/\\`/g, '`')}</ReactMarkdown>
+      </div>
 
       <h3 className="text-sm mb-2">Resolve</h3>
       <div className="flex items-center gap-2">

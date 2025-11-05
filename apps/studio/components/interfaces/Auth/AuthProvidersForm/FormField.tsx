@@ -249,13 +249,11 @@ const FormField = ({
           label={properties.title}
           descriptionText={
             properties.description ? (
-              <ReactMarkdown
-                unwrapDisallowed
-                disallowedElements={['p']}
-                className="form-field-markdown"
-              >
-                {properties.description}
-              </ReactMarkdown>
+              <div className="form-field-markdown">
+                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                  {properties.description}
+                </ReactMarkdown>
+              </div>
             ) : null
           }
           defaultValue={properties.enum[0]}

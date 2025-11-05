@@ -6,7 +6,7 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { useKeyboardShortcuts } from './Hooks'
 
 type ShortcutsProps = {
-  gridRef: RefObject<DataGridHandle>
+  gridRef: RefObject<DataGridHandle | null>
   rows: SupaRow[]
 }
 

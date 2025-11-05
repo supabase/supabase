@@ -1,8 +1,8 @@
 import { PropsWithChildren } from 'react'
 
 interface TableProps {
-  body: JSX.Element | JSX.Element[]
-  head?: JSX.Element | JSX.Element[]
+  body: React.ReactElement | React.ReactElement[]
+  head?: React.ReactElement | React.ReactElement[]
   className?: string
   containerClassName?: string
   borderless?: boolean
