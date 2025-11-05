@@ -1,5 +1,5 @@
 import { allDocs } from 'contentlayer/generated'
-import { gettingStarted } from '@/config/docs'
+import { courses } from '@/config/docs'
 import { SidebarNavItem } from '@/types/nav'
 
 /**
@@ -32,9 +32,11 @@ export function normalizeSlug(slug: string): string {
 /**
  * Gets the next page in the navigation structure based on the current page slug
  */
-export function getNextPage(currentSlug: string): { title: string; href: string; description?: string; chapterNumber?: number } | null {
+export function getNextPage(
+  currentSlug: string
+): { title: string; href: string; description?: string; chapterNumber?: number } | null {
   // Flatten all navigation items
-  const allPages = flattenNavItems(gettingStarted.items)
+  const allPages = flattenNavItems(courses.items)
 
   // Normalize the current slug for comparison
   const normalizedCurrentSlug = normalizeSlug(currentSlug)
@@ -78,4 +80,3 @@ export function getNextPage(currentSlug: string): { title: string; href: string;
     chapterNumber,
   }
 }
-

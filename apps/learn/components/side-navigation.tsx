@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import NavigationItem from '@/components/side-navigation-item'
-import { gettingStarted } from '@/config/docs'
+import { courses } from '@/config/docs'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
@@ -68,10 +68,10 @@ function SideNavigation() {
       </div>
       <div className="pb-6 px-6">
         <h3 className="text-xs font-semibold text-foreground-lighter/75 uppercase tracking-wider mb-3">
-          {gettingStarted.title}
+          {courses.title}
         </h3>
         <ul className="space-y-1">
-          {gettingStarted.items.map((item, i) => (
+          {courses.items.map((item, i) => (
             <NavigationItem item={item} key={`${item.href}-${i}`} />
           ))}
         </ul>

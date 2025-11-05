@@ -1,6 +1,6 @@
 import { SidebarNavGroup } from 'types/nav'
 
-export const gettingStarted: SidebarNavGroup = {
+export const courses: SidebarNavGroup = {
   title: 'Courses',
   items: [
     {
@@ -22,6 +22,22 @@ export const gettingStarted: SidebarNavGroup = {
         {
           title: 'Authentication',
           href: '/foundations/authentication',
+        },
+        {
+          title: 'Security',
+          href: '/foundations/security',
+        },
+        {
+          title: 'Storage',
+          href: '/foundations/storage',
+        },
+        {
+          title: 'Edge Functions',
+          href: '/foundations/edge-functions',
+        },
+        {
+          title: 'Vector Search',
+          href: '/foundations/vector-search',
         },
       ],
       commandItemLabel: 'Foundations',
@@ -45,7 +61,7 @@ export const gettingStarted: SidebarNavGroup = {
 }
 
 export const COMMAND_ITEMS = [
-  ...gettingStarted.items.map((item) => ({
+  ...courses.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),
