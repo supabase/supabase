@@ -247,8 +247,8 @@ const AddNewSecretForm = () => {
               </Button>
             </CardContent>
             <CardFooter className="justify-between space-x-2">
-              <p className="text-sm text-foreground-light">
-                Insert or update multiple secrets at once by pasting key–value pairs.
+              <p className="text-sm text-foreground-lighter">
+                Insert or update multiple secrets at once by pasting key-value pairs
               </p>
 
               <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
