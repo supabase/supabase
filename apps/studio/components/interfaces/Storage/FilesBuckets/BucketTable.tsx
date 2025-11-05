@@ -1,7 +1,6 @@
 import { Edit, FolderOpen, MoreVertical, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 
-import { TableLink } from 'components/ui/TableLink'
 import {
   VirtualizedTableCell,
   VirtualizedTableHead,
@@ -100,12 +99,13 @@ export const BucketTableRow = ({
     <BucketTableRow key={bucket.id}>
       <BucketTableCell>
         <div className="flex items-center gap-2">
-          <TableLink
+          <Link
             href={`/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
             title={bucket.id}
+            className="text-link-table-cell"
           >
             {bucket.id}
-          </TableLink>
+          </Link>
           {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
       </BucketTableCell>

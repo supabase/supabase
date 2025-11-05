@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { TableLink } from 'components/ui/TableLink'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import {
   Button,
@@ -129,12 +128,13 @@ export const VectorsBuckets = () => {
                     return (
                       <TableRow key={id}>
                         <TableCell>
-                          <TableLink
+                          <Link
                             href={`/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`}
                             title={name}
+                            className="text-link-table-cell"
                           >
                             {name}
-                          </TableLink>
+                          </Link>
                         </TableCell>
                         <TableCell>
                           <p className="text-foreground-light">

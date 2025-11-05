@@ -2,11 +2,11 @@ import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
 import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { TableLink } from 'components/ui/TableLink'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -22,9 +22,6 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
@@ -100,28 +97,24 @@ export const TriggerList = ({
       {_triggers.map((x) => (
         <TableRow key={x.id}>
           <TableCell className="space-x-2">
-            <Tooltip>
-              <TooltipTrigger
-                onClick={() => editTrigger(x)}
-                className="cursor-pointer text-foreground truncate max-w-48 inline-block"
-              >
-                {x.name}
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="center">
-                {x.name}
-              </TooltipContent>
-            </Tooltip>
+            <Button
+              type="text"
+              onClick={() => editTrigger(x)}
+              title={x.name}
+              className="text-link-table-cell text-left text-sm min-w-0 p-0 hover:bg-transparent font-medium max-w-48 title"
+            >
+              {x.name}
+            </Button>
           </TableCell>
 
           <TableCell className="break-all">
             {x.table_id ? (
-              <TableLink
+              <Link
                 href={`/project/${projectRef}/editor/${x.table_id}`}
-                weight="normal"
-                className="block max-w-40"
+                className="text-link-table-cell block max-w-40 text-foreground-light"
               >
                 {x.table}
-              </TableLink>
+              </Link>
             ) : (
               <p title={x.table} className="truncate">
                 {x.table}
@@ -131,13 +124,12 @@ export const TriggerList = ({
 
           <TableCell className="space-x-2">
             {x.function_name ? (
-              <TableLink
+              <Link
                 href={`/project/${projectRef}/database/functions?search=${x.function_name}&schema=${x.function_schema}`}
-                weight="normal"
-                className="block max-w-40"
+                className="text-link-table-cell block max-w-40 text-foreground-light"
               >
                 {x.function_name}
-              </TableLink>
+              </Link>
             ) : (
               <p className="truncate text-foreground-light">-</p>
             )}
