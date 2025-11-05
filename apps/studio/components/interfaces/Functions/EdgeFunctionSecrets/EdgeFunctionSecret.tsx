@@ -4,7 +4,16 @@ import { Edit2, MoreVertical, Trash } from 'lucide-react'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { ProjectSecret } from 'data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, TableCell, TableRow } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  TableCell,
+  TableRow,
+} from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
 interface EdgeFunctionSecretProps {
@@ -80,7 +89,6 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
 
               <DropdownMenuSeparator />
 
-
               <DropdownMenuItem asChild>
                 <ButtonTooltip
                   type="text"
@@ -102,7 +110,6 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
                   Delete secret
                 </ButtonTooltip>
               </DropdownMenuItem>
-
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

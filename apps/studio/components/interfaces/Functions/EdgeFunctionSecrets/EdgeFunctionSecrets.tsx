@@ -18,7 +18,7 @@ import EdgeFunctionSecret from './EdgeFunctionSecret'
 import { EditSecretModal } from './EditSecretModal'
 
 type SelectedProjectSecret = {
-  secret: ProjectSecret,
+  secret: ProjectSecret
   op: 'delete' | 'edit'
 }
 
@@ -47,7 +47,7 @@ const EdgeFunctionSecrets = () => {
   const secrets =
     searchString.length > 0
       ? data?.filter((secret) => secret.name.toLowerCase().includes(searchString.toLowerCase())) ??
-      []
+        []
       : data ?? []
 
   const headers = [

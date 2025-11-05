@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
-import { SubmitHandler, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import z from "zod";
+import z from 'zod'
 
-import { Eye, EyeOff, X } from "lucide-react";
+import { Eye, EyeOff, X } from 'lucide-react'
 import { useParams } from 'common'
 import {
   Button,
@@ -21,20 +21,20 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  cn
-} from "ui";
-import ConfirmationModal from "ui-patterns/Dialogs/ConfirmationModal";
-import { FormItemLayout } from "ui-patterns/form/FormItemLayout/FormItemLayout";
+  cn,
+} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
-import { ProjectSecret } from "data/secrets/secrets-query";
+import { ProjectSecret } from 'data/secrets/secrets-query'
 
 const FORM_ID = 'edit-secret-sidepanel'
 
 const FormSchema = z.object({
   value: z.string().min(1, 'Please provide a value for your secret'),
-});
+})
 
-type FormSchemaType = z.infer<typeof FormSchema>;
+type FormSchemaType = z.infer<typeof FormSchema>
 
 interface EditSecretModalProps {
   secret?: ProjectSecret
@@ -50,7 +50,7 @@ export function EditSecretModal({ secret, visible, onClose }: EditSecretModalPro
   const [showSecretValue, setShowSecretValue] = useState(false)
 
   const form = useForm<FormSchemaType>({
-    resolver: zodResolver(FormSchema)
+    resolver: zodResolver(FormSchema),
   })
 
   const { mutate: updateSecret, isLoading: isUpdating } = useSecretsCreateMutation({
@@ -65,13 +65,12 @@ export function EditSecretModal({ secret, visible, onClose }: EditSecretModalPro
   }
   const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
     if (secret === undefined) {
-      return;
+      return
     }
 
     updateSecret({
-      projectRef, secrets: [
-        { name: secret?.name, value: data.value }
-      ]
+      projectRef,
+      secrets: [{ name: secret?.name, value: data.value }],
     })
   }
 
@@ -103,9 +102,7 @@ export function EditSecretModal({ secret, visible, onClose }: EditSecretModalPro
                 <X className="h-3 w-3" />
                 <span className="sr-only">Close</span>
               </SheetClose>
-              <SheetTitle className="truncate">
-                Edit secret
-              </SheetTitle>
+              <SheetTitle className="truncate">Edit secret</SheetTitle>
             </div>
           </SheetHeader>
           <Separator />
@@ -121,10 +118,7 @@ export function EditSecretModal({ secret, visible, onClose }: EditSecretModalPro
                   defaultValue={secret?.name}
                   disabled
                   render={({ field }) => (
-                    <FormItemLayout
-                      label="Name"
-                      layout="horizontal"
-                    >
+                    <FormItemLayout label="Name" layout="horizontal">
                       <FormControl_Shadcn_>
                         <Input_Shadcn_
                           {...field}
@@ -179,12 +173,7 @@ export function EditSecretModal({ secret, visible, onClose }: EditSecretModalPro
             <Button disabled={false} type="default" onClick={isClosingSidePanel}>
               Cancel
             </Button>
-            <Button
-              form={FORM_ID}
-              htmlType="submit"
-              disabled={false}
-              loading={false}
-            >
+            <Button form={FORM_ID} htmlType="submit" disabled={false} loading={false}>
               Save
             </Button>
           </SheetFooter>
@@ -208,4 +197,3 @@ export function EditSecretModal({ secret, visible, onClose }: EditSecretModalPro
     </Sheet>
   )
 }
-
