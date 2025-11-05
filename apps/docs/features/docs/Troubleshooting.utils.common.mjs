@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * This file is for utils needed in both the Next.js app build and the
  * troubleshooting sync script. Because of unsolved problems with imports, the
@@ -14,8 +16,8 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { readdir, readFile, stat } from 'node:fs/promises'
-import { join } from 'node:path'
-import toml from 'toml'
+import { join, sep } from 'node:path'
+import { parse } from 'smol-toml'
 import { visit } from 'unist-util-visit'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
@@ -98,16 +100,13 @@ export const TroubleshootingSchema = z
   })
   .strict()
 
-/*
+/**
  * @param {unknown} troubleshootingMetadata
  */
 function validateTroubleshootingMetadata(troubleshootingMetadata) {
   return TroubleshootingSchema.safeParse(troubleshootingMetadata)
 }
 
-/*
- * @returns {Promise<TroubleshootingEntry[]>}
- */
 export async function getAllTroubleshootingEntriesInternal() {
   const troubleshootingDirectoryContents = await readdir(TROUBLESHOOTING_DIRECTORY, {
     recursive: true,
@@ -124,7 +123,7 @@ export async function getAllTroubleshootingEntriesInternal() {
     const fileContents = await readFile(filePath, 'utf-8')
     const { content, data: frontmatter } = matter(fileContents, {
       language: 'toml',
-      engines: { toml: toml.parse.bind(toml) },
+      engines: { toml: parse },
     })
 
     const parseResult = validateTroubleshootingMetadata(frontmatter)
@@ -159,7 +158,12 @@ export async function getAllTroubleshootingEntriesInternal() {
             ].includes(child.type)
         )
       }
+
+      if (node.type === 'link' || node.type === 'image') {
+        canonicalizeUrl(node)
+      }
     })
+
     const contentWithoutJsx = toMarkdown(mdxTree, {
       extensions: [gfmToMarkdown()],
     })
@@ -172,14 +176,23 @@ export async function getAllTroubleshootingEntriesInternal() {
     }
   })
 
-  return (await Promise.all(troubleshootingFiles)).filter(Boolean)
+  return (await Promise.all(troubleshootingFiles)).filter((x) => x != null)
 }
 
 /**
- * @param {TroubleshootingMetadata} meta
+ *
+ * @param {import('mdast').Image | import('mdast').Link} node
  */
-export function getArticleSlug(meta) {
-  const slugifiedTitle = meta.title.toLowerCase().replace(/\s+/g, '-')
-  const escapedTitle = encodeURIComponent(slugifiedTitle)
-  return escapedTitle
+function canonicalizeUrl(node) {
+  if (node.url.startsWith('/')) {
+    node.url === 'https://supabase.com' + node.url
+  }
+}
+
+/**
+ * @param {TroubleshootingEntry} entry
+ */
+export function getArticleSlug(entry) {
+  const parts = entry.filePath.split(sep)
+  return parts[parts.length - 1].replace(/\.mdx$/, '')
 }

@@ -1,67 +1,110 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { groupBy, isNull } from 'lodash'
-import { useEffect, useState } from 'react'
+import { groupBy, isEqual, isNull } from 'lodash'
+import { ArrowRight, Plus, RefreshCw, Save } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { Loading } from 'components/ui/Loading'
+import { DateRangePicker } from 'components/ui/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
+import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from 'data/analytics/constants'
+import { analyticsKeys } from 'data/analytics/keys'
 import { useContentQuery } from 'data/content/content-query'
-import { useContentUpdateMutation } from 'data/content/content-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from 'data/content/content-upsert-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { ArrowRight, Plus, Save, Settings } from 'lucide-react'
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
-import GridResize from './GridResize'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import type { Dashboards } from 'types'
+import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
+import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
+import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
-const DEFAULT_CHART_COLUMN_COUNT = 12
-const DEFAULT_CHART_ROW_COUNT = 4
+const DEFAULT_CHART_COLUMN_COUNT = 1
+const DEFAULT_CHART_ROW_COUNT = 1
 
 const Reports = () => {
+  const router = useRouter()
   const { id, ref } = useParams()
   const { profile } = useProfile()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const queryClient = useQueryClient()
+  const state = useDatabaseSelectorStateSnapshot()
 
-  const [config, setConfig] = useState<any>(undefined)
-  const [startDate, setStartDate] = useState<any>(null)
-  const [endDate, setEndDate] = useState<any>(null)
-  const [hasEdits, setHasEdits] = useState<any>(false)
+  const [isDraggedOver, setIsDraggedOver] = useState(false)
+  const [config, setConfig] = useState<Dashboards.Content>()
+  const [startDate, setStartDate] = useState<string>()
+  const [endDate, setEndDate] = useState<string>()
+  const [hasEdits, setHasEdits] = useState<boolean>(false)
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
-  const { data: userContents, isLoading } = useContentQuery(ref)
-  const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
-    onSuccess: () => {
+  const [navigateUrl, setNavigateUrl] = useState<string>()
+  const [confirmNavigate, setConfirmNavigate] = useState(false)
+
+  const {
+    data: userContents,
+    isLoading,
+    isSuccess,
+  } = useContentQuery({
+    projectRef: ref,
+    type: 'report',
+  })
+  const { mutate: upsertContent, isLoading: isSaving } = useContentUpsertMutation({
+    onSuccess: (_, vars) => {
       setHasEdits(false)
-      toast.success('Successfully saved report!')
+      if (vars.payload.type === 'report') toast.success('Successfully saved report!')
     },
-    onError: (error) => {
-      toast.error(`Failed to update report: ${error.message}`)
+    onError: (error, vars) => {
+      if (vars.payload.type === 'report') toast.error(`Failed to update report: ${error.message}`)
     },
   })
-  const currentReport = userContents?.content.find((report) => report.id === id)
+  const { mutate: sendEvent } = useSendEventMutation()
 
-  const canReadReport = useCheckPermissions(PermissionAction.READ, 'user_content', {
-    resource: {
-      type: 'report',
-      visibility: currentReport?.visibility,
-      owner_id: currentReport?.owner_id,
-    },
-    subject: { id: profile?.id },
-  })
-  const canUpdateReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
-    resource: {
-      type: 'report',
-      visibility: currentReport?.visibility,
-      owner_id: currentReport?.owner_id,
-    },
-    subject: { id: profile?.id },
-  })
+  const currentReport = userContents?.content.find((report) => report.id === id)
+  const currentReportContent = currentReport?.content as Dashboards.Content
+
+  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'user_content',
+    {
+      resource: {
+        type: 'report',
+        visibility: currentReport?.visibility,
+        owner_id: currentReport?.owner_id,
+      },
+      subject: { id: profile?.id },
+    }
+  )
+  const { can: canUpdateReport } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'user_content',
+    {
+      resource: {
+        type: 'report',
+        visibility: currentReport?.visibility,
+        owner_id: currentReport?.owner_id,
+      },
+      subject: { id: profile?.id },
+    }
+  )
 
   function handleDateRangePicker({ period_start, period_end }: any) {
     setStartDate(period_start.date)
@@ -71,7 +114,7 @@ const Reports = () => {
   function checkEditState() {
     if (config === undefined) return
     /*
-     * Shallow copying the config state variable maintains a mobx reference
+     * Shallow copying the config state variable maintains a reference
      * Instead, we stringify it and parse it again to remove anything
      * that can be mutated at component state level.
      *
@@ -79,7 +122,7 @@ const Reports = () => {
      * want to compare fixed dates as possible differences from saved and edited versions of report.
      */
     let _config = JSON.parse(JSON.stringify(config))
-    let _original = JSON.parse(JSON.stringify(currentReport?.content))
+    let _original = JSON.parse(JSON.stringify(currentReportContent))
 
     if (!_original || !_config) return
 
@@ -91,8 +134,8 @@ const Reports = () => {
      * the below would not need to be run
      */
     if (
-      _config.period_start.time_period != 'custom' ||
-      _config.period_end.time_period != 'custom'
+      _config.period_start.time_period !== 'custom' ||
+      _config.period_end.time_period !== 'custom'
     ) {
       _original.period_start.date = ''
       _config.period_start.date = ''
@@ -101,25 +144,26 @@ const Reports = () => {
     }
 
     // Runs comparison
-    if (JSON.stringify(_config) == JSON.stringify(_original)) {
+    if (isEqual(_config, _original)) {
       setHasEdits(false)
     } else {
       setHasEdits(true)
     }
   }
-  // Updates the report and reloads the report again
-  const onSaveReport = async () => {
-    if (ref === undefined) return console.error('Project ref is required')
-    if (id === undefined) return console.error('Report ID is required')
-    saveReport({ projectRef: ref, id, type: 'report', content: config })
-  }
 
-  function handleChartSelection({ metric, value }: any) {
-    if (value) pushChart({ metric })
+  const handleChartSelection = ({
+    metric,
+    isAddingChart,
+  }: {
+    metric: Metric
+    isAddingChart: boolean
+  }) => {
+    if (isAddingChart) pushChart({ metric })
     else popChart({ metric })
   }
 
-  function pushChart({ metric }: any) {
+  const pushChart = ({ metric }: { metric: Metric }) => {
+    if (!config) return
     const current = [...config.layout]
 
     let x = 0
@@ -127,6 +171,7 @@ const Reports = () => {
 
     const chartsByY = groupBy(config.layout, 'y')
     const yValues = Object.keys(chartsByY)
+    const isSnippet = metric.key?.startsWith('snippet_')
 
     if (yValues.length === 0) {
       y = 0
@@ -155,10 +200,12 @@ const Reports = () => {
       y,
       w: DEFAULT_CHART_COLUMN_COUNT,
       h: DEFAULT_CHART_ROW_COUNT,
-      id: uuidv4(),
-      attribute: metric.key,
+      id: metric?.id ?? uuidv4(),
       label: metric.label,
-      provider: metric.provider,
+      attribute: metric.key as Dashboards.ChartType,
+      provider: metric.provider as any,
+      chart_type: 'bar',
+      ...(isSnippet ? { chartConfig: DEFAULT_CHART_CONFIG } : {}),
     })
 
     setConfig({
@@ -167,32 +214,184 @@ const Reports = () => {
     })
   }
 
-  function popChart({ metric }: any) {
-    const { key } = metric
+  const popChart = ({ metric }: { metric: Partial<Metric> }) => {
+    if (!config) return
+
+    const { key, id } = metric
     const current = [...config.layout]
 
-    const foundIndex = current.findIndex((x: any, i: number) => {
-      if (x.attribute === key) {
-        return x
-      }
+    const foundIndex = current.findIndex((x) => {
+      if (x.attribute === key || x.id === id) return x
     })
     current.splice(foundIndex, 1)
-    setConfig({
-      ...config,
-      layout: [...current],
+    setConfig({ ...config, layout: [...current] })
+  }
+
+  const updateChart = (
+    id: string,
+    {
+      chart,
+      chartConfig,
+    }: { chart?: Partial<Dashboards.Chart>; chartConfig?: Partial<ChartConfig> }
+  ) => {
+    const currentChart = config?.layout.find((x) => x.id === id)
+
+    if (currentChart) {
+      const updatedChart: Dashboards.Chart = {
+        ...currentChart,
+        ...(chart ?? {}),
+      }
+      if (chartConfig) {
+        updatedChart.chartConfig = { ...(currentChart?.chartConfig ?? {}), ...chartConfig }
+      }
+
+      const foundIndex = config?.layout.findIndex((x) => x.id === id)
+      if (config && foundIndex !== undefined && foundIndex >= 0) {
+        const updatedLayouts = [...config.layout]
+        updatedLayouts[foundIndex] = updatedChart
+        setConfig({ ...config, layout: updatedLayouts })
+      }
+    }
+  }
+
+  // Updates the report and reloads the report again
+  const onSaveReport = async () => {
+    if (ref === undefined) return console.error('Project ref is required')
+    if (currentReport === undefined) return console.error('Report is required')
+    if (config === undefined) return console.error('Config is required')
+    upsertContent({
+      projectRef: ref,
+      payload: { ...currentReport, content: config },
+    })
+  }
+
+  const onRefreshReport = () => {
+    // [Joshen] Since we can't track individual loading states for each chart
+    // so for now we mock a loading state that only lasts for a second
+    setIsRefreshing(true)
+    const monitoringCharts = config?.layout.filter(
+      (x) => x.provider === 'infra-monitoring' || x.provider === 'daily-stats'
+    )
+    monitoringCharts?.forEach((x) => {
+      queryClient.invalidateQueries({
+        queryKey: analyticsKeys.infraMonitoring(ref, {
+          attribute: x.attribute,
+          startDate,
+          endDate,
+          interval: config?.interval,
+          databaseIdentifier: state.selectedDatabaseId,
+        }),
+      })
+    })
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }
+
+  const onDragOverEmptyState = (event: DragEvent<HTMLDivElement>) => {
+    if (event.type === 'dragover' && !isDraggedOver) {
+      setIsDraggedOver(true)
+    } else if (event.type === 'dragleave' || event.type === 'drop') {
+      setIsDraggedOver(false)
+    }
+    event.stopPropagation()
+    event.preventDefault()
+  }
+
+  const onDropSQLBlockEmptyState = (event: DragEvent<HTMLDivElement>) => {
+    onDragOverEmptyState(event)
+    if (!ref) return console.error('Project ref is required')
+    if (!profile) return console.error('Profile is required')
+    if (!project) return console.error('Project is required')
+    if (!config) return console.error('Chart configuration is required')
+
+    const data = event.dataTransfer.getData('application/json')
+    if (!data) return
+
+    const queryData = JSON.parse(data)
+    const { label, sql, config: sqlConfig } = queryData
+    if (!label || !sql) return console.error('SQL and Label required')
+
+    const toastId = toast.loading(`Creating new query: ${label}`)
+    const id = uuidv4()
+
+    const updatedLayout = [...config.layout]
+    updatedLayout.push({
+      id,
+      label,
+      x: 0,
+      y: 0,
+      chart_type: 'bar',
+      attribute: `new_snippet_${id}` as Dashboards.ChartType,
+      w: DEFAULT_CHART_COLUMN_COUNT,
+      h: DEFAULT_CHART_ROW_COUNT,
+      chartConfig: { ...DEFAULT_CHART_CONFIG, ...(sqlConfig ?? {}) },
+      provider: undefined as any,
+    })
+
+    setConfig({ ...config, layout: [...updatedLayout] })
+
+    const payload = createSqlSnippetSkeletonV2({
+      id,
+      name: label,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+    }) as UpsertContentPayload
+
+    upsertContent(
+      { projectRef: ref, payload },
+      {
+        onSuccess: () => {
+          toast.success(`Successfully created new query: ${label}`, { id: toastId })
+          const finalLayout = updatedLayout.map((x) => {
+            if (x.id === id) {
+              return { ...x, attribute: `snippet_${id}` as Dashboards.ChartType }
+            } else return x
+          })
+          setConfig({ ...config, layout: finalLayout })
+        },
+      }
+    )
+    sendEvent({
+      action: 'custom_report_assistant_sql_block_added',
+      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
     })
   }
 
   useEffect(() => {
-    if (currentReport !== undefined) setConfig(currentReport?.content)
-  }, [currentReport])
+    if (isSuccess && currentReportContent !== undefined) setConfig(currentReportContent)
+  }, [isSuccess, currentReportContent])
 
   useEffect(() => {
     checkEditState()
   }, [config])
 
-  if (isLoading) {
-    return <Loading />
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasEdits) {
+        e.preventDefault()
+        e.returnValue = '' // deprecated, but older browsers still require this
+      }
+    }
+
+    const handleBrowseAway = (url: string) => {
+      if (hasEdits && !confirmNavigate) {
+        setNavigateUrl(url)
+        throw 'Route change declined' // Just to prevent the route change
+      } else {
+        setNavigateUrl(undefined)
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    router.events.on('routeChangeStart', handleBrowseAway)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      router.events.off('routeChangeStart', handleBrowseAway)
+    }
+  }, [hasEdits, confirmNavigate, router])
+
+  if (isLoading || isLoadingPermissions) {
+    return <LogoLoader />
   }
 
   if (!canReadReport) {
@@ -200,123 +399,167 @@ const Reports = () => {
   }
 
   return (
-    <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl text-foreground">{currentReport?.name || 'Reports'}</h1>
-          <p className="text-foreground-light">{currentReport?.description}</p>
-        </div>
-        {hasEdits && (
-          <div className="flex items-center gap-x-2">
-            <Button
-              type="default"
-              onClick={() => setConfig(currentReport?.content)}
-              disabled={isSaving}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              icon={<Save />}
-              onClick={() => onSaveReport()}
-              loading={isSaving}
-            >
-              Save changes
-            </Button>
+    <>
+      <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1>{currentReport?.name || 'Reports'}</h1>
+            <p className="text-foreground-light">{currentReport?.description}</p>
           </div>
-        )}
-      </div>
-      <div className="mb-4 flex items-center justify-between space-x-3">
-        <div className="flex items-center space-x-3">
-          <DateRangePicker
-            onChange={handleDateRangePicker}
-            value="7d"
-            options={TIME_PERIODS_REPORTS}
-            loading={isLoading}
-          />
-
-          {startDate && endDate && (
-            <div className="hidden items-center space-x-1 lg:flex ">
-              <span className="text-sm text-foreground-light">
-                {dayjs(startDate).format('MMM D, YYYY')}
-              </span>
-              <span className="text-foreground-lighter">
-                <ArrowRight size={12} />
-              </span>
-              <span className="text-sm text-foreground-light">
-                {dayjs(endDate).format('MMM D, YYYY')}
-              </span>
+          {hasEdits && (
+            <div className="flex items-center gap-x-2">
+              <Button
+                type="default"
+                disabled={isSaving}
+                onClick={() => setConfig(currentReportContent)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                icon={<Save />}
+                loading={isSaving}
+                onClick={() => onSaveReport()}
+              >
+                Save changes
+              </Button>
             </div>
           )}
         </div>
-
-        <div className="flex items-center gap-x-2">
-          {canUpdateReport ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<Settings size={14} />}>
-                  <span>Add / Remove charts</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="end">
-                <MetricOptions config={config} handleChartSelection={handleChartSelection} />
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
+        <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
+          <div className="flex items-center gap-x-2">
             <ButtonTooltip
-              disabled
               type="default"
-              iconRight={<Settings size={14} />}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  className: 'w-56 text-center',
-                  text: 'You need additional permissions to update custom reports',
-                },
-              }}
-            >
-              Add / Remove charts
-            </ButtonTooltip>
-          )}
-          <DatabaseSelector />
-        </div>
-      </div>
-
-      {config?.layout !== undefined && config.layout.length <= 0 ? (
-        <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 border-default">
-          {canUpdateReport ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<Plus size={14} />}>
-                  <span>
-                    {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="center">
-                <MetricOptions config={config} handleChartSelection={handleChartSelection} />
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <p className="text-sm text-foreground-light">No charts set up yet in report</p>
-          )}
-        </div>
-      ) : (
-        <div className="relative mb-16 max-w-7xl flex-grow">
-          {config && startDate && endDate && (
-            <GridResize
-              startDate={startDate}
-              endDate={endDate}
-              interval={config.interval}
-              editableReport={config}
-              disableUpdate={!canUpdateReport}
-              onRemoveChart={popChart}
-              setEditableReport={setConfig}
+              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              className="w-7"
+              disabled={isRefreshing}
+              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+              onClick={onRefreshReport}
             />
-          )}
+            <div className="flex items-center gap-x-3">
+              <DateRangePicker
+                value="7d"
+                className="w-48"
+                onChange={handleDateRangePicker}
+                options={TIME_PERIODS_REPORTS}
+                loading={isLoading}
+                footer={
+                  <div className="px-2 py-1">
+                    <p className="text-xs text-foreground-lighter">
+                      SQL blocks are independent of the selected date range
+                    </p>
+                  </div>
+                }
+              />
+
+              {startDate && endDate && (
+                <div className="hidden items-center space-x-1 lg:flex ">
+                  <span className="text-sm text-foreground-light">
+                    {dayjs(startDate).format('MMM D, YYYY')}
+                  </span>
+                  <span className="text-foreground-lighter">
+                    <ArrowRight size={12} />
+                  </span>
+                  <span className="text-sm text-foreground-light">
+                    {dayjs(endDate).format('MMM D, YYYY')}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-x-2">
+            {canUpdateReport ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" icon={<Plus />}>
+                    <span>Add block</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="center" className="w-44">
+                  <MetricOptions config={config} handleChartSelection={handleChartSelection} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <ButtonTooltip
+                disabled
+                type="default"
+                icon={<Plus />}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    className: 'w-56 text-center',
+                    text: 'You need additional permissions to update custom reports',
+                  },
+                }}
+              >
+                Add block
+              </ButtonTooltip>
+            )}
+            <DatabaseSelector />
+          </div>
         </div>
-      )}
-    </div>
+
+        {config?.layout !== undefined && config.layout.length === 0 ? (
+          <div
+            className={cn(
+              'flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 border-default transition duration-100',
+              isDraggedOver ? 'bg-surface-100' : ''
+            )}
+            onDragOver={onDragOverEmptyState}
+            onDragLeave={onDragOverEmptyState}
+            onDrop={onDropSQLBlockEmptyState}
+          >
+            {canUpdateReport ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<Plus size={14} />}>
+                    Add your first chart
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="center">
+                  <MetricOptions config={config} handleChartSelection={handleChartSelection} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <p className="text-sm text-foreground-light">No charts set up yet in report</p>
+            )}
+          </div>
+        ) : (
+          <div className="relative mb-16 flex-grow">
+            {config && startDate && endDate && (
+              <GridResize
+                startDate={startDate}
+                endDate={endDate}
+                interval={config.interval as AnalyticsInterval}
+                editableReport={config}
+                disableUpdate={!canUpdateReport}
+                isRefreshing={isRefreshing}
+                onRemoveChart={popChart}
+                onUpdateChart={updateChart}
+                setEditableReport={setConfig}
+              />
+            )}
+          </div>
+        )}
+      </div>
+      <ConfirmationModal
+        visible={!!navigateUrl}
+        variant="warning"
+        title="You have unsaved changes in your report"
+        confirmLabel="Confirm"
+        onConfirm={() => {
+          setConfirmNavigate(true)
+          setNavigateUrl(undefined)
+          router.push(navigateUrl ?? '/')
+        }}
+        onCancel={() => setNavigateUrl(undefined)}
+      >
+        <p className="text-sm">
+          Unsaved changes will be lost, are you sure you want to navigate away?
+        </p>
+      </ConfirmationModal>
+    </>
   )
 }
 

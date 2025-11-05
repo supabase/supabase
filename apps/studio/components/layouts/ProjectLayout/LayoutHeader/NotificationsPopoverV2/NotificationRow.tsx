@@ -1,44 +1,43 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { Archive, ArchiveRestoreIcon, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { Button, cn } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
-import { ProjectInfo } from 'data/projects/projects-query'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useVirtualizerContext } from 'components/ui/InfiniteList'
+import { NotificationData, type NotificationsData } from 'data/notifications/notifications-v2-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import type { Organization } from 'types'
 import { CriticalIcon, WarningIcon } from 'ui'
 
 interface NotificationRowProps {
-  setRowHeight: (idx: number, height: number) => void
-  getProject: (ref: string) => ProjectInfo
+  index: number
+  item: NotificationsData[number]
   getOrganizationById: (id: number) => Organization
   getOrganizationBySlug: (slug: string) => Organization
   onUpdateNotificationStatus: (id: string, status: 'archived' | 'seen') => void
   queueMarkRead: (id: string) => void
 }
 
-const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
+const NotificationRow = ({
   index,
-  listRef,
   item: notification,
-  setRowHeight,
-  getProject,
   getOrganizationById,
   getOrganizationBySlug,
   onUpdateNotificationStatus,
   queueMarkRead,
-}) => {
-  const ref = useRef<HTMLDivElement>(null)
+}: NotificationRowProps) => {
+  const { virtualizer } = useVirtualizerContext()
   const { ref: viewRef, inView } = useInView()
-  const { status, priority } = notification
 
+  const { status, priority } = notification
   const data = notification.data as NotificationData
-  const project = data.project_ref !== undefined ? getProject(data.project_ref) : undefined
+
+  const { data: project } = useProjectDetailQuery({ ref: data.project_ref })
+
   const organization =
     data.org_slug !== undefined
       ? getOrganizationBySlug(data.org_slug)
@@ -56,13 +55,6 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
   }
 
   useEffect(() => {
-    if (ref.current) {
-      listRef?.current?.resetAfterIndex(0)
-      setRowHeight(index, ref.current.clientHeight)
-    }
-  }, [ref])
-
-  useEffect(() => {
     if (inView && notification.status === 'new') {
       queueMarkRead(notification.id)
     }
@@ -70,7 +62,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
 
   return (
     <div
-      ref={ref}
+      ref={virtualizer.measureElement}
       className={cn(
         `p-4 flex justify-between gap-x-3 group`,
         index !== 0 ? 'border-t border-overlay' : '',
@@ -171,55 +163,23 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
         {priority === 'Warning' && <WarningIcon className="w-5 h-5" />}
         {priority === 'Critical' && <CriticalIcon className="w-5 h-5" />}
         {notification.status === 'archived' ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                type="outline"
-                icon={
-                  <ArchiveRestoreIcon size={13} strokeWidth={2} className="text-foreground-light" />
-                }
-                className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
-                onClick={() => onUpdateNotificationStatus(notification.id, 'seen')}
-              />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Unarchive</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          <ButtonTooltip
+            type="outline"
+            icon={
+              <ArchiveRestoreIcon size={13} strokeWidth={2} className="text-foreground-light" />
+            }
+            className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
+            onClick={() => onUpdateNotificationStatus(notification.id, 'seen')}
+            tooltip={{ content: { text: 'Unarchive', side: 'bottom' } }}
+          />
         ) : (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                type="outline"
-                icon={<Archive size={13} strokeWidth={2} className="text-foreground-light" />}
-                className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
-                onClick={() => onUpdateNotificationStatus(notification.id, 'archived')}
-              />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Archive</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          <ButtonTooltip
+            type="outline"
+            icon={<Archive size={13} strokeWidth={2} className="text-foreground-light" />}
+            className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
+            onClick={() => onUpdateNotificationStatus(notification.id, 'archived')}
+            tooltip={{ content: { text: 'Archive', side: 'bottom' } }}
+          />
         )}
       </div>
     </div>

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ai-editor-rules",
+  "type": "registry:file",
+  "title": "Prompt rules for AI Editors",
+  "description": "Prompts for working with Supabase using AI-powered IDE tools",
+  "registryDependencies": [],
+  "dependencies": [],
+  "files": [
+    {
+      "path": "registry/default/ai-editor-rules/create-db-functions.mdc",
+      "type": "registry:file",
+      "target": "~/.cursor/rules/create-db-functions.mdc"
+    },
+    {
+      "path": "registry/default/ai-editor-rules/create-migration.mdc",
+      "type": "registry:file",
+      "target": "~/.cursor/rules/create-migration.mdc"
+    },
+    {
+      "path": "registry/default/ai-editor-rules/create-rls-policies.mdc",
+      "type": "registry:file",
+      "target": "~/.cursor/rules/create-rls-policies.mdc"
+    },
+    {
+      "path": "registry/default/ai-editor-rules/postgres-sql-style-guide.mdc",
+      "type": "registry:file",
+      "target": "~/.cursor/rules/postgres-sql-style-guide.mdc"
+    },
+    {
+      "path": "registry/default/ai-editor-rules/writing-supabase-edge-functions.mdc",
+      "type": "registry:file",
+      "target": "~/.cursor/rules/writing-supabase-edge-functions.mdc"
+    },
+    {
+      "path": "registry/default/ai-editor-rules/use-realtime.mdc",
+      "type": "registry:file",
+      "target": "~/.cursor/rules/use-realtime.mdc"
+    }
+  ]
+}

@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { components } from 'api-types'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigUpdateVariables = {
@@ -14,6 +14,8 @@ export type ProjectPostgrestConfigUpdateVariables = {
   dbPool: number | null
 }
 
+type UpdatePostgrestConfigResponse = components['schemas']['UpdatePostgrestConfigBody']
+
 export async function updateProjectPostgrestConfig({
   projectRef,
   dbSchema,
@@ -21,15 +23,20 @@ export async function updateProjectPostgrestConfig({
   dbExtraSearchPath,
   dbPool,
 }: ProjectPostgrestConfigUpdateVariables) {
-  const response = await patch(`${API_URL}/projects/${projectRef}/config/postgrest`, {
+  const payload: UpdatePostgrestConfigResponse = {
     db_schema: dbSchema,
     max_rows: maxRows,
     db_extra_search_path: dbExtraSearchPath,
-    db_pool: dbPool,
+  }
+  if (dbPool) payload.db_pool = dbPool
+
+  const { data, error } = await patch('/platform/projects/{ref}/config/postgrest', {
+    params: { path: { ref: projectRef } },
+    body: payload,
   })
 
-  if (response.error) throw response.error
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type ProjectPostgrestConfigUpdateData = Awaited<ReturnType<typeof updateProjectPostgrestConfig>>
@@ -39,7 +46,7 @@ export const useProjectPostgrestConfigUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     ProjectPostgrestConfigUpdateData,
     ResponseError,
     ProjectPostgrestConfigUpdateVariables
@@ -52,10 +59,11 @@ export const useProjectPostgrestConfigUpdateMutation = ({
     ProjectPostgrestConfigUpdateData,
     ResponseError,
     ProjectPostgrestConfigUpdateVariables
-  >((vars) => updateProjectPostgrestConfig(vars), {
+  >({
+    mutationFn: (vars) => updateProjectPostgrestConfig(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      queryClient.invalidateQueries(configKeys.postgrest(projectRef))
+      queryClient.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -11,10 +11,9 @@ import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { calculateThroughputPrice } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import {
-  COMPUTE_BASELINE_THROUGHPUT,
+  DISK_LIMITS,
   DiskType,
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
-  THROUGHPUT_RANGE,
 } from '../ui/DiskManagement.constants'
 import { DiskManagementThroughputReadReplicas } from '../ui/DiskManagementReadReplicas'
 import FormMessage from '../ui/FormMessage'
@@ -53,9 +52,13 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
     } else if (watchedStorageType === 'gp3') {
       // Ensure throughput is within the allowed range if it's greater than or equal to 400 GB
       const currentThroughput = form.getValues('throughput')
-      const { min, max } = THROUGHPUT_RANGE[DiskType.GP3]
-      if (!currentThroughput || currentThroughput < min || currentThroughput > max) {
-        setValue('throughput', min) // Reset to default if undefined or out of bounds
+      const { minThroughput, maxThroughput } = DISK_LIMITS[DiskType.GP3]
+      if (
+        !currentThroughput ||
+        currentThroughput < minThroughput ||
+        currentThroughput > maxThroughput
+      ) {
+        setValue('throughput', minThroughput) // Reset to default if undefined or out of bounds
       }
     }
   }, [watchedStorageType, watchedTotalSize, setValue, form])
@@ -110,7 +113,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                   </>
                 }
               >
-                <InputPostTab label="MiB/s">
+                <InputPostTab label="MB/s">
                   {isLoading ? (
                     <div
                       className={cn(
@@ -125,13 +128,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                       <Input_Shadcn_
                         type="number"
                         {...field}
-                        value={
-                          disableIopsInput
-                            ? COMPUTE_BASELINE_THROUGHPUT[
-                                watchedComputeSize as keyof typeof COMPUTE_BASELINE_THROUGHPUT
-                              ]
-                            : field.value
-                        }
+                        value={field.value}
                         onChange={(e) => {
                           setValue('throughput', e.target.valueAsNumber, {
                             shouldDirty: true,

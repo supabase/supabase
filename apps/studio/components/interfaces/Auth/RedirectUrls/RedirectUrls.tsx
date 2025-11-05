@@ -2,21 +2,18 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import {
+  ScaffoldDescription,
+  ScaffoldSection,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
+import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Modal,
-  ScrollArea,
-  WarningIcon,
-  cn,
-} from 'ui'
+import { DOCS_URL } from 'lib/constants'
+import { Button, Modal, ScrollArea, cn } from 'ui'
 import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
 import { ValueContainer } from './ValueContainer'
@@ -69,15 +66,18 @@ export const RedirectUrls = () => {
   }
 
   return (
-    <div>
+    <ScaffoldSection isFullWidth>
       <div className="flex items-center justify-between mb-6">
-        <FormHeader
-          className="mb-0"
-          title="Redirect URLs"
-          description="URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com"
-        />
-        <DocsButton href="https://supabase.com/docs/guides/auth/concepts/redirect-urls" />
+        <div>
+          <ScaffoldSectionTitle>Redirect URLs</ScaffoldSectionTitle>
+          <ScaffoldDescription>
+            URLs that auth providers are permitted to redirect to post authentication. Wildcards are
+            allowed, for example, https://*.domain.com
+          </ScaffoldDescription>
+        </div>
+        <DocsButton href={`${DOCS_URL}/guides/auth/concepts/redirect-urls`} />
       </div>
+
       {isLoading && (
         <>
           <ValueContainer>
@@ -88,13 +88,11 @@ export const RedirectUrls = () => {
           </ValueContainer>
         </>
       )}
+
       {isError && (
-        <Alert_Shadcn_ variant="destructive">
-          <WarningIcon />
-          <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
       )}
+
       {isSuccess && (
         <RedirectUrlList
           allowList={URI_ALLOW_LIST_ARRAY}
@@ -166,6 +164,6 @@ export const RedirectUrls = () => {
           </Button>
         </Modal.Content>
       </Modal>
-    </div>
+    </ScaffoldSection>
   )
 }

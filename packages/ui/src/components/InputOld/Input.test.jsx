@@ -1,6 +1,5 @@
 import { describe, it } from 'vitest'
 
-
 describe('#Input', () => {
   it.skip('should render input correctly', async () => {
     // render(<Input data-testid="form-input" />)
@@ -13,7 +12,7 @@ describe('#Input', () => {
   })
 
   // it.each(SIZES)('should have "form-input--%s" class', (size) => {
-    // render(<Input size={size} data-testid="form-input" />)
-    // expect(screen.queryByTestId('form-input')).toHaveClass(`form-input border-solid form-input--${size}`)
+  // render(<Input size={size} data-testid="form-input" />)
+  // expect(screen.queryByTestId('form-input')).toHaveClass(`form-input border-solid form-input--${size}`)
   // })
 })

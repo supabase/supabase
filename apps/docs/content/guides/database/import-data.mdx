@@ -27,11 +27,11 @@ If you're importing a large dataset or importing data into production, plan ahea
 Supabase dashboard provides a user-friendly way to import data. However, for very large datasets, this method may not be the most efficient choice, given the size limit is 100MB. It's generally better suited for smaller datasets and quick data imports. Consider using alternative methods like pgloader for large-scale data imports.
 
 1. Navigate to the relevant table in the [Table Editor.](/dashboard/project/_/editor)
-2. Click on “Insert” then choose "Import Data from CSV" and follow the on-screen instructions to upload your CSV file.
+2. Click on _+ New table_ (for new, empty projects) or _Insert_ (for existing tables), then choose _Import Data from CSV_ and follow the on-screen instructions to upload your CSV file.
 
 ### Option 2: Bulk import using pgloader
 
-[pgloader](https://pgloader.io/) is a powerful tool for efficiently importing data into a PostgreSQL database that supports a wide range of source database engines, including MySQL and MS SQL.
+[pgloader](https://pgloader.io/) is a powerful tool for efficiently importing data into a Postgres database that supports a wide range of source database engines, including MySQL and MS SQL.
 
 You can use it in conjunction with Supabase by following these steps:
 
@@ -75,6 +75,7 @@ Read more about [Bulk data loading.](/docs/guides/database/tables#bulk-data-load
 The Supabase API allows you to programmatically import data into your tables. You can use various client libraries to interact with the API and perform data import operations. This approach is useful when you need to automate data imports, and it gives you fine-grained control over the process. Refer to our [API guide](/docs/guides/api) for more details.
 
 <Admonition type="note">
+
 When importing data via the Supabase API, it's advisable to refrain from bulk imports. This helps ensure a smooth data transfer process and prevents any potential disruptions.
 
 Read more about [Rate Limiting, Resource Allocation, & Abuse Prevention.](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention)
@@ -97,7 +98,7 @@ By default, Supabase enforces query statement timeouts to ensure fair resource a
 
 ### 3. Estimate your required disk size
 
-Large datasets consume disk space. Ensure your Supabase project has sufficient disk capacity to accommodate the imported data. If you know how big your database is going to be, you can manually increase the size in your [projects database settings](/dashboard/project/_/settings/database).
+Large datasets consume disk space. Ensure your Supabase project has sufficient disk capacity to accommodate the imported data. If you know how big your database is going to be, you can manually increase the size in your [projects database settings](/dashboard/project/_/database/settings).
 
 Read more about [disk management](/docs/guides/platform/database-size#disk-management).
 
@@ -126,4 +127,4 @@ To build an index after the data import:
 create index index_name on table_name (column_name);
 ```
 
-Read more about [Managing Indexes in PostgreSQL](/docs/guides/database/postgres/indexes).
+Read more about [Managing Indexes in Postgres](/docs/guides/database/postgres/indexes).

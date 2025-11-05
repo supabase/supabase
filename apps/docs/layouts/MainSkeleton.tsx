@@ -2,20 +2,23 @@
 
 import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
-import { memo, useEffect, type PropsWithChildren, type ReactNode } from 'react'
+import { memo, type PropsWithChildren, type ReactNode, useEffect } from 'react'
+// End of third-party imports
 
+import { isFeatureEnabled } from 'common'
 import { cn } from 'ui'
-
+import type { NavMenuSection } from '~/components/Navigation/Navigation.types'
 import DefaultNavigationMenu, {
-  MenuId,
+  type MenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
-import { type NavMenuSection } from '~/components/Navigation/Navigation.types'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
+
+const footerEnabled = isFeatureEnabled('docs:footer')
 
 const levelsData = {
   home: {
@@ -29,6 +32,14 @@ const levelsData = {
   database: {
     icon: 'database',
     name: 'Database',
+  },
+  cron: {
+    icon: 'cron',
+    name: 'Cron',
+  },
+  queues: {
+    icon: 'queues',
+    name: 'Queues',
   },
   api: {
     icon: 'rest',
@@ -45,6 +56,10 @@ const levelsData = {
   functions: {
     icon: 'edge-functions',
     name: 'Edge Functions',
+  },
+  telemetry: {
+    icon: 'telemetry',
+    name: 'Telemetry',
   },
   realtime: {
     icon: 'realtime',
@@ -66,9 +81,17 @@ const levelsData = {
     icon: 'reference-cli',
     name: 'Local Development',
   },
+  security: {
+    icon: 'platform',
+    name: 'Security',
+  },
   platform: {
     icon: 'platform',
     name: 'Platform',
+  },
+  contributing: {
+    icon: 'contributing',
+    name: 'Contributing',
   },
   resources: {
     icon: 'resources',
@@ -336,7 +359,7 @@ interface SkeletonProps extends PropsWithChildren {
   NavigationMenu?: ReactNode
   hideFooter?: boolean
   className?: string
-  additionalNavItems?: Partial<NavMenuSection>[]
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
 }
 
 function TopNavSkeleton({ children }) {
@@ -355,7 +378,7 @@ function SidebarSkeleton({
   menuId: _menuId,
   menuName,
   NavigationMenu,
-  hideFooter = false,
+  hideFooter = !footerEnabled,
   className,
   hideSideNav,
   additionalNavItems,
@@ -407,4 +430,4 @@ function SidebarSkeleton({
   )
 }
 
-export { TopNavSkeleton, SidebarSkeleton }
+export { SidebarSkeleton, TopNavSkeleton }

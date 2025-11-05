@@ -17,7 +17,7 @@ info:
 functions:
   - id: initializing
     title: 'Initializing'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    $ref: '@supabase/supabase-js.SupabaseClient.constructor'
     description: |
       You can initialize a new Supabase client using the `createClient()` method.
 
@@ -32,7 +32,7 @@ functions:
           import { createClient } from '@supabase/supabase-js'
 
           // Create a single supabase client for interacting with your database
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')
           ```
       - id: with-custom-domain
         name: With a custom domain
@@ -41,7 +41,7 @@ functions:
           import { createClient } from '@supabase/supabase-js'
 
           // Use a custom domain as the supabase URL
-          const supabase = createClient('https://my-custom-domain.com', 'public-anon-key')
+          const supabase = createClient('https://my-custom-domain.com', 'publishable-or-anon-key')
           ```
       - id: with-additional-parameters
         name: With additional parameters
@@ -62,7 +62,7 @@ functions:
               headers: { 'x-my-custom-header': 'my-app-name' },
             },
           }
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key", options)
           ```
       - id: api-schemas
         name: With custom schemas
@@ -70,7 +70,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+          const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
             // Provide a custom schema. Defaults to "public".
             db: { schema: 'other_schema' }
           })
@@ -86,7 +86,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+          const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
             global: { fetch: fetch.bind(globalThis) }
           })
           ```
@@ -102,7 +102,7 @@ functions:
           import { createClient } from '@supabase/supabase-js'
           import AsyncStorage from "@react-native-async-storage/async-storage";
 
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
+          const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key", {
             auth: {
               storage: AsyncStorage,
               autoRefreshToken: true,
@@ -170,7 +170,7 @@ functions:
             }
           }
 
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
+          const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key", {
             auth: {
               storage: new LargeSecureStore(),
               autoRefreshToken: true,
@@ -233,7 +233,7 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
@@ -386,7 +386,7 @@ functions:
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
         description: |
-          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```js
           const { data, error } = await supabase.auth.signUp(
@@ -423,7 +423,7 @@ functions:
         - `INITIAL_SESSION`
           - Emitted right after the Supabase client is constructed and the initial session from storage is loaded.
         - `SIGNED_IN`
-          - Emitted each time a user session is confirmed or re-established, including on user sign in and when refocusing a tab. 
+          - Emitted each time a user session is confirmed or re-established, including on user sign in and when refocusing a tab.
           - Avoid making assumptions as to when this event is fired, this may occur even when the user is already signed in. Instead, check the user object attached to the event to see if a new user has signed in and update your application's UI.
           - This event can fire very frequently depending on the number of tabs open in your application.
         - `SIGNED_OUT`
@@ -790,10 +790,10 @@ functions:
       - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls).
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
-      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSmsProvider=Twilio) for details about configuring WhatsApp sign in.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSMSProvider=Twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -845,8 +845,8 @@ functions:
     title: 'signInWithOAuth()'
     $ref: '@supabase/auth-js.GoTrueClient.signInWithOAuth'
     notes: |
-      - This method is used for signing in using a third-party provider.
-      - Supabase supports many different [third-party providers](/docs/guides/auth#configure-third-party-providers).
+      - This method is used for signing in using [Social Login (OAuth) providers](/docs/guides/auth#configure-third-party-providers).
+      - It works by redirecting your application to the provider's authorization screen, before bringing back the user to your app.
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -871,8 +871,8 @@ functions:
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - When the OAuth provider successfully authenticates the user, they are redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls). It does not redirect the user immediately after invoking this method.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
@@ -924,6 +924,10 @@ functions:
   - id: sign-in-with-id-token
     title: 'signInWithIdToken'
     $ref: '@supabase/auth-js.GoTrueClient.signInWithIdToken'
+    notes: |
+      - Use an ID token to sign in.
+      - Especially useful when implementing sign in using native platform dialogs in mobile or desktop apps using Sign in with Apple or Sign in with Google on iOS and Android.
+      - You can also use Google's [One Tap](https://developers.google.com/identity/gsi/web/guides/display-google-one-tap) and [Automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) via this API.
     examples:
       - id: sign-in-with-id-token
         name: 'Sign In using ID Token'
@@ -1033,26 +1037,188 @@ functions:
               window.location.href = data.url
             }
           ```
+  - id: sign-in-with-web3
+    title: 'signInWithWeb3()'
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithWeb3'
+    notes: |
+      - Uses a Web3 (Ethereum, Solana) wallet to sign a user in.
+      - Read up on the [potential for abuse](/docs/guides/auth/auth-web3#potential-for-abuse) before using it.
+    examples:
+      - id: sign-in-with-solana-window
+        name: Sign in with Solana or Ethereum (Window API)
+        isSpotlight: true
+        code: |
+          ```js
+            // uses window.ethereum for the wallet
+            const { data, error } = await supabase.auth.signInWithWeb3({
+              chain: 'ethereum',
+              statement: 'I accept the Terms of Service at https://example.com/tos'
+            })
+
+            // uses window.solana for the wallet
+            const { data, error } = await supabase.auth.signInWithWeb3({
+              chain: 'solana',
+              statement: 'I accept the Terms of Service at https://example.com/tos'
+            })
+          ```
+      - id: sign-in-with-ethereum-raw
+        name: Sign in with Ethereum (Message and Signature)
+        isSpotlight: true
+        code: |
+          ```js
+            const { data, error } = await supabase.auth.signInWithWeb3({
+              chain: 'ethereum',
+              message: '<sign in with ethereum message>',
+              signature: '<hex of the ethereum signature over the message>',
+            })
+          ```
+      - id: sign-in-with-solana-brave
+        name: Sign in with Solana (Brave)
+        isSpotlight: false
+        code: |
+          ```js
+            const { data, error } = await supabase.auth.signInWithWeb3({
+              chain: 'solana',
+              statement: 'I accept the Terms of Service at https://example.com/tos',
+              wallet: window.braveSolana
+            })
+          ```
+      - id: sign-in-with-solana-wallet-adapter
+        name: Sign in with Solana (Wallet Adapter)
+        isSpotlight: false
+        code: |
+          ```jsx
+            function SignInButton() {
+            const wallet = useWallet()
+
+            return (
+              <>
+                {wallet.connected ? (
+                  <button
+                    onClick={() => {
+                      supabase.auth.signInWithWeb3({
+                        chain: 'solana',
+                        statement: 'I accept the Terms of Service at https://example.com/tos',
+                        wallet,
+                      })
+                    }}
+                  >
+                    Sign in with Solana
+                  </button>
+                ) : (
+                  <WalletMultiButton />
+                )}
+              </>
+            )
+          }
+
+          function App() {
+            const endpoint = clusterApiUrl('devnet')
+            const wallets = useMemo(() => [], [])
+
+            return (
+              <ConnectionProvider endpoint={endpoint}>
+                <WalletProvider wallets={wallets}>
+                  <WalletModalProvider>
+                    <SignInButton />
+                  </WalletModalProvider>
+                </WalletProvider>
+              </ConnectionProvider>
+            )
+          }
+          ```
+  - id: get-claims
+    title: 'getClaims()'
+    $ref: '@supabase/auth-js.GoTrueClient.getClaims'
+    notes: |
+      - Parses the user's [access token](/docs/guides/auth/sessions#access-token-jwt-claims) as a [JSON Web Token (JWT)](/docs/guides/auth/jwts) and returns its components if valid and not expired.
+      - If your project is using asymmetric JWT signing keys, then the verification is done locally usually without a network request using the [WebCrypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API).
+      - A network request is sent to your project's JWT signing key discovery endpoint `https://project-id.supabase.co/auth/v1/.well-known/jwks.json`, which is cached locally. If your environment is ephemeral, such as a Lambda function that is destroyed after every request, a network request will be sent for each new invocation. Supabase provides a network-edge cache providing fast responses for these situations.
+      - If the user's access token is about to expire when calling this function, the user's session will first be refreshed before validating the JWT.
+      - If your project is using a symmetric secret to sign the JWT, it always sends a request similar to `getUser()` to validate the JWT at the server before returning the decoded token. This is also used if the WebCrypto API is not available in the environment. Make sure you polyfill it in such situations.
+      - The returned claims can be customized per project using the [Custom Access Token Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook).
+    examples:
+      - id: get-claims
+        name: Get JWT claims, header and signature
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.getClaims()
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "claims": {
+                "aal": "aal1",
+                "amr": [{
+                  "method": "email",
+                  "timestamp": 1715766000
+                }],
+                "app_metadata": {},
+                "aud": "authenticated",
+                "email": "example@email.com",
+                "exp": 1715769600,
+                "iat": 1715766000,
+                "is_anonymous": false,
+                "iss": "https://project-id.supabase.co/auth/v1",
+                "phone": "+13334445555",
+                "role": "authenticated",
+                "session_id": "11111111-1111-1111-1111-111111111111",
+                "sub": "11111111-1111-1111-1111-111111111111",
+                "user_metadata": {}
+              },
+              "header": {
+                "alg": "RS256",
+                "typ": "JWT",
+                "kid": "11111111-1111-1111-1111-111111111111"
+              },
+              "signature": [/** Uint8Array */],
+            },
+            "error": null
+          }
+          ```
   - id: sign-out
     title: 'signOut()'
     $ref: '@supabase/auth-js.GoTrueClient.signOut'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
-      - By default, `signOut()` uses the global scope, which signs out all other sessions that the user is logged into as well.
+      - By default, `signOut()` uses the global scope, which signs out all other sessions that the user is logged into as well. Customize this behavior by passing a scope parameter.
       - Since Supabase Auth uses JWTs for authentication, the access token JWT will be valid until it's expired. When the user signs out, Supabase revokes the refresh token and deletes the JWT from the client-side. This does not revoke the JWT and it will still be valid until it expires.
     examples:
       - id: sign-out
-        name: Sign out
+        name: Sign out (all sessions)
         isSpotlight: true
         code: |
           ```js
           const { error } = await supabase.auth.signOut()
           ```
+      - id: sign-out-current-session
+        name: Sign out (current session)
+        isSpotlight: false
+        code: |
+          ```js
+          const { error } = await supabase.auth.signOut({ scope: 'local' })
+          ```
+      - id: sign-out-other-sessions
+        name: Sign out (other sessions)
+        isSpotlight: false
+        code: |
+          ```js
+          const { error } = await supabase.auth.signOut({ scope: 'others' })
+          ```
   - id: verify-otp
     title: 'verifyOtp()'
     $ref: '@supabase/auth-js.GoTrueClient.verifyOtp'
     notes: |
-      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
+      - The `verifyOtp` method takes in different verification types.
+      - If a phone number is used, the type can either be:
+        1. `sms` – Used when verifying a one-time password (OTP) sent via SMS during sign-up or sign-in.
+        2. `phone_change` – Used when verifying an OTP sent to a new phone number during a phone number update process.
+      - If an email address is used, the type can be one of the following (note: `signup` and `magiclink` types are deprecated):
+        1. `email` – Used when verifying an OTP sent to the user's email during sign-up or sign-in.
+        2. `recovery` – Used when verifying an OTP sent for account recovery, typically after a password reset request.
+        3. `invite` – Used when verifying an OTP sent as part of an invitation to join a project or organization.
+        4. `email_change` – Used when verifying an OTP sent to a new email address during an email update process.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
       - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash with Magic Links for the PKCE flow for Server Side Auth. See [this guide](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr) for more details.
     examples:
@@ -1167,7 +1333,7 @@ functions:
           }
           ```
       - id: verify-sms-one-time-password(otp)
-        name: Verify Sms One-Time Password (OTP)
+        name: Verify SMS One-Time Password (OTP)
         isSpotlight: true
         code: |
           ```js
@@ -1184,10 +1350,13 @@ functions:
     title: 'getSession()'
     $ref: '@supabase/auth-js.GoTrueClient.getSession'
     notes: |
-      - This method retrieves the current local session (i.e local storage).
-      - The session contains a signed JWT and unencoded session data.
-      - Since the unencoded session data is retrieved from the local storage medium, **do not** rely on it as a source of trusted data on the server. It could be tampered with by the sender. If you need verified, trustworthy user data, call [`getUser`](/docs/reference/javascript/auth-getuser) instead.
-      - If the session has an expired access token, this method will use the refresh token to get a new session.
+      - Since the introduction of [asymmetric JWT signing keys](/docs/guides/auth/signing-keys), this method is considered low-level and we encourage you to use `getClaims()` or `getUser()` instead.
+      - Retrieves the current [user session](/docs/guides/auth/sessions) from the storage medium (local storage, cookies).
+      - The session contains an access token (signed JWT), a refresh token and the user object.
+      - If the session's access token is expired or is about to expire, this method will use the refresh token to refresh the session.
+      - When using in a browser, or you've called `startAutoRefresh()` in your environment (React Native, etc.) this function always returns a valid access token without refreshing the session itself, as this is done in the background. This function returns very fast.
+      - **IMPORTANT SECURITY NOTICE:** If using an insecure storage medium, such as cookies or request headers, the user object returned by this function **must not be trusted**. Always verify the JWT using `getClaims()` or your own JWT verification library to securely establish the user's identity and access. You can also use `getUser()` to fetch the user object directly from the Auth server for this purpose.
+      - When using in a browser, this function is synchronized across all tabs using the [LockManager](https://developer.mozilla.org/en-US/docs/Web/API/LockManager) API. In other environments make sure you've defined a proper `lock` property, if necessary, to make sure there are no race conditions while the session is being refreshed.
     examples:
       - id: get-the-session-data
         name: Get the session data
@@ -1387,7 +1556,8 @@ functions:
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
-        description: Sends a "Confirm Email Change" email to the new email address.
+        description: |
+          Sends a "Confirm Email Change" email to the new address. If **Secure Email Change** is enabled (default), confirmation is also required from the **old email** before the change is applied. To skip dual confirmation and apply the change after only the new email is verified, disable **Secure Email Change** in the [Email Auth Provider settings](/dashboard/project/_/auth/providers?provider=Email).
         isSpotlight: false
         code: |
           ```js
@@ -1469,6 +1639,10 @@ functions:
           ```
       - id: update-the-users-metadata
         name: Update the user's metadata
+        description: |
+          Updates the user's custom metadata.
+
+          **Note**: The `data` field maps to the `auth.users.raw_user_meta_data` column in your Supabase database. When calling `getUser()`, the data will be available as `user.user_metadata`.
         isSpotlight: true
         code: |
           ```js
@@ -1569,10 +1743,10 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          // retrieve all identites linked to a user
+          // retrieve all identities linked to a user
           const identities = await supabase.auth.getUserIdentities()
 
-          // find the google identity 
+          // find the google identity
           const googleIdentity = identities.find(
             identity => identity.provider === 'google'
           )
@@ -1588,6 +1762,7 @@ functions:
       - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
       - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
       - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+      - After receiving the OTP, include it as the `nonce` in your `updateUser()` call to finalize the password change.
     examples:
       - id: send-reauthentication-nonce
         name: Send reauthentication nonce
@@ -1604,7 +1779,7 @@ functions:
       - Resends a signup confirmation, email change or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
       - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
-      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made(note: For existing users signing in with OTP, you should use `signInWithOtp()` again to resend the OTP).
       - You can specify a redirect url when you resend an email link using the `emailRedirectTo` option.
     examples:
       - id: resend-email-signup-confirmation
@@ -2004,7 +2179,7 @@ functions:
                   providers: [
                     "email",
                     "<OTHER_PROVIDER>"
-                  ]        
+                  ]
                 },
                 user_metadata: {
                   email: 'email@email.com',
@@ -2071,9 +2246,11 @@ functions:
       Currently, there is support for time-based one-time password (TOTP) and phone verification code as the 2nd factor. Recovery codes are not supported but users can enroll multiple factors, with an upper limit of 10.
 
       Having a 2nd factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup factor.
+
+      Learn more about implementing MFA in your application [in the MFA guide](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
     title: 'mfa.enroll()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.enroll'
     notes: |
       - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
@@ -2147,7 +2324,7 @@ functions:
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.challenge'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
@@ -2215,7 +2392,7 @@ functions:
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.verify'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.verify'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/javascript/auth-mfa-challenge) first.
     examples:
@@ -2252,7 +2429,7 @@ functions:
                   provider: 'email',
                   providers: [
                     "email",
-                  ]        
+                  ]
                 },
                 user_metadata: {},
                 identities: [
@@ -2291,7 +2468,7 @@ functions:
           ```
   - id: mfa-challenge-and-verify
     title: 'mfa.challengeAndVerify()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.challengeAndVerify'
     notes: |
       - Intended for use with only TOTP factors.
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
@@ -2329,7 +2506,7 @@ functions:
                   provider: 'email',
                   providers: [
                     "email",
-                  ]        
+                  ]
                 },
                 user_metadata: {},
                 identities: [
@@ -2368,7 +2545,7 @@ functions:
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.unenroll'
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -2390,7 +2567,7 @@ functions:
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
-    $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
+    $ref: '@supabase/auth-js.GoTrueClient.mfa.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
@@ -2695,11 +2872,11 @@ functions:
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`updateUser()`](/docs/reference/javascript/auth-updateuser).
-      - A `SIGNED_IN` and `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked.
+      - A `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked.
       You can use [`onAuthStateChange()`](/docs/reference/javascript/auth-onauthstatechange) to listen and invoke a callback function on these events.
       - When the user clicks the reset link in the email they are redirected back to your application.
       You can configure the URL that the user is redirected to with the `redirectTo` parameter.
-      See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
       const { data, error } = await supabase.auth.updateUser({
@@ -3018,6 +3195,16 @@ functions:
             { phone_confirm: true }
           )
           ```
+      - id: ban-a-user
+        name: Ban a user for 100 years
+        isSpotlight: false
+        code: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { ban_duration: '100y' }
+          )
+          ```
   - id: mfa-list-factors-admin
     title: 'mfa.listFactors()'
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
@@ -3084,21 +3271,21 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Harry'),
+              (2, 'Frodo'),
+              (3, 'Katniss');
             ```
         response: |
           ```json
@@ -3106,15 +3293,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Harry"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Frodo"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Katniss"
               }
             ],
             "status": 200,
@@ -3126,34 +3313,34 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('name')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Frodo'),
+              (2, 'Harry'),
+              (3, 'Katniss');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Frodo"
               },
               {
-                "name": "Albania"
+                "name": "Harry"
               },
               {
-                "name": "Algeria"
+                "name": "Katniss"
               }
             ],
             "status": 200,
@@ -3167,10 +3354,10 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('countries')
+            .from('orchestal_sections')
             .select(`
               name,
-              cities (
+              instruments (
                 name
               )
             `)
@@ -3179,42 +3366,105 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Germany",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Munich"
+                    "name": "violin"
                   }
                 ]
               },
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+      - id: query-referenced-tables-with-spaces-in-their-names
+        name: Query referenced tables with spaces in their names
+        description: |
+          If your table name contains spaces, you must use double quotes in the `select` statement to reference the table.
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .from('orchestal sections')
+            .select(`
+              name,
+              "musical instruments" (
+                name
+              )
+            `)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              "orchestral sections" (id int8 primary key, name text);
+            create table
+              "musical instruments" (
+                id int8 primary key,
+                section_id int8 not null references "orchestral sections",
+                name text
+              );
+
+            insert into
+              "orchestral sections" (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              "musical instruments" (id, section_id, name)
+            values
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "strings",
+                "musical instruments": [
+                  {
+                    "name": "violin"
+                  }
+                ]
+              },
+              {
+                "name": "woodwinds",
+                "musical instruments": [
+                  {
+                    "name": "flute"
                   }
                 ]
               }
@@ -3489,44 +3739,44 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries(*)')
-            .eq('countries.name', 'Estonia')
+            .from('instruments')
+            .select('name, orchestral_sections(*)')
+            .eq('orchestral_sections.name', 'percussion')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "countries": null
+                "name": "flute",
+                "orchestral_sections": null
               },
               {
-                "name": "Munich",
-                "countries": null
+                "name": "violin",
+                "orchestral_sections": null
               }
             ],
             "status": 200,
@@ -3543,40 +3793,40 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select(`*, cities(count)`)
+            .from('orchestral_sections')
+            .select(`*, instruments(count)`)
           ```
         data:
           sql: |
             ```sql
-            create table countries (
+            create table orchestral_sections (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
-            create table cities (
+            create table characters (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text,
-              "country_id" "uuid" references public.countries on delete cascade
+              "section_id" "uuid" references public.orchestral_sections on delete cascade
             );
 
-            with country as (
-              insert into countries (name)
-              values ('united kingdom') returning id
+            with section as (
+              insert into orchestral_sections (name)
+              values ('strings') returning id
             )
-            insert into cities (name, country_id) values
-            ('London', (select id from country)),
-            ('Manchester', (select id from country)),
-            ('Liverpool', (select id from country)),
-            ('Bristol', (select id from country));
+            insert into instruments (name, section_id) values
+            ('violin', (select id from section)),
+            ('viola', (select id from section)),
+            ('cello', (select id from section)),
+            ('double bass', (select id from section));
             ```
         response: |
           ```json
           [
             {
               "id": "693694e7-d993-4360-a6d7-6294e325d9b6",
-              "name": "United Kingdom",
-              "cities": [
+              "name": "strings",
+              "instruments": [
                 {
                   "count": 4
                 }
@@ -3593,21 +3843,21 @@ functions:
         code: |
           ```ts
           const { count, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('*', { count: 'exact', head: true })
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -3645,7 +3895,7 @@ functions:
             insert into
               users (id, name, address)
             values
-              (1, 'Avdotya', '{"city":"Saint Petersburg"}');
+              (1, 'Frodo', '{"city":"Hobbiton"}');
             ```
         response: |
           ```json
@@ -3653,8 +3903,8 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Avdotya",
-                "city": "Saint Petersburg"
+                "name": "Frodo",
+                "city": "Hobbiton"
               }
             ],
             "status": 200,
@@ -3672,41 +3922,42 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries!inner(name)')
-            .eq('countries.name', 'Indonesia')
+            .from('instruments')
+            .select('name, orchestral_sections!inner(name)')
+            .eq('orchestral_sections.name', 'woodwinds')
+            .limit(1)
           ```
         data:
           sql: |
             ```sql
-            create table countries (
+            create table orchestral_sections (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
-            create table cities (
+            create table instruments (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text,
-              "country_id" "uuid" references public.countries on delete cascade
+              "section_id" "uuid" references public.orchestral_sections on delete cascade
             );
 
-            with country as (
-              insert into countries (name)
-              values ('united kingdom') returning id
+            with section as (
+              insert into orchestral_sections (name)
+              values ('woodwinds') returning id
             )
-            insert into cities (name, country_id) values
-            ('London', (select id from country)),
-            ('Manchester', (select id from country)),
-            ('Liverpool', (select id from country)),
-            ('Bristol', (select id from country));
+            insert into instruments (name, section_id) values
+            ('flute', (select id from section)),
+            ('clarinet', (select id from section)),
+            ('bassoon', (select id from section)),
+            ('piccolo', (select id from section));
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "countries": {"name": "Indonesia"}
+                "name": "flute",
+                "orchestral_sections": {"name": "woodwinds"}
               }
             ],
             "status": 200,
@@ -3715,7 +3966,7 @@ functions:
           ```
         description: |
           If you don't want to return the referenced table contents, you can leave the parenthesis empty.
-          Like `.select('name, countries!inner()')`.
+          Like `.select('name, orchestral_sections!inner()')`.
         hideCodeBlock: true
       - id: switching-schemas-per-query
         name: Switching schemas per query
@@ -3766,7 +4017,7 @@ functions:
           ```ts
           const { error } = await supabase
             .from('countries')
-            .insert({ id: 1, name: 'Denmark' })
+            .insert({ id: 1, name: 'Mordor' })
           ```
         data:
           sql: |
@@ -3789,7 +4040,7 @@ functions:
           ```ts
           const { data, error } = await supabase
             .from('countries')
-            .insert({ id: 1, name: 'Denmark' })
+            .insert({ id: 1, name: 'Mordor' })
             .select()
           ```
         data:
@@ -3804,7 +4055,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Denmark"
+                "name": "Mordor"
               }
             ],
             "status": 201,
@@ -3819,8 +4070,8 @@ functions:
           const { error } = await supabase
             .from('countries')
             .insert([
-              { id: 1, name: 'Nepal' },
-              { id: 1, name: 'Vietnam' },
+              { id: 1, name: 'Mordor' },
+              { id: 1, name: 'The Shire' },
             ])
           ```
         data:
@@ -3858,20 +4109,20 @@ functions:
         code: |
           ```ts
           const { error } = await supabase
-            .from('countries')
-            .update({ name: 'Australia' })
+            .from('instruments')
+            .update({ name: 'piano' })
             .eq('id', 1)
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Taiwan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -3887,8 +4138,8 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .update({ name: 'Australia' })
+            .from('instruments')
+            .update({ name: 'piano' })
             .eq('id', 1)
             .select()
           ```
@@ -3896,12 +4147,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Taiwan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -3909,7 +4160,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Australia"
+                "name": "piano"
               }
             ],
             "status": 200,
@@ -3980,20 +4231,20 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .upsert({ id: 1, name: 'Albania' })
+            .from('instruments')
+            .upsert({ id: 1, name: 'piano' })
             .select()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -4001,7 +4252,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Albania"
+                "name": "piano"
               }
             ],
             "status": 201,
@@ -4015,10 +4266,10 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('instruments')
             .upsert([
-              { id: 1, name: 'Albania' },
-              { id: 2, name: 'Algeria' },
+              { id: 1, name: 'piano' },
+              { id: 2, name: 'harp' },
             ])
             .select()
           ```
@@ -4026,12 +4277,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -4039,11 +4290,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Albania"
+                "name": "piano"
               },
               {
                 "id": 2,
-                "name": "Algeria"
+                "name": "harp"
               }
             ],
             "status": 201,
@@ -4128,7 +4379,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Spain');
+              (1, 'Mordor');
             ```
         response: |
           ```json
@@ -4159,7 +4410,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Spain');
+              (1, 'Mordor');
             ```
         response: |
           ```json
@@ -4167,7 +4418,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Spain"
+                "name": "Mordor"
               }
             ],
             "status": 200,
@@ -4194,7 +4445,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Spain'), (2, 'France'), (3, 'Germany');
+              (1, 'Rohan'), (2, 'The Shire'), (3, 'Mordor');
             ```
         response: |
           ```json
@@ -4311,8 +4562,8 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'France'),
-              (2, 'United Kingdom');
+              (1, 'Rohan'),
+              (2, 'The Shire');
 
             create function list_stored_countries() returns setof countries as $$
               select * from countries;
@@ -4323,7 +4574,7 @@ functions:
           {
             "data": {
               "id": 1,
-              "name": "France"
+              "name": "Rohan"
             },
             "status": 200,
             "statusText": "OK"
@@ -4336,7 +4587,7 @@ functions:
         name: Call a read-only Postgres function
         code: |
           ```ts
-          const { data, error } = await supabase.rpc('hello_world', { get: true })
+          const { data, error } = await supabase.rpc('hello_world', undefined, { get: true })
           ```
         data:
           sql: |
@@ -4373,14 +4624,14 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'The Shire')    // Correct
+            .from('instruments')
+            .select('name, section_id')
+            .eq('name', 'violin')    // Correct
 
           const { data, error } = await supabase
-            .from('cities')
-            .eq('name', 'The Shire')    // Incorrect
-            .select('name, country_id')
+            .from('instruments')
+            .eq('name', 'violin')    // Incorrect
+            .select('name, section_id')
           ```
       - id: chaining-filters
         name: Chaining
@@ -4485,47 +4736,47 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('orchestral_sections')
             .select(`
               name,
-              cities!inner (
+              instruments!inner (
                 name
               )
             `)
-            .eq('cities.name', 'Bali')
+            .eq('instruments.name', 'flute')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
           response: |
             ```json
             {
               "data": [
                 {
-                  "name": "Indonesia",
-                  "cities": [
+                  "name": "woodwinds",
+                  "characters": [
                     {
-                      "name": "Bali"
+                      "name": "flute"
                     }
                   ]
                 }
@@ -4547,22 +4798,22 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
-            .eq('name', 'Albania')
+            .eq('name', 'Leia')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -4570,7 +4821,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Leia"
               }
             ],
             "status": 200,
@@ -4588,22 +4839,22 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
-            .neq('name', 'Albania')
+            .neq('name', 'Leia')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -4611,11 +4862,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Luke"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -4633,7 +4884,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
             .gt('id', 2)
           ```
@@ -4641,14 +4892,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -4656,7 +4907,7 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -4677,7 +4928,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
             .gte('id', 2)
           ```
@@ -4685,14 +4936,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -4700,11 +4951,11 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Leia"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -4722,7 +4973,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
             .lt('id', 2)
           ```
@@ -4730,14 +4981,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -4745,7 +4996,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -4763,7 +5014,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
             .lte('id', 2)
           ```
@@ -4771,14 +5022,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -4786,11 +5037,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Luke"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Leia"
               }
             ],
             "status": 200,
@@ -4808,30 +5059,30 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
-            .like('name', '%Alba%')
+            .like('name', '%Lu%')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "id": 2,
-                "name": "Albania"
+                "id": 1,
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -4849,30 +5100,30 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
-            .ilike('name', '%alba%')
+            .ilike('name', '%lu%')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "id": 2,
-                "name": "Albania"
+                "id": 1,
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -4935,22 +5186,22 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
-            .in('name', ['Albania', 'Algeria'])
+            .in('name', ['Leia', 'Han'])
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -4958,11 +5209,11 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Leia"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -5671,29 +5922,29 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('name')
-            .match({ id: 2, name: 'Albania' })
+            .match({ id: 2, name: 'Leia' })
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Albania"
+                "name": "Leia"
               }
             ],
             "status": 200,
@@ -5765,32 +6016,32 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('name')
-            .or('id.eq.2,name.eq.Algeria')
+            .or('id.eq.2,name.eq.Han')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Albania"
+                "name": "Leia"
               },
               {
-                "name": "Algeria"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -5804,29 +6055,29 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('name')
-            .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)')
+            .or('id.gt.3,and(id.eq.1,name.eq.Luke)')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         reponse: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -5839,47 +6090,47 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('orchestral_sections')
             .select(`
               name,
-              cities!inner (
+              instruments!inner (
                 name
               )
             `)
-            .or('country_id.eq.1,name.eq.Beijing', { referencedTable: 'cities' })
+            .or('section_id.eq.1,name.eq.guzheng', { referencedTable: 'instruments' })
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Germany",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Munich"
+                    "name": "violin"
                   }
                 ]
               }
@@ -5906,22 +6157,22 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
-            .filter('name', 'in', '("Algeria","Japan")')
+            .filter('name', 'in', '("Han","Yoda")')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -5929,7 +6180,7 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -5943,47 +6194,47 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('orchestral_sections')
             .select(`
               name,
-              cities!inner (
+              instruments!inner (
                 name
               )
             `)
-            .filter('cities.name', 'eq', 'Bali')
+            .filter('instruments.name', 'eq', 'flute')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+               instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments":
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -6014,20 +6265,20 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .upsert({ id: 1, name: 'Algeria' })
+            .from('characters')
+            .upsert({ id: 1, name: 'Han Solo' })
             .select()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'Han');
             ```
         response: |
           ```json
@@ -6035,7 +6286,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Algeria"
+                "name": "Han Solo"
               }
             ],
             "status": 201,
@@ -6053,22 +6304,22 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
-            .select('id', 'name')
+            .from('characters')
+            .select('id, name')
             .order('id', { ascending: false })
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -6076,15 +6327,15 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Leia"
               },
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -6098,56 +6349,56 @@ functions:
         code: |
           ```ts
             const { data, error } = await supabase
-              .from('countries')
+              .from('orchestral_sections')
               .select(`
                 name,
-                cities (
+                instruments (
                   name
                 )
               `)
-              .order('name', { referencedTable: 'cities', ascending: false })
+              .order('name', { referencedTable: 'instruments', ascending: false })
             ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States'),
-              (2, 'Vanuatu');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "New York City"
+                    "name": "violin"
                   },
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               },
               {
-                "name": "Vanuatu",
-                "cities": []
+                "name": "woodwinds",
+                "characters": []
               }
             ],
             "status": 200,
@@ -6155,8 +6406,66 @@ functions:
           }
           ```
         description: |
-          Ordering on referenced tables doesn't affect the ordering of
-          the parent table.
+          Ordering with `referencedTable` doesn't affect the ordering of the
+          parent table.
+        hideCodeBlock: true
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```ts
+            const { data, error } = await supabase
+              .from('instruments')
+              .select(`
+                name,
+                section:orchestral_sections (
+                  name
+                )
+              `)
+              .order('section(name)', { ascending: true })
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              orchestral_sections (id int8 primary key, name text);
+            create table
+              instruments (
+                id int8 primary key,
+                section_id int8 not null references orchestral_sections,
+                name text
+              );
+
+            insert into
+              orchestral_sections (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              instruments (id, section_id, name)
+            values
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "violin",
+                "orchestral_sections": {"name": "strings"}
+              },
+              {
+                "name": "flute",
+                "orchestral_sections": {"name": "woodwinds"}
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Ordering with `referenced_table(col)` affects the ordering of the
+          parent table.
         hideCodeBlock: true
 
   - id: limit
@@ -6168,7 +6477,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('name')
             .limit(1)
           ```
@@ -6176,21 +6485,21 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -6204,46 +6513,46 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('orchestral_sections')
             .select(`
               name,
-              cities (
+              instruments (
                 name
               )
             `)
-            .limit(1, { referencedTable: 'cities' })
+            .limit(1, { referencedTable: 'instruments' })
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States');
+              (1, 'strings');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Atlanta"
+                    "name": "violin"
                   }
                 ]
               }
@@ -6262,7 +6571,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('name')
             .range(0, 1)
           ```
@@ -6270,24 +6579,24 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Luke"
               },
               {
-                "name": "Albania"
+                "name": "Leia"
               }
             ],
             "status": 200,
@@ -6363,7 +6672,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('name')
             .limit(1)
             .single()
@@ -6372,20 +6681,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": {
-              "name": "Afghanistan"
+              "name": "Luke"
             },
             "status": 200,
             "statusText": "OK"
@@ -6402,23 +6711,23 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
-            .eq('name', 'Singapore')
+            .eq('name', 'Katniss')
             .maybeSingle()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -6439,7 +6748,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
             .csv()
           ```
@@ -6447,19 +6756,19 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
-            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "data": "id,name\n1,Luke\n2,Leia\n3,Han",
             "status": 200,
             "statusText": "OK"
           }
@@ -6471,6 +6780,8 @@ functions:
 
   - id: returns
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
+    notes: |
+      - Deprecated: use overrideTypes method instead
     title: returns()
     examples:
       - id: override-type-of-successful-response
@@ -6480,11 +6791,94 @@ functions:
           const { data } = await supabase
             .from('countries')
             .select()
+            .returns<Array<MyType>>()
+          ```
+        response: |
+          ```
+          let x: typeof data // MyType[]
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: override-type-of-object-response
+        name: Override type of object response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .maybeSingle()
             .returns<MyType>()
           ```
         response: |
           ```
           let x: typeof data // MyType | null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: overrideTypes
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.overrideTypes'
+    title: overrideTypes()
+    examples:
+      - id: complete-override-type-of-successful-response
+        name: Complete Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .overrideTypes<Array<MyType>, { merge: false }>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // MyType[]
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: complete-override-type-of-object-response
+        name: Complete Override type of object response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .maybeSingle()
+            .overrideTypes<MyType, { merge: false }>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // MyType | null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: partial-override-type-of-successful-response
+        name: Partial Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .overrideTypes<Array<{ status: "A" | "B" }>>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // Array<CountryRowProperties & { status: "A" | "B" }>
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: partial-override-type-of-object-response
+        name: Partial Override type of object response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .maybeSingle()
+            .overrideTypes<{ status: "A" | "B" }>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // CountryRowProperties & { status: "A" | "B" } | null
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -6506,7 +6900,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
             .explain()
           ```
@@ -6514,20 +6908,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
-                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+                  ->  Seq Scan on characters  (cost=0.00..22.00 rows=1200 width=40)
           ```
         description: |
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
@@ -6539,7 +6933,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select()
             .explain({analyze:true,verbose:true})
           ```
@@ -6547,23 +6941,23 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
-            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            Output: NULL::bigint, count(ROW(characters.id, characters.name)), COALESCE(json_agg(ROW(characters.id, characters.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
-                  Output: countries.id, countries.name
-                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
-                        Output: countries.id, countries.name
+                  Output: characters.id, characters.name
+                  ->  Seq Scan on public.characters  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: characters.id, characters.name
           Query Identifier: -4730654291623321173
           Planning Time: 0.407 ms
           Execution Time: 0.119 ms
@@ -6600,7 +6994,7 @@ functions:
   #           insert into
   #             countries (id, name)
   #           values
-  #             (1, 'Spain');
+  #             (1, 'Mordor');
   #           ```
   #         </details>
 
@@ -6637,7 +7031,7 @@ functions:
   #             "data": [
   #               {
   #                 "id": 1,
-  #                 "name": "Spain"
+  #                 "name": "Mordor"
   #               }
   #             ],
   #             "status": 200,
@@ -6990,7 +7384,7 @@ functions:
           ```
   - id: get-channels
     title: getChannels()
-    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
+    $ref: '@supabase/supabase-js.SupabaseClient.getChannels'
     examples:
       - id: get-all-channels
         name: Get all channels
@@ -7002,7 +7396,7 @@ functions:
 
   - id: remove-channel
     title: removeChannel()
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
+    $ref: '@supabase/supabase-js.SupabaseClient.removeChannel'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
@@ -7016,7 +7410,7 @@ functions:
 
   - id: remove-all-channels
     title: removeAllChannels()
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
+    $ref: '@supabase/supabase-js.SupabaseClient.removeAllChannels'
     notes: |
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:

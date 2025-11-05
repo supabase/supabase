@@ -1,17 +1,18 @@
 import { useParams } from 'common'
 import { Lock } from 'lucide-react'
 import { toast } from 'sonner'
-import { Alert, Modal } from 'ui'
+import { Modal } from 'ui'
 
 import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
 import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
+import { Admonition } from 'ui-patterns'
 
 export interface RevokeAppModalProps {
   selectedApp?: AuthorizedApp
   onClose: () => void
 }
 
-const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
+export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
   const { slug } = useParams()
   const { mutate: revokeAuthorizedApp, isLoading: isDeleting } = useAuthorizedAppRevokeMutation({
     onSuccess: () => {
@@ -37,10 +38,12 @@ const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
       onConfirm={onConfirmDelete}
     >
       <Modal.Content>
-        <Alert withIcon variant="warning" title="This action cannot be undone">
-          {selectedApp?.name} application will no longer have access to your organization's settings
-          and projects.
-        </Alert>
+        <Admonition
+          type="warning"
+          title="This action cannot be undone"
+          description={`${selectedApp?.name} application will no longer have access to your organization's settings
+          and projects.`}
+        />
       </Modal.Content>
       <Modal.Content>
         <ul className="space-y-5">
@@ -61,5 +64,3 @@ const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
     </Modal>
   )
 }
-
-export default RevokeAppModal

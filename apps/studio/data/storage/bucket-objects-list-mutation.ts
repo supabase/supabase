@@ -1,15 +1,15 @@
-import { UseMutationOptions, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 type ListBucketObjectsParams = {
   projectRef: string
   bucketId?: string
   path: string
-  options: components['schemas']['StorageObjectSearchOptions']
+  options: components['schemas']['GetObjectsBody']['options']
 }
 
 export type StorageObject = components['schemas']['StorageObject']
@@ -46,23 +46,21 @@ export const useGetSignBucketObjectMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>,
+  UseCustomMutationOptions<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>(
-    (vars) => listBucketObjects(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to list bucket objects: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>({
+    mutationFn: (vars) => listBucketObjects(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to list bucket objects: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

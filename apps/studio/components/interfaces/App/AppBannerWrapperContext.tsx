@@ -1,46 +1,42 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-
-const AUTH_SMTP_CHANGES_WARNING_KEY = LOCAL_STORAGE_KEYS.AUTH_SMTP_CHANGES_WARNING
+const MIDDLEWARE_OUTAGE_BANNER_KEY = LOCAL_STORAGE_KEYS.MIDDLEWARE_OUTAGE_BANNER
 
 // [Joshen] This file is meant to be dynamic - update this as and when we need to use the NoticeBanner
 
 type AppBannerContextType = {
-  authSmtpBannerAcknowledged: string[]
-  onUpdateAcknowledged: (key: 'auth-smtp', value: boolean | string) => void
+  middlewareOutageBannerAcknowledged: boolean
+  onUpdateAcknowledged: (key: typeof MIDDLEWARE_OUTAGE_BANNER_KEY) => void
 }
 
 const AppBannerContext = createContext<AppBannerContextType>({
-  authSmtpBannerAcknowledged: [],
+  middlewareOutageBannerAcknowledged: false,
   onUpdateAcknowledged: noop,
 })
 
 export const useAppBannerContext = () => useContext(AppBannerContext)
 
 export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) => {
-  // [Joshen] If project specific, can take a list of refs instead - comma separated strings, no spaces
-  // Otherwise just a boolean will be fine
-  const [authSmtpBannerAcknowledged, setAuthSmtpBannerAcknowledged] = useState<string[]>([])
+  const [middlewareOutageBannerAcknowledged, setmiddlewareOutageBannerAcknowledged] =
+    useState<boolean>(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const acknowledgedProjectRefs =
-        localStorage.getItem(AUTH_SMTP_CHANGES_WARNING_KEY)?.split(',') ?? []
-      setAuthSmtpBannerAcknowledged(acknowledgedProjectRefs)
+      const acknowledged = localStorage.getItem(MIDDLEWARE_OUTAGE_BANNER_KEY) === 'true'
+      setmiddlewareOutageBannerAcknowledged(acknowledged)
     }
   }, [])
 
   const value = {
-    authSmtpBannerAcknowledged,
-    onUpdateAcknowledged: (key: 'auth-smtp', value: boolean | string) => {
-      if (key === 'auth-smtp' && typeof value === 'string' && value.length > 0) {
-        const updatedRefs = authSmtpBannerAcknowledged.concat([value])
+    middlewareOutageBannerAcknowledged,
+    onUpdateAcknowledged: (key: typeof MIDDLEWARE_OUTAGE_BANNER_KEY) => {
+      if (key === MIDDLEWARE_OUTAGE_BANNER_KEY) {
         if (typeof window !== 'undefined') {
-          window.localStorage.setItem(AUTH_SMTP_CHANGES_WARNING_KEY, updatedRefs.join(','))
+          window.localStorage.setItem(MIDDLEWARE_OUTAGE_BANNER_KEY, 'true')
         }
-        setAuthSmtpBannerAcknowledged(updatedRefs)
+        setmiddlewareOutageBannerAcknowledged(true)
       }
     },
   }
@@ -49,6 +45,6 @@ export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) =>
 }
 
 export const useIsNoticeBannerShown = () => {
-  const { authSmtpBannerAcknowledged } = useAppBannerContext()
-  return authSmtpBannerAcknowledged
+  const { middlewareOutageBannerAcknowledged } = useAppBannerContext()
+  return middlewareOutageBannerAcknowledged
 }

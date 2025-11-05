@@ -1,12 +1,13 @@
-import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Link2, Table2 } from 'lucide-react'
-import { Handle, NodeProps } from 'reactflow'
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
+import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import Link from 'next/link'
+import { Handle, NodeProps } from 'reactflow'
 
-import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Button, cn } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
-const TABLE_NODE_WIDTH = 320
-const TABLE_NODE_ROW_HEIGHT = 40
+export const TABLE_NODE_WIDTH = 320
+export const TABLE_NODE_ROW_HEIGHT = 40
 
 export type TableNodeData = {
   id?: number
@@ -24,7 +25,12 @@ export type TableNodeData = {
   }[]
 }
 
-const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNodeData>) => {
+export const TableNode = ({
+  data,
+  targetPosition,
+  sourcePosition,
+  placeholder,
+}: NodeProps<TableNodeData> & { placeholder?: boolean }) => {
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
@@ -34,7 +40,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
   return (
     <>
       {data.isForeign ? (
-        <header className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative text-default flex gap-1 items-center">
+        <header className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center">
           {data.name}
           {targetPosition && (
             <Handle
@@ -52,7 +58,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
         >
           <header
             className={cn(
-              'text-[0.55rem] pl-2 pr-1 bg-alternative text-default flex items-center justify-between',
+              'text-[0.55rem] pl-2 pr-1 bg-alternative flex items-center justify-between',
               itemHeight
             )}
           >
@@ -60,9 +66,11 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
               <Table2 strokeWidth={1} size={12} className="text-light" />
               {data.name}
             </div>
-            {data.id && (
+            {data.id && !placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={`/project/${data.ref}/editor/${data.id}`}>
+                <Link
+                  href={`/project/${data.ref}/editor/${data.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`}
+                >
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>
@@ -147,5 +155,3 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
     </>
   )
 }
-
-export { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode }

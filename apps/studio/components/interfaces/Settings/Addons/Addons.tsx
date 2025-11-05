@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -6,16 +5,16 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
-import { useParams } from 'common'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { useFlag, useParams } from 'common'
 import {
   getAddons,
   subscriptionHasHipaaAddon,
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
-import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -24,45 +23,52 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { BASE_PATH, DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
-import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
-import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 
-const Addons = () => {
+export const Addons = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
-  const selectedOrg = useSelectedOrganization()
-  const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
-  const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
-  const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
+
+  const { projectSettingsCustomDomains, projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
+    'project_settings:custom_domains',
+    'project_addons:dedicated_ipv4_address',
+  ])
+
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const { data: selectedProject, isLoading: isLoadingProject } = useSelectedProjectQuery()
+  const { data: parentProject } = useProjectDetailQuery({
+    ref: selectedProject?.parent_project_ref,
+  })
+  const isBranch = parentProject !== undefined
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
-  const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && settings?.is_sensitive
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
@@ -121,8 +127,8 @@ const Addons = () => {
               You are currently on a preview branch of your project
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
-              Updating addons are not available while you're on a preview branch. To manage your
-              addons, you may return to your{' '}
+              Updating addons here will only apply to this preview branch. To manage your addons,
+              for your main branch, please visit the{' '}
               <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
                 main branch
               </Link>
@@ -175,7 +181,7 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                        href={`${DOCS_URL}/guides/platform/compute-add-ons`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -187,7 +193,7 @@ const Addons = () => {
                     </div>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
+                        href={`${DOCS_URL}/guides/database/connecting-to-postgres#connection-pooler`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -233,41 +239,19 @@ const Addons = () => {
                       </div>
                     )}
 
-                    {!diskAndComputeFormEnabled ? (
-                      <ProjectUpdateDisabledTooltip
-                        projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
-                        projectNotActive={!isProjectActive}
-                        tooltip="Compute size changes are currently disabled. Our engineers are working on a fix."
-                      >
-                        <Button
-                          type="default"
-                          className="mt-2 pointer-events-auto"
-                          onClick={() => setPanel('computeInstance')}
-                          disabled={
-                            isBranch ||
-                            !isProjectActive ||
-                            projectUpdateDisabled ||
-                            computeSizeChangesDisabled
-                          }
-                        >
-                          Change compute size
+                    <NoticeBar
+                      visible={true}
+                      type="default"
+                      title="Compute size has moved"
+                      description="Compute size is now managed alongside Disk configuration on the new Compute and Disk page."
+                      actions={
+                        <Button type="default" asChild>
+                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                            Go to Compute and Disk
+                          </Link>
                         </Button>
-                      </ProjectUpdateDisabledTooltip>
-                    ) : (
-                      <NoticeBar
-                        visible={true}
-                        type="default"
-                        title="Compute size has moved"
-                        description="Compute size is now managed alongside Disk configuration on the new Compute and Disk page."
-                        actions={
-                          <Button type="default" asChild>
-                            <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                              Go to Compute and Disk
-                            </Link>
-                          </Button>
-                        }
-                      />
-                    )}
+                      }
+                    />
 
                     {Number(mostRecentRemainingIOBudget?.disk_io_budget) === 0 ? (
                       <Alert
@@ -346,144 +330,89 @@ const Addons = () => {
                       <p className="text-sm text-foreground-light">No. of pooler connections</p>
                       <p className="text-sm">{meta?.connections_pooler ?? '-'}</p>
                     </div>
-                    {!diskAndComputeFormEnabled && (
-                      <>
-                        <div className="w-full flex items-center justify-between border-b py-2">
-                          <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                            <div className="group flex items-center space-x-2">
-                              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                                Max Disk Throughput
-                              </p>
-                              <ChevronRight
-                                strokeWidth={1.5}
-                                size={16}
-                                className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                              />
-                            </div>
-                          </Link>
-                          <p className="text-sm">
-                            {meta?.max_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
-                          </p>
-                        </div>
-                        <div className="w-full flex items-center justify-between py-2">
-                          <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                            <div className="group flex items-center space-x-2">
-                              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                                Baseline Disk Throughput
-                              </p>
-                              <ChevronRight
-                                strokeWidth={1.5}
-                                size={16}
-                                className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                              />
-                            </div>
-                          </Link>
-                          <p className="text-sm">
-                            {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
-                          </p>
-                        </div>
-                      </>
-                    )}
                   </div>
                 </div>
               </ScaffoldSectionContent>
             </ScaffoldSection>
           </ScaffoldContainer>
 
-          <ScaffoldDivider />
-
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <ScaffoldSectionDetail>
-                <div className="space-y-6">
-                  <p className="m-0">Dedicated IPv4 address</p>
-                  <div className="space-y-2">
-                    <p className="text-sm text-foreground-light m-0">More information</p>
-                    <div>
-                      <Link
-                        href="https://supabase.com/docs/guides/platform/ipv4-address"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                          <p className="text-sm m-0">About IPv4 deprecation</p>
-                          <ExternalLink size={16} strokeWidth={1.5} />
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </ScaffoldSectionDetail>
-              <ScaffoldSectionContent>
-                <div className="flex space-x-6">
-                  <div>
-                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
-                      <img
-                        alt="IPv4"
-                        width={160}
-                        height={96}
-                        src={
-                          ipv4 !== undefined
-                            ? `${BASE_PATH}/img/ipv4-on${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg?v=2`
-                            : `${BASE_PATH}/img/ipv4-off${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg?v=2`
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>
-                      {ipv4 !== undefined
-                        ? 'Dedicated IPv4 address is enabled'
-                        : 'Dedicated IPv4 address is not enabled'}
-                    </p>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger asChild>
+          {projectAddonsDedicatedIpv4Address && (
+            <>
+              <ScaffoldDivider />
+              <ScaffoldContainer>
+                <ScaffoldSection>
+                  <ScaffoldSectionDetail>
+                    <div className="space-y-6">
+                      <p className="m-0">Dedicated IPv4 address</p>
+                      <div className="space-y-2">
+                        <p className="text-sm text-foreground-light m-0">More information</p>
                         <div>
-                          <Button
-                            type="default"
-                            className="mt-2 pointer-events-auto"
-                            onClick={() => setPanel('ipv4')}
-                            disabled={
-                              isBranch ||
-                              !isProjectActive ||
-                              projectUpdateDisabled ||
-                              !(canUpdateIPv4 || ipv4)
-                            }
+                          <Link
+                            href={`${DOCS_URL}/guides/platform/ipv4-address`}
+                            target="_blank"
+                            rel="noreferrer"
                           >
-                            Change dedicated IPv4 address
-                          </Button>
-                        </div>
-                      </Tooltip.Trigger>
-                      <Tooltip.Portal>
-                        {/* Only show the tooltip if the user can't add the addon and ipv4 is not currently applied */}
-                        {!(canUpdateIPv4 || ipv4) && (
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                'border border-background',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-foreground">
-                                Temporarily disabled while we are migrating to IPv6, please check
-                                back later.
-                              </span>
+                            <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                              <p className="text-sm m-0">About IPv4 deprecation</p>
+                              <ExternalLink size={16} strokeWidth={1.5} />
                             </div>
-                          </Tooltip.Content>
-                        )}
-                      </Tooltip.Portal>
-                    </Tooltip.Root>
-                  </div>
-                </div>
-              </ScaffoldSectionContent>
-            </ScaffoldSection>
-          </ScaffoldContainer>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </ScaffoldSectionDetail>
+                  <ScaffoldSectionContent>
+                    <div className="flex space-x-6">
+                      <div>
+                        <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
+                          <img
+                            alt="IPv4"
+                            width={160}
+                            height={96}
+                            src={
+                              ipv4 !== undefined
+                                ? `${BASE_PATH}/img/ipv4-on${
+                                    resolvedTheme?.includes('dark') ? '' : '--light'
+                                  }.svg?v=2`
+                                : `${BASE_PATH}/img/ipv4-off${
+                                    resolvedTheme?.includes('dark') ? '' : '--light'
+                                  }.svg?v=2`
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-foreground-light">Current option:</p>
+                        <p>
+                          {ipv4 !== undefined
+                            ? 'Dedicated IPv4 address is enabled'
+                            : 'Dedicated IPv4 address is not enabled'}
+                        </p>
+                        <ButtonTooltip
+                          type="default"
+                          className="mt-2 pointer-events-auto"
+                          onClick={() => setPanel('ipv4')}
+                          disabled={
+                            !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
+                          }
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: !(canUpdateIPv4 || ipv4)
+                                ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
+                                : undefined,
+                            },
+                          }}
+                        >
+                          Change dedicated IPv4 address
+                        </ButtonTooltip>
+                      </div>
+                    </div>
+                  </ScaffoldSectionContent>
+                </ScaffoldSection>
+              </ScaffoldContainer>
+            </>
+          )}
 
           <ScaffoldDivider />
 
@@ -496,7 +425,7 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
+                        href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -519,7 +448,7 @@ const Addons = () => {
                     </AlertDescription_Shadcn_>
                     <div className="mt-4">
                       <Button type="default" asChild>
-                        <Link href="/support/new">Contact support</Link>
+                        <SupportLink>Contact support</SupportLink>
                       </Button>
                     </div>
                   </Alert_Shadcn_>
@@ -547,7 +476,7 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light">Current option:</p>
                     <p>
                       {pitr !== undefined
-                        ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
+                        ? `Point in time recovery of ${(pitr.variant.meta as any)?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
                     </p>
                     {!sufficientPgVersion ? (
@@ -560,14 +489,32 @@ const Addons = () => {
                             Reach out to us via support if you're interested
                           </p>
                           <Button asChild type="default">
-                            <Link
-                              href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                            <SupportLink
+                              queryParams={{
+                                projectRef,
+                                category: SupportCategories.SALES_ENQUIRY,
+                                subject: 'Project too old old for PITR',
+                              }}
                             >
                               <a>Contact support</a>
-                            </Link>
+                            </SupportLink>
                           </Button>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
+                    ) : isOrioleDbInAws ? (
+                      <ButtonTooltip
+                        disabled
+                        type="default"
+                        className="mt-2"
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: 'Point in time recovery is not supported with OrioleDB',
+                          },
+                        }}
+                      >
+                        Change point in time recovery
+                      </ButtonTooltip>
                     ) : (
                       <ProjectUpdateDisabledTooltip
                         projectUpdateDisabled={projectUpdateDisabled}
@@ -578,7 +525,6 @@ const Addons = () => {
                           className="mt-2 pointer-events-auto"
                           onClick={() => setPanel('pitr')}
                           disabled={
-                            isBranch ||
                             !isProjectActive ||
                             projectUpdateDisabled ||
                             !sufficientPgVersion ||
@@ -595,84 +541,84 @@ const Addons = () => {
             </ScaffoldSection>
           </ScaffoldContainer>
 
-          <ScaffoldDivider />
-
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <ScaffoldSectionDetail>
-                <div className="space-y-6">
-                  <p className="m-0">Custom domain</p>
-                  <div className="space-y-2">
-                    <p className="text-sm text-foreground-light m-0">More information</p>
-                    <div>
-                      <Link
-                        href="https://supabase.com/docs/guides/platform/custom-domains"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                          <p className="text-sm m-0">About custom domains</p>
-                          <ExternalLink size={16} strokeWidth={1.5} />
+          {projectSettingsCustomDomains && (
+            <>
+              <ScaffoldDivider />
+              <ScaffoldContainer>
+                <ScaffoldSection>
+                  <ScaffoldSectionDetail>
+                    <div className="space-y-6">
+                      <p className="m-0">Custom domain</p>
+                      <div className="space-y-2">
+                        <p className="text-sm text-foreground-light m-0">More information</p>
+                        <div>
+                          <Link
+                            href={`${DOCS_URL}/guides/platform/custom-domains`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                              <p className="text-sm m-0">About custom domains</p>
+                              <ExternalLink size={16} strokeWidth={1.5} />
+                            </div>
+                          </Link>
                         </div>
-                      </Link>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </ScaffoldSectionDetail>
-              <ScaffoldSectionContent>
-                <div className="flex space-x-6">
-                  <div>
-                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
-                      <img
-                        alt="Custom Domain"
-                        width={160}
-                        height={96}
-                        src={
-                          customDomain !== undefined
-                            ? `${BASE_PATH}/img/custom-domain-on${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg`
-                            : `${BASE_PATH}/img/custom-domain-off${
-                                resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.svg`
-                        }
-                      />
+                  </ScaffoldSectionDetail>
+                  <ScaffoldSectionContent>
+                    <div className="flex space-x-6">
+                      <div>
+                        <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
+                          <img
+                            alt="Custom Domain"
+                            width={160}
+                            height={96}
+                            src={
+                              customDomain !== undefined
+                                ? `${BASE_PATH}/img/custom-domain-on${
+                                    resolvedTheme?.includes('dark') ? '' : '--light'
+                                  }.svg`
+                                : `${BASE_PATH}/img/custom-domain-off${
+                                    resolvedTheme?.includes('dark') ? '' : '--light'
+                                  }.svg`
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-foreground-light">Current option:</p>
+                        <p>
+                          {customDomain !== undefined
+                            ? 'Custom domain is enabled'
+                            : 'Custom domain is not enabled'}
+                        </p>
+                        <ProjectUpdateDisabledTooltip
+                          projectUpdateDisabled={projectUpdateDisabled}
+                          projectNotActive={!isProjectActive}
+                        >
+                          <Button
+                            type="default"
+                            className="mt-2 pointer-events-auto"
+                            onClick={() => setPanel('customDomain')}
+                            disabled={!isProjectActive || projectUpdateDisabled}
+                          >
+                            Change custom domain
+                          </Button>
+                        </ProjectUpdateDisabledTooltip>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>
-                      {customDomain !== undefined
-                        ? 'Custom domain is enabled'
-                        : 'Custom domain is not enabled'}
-                    </p>
-                    <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
-                      projectNotActive={!isProjectActive}
-                    >
-                      <Button
-                        type="default"
-                        className="mt-2 pointer-events-auto"
-                        onClick={() => setPanel('customDomain')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
-                      >
-                        Change custom domain
-                      </Button>
-                    </ProjectUpdateDisabledTooltip>
-                  </div>
-                </div>
-              </ScaffoldSectionContent>
-            </ScaffoldSection>
-          </ScaffoldContainer>
+                  </ScaffoldSectionContent>
+                </ScaffoldSection>
+              </ScaffoldContainer>
+            </>
+          )}
         </>
       )}
 
-      <ComputeInstanceSidePanel />
       <PITRSidePanel />
       <CustomDomainSidePanel />
       <IPv4SidePanel />
     </>
   )
 }
-
-export default Addons

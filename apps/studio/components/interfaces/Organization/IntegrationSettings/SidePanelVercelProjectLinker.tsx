@@ -3,15 +3,16 @@ import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
-import ProjectLinker, { ForeignProject } from 'components/interfaces/Integrations/ProjectLinker'
+import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
+import ProjectLinker, {
+  ForeignProject,
+} from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
@@ -25,7 +26,7 @@ const VERCEL_ICON = (
 
 const SidePanelVercelProjectLinker = () => {
   const { ref } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
   const organizationIntegrationId = sidePanelStateSnapshot.vercelConnectionsIntegrationId
 
@@ -42,21 +43,6 @@ const SidePanelVercelProjectLinker = () => {
    * we use the snapshot.organizationIntegrationId which should be set whenever this sidepanel is opened
    */
   const selectedIntegration = vercelIntegrations?.find((x) => x.id === organizationIntegrationId)
-
-  /**
-   * Supabase projects available
-   */
-  const { data: supabaseProjectsData } = useProjectsQuery({
-    enabled: organizationIntegrationId !== undefined,
-  })
-
-  const supabaseProjects = useMemo(
-    () =>
-      supabaseProjectsData
-        ?.filter((project) => project.organization_id === selectedOrganization?.id)
-        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
-    [selectedOrganization?.id, supabaseProjectsData]
-  )
 
   const { data: vercelProjectsData } = useVercelProjectsQuery(
     {
@@ -139,10 +125,10 @@ Check the details below before proceeding
         </SidePanel.Content>
         <SidePanel.Content className="flex flex-col gap-2">
           <ProjectLinker
+            slug={selectedOrganization?.slug}
             defaultSupabaseProjectRef={ref}
             organizationIntegrationId={selectedIntegration?.id}
             foreignProjects={vercelProjects}
-            supabaseProjects={supabaseProjects}
             onCreateConnections={onCreateConnections}
             installedConnections={selectedIntegration?.connections}
             isLoading={isCreatingConnection}

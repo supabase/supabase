@@ -1,8 +1,8 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 
 import type { components } from 'data/api'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { notificationKeys } from './keys'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10
@@ -18,7 +18,7 @@ export type NotificationVariables = {
   }
 }
 
-export type Notification = components['schemas']['NotificationResponseV2']
+export type Notification = components['schemas']['NotificationResponse']
 
 /**
  * Notification Data - This is not typed from the API end as it's meant to be open-ended
@@ -39,14 +39,14 @@ export async function getNotifications(options: NotificationVariables, signal?: 
   const { status, filters, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
   const { data, error } = await get('/platform/notifications', {
     params: {
-      // @ts-ignore
       query: {
         offset: page * limit,
         limit,
-        ...(status !== undefined ? { status } : { status: ['new', 'seen'] }),
-        ...(filters.priority.length > 0 ? { priority: filters.priority } : {}),
-        ...(filters.organizations.length > 0 ? { org_slug: filters.organizations } : {}),
-        ...(filters.projects.length > 0 ? { project_ref: filters.projects } : {}),
+        // [Alaister]: 'as any' is needed because the API types don't reflect an array of strings
+        ...(status !== undefined ? { status } : { status: ['new', 'seen'].join(',') as any }),
+        ...(filters.priority.length > 0 ? { priority: filters.priority.join(',') as any } : {}),
+        ...(filters.organizations.length > 0 ? { org_slug: filters.organizations.join(',') } : {}),
+        ...(filters.projects.length > 0 ? { project_ref: filters.projects.join(',') } : {}),
       },
     },
     headers: { Version: '2' },
@@ -66,20 +66,18 @@ export const useNotificationsV2Query = <TData = NotificationsData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
 ) => {
-  return useInfiniteQuery<NotificationsData, NotificationsError, TData>(
-    notificationKeys.listV2({ status, filters, limit }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery<NotificationsData, NotificationsError, TData>({
+    queryKey: notificationKeys.listV2({ status, filters, limit }),
+    queryFn: ({ signal, pageParam }) =>
       getNotifications({ status, filters, limit, page: pageParam }, signal),
-    {
-      enabled: enabled,
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        if ((lastPage ?? []).length < limit) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
+    enabled: enabled,
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      if ((lastPage ?? []).length < limit) return undefined
+      return page
+    },
+    ...options,
+  })
 }

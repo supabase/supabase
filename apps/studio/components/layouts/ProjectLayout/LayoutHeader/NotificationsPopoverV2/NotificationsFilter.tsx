@@ -1,8 +1,9 @@
-import { RotateCcw, Settings2Icon } from 'lucide-react'
-import { useState } from 'react'
+import { RotateCcw, Settings2Icon, X } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import {
   Button,
   Checkbox_Shadcn_,
+  CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
@@ -19,17 +20,31 @@ import {
 } from 'ui'
 
 import { CommandGroup } from '@ui/components/shadcn/ui/command'
-import { CriticalIcon, WarningIcon } from 'ui'
+import { useDebounce } from '@uidotdev/usehooks'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
+import { CriticalIcon, WarningIcon } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+
+// [Joshen] Opting to not use infinite loading for projects in this UI specifically
+// since the UX feels quite awkward having infinite loading for just a specific section in this Popover
 
 export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archived' }) => {
   const [open, setOpen] = useState(false)
   const snap = useNotificationsStateSnapshot()
 
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 500)
+
   const { data: organizations } = useOrganizationsQuery()
-  const { data: projects } = useProjectsQuery()
+  const { data } = useProjectsInfiniteQuery(
+    { search: search.length === 0 ? search : debouncedSearch },
+    { keepPreviousData: true, enabled: open }
+  )
+  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
+  const projectCount = data?.pages[0].pagination.count ?? 0
+  const pageLimit = data?.pages[0].pagination.limit ?? 0
 
   return (
     <Popover_Shadcn_ modal={true} open={open} onOpenChange={setOpen}>
@@ -46,6 +61,9 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
       <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Find filter..." />
+
+          <CommandEmpty_Shadcn_>No filters found that match your search</CommandEmpty_Shadcn_>
+
           <CommandList_Shadcn_>
             <ScrollArea className="max-h-[240px] py-1 overflow-y-auto">
               <CommandGroup_Shadcn_>
@@ -66,12 +84,14 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
                     <Checkbox_Shadcn_
                       name="unread"
                       checked={snap.filterStatuses.includes('unread')}
-                    ></Checkbox_Shadcn_>
+                    />
                     Unread
                   </Label_Shadcn_>
                 </CommandItem_Shadcn_>
               </CommandGroup_Shadcn_>
+
               <CommandSeparator_Shadcn_ />
+
               <CommandGroup_Shadcn_>
                 <DropdownMenuLabel>Priority</DropdownMenuLabel>
                 <CommandItem_Shadcn_
@@ -90,8 +110,8 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
                     <Checkbox_Shadcn_
                       name="warning"
                       checked={snap.filterPriorities.includes('Warning')}
-                    ></Checkbox_Shadcn_>
-                    <WarningIcon className="w-2 h-2" />
+                    />
+                    <WarningIcon className="size-4" />
                     Warning
                   </Label_Shadcn_>
                 </CommandItem_Shadcn_>
@@ -111,13 +131,15 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
                     <Checkbox_Shadcn_
                       name="critical"
                       checked={snap.filterPriorities.includes('Critical')}
-                    ></Checkbox_Shadcn_>
-                    <CriticalIcon className="w-2 h-2" />
+                    />
+                    <CriticalIcon className="size-4" />
                     Critical
                   </Label_Shadcn_>
                 </CommandItem_Shadcn_>
               </CommandGroup_Shadcn_>
+
               <CommandSeparator_Shadcn_ />
+
               <CommandGroup_Shadcn_>
                 <DropdownMenuLabel>Organizations</DropdownMenuLabel>
                 {(organizations ?? []).map((org) => (
@@ -139,21 +161,45 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
                       <Checkbox_Shadcn_
                         name={`${org.slug}`}
                         checked={snap.filterOrganizations.includes(org.slug)}
-                        className=""
-                      ></Checkbox_Shadcn_>
+                      />
                       {org.name}
                     </Label_Shadcn_>
                   </CommandItem_Shadcn_>
                 ))}
               </CommandGroup_Shadcn_>
+
               <CommandSeparator_Shadcn_ />
+
               <CommandGroup_Shadcn_>
                 <DropdownMenuLabel>Projects</DropdownMenuLabel>
+                {/* 
+                  [Joshen] Adding a separate search input field here for projects as the
+                  top level CommandInput doesn't work well with a mix of sync and async data
+                */}
+                <div className="px-2 mb-2">
+                  <Input
+                    size="tiny"
+                    className="rounded"
+                    placeholder="Search for a project"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    actions={
+                      search.length > 0 ? (
+                        <X
+                          size={14}
+                          className="cursor-pointer mr-1"
+                          onClick={() => setSearch('')}
+                        />
+                      ) : null
+                    }
+                  />
+                </div>
                 {(projects ?? []).map((project) => (
                   <CommandItem_Shadcn_
                     key={project.ref}
+                    value={project.ref}
                     className="flex items-center gap-x-2"
-                    onSelect={(event) => {
+                    onSelect={() => {
                       snap.setFilters(project.ref, 'projects')
                     }}
                   >
@@ -167,21 +213,27 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
                       <Checkbox_Shadcn_
                         name={`${project.ref}`}
                         checked={snap.filterProjects.includes(project.ref)}
-                        className=""
-                      ></Checkbox_Shadcn_>
+                      />
                       {project.name}
                     </Label_Shadcn_>
                   </CommandItem_Shadcn_>
                 ))}
+                {projectCount > pageLimit && (
+                  <p className="text-foreground-lighter text-xs pt-2 px-2">
+                    Not all projects are shown here. Try searching to find a specific project.
+                  </p>
+                )}
               </CommandGroup_Shadcn_>
             </ScrollArea>
+
             <CommandSeparator_Shadcn_ />
+
             <CommandGroup>
               <CommandItem_Shadcn_
                 onSelect={() => snap.resetFilters()}
                 className="flex gap-x-2 items-center"
               >
-                <RotateCcw className="text-foreground-muted" size={12} strokeWidth={1} />
+                <RotateCcw size={12} />
                 Reset filters
               </CommandItem_Shadcn_>
             </CommandGroup>

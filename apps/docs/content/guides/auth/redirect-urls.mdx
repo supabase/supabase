@@ -7,13 +7,21 @@ subtitle: 'Set up redirect urls with Supabase Auth.'
 
 ## Overview
 
-When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library methods provide a `redirectTo` parameter to specify where to redirect the user to after authentication. By default, the user will be redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls) but you can modify the `SITE_URL` or add additional redirect URLs to the allow list. Once you've added necessary URLs to the allow list, you can specify the URL you want the user to be redirected to in the `redirectTo` parameter.
+Supabase Auth allows you to control how the [user sessions](/docs/guides/auth/sessions) are handled by your application.
 
-To edit the allow list, go to the [URL Configuration](/dashboard/project/_/auth/url-configuration) page. In local development or self-hosted projects, use the [configuration file](/docs/guides/cli/config#auth.additional_redirect_urls).
+When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library provides a `redirectTo` parameter to specify where to redirect the user after authentication. The URL in `redirectTo` should match the [Redirect URLs](/dashboard/project/_/auth/url-configuration) list configuration.
+
+To configure allowed redirect URLs, go to the [URL Configuration](/dashboard/project/_/auth/url-configuration) page. Once you've added necessary URLs, you can use the URL you want the user to be redirected to in the `redirectTo` parameter.
+
+The Site URL in [URL Configuration](/dashboard/project/_/auth/url-configuration) defines the **default redirect URL** when no `redirectTo` is specified in the code. Change this from `http://localhost:3000` to your production URL (e.g., https://example.com). This setting is critical for email confirmations and password resets.
+
+When using [Sign in with Web3](/docs/guides/auth/auth-web3), the message signed by the user in the Web3 wallet application will indicate the URL on which the signature took place. Supabase Auth will reject messages that are signed for URLs that are not on the allowed list.
+
+In local development or self-hosted projects, use the [configuration file](/docs/guides/local-development/cli/config#auth.additional_redirect_urls). See below for more information on configuring `SITE_URL` when deploying to Vercel or Netlify.
 
 ## Use wildcards in redirect URLs
 
-Supabase allows you to specify wildcards when adding redirect URLs to the [allow list](https://supabase.com/dashboard/project/_/auth/url-configuration). You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel.
+Supabase allows you to specify wildcards when adding redirect URLs to the [allow list](/dashboard/project/_/auth/url-configuration). You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel.
 
 | Wildcard                 | Description                                                                                                                                |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -86,10 +94,10 @@ For example, change the following:
 
 ```html
 <!-- Old -->
-<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup">Confirm your mail</a>
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm your mail</a>
 
 <!-- New -->
-<a href="{{ .RedirectTo }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup"
+<a href="{{ .RedirectTo }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
   >Confirm your mail</a
 >
 ```
@@ -100,7 +108,7 @@ For mobile applications you can use deep linking URIs. For example, for your `SI
 
 Read more about deep linking and find code examples for different frameworks [here](/docs/guides/auth/native-mobile-deep-linking).
 
-## Error Handling
+## Error handling
 
 When authentication fails, the user will still be redirected to the redirect URL provided. However, the error details will be returned as query fragments in the URL. You can parse these query fragments and show a custom error message to the user. For example:
 

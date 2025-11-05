@@ -3,11 +3,14 @@ import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -19,6 +22,9 @@ import {
   Modal,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+
+const orioleExtCallOuts = ['vector', 'postgis']
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -27,17 +33,22 @@ interface EnableExtensionModalProps {
 }
 
 const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const isOrioleDb = useIsOrioleDb()
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
-  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: visible }
+  )
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
-      toast.success(`${extension.name} is on.`)
+      toast.success(`Extension "${extension.name}" is now enabled`)
       onCancel()
     },
     onError: (error) => {
@@ -113,7 +124,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       size="small"
       header={
         <div className="flex items-baseline gap-2">
-          <h5 className="text-sm text-foreground">Confirm to enable</h5>
+          <h5 className="text-foreground">Confirm to enable</h5>
           <code className="text-xs">{extension.name}</code>
         </div>
       }
@@ -129,7 +140,17 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
         {({ values }: any) => {
           return (
             <>
-              <Modal.Content>
+              <Modal.Content className="flex flex-col gap-y-2">
+                {isOrioleDb && orioleExtCallOuts.includes(extension.name) && (
+                  <Admonition type="default" title="Extension is limited by OrioleDB">
+                    <span className="block">
+                      {extension.name} cannot be accelerated by indexes on tables that are using the
+                      OrioleDB access method
+                    </span>
+                    <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
+                  </Admonition>
+                )}
+
                 {fetchingSchemaInfo || isSchemasLoading ? (
                   <div className="space-y-2">
                     <ShimmeringLoader />
@@ -162,19 +183,26 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
                     <Modal.Separator />
-                    {schemas?.map((schema) => {
-                      return (
-                        <Listbox.Option
-                          key={schema.id}
-                          id={schema.name}
-                          label={schema.name}
-                          value={schema.name}
-                          addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
-                        >
-                          {schema.name}
-                        </Listbox.Option>
+                    {schemas
+                      ?.filter(
+                        (schema) =>
+                          !protectedSchemas.some(
+                            (protectedSchema) => protectedSchema.name === schema.name
+                          )
                       )
-                    })}
+                      .map((schema) => {
+                        return (
+                          <Listbox.Option
+                            key={schema.id}
+                            id={schema.name}
+                            label={schema.name}
+                            value={schema.name}
+                            addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
+                          >
+                            {schema.name}
+                          </Listbox.Option>
+                        )
+                      })}
                   </Listbox>
                 )}
               </Modal.Content>

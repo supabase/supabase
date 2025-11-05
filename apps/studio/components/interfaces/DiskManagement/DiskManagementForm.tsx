@@ -1,32 +1,39 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
 } from 'data/config/disk-attributes-query'
 import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-update-mutation'
+import { useDiskAutoscaleCustomConfigQuery } from 'data/config/disk-autoscale-config-query'
+import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale-config-update-mutation'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { setProjectStatus } from 'data/projects/projects-query'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { GB, PROJECT_STATUS } from 'lib/constants'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsCloudProvider,
+  useIsAwsK8sCloudProvider,
+  useIsAwsNimbusCloudProvider,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
+import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
+import { CloudProvider } from 'shared-data'
 import {
   Button,
   cn,
@@ -43,6 +50,7 @@ import { DiskManagementMessage } from './DiskManagement.types'
 import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+import { AutoScaleFields } from './fields/AutoScaleFields'
 import { ComputeSizeField } from './fields/ComputeSizeField'
 import { DiskSizeField } from './fields/DiskSizeField'
 import { IOPSField } from './fields/IOPSField'
@@ -50,51 +58,44 @@ import { StorageTypeField } from './fields/StorageTypeField'
 import { ThroughputField } from './fields/ThroughputField'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import {
+  DISK_LIMITS,
   DiskType,
-  IOPS_RANGE,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function DiskManagementForm() {
-  const {
-    project,
-    // isLoading is used to avoid a useCheckPermissions() race condition
-    isLoading: isProjectLoading,
-  } = useProjectContext()
-  const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
-  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { setProjectStatus } = useSetProjectStatus()
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === project?.ref
   )
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
+  const isAws = useIsAwsCloudProvider()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
 
-  /**
-   * Permissions
-   */
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
+      resource: {
+        project_id: project?.id,
+      },
+    })
 
-  /**
-   * Component States
-   */
+  const { hasAccess } = useCheckEntitlements('instances.compute_update')
+
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [message, setMessageState] = useState<DiskManagementMessage | null>(null)
   const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
 
-  /**
-   * Fetch form data
-   */
   const { data: databases, isSuccess: isReadReplicasSuccess } = useReadReplicasQuery({ projectRef })
   const { data, isSuccess: isDiskAttributesSuccess } = useDiskAttributesQuery(
     { projectRef },
@@ -117,128 +118,167 @@ export function DiskManagementForm() {
             setRefetchInterval(false)
             toast.success('Disk configuration changes have been successfully applied!')
           }
+        } else {
+          setRefetchInterval(2000)
         }
       },
+      enabled: project != null && isAws,
     }
   )
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
   const { isWithinCooldownWindow, isSuccess: isCooldownSuccess } =
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
+      enabled: project != null && isAws,
     })
-  const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery({
-    projectRef,
-  })
-  const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
-    orgSlug: org?.slug,
-  })
+  const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery(
+    {
+      projectRef,
+    },
+    { enabled: project != null && isAws }
+  )
 
-  /**
-   * Handle default values
-   */
-  // @ts-ignore [Joshen TODO] check whats happening here
-  const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+  const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
+    useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: project != null && isAws })
+
+  const computeSize = project?.infra_compute_size
+    ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+    : undefined
+
+  // @ts-ignore
+  const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0, iops: 0 }
+  const { growth_percent, max_size_gb, min_increment_gb } = diskAutoscaleConfig ?? {}
   const defaultValues = {
     storageType: type ?? DiskType.GP3,
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
-    computeSize: project?.infra_compute_size
-      ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
-      : undefined,
+    computeSize,
+    growthPercent: growth_percent,
+    minIncrementGb: min_increment_gb,
+    maxSizeGb: max_size_gb,
   }
 
   const form = useForm<DiskStorageSchemaType>({
-    resolver: zodResolver(CreateDiskStorageSchema(defaultValues.totalSize)),
+    resolver: zodResolver(
+      CreateDiskStorageSchema({
+        defaultTotalSize: defaultValues.totalSize,
+        cloudProvider: project?.cloud_provider as CloudProvider,
+      })
+    ),
     defaultValues,
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })
 
-  /**
-   * State handling
-   */
+  const { computeSize: modifiedComputeSize } = form.watch()
+
+  // We only support disk configurations for >=Large instances
+  // If a customer downgrades back to <Large, we should reset the storage settings to avoid incurring unnecessary costs
+  useEffect(() => {
+    if (modifiedComputeSize && project?.infra_compute_size && isDialogOpen) {
+      if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)) {
+        form.setValue('storageType', DiskType.GP3)
+        form.setValue('throughput', DISK_LIMITS['gp3'].minThroughput)
+        form.setValue('provisionedIOPS', DISK_LIMITS['gp3'].minIops)
+      }
+    }
+  }, [modifiedComputeSize, isDialogOpen, project])
 
   const isSuccess =
     isAddonsSuccess &&
     isDiskAttributesSuccess &&
     isDiskUtilizationSuccess &&
     isReadReplicasSuccess &&
-    isSubscriptionSuccess &&
+    isDiskAutoscaleConfigSuccess &&
     isCooldownSuccess
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const isPlanUpgradeRequired = subscription?.plan.id === 'free'
+  const isPlanUpgradeRequired = !hasAccess
 
   const { formState } = form
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
   const totalSize = formState.defaultValues?.totalSize || 0
   const usedPercentage = (usedSize / totalSize) * 100
 
-  const isFlyArchitecture = project?.cloud_provider === 'FLY'
+  const disableIopsThroughputConfig =
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) && !hasAccess
+
+  const isBranch = project?.parent_project_ref !== undefined
 
   const disableDiskInputs =
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration ||
-    isFlyArchitecture
+    !isAws
 
   const disableComputeInputs = isPlanUpgradeRequired
-
-  useEffect(() => {
-    // Initialize field values properly when data has been loaded, preserving any user changes
-    if (isSuccess) {
-      form.reset(defaultValues, {})
-    }
-  }, [isSuccess])
-
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
-  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration && !isProjectLoading
+  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration
 
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({
       // this is to suppress to toast message
       onError: () => {},
+      onSuccess: () => setRefetchInterval(2000),
     })
   const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
       // this is to suppress to toast message
       onError: () => {},
       onSuccess: () => {
-        /**
-         * Manually set project status to RESIZING
-         * Project status should be RESIZING on next project status request.
-         */
-        setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
+        //Manually set project status to RESIZING, Project status should be RESIZING on next project status request.
+        if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
       },
     })
+  const { mutateAsync: updateDiskAutoscaleConfig, isLoading: isUpdatingDiskAutoscaleConfig } =
+    useUpdateDiskAutoscaleConfigMutation({
+      // this is to suppress to toast message
+      onError: () => {},
+    })
 
-  const isUpdatingConfig = isUpdatingDisk || isUpdatingCompute
+  const isUpdatingConfig = isUpdatingDisk || isUpdatingCompute || isUpdatingDiskAutoscaleConfig
 
   const onSubmit = async (data: DiskStorageSchemaType) => {
     let payload = data
+    let willUpdateDiskConfiguration = false
     setMessageState(null)
+
+    // [Joshen] Skip disk configuration related stuff for AWS Nimbus
     try {
       if (
-        payload.storageType !== form.formState.defaultValues?.storageType ||
-        payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
-        payload.throughput !== form.formState.defaultValues?.throughput ||
-        payload.totalSize !== form.formState.defaultValues?.totalSize
+        !isAwsNimbus &&
+        (payload.storageType !== form.formState.defaultValues?.storageType ||
+          payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
+          payload.throughput !== form.formState.defaultValues?.throughput ||
+          payload.totalSize !== form.formState.defaultValues?.totalSize)
       ) {
-        if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(payload.computeSize)) {
-          payload.provisionedIOPS = IOPS_RANGE[DiskType.GP3].min
-        }
+        willUpdateDiskConfiguration = true
 
         await updateDiskConfiguration({
           ref: projectRef,
-          provisionedIOPS: payload.provisionedIOPS,
+          provisionedIOPS: payload.provisionedIOPS!,
           storageType: payload.storageType,
-          totalSize: payload.totalSize,
+          totalSize: payload.totalSize!,
           throughput: payload.throughput,
+        })
+      }
+
+      if (
+        !isAwsNimbus &&
+        (payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
+          payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
+          payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb)
+      ) {
+        await updateDiskAutoscaleConfig({
+          projectRef,
+          growthPercent: payload.growthPercent,
+          minIncrementGb: payload.minIncrementGb,
+          maxSizeGb: payload.maxSizeGb,
         })
       }
 
@@ -254,6 +294,9 @@ export function DiskManagementForm() {
 
       setIsDialogOpen(false)
       form.reset(data as DiskStorageSchemaType)
+      toast.success(
+        `Successfully updated disk settings!${willUpdateDiskConfiguration ? ' The requested changes will be applied to your disk shortly.' : ''}`
+      )
     } catch (error: unknown) {
       setMessageState({
         message: error instanceof Error ? error.message : 'An unknown error occurred',
@@ -262,19 +305,22 @@ export function DiskManagementForm() {
     }
   }
 
+  useEffect(() => {
+    // Initialize field values properly when data has been loaded, preserving any user changes
+    if (isDiskAttributesSuccess || isSuccess) {
+      form.reset(defaultValues, {})
+    }
+  }, [isSuccess, isDiskAttributesSuccess])
+
   return (
     <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
         <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
           <NoticeBar
             type="default"
-            visible={isPlanUpgradeRequired}
+            visible={!hasAccess}
             title="Compute and Disk configuration is not available on the Free Plan"
-            actions={
-              <Button type="default" asChild>
-                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
-              </Button>
-            }
+            actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
           />
 
@@ -300,16 +346,26 @@ export function DiskManagementForm() {
             </div>
           ) : null}
           <Separator />
+
           <ComputeSizeField form={form} disabled={disableComputeInputs} />
-          <Separator />
+
+          {!(isAws || isAwsNimbus) && <Separator />}
+
           <SpendCapDisabledSection />
+
           <NoticeBar
             type="default"
-            visible={isFlyArchitecture}
-            title="Disk configuration is not available on Fly Postgres"
-            description="Please contact Fly support if you need to update your disk configuration"
+            visible={!(isAws || isAwsNimbus)}
+            title="Disk configuration is only available for projects in the AWS cloud provider"
+            description={
+              isAwsK8s
+                ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
+                : isBranch
+                  ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
+                  : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
+            }
           />
-          {!isFlyArchitecture && (
+          {isAws && (
             <>
               <div className="flex flex-col gap-y-3">
                 <DiskCountdownRadial />
@@ -322,7 +378,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#read-only-mode`}
                     />
                   </Admonition>
                 )}
@@ -335,7 +391,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                     />
                   </Admonition>
                 )}
@@ -355,9 +411,9 @@ export function DiskManagementForm() {
                 <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
                   <div className="flex flex-col items-start">
                     <span className="text-sm text-foreground">Advanced disk settings</span>
-                    <span className="text-sm text-foreground-light">
-                      Specify additional settings for your disk, including IOPS, throughput, and
-                      disk type.
+                    <span className="text-sm text-foreground-light text-left">
+                      Specify additional settings for your disk, including autoscaling
+                      configuration, IOPS, throughput, and disk type.
                     </span>
                   </div>
                   <ChevronRight
@@ -368,32 +424,44 @@ export function DiskManagementForm() {
                 </CollapsibleTrigger_Shadcn_>
                 <CollapsibleContent_Shadcn_
                   className={cn(
-                    'flex flex-col gap-8 px-8 py-8 transition-all',
+                    'flex flex-col gap-8 py-8 transition-all',
                     'data-[state=open]:border data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
                   )}
                 >
-                  <StorageTypeField form={form} disableInput={disableDiskInputs} />
-                  <NoticeBar
-                    type="default"
-                    visible={
-                      RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(
-                        form.watch('computeSize')
-                      ) && subscription?.plan.id !== 'free'
-                    }
-                    title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
-                    actions={
-                      <Button
-                        type="default"
-                        onClick={() => {
-                          form.setValue('computeSize', 'ci_large')
-                        }}
-                      >
-                        Change to LARGE Compute
-                      </Button>
-                    }
-                  />
-                  <IOPSField form={form} disableInput={disableDiskInputs} />
-                  <ThroughputField form={form} disableInput={disableDiskInputs} />
+                  <div className="px-8 flex flex-col gap-y-8">
+                    <AutoScaleFields form={form} />
+                  </div>
+                  <Separator />
+                  <div className="px-8 flex flex-col gap-y-8">
+                    <NoticeBar
+                      type="default"
+                      visible={disableIopsThroughputConfig}
+                      title="Adjusting disk configuration requires LARGE Compute size or above"
+                      description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
+                      actions={
+                        <Button
+                          type="default"
+                          onClick={() => {
+                            form.setValue('computeSize', 'ci_large')
+                          }}
+                        >
+                          Change to LARGE Compute
+                        </Button>
+                      }
+                    />
+                    <StorageTypeField
+                      form={form}
+                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                    />
+                    <IOPSField
+                      form={form}
+                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                    />
+                    <ThroughputField
+                      form={form}
+                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                    />
+                  </div>
                 </CollapsibleContent_Shadcn_>
               </Collapsible_Shadcn_>
             </>

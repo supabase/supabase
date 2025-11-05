@@ -1,55 +1,47 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { useQuery } from '@tanstack/react-query'
+
+import { components } from 'api-types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigVariables = {
   projectRef?: string
 }
 
-export type ProjectPostgrestConfigResponse = {
-  max_rows: number
-  role_claim_key: string
-  db_schema: string
-  db_anon_role: string
-  db_extra_search_path: string
+type PostgrestConfigResponse = components['schemas']['GetPostgrestConfigResponse'] & {
   db_pool: number | null
-  jwt_secret: string
 }
 
 export async function getProjectPostgrestConfig(
   { projectRef }: ProjectPostgrestConfigVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_URL}/projects/${projectRef}/config/postgrest`, {
+  const { data, error } = await get('/platform/projects/{ref}/config/postgrest', {
+    params: { path: { ref: projectRef } },
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
-
-  return response as ProjectPostgrestConfigResponse
+  if (error) handleError(error)
+  // [Joshen] Not sure why but db_pool isn't part of the API typing
+  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/config/postgrest.dto.ts#L6
+  return data as unknown as PostgrestConfigResponse
 }
 
 export type ProjectPostgrestConfigData = Awaited<ReturnType<typeof getProjectPostgrestConfig>>
-export type ProjectPostgrestConfigError = unknown
+export type ProjectPostgrestConfigError = ResponseError
 
 export const useProjectPostgrestConfigQuery = <TData = ProjectPostgrestConfigData>(
   { projectRef }: ProjectPostgrestConfigVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData> = {}
+  }: UseCustomQueryOptions<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData> = {}
 ) =>
-  useQuery<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData>(
-    configKeys.postgrest(projectRef),
-    ({ signal }) => getProjectPostgrestConfig({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectPostgrestConfigData, ProjectPostgrestConfigError, TData>({
+    queryKey: configKeys.postgrest(projectRef),
+    queryFn: ({ signal }) => getProjectPostgrestConfig({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -1190,6 +1190,15 @@ functions:
             .Order("cities", "name", Ordering.Descending)
             .Get();
           ```
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country:countries(name)")
+            .Order("country(name)", Ordering.Ascending)
+            .Get();
+          ```
 
   - id: range
     title: Range()

@@ -1,13 +1,14 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { PostgresMaterializedView } from '@supabase/postgres-meta'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { materializedViewKeys } from './keys'
 
 export type MaterializedViewsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
 }
 
@@ -22,7 +23,10 @@ export async function getMaterializedViews(
 
   const { data, error } = await get('/platform/pg-meta/{ref}/materialized-views', {
     params: {
-      header: { 'x-connection-encrypted': connectionString! },
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
       path: { ref: projectRef },
       query: {
         included_schemas: schema || '',
@@ -45,16 +49,14 @@ export const useMaterializedViewsQuery = <TData = MaterializedViewsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
+  }: UseCustomQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
 ) =>
-  useQuery<MaterializedViewsData, MaterializedViewsError, TData>(
-    schema
+  useQuery<MaterializedViewsData, MaterializedViewsError, TData>({
+    queryKey: schema
       ? materializedViewKeys.listBySchema(projectRef, schema)
       : materializedViewKeys.list(projectRef),
-    ({ signal }) => getMaterializedViews({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      staleTime: 0,
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) => getMaterializedViews({ projectRef, connectionString, schema }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    staleTime: 0,
+    ...options,
+  })

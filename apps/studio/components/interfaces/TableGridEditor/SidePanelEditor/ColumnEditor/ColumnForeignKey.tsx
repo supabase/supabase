@@ -2,9 +2,9 @@ import { useParams } from 'common'
 import { useState } from 'react'
 import { Button } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
@@ -30,7 +30,7 @@ const ColumnForeignKey = ({
   const [open, setOpen] = useState(false)
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -44,7 +44,12 @@ const ColumnForeignKey = ({
     id,
   })
   const formattedColumnsForFkSelector = (table?.columns ?? []).map((c) => {
-    return { id: c.id, name: c.name, format: column.format, isNewColumn: false }
+    return {
+      id: c.id,
+      name: c.name,
+      format: column.format || c.format,
+      isNewColumn: false,
+    }
   })
 
   const getRelationStatus = (fk: ForeignKey) => {
@@ -108,7 +113,7 @@ const ColumnForeignKey = ({
         </Button>
       </div>
 
-      {table !== undefined && (
+      {table != undefined && (
         <ForeignKeySelector
           visible={open}
           column={column}

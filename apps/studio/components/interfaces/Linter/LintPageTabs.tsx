@@ -6,9 +6,9 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 
@@ -20,17 +20,10 @@ import { useRouter } from 'next/router'
 interface LintPageTabsProps {
   currentTab: string
   setCurrentTab: (value: LINTER_LEVELS) => void
-  setSelectedLint: (value: Lint | null) => void
   isLoading: boolean
   activeLints: Lint[]
 }
-const LintPageTabs = ({
-  currentTab,
-  setCurrentTab,
-  setSelectedLint,
-  isLoading,
-  activeLints,
-}: LintPageTabsProps) => {
+const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: LintPageTabsProps) => {
   const router = useRouter()
 
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
@@ -73,7 +66,6 @@ const LintPageTabs = ({
       defaultValue={currentTab}
       onValueChange={(value) => {
         setCurrentTab(value as LINTER_LEVELS)
-        setSelectedLint(null)
         const { sort, search, ...rest } = router.query
         router.push({ ...router, query: { ...rest, preset: value, id: null } })
       }}
@@ -103,7 +95,7 @@ const LintPageTabs = ({
                   tab.id === LINTER_LEVELS.ERROR
                     ? 'text-destructive-600'
                     : tab.id === LINTER_LEVELS.WARN
-                      ? 'text-warning-600'
+                      ? 'text-warning'
                       : 'text-brand-500'
                 }
               >
@@ -111,12 +103,12 @@ const LintPageTabs = ({
               </span>
 
               <span className="">{tab.label}</span>
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipTrigger>
+                <TooltipContent side="top">{tab.description}</TooltipContent>
+              </Tooltip>
             </div>
             <LintCountLabel tab={tab} />
           </TabsTrigger_Shadcn_>

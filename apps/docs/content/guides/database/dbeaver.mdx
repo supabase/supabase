@@ -32,13 +32,15 @@ If you do not have DBeaver, you can download it from its [website](https://dbeav
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Get Your Credentials">
-      Inside the Dashboard's [Database Settings](https://supabase.com/dashboard/project/_/settings/database), note your session mode's:
+      On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true), note your session pooler's:
       - host
       - username
 
       You will also need your database's password. If you forgot it, you can generate a new one in the settings.
       <Admonition type="note">
+
         If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+
       </Admonition>
 
     </StepHikeCompact.Details>
@@ -62,7 +64,7 @@ If you do not have DBeaver, you can download it from its [website](https://dbeav
 
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Download certificate">
-        In the [Database Settings](https://supabase.com/dashboard/project/_/settings/database), download your SSL certificate.
+        In the [Database Settings](/dashboard/project/_/database/settings), download your SSL certificate.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>

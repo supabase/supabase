@@ -33,8 +33,7 @@ File, Folder, and Bucket names **must follow** [AWS object key naming guidelines
 
 ## Create a bucket
 
-You can create a bucket using the Supabase Dashboard. Since the storage is interoperable with your Postgres database, you can also use SQL or our
-client libraries. Here we create a bucket called "avatars":
+You can create a bucket using the Supabase Dashboard. Since the storage is interoperable with your Postgres database, you can also use SQL or our client libraries. Here we create a bucket called "avatars":
 
 <Tabs
   scrollable
@@ -45,7 +44,7 @@ client libraries. Here we create a bucket called "avatars":
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+1. Go to the [Storage](/dashboard/project/_/storage/buckets) page in the Dashboard.
 2. Click **New Bucket** and enter a name for the bucket.
 3. Click **Create Bucket**.
 
@@ -73,6 +72,7 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 [Reference.](/docs/reference/javascript/storage-createbucket)
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -88,6 +88,8 @@ void main() async {
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -97,6 +99,8 @@ try await supabase.storage.createBucket("avatars")
 [Reference.](/docs/reference/swift/storage-createbucket)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -106,6 +110,7 @@ response = supabase.storage.create_bucket('avatars')
 [Reference.](/docs/reference/python/storage-createbucket)
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Upload a file
@@ -121,7 +126,7 @@ You can upload a file from the Dashboard, or within a browser using our JS libra
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+1. Go to the [Storage](/dashboard/project/_/storage/buckets) page in the Dashboard.
 2. Select the bucket you want to upload the file to.
 3. Click **Upload File**.
 4. Select the file you want to upload.
@@ -139,6 +144,7 @@ const { data, error } = await supabase.storage
 [Reference.](/docs/reference/javascript/storage-from-upload)
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -158,6 +164,7 @@ void main() async {
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Download a file
@@ -173,7 +180,7 @@ You can download a file from the Dashboard, or within a browser using our JS lib
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+1. Go to the [Storage](/dashboard/project/_/storage/buckets) page in the Dashboard.
 2. Select the bucket that contains the file.
 3. Select the file that you want to download.
 4. Click **Download**.
@@ -190,6 +197,7 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 [Reference.](/docs/reference/javascript/storage-from-download)
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -206,6 +214,8 @@ void main() async {
 [Reference.](/docs/reference/dart/storage-from-download)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -215,6 +225,8 @@ let response = try await supabase.storage.from("avatars").download(path: "public
 [Reference.](/docs/reference/python/storage-from-download)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -224,6 +236,7 @@ response = supabase.storage.from_('avatars').download('public/avatar1.png')
 [Reference.](/docs/reference/python/storage-from-download)
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Add security rules
@@ -239,7 +252,7 @@ To restrict access to your files you can use either the Dashboard or SQL.
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+1. Go to the [Storage](/dashboard/project/_/storage/buckets) page in the Dashboard.
 2. Click **Policies** in the sidebar.
 3. Click **Add Policies** in the `OBJECTS` table to add policies for Files. You can also create policies for Buckets.
 4. Choose whether you want the policy to apply to downloads (SELECT), uploads (INSERT), updates (UPDATE), or deletes (DELETE).

@@ -1,3 +1,5 @@
+import { DOCS_URL } from 'lib/constants'
+
 export const DOCS_MENU = [
   { name: 'Connect', key: 'introduction' },
   { name: 'User Management', key: 'user-management' },
@@ -345,11 +347,11 @@ Edge Functions are server-side TypeScript functions, distributed globally at the
     description: `
 Follow the steps to prepare your Supabase project on your local machine.
 
-- Install the Supabase [CLI](https://supabase.com/docs/guides/cli).
-- [Login to the CLI](https://supabase.com/docs/reference/cli/usage#supabase-login) using the command: \`supabase login\`..
-- [Initialize Supabase](https://supabase.com/docs/guides/getting-started/local-development#getting-started) inside your project using the command: \`supabase init\`..
-- [Link to your Remote Project](https://supabase.com/docs/reference/cli/usage#supabase-link) using the command \`supabase link --project-ref [ref]\`..
-- Setup your environment: Follow the steps [here](https://supabase.com/docs/guides/functions/quickstart#setting-up-your-environment).
+- Install the Supabase [CLI](${DOCS_URL}/guides/cli).
+- [Login to the CLI](${DOCS_URL}/reference/cli/usage#supabase-login) using the command: \`supabase login\`..
+- [Initialize Supabase](${DOCS_URL}/guides/getting-started/local-development#getting-started) inside your project using the command: \`supabase init\`..
+- [Link to your Remote Project](${DOCS_URL}/reference/cli/usage#supabase-link) using the command \`supabase link --project-ref [ref]\`..
+- Setup your environment: Follow the steps [here](${DOCS_URL}/guides/functions/quickstart#setting-up-your-environment).
 `,
     js: undefined,
     bash: undefined,
@@ -397,7 +399,7 @@ If you don't want to expose tables in your API, simply add them to a different s
     description: `
 Supabase APIs are generated from your database, which means that we can use database introspection to generate type-safe API definitions.
 
-You can generate types from your database either through the [Supabase CLI](https://supabase.com/docs/guides/database/api/generating-types), or by downloading the types file via the button on the right and importing it in your application within \`src/index.ts\`.
+You can generate types from your database either through the [Supabase CLI](${DOCS_URL}/guides/database/api/generating-types), or by downloading the types file via the button on the right and importing it in your application within \`src/index.ts\`.
 `,
     js: undefined,
     bash: undefined,
@@ -410,7 +412,7 @@ You can generate types from your database either through the [Supabase CLI](http
 If you have a GraphQL background, you might be wondering if you can fetch your data in a single round-trip. The answer is yes! The syntax is very similar. This example shows how you might achieve the same thing with Apollo GraphQL and Supabase.
 
 Still want GraphQL?
-If you still want to use GraphQL, you can. Supabase provides you with a full Postgres database, so as long as your middleware can connect to the database then you can still use the tools you love. You can find the database connection details [in the settings](/project/[ref]/settings/database).
+If you still want to use GraphQL, you can. Supabase provides you with a full Postgres database, so as long as your middleware can connect to the database then you can still use the tools you love. You can find the database connection details [in the settings](/project/[ref]/database/settings).
 `,
     js: (apikey?: string, endpoint?: string) => `
 // With Apollo GraphQL
@@ -480,9 +482,9 @@ The API endpoint supports POST (and in some cases GET) to execute the function.
     description: `
 Supabase provides a globally distributed cluster of Realtime servers that enable the following functionality:
 
-- [Broadcast](https://supabase.com/docs/guides/realtime/broadcast): Send ephemeral messages from client to clients with low latency.
-- [Presence](https://supabase.com/docs/guides/realtime/presence): Track and synchronize shared state between clients.
-- [Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes): Listen to Postgres database changes and send them to authorized clients.
+- [Broadcast](${DOCS_URL}/guides/realtime/broadcast): Send ephemeral messages from client to clients with low latency.
+- [Presence](${DOCS_URL}/guides/realtime/presence): Track and synchronize shared state between clients.
+- [Postgres Changes](${DOCS_URL}/guides/realtime/postgres-changes): Listen to Postgres database changes and send them to authorized clients.
 `,
     js: undefined,
     bash: undefined,
@@ -495,7 +497,7 @@ Supabase provides a globally distributed cluster of Realtime servers that enable
 Creates an event handler that listens to changes.
 
 - By default, Broadcast and Presence are enabled for all projects.
-- By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](https://supabase.com/docs/guides/api#realtime-api-overview).
+- By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](${DOCS_URL}/guides/api#realtime-api-overview).
 - You can receive the "previous" data for updates and deletes by setting the table's \`REPLICA IDENTITY\` to \`FULL\` (e.g., \`ALTER TABLE your_table REPLICA IDENTITY FULL;\`).
 - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
 `,
@@ -568,7 +570,7 @@ export const DOCS_RESOURCE_CONTENT: {
     title: 'Invoke function',
     category: 'stored-procedures',
     description: undefined,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/rpc',
+    docsUrl: `${DOCS_URL}/reference/javascript/rpc`,
     code: ({
       rpcName,
       rpcParams,
@@ -624,7 +626,7 @@ else console.log(data)
     key: 'read-rows',
     title: `Read rows`,
     category: 'entities',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/select',
+    docsUrl: `${DOCS_URL}/reference/javascript/select`,
     description: `To read rows in this table, use the \`select\` method.`,
     code: ({
       resourceId,
@@ -707,7 +709,7 @@ let { data: ${resourceId}, error } = await supabase
     category: 'entities',
     title: 'Filtering',
     description: `Supabase provides a wide range of filters`,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/using-filters',
+    docsUrl: `${DOCS_URL}/reference/javascript/using-filters`,
     code: ({
       resourceId,
       endpoint,
@@ -722,10 +724,31 @@ let { data: ${resourceId}, error } = await supabase
           key: 'with-filtering',
           title: 'With filtering',
           bash: `
-curl '${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
+curl --get '${endpoint}/rest/v1/${resourceId}' \\
 -H "apikey: ${apikey}" \\
 -H "Authorization: Bearer ${apikey}" \\
--H "Range: 0-9"
+-H "Range: 0-9" \\
+-d "select=*" \\
+\\
+\`# Filters\` \\
+-d "column=eq.Equal+to" \\
+-d "column=gt.Greater+than" \\
+-d "column=lt.Less+than" \\
+-d "column=gte.Greater+than+or+equal+to" \\
+-d "column=lte.Less+than+or+equal+to" \\
+-d "column=like.*CaseSensitive*" \\
+-d "column=ilike.*CaseInsensitive*" \\
+-d "column=is.null" \\
+-d "column=in.(Array,Values)" \\
+-d "column=neq.Not+equal+to" \\
+\\
+\`# Arrays\` \\
+-d "array_column=cs.{array,contains}" \\
+-d "array_column=cd.{contained,by}" \\
+\\
+\`# Logical operators\` \\
+-d "column=not.like.Negate+filter" \\
+-d "or=(some_column.eq.Some+value,other_column.eq.Other+value)"
         `,
           js: `
 let { data: ${resourceId}, error } = await supabase
@@ -747,6 +770,10 @@ let { data: ${resourceId}, error } = await supabase
   // Arrays
   .contains('array_column', ['array', 'contains'])
   .containedBy('array_column', ['contained', 'by'])
+
+  // Logical operators
+  .not('column', 'like', 'Negate filter')
+  .or('some_column.eq.Some value, other_column.eq.Other value')
           `,
         },
       ]
@@ -761,7 +788,7 @@ let { data: ${resourceId}, error } = await supabase
 
 \`insert\` will also return the replaced values for UPSERT.
 `,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/insert',
+    docsUrl: `${DOCS_URL}/reference/javascript/insert`,
     code: ({
       resourceId,
       endpoint,
@@ -842,7 +869,7 @@ const { data, error } = await supabase
 
 \`update\` will also return the replaced values for UPDATE.
 `,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/update',
+    docsUrl: `${DOCS_URL}/reference/javascript/update`,
     code: ({
       resourceId,
       endpoint,
@@ -882,7 +909,7 @@ const { data, error } = await supabase
     description: `
 \`delete\` lets you delete rows. \`delete\` will match all rows by default, so remember to specify your filters!
 `,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/delete',
+    docsUrl: `${DOCS_URL}/reference/javascript/delete`,
     code: ({
       resourceId,
       endpoint,
@@ -918,7 +945,7 @@ const { error } = await supabase
     description: `
 Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level Security (RLS) policies.
 `,
-    docsUrl: 'https://supabase.com/docs/reference/javascript/subscribe',
+    docsUrl: `${DOCS_URL}/reference/javascript/subscribe`,
     code: ({ resourceId }: { resourceId: string }) => {
       return [
         {
@@ -1003,7 +1030,7 @@ const channels = supabase.channel('custom-filter-channel')
     key: 'upload-file',
     category: 'storage',
     title: 'Upload a file',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-upload',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-upload`,
     description: `
 Upload a file to an existing bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1039,7 +1066,7 @@ const { data, error } = await supabase
     key: 'delete-files',
     category: 'storage',
     title: 'Delete files',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-remove',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-remove`,
     description: `
 Delete files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1068,7 +1095,7 @@ const { data, error } = await supabase
     key: 'list-files',
     category: 'storage',
     title: 'List all files',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-list',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-list`,
     description: `
 List all files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1100,7 +1127,7 @@ const { data, error } = await supabase
     key: 'download-file',
     category: 'storage',
     title: 'Download a file',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-download',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-download`,
     description: `
 Downloads a file from a private bucket. For public buckets, make a request to the URL returned from getPublicUrl instead. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1129,7 +1156,7 @@ const { data, error } = await supabase
     key: 'create-signed-url',
     category: 'storage',
     title: 'Create a signed URL',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-createsignedurl',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-createsignedurl`,
     description: `
 Create a signed URL which can be used to share a file for a fixed amount of time. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1158,7 +1185,7 @@ const { data, error } = await supabase
     key: 'retrieve-public-url',
     category: 'storage',
     title: 'Retrieve public URL',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/storage-from-getpublicurl',
+    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-getpublicurl`,
     description: `
 A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.
 
@@ -1191,7 +1218,7 @@ const { data } = supabase
     key: 'invoke-edge-function',
     category: 'edge-functions',
     title: 'Invoke an edge function',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/functions-invoke',
+    docsUrl: `${DOCS_URL}/reference/javascript/functions-invoke`,
     description: `
 Invokes a Supabase Edge Function. Requires an Authorization header, and invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
 

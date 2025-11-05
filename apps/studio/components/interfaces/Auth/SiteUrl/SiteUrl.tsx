@@ -1,18 +1,28 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { useParams } from 'common'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Form, Input } from 'ui'
-import { AlertCircle } from 'lucide-react'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = object({
   SITE_URL: string().required('Must have a Site URL'),
@@ -23,28 +33,45 @@ const SiteUrl = () => {
   const {
     data: authConfig,
     error: authConfigError,
-    isLoading,
     isError,
-    isSuccess,
+    isLoading,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+  const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
 
-  const formId = 'auth-config-general-form'
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
-  const INITIAL_VALUES = { SITE_URL: authConfig?.SITE_URL }
+  const siteUrlForm = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      SITE_URL: '',
+    },
+  })
 
-  const onSubmit = (values: any, { resetForm }: any) => {
-    const payload = { ...values }
+  useEffect(() => {
+    if (authConfig && !isUpdatingSiteUrl) {
+      siteUrlForm.reset({
+        SITE_URL: authConfig.SITE_URL || '',
+      })
+    }
+  }, [authConfig, isUpdatingSiteUrl])
+
+  const onSubmitSiteUrl = (values: any) => {
+    setIsUpdatingSiteUrl(true)
+
     updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+      { projectRef: projectRef!, config: values },
       {
-        onError: () => {
-          toast.error('Failed to update settings')
+        onError: (error) => {
+          toast.error(`Failed to update site URL: ${error?.message}`)
+          setIsUpdatingSiteUrl(false)
         },
         onSuccess: () => {
-          toast.success('Successfully updated settings')
-          resetForm({ values: values, initialValues: values })
+          toast.success('Successfully updated site URL')
+          setIsUpdatingSiteUrl(false)
         },
       }
     )
@@ -52,62 +79,64 @@ const SiteUrl = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <AlertCircle strokeWidth={2} />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <ScaffoldSection isFullWidth>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
     )
   }
 
   return (
-    <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
-      {({ handleReset, resetForm, values, initialValues }: any) => {
-        const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+    <ScaffoldSection isFullWidth>
+      <ScaffoldSectionTitle className="mb-4">Site URL</ScaffoldSectionTitle>
 
-        // Form is reset once remote data is loaded in store
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useEffect(() => {
-          if (isSuccess) {
-            resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
-          }
-        }, [isSuccess])
+      <Form_Shadcn_ {...siteUrlForm}>
+        <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)} className="space-y-4">
+          <Card>
+            <CardContent className="pt-6">
+              <FormField_Shadcn_
+                control={siteUrlForm.control}
+                name="SITE_URL"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Site URL"
+                    description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ {...field} disabled={!canUpdateConfig} />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </CardContent>
 
-        return (
-          <>
-            <FormHeader
-              title="Site URL"
-              description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
-            />
-            <FormPanel
-              disabled={true}
-              footer={
-                <div className="flex py-4 px-8">
-                  <FormActions
-                    form={formId}
-                    isSubmitting={isUpdatingConfig}
-                    hasChanges={hasChanges}
-                    handleReset={handleReset}
-                    disabled={!canUpdateConfig}
-                    helper={
-                      !canUpdateConfig
-                        ? 'You need additional permissions to update authentication settings'
-                        : undefined
-                    }
-                  />
-                </div>
-              }
-            >
-              <FormSection>
-                <FormSectionContent loading={isLoading}>
-                  <Input id="SITE_URL" size="small" label="Site URL" disabled={!canUpdateConfig} />
-                </FormSectionContent>
-              </FormSection>
-            </FormPanel>
-          </>
-        )
-      }}
-    </Form>
+            <CardFooter className="justify-end space-x-2">
+              {siteUrlForm.formState.isDirty && (
+                <Button type="default" onClick={() => siteUrlForm.reset()}>
+                  Cancel
+                </Button>
+              )}
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={!canUpdateConfig || isUpdatingSiteUrl || !siteUrlForm.formState.isDirty}
+                loading={isUpdatingSiteUrl}
+              >
+                Save changes
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
+      </Form_Shadcn_>
+    </ScaffoldSection>
   )
 }
 

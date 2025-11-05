@@ -15,7 +15,7 @@ import {
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { CreateCronJobForm } from './CreateCronJobSheet'
+import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 
 interface HttpRequestSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -51,7 +51,9 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
         name="values.endpoint"
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Endpoint URL" className="gap-1">
-            <Input {...rest} placeholder="https://api.example.com/endpoint" />
+            <FormControl_Shadcn_>
+              <Input {...rest} placeholder="https://api.example.com/endpoint" />
+            </FormControl_Shadcn_>
           </FormItemLayout>
         )}
       />

@@ -1,9 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SendDowngradeFeedbackVariables = {
   projectRef?: string
@@ -20,15 +19,17 @@ export async function sendDowngradeFeedback({
   message,
   exitAction,
 }: SendDowngradeFeedbackVariables) {
-  const response = await post(`${API_URL}/feedback/downgrade`, {
-    ...(projectRef !== undefined && { projectRef }),
-    ...(orgSlug !== undefined && { orgSlug }),
-    reasons,
-    additionalFeedback: message,
-    exitAction,
+  const { data, error } = await post('/platform/feedback/downgrade', {
+    body: {
+      ...(projectRef !== undefined && { projectRef }),
+      ...(orgSlug !== undefined && { orgSlug }),
+      reasons,
+      additionalFeedback: message,
+      exitAction,
+    },
   })
-  if (response.error) throw response.error
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type SendDowngradeFeedbackData = Awaited<ReturnType<typeof sendDowngradeFeedback>>
@@ -37,20 +38,22 @@ export const useSendDowngradeFeedbackMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SendDowngradeFeedbackData, ResponseError, SendDowngradeFeedbackVariables>,
+  UseCustomMutationOptions<
+    SendDowngradeFeedbackData,
+    ResponseError,
+    SendDowngradeFeedbackVariables
+  >,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendDowngradeFeedbackData, ResponseError, SendDowngradeFeedbackVariables>(
-    (vars) => sendDowngradeFeedback(vars),
-    {
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit exit survey: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SendDowngradeFeedbackData, ResponseError, SendDowngradeFeedbackVariables>({
+    mutationFn: (vars) => sendDowngradeFeedback(vars),
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to submit exit survey: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

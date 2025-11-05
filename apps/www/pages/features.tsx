@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { NextSeo } from 'next-seo'
 import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
-import debounce from 'lodash/debounce'
+import { debounce } from 'lib/helpers'
 
 import { Button, Checkbox, cn, Input } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -15,10 +15,9 @@ import { features } from '~/data/features'
 
 function FeaturesPage() {
   const router = useRouter()
-  const { basePath, query } = router
-  const [searchTerm, setSearchTerm] = useState<string>((query.q as string) || '')
+  const [searchTerm, setSearchTerm] = useState<string>((router?.query.q as string) || '')
   const [selectedProducts, setSelectedProducts] = useState<string[]>(
-    (query.products as string)?.split(',') || []
+    (router?.query.products as string)?.split(',') || []
   )
 
   const HAS_ACTIVE_FILTERS = selectedProducts.length || searchTerm.length
@@ -36,7 +35,7 @@ function FeaturesPage() {
     if (searchTerm) params.set('q', searchTerm)
     if (selectedProducts.length > 0) params.set('products', selectedProducts.join(','))
 
-    router.replace({ pathname: '/features', query: params.toString() }, undefined, {
+    router?.replace({ pathname: '/features', query: params.toString() }, undefined, {
       shallow: true,
     })
   }
@@ -49,11 +48,11 @@ function FeaturesPage() {
 
   // Sync state with query parameters when they change
   useEffect(() => {
-    if (query.q !== searchTerm) setSearchTerm((query.q as string) || '')
-    if (query.products !== selectedProducts.join(',')) {
-      setSelectedProducts((query.products as string)?.split(',') || [])
+    if (router?.query.q !== searchTerm) setSearchTerm((router?.query.q as string) || '')
+    if (router?.query.products !== selectedProducts.join(',')) {
+      setSelectedProducts((router?.query.products as string)?.split(',') || [])
     }
-  }, [query.q, query.products])
+  }, [router?.query.q, router?.query.products])
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,7 +94,7 @@ function FeaturesPage() {
         openGraph={{
           title: meta.title,
           description: meta.description,
-          url: `${basePath}/customers`,
+          url: '/customers',
         }}
       />
       <DefaultLayout>
@@ -131,7 +130,7 @@ function FeaturesPage() {
                 <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
                 <div className="flex flex-col gap-2.5">
                   {products
-                    .sort((a, b) => (a > b ? 1 : -1))
+                    .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
                     .map((product) => (
                       <div
                         key={product}

@@ -27,7 +27,7 @@ const icons: Record<AlertVariant, React.ReactElement> = {
 }
 
 /**
- * @deprecated Use Alert_Shadcn_
+ * @deprecated Use `import { Alert_Shadcn_ } from "ui"` instead. For studio use `Admonition`
  */
 export function Alert({
   variant = 'neutral',

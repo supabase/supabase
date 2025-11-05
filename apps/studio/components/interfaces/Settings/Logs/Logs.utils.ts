@@ -1,21 +1,21 @@
 import { useMonaco } from '@monaco-editor/react'
 import dayjs, { Dayjs } from 'dayjs'
-import { get, isEqual } from 'lodash'
+import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 
+import { IS_PLATFORM } from 'common'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import type { PlanId } from 'data/subscriptions/types'
 import logConstants from 'shared-data/logConstants'
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
-import { IS_PLATFORM } from 'common'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
  */
 export const unixMicroToIsoTimestamp = (unix: string | number): string => {
-  return dayjs.unix(Number(unix) / 1000 / 1000).toISOString()
+  return dayjs.utc(Number(unix) / 1000).toISOString()
 }
 
 export const isUnixMicro = (unix: string | number): boolean => {
@@ -142,18 +142,18 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
 
   switch (table) {
     case 'edge_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 -- local dev edge_logs query
-select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code 
-from edge_logs 
+select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
+from edge_logs
 ${joins}
 ${where}
 ${orderBy}
 limit ${limit};
 `
       }
-      return `select id, identifier, timestamp, event_message, request.method, request.path, response.status_code
+      return `select id, identifier, timestamp, event_message, request.method, request.path, request.search, response.status_code
   from ${table}
   ${joins}
   ${where}
@@ -162,9 +162,9 @@ limit ${limit};
   `
 
     case 'postgres_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
-select postgres_logs.timestamp, id, event_message, parsed.error_severity
+select postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint
 from postgres_logs
 ${joins}
 ${where}
@@ -172,7 +172,7 @@ ${orderBy}
 limit ${limit}
   `
       }
-      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint from ${table}
   ${joins}
   ${where}
   ${orderBy}
@@ -196,6 +196,14 @@ limit ${limit}
     `
 
     case 'function_edge_logs':
+      if (!IS_PLATFORM) {
+        return `
+select id, function_edge_logs.timestamp, event_message
+from function_edge_logs
+${orderBy}
+limit ${limit}
+`
+      }
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   ${joins}
   ${where}
@@ -205,12 +213,26 @@ limit ${limit}
     case 'supavisor_logs':
       return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
 
+    case 'pg_upgrade_logs':
+      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
+
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
   ${orderBy}
   limit ${limit}
   `
+
+    case 'pg_cron_logs':
+      const pgCronWhere = where ? `${basePgCronWhere} AND ${where.substring(6)}` : basePgCronWhere
+
+      return `select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
+from postgres_logs
+${joins}
+${pgCronWhere}
+${orderBy}
+limit ${limit}
+`
   }
 }
 
@@ -225,6 +247,7 @@ const genCrossJoinUnnests = (table: LogsTableName) => {
   cross join unnest(m.request) as request
   cross join unnest(m.response) as response`
 
+    case 'pg_cron_logs':
     case 'postgres_logs':
       return `cross join unnest(metadata) as m
   cross join unnest(m.parsed) as parsed`
@@ -268,8 +291,27 @@ export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?:
   )
 }
 
+/**
+ * Determine if we should show the user an upgrade prompt while browsing logs
+ * This method should replace maybeShowUpgradePrompt once we have migrated all usage to the Entitlements API.
+ */
+export const maybeShowUpgradePromptIfNotEntitled = (
+  from: string | null | undefined,
+  entitledToDays: number | undefined
+) => {
+  if (!entitledToDays) return false
+  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
+  return day > entitledToDays
+}
+
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
-  const where = genWhereStatement(table, filters)
+  let where = genWhereStatement(table, filters)
+  // pg_cron logs are a subset of postgres logs
+  // to calculate the chart, we need to query postgres logs
+  if (table === LogsTableName.PG_CRON) {
+    table = LogsTableName.POSTGRES
+    where = basePgCronWhere
+  }
   const joins = genCrossJoinUnnests(table)
   return `SELECT count(*) as count FROM ${table} ${joins} ${where}`
 }
@@ -296,6 +338,10 @@ const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] =>
   return [its.add(-extendValue, trunc), trunc]
 }
 
+// TODO(qiao): workaround for self-hosted cron logs error until logflare is fixed
+const basePgCronWhere = IS_PLATFORM
+  ? `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
+  : `where ( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
 /**
  *
  * generates log event chart query
@@ -306,15 +352,26 @@ export const genChartQuery = (
   filters: Filters
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
-  const where = genWhereStatement(table, filters)
+  let where = genWhereStatement(table, filters)
+  const errorCondition = getErrorCondition(table)
+  const warningCondition = getWarningCondition(table)
+
+  // pg_cron logs are a subset of postgres logs
+  // to calculate the chart, we need to query postgres logs
+  if (table === LogsTableName.PG_CRON) {
+    table = LogsTableName.POSTGRES
+    where = basePgCronWhere
+  }
 
   let joins = genCrossJoinUnnests(table)
 
-  return `
+  const q = `
 SELECT
 -- log-event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
-  count(t.timestamp) as count
+  count(CASE WHEN NOT (${errorCondition} OR ${warningCondition}) THEN 1 END) as ok_count,
+  count(CASE WHEN ${errorCondition} THEN 1 END) as error_count,
+  count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count,
 FROM
   ${table} t
   ${joins}
@@ -328,6 +385,7 @@ timestamp
 ORDER BY
   timestamp ASC
   `
+  return q
 }
 
 type TsPair = [string | '', string | '']
@@ -444,51 +502,99 @@ export const fillTimeseries = (
   valueKey: string | string[],
   defaultValue: number,
   min?: string,
-  max?: string
+  max?: string,
+  minPointsToFill: number = 20,
+  interval?: string
 ) => {
-  if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
+  if (timeseriesData.length === 0 && !(min && max)) {
+    return []
+  }
+  // If we have more points than minPointsToFill, just normalize timestamps and return
+  if (timeseriesData.length > minPointsToFill) {
+    return timeseriesData.map((datum) => {
+      const timestamp = datum[timestampKey]
+      const iso = isUnixMicro(timestamp)
+        ? unixMicroToIsoTimestamp(timestamp)
+        : dayjs.utc(timestamp).toISOString()
+      datum[timestampKey] = iso
+      return datum
+    })
+  }
+
+  if (timeseriesData.length <= 1 && !(min && max)) return timeseriesData
   const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
 
   const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
   const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
 
-  // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  // When no data exists but min/max are provided, we need to determine truncation from the time range
   const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
-  const truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+  let truncation: 'second' | 'minute' | 'hour' | 'day'
+  let step = 1
+
+  if (interval) {
+    const match = interval.match(/^(\d+)(m|h|d|s)$/)
+    if (match) {
+      step = parseInt(match[1], 10)
+      const unitChar = match[2] as 'm' | 'h' | 'd' | 's'
+      const unitMap = { s: 'second', m: 'minute', h: 'hour', d: 'day' } as const
+      truncation = unitMap[unitChar]
+    } else {
+      // Fallback for invalid format
+      truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+    }
+  } else {
+    truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+  }
+
+  // If no data exists and no interval specified, default to minute precision
+  if (timeseriesData.length === 0 && !interval) {
+    truncation = 'minute'
+  }
 
   const newData = timeseriesData.map((datum) => {
-    const iso = dayjs.utc(datum[timestampKey]).toISOString()
+    const timestamp = datum[timestampKey]
+    const iso = isUnixMicro(timestamp)
+      ? unixMicroToIsoTimestamp(timestamp)
+      : dayjs.utc(timestamp).toISOString()
+
+    if (Array.isArray(valueKey) && valueKey.length === 0) {
+      return { [timestampKey]: iso }
+    }
+
     datum[timestampKey] = iso
     return datum
   })
 
-  const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
-  // Intentional throwing of error here to be caught by Sentry, as this would indicate a bug since charts shouldn't be rendering more than 10k data points
-  if (diff > 10000) {
-    throw new Error(
-      'The selected date range will render more than 10,000 data points within the charts, which will degrade browser performance. Please select a smaller date range.'
-    )
-  }
+  let currentDate = minDate
+  while (currentDate.isBefore(maxDate) || currentDate.isSame(maxDate)) {
+    const found = dates.find((d) => {
+      const d_date = d as Dayjs
+      return (
+        d_date.year() === currentDate.year() &&
+        d_date.month() === currentDate.month() &&
+        d_date.date() === currentDate.date() &&
+        d_date.hour() === currentDate.hour() &&
+        d_date.minute() === currentDate.minute() &&
+        d_date.second() === currentDate.second()
+      )
+    })
+    if (!found) {
+      const keys = typeof valueKey === 'string' ? [valueKey] : valueKey
 
-  for (let i = 0; i <= diff; i++) {
-    const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
-
-    const keys = typeof valueKey === 'string' ? [valueKey] : valueKey
-
-    const toMerge = keys.reduce(
-      (acc, key) => ({
-        ...acc,
-        [key]: defaultValue,
-      }),
-      {}
-    )
-
-    if (!dates.find((d) => isEqual(d, dateToMaybeAdd))) {
+      const toMerge = keys.reduce(
+        (acc, key) => ({
+          ...acc,
+          [key]: defaultValue,
+        }),
+        {}
+      )
       newData.push({
-        [timestampKey]: dateToMaybeAdd.toISOString(),
+        [timestampKey]: currentDate.toISOString(),
         ...toMerge,
       })
     }
+    currentDate = currentDate.add(step, truncation)
   }
 
   return newData
@@ -554,4 +660,98 @@ export function checkForWildcard(query: string) {
 
   const wildcardRegex = /\*/
   return wildcardRegex.test(queryWithoutCount)
+}
+
+function getErrorCondition(table: LogsTableName): string {
+  switch (table) {
+    case 'edge_logs':
+      return 'response.status_code >= 500'
+    case 'postgres_logs':
+      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+    case 'auth_logs':
+      return "metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 400"
+    case 'function_edge_logs':
+      return 'response.status_code >= 500'
+    case 'function_logs':
+      return "metadata.level IN ('error', 'fatal')"
+    case 'pg_cron_logs':
+      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+    default:
+      return 'false'
+  }
+}
+
+function getWarningCondition(table: LogsTableName): string {
+  switch (table) {
+    case 'edge_logs':
+      return 'response.status_code >= 400 AND response.status_code < 500'
+    case 'postgres_logs':
+      return "parsed.error_severity IN ('WARNING')"
+    case 'auth_logs':
+      return "metadata.level = 'warning'"
+    case 'function_edge_logs':
+      return 'response.status_code >= 400 AND response.status_code < 500'
+    case 'function_logs':
+      return "metadata.level IN ('warning')"
+    default:
+      return 'false'
+  }
+}
+
+export function jwtAPIKey(metadata: any) {
+  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.apikey?.[0]
+  if (!apikeyHeader) {
+    return undefined
+  }
+
+  if (apikeyHeader.invalid) {
+    return '<invalid>'
+  }
+
+  const payload = apikeyHeader?.payload?.[0]
+  if (!payload) {
+    return '<unrecognized>'
+  }
+
+  if (
+    payload.algorithm === 'HS256' &&
+    payload.issuer === 'supabase' &&
+    ['anon', 'service_role'].includes(payload.role) &&
+    !payload.subject
+  ) {
+    return payload.role
+  }
+
+  return '<unrecognized>'
+}
+
+export function apiKey(metadata: any) {
+  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.apikey?.[0]?.apikey?.[0]
+  if (!apikeyHeader) {
+    return undefined
+  }
+
+  if (apikeyHeader.error) {
+    return `${apikeyHeader.prefix}... <invalid: ${apikeyHeader.error}>`
+  }
+
+  return `${apikeyHeader.prefix}...`
+}
+
+export function role(metadata: any) {
+  const authorizationHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.authorization?.[0]
+  if (!authorizationHeader) {
+    return undefined
+  }
+
+  if (authorizationHeader.invalid) {
+    return undefined
+  }
+
+  const payload = authorizationHeader?.payload?.[0]
+  if (!payload || !payload.role) {
+    return undefined
+  }
+
+  return payload.role
 }

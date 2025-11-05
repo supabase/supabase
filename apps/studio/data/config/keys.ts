@@ -1,6 +1,4 @@
 export const configKeys = {
-  pgBouncerStatus: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'pgbouncer'] as const,
   settings: (projectRef: string | undefined) => ['projects', projectRef, 'settings'] as const,
   settingsV2: (projectRef: string | undefined) => ['projects', projectRef, 'settings-v2'] as const,
   api: (projectRef: string | undefined) => ['projects', projectRef, 'settings', 'api'] as const,
@@ -14,6 +12,8 @@ export const configKeys = {
     ['projects', projectRef, 'upgrade-status'] as const,
   diskAttributes: (projectRef: string | undefined) =>
     ['projects', projectRef, 'disk-attributes'] as const,
+  diskBreakdown: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'disk-breakdown'] as const,
   diskUtilization: (projectRef: string | undefined) =>
     ['projects', projectRef, 'disk-utilization'] as const,
   projectCreationPostgresVersions: (
@@ -24,4 +24,6 @@ export const configKeys = {
     ['projects', organizationSlug, cloudProvider, dbRegion, 'available-creation-versions'] as const,
   projectUnpausePostgresVersions: (projectRef: string | undefined) =>
     ['projects', projectRef, 'available-unpause-versions'] as const,
+  diskAutoscaleConfig: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'disk-autoscale-config'] as const,
 }

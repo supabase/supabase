@@ -5,6 +5,7 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules"
   },
   "author": "",

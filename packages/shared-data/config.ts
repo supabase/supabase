@@ -104,9 +104,8 @@ const config = {
       },
       http_hooks: {
         value: 5,
-
       },
-    }
+    },
   },
   branching: {
     inactivity_period_in_minutes: {
@@ -119,9 +118,9 @@ const config = {
      */
     free_tier: {
       value: '1',
-      unit: 'week'
-    }
-  }
+      unit: 'week',
+    },
+  },
 } as const
 
 export default config

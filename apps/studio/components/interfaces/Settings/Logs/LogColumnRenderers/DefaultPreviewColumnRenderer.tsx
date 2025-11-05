@@ -5,7 +5,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 export const defaultRenderCell = (props: RenderCellProps<LogData, unknown>) => (
   <RowLayout>
-    <TimestampInfo value={props.row.timestamp!} />
+    <TimestampInfo utcTimestamp={props.row.timestamp!} />
     <TextFormatter className="w-full" value={props.row.event_message} />
   </RowLayout>
 )
@@ -14,6 +14,7 @@ const columns: Column<LogData>[] = [
   {
     name: 'default-preview-first-column',
     key: 'default-preview-first-column',
+    renderHeaderCell: () => null,
     renderCell: defaultRenderCell,
   },
 ]

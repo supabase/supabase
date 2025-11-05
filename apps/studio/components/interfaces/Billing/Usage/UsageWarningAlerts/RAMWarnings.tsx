@@ -1,6 +1,8 @@
-import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+
+import { AlertTitle } from '@ui/components/shadcn/ui/alert'
+import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 interface RAMWarningsProps {
@@ -9,7 +11,7 @@ interface RAMWarningsProps {
   severity?: 'warning' | 'critical' | null
 }
 
-const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => {
+export const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => {
   if (severity === 'warning') {
     return (
       <Alert_Shadcn_ variant="warning">
@@ -22,7 +24,7 @@ const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => 
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
           <Button asChild type="default">
-            <Link href="https://supabase.com/docs/guides/platform/exhaust-ram">Learn more</Link>
+            <Link href={`${DOCS_URL}/guides/troubleshooting/exhaust-ram`}>Learn more</Link>
           </Button>
           <Button asChild type="warning">
             <Link href={upgradeUrl}>
@@ -46,7 +48,7 @@ const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => 
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
           <Button asChild type="default">
-            <Link href="https://supabase.com/docs/guides/platform/exhaust-cpu">Learn more</Link>
+            <Link href={`${DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>Learn more</Link>
           </Button>
           <Button asChild type="danger">
             <Link href={upgradeUrl}>
@@ -60,5 +62,3 @@ const RAMWarnings = ({ isFreePlan, upgradeUrl, severity }: RAMWarningsProps) => 
 
   return null
 }
-
-export default RAMWarnings

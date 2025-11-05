@@ -8,14 +8,18 @@ import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 
 let octokitInstance: Octokit
 
-function octokit() {
+export function octokit() {
   if (!octokitInstance) {
-    const privateKeyPkcs8 = crypto
-      .createPrivateKey(process.env.DOCS_GITHUB_APP_PRIVATE_KEY)
-      .export({
-        type: 'pkcs8',
-        format: 'pem',
-      })
+    const privateKey = process.env.DOCS_GITHUB_APP_PRIVATE_KEY
+    if (!privateKey) {
+      throw new Error('DOCS_GITHUB_APP_PRIVATE_KEY environment variable is required')
+    }
+
+    // https://github.com/gr2m/universal-github-app-jwt?tab=readme-ov-file#converting-pkcs1-to-pkcs8
+    const privateKeyPkcs8 = crypto.createPrivateKey(privateKey).export({
+      type: 'pkcs8',
+      format: 'pem',
+    })
 
     octokitInstance = new Octokit({
       authStrategy: createAppAuth,
@@ -30,12 +34,12 @@ function octokit() {
   return octokitInstance
 }
 
-export async function getGitHubFileContents({
+async function getGitHubFileContents({
   org,
   repo,
   path,
   branch,
-  options: { onError },
+  options: { onError, fetch },
 }: {
   org: string
   repo: string
@@ -63,7 +67,7 @@ export async function getGitHubFileContents({
       path: path,
       ref: branch,
       options: {
-        fetch: fetchRevalidatePerDay,
+        fetch: fetch ?? fetchRevalidatePerDay,
       },
     })
     if (response.status !== 200 || !response.data) {
@@ -77,5 +81,84 @@ export async function getGitHubFileContents({
   } catch (err) {
     console.error('Error fetching GitHub file: %o', err)
     onError?.(err)
+    return ''
+  }
+}
+
+export async function getGitHubFileContentsImmutableOnly({
+  org,
+  repo,
+  branch,
+  path,
+  options: { onError, fetch },
+}: {
+  org: string
+  repo: string
+  branch: string
+  path: string
+  options: {
+    onError: (error: unknown) => void
+    fetch: (url: string) => Promise<Response>
+  }
+}): Promise<string> {
+  const isImmutableCommit = await checkForImmutableCommit({
+    org,
+    repo,
+    branch,
+  })
+  if (!isImmutableCommit) {
+    throw Error('The commit is not an immutable commit SHA. Tags and branch names are not allowed.')
+  }
+
+  const result = await getGitHubFileContents({
+    org,
+    repo,
+    branch,
+    path,
+    options: { onError, fetch },
+  })
+  return result || ''
+}
+
+async function checkForImmutableCommit({
+  org,
+  repo,
+  branch,
+  options: { fetch: _fetch = fetch } = {},
+}: {
+  org: string
+  repo: string
+  branch: string
+  options?: {
+    /**
+     *
+     * A custom fetch implementation to control Next.js caching.
+     */
+    fetch?: (info: RequestInfo, init?: RequestInit) => Promise<Response>
+  }
+}) {
+  try {
+    const response = await octokit().request('GET /repos/{owner}/{repo}/git/commits/{commit_sha}', {
+      owner: org,
+      repo: repo,
+      commit_sha: branch,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      options: {
+        fetch: _fetch,
+      },
+    })
+    if (response.status === 200) {
+      return true
+    } else {
+      throw Error(
+        "Checking for an immutable commit didn't throw an error, but it also didn't return a 200. Erring on the side of safety, assuming this is not an immutable commit.",
+        { cause: response }
+      )
+    }
+  } catch (err) {
+    console.error('Not an immutable commit: %o', err)
+    return false
   }
 }

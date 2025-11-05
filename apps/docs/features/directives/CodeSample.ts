@@ -10,6 +10,8 @@
  *   path="/path/to/file.ts"
  *   lines={[1, 2], [5, 7]} // -1 may be used in end position as an alias for the last line, e.g., [1, -1]
  *   meta="utils/client.ts" // Optional, for displaying a file path on the code block
+ *   hideElidedLines={true} // Optional, for hiding elided lines in the code block
+ *   convertToJs={true} // Optional, strips TypeScript types to produce JavaScript
  * />
  * ```
  *
@@ -24,29 +26,29 @@
  *   path="/path/to/file.ts"
  *   lines={[1, 2], [5, 7]} // -1 may be used in end position as an alias for the last line, e.g., [1, -1]
  *   meta="utils/client.ts" // Optional, for displaying a file path on the code block
+ *   hideElidedLines={true} // Optional, for hiding elided lines in the code block
+ *   convertToJs={true} // Optional, strips TypeScript types to produce JavaScript
  * />
  */
 
 import * as acorn from 'acorn'
 import tsPlugin from 'acorn-typescript'
-import { type BlockContent, type Code, type Root } from 'mdast'
-import type {
-  MdxJsxAttribute,
-  MdxJsxAttributeValueExpression,
-  MdxJsxExpressionAttribute,
-  MdxJsxFlowElement,
-  MdxJsxFlowElementHast,
-  MdxJsxTextElement,
-  MdxJsxTextElementHast,
-} from 'mdast-util-mdx-jsx'
+import { type DefinitionContent, type BlockContent, type Code, type Root } from 'mdast'
+import type { MdxJsxAttributeValueExpression, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
+import assert from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { removeTypes } from 'remove-types'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
 import { z, type SafeParseError } from 'zod'
 
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
+import { IS_PLATFORM } from '~/lib/constants'
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
+import { getAttributeValue, getAttributeValueExpression } from './utils.server'
+
+const ALLOW_LISTED_GITHUB_ORGS = ['supabase', 'supabase-community'] as [string, ...string[]]
 
 const linesSchema = z.array(z.tuple([z.coerce.number(), z.coerce.number()]))
 const linesValidator = z
@@ -71,14 +73,24 @@ type AdditionalMeta = {
   codeHikeAncestorParent: Parent | null
 }
 
+const booleanValidator = z.union([z.boolean(), z.string(), z.undefined()]).transform((v) => {
+  if (typeof v === 'boolean') return v
+  if (typeof v === 'string') return v === 'true'
+  return false
+})
+
 const codeSampleExternalSchema = z.object({
   external: z.coerce.boolean().refine((v) => v === true),
-  org: z.string(),
+  org: z.enum(ALLOW_LISTED_GITHUB_ORGS, {
+    errorMap: () => ({ message: 'Org must be one of: ' + ALLOW_LISTED_GITHUB_ORGS.join(', ') }),
+  }),
   repo: z.string(),
   commit: z.string(),
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
+  hideElidedLines: z.coerce.boolean().default(false),
+  convertToJs: booleanValidator,
 })
 type ICodeSampleExternal = z.infer<typeof codeSampleExternalSchema> & AdditionalMeta
 
@@ -90,6 +102,8 @@ const codeSampleInternalSchema = z.object({
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
+  hideElidedLines: z.coerce.boolean().default(false),
+  convertToJs: booleanValidator,
 })
 type ICodeSampleInternal = z.infer<typeof codeSampleInternalSchema> & AdditionalMeta
 
@@ -112,7 +126,7 @@ interface Dependencies {
 export function codeSampleRemark(deps: Dependencies) {
   return async function transform(tree: Root) {
     const contentMap = await fetchSourceCodeContent(tree, deps)
-    rewriteNodes(contentMap)
+    await rewriteNodes(contentMap)
 
     return tree
   }
@@ -137,12 +151,22 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
     const isExternal = getAttributeValueExpression(getAttributeValue(node, 'external')) === 'true'
 
     if (isExternal) {
+      if (!IS_PLATFORM) {
+        node.name = 'CodeSampleDummy'
+        node.attributes = []
+        return
+      }
+
       const org = getAttributeValue(node, 'org')
       const repo = getAttributeValue(node, 'repo')
       const commit = getAttributeValue(node, 'commit')
       const path = getAttributeValue(node, 'path')
       const lines = getAttributeValueExpression(getAttributeValue(node, 'lines'))
       const meta = getAttributeValue(node, 'meta')
+      const hideElidedLines = getAttributeValueExpression(
+        getAttributeValue(node, 'hideElidedLines')
+      )
+      const convertToJs = getAttributeValueExpression(getAttributeValue(node, 'convertToJs'))
 
       const result = codeSampleExternalSchema.safeParse({
         external: isExternal,
@@ -152,6 +176,8 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
         path,
         lines,
         meta,
+        hideElidedLines,
+        convertToJs,
       })
 
       if (!result.success) {
@@ -182,12 +208,18 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
       const path = getAttributeValue(node, 'path')
       const lines = getAttributeValueExpression(getAttributeValue(node, 'lines'))
       const meta = getAttributeValue(node, 'meta')
+      const hideElidedLines = getAttributeValueExpression(
+        getAttributeValue(node, 'hideElidedLines')
+      )
+      const convertToJs = getAttributeValueExpression(getAttributeValue(node, 'convertToJs'))
 
       const result = codeSampleInternalSchema.safeParse({
         external: isExternal,
         path,
         lines,
         meta,
+        hideElidedLines,
+        convertToJs,
       })
 
       if (!result.success) {
@@ -218,32 +250,30 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
   return nodeContentMap
 }
 
-function getAttributeValue(
-  node: MdxJsxFlowElement | MdxJsxFlowElementHast | MdxJsxTextElement | MdxJsxTextElementHast,
-  attributeName: string
-) {
-  return (
-    node.attributes.find(
-      (attr: MdxJsxAttribute | MdxJsxExpressionAttribute) =>
-        'name' in attr && attr.name === attributeName
-    )?.value ?? undefined
-  )
-}
-
-function getAttributeValueExpression(node: MdxJsxAttributeValueExpression | string | undefined) {
-  if (typeof node === 'string' || node?.type !== 'mdxJsxAttributeValueExpression') return undefined
-  return node.value
-}
-
-function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, string]>) {
+async function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, string]>) {
   for (const [node, [meta, content]] of contentMap) {
-    const lang = matchLang(meta.path.split('.').pop())
+    let lang = matchLang(meta.path.split('.').pop() || '')
 
     const source = isExternalSource(meta)
       ? `https://github.com/${meta.org}/${meta.repo}/blob/${meta.commit}${meta.path}`
       : `https://github.com/supabase/supabase/blob/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? 'master'}/examples${meta.path}`
 
-    const elidedContent = redactLines(content, meta.lines, lang)
+    let processedContent = content
+    if (meta.convertToJs) {
+      processedContent = await removeTypes(content)
+      // Convert TypeScript/TSX language to JavaScript/JSX when converting types
+      assert(
+        lang === 'typescript' || lang === 'tsx',
+        'Type stripping to JS is only supported for TypeScript and TSX'
+      )
+      if (lang === 'typescript') {
+        lang = 'javascript'
+      } else if (lang === 'tsx') {
+        lang = 'jsx'
+      }
+    }
+
+    const elidedContent = redactLines(processedContent, meta.lines, lang, meta.hideElidedLines)
 
     const replacementContent: MdxJsxFlowElement | Code = meta.codeHikeAncestor
       ? {
@@ -287,6 +317,7 @@ function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, string
           existingWrapper.attributes[0].value = newSource
         } else if (
           typeof existingSource !== 'string' &&
+          existingSource &&
           existingSource.type === 'mdxJsxAttributeValueExpression'
         ) {
           const existingSourceArray =
@@ -344,6 +375,8 @@ function matchLang(lang: string) {
       return 'swift'
     case 'sql':
       return 'sql'
+    case 'svelte':
+      return 'svelte'
     default:
       return null
   }
@@ -352,18 +385,19 @@ function matchLang(lang: string) {
 function redactLines(
   content: string,
   lines: [number, number, ...unknown[]][],
-  lang: string | null
+  lang: string | null,
+  hideElidedLines: boolean = false
 ) {
   const contentLines = content.split('\n')
   const preservedLines = lines.reduce((acc, [start, end], index, arr) => {
-    if (index !== 0 || start !== 1) {
+    if (!hideElidedLines && (index !== 0 || start !== 1)) {
       acc.push(_createElidedLine(lang, contentLines, start, end))
     }
 
     // Start and end are 1-indexed and inclusive
     acc.push(...contentLines.slice(start - 1, end === -1 ? contentLines.length : end))
 
-    if (index === arr.length - 1 && end !== -1 && end !== contentLines.length) {
+    if (!hideElidedLines && index === arr.length - 1 && end !== -1 && end !== contentLines.length) {
       acc.push(_createElidedLine(lang, contentLines, start, end))
     }
 
@@ -405,7 +439,10 @@ export function _createElidedLine(
 
 function isContainedInJsx(tree: acorn.Node, line: number) {
   const acornNodeContainsLine = (node: acorn.Node, line) =>
-    node.loc?.start.line <= line && node.loc?.end.line >= line
+    node.loc?.start?.line != null &&
+    node.loc?.end?.line != null &&
+    node.loc.start.line <= line &&
+    node.loc.end.line >= line
   if (!acornNodeContainsLine(tree, line)) {
     return false
   }
@@ -430,10 +467,18 @@ function isContainedInJsx(tree: acorn.Node, line: number) {
             continue
           } else {
             if (
-              child.loc?.start?.line > candidateNarrowestContainingNode.loc?.start?.line ||
-              child.loc.end.line < candidateNarrowestContainingNode.loc?.end?.line ||
-              child.loc.start.column > candidateNarrowestContainingNode.loc?.start.column ||
-              child.loc.end.column < candidateNarrowestContainingNode.loc?.end.column
+              (child.loc?.start?.line != null &&
+                candidateNarrowestContainingNode.loc?.start?.line != null &&
+                child.loc.start.line > candidateNarrowestContainingNode.loc.start.line) ||
+              (child.loc?.end?.line != null &&
+                candidateNarrowestContainingNode.loc?.end?.line != null &&
+                child.loc.end.line < candidateNarrowestContainingNode.loc.end.line) ||
+              (child.loc?.start?.column != null &&
+                candidateNarrowestContainingNode.loc?.start?.column != null &&
+                child.loc.start.column > candidateNarrowestContainingNode.loc.start.column) ||
+              (child.loc?.end?.column != null &&
+                candidateNarrowestContainingNode.loc?.end?.column != null &&
+                child.loc.end.column < candidateNarrowestContainingNode.loc.end.column)
             ) {
               candidateNarrowestContainingNode = child
               getNarrowestContainingNode(child, line)
@@ -473,4 +518,8 @@ function createArrayAttributeValueExpression(...arrayElements: string[]) {
     },
   }
   return expression
+}
+
+export function isCodeSampleWrapper(node: BlockContent | DefinitionContent) {
+  return node.type === 'mdxJsxFlowElement' && node.name === 'CodeSampleWrapper'
 }

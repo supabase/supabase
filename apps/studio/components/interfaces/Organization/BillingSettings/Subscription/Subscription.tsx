@@ -1,10 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import dayjs from 'dayjs'
-import { ExternalLink } from 'lucide-react'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 
-import { Markdown } from 'components/interfaces/Markdown'
+import { useFlag, useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -13,23 +11,21 @@ import {
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
-import PlanUpdateSidePanel from './PlanUpdateSidePanel'
+import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 
 const Subscription = () => {
   const { slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const canReadSubscriptions = useCheckPermissions(
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
@@ -44,10 +40,6 @@ const Subscription = () => {
 
   const currentPlan = subscription?.plan
   const planName = currentPlan?.name ?? 'Unknown'
-  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
-  const daysToCycleEnd = billingCycleEnd.diff(dayjs(), 'days')
-  const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
 
   const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
 
@@ -59,22 +51,17 @@ const Subscription = () => {
         </div>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-6 top-12">
-            <p className="text-foreground text-base m-0">Subscription Plan</p>
-            <div className="space-y-2">
-              <p className="text-sm text-foreground-light m-0">More information</p>
-              <div>
-                <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
-                  <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                    <p className="text-sm m-0">Pricing</p>
-                    <ExternalLink size={16} strokeWidth={1.5} />
-                  </div>
-                </Link>
-              </div>
+            <div className="space-y-2 mb-4">
+              <p className="text-foreground text-base m-0">Subscription Plan</p>
+              <p className="text-sm text-foreground-light m-0">
+                Each organization has it's own subscription plan, billing cycle, payment methods and
+                usage quotas.
+              </p>
             </div>
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadSubscriptions ? (
+          {isPermissionsLoaded && !canReadSubscriptions ? (
             <NoPermission resourceText="view this organization's subscription" />
           ) : (
             <>
@@ -91,10 +78,7 @@ const Subscription = () => {
               {isSuccess && (
                 <div className="space-y-6">
                   <div>
-                    <p className="text-sm">This organization is currently on the plan:</p>
-                    <p className="text-2xl text-brand uppercase">
-                      {currentPlan?.name ?? 'Unknown'}
-                    </p>
+                    <p className="text-2xl text-brand">{currentPlan?.name ?? 'Unknown'} Plan</p>
                   </div>
 
                   <div>
@@ -126,15 +110,16 @@ const Subscription = () => {
                           variant="info"
                           title={`Unable to update plan from ${planName}`}
                           actions={[
-                            <div key="contact-support">
-                              <Button asChild type="default">
-                                <Link
-                                  href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
-                                >
-                                  Contact support
-                                </Link>
-                              </Button>
-                            </div>,
+                            <Button asChild key="contact-support" type="default">
+                              <SupportLink
+                                queryParams={{
+                                  category: SupportCategories.SALES_ENQUIRY,
+                                  subject: `Change plan away from ${planName}`,
+                                }}
+                              >
+                                Contact support
+                              </SupportLink>
+                            </Button>,
                           ]}
                         >
                           Please contact us if you'd like to change your plan.
@@ -147,36 +132,16 @@ const Subscription = () => {
                       type="default"
                       title="This organization is limited by the included usage"
                     >
-                      <Markdown
-                        className="[&>p]:!leading-normal"
-                        content={`Projects may become unresponsive when this organization exceeds its [included usage quota](/org/${slug}/usage). To scale seamlessly and pay for over-usage, ${currentPlan?.id === 'free' ? 'upgrade to a paid plan.' : 'you can disable Spend Cap under the Cost Control settings.'}`}
-                      />
-                      <Button
-                        type="default"
-                        className="mt-1"
-                        onClick={() =>
-                          snap.setPanelKey(
-                            currentPlan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
-                          )
-                        }
-                      >
-                        {currentPlan?.id === 'free' ? 'Upgrade Plan' : 'Adjust Spend Cap'}
-                      </Button>
+                      <div className="[&>p]:!leading-normal prose text-sm">
+                        Projects may become unresponsive when this organization exceeds its{' '}
+                        <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
+                        seamlessly,{' '}
+                        {currentPlan?.id === 'free'
+                          ? 'upgrade to a paid plan.'
+                          : 'you can disable Spend Cap under the Cost Control settings.'}
+                      </div>
                     </Admonition>
                   )}
-
-                  <SparkBar
-                    type="horizontal"
-                    value={daysWithinCycle - daysToCycleEnd}
-                    max={daysWithinCycle}
-                    barClass="bg-foreground"
-                    labelBottom={`Current billing cycle (${billingCycleStart.format(
-                      'MMM DD'
-                    )} - ${billingCycleEnd.format('MMM DD')})`}
-                    bgClass="bg-surface-300"
-                    labelBottomClass="!text-foreground-light pb-1"
-                    labelTop={`${daysToCycleEnd} days remaining`}
-                  />
                 </div>
               )}
             </>

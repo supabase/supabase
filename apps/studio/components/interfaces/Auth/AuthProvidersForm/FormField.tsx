@@ -3,9 +3,11 @@ import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
+import { Markdown } from 'components/interfaces/Markdown'
 import { DatePicker } from 'components/ui/DatePicker'
 import { BASE_PATH } from 'lib/constants'
 import { Button, Input, InputNumber, Listbox, Toggle } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import type { Enum } from './AuthProvidersForm.types'
 
 interface FormFieldProps {
@@ -109,16 +111,15 @@ const FormField = ({
           label={properties.title}
           labelOptional={
             properties.descriptionOptional ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.descriptionOptional}
-              </ReactMarkdown>
+              <Markdown
+                content={properties.descriptionOptional}
+                className="text-foreground-lighter"
+              />
             ) : null
           }
           descriptionText={
             properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
+              <Markdown content={properties.description} className="text-foreground-lighter" />
             ) : null
           }
           actions={
@@ -140,6 +141,7 @@ const FormField = ({
           }
         />
       )
+
     case 'multiline-string':
       return (
         <Input.TextArea
@@ -159,9 +161,7 @@ const FormField = ({
           }
           descriptionText={
             properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
+              <Markdown content={properties.description} className="text-foreground-lighter" />
             ) : null
           }
           actions={
@@ -183,6 +183,7 @@ const FormField = ({
           }
         />
       )
+
     case 'number':
       return (
         <InputNumber
@@ -201,9 +202,7 @@ const FormField = ({
           }
           descriptionText={
             properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
+              <Markdown content={properties.description} className="text-foreground-lighter" />
             ) : null
           }
           actions={
@@ -225,17 +224,18 @@ const FormField = ({
           id={name}
           name={name}
           disabled={disabled}
-          label={properties.title}
+          label={
+            <div className="flex items-center gap-x-2">
+              <span>{properties.title}</span>
+              {properties.link && (
+                <a href={properties.link} target="_blank" rel="noreferrer noopener">
+                  <InfoTooltip side="bottom">Documentation</InfoTooltip>
+                </a>
+              )}
+            </div>
+          }
           descriptionText={
-            properties.description ? (
-              <ReactMarkdown
-                unwrapDisallowed
-                disallowedElements={['p']}
-                className="form-field-markdown"
-              >
-                {properties.description}
-              </ReactMarkdown>
-            ) : null
+            properties.description ? <Markdown content={properties.description} /> : null
           }
         />
       )
@@ -284,7 +284,7 @@ const FormField = ({
       break
   }
 
-  return <></>
+  return null
 }
 
 export default FormField

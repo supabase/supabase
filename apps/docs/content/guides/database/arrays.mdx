@@ -4,7 +4,7 @@ title: 'Working With Arrays'
 description: 'How to use arrays in PostgreSQL and the Supabase API.'
 ---
 
-PostgreSQL supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html). These arrays are also supported in the Supabase Dashboard and in the JavaScript API.
+Postgres supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html). These arrays are also supported in the Supabase Dashboard and in the JavaScript API.
 
 ## Create a table with an array column
 
@@ -19,7 +19,7 @@ Create a test table with a text array (an array of strings):
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table editor](/dashboard/project/_/editor) page in the Dashboard.
 1. Click **New Table** and create a table with the name `arraytest`.
 1. Click **Save**.
 1. Click **New Column** and create a column with the name `textarray`, type `text`, and select **Define as array**.
@@ -49,7 +49,7 @@ create table arraytest (
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table editor](/dashboard/project/_/editor) page in the Dashboard.
 1. Select the `arraytest` table.
 1. Click **Insert row** and add `["Harry", "Larry", "Moe"]`.
 1. Click **Save.**
@@ -73,6 +73,7 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 Insert a record from the Swift client:
@@ -97,6 +98,8 @@ try await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 Insert a record from the Python client:
@@ -114,6 +117,7 @@ supabase.from_('arraytest').insert(
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## View the results
@@ -127,14 +131,16 @@ supabase.from_('arraytest').insert(
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table editor](/dashboard/project/_/editor) page in the Dashboard.
 1. Select the `arraytest` table.
 
 You should see:
 
+```
 | id  | textarray               |
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
+```
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -145,16 +151,18 @@ select * from arraytest;
 
 You should see:
 
+```
 | id  | textarray               |
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
+```
 
 </TabPanel>
 </Tabs>
 
 ## Query array data
 
-PostgreSQL uses 1-based indexing (e.g., `textarray[1]` is the first item in the array).
+Postgres uses 1-based indexing (e.g., `textarray[1]` is the first item in the array).
 
 <Tabs
   scrollable
@@ -173,9 +181,11 @@ SELECT textarray[1], array_length(textarray, 1) FROM arraytest;
 
 returns:
 
+```
 | textarray | array_length |
 | --------- | ------------ |
 | Harry     | 3            |
+```
 
 </TabPanel>
 <TabPanel id="js" label="JavaScript">
@@ -198,6 +208,7 @@ returns:
 ```
 
 </TabPanel>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 This returns the entire array field:
@@ -222,10 +233,11 @@ returns:
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources
 
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Supabase - Get started for free](https://supabase.com)
-- [PostgreSQL Arrays](https://www.postgresql.org/docs/15/arrays.html)
+- [Postgres Arrays](https://www.postgresql.org/docs/15/arrays.html)

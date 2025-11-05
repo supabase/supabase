@@ -3,10 +3,12 @@ import { ApplicationError, UserError, clippy } from 'ai-commands/edge'
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
+import { isFeatureEnabled } from 'common/enabled-features'
+
 export const runtime = 'edge'
 /* To avoid OpenAI errors, restrict to the Vercel Edge Function regions that
   overlap with the OpenAI API regions.
-  
+
   Reference for Vercel regions: https://vercel.com/docs/edge-network/regions#region-list
   Reference for OpenAI regions: https://help.openai.com/en/articles/5347006-openai-api-supported-countries-and-territories
   */
@@ -54,7 +56,10 @@ export async function POST(req: NextRequest) {
       throw new UserError('Missing messages in request data')
     }
 
-    const response = await clippy(openai, supabaseClient, messages)
+    const useAltSearchIndex = !isFeatureEnabled('search:fullIndex')
+    const response = await clippy(openai, supabaseClient, messages, {
+      useAltSearchIndex,
+    })
 
     // Proxy the streamed SSE response from OpenAI
     return new NextResponse(response.body, {

@@ -1,6 +1,30 @@
-const schemas = [
+type LogTable =
+  | 'edge_logs'
+  | 'postgres_logs'
+  | 'function_logs'
+  | 'function_edge_logs'
+  | 'auth_logs'
+  | 'auth_audit_logs'
+  | 'realtime_logs'
+  | 'storage_logs'
+  | 'postgrest_logs'
+  | 'supavisor_logs'
+  | 'pgbouncer_logs'
+  | 'pg_cron_logs'
+  | 'pg_upgrade_logs'
+
+type LogSchema = {
+  name: string
+  reference: LogTable
+  fields: {
+    path: string
+    type: string
+  }[]
+}
+
+const schemas: LogSchema[] = [
   {
-    name: 'API Edge',
+    name: 'API Gateway',
     reference: 'edge_logs',
     fields: [
       { path: 'id', type: 'string' },
@@ -75,6 +99,7 @@ const schemas = [
       { path: 'timestamp', type: 'datetime' },
       { path: 'metadata.auth_event.action', type: 'string' },
       { path: 'metadata.auth_event.actor_id', type: 'string' },
+      { path: 'metadata.auth_event.actor_via_sso', type: 'boolean' },
       { path: 'metadata.auth_event.actor_username', type: 'string' },
       { path: 'metadata.auth_event.log_type', type: 'string' },
       { path: 'metadata.auth_event.traits.provider', type: 'string' },
@@ -92,6 +117,29 @@ const schemas = [
       { path: 'metadata.remote_addr', type: 'string' },
       { path: 'metadata.status', type: 'number' },
       { path: 'metadata.timestamp', type: 'string' },
+    ],
+  },
+  {
+    name: 'Auth Audit Logs',
+    reference: 'auth_audit_logs',
+    fields: [
+      { path: 'event_message', type: 'string' },
+      { path: 'id', type: 'string' },
+      { path: 'identifier', type: 'string' },
+      { path: 'timestamp', type: 'datetime' },
+      { path: 'metadata.auth_audit_event.action', type: 'string' },
+      { path: 'metadata.auth_audit_event.actor_id', type: 'string' },
+      { path: 'metadata.auth_audit_event.actor_name', type: 'string' },
+      { path: 'metadata.auth_audit_event.actor_username', type: 'string' },
+      { path: 'metadata.auth_audit_event.actor_via_sso', type: 'boolean' },
+      { path: 'metadata.auth_audit_event.audit_log_id', type: 'string' },
+      { path: 'metadata.auth_audit_event.created_at', type: 'string' },
+      { path: 'metadata.auth_audit_event.log_type', type: 'string' },
+      { path: 'metadata.auth_audit_event.request_id', type: 'string' },
+      { path: 'metadata.auth_audit_event.user_agent', type: 'string' },
+      { path: 'metadata.host', type: 'string' },
+      { path: 'metadata.level', type: 'string' },
+      { path: 'metadata.msg', type: 'string' },
     ],
   },
   {
@@ -229,13 +277,51 @@ const schemas = [
     ],
   },
   {
-    name: 'Supavisor',
+    name: 'Supavisor (Shared Pooler)',
     reference: 'supavisor_logs',
     fields: [
       { path: 'event_message', type: 'string' },
       { path: 'id', type: 'string' },
       { path: 'timestamp', type: 'datetime' },
+      { path: 'metadata.context.application', type: 'string' },
+      { path: 'metadata.context.domain', type: 'string[]' },
+      { path: 'metadata.context.file', type: 'string' },
+      { path: 'metadata.context.function', type: 'string' },
+      { path: 'metadata.context.gl', type: 'string' },
+      { path: 'metadata.context.line', type: 'number' },
+      { path: 'metadata.context.mfa', type: 'string[]' },
+      { path: 'metadata.context.module', type: 'string' },
+      { path: 'metadata.context.pid', type: 'string' },
+      { path: 'metadata.context.time', type: 'number' },
+      { path: 'metadata.context.vm.node', type: 'string' },
+      { path: 'metadata.db_name', type: 'string' },
+      { path: 'metadata.instance_id', type: 'string' },
+      { path: 'metadata.level', type: 'string' },
+      { path: 'metadata.project', type: 'string' },
+      { path: 'metadata.region', type: 'string' },
+      { path: 'metadata.type', type: 'string' },
+      { path: 'metadata.user', type: 'string' },
+    ],
+  },
+  {
+    name: 'PgBouncer (Dedicated Pooler)',
+    reference: 'pgbouncer_logs',
+    fields: [
+      { path: 'id', type: 'string' },
+      { path: 'event_message', type: 'string' },
+      { path: 'file', type: 'string' },
+      { path: 'timestamp', type: 'datetime' },
       { path: 'metadata.host', type: 'string' },
+      { path: 'project', type: 'string' },
+    ],
+  },
+  {
+    name: 'Database Version Upgrade',
+    reference: 'pg_upgrade_logs',
+    fields: [
+      { path: 'event_message', type: 'string' },
+      { path: 'id', type: 'string' },
+      { path: 'timestamp', type: 'datetime' },
     ],
   },
 ]

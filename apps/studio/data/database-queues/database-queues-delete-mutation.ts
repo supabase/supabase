@@ -1,13 +1,13 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   queueName: string
 }
 
@@ -20,7 +20,7 @@ export async function deleteDatabaseQueue({
     projectRef,
     connectionString,
     sql: `select * from pgmq.drop_queue('${queueName}');`,
-    queryKey: databaseQueuesKeys.delete(),
+    queryKey: databaseQueuesKeys.delete(queueName),
   })
 
   return result
@@ -33,30 +33,25 @@ export const useDatabaseQueueDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>,
+  UseCustomMutationOptions<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>(
-    (vars) => deleteDatabaseQueue(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, queueName } = variables
-        await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
-        await queryClient.invalidateQueries(
-          databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete database queue: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>({
+    mutationFn: (vars) => deleteDatabaseQueue(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete database queue: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

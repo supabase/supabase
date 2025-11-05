@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { Maximize2 } from 'lucide-react'
 import { ChangeEvent, InputHTMLAttributes, SyntheticEvent, useEffect, useRef } from 'react'
 import {
@@ -9,9 +8,10 @@ import {
   useRowSelection,
 } from 'react-data-grid'
 
-import { Button } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { SELECT_COLUMN_KEY } from '../../constants'
-import { useTrackedState } from '../../store/Store'
 import type { SupaRow } from '../../types'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
@@ -111,8 +111,7 @@ function SelectCellFormatter({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellFormatterProps) {
-  const state = useTrackedState()
-  const { onEditRow } = state
+  const snap = useTableEditorStateSnapshot()
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
@@ -120,8 +119,8 @@ function SelectCellFormatter({
 
   function onEditClick(e: any) {
     e.stopPropagation()
-    if (onEditRow && row) {
-      onEditRow(row)
+    if (row) {
+      snap.onEditRow(row)
     }
   }
 
@@ -138,31 +137,20 @@ function SelectCellFormatter({
         onChange={handleChange}
         onClick={onClick}
       />
-      {onEditRow && row && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <Button
-              type="text"
-              size="tiny"
-              className="px-1 rdg-row__select-column__edit-action"
-              icon={<Maximize2 />}
-              onClick={onEditClick}
-            />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">Expand row</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+      {row && (
+        <ButtonTooltip
+          type="text"
+          size="tiny"
+          className="px-1 rdg-row__select-column__edit-action"
+          icon={<Maximize2 />}
+          onClick={onEditClick}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'Expand row',
+            },
+          }}
+        />
       )}
     </div>
   )
@@ -182,12 +170,11 @@ function SelectCellHeader({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellHeaderProps) {
-  const state = useTrackedState()
-  const { selectedRows, allRowsSelected } = state
+  const snap = useTableEditorTableStateSnapshot()
   const inputRef = useRef<HTMLInputElement>(null)
 
   // indeterminate state === some rows are selected but not all
-  const isIndeterminate = selectedRows.size > 0 && !allRowsSelected
+  const isIndeterminate = snap.selectedRows.size > 0 && !snap.allRowsSelected
 
   useEffect(() => {
     if (inputRef.current) {

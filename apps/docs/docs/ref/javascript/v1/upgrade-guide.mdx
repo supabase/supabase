@@ -249,12 +249,13 @@ const { error } = await supabase
 const { data, error } = await supabase
   .auth
   .signInWithOtp({ phone })
-  
+
 // After receiving a SMS with a OTP.
 const { data, error } = await supabase
-  .auth
-  .verifyOtp({ phone, token })
-```
+.auth
+.verifyOtp({ phone, token })
+
+````
 
 </TabPanel>
 </Tabs>
@@ -283,7 +284,7 @@ const { data, error } = await supabase
   .auth
   .api
   .resetPasswordForEmail(email)
-```
+````
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
@@ -304,7 +305,7 @@ const { data, error } = await supabase
 
 #### Get the user's current session
 
-<GetSessionWarning />
+<$Partial path="get_session_warning.mdx" />
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>

@@ -1,6 +1,6 @@
 import { DocsButton } from 'components/ui/DocsButton'
-import { ExternalLink } from 'lucide-react'
-import { Button } from 'ui'
+import { DOCS_URL } from 'lib/constants'
+import { cn } from 'ui'
 
 const NoChannelEmptyState = () => {
   return (
@@ -14,12 +14,12 @@ const NoChannelEmptyState = () => {
           </p>
         </div>
       </div>
-      <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md">
+      <div className={cn('w-full px-5 py-4 items-center gap-4 inline-flex')}>
         <div className="grow flex-col flex">
           <p className="text-foreground">Not sure what to do?</p>
           <p className="text-foreground-lighter text-xs">Browse our documentation</p>
         </div>
-        <DocsButton href="https://supabase.com/docs/guides/realtime" />
+        <DocsButton href={`${DOCS_URL}/guides/realtime`} />
       </div>
     </div>
   )

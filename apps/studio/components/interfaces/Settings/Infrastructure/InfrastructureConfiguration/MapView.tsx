@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import { MoreVertical } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import {
   ComposableMap,
@@ -15,11 +16,14 @@ import {
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -29,9 +33,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   ScrollArea,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
@@ -50,15 +51,21 @@ const MapView = ({
   onSelectDropReplica,
 }: MapViewProps) => {
   const { ref } = useParams()
+  const dbSelectorState = useDatabaseSelectorStateSnapshot()
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+
   const [mount, setMount] = useState(false)
   const [zoom, setZoom] = useState<number>(1.5)
   const [center, setCenter] = useState<[number, number]>([14, 7])
   const [tooltip, setTooltip] = useState<{
     x: number
     y: number
-    region: { key: string; country?: string; name?: string }
+    region: { key: string; country?: string; name?: string; region?: string }
   }>()
-  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data } = useReadReplicasQuery({ projectRef: ref })
   const databases = data ?? []
@@ -159,6 +166,7 @@ const MapView = ({
                     region: {
                       key: region.key,
                       country: region.name,
+                      region: region.region,
                       name: hasNoDatabases
                         ? undefined
                         : hasPrimary
@@ -207,17 +215,17 @@ const MapView = ({
             <Marker coordinates={[tooltip.x - 47, tooltip.y - 5]}>
               <foreignObject width={220} height={66.25}>
                 <div className="bg-studio/50 rounded border">
-                  <div className="px-3 py-2 flex flex-col gap-y-1">
+                  <div className="px-3 py-2 flex flex-col">
                     <div className="flex items-center gap-x-2">
                       <img
                         alt="region icon"
                         className="w-4 rounded-sm"
-                        src={`${BASE_PATH}/img/regions/${tooltip.region.key}.svg`}
+                        src={`${BASE_PATH}/img/regions/${tooltip.region.region}.svg`}
                       />
-                      <p className="text-[11px]">{tooltip.region.country}</p>
+                      <p className="text-[10px]">{tooltip.region.country}</p>
                     </div>
                     <p
-                      className={`text-[11px] ${
+                      className={`text-[10px] ${
                         tooltip.region.name === undefined ? 'text-foreground-light' : ''
                       }`}
                     >
@@ -244,7 +252,7 @@ const MapView = ({
             <img
               alt="region icon"
               className="w-10 rounded-sm"
-              src={`${BASE_PATH}/img/regions/${selectedRegion.key}.svg`}
+              src={`${BASE_PATH}/img/regions/${selectedRegion.region}.svg`}
             />
           </div>
 
@@ -279,13 +287,15 @@ const MapView = ({
                             <Badge variant="warning">Unhealthy</Badge>
                           )}
                         </p>
-                        <p className="text-xs text-foreground-light">AWS • {database.size}</p>
+                        <p className="text-xs text-foreground-light">
+                          AWS{projectHomepageShowInstanceSize ? ` • ${database.size}` : ''}
+                        </p>
                         {database.identifier !== ref && (
                           <p className="text-xs text-foreground-light">Created on: {created}</p>
                         )}
                       </div>
                       {database.identifier !== ref && (
-                        <DropdownMenu modal={false}>
+                        <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button type="text" icon={<MoreVertical />} className="px-1" />
                           </DropdownMenuTrigger>
@@ -293,12 +303,12 @@ const MapView = ({
                             <DropdownMenuItem
                               className="gap-x-2"
                               disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+                              onClick={() => {
+                                setShowConnect(true)
+                                dbSelectorState.setSelectedDatabaseId(database.identifier)
+                              }}
                             >
-                              <Link
-                                href={`/project/${ref}/settings/database?connectionString=${database.identifier}`}
-                              >
-                                View connection string
-                              </Link>
+                              View connection string
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-x-2"
@@ -320,22 +330,20 @@ const MapView = ({
                             >
                               Restart replica
                             </DropdownMenuItem>
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_ asChild>
-                                <DropdownMenuItem
-                                  className="gap-x-2 !pointer-events-auto"
-                                  disabled={!canManageReplicas}
-                                  onClick={() => onSelectDropReplica(database)}
-                                >
-                                  Drop replica
-                                </DropdownMenuItem>
-                              </TooltipTrigger_Shadcn_>
-                              {!canManageReplicas && (
-                                <TooltipContent_Shadcn_ side="left">
-                                  You need additional permissions to drop replicas
-                                </TooltipContent_Shadcn_>
-                              )}
-                            </Tooltip_Shadcn_>
+
+                            <DropdownMenuItemTooltip
+                              className="gap-x-2 !pointer-events-auto"
+                              disabled={!canManageReplicas}
+                              onClick={() => onSelectDropReplica(database)}
+                              tooltip={{
+                                content: {
+                                  side: 'left',
+                                  text: 'You need additional permissions to drop replicas',
+                                },
+                              }}
+                            >
+                              Drop replica
+                            </DropdownMenuItemTooltip>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}

@@ -113,7 +113,15 @@ export function getTableEditorSql(id?: number) {
                             else 'USER-DEFINED'
                         end
                 end,
-                'format', coalesce(bt.typname, t.typname),
+                'format', case
+                    when t.typtype = 'e' then
+                        case
+                            when nt.nspname <> 'public' then concat(nt.nspname, '.', coalesce(bt.typname, t.typname))
+                            else coalesce(bt.typname, t.typname)
+                        end
+                    else
+                        coalesce(bt.typname, t.typname)
+                end,
                 'is_identity', a.attidentity in ('a', 'd'),
                 'identity_generation', case a.attidentity
                     when 'a' then 'ALWAYS'
@@ -154,6 +162,7 @@ export function getTableEditorSql(id?: number) {
                 conkey[1] as ordinal_position
             from pg_catalog.pg_constraint
             where contype = 'u' and cardinality(conkey) = 1
+            group by conrelid, conkey[1]
         ) as uniques on uniques.table_id = a.attrelid and uniques.ordinal_position = a.attnum
         left join (
             select distinct on (conrelid, conkey[1])

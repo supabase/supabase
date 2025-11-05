@@ -1,10 +1,8 @@
 /// <reference types="@testing-library/jest-dom" />
 
-import * as matchers from '@testing-library/jest-dom/matchers'
+import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
-import { afterEach, expect, vi } from 'vitest'
-
-expect.extend(matchers)
+import { afterEach, vi } from 'vitest'
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -19,6 +17,16 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 })
+
+// Mock ResizeObserver
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}))
+
+// Mock scrollIntoView
+Element.prototype.scrollIntoView = vi.fn()
 
 vi.mock('next/navigation', () => require('next-router-mock'))
 

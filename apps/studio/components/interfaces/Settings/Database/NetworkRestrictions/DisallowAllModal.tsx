@@ -39,7 +39,7 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
         <InformationBox
           defaultVisibility
           hideCollapse
-          title="Note: Restrictions only apply to direct connections to your database and Supavisor"
+          title="Note: Restrictions only apply to direct connections to your database and connection pooler"
           description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
         />
       </Modal.Content>

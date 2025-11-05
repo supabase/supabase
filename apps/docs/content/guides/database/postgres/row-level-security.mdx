@@ -9,15 +9,24 @@ When you need granular authorization rules, nothing beats Postgres's [Row Level 
 
 ## Row Level Security in Supabase
 
-RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be [combined with Supabase Auth](/docs/guides/database/postgres/row-level-security) for end-to-end user security from the browser to the database.
+<Admonition type="danger">
 
-RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors even when accessed through third-party tooling.
+Supabase allows convenient and secure data access from the browser, as long as you enable RLS.
 
-<Admonition type="info">
+RLS _must_ always be enabled on any tables stored in an exposed schema. By default, this is the `public` schema.
 
-You should _always_ enable RLS on tables created in a public schema. This is done for you when you create a table with the Table Editor. If you create one in raw SQL or with the SQL Editor, remember to enable RLS yourself.
+RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself:
+
+```sql
+alter table <schema_name>.<table_name>
+enable row level security;
+```
 
 </Admonition>
+
+RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be combined with [Supabase Auth](/docs/guides/auth) for end-to-end user security from the browser to the database.
+
+RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors even when accessed through third-party tooling.
 
 ## Policies
 
@@ -50,6 +59,32 @@ alter table "table_name" enable row level security;
 
 Once you have enabled RLS, no data will be accessible via the [API](/docs/guides/api) when using the public `anon` key, until you create policies.
 
+<Admonition type="caution" label="`auth.uid()` Returns `null` When Unauthenticated">
+
+When a request is made without an authenticated user (e.g., no access token is provided or the session has expired), `auth.uid()` returns `null`.
+
+This means that a policy like:
+
+```sql
+USING (auth.uid() = user_id)
+```
+
+will silently fail for unauthenticated users, because:
+
+```sql
+null = user_id
+```
+
+is always false in SQL.
+
+To avoid confusion and make your intention clear, we recommend explicitly checking for authentication:
+
+```sql
+USING (auth.uid() IS NOT NULL AND auth.uid() = user_id)
+```
+
+</Admonition>
+
 ## Authenticated and unauthenticated roles
 
 Supabase maps every request to one of the roles:
@@ -81,7 +116,7 @@ Using the `anon` Postgres role is different from an [anonymous user](/docs/guide
 
 ## Creating policies
 
-Policies are simply SQL logic that you attach to a Postgres table. You can attach as many policies as you want to each table.
+Policies are SQL logic that you attach to a Postgres table. You can attach as many policies as you want to each table.
 
 Supabase provides some [helpers](#helper-functions) that simplify RLS if you're using Supabase Auth. We'll use these helpers to illustrate some basic policies:
 
@@ -95,7 +130,7 @@ Let's say you have a table called `profiles` in the public schema and you want t
 -- 1. Create table
 create table profiles (
   id uuid primary key,
-  user_id references auth.users,
+  user_id uuid references auth.users,
   avatar_url text
 );
 
@@ -416,12 +451,12 @@ $$;
 create policy "rls_test_select"
 on test_table
 to authenticated
-using ( private.has_good_role() );
+using ( (select private.has_good_role()) );
 ```
 
 <Admonition type="caution">
 
-Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](https://supabase.com/dashboard/project/_/settings/api)`.
+Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](/dashboard/project/_/settings/api)`.
 
 </Admonition>
 

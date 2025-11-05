@@ -9,10 +9,10 @@ import { VariantProps, cva } from 'class-variance-authority'
 import { cn } from '../../../lib/utils/cn'
 
 export const DIALOG_PADDING_Y_SMALL = 'py-4'
-export const DIALOG_PADDING_X_SMALL = 'px-5'
+export const DIALOG_PADDING_X_SMALL = 'px-4 md:px-5'
 
 export const DIALOG_PADDING_Y = 'py-6'
-export const DIALOG_PADDING_X = 'px-7'
+export const DIALOG_PADDING_X = 'px-4 md:px-7'
 
 const DialogPaddingVariants = cva('', {
   variants: {
@@ -54,7 +54,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const DialogContentVariants = cva(
   cn(
-    'relative z-50 w-full border shadow-md dark:shadow-sm',
+    'relative z-50 w-full max-w-screen border shadow-md dark:shadow-sm',
     'data-[state=open]:animate-in data-[state=closed]:animate-out',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
@@ -68,10 +68,10 @@ const DialogContentVariants = cva(
         tiny: `sm:align-middle sm:w-full sm:max-w-xs`,
         small: `sm:align-middle sm:w-full sm:max-w-sm`,
         medium: `sm:align-middle sm:w-full sm:max-w-lg`,
-        large: `sm:align-middle sm:w-full max-w-xl`,
-        xlarge: `sm:align-middle sm:w-full max-w-3xl`,
-        xxlarge: `sm:align-middle sm:w-full max-w-6xl`,
-        xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
+        large: `sm:align-middle sm:w-full md:max-w-xl`,
+        xlarge: `sm:align-middle sm:w-full md:max-w-3xl`,
+        xxlarge: `sm:align-middle sm:w-full md:max-w-6xl`,
+        xxxlarge: `sm:align-middle sm:w-full md:max-w-7xl`,
       },
     },
     defaultVariants: {
@@ -102,8 +102,13 @@ const DialogContent = React.forwardRef<
         >
           {children}
           {!hideClose && (
-            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted">
-              <X className="h-4 w-4" />
+            <DialogPrimitive.Close
+              className={cn(
+                'absolute p-0.5 right-3.5 top-3.5 rounded-sm opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+                'before:content-[""] before:block before:absolute before:top-1/2 before:left-1/2 before:w-full before:h-full before:outline-red-500 before:outline-2 before:min-w-6 before:min-h-6 before:z-50 before:-translate-x-1/2 before:-translate-y-1/2'
+              )}
+            >
+              <X size={16} />
               <span className="sr-only">Close</span>
             </DialogPrimitive.Close>
           )}

@@ -4,21 +4,13 @@ import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import {
-  Button,
-  Popover,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  cn,
-} from 'ui'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Button, Popover, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useTrackedState } from '../../store/Store'
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
 import { MonacoEditor } from '../common/MonacoEditor'
@@ -37,10 +29,9 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   isEditable?: boolean
   onExpandEditor: (column: string, row: TRow) => void
 }) => {
-  const state = useTrackedState()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -48,18 +39,15 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     id,
   })
 
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
-  const initialValue = row[column.key as keyof TRow] as unknown as string
+  const rawValue = row[column.key as keyof TRow] as unknown
+  const initialValue = rawValue || rawValue === '' ? String(rawValue) : null
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(initialValue)
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
   const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
 
-  const isTruncated =
-    typeof initialValue === 'string' &&
-    initialValue.endsWith('...') &&
-    initialValue.length > MAX_CHARACTERS
+  const isTruncated = isValueTruncated(initialValue)
 
   const loadFullValue = () => {
     if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
@@ -123,13 +111,13 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
         overlay={
           isTruncated && !isSuccess ? (
             <div
-              style={{ width: `${gridColumn?.width || column.width}px` }}
+              style={{ width: `${column.width}px` }}
               className="flex items-center justify-center flex-col relative"
             >
               <MonacoEditor
                 readOnly
                 onChange={() => {}}
-                width={`${gridColumn?.width || column.width}px`}
+                width={`${column.width}px`}
                 value={value ?? ''}
                 language="markdown"
               />
@@ -143,7 +131,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
               ignoreOutsideClicks={isConfirmNextModalOpen}
             >
               <MonacoEditor
-                width={`${gridColumn?.width || column.width}px`}
+                width={`${column.width}px`}
                 value={value ?? ''}
                 readOnly={!isEditable}
                 onChange={onChange}
@@ -165,17 +153,17 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-y-1">
-                    <Tooltip_Shadcn_>
-                      <TooltipTrigger_Shadcn_ asChild>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
                         <Button
                           type="default"
                           className="px-1"
                           onClick={() => onSelectExpand()}
                           icon={<Maximize size={12} strokeWidth={2} />}
                         />
-                      </TooltipTrigger_Shadcn_>
-                      <TooltipContent_Shadcn_ side="bottom">Expand editor</TooltipContent_Shadcn_>
-                    </Tooltip_Shadcn_>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Expand editor</TooltipContent>
+                    </Tooltip>
                     {isNullable && (
                       <Button
                         size="tiny"

@@ -1,0 +1,65 @@
+import { useQuery } from '@tanstack/react-query'
+
+import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { storageKeys } from './keys'
+
+type GetNamespacesVariables = {
+  catalogUri: string
+  warehouse: string
+  token: string
+}
+
+// [Joshen] Investigate if we can use the temp API keys here
+async function getNamespaces({ catalogUri, warehouse, token }: GetNamespacesVariables) {
+  let headers = new Headers()
+  // handle both secret key and service role key
+  if (token.startsWith('sb_secret_')) {
+    headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      apikey: `${token}`,
+    })
+    headers.delete('Authorization')
+  } else {
+    headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    })
+  }
+
+  const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
+
+  try {
+    const response = await fetchHandler(url, {
+      headers,
+      method: 'GET',
+    })
+
+    const result = await response.json()
+    if (result.error) {
+      if (result.error.message) {
+        throw new Error(result.error.message)
+      }
+      throw new Error('Failed to get iceberg namespaces')
+    }
+    const r = result as { namespaces: string[][] }
+    return r.namespaces.flat()
+  } catch (error) {
+    handleError(error)
+  }
+}
+
+type IcebergNamespacesData = Awaited<ReturnType<typeof getNamespaces>>
+
+export type IcebergNamespacesError = ResponseError
+
+export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
+  params: GetNamespacesVariables,
+  { ...options }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
+) => {
+  return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
+    queryKey: storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
+    queryFn: () => getNamespaces(params),
+    ...options,
+  })
+}

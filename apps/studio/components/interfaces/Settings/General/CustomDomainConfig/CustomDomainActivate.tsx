@@ -9,6 +9,7 @@ import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mut
 import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { DOCS_URL } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -30,7 +31,13 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
       },
     }
   )
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+    onSuccess: () => {
+      toast.success(
+        'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
+      )
+    },
+  })
 
   const endpoint = settings?.app_config?.endpoint
 
@@ -89,7 +96,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
 
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">
-            <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
+            <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
             <div className="flex items-center space-x-2">
               <Button
                 type="default"

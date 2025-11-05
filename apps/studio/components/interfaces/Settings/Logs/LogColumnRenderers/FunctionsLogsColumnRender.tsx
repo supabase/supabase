@@ -8,13 +8,14 @@ const columns: Column<LogData>[] = [
   {
     name: 'functions-logs-first-column',
     key: 'functions-logs-first-column',
+    renderHeaderCell: () => null,
     renderCell: (props) => {
       if (!props.row.event_type && !props.row.level) {
         return defaultRenderCell(props)
       }
       return (
         <RowLayout>
-          <TimestampInfo value={props.row.timestamp!} />
+          <TimestampInfo utcTimestamp={props.row.timestamp!} />
           {props.row.event_type === 'uncaughtException' ? (
             <SeverityFormatter value={props.row.event_type} uppercase={false} />
           ) : (

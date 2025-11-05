@@ -1,11 +1,12 @@
 import { useParams } from 'common'
+import { AlertTriangle, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
+import OrganizationPicker from 'components/interfaces/Integrations/Vercel/OrganizationPicker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
@@ -15,7 +16,6 @@ import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-int
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout, Organization } from 'types'
-import { AlertTriangle, Info } from 'lucide-react'
 
 /**
  * Variations of the Vercel integration flow.
@@ -175,10 +175,6 @@ const VercelIntegration: NextPageWithLayout = () => {
       : false
   }, [installed, selectedOrg, source, dataLoading])
 
-  const hasVercelManagedOrgSelected = useMemo(() => {
-    return !!selectedOrg && selectedOrg.managed_by === 'vercel-marketplace'
-  }, [selectedOrg])
-
   const disableInstallationForm =
     (isLoadingVercelIntegrationCreateMutation && !dataLoading) ||
     // disables installation button if integration is already installed and it is Marketplace flow
@@ -193,7 +189,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="mx-auto w-full max-w-md">
-          <h1 className="text-xl text-foreground">Choose organization</h1>
+          <h2>Choose organization</h2>
           <>
             <Markdown content={`Choose the Supabase organization you wish to install in`} />
             <OrganizationPicker
@@ -231,21 +227,11 @@ const VercelIntegration: NextPageWithLayout = () => {
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
-            {hasVercelManagedOrgSelected && (
-              <p className="prose text-sm text-red-900">
-                Vercel Integration cannot be used with Vercel-managed organizations. Choose a
-                different organization or create a Vercel resource directly.
-              </p>
-            )}
             <div className="flex flex-row w-full justify-end">
               <Button
                 size="medium"
                 className="self-end"
-                disabled={
-                  disableInstallationForm ||
-                  isLoadingVercelIntegrationCreateMutation ||
-                  hasVercelManagedOrgSelected
-                }
+                disabled={disableInstallationForm || isLoadingVercelIntegrationCreateMutation}
                 loading={isLoadingVercelIntegrationCreateMutation}
                 onClick={onInstall}
               >

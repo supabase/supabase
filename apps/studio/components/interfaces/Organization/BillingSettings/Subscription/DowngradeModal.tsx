@@ -1,18 +1,18 @@
-import { AlertOctagon, MinusCircle, PauseCircle } from 'lucide-react'
+import { MinusCircle, PauseCircle } from 'lucide-react'
 
-import type { ProjectInfo } from 'data/projects/projects-query'
+import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'
-import { PricingInformation } from 'shared-data'
+import { useMemo } from 'react'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Modal } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 export interface DowngradeModalProps {
   visible: boolean
-  selectedPlan?: PricingInformation
   subscription?: OrgSubscription
   onClose: () => void
   onConfirm: () => void
-  projects: ProjectInfo[]
+  projects: OrgProject[]
 }
 
 const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon }) => {
@@ -50,12 +50,13 @@ const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon
 
 const DowngradeModal = ({
   visible,
-  selectedPlan,
   subscription,
   onClose,
   onConfirm,
   projects,
 }: DowngradeModalProps) => {
+  const selectedPlan = useMemo(() => subscriptionsPlans.find((tier) => tier.id === 'tier_free'), [])
+
   // Filter out the micro addon as we're dealing with that separately
   const previousProjectAddons =
     subscription?.project_addons.flatMap((projectAddons) => {
@@ -71,8 +72,10 @@ const DowngradeModal = ({
       }
     }) || []
 
-  const hasInstancesOnMicro = projects.some((project) => project.infra_compute_size === 'micro')
-  const downgradingToNano = subscription?.nano_enabled === true
+  const hasInstancesOnMicro = projects.some((project) => {
+    const computeSize = getComputeSize(project)
+    return computeSize === 'micro'
+  })
 
   return (
     <Modal
@@ -93,8 +96,7 @@ const DowngradeModal = ({
               unresponsive or enter read only mode."
           />
 
-          {((previousProjectAddons.length ?? 0) > 0 ||
-            (hasInstancesOnMicro && downgradingToNano)) && (
+          {((previousProjectAddons.length ?? 0) > 0 || hasInstancesOnMicro) && (
             <Admonition type="warning" title="Projects affected by the downgrade">
               <ul className="space-y-1 max-h-[100px] overflow-y-auto">
                 {previousProjectAddons.map((project) => (
@@ -102,7 +104,10 @@ const DowngradeModal = ({
                 ))}
 
                 {projects
-                  .filter((it) => it.infra_compute_size === 'micro')
+                  .filter((it) => {
+                    const computeSize = getComputeSize(it)
+                    return computeSize === 'micro'
+                  })
                   .map((project) => (
                     <li className="list-disc ml-6" key={project.ref}>
                       {project.name}: Compute will be downgraded. Project will also{' '}

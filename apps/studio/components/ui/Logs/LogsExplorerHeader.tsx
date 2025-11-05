@@ -1,13 +1,20 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { BookOpen, Check, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs/Logs.constants'
 import Table from 'components/to-be-cleaned/Table'
-import { copyToClipboard } from 'lib/helpers'
-import { BookOpen, Check, Clipboard, ExternalLink, List, X } from 'lucide-react'
+import { DOCS_URL } from 'lib/constants'
 import { logConstants } from 'shared-data'
-import { Button, SidePanel, Tabs } from 'ui'
+import {
+  Button,
+  SidePanel,
+  Tabs,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  copyToClipboard,
+} from 'ui'
 import { DocsButton } from '../DocsButton'
 
 export interface LogsExplorerHeaderProps {
@@ -18,17 +25,15 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
   const [showReference, setShowReference] = useState(false)
 
   return (
-    <div className={['flex items-center gap-8 transition-all pb-6 justify-between'].join(' ')}>
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-6 w-6 items-center justify-center rounded border
-            border-brand-600 bg-brand-300 text-brand
-          "
-        >
-          <List size={14} strokeWidth={3} />
-        </div>
+    <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
+      <div className="flex flex-col md:flex-row md:items-center gap-3">
+        <div className="flex flex-row items-center gap-3">
+          <div className="flex h-6 w-6 items-center justify-center rounded border border-brand-600 bg-brand-300 text-brand">
+            <List size={14} strokeWidth={3} />
+          </div>
 
-        <h1 className="text-2xl text-foreground">Logs Explorer</h1>
+          <h1>Logs Explorer</h1>
+        </div>
         {subtitle && <span className="text-2xl text-foreground-light">{subtitle}</span>}
       </div>
       <div className="flex flex-row gap-2">
@@ -57,7 +62,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
               onClick={() => setShowReference(true)}
               icon={<BookOpen strokeWidth={1.5} />}
             >
-              Field Reference
+              <span>Field Reference</span>
             </Button>
           }
         >
@@ -68,7 +73,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
                 <Link
-                  href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                  href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                   target="_blank"
                   rel="noreferrer"
                   className="text-brand"
@@ -147,43 +152,23 @@ const Field = ({
       >
         <span>{field.path}</span>
         {isCopied ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+          <Tooltip>
+            <TooltipTrigger>
               <Check size={14} strokeWidth={3} className="text-brand" />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copied</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="font-sans">
+              Copied
+            </TooltipContent>
+          </Tooltip>
         ) : (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Clipboard size={14} strokeWidth={1.5} />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copy value</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          <Tooltip>
+            <TooltipTrigger>
+              <Copy size={14} />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="font-sans">
+              Copy value
+            </TooltipContent>
+          </Tooltip>
         )}
       </Table.td>
       <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>

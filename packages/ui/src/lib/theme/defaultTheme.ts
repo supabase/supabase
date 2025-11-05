@@ -1182,20 +1182,16 @@ export default {
           rounded: `rounded-md`,
         },
         pills: {
-          base: `
-            px-3 py-1
-          `,
+          base: `px-3 py-1`,
           normal: `
             font-normal
             border-default
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
-            bg-surface-200
+            bg-sidebar-accent
             text-foreground-lighter
-            z-10
-
-            rounded-md
+            z-10 rounded-md
           `,
         },
       },
@@ -1223,7 +1219,7 @@ export default {
     base: `
       relative
       bg-dash-sidebar
-      my-4
+      my-4 max-w-screen
       border border-overlay
       rounded-md
       shadow-xl
@@ -1246,10 +1242,10 @@ export default {
       tiny: `sm:align-middle sm:w-full sm:max-w-xs`,
       small: `sm:align-middle sm:w-full sm:max-w-sm`,
       medium: `sm:align-middle sm:w-full sm:max-w-lg`,
-      large: `sm:align-middle sm:w-full max-w-xl`,
-      xlarge: `sm:align-middle sm:w-full max-w-3xl`,
-      xxlarge: `sm:align-middle sm:w-full max-w-6xl`,
-      xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
+      large: `sm:align-middle sm:w-full md:max-w-xl`,
+      xlarge: `sm:align-middle sm:w-full md:max-w-3xl`,
+      xxlarge: `sm:align-middle sm:w-full max-w-screen md:max-w-6xl`,
+      xxxlarge: `sm:align-middle sm:w-full md:max-w-7xl`,
     },
     overlay: `
       z-40
@@ -1417,8 +1413,9 @@ export default {
     },
     spinner: `
       absolute
-      text-brand animate-spin
+      text-foreground-lighter animate-spin
       inset-0
+      size-5
       m-auto
     `,
   },
