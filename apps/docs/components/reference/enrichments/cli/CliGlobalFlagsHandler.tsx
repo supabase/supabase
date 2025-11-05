@@ -6,9 +6,7 @@ import { isFeatureEnabled } from 'common'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 
 const { cliCustomProfiles } = isFeatureEnabled(['cli:custom_profiles'])
-const { cliProfile } = getCustomContent([
-  'cli:profile',
-])
+const { cliProfile } = getCustomContent(['cli:profile'])
 
 const CliGlobalFlagsHandler = () => {
   // Transform the flags based on feature flags
