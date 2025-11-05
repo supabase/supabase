@@ -1,7 +1,8 @@
 import { getUsersCountSQL } from '@supabase/pg-meta/src/sql/studio/get-users-count'
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
 
@@ -63,7 +64,7 @@ export const useUsersCountQuery = <TData = UsersCountData>(
     providers,
     forceExactCount,
   }: UsersCountVariables,
-  { enabled = true, ...options }: UseQueryOptions<UsersCountData, UsersCountError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<UsersCountData, UsersCountError, TData> = {}
 ) =>
   useQuery<UsersCountData, UsersCountError, TData>({
     queryKey: authKeys.usersCount(projectRef, {

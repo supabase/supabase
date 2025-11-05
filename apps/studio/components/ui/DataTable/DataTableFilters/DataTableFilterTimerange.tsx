@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import type { DateRange } from 'react-day-picker'
 
-import {
-  LogsDatePicker,
-  DatePickerValue,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
+import {
+  DatePickerValue,
+  LogsDatePicker,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
@@ -15,8 +15,6 @@ import { useDataTable } from '../providers/DataTableProvider'
 
 export function DataTableFilterTimerange<TData>({
   value: _value,
-  presets,
-  dateRangeDisabled,
 }: DataTableTimerangeFilterField<TData>) {
   const value = _value as string
   const { table, columnFilters } = useDataTable()

@@ -1,8 +1,8 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { privilegeKeys } from './keys'
 
 export type ColumnPrivilegesRevoke = {
@@ -47,7 +47,11 @@ export const useColumnPrivilegesRevokeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ColumnPrivilegesRevokeData, ResponseError, ColumnPrivilegesRevokeVariables>,
+  UseCustomMutationOptions<
+    ColumnPrivilegesRevokeData,
+    ResponseError,
+    ColumnPrivilegesRevokeVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

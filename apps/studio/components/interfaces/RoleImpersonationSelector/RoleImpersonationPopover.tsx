@@ -5,8 +5,8 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { User } from 'data/auth/users-infinite-query'
 import { ChevronDown, User as IconUser } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { RoleImpersonationSelector } from '.'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
-import RoleImpersonationSelector from './RoleImpersonationSelector'
 
 export interface RoleImpersonationPopoverProps {
   portal?: boolean
@@ -18,7 +18,7 @@ export interface RoleImpersonationPopoverProps {
   disallowAuthenticatedOption?: boolean
 }
 
-const RoleImpersonationPopover = ({
+export const RoleImpersonationPopover = ({
   portal = true,
   serviceRoleLabel,
   variant = 'regular',
@@ -85,8 +85,6 @@ const RoleImpersonationPopover = ({
     </Popover_Shadcn_>
   )
 }
-
-export default RoleImpersonationPopover
 
 const UserRoleButtonSection = ({ user }: { user: User }) => {
   const avatarUrl = getAvatarUrl(user)

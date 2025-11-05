@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams, useFlag } from 'common'
+import { useFlag, useParams } from 'common'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import {
   Entity,
@@ -43,7 +43,7 @@ import {
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {

@@ -8,7 +8,6 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
 import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
@@ -29,11 +28,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useIsNewStorageUIEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
-import {
-  useAnalyticsBucketAssociatedEntities,
-  useAnalyticsBucketDeleteCleanUp,
-} from './AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 import { formatPoliciesForStorage } from './Storage.utils'
 
 export interface DeleteBucketModalProps {
@@ -46,11 +40,8 @@ const formId = `delete-storage-bucket-form`
 
 export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModalProps) => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isStorageV2 = useIsNewStorageUIEnabled()
-
-  const isStandardBucketSelected = 'type' in bucket && bucket.type === 'STANDARD'
 
   const schema = z.object({
     confirm: z.literal(bucket.id, {
@@ -70,12 +61,6 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     connectionString: project?.connectionString,
     schema: 'storage',
   })
-
-  const { icebergWrapper, icebergWrapperMeta, s3AccessKey, publication } =
-    useAnalyticsBucketAssociatedEntities(
-      { projectRef, bucketId: bucket.id },
-      { enabled: !isStandardBucketSelected }
-    )
 
   const { mutateAsync: deletePolicy } = useDatabasePolicyDeleteMutation()
 
@@ -107,11 +92,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
         )
 
         toast.success(`Successfully deleted bucket ${bucket.id}`)
-        if (isStorageV2) {
-          router.push(`/project/${projectRef}/storage/files`)
-        } else {
-          router.push(`/project/${projectRef}/storage/buckets`)
-        }
+        if (!!bucketId) router.push(`/project/${projectRef}/storage/files`)
         onClose()
       } catch (error) {
         toast.success(
@@ -121,50 +102,11 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     },
   })
 
-  const { mutateAsync: deleteAnalyticsBucketCleanUp, isLoading: isCleaningUpAnalyticsBucket } =
-    useAnalyticsBucketDeleteCleanUp()
-
-  const { mutate: deleteAnalyticsBucket, isLoading: isDeletingAnalyticsBucket } =
-    useAnalyticsBucketDeleteMutation({
-      onSuccess: async () => {
-        if (project?.connectionString) {
-          await deleteAnalyticsBucketCleanUp({
-            projectRef,
-            connectionString: project.connectionString,
-            bucketId: bucket.id,
-            icebergWrapper,
-            icebergWrapperMeta,
-            s3AccessKey,
-            publication,
-          })
-        }
-        toast.success(`Successfully deleted analytics bucket ${bucket.id}`)
-        if (isStorageV2) {
-          router.push(`/project/${projectRef}/storage/analytics`)
-        } else {
-          router.push(`/project/${projectRef}/storage/buckets`)
-        }
-        onClose()
-      },
-    })
-
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
-
-    // [Joshen] We'll need a third case to figure out for vector buckets
-    if (isStandardBucketSelected) {
-      deleteBucket({ projectRef, id: bucket.id })
-    } else {
-      if (isStorageV2) {
-        deleteAnalyticsBucket({ projectRef, id: bucket.id })
-      } else {
-        deleteBucket({ projectRef, id: bucket.id })
-      }
-    }
+    deleteBucket({ projectRef, id: bucket.id })
   }
-
-  const isDeleting = isDeletingBucket || isDeletingAnalyticsBucket || isCleaningUpAnalyticsBucket
 
   return (
     <Dialog
@@ -226,10 +168,10 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={isDeleting} onClick={onClose}>
+          <Button type="default" disabled={isDeletingBucket} onClick={onClose}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" type="danger" loading={isDeleting}>
+          <Button form={formId} htmlType="submit" type="danger" loading={isDeletingBucket}>
             Delete bucket
           </Button>
         </DialogFooter>
