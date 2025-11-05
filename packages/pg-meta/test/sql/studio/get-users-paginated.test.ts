@@ -1,5 +1,5 @@
 import { expect, test, afterAll } from 'vitest'
-import { createTestDatabase, cleanupRoot } from '../../db/utils'
+import { createTestDatabase, cleanupRoot, createDatabaseWithAuthSchema } from '../../db/utils'
 import { getPaginatedUsersSQL } from '../../../src/sql/studio/get-users-paginated'
 import { randomUUID } from 'crypto'
 
@@ -15,64 +15,7 @@ const withTestDatabase = (
     const db = await createTestDatabase()
 
     // Initialize minimal auth schema needed for user pagination tests
-    await db.executeQuery(`
-      CREATE SCHEMA IF NOT EXISTS auth;
-
-      CREATE TABLE IF NOT EXISTS auth.users (
-        instance_id uuid NULL,
-        id uuid NOT NULL UNIQUE,
-        aud varchar(255) NULL,
-        "role" varchar(255) NULL,
-        email varchar(255) NULL,
-        encrypted_password varchar(255) NULL,
-        email_confirmed_at timestamptz NULL,
-        invited_at timestamptz NULL,
-        confirmation_token varchar(255) NULL,
-        confirmation_sent_at timestamptz NULL,
-        recovery_token varchar(255) NULL,
-        recovery_sent_at timestamptz NULL,
-        email_change_token varchar(255) NULL,
-        email_change varchar(255) NULL,
-        email_change_sent_at timestamptz NULL,
-        last_sign_in_at timestamptz NULL,
-        raw_app_meta_data jsonb NULL,
-        raw_user_meta_data jsonb NULL,
-        is_super_admin bool NULL,
-        created_at timestamptz NULL,
-        updated_at timestamptz NULL,
-        phone text NULL,
-        phone_confirmed_at timestamptz NULL,
-        phone_change text NULL,
-        phone_change_token varchar(255) NULL,
-        phone_change_sent_at timestamptz NULL,
-        confirmed_at timestamptz NULL,
-        email_change_token_current varchar(255) NULL,
-        email_change_confirm_status smallint NULL,
-        banned_until timestamptz NULL,
-        reauthentication_token varchar(255) NULL,
-        reauthentication_sent_at timestamptz NULL,
-        is_sso_user bool NOT NULL DEFAULT false,
-        deleted_at timestamptz NULL,
-        is_anonymous bool NOT NULL DEFAULT false,
-        CONSTRAINT users_pkey PRIMARY KEY (id)
-      );
-
-      CREATE INDEX IF NOT EXISTS users_instance_id_idx ON auth.users USING btree (instance_id);
-      CREATE INDEX IF NOT EXISTS users_instance_id_email_idx ON auth.users USING btree (instance_id, lower(email));
-
-      CREATE TABLE IF NOT EXISTS auth.identities (
-        id text NOT NULL,
-        user_id uuid NOT NULL,
-        identity_data jsonb NOT NULL,
-        provider text NOT NULL,
-        last_sign_in_at timestamptz NULL,
-        created_at timestamptz NULL,
-        updated_at timestamptz NULL,
-        CONSTRAINT identities_pkey PRIMARY KEY (provider, id)
-      );
-
-      CREATE INDEX IF NOT EXISTS identities_user_id_idx ON auth.identities USING btree (user_id);
-    `)
+    await createDatabaseWithAuthSchema(db, { includeIdentities: true })
 
     try {
       await fn(db)
