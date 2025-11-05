@@ -38,7 +38,10 @@ export function DataTableFilterTimerange<TData>({
 
   const handleDatePickerChange = (vals: DatePickerValue) => {
     // Check if the selected date range exceeds the plan limits
-    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(vals.from, entitledToAuditLogDays)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      vals.from,
+      entitledToAuditLogDays
+    )
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)

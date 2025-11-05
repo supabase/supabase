@@ -240,7 +240,7 @@ export const LogsDatePicker = ({
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
-  
+
   const showHelperBadge = (helper?: DatetimeHelper) => {
     if (!helper) return false
     if (!helper.availableIn?.length) return false
