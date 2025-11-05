@@ -68,6 +68,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     error: branchesError,
     isLoading: isLoadingBranches,
     isError: isErrorBranches,
+    isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
@@ -215,12 +216,11 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                     <BranchManagementSection
                       header={`${mergeRequestBranches.length} merge requests`}
                     >
-                      {isLoadingBranches && (
+                      {isLoadingBranches ? (
                         <div className="p-4">
                           <GenericSkeletonLoader />
                         </div>
-                      )}
-                      {mergeRequestBranches.length > 0 ? (
+                      ) : mergeRequestBranches.length > 0 ? (
                         mergeRequestBranches.map((branch) => {
                           const isPR = branch.pr_number !== undefined
                           const rowLink = isPR

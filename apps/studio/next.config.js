@@ -141,7 +141,17 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/storage',
-        destination: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/buckets',
+        destination: '/project/:ref/storage/files',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/storage/buckets/:bucketId',
+        destination: '/project/:ref/storage/files/buckets/:bucketId',
         permanent: true,
       },
       {
