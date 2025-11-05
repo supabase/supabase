@@ -67,7 +67,7 @@ export const getUsersCountSQL = ({
       // JFYI in case we do eventually run into performance issues here when filtering for SAML provider
       if (providers.includes('saml 2.0')) {
         conditions.push(
-          `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => (p === 'saml 2.0' ? `'sso'` : `'${p}'`)).join(', ')}]`.trim()
+          `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${literal(providers.map((p) => (p === 'saml 2.0' ? 'sso' : p)))}]`.trim()
         )
       } else {
         conditions.push(
