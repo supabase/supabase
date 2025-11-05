@@ -28,14 +28,14 @@ export function useCsvFileDrop({
     (event: DragEvent<HTMLDivElement>) => {
       if (!enabled) return
 
-      const [item] = event.dataTransfer.items;
+      const [item] = event.dataTransfer.items
 
       // ignore non files drop, like column headers
-      if (item && item.kind !== 'file') return;
+      if (item && item.kind !== 'file') return
 
       if (event.type === 'dragover' && !isDraggedOver) {
         setIsDraggedOver(true)
-        setIsValidFile(item.type === "text/csv")
+        setIsValidFile(item.type === 'text/csv')
       } else if (event.type === 'dragleave' || event.type === 'drop') {
         setIsDraggedOver(false)
         setIsValidFile(false)
@@ -56,7 +56,7 @@ export function useCsvFileDrop({
       const [item] = event.dataTransfer.items
 
       // ignore non files drop, like column headers
-      if (item && item.kind !== 'file') return;
+      if (item && item.kind !== 'file') return
 
       if (flagInvalidFileImport(file)) return
 
