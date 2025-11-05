@@ -31,12 +31,16 @@ import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
 import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 
 export const EnumeratedTypes = () => {
   const { data: project } = useSelectedProjectQuery()
   const [search, setSearch] = useState('')
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [showCreateTypePanel, setShowCreateTypePanel] = useState(false)
+  const [showCreateTypePanel, setShowCreateTypePanel] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+  )
   const [selectedTypeToEdit, setSelectedTypeToEdit] = useState<EnumeratedType>()
   const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
 
