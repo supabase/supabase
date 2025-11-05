@@ -109,9 +109,11 @@ export const DownloadResultsButton = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={align} className="w-44">
-        <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsCSV()}>
-          <Download size={14} />
-          <p>Download CSV</p>
+        <DropdownMenuItem asChild className="gap-x-2">
+          <Link href={`/project/${ref}/settings/log-drains`}>
+            <Settings size={14} />
+            <p>Add a Log Drain</p>
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
           <Copy size={14} />
@@ -121,11 +123,9 @@ export const DownloadResultsButton = ({
           <Copy size={14} />
           <p>Copy as JSON</p>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild className="gap-x-2">
-          <Link href={`/project/${ref}/settings/log-drains`}>
-            <Settings size={14} />
-            <p>Add a Log Drain</p>
-          </Link>
+        <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsCSV()}>
+          <Download size={14} />
+          <p>Download CSV</p>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

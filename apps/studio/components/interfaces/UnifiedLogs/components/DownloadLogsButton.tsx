@@ -92,7 +92,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
       <DropdownMenu>
         <DropdownMenuTrigger>
           <ButtonTooltip
-            type="outline"
+            type="default"
             className="w-[26px]"
             icon={<Download className="text-foreground" />}
             tooltip={{ content: { side: 'bottom', text: 'Download logs' } }}
