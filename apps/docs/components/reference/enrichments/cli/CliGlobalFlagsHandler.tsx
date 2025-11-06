@@ -6,9 +6,13 @@ import { isFeatureEnabled } from 'common'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 
 const { cliDisableCustomProfiles } = isFeatureEnabled(['cli:disable_custom_profiles'])
-const { cliProfile } = getCustomContent(['cli:profile'])
 
 const CliGlobalFlagsHandler = () => {
+  // Only fetch cliProfile when custom profiles are enabled
+  const cliProfile = !cliDisableCustomProfiles
+    ? getCustomContent(['cli:profile'] as any).cliProfile
+    : undefined
+
   // Transform the flags based on feature flags
   const processedFlags = spec.flags.map((flag: any) => {
     if (flag.id === 'profile' && !cliDisableCustomProfiles) {
