@@ -61,7 +61,6 @@ const formId = 'connect-tables-form'
 const FormSchema = z.object({
   tables: z.array(z.string()).min(1, 'Select at least one table'),
 })
-const isEnabled = true // Kill switch if we wanna hold off supporting connecting tables
 
 type ConnectTablesForm = z.infer<typeof FormSchema>
 
@@ -92,6 +91,8 @@ interface ConnectTablesDialogProps {
 export const ConnectTablesDialog = ({ onSuccessConnectTables }: ConnectTablesDialogProps) => {
   const { ref: projectRef, bucketId } = useParams()
   const [visible, setVisible] = useState(false)
+
+  const isEnabled = useFlag('storageAnalyticsVector') // Kill switch if we wanna hold off supporting connecting tables
 
   const { sourceId, pipeline, publication } = useAnalyticsBucketAssociatedEntities({
     projectRef,
