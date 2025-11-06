@@ -1,6 +1,7 @@
 import { getPaginatedUsersSQL } from '@supabase/pg-meta/src/sql/studio/get-users-paginated'
 import { useInfiniteQuery } from '@tanstack/react-query'
 
+import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import type { components } from 'data/api'
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -20,8 +21,8 @@ type UsersVariables = {
   providers?: string[]
   sort?: 'id' | 'created_at' | 'email' | 'phone' | 'last_sign_in_at'
   order?: 'asc' | 'desc'
-
-  column?: 'id' | 'email' | 'phone'
+  /** If set, uses optimized prefix search for the specified column */
+  column?: OptimizedSearchColumns
   startAt?: string
 }
 
