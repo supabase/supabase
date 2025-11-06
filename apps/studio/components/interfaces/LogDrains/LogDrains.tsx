@@ -193,7 +193,7 @@ export function LogDrains({
             onConfirm={() => {
               if (selectedLogDrain && ref) {
                 deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
-                track('log_drain_destination_confirmed', {
+                track('log_drain_confirm_button_submitted', {
                   destination: selectedLogDrain.type as Exclude<
                     LogDrainType,
                     'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3'
