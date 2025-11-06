@@ -75,15 +75,16 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                     .map((option) => {
                       return (
                         <SelectItem_Shadcn_ key={option} value={option}>
-                          <div className="flex flex-row gap-2">
-                            <div className="text-center w-[80px]">
+                          <div className="flex flex-row gap-4 items-center">
+                            <div className="w-14 flex items-center">
                               <Badge
-                                variant={option === 'micro' ? 'default' : 'brand'}
-                                className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
+                                variant={option === 'micro' ? 'default' : 'success'}
+                                type="code"
                               >
                                 {instanceSizeSpecs[option].label}
                               </Badge>
                             </div>
+
                             <div className="text-sm">
                               <span className="text-foreground">
                                 {instanceSizeSpecs[option].ram} RAM /{' '}

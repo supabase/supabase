@@ -37,11 +37,7 @@ const ProductMenuItem = ({
           className={'flex items-center gap-2 truncate w-full ' + textClassName}
         >
           <span className="truncate">{name} </span>
-          {label !== undefined && (
-            <Badge variant="warning" className="py-0 px-1.5 capitalize">
-              {label}
-            </Badge>
-          )}
+          {label !== undefined && <Badge variant="warning">{label}</Badge>}
         </div>
         {rightIcon && <div>{rightIcon}</div>}
       </div>
