@@ -22,7 +22,9 @@ export default function StudioCommandMenu() {
   useApiUrlCommand()
   useProjectLevelTableEditorCommands()
   useProjectSwitchCommand()
-  useConfigureOrganizationCommand()
+
+  IS_PLATFORM && useConfigureOrganizationCommand()
+
   useQueryTableCommands()
   useBranchCommands()
   useSnippetCommands()
