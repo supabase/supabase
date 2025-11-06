@@ -1,8 +1,9 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DatabaseZap, FunctionSquare, Plus, Search, Shield } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { toast } from 'sonner'
 
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from 'components/ui/AlertError'
@@ -95,6 +96,22 @@ export const TriggersList = () => {
 
   const triggerToEdit = triggers?.find((t) => t.name === triggerToEditByName)
   const triggerToDelete = triggers?.find((t) => t.name === triggerToDeleteByName)
+
+  // Error handling if edit panel is open and trigger is not found
+  useEffect(() => {
+    if (triggerToEditByName !== '' && !triggerToEdit) {
+      toast.error('Trigger not found')
+      setTriggerToEditByName('')
+    }
+  }, [triggerToEditByName, triggerToEdit])
+
+  // Error handling if delete panel is open and trigger is not found
+  useEffect(() => {
+    if (triggerToDeleteByName !== '' && !triggerToDelete) {
+      toast.error('Trigger not found')
+      setTriggerToDeleteByName('')
+    }
+  }, [triggerToDeleteByName, triggerToDelete])
 
   const createTrigger = () => {
     setIsDuplicatingTrigger(false)
