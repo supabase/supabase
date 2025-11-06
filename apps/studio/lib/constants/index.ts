@@ -3,6 +3,9 @@
 export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+export const IS_LOCAL_CLI =
+  !IS_PLATFORM && !!(process.env.CURRENT_CLI_VERSION ?? process.env.NEXT_PUBLIC_CURRENT_CLI_VERSION)
+export const IS_SELF_HOST = !IS_PLATFORM && !IS_LOCAL_CLI
 
 export const API_URL = (() => {
   if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
