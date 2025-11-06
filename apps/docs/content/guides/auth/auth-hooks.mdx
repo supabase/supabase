@@ -146,7 +146,13 @@ Let us develop a Hook locally and then deploy it to the cloud. As a recap, hereâ
 | MFA Verification Attempt      | `mfa_verification_attempt`      | Each time a user tries to verify an MFA factor.    | Returns a decision on whether to reject the attempt and future ones, or to allow the user to keep trying. |
 | Password Verification Attempt | `password_verification_attempt` | Each time a user tries to sign in with a password. | Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying.   |
 
-Edit `config.toml` to set up the Auth Hook locally. The hook name used must correspond to one of the available Hooks listed above.
+Edit `config.toml` to set up the Auth Hook locally.
+
+<Admonition type="note">
+  
+  The hook name used in the `config.toml` must correspond to one of the available Hooks listed above. For example, the Send SMS hook would be configured as: `[auth.hook.send_sms]`
+
+</Admonition>
 
 <Tabs
   scrollable
