@@ -2,6 +2,7 @@ export { default as RESTApi } from './REST-api';
 export { default as ExampleTemplate } from './_example-template';
 export { default as ApiDocs } from './api-docs';
 export { default as Auth } from './auth';
+export { default as Axiom } from './axiom';
 export { default as BucketAdd } from './bucket-add';
 export { default as Bucket } from './bucket';
 export { default as Database } from './database';
