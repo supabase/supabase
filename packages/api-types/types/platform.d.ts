@@ -544,9 +544,16 @@ export interface paths {
     /** Get GitHub authorization */
     get: operations['GitHubAuthorizationsController_getGitHubAuthorization']
     put?: never
-    /** Create GitHub authorization */
+    /**
+     * Upsert GitHub authorization
+     * @description Creates or updates a GitHub authorization for the current user
+     */
     post: operations['GitHubAuthorizationsController_createGitHubAuthorization']
-    delete?: never
+    /**
+     * Remove GitHub authorization
+     * @description Removes the GitHub authorization for the current user
+     */
+    delete: operations['GitHubAuthorizationsController_removeGitHubAuthorization']
     options?: never
     head?: never
     patch?: never
@@ -6992,6 +6999,8 @@ export interface components {
       }[]
     }
     ListGitHubRepositoriesResponse: {
+      /** @description The authorized user may not have access to all GitHub repositories in case they haven't gone through the authorization process with SSO yet. This field will be `true` if this is the case. The calling user must reauthorize their GitHub account with SSO to see all repositories. */
+      partial_response_due_to_sso: boolean
       repositories: {
         default_branch: string
         id: number
@@ -12122,6 +12131,37 @@ export interface operations {
         content?: never
       }
       /** @description Failed to create GitHub authorization */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GitHubAuthorizationsController_removeGitHubAuthorization: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description There was no GitHub authorization attached to the user */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to remove GitHub authorization */
       500: {
         headers: {
           [name: string]: unknown

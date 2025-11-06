@@ -74,4 +74,8 @@
   .text-link {
     @apply text-foreground-light underline underline-offset-4 decoration-inherit hover:decoration-foreground transition-colors hover:text-foreground;
   }
+
+  .text-link-table-cell {
+    @apply truncate cursor-pointer underline underline-offset-4 decoration-foreground-muted/50 hover:decoration-foreground-lighter/80 transition-colors duration-100;
+  }
 }
