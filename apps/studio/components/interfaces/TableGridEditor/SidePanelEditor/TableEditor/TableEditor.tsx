@@ -1,4 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import dayjs from 'dayjs'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -15,12 +16,13 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTrack } from 'lib/telemetry/track'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
@@ -75,6 +77,8 @@ export interface TableEditorProps {
   updateEditorDirty: () => void
 }
 
+const NEW_PROJECT_THRESHOLD_DAYS = 7
+
 export const TableEditor = ({
   table,
   isDuplicating,
@@ -89,8 +93,9 @@ export const TableEditor = ({
   const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
+  const hideRealtimeButton = usePHFlag<boolean>('hideRealtimeButton')
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
@@ -122,6 +127,11 @@ export const TableEditor = ({
   const isRealtimeEnabled = isNewRecord
     ? false
     : realtimeEnabledTables.some((t: any) => t.id === table?.id)
+
+  const isNewProject = useMemo(() => {
+    if (!project?.inserted_at) return false
+    return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
+  }, [project?.inserted_at])
 
   const [errors, setErrors] = useState<any>({})
   const [tableFields, setTableFields] = useState<TableField>()
@@ -371,23 +381,16 @@ export const TableEditor = ({
           </Admonition>
         )}
 
-        {realtimeEnabled && (
+        {!(isNewProject && hideRealtimeButton) && realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
             label="Enable Realtime"
             description="Broadcast changes on this table to authorized subscribers"
             checked={tableFields.isRealtimeEnabled}
             onChange={() => {
-              sendEvent({
-                action: 'realtime_toggle_table_clicked',
-                properties: {
-                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                  origin: 'tableSidePanel',
-                },
-                groups: {
-                  project: project?.ref ?? 'Unknown',
-                  organization: org?.slug ?? 'Unknown',
-                },
+              track('realtime_toggle_table_clicked', {
+                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                origin: 'tableSidePanel',
               })
               onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
             }}
