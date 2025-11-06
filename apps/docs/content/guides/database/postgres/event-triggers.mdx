@@ -12,9 +12,12 @@ With our `Supautils` extension (installed automatically for all Supabase project
 Some use cases for event triggers ares:
 
 - Capturing Data Definition Language (DDL) changes - these are changes to your database schema (though the [pgAudit](/docs/guides/database/extensions/pgaudit) extension provides a more complete solution)
-- Monitoring/preventing actions - such as preventing tables from being dropped in Production or enforcing RLS on all new tables
+- Enforcing/monitoring/preventing actions - such as preventing tables from being dropped in Production or enforcing RLS on all new tables
 
-In this guide, we will go through an example event trigger that prevents accidental dropping of a table
+In this guide, we will go through two example event triggers:
+
+1. Preventing accidental dropping of a table
+2. Automatically enabling Row Level Security on new tables in the `public` schema
 
 ## Creating an event trigger
 
@@ -50,6 +53,46 @@ ON sql_drop
 EXECUTE FUNCTION dont_drop_function();
 ```
 
+### Example trigger function - auto enable Row Level Security
+
+```sql
+CREATE OR REPLACE FUNCTION rls_auto_enable()
+RETURNS EVENT_TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog
+AS $$
+DECLARE
+  cmd record;
+BEGIN
+  FOR cmd IN
+    SELECT *
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
+      AND object_type IN ('table','partitioned table')
+  LOOP
+     IF cmd.schema_name IS NOT NULL AND cmd.schema_name IN ('public') AND cmd.schema_name NOT IN ('pg_catalog','information_schema') AND cmd.schema_name NOT LIKE 'pg_toast%' AND cmd.schema_name NOT LIKE 'pg_temp%' THEN
+      BEGIN
+        EXECUTE format('alter table if exists %s enable row level security', cmd.object_identity);
+        RAISE LOG 'rls_auto_enable: enabled RLS on %', cmd.object_identity;
+      EXCEPTION
+        WHEN OTHERS THEN
+          RAISE LOG 'rls_auto_enable: failed to enable RLS on %', cmd.object_identity;
+      END;
+     ELSE
+        RAISE LOG 'rls_auto_enable: skip % (either system schema or not in enforced list: %.)', cmd.object_identity, cmd.schema_name;
+     END IF;  
+  END LOOP;
+END;
+$$;
+
+DROP EVENT TRIGGER IF EXISTS ensure_rls;
+CREATE EVENT TRIGGER ensure_rls
+ON ddl_command_end
+WHEN TAG IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
+EXECUTE FUNCTION rls_auto_enable();
+```
+
 ### Event trigger Functions and firing Events
 
 Event triggers can be triggered on:
@@ -58,6 +101,12 @@ Event triggers can be triggered on:
 - `ddl_command_end` - occurs just after a DDL command for almost all objects within a schema
 - `sql_drop` - occurs just before `ddl_command_end` for any DDL commands that `DROP` a database object (note that altering a table can cause it to be dropped)
 - `table_rewrite` - occurs just before a table is rewritten using the `ALTER TABLE` command
+
+<Admonition type="warning">
+
+Event triggers run for each DDL command specified above and can consume resources which may cause performance issues if not used carefully.
+
+</Admonition>
 
 Within each event trigger, helper functions exist to view the objects being modified or the command being run. For example, our example calls `pg_event_trigger_dropped_objects()` to view the object(s) being dropped. For a more comprehensive overview of these functions, see the [official documentation](https://www.postgresql.org/docs/current/event-trigger-definition.html)
 
