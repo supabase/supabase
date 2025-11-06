@@ -15,14 +15,14 @@ import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Loader } from 'lucide-react'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { formatPoliciesForStorage } from '../Storage.utils'
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
-const StoragePolicies = () => {
+export const StoragePolicies = () => {
   const { data: project } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
 
@@ -182,9 +182,9 @@ const StoragePolicies = () => {
   return (
     <div className="flex min-h-full w-full flex-col">
       {isLoading ? (
-        <div className="flex h-full items-center justify-center">
-          <Loader className="animate-spin" size={16} />
-        </div>
+        <ScaffoldSection isFullWidth>
+          <GenericSkeletonLoader />
+        </ScaffoldSection>
       ) : (
         <div>
           <ScaffoldSection isFullWidth>
@@ -284,5 +284,3 @@ const StoragePolicies = () => {
     </div>
   )
 }
-
-export default StoragePolicies

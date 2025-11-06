@@ -1,10 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { useFlag } from 'common'
 import { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { configKeys } from './keys'
 import { IS_PLATFORM } from 'lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { configKeys } from './keys'
 
 export type ProjectStorageConfigVariables = {
   projectRef?: string
@@ -23,7 +24,15 @@ export async function getProjectStorageConfig(
     signal,
   })
 
-  if (error) handleError(error)
+  if (error) {
+    // [Joshen] This is due to API not returning an error message on this endpoint if a 404 is returned
+    // Should only be a temporary patch, needs to be addressed on the API end
+    if ((error as any).code === 404) {
+      handleError({ ...(error as any), message: 'Storage configuration not found.' })
+    } else {
+      handleError(error)
+    }
+  }
   return data
 }
 
@@ -35,10 +44,22 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectStorageConfigData, ProjectStorageConfigError, TData> = {}
+  }: UseCustomQueryOptions<ProjectStorageConfigData, ProjectStorageConfigError, TData> = {}
 ) =>
-  useQuery<ProjectStorageConfigData, ProjectStorageConfigError, TData>(
-    configKeys.storage(projectRef),
-    ({ signal }) => getProjectStorageConfig({ projectRef }, signal),
-    { enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<ProjectStorageConfigData, ProjectStorageConfigError, TData>({
+    queryKey: configKeys.storage(projectRef),
+    queryFn: ({ signal }) => getProjectStorageConfig({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    ...options,
+  })
+
+export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
+  const { data } = useProjectStorageConfigQuery({ projectRef })
+  return !!data?.features.icebergCatalog?.enabled
+}
+
+export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
+  // [Joshen] Temp using feature flag - will need to shift to storage config like analytics bucket once ready
+  const isVectorBucketsEnabled = useFlag('storageAnalyticsVector')
+  return isVectorBucketsEnabled
+}

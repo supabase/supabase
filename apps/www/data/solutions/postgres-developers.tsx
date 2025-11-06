@@ -83,22 +83,7 @@ const data: () => {
         </>,
       ],
       footer: <Logos showHeading={false} className="mt-12" />,
-      image: (
-        <DatabaseVisual
-          className="group
-            [&>span]:!w-[120%]
-            [&>span]:!h-[120%]
-            [&>span]:!inset-auto
-            [&>span]:!-left-10
-            [&>span]:sm:!-left-20
-            [&>span]:lg:!-left-10
-            [&>span]:!-top-16
-            [&>span]:md:!-top-28
-            [&>span]:lg:!-top-52
-          "
-          hasGlow={false}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your project',
@@ -710,12 +695,12 @@ const data: () => {
         "Supabase ensures optimal database performance at any scale, so you can focus on innovating and growing without worrying about infrastructure limitations — whether you're handling high-traffic applications, complex queries, or massive data volumes.",
       highlights: [
         {
-          heading: 'databases managed',
-          subheading: companyStats.databasesManaged,
+          heading: companyStats.databasesManaged.label,
+          subheading: companyStats.databasesManaged.text,
         },
         {
-          heading: 'databases launched daily',
-          subheading: companyStats.databasesLaunchedDaily,
+          heading: companyStats.databasesLaunchedDaily.label,
+          subheading: companyStats.databasesLaunchedDaily.text,
         },
       ],
     },

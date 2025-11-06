@@ -11,7 +11,6 @@ import {
 } from 'react'
 
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { EMPTY_OBJ } from 'lib/void'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 
@@ -101,11 +100,6 @@ export const useUnifiedLogsPreview = () => {
   return { isEnabled, enable, disable }
 }
 
-export const useIsRealtimeSettingsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS]
-}
-
 export const useIsBranching2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
@@ -116,13 +110,18 @@ export const useIsAdvisorRulesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
+export const useIsSecurityNotificationsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]
+}
+
 export const useFeaturePreviewModal = () => {
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
 
-  const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const isSecurityNotificationsAvailable = useFlag('securityNotifications')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
@@ -131,23 +130,23 @@ export const useFeaturePreviewModal = () => {
   const isFeaturePreviewReleasedToPublic = useCallback(
     (feature: (typeof FEATURE_PREVIEWS)[number]) => {
       switch (feature.key) {
-        case 'supabase-ui-realtime-settings':
-          return isRealtimeSettingsEnabled
         case 'supabase-ui-branching-2-0':
           return gitlessBranchingEnabled
         case 'supabase-ui-advisor-rules':
           return advisorRulesEnabled
         case 'supabase-ui-preview-unified-logs':
           return isUnifiedLogsPreviewAvailable
+        case 'security-notifications':
+          return isSecurityNotificationsAvailable
         default:
           return true
       }
     },
     [
-      isRealtimeSettingsEnabled,
       gitlessBranchingEnabled,
       advisorRulesEnabled,
       isUnifiedLogsPreviewAvailable,
+      isSecurityNotificationsAvailable,
     ]
   )
 

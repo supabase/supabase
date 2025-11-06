@@ -17,6 +17,7 @@ import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -290,7 +291,7 @@ export const CreateHookSheet = ({
               {isCreating ? `Add ${title}` : `Update ${title}`}
             </SheetTitle>
           </div>
-          <DocsButton href={'https://supabase.com/docs/guides/auth/auth-hooks/' + hook.docSlug} />
+          <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </SheetHeader>
         <Separator />
         <SheetSection className="overflow-auto flex-grow px-0">

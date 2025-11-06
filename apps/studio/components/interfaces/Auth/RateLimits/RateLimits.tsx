@@ -13,7 +13,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Card,
@@ -30,13 +30,13 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 
-const RateLimits = () => {
+export const RateLimits = () => {
   const { ref: projectRef } = useParams()
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
-  const { can: canReadConfig } = useAsyncCheckProjectPermissions(
+  const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
@@ -142,15 +142,27 @@ const RateLimits = () => {
   }, [isSuccess])
 
   if (isError) {
-    return <AlertError subject="Failed to retrieve auth config rate limits" error={error} />
+    return (
+      <ScaffoldSection isFullWidth>
+        <AlertError error={error} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
+    )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view auth configuration settings" />
+    return (
+      <ScaffoldSection isFullWidth>
+        <NoPermission resourceText="view auth configuration settings" />
+      </ScaffoldSection>
+    )
   }
 
   if (isLoading) {
-    return <GenericSkeletonLoader />
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
+    )
   }
 
   return (
@@ -505,5 +517,3 @@ const RateLimits = () => {
     </ScaffoldSection>
   )
 }
-
-export default RateLimits

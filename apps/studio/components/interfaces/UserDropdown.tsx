@@ -4,12 +4,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
-import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import { getGitHubProfileImgUrl } from 'lib/github'
-import { useProfile } from 'lib/profile'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useProfileNameAndPicture } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
@@ -25,45 +22,38 @@ import {
   Theme,
   singleThemes,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { useCommandMenuOpenedTelemetry, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
 export function UserDropdown() {
   const router = useRouter()
-  const signOut = useSignOut()
-  const { profile, isLoading: isLoadingProfile } = useProfile()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
-  const setCommandMenuOpen = useSetCommandMenuOpen()
-  const { openFeaturePreviewModal } = useFeaturePreviewModal()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
+  const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
-  const { username, primary_email } = profile ?? {}
+  const setCommandMenuOpen = useSetCommandMenuOpen()
+  const sendTelemetry = useCommandMenuOpenedTelemetry()
+  const { openFeaturePreviewModal } = useFeaturePreviewModal()
 
-  const { data, isLoading: isLoadingIdentities } = useProfileIdentitiesQuery()
-  const isGitHubProfile = profile?.auth0_id.startsWith('github')
-  const gitHubUsername = isGitHubProfile
-    ? (data?.identities ?? []).find((x) => x.provider === 'github')?.identity_data?.user_name
-    : undefined
-  const profileImageUrl = isGitHubProfile ? getGitHubProfileImgUrl(gitHubUsername) : undefined
+  const handleCommandMenuOpen = () => {
+    setCommandMenuOpen(true)
+    sendTelemetry()
+  }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="border flex-shrink-0 px-3" asChild>
+      <DropdownMenuTrigger asChild className="border flex-shrink-0 px-3">
         <Button
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
         >
-          {isLoadingProfile || isLoadingIdentities ? (
+          {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
               <Loader2 className="animate-spin text-foreground-lighter" size={16} />
             </div>
           ) : (
-            <ProfileImage
-              alt={profile?.username}
-              src={profileImageUrl}
-              className="w-8 h-8 rounded-md"
-            />
+            <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
           )}
         </Button>
       </DropdownMenuTrigger>
@@ -72,17 +62,17 @@ export function UserDropdown() {
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-              {profile && (
+              {!!username && (
                 <>
                   <span title={username} className="w-full text-left text-foreground truncate">
                     {username}
                   </span>
-                  {primary_email !== username && profileShowEmailEnabled && (
+                  {primaryEmail !== username && profileShowEmailEnabled && (
                     <span
-                      title={primary_email}
+                      title={primaryEmail}
                       className="w-full text-left text-foreground-light text-xs truncate"
                     >
-                      {primary_email}
+                      {primaryEmail}
                     </span>
                   )}
                 </>
@@ -111,7 +101,7 @@ export function UserDropdown() {
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
+              <DropdownMenuItem className="flex gap-2" onClick={handleCommandMenuOpen}>
                 <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Command menu
               </DropdownMenuItem>
@@ -139,8 +129,8 @@ export function UserDropdown() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onSelect={async () => {
-                  await signOut()
+                onSelect={() => {
+                  router.push('/logout')
                 }}
               >
                 Log out

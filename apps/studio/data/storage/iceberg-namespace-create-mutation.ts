@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 type CreateIcebergNamespaceVariables = {
@@ -12,6 +12,7 @@ type CreateIcebergNamespaceVariables = {
   namespace: string
 }
 
+// [Joshen] Investigate if we can use the temp API keys here
 async function createIcebergNamespace({
   catalogUri,
   warehouse,
@@ -64,36 +65,41 @@ export const useIcebergNamespaceCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>,
+  UseCustomMutationOptions<
+    IcebergNamespaceCreateData,
+    ResponseError,
+    CreateIcebergNamespaceVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>(
-    (vars) => createIcebergNamespace(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(
-          storageKeys.icebergNamespace(
-            variables.catalogUri,
-            variables.warehouse,
-            variables.namespace
-          )
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if ((data.message = 'Request failed with status code 409')) {
-          toast.error(`A namespace named ${variables.namespace} already exists in the catalog.`)
-          return
-        }
-        if (onError === undefined) {
-          toast.error(`Failed to create Iceberg namespace: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>({
+    mutationFn: (vars) => createIcebergNamespace(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.icebergNamespace(
+          variables.catalogUri,
+          variables.warehouse,
+          variables.namespace
+        ),
+      })
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.icebergNamespaces(variables.catalogUri, variables.warehouse),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if ((data.message = 'Request failed with status code 409')) {
+        toast.error(`A namespace named ${variables.namespace} already exists in the catalog.`)
+        return
+      }
+      if (onError === undefined) {
+        toast.error(`Failed to create Iceberg namespace: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

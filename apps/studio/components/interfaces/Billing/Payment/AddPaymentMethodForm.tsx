@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
-} from 'components/interfaces/Organization/BillingSettings/PaymentMethods/NewPaymentMethodElement'
+} from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
@@ -74,12 +74,12 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
             paymentMethodId: result.setupIntent.payment_method,
           })
 
-          await queryClient.invalidateQueries(
-            organizationKeys.paymentMethods(selectedOrganization.slug)
-          )
+          await queryClient.invalidateQueries({
+            queryKey: organizationKeys.paymentMethods(selectedOrganization.slug),
+          })
 
           queryClient.setQueriesData(
-            organizationKeys.paymentMethods(selectedOrganization.slug),
+            { queryKey: organizationKeys.paymentMethods(selectedOrganization.slug) },
             (prev: any) => {
               if (!prev) return prev
               return {
@@ -97,9 +97,9 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         }
       } else {
         if (selectedOrganization) {
-          await queryClient.invalidateQueries(
-            organizationKeys.paymentMethods(selectedOrganization.slug)
-          )
+          await queryClient.invalidateQueries({
+            queryKey: organizationKeys.paymentMethods(selectedOrganization.slug),
+          })
         }
       }
 

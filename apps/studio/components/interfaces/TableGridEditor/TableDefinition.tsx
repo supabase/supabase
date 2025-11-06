@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
-import Footer from 'components/grid/components/footer/Footer'
+import { Footer } from 'components/grid/components/footer/Footer'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
@@ -24,7 +24,7 @@ export interface TableDefinitionProps {
   entity?: Entity
 }
 
-const TableDefinition = ({ entity }: TableDefinitionProps) => {
+export const TableDefinition = ({ entity }: TableDefinitionProps) => {
   const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
@@ -132,5 +132,3 @@ const TableDefinition = ({ entity }: TableDefinitionProps) => {
     </>
   )
 }
-
-export default TableDefinition

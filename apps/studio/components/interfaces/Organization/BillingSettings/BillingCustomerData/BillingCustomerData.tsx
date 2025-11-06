@@ -16,10 +16,7 @@ import { useOrganizationCustomerProfileQuery } from 'data/organizations/organiza
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import {
-  useAsyncCheckProjectPermissions,
-  useCheckPermissions,
-} from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
 import {
@@ -33,9 +30,9 @@ export const BillingCustomerData = () => {
   const { slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadBillingCustomerData } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const canUpdateBillingCustomerData = useCheckPermissions(
+  const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
+  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )
@@ -61,6 +58,7 @@ export const BillingCustomerData = () => {
       line1: customerProfile?.address?.line1,
       line2: customerProfile?.address?.line2 ?? undefined,
       postal_code: customerProfile?.address?.postal_code ?? undefined,
+      state: customerProfile?.address?.state ?? undefined,
       billing_name: customerProfile?.billing_name,
       tax_id_type: taxId?.type,
       tax_id_value: taxId?.value,
@@ -110,7 +108,10 @@ export const BillingCustomerData = () => {
         <div className="sticky space-y-2 top-12 pr-3">
           <p className="text-foreground text-base m-0">Billing Address &amp; Tax ID</p>
           <p className="text-sm text-foreground-light m-0">
-            This will be reflected in every upcoming invoice, past invoices are not affected
+            Changes will be reflected in every upcoming invoice, past invoices are not affected
+          </p>
+          <p className="text-sm text-foreground-light m-0">
+            A Tax ID is only required for registered businesses.
           </p>
         </div>
       </ScaffoldSectionDetail>

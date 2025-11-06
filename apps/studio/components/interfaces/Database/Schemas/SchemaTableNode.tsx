@@ -1,3 +1,4 @@
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
@@ -5,8 +6,8 @@ import { Handle, NodeProps } from 'reactflow'
 import { Button, cn } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
-const TABLE_NODE_WIDTH = 320
-const TABLE_NODE_ROW_HEIGHT = 40
+export const TABLE_NODE_WIDTH = 320
+export const TABLE_NODE_ROW_HEIGHT = 40
 
 export type TableNodeData = {
   id?: number
@@ -24,7 +25,7 @@ export type TableNodeData = {
   }[]
 }
 
-const TableNode = ({
+export const TableNode = ({
   data,
   targetPosition,
   sourcePosition,
@@ -67,7 +68,9 @@ const TableNode = ({
             </div>
             {data.id && !placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={`/project/${data.ref}/editor/${data.id}`}>
+                <Link
+                  href={`/project/${data.ref}/editor/${data.id}?${LOAD_TAB_FROM_CACHE_PARAM}=true`}
+                >
                   <ExternalLink size={10} className="text-foreground-light" />
                 </Link>
               </Button>
@@ -152,5 +155,3 @@ const TableNode = ({
     </>
   )
 }
-
-export { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode }

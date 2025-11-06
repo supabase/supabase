@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
-  Clipboard,
+  Copy,
   Download,
   Edit,
   File,
@@ -18,10 +18,10 @@ import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import type { CSSProperties } from 'react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
@@ -46,8 +46,8 @@ import {
   STORAGE_VIEWS,
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
-import { StorageItem, StorageItemWithColumn } from '../Storage.types'
-import FileExplorerRowEditing from './FileExplorerRowEditing'
+import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
+import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 
@@ -98,19 +98,23 @@ export const RowIcon = ({
   return <File size={16} strokeWidth={2} />
 }
 
-export interface FileExplorerRowProps {
+interface FileExplorerRowProps {
+  index: number
+  item: StorageItem
   view: STORAGE_VIEWS
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
+  style?: CSSProperties
 }
 
-const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
+export const FileExplorerRow = ({
   index: itemIndex,
   item,
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
   selectedItems = [],
-}) => {
+  style,
+}: FileExplorerRowProps) => {
   const { ref: projectRef, bucketId } = useParams()
 
   const {
@@ -139,9 +143,9 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   const isOpened =
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  const onSelectFile = async (columnIndex: number, file: StorageItem) => {
+  const onSelectFile = async (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
     setSelectedFilePreview(itemWithColumnIndex)
@@ -183,7 +187,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           },
           {
             name: 'Copy path to folder',
-            icon: <Clipboard size={14} strokeWidth={1} />,
+            icon: <Copy size={14} strokeWidth={1} />,
             onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
           },
           ...(canUpdateFiles
@@ -204,14 +208,14 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                   ? [
                       {
                         name: 'Get URL',
-                        icon: <Clipboard size={14} strokeWidth={1} />,
+                        icon: <Copy size={14} strokeWidth={1} />,
                         onClick: () => onCopyUrl(itemWithColumnIndex.name),
                       },
                     ]
                   : [
                       {
                         name: 'Get URL',
-                        icon: <Clipboard size={14} strokeWidth={1} />,
+                        icon: <Copy size={14} strokeWidth={1} />,
                         children: [
                           {
                             name: 'Expire in 1 week',
@@ -299,11 +303,14 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
         : '100%'
 
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
-    return <FileExplorerRowEditing view={view} item={item} columnIndex={columnIndex} />
+    return (
+      <FileExplorerRowEditing style={style} view={view} item={item} columnIndex={columnIndex} />
+    )
   }
 
   return (
     <div
+      style={style}
       className="h-full border-b border-default"
       onContextMenu={(event) => {
         event.stopPropagation()
@@ -326,7 +333,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
             item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
               ? openFolder(columnIndex, item)
-              : onSelectFile(columnIndex, item)
+              : onSelectFile(columnIndex)
           }
         }}
       >
@@ -455,5 +462,3 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     </div>
   )
 }
-
-export default FileExplorerRow

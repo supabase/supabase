@@ -1,6 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import dayjs, { Dayjs } from 'dayjs'
-import { get, isEqual } from 'lodash'
+import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 
@@ -15,7 +15,7 @@ import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
  * Convert a micro timestamp from number/string to iso timestamp
  */
 export const unixMicroToIsoTimestamp = (unix: string | number): string => {
-  return dayjs.unix(Number(unix) / 1000 / 1000).toISOString()
+  return dayjs.utc(Number(unix) / 1000).toISOString()
 }
 
 export const isUnixMicro = (unix: string | number): boolean => {
@@ -142,7 +142,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
 
   switch (table) {
     case 'edge_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 -- local dev edge_logs query
 select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
@@ -162,7 +162,7 @@ limit ${limit};
   `
 
     case 'postgres_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 select postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint
 from postgres_logs
@@ -196,6 +196,14 @@ limit ${limit}
     `
 
     case 'function_edge_logs':
+      if (!IS_PLATFORM) {
+        return `
+select id, function_edge_logs.timestamp, event_message
+from function_edge_logs
+${orderBy}
+limit ${limit}
+`
+      }
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   ${joins}
   ${where}
@@ -216,14 +224,11 @@ limit ${limit}
   `
 
     case 'pg_cron_logs':
-      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+      const pgCronWhere = where ? `${basePgCronWhere} AND ${where.substring(6)}` : basePgCronWhere
 
-      const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
-
-      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.query
+      return `select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
 from postgres_logs
-  cross join unnest(metadata) as m
-  cross join unnest(m.parsed) as parsed
+${joins}
 ${pgCronWhere}
 ${orderBy}
 limit ${limit}
@@ -242,6 +247,7 @@ const genCrossJoinUnnests = (table: LogsTableName) => {
   cross join unnest(m.request) as request
   cross join unnest(m.response) as response`
 
+    case 'pg_cron_logs':
     case 'postgres_logs':
       return `cross join unnest(metadata) as m
   cross join unnest(m.parsed) as parsed`
@@ -285,8 +291,27 @@ export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?:
   )
 }
 
+/**
+ * Determine if we should show the user an upgrade prompt while browsing logs
+ * This method should replace maybeShowUpgradePrompt once we have migrated all usage to the Entitlements API.
+ */
+export const maybeShowUpgradePromptIfNotEntitled = (
+  from: string | null | undefined,
+  entitledToDays: number | undefined
+) => {
+  if (!entitledToDays) return false
+  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
+  return day > entitledToDays
+}
+
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
-  const where = genWhereStatement(table, filters)
+  let where = genWhereStatement(table, filters)
+  // pg_cron logs are a subset of postgres logs
+  // to calculate the chart, we need to query postgres logs
+  if (table === LogsTableName.PG_CRON) {
+    table = LogsTableName.POSTGRES
+    where = basePgCronWhere
+  }
   const joins = genCrossJoinUnnests(table)
   return `SELECT count(*) as count FROM ${table} ${joins} ${where}`
 }
@@ -313,6 +338,10 @@ const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] =>
   return [its.add(-extendValue, trunc), trunc]
 }
 
+// TODO(qiao): workaround for self-hosted cron logs error until logflare is fixed
+const basePgCronWhere = IS_PLATFORM
+  ? `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
+  : `where ( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
 /**
  *
  * generates log event chart query
@@ -331,7 +360,7 @@ export const genChartQuery = (
   // to calculate the chart, we need to query postgres logs
   if (table === LogsTableName.PG_CRON) {
     table = LogsTableName.POSTGRES
-    where = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+    where = basePgCronWhere
   }
 
   let joins = genCrossJoinUnnests(table)
@@ -483,19 +512,22 @@ export const fillTimeseries = (
   // If we have more points than minPointsToFill, just normalize timestamps and return
   if (timeseriesData.length > minPointsToFill) {
     return timeseriesData.map((datum) => {
-      const iso = dayjs.utc(datum[timestampKey]).toISOString()
+      const timestamp = datum[timestampKey]
+      const iso = isUnixMicro(timestamp)
+        ? unixMicroToIsoTimestamp(timestamp)
+        : dayjs.utc(timestamp).toISOString()
       datum[timestampKey] = iso
       return datum
     })
   }
 
-  if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
+  if (timeseriesData.length <= 1 && !(min && max)) return timeseriesData
   const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
 
   const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
   const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
 
-  // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  // When no data exists but min/max are provided, we need to determine truncation from the time range
   const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
   let truncation: 'second' | 'minute' | 'hour' | 'day'
   let step = 1
@@ -515,11 +547,21 @@ export const fillTimeseries = (
     truncation = getTimestampTruncation(truncationSamples as Dayjs[])
   }
 
+  // If no data exists and no interval specified, default to minute precision
+  if (timeseriesData.length === 0 && !interval) {
+    truncation = 'minute'
+  }
+
   const newData = timeseriesData.map((datum) => {
     const timestamp = datum[timestampKey]
     const iso = isUnixMicro(timestamp)
       ? unixMicroToIsoTimestamp(timestamp)
       : dayjs.utc(timestamp).toISOString()
+
+    if (Array.isArray(valueKey) && valueKey.length === 0) {
+      return { [timestampKey]: iso }
+    }
+
     datum[timestampKey] = iso
     return datum
   })
@@ -533,7 +575,8 @@ export const fillTimeseries = (
         d_date.month() === currentDate.month() &&
         d_date.date() === currentDate.date() &&
         d_date.hour() === currentDate.hour() &&
-        d_date.minute() === currentDate.minute()
+        d_date.minute() === currentDate.minute() &&
+        d_date.second() === currentDate.second()
       )
     })
     if (!found) {
@@ -626,7 +669,7 @@ function getErrorCondition(table: LogsTableName): string {
     case 'postgres_logs':
       return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
     case 'auth_logs':
-      return "metadata.level = 'error' OR metadata.status >= 400"
+      return "metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 400"
     case 'function_edge_logs':
       return 'response.status_code >= 500'
     case 'function_logs':

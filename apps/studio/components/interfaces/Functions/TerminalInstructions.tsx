@@ -9,6 +9,7 @@ import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   CollapsibleContent_Shadcn_,
@@ -82,7 +83,7 @@ export const TerminalInstructions = forwardRef<
         return (
           <>
             <span className="text-brand-600">curl</span> -L -X POST '{functionsEndpoint}
-            /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]' s
+            /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'
             {anonKey?.type === 'publishable' ? " -H 'apikey: [YOUR ANON KEY]' " : ''}
             {`--data '{"name":"Functions"}'`}
           </>
@@ -140,7 +141,7 @@ export const TerminalInstructions = forwardRef<
               </p>
             </div>
             <div className="flex gap-2">
-              <DocsButton href="https://supabase.com/docs/guides/functions" />
+              <DocsButton href={`${DOCS_URL}/guides/functions`} />
               <Button asChild type="default" icon={<ExternalLink />}>
                 <a
                   target="_blank"

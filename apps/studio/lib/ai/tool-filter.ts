@@ -1,6 +1,8 @@
-import { Tool, ToolSet } from 'ai'
+import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+// End of third-party imports
+
+import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
 export type DatabaseExtension = {
@@ -25,10 +27,11 @@ export const toolSetValidationSchema = z.record(
     'list_branches',
     'search_docs',
     'get_advisors',
+    'get_logs',
 
     // Local tools
-    'display_query',
-    'display_edge_function',
+    'execute_sql',
+    'deploy_edge_function',
     'rename_chat',
     'list_policies',
 
@@ -40,31 +43,7 @@ export const toolSetValidationSchema = z.record(
   ]),
   basicToolSchema
 )
-
-/**
- * Transforms the result of a tool execution to a new output.
- */
-export function transformToolResult<OriginalResult, NewResult>(
-  tool: Tool<any, OriginalResult>,
-  execute: (result: OriginalResult) => NewResult
-): Tool<any, NewResult> {
-  if (!tool) {
-    throw new Error('Tool is required')
-  }
-
-  if (!tool.execute) {
-    throw new Error('Tool does not have an execute function')
-  }
-
-  // Intercept the tool to add a custom execute function
-  return {
-    ...tool,
-    execute: async (args: any, options: any) => {
-      const result = await tool.execute!(args, options)
-      return execute(result)
-    },
-  } as unknown as Tool<any, NewResult>
-}
+export type ToolName = keyof z.infer<typeof toolSetValidationSchema>
 
 /**
  * Tool categories based on the data they access
@@ -87,8 +66,8 @@ type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
  */
 export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   // UI tools - always available
-  display_query: TOOL_CATEGORIES.UI,
-  display_edge_function: TOOL_CATEGORIES.UI,
+  execute_sql: TOOL_CATEGORIES.UI,
+  deploy_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
 
@@ -105,6 +84,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
 
   // Log tools - MCP and local
   get_advisors: TOOL_CATEGORIES.LOG,
+  get_logs: TOOL_CATEGORIES.LOG,
 }
 
 /**

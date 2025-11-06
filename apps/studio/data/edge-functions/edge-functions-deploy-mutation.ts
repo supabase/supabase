@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionsDeployVariables = {
@@ -53,30 +53,29 @@ export const useEdgeFunctionDeployMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>,
+  UseCustomMutationOptions<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>(
-    (vars) => deployEdgeFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, slug } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(edgeFunctionsKeys.detail(projectRef, slug)),
-          queryClient.invalidateQueries(edgeFunctionsKeys.body(projectRef, slug)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to deploy edge function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>({
+    mutationFn: (vars) => deployEdgeFunction(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, slug } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: edgeFunctionsKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: edgeFunctionsKeys.detail(projectRef, slug) }),
+        queryClient.invalidateQueries({ queryKey: edgeFunctionsKeys.body(projectRef, slug) }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to deploy edge function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -33,9 +33,9 @@ transforms:
       kong: '.appname == "supabase-kong"'
       auth: '.appname == "supabase-auth"'
       rest: '.appname == "supabase-rest"'
-      realtime: '.appname == "supabase-realtime"'
+      realtime: '.appname == "realtime-dev.supabase-realtime"'
       storage: '.appname == "supabase-storage"'
-      functions: '.appname == "supabase-functions"'
+      functions: '.appname == "supabase-edge-functions"'
       db: '.appname == "supabase-db"'
   # Ignores non nginx errors since they are related with kong booting up
   kong_logs:
@@ -117,6 +117,13 @@ transforms:
           .event_message = parsed.msg
           .metadata.level = parsed.level
       }
+  # Function logs are unstructured messages on stderr
+  functions_logs:
+    type: remap
+    inputs:
+      - router.functions
+    source: |-
+      .metadata.project_ref = del(.project)
   # Storage logs may contain json objects so we parse them for completeness
   storage_logs:
     type: remap
@@ -210,7 +217,7 @@ sinks:
   logflare_functions:
     type: 'http'
     inputs:
-      - router.functions
+      - functions_logs
     encoding:
       codec: 'json'
     method: 'post'

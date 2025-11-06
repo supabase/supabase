@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { keys } from './keys'
 
 export type GetThirdPartyAuthIntegrationsVariables = {
@@ -34,13 +34,11 @@ export const useThirdPartyAuthIntegrationsQuery = <TData = ThirdPartyAuthIntegra
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ThirdPartyAuthIntegrationsData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ThirdPartyAuthIntegrationsData, ResponseError, TData> = {}
 ) =>
-  useQuery<ThirdPartyAuthIntegrationsData, ResponseError, TData>(
-    keys.integrations(projectRef),
-    ({ signal }) => getThirdPartyAuthIntegrations({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ThirdPartyAuthIntegrationsData, ResponseError, TData>({
+    queryKey: keys.integrations(projectRef),
+    queryFn: ({ signal }) => getThirdPartyAuthIntegrations({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
