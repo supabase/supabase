@@ -99,9 +99,13 @@ export const BucketTableRow = ({
     <BucketTableRow key={bucket.id}>
       <BucketTableCell>
         <div className="flex items-center gap-2">
-          <p title={bucket.id} className="text-foreground truncate max-w-[240px]">
+          <Link
+            href={`/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
+            title={bucket.id}
+            className="text-link-table-cell"
+          >
             {bucket.id}
-          </p>
+          </Link>
           {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
       </BucketTableCell>
