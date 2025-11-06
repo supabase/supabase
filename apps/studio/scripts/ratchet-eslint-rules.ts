@@ -17,6 +17,7 @@
  *   --eslint "<cmd>"      ESLint command to run (default "npx eslint"). Do not pass untrusted input.
  *   --eslint-args "<...>" Extra args/paths for ESLint (e.g., "."). Do not pass untrusted input.
  *   --rule <id>[,<id>...] Rule id(s). Repeat flag or comma-separate. REQUIRED.
+ *   --decrease-baselines  When improvements occur, lower stored baselines to match the new counts.
  *
  * Notes:
  * - Counts occurrences regardless of severity (warn/error).
@@ -32,6 +33,7 @@ interface Args {
   init: boolean
   eslint: string
   eslintArgs: string
+  decreaseBaselines: boolean
   rules: string[]
 }
 
@@ -58,6 +60,7 @@ function parseArgs(argv: string[]): Args {
     init: false,
     eslint: 'npx eslint',
     eslintArgs: '',
+    decreaseBaselines: false,
     rules: [],
   }
 
@@ -81,6 +84,8 @@ function parseArgs(argv: string[]): Args {
             .filter(Boolean)
         )
       }
+    } else if (a === '--decrease-baselines') {
+      args.decreaseBaselines = true
     } else {
       console.warn(`Unknown argument: ${a}`)
     }
@@ -237,6 +242,8 @@ function main(): void {
 
   let failed = false
   const tableRows: string[] = []
+  const improvedRules: string[] = []
+  const decreasedBaselines: Record<string, { from: number; to: number }> = {}
   for (const rule of args.rules) {
     const baseline = baselines[rule] ?? 0
     const current = currentCounts[rule] ?? 0
@@ -252,28 +259,48 @@ function main(): void {
       const msg = `You added ${delta === 1 ? 'a new violation' : `${delta} new violations`} of ${rule}. Please fix it: baseline=${baseline}, current=${current}`
       console.error(msg)
       console.log(`::error title=New violations::${msg}`)
+    } else if (current < baseline) {
+      improvedRules.push(rule)
+      if (args.decreaseBaselines) {
+        decreasedBaselines[rule] = { from: baseline, to: current }
+      }
     }
   }
 
-  writeSummary(
-    [
-      `### ESLint rule ratchet`,
-      `Metadata: \`${args.metadata}\``,
-      ``,
-      `| Rule | Baseline | Current | Δ |`,
-      `| --- | ---: | ---: | ---: |`,
-      ...tableRows,
-      ``,
-    ].join('\n')
-  )
+  const summaryLines = [
+    `### ESLint rule ratchet`,
+    `Metadata: \`${args.metadata}\``,
+    ``,
+    `| Rule | Baseline | Current | Δ |`,
+    `| --- | ---: | ---: | ---: |`,
+    ...tableRows,
+    ``,
+  ]
+
+  if (args.decreaseBaselines && Object.keys(decreasedBaselines).length > 0) {
+    const updates: Record<string, number> = {}
+    const details: string[] = []
+    const logParts: string[] = []
+    for (const [rule, { from, to }] of Object.entries(decreasedBaselines)) {
+      updates[rule] = to
+      details.push(`- \`${rule}\`: ${from} -> ${to}`)
+      logParts.push(`${rule}: ${from} -> ${to}`)
+    }
+    writeBaselines(args.metadata, updates, true)
+    summaryLines.push('', 'Baselines decreased for improved rules:', ...details, '')
+    console.log(`Baselines decreased for improved rules: ${logParts.join(', ')}`)
+  }
+
+  writeSummary(summaryLines.join('\n'))
 
   if (failed) {
     if (stderr && stderr.trim()) console.error('\nESLint stderr:\n', stderr)
     process.exit(1)
   } else {
-    const improved = args.rules.some((r) => (currentCounts[r] ?? 0) < (baselines[r] ?? 0))
     console.log(
-      improved ? 'Nice! Some rules improved.' : 'Stable: No regressions for selected rules.'
+      improvedRules.length > 0
+        ? 'Nice! Some rules improved.'
+        : 'Stable: No regressions for selected rules.'
     )
     process.exit(0)
   }
