@@ -17,6 +17,7 @@ import { DeleteRoleModal } from './DeleteRoleModal'
 import { RoleRow } from './RoleRow'
 import { RoleRowSkeleton } from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
+import type { PostgresRole } from '@supabase/postgres-meta'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
@@ -66,6 +67,10 @@ export const RolesList = () => {
     roles.filter((role) => role.activeConnections > 0),
     (r) => -r.activeConnections
   )
+
+  const roleToDelete = data?.find(
+    (role) => role.id.toString() === selectedRoleToDelete
+  ) as unknown as PostgresRole
 
   return (
     <>
@@ -219,7 +224,7 @@ export const RolesList = () => {
       <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
 
       <DeleteRoleModal
-        role={data?.find((role) => role.id.toString() === selectedRoleToDelete)}
+        role={roleToDelete}
         visible={!!selectedRoleToDelete}
         onClose={() => setSelectedRoleToDelete('')}
       />
