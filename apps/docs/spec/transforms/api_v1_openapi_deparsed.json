@@ -8221,9 +8221,22 @@
                         }
                       },
                       "required": ["upstreamTarget"]
+                    },
+                    "migrationVersion": {
+                      "type": "string"
+                    },
+                    "databasePoolMode": {
+                      "type": "string"
                     }
                   },
-                  "required": ["fileSizeLimit", "features", "capabilities", "external"]
+                  "required": [
+                    "fileSizeLimit",
+                    "features",
+                    "capabilities",
+                    "external",
+                    "migrationVersion",
+                    "databasePoolMode"
+                  ]
                 }
               }
             }
@@ -13937,7 +13950,7 @@
     },
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
-        "description": "Executes a SQL query on the project's logs.\n\nEither the 'iso_timestamp_start' and 'iso_timestamp_end' parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n",
+        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources. \n",
         "operationId": "v1-get-project-logs",
         "parameters": [
           {
@@ -13956,6 +13969,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "type": "string"
             }
@@ -20665,6 +20679,12 @@
           "required": ["name", "value"]
         }
       },
+      "DeleteSecretsBody": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
       "SslEnforcementResponse": {
         "type": "object",
         "properties": {
@@ -21390,9 +21410,22 @@
               }
             },
             "required": ["upstreamTarget"]
+          },
+          "migrationVersion": {
+            "type": "string"
+          },
+          "databasePoolMode": {
+            "type": "string"
           }
         },
-        "required": ["fileSizeLimit", "features", "capabilities", "external"]
+        "required": [
+          "fileSizeLimit",
+          "features",
+          "capabilities",
+          "external",
+          "migrationVersion",
+          "databasePoolMode"
+        ]
       },
       "UpdateStorageConfigBody": {
         "type": "object",
