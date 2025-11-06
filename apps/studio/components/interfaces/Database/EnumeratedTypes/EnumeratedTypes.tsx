@@ -1,6 +1,7 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -45,7 +46,6 @@ export const EnumeratedTypes = () => {
     'edit',
     parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )
-
   const [selectedTypeToDelete, setSelectedTypeToDelete] = useQueryState(
     'delete',
     parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
@@ -55,6 +55,33 @@ export const EnumeratedTypes = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const typeToEdit = data?.find((type: EnumeratedType) => type.id.toString() === selectedTypeToEdit)
+  const showTypeToEdit = selectedTypeToEdit !== '' && !!typeToEdit
+  const typeToEditNotFound = selectedTypeToEdit !== '' && !typeToEdit
+
+  const typeToDelete = data?.find(
+    (type: EnumeratedType) => type.id.toString() === selectedTypeToDelete
+  )
+  const showTypeToDelete = selectedTypeToDelete !== '' && !!typeToDelete
+  const typeToDeleteNotFound = selectedTypeToDelete !== '' && !typeToDelete
+
+  // Error handling if edit panel is open and type is not found
+  useEffect(() => {
+    if (!isLoading && typeToEditNotFound) {
+      toast.error('Enumerated Type not found')
+      setSelectedTypeToEdit('')
+    }
+  }, [selectedTypeToEdit, typeToEdit, isLoading])
+
+  // Error handling if delete panel is open and type is not found
+  useEffect(() => {
+    if (!isLoading && typeToDeleteNotFound) {
+      toast.error('Enumerated Type not found')
+      setSelectedTypeToDelete('')
+    }
+  }, [selectedTypeToDelete, typeToDelete])
+
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
   const filteredEnumeratedTypes =
     search.length > 0
@@ -193,14 +220,14 @@ export const EnumeratedTypes = () => {
       />
 
       <EditEnumeratedTypeSidePanel
-        visible={!!selectedTypeToEdit}
-        selectedEnumeratedType={data?.find((type) => type.id.toString() === selectedTypeToEdit)}
+        visible={showTypeToEdit}
+        selectedEnumeratedType={typeToEdit}
         onClose={() => setSelectedTypeToEdit('')}
       />
 
       <DeleteEnumeratedTypeModal
-        visible={!!selectedTypeToDelete}
-        selectedEnumeratedType={data?.find((type) => type.id.toString() === selectedTypeToDelete)}
+        visible={showTypeToDelete}
+        selectedEnumeratedType={typeToDelete}
         onClose={() => setSelectedTypeToDelete('')}
       />
     </div>

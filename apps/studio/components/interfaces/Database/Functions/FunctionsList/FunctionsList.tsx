@@ -1,9 +1,9 @@
-import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
+import { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { parseAsJson, useQueryState } from 'nuqs'
+import { parseAsJson, parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -36,26 +36,77 @@ import {
 } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
+import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 
-interface FunctionsListProps {
-  createFunction: () => void
-  duplicateFunction: (fn: PostgresFunction) => void
-  editFunction: (fn: PostgresFunction) => void
-  deleteFunction: (fn: PostgresFunction) => void
-}
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
+import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
+import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 
-const FunctionsList = ({
-  createFunction = noop,
-  editFunction = noop,
-  deleteFunction = noop,
-  duplicateFunction = noop,
-}: FunctionsListProps) => {
+const FunctionsList = () => {
   const router = useRouter()
   const { search } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const {
+    setValue: setEditorPanelValue,
+    setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
+  } = useEditorPanelStateSnapshot()
+
+  const createFunction = () => {
+    setSelectedFunctionIdToDuplicate('')
+    if (isInlineEditorEnabled) {
+      setEditorPanelInitialPrompt('Create a new database function that...')
+      setEditorPanelValue(`create function function_name()
+returns void
+language plpgsql
+as $$
+begin
+  -- Write your function logic here
+end;
+$$;`)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setShowCreateFunctionForm(true)
+    }
+  }
+
+  const duplicateFunction = (fn: DatabaseFunction) => {
+    const dupFn = {
+      ...fn,
+      name: `${fn.name}_duplicate`,
+    }
+
+    if (isInlineEditorEnabled) {
+      setEditorPanelInitialPrompt('Create new database function that...')
+      setEditorPanelValue(dupFn.complete_statement)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      !selectedFunctionIdToDuplicate && setSelectedFunctionIdToDuplicate(dupFn.id.toString())
+      functionToDuplicate = dupFn
+    }
+  }
+
+  const editFunction = (fn: DatabaseFunction) => {
+    setSelectedFunctionIdToDuplicate('')
+    if (isInlineEditorEnabled) {
+      setEditorPanelValue(fn.complete_statement)
+      setEditorPanelTemplates([])
+      openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+    } else {
+      setSelectedFunctionToEdit(fn.id.toString())
+    }
+  }
+
+  const deleteFunction = (fn: any) => {
+    setSelectedFunctionToDelete(fn.id.toString())
+  }
 
   const filterString = search ?? ''
 
@@ -113,6 +164,68 @@ const FunctionsList = ({
     ...(hasDefiner ? [{ label: 'Definer', value: 'definer' }] : []),
     ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
   ]
+
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [selectedFunctionToEdit, setSelectedFunctionToEdit] = useQueryState(
+    'edit',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [selectedFunctionIdToDuplicate, setSelectedFunctionIdToDuplicate] = useQueryState(
+    'duplicate',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [selectedFunctionToDelete, setSelectedFunctionToDelete] = useQueryState(
+    'delete',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const functionToEdit = functions?.find((fn) => fn.id.toString() === selectedFunctionToEdit)
+  const showFunctionToEdit = selectedFunctionToEdit !== '' && !!functionToEdit
+  const functionToEditNotFound = selectedFunctionToEdit !== '' && !functionToEdit
+
+  let functionToDuplicate = functions?.find(
+    (fn) => fn.id.toString() === selectedFunctionIdToDuplicate
+  )
+  const showFunctionToDuplicate =
+    !isLoading && selectedFunctionIdToDuplicate !== '' && !!functionToDuplicate
+
+  const functionToDelete = functions?.find((fn) => fn.id.toString() === selectedFunctionToDelete)
+  const showFunctionToDelete = selectedFunctionToDelete !== '' && !!functionToDelete
+  const functionToDeleteNotFound = selectedFunctionToDelete !== '' && !functionToDelete
+
+  // Error handling if edit panel is open and function is not found
+  useEffect(() => {
+    if (!isLoading && functionToEditNotFound) {
+      toast.error('Database Function not found')
+      setSelectedFunctionToEdit('')
+    }
+  }, [selectedFunctionToEdit, functionToEdit, isLoading])
+
+  // Error handling if duplicate panel is open and function is not found
+  useEffect(() => {
+    if (selectedFunctionIdToDuplicate !== '') {
+      const fnToDuplicate = functions?.find(
+        (fn) => fn.id.toString() === selectedFunctionIdToDuplicate
+      )
+      if (fnToDuplicate) {
+        duplicateFunction(fnToDuplicate)
+      } else {
+        toast.error('Database Function not found')
+        setSelectedFunctionIdToDuplicate('')
+      }
+    }
+  }, [functionToDuplicate, selectedFunctionToDelete, isLoading])
+
+  // Error handling if delete panel is open and function is not found
+  useEffect(() => {
+    if (!isLoading && functionToDeleteNotFound) {
+      toast.error('Database Function not found')
+      setSelectedFunctionToDelete('')
+    }
+  }, [selectedFunctionToDelete, functionToDelete, isLoading])
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
@@ -252,12 +365,37 @@ const FunctionsList = ({
                   duplicateFunction={duplicateFunction}
                   editFunction={editFunction}
                   deleteFunction={deleteFunction}
+                  functions={functions ?? []}
                 />
               </TableBody>
             </Table>
           </Card>
         </div>
       )}
+
+      <CreateFunction
+        visible={showCreateFunctionForm}
+        onClose={() => {
+          setShowCreateFunctionForm(false)
+        }}
+      />
+
+      <CreateFunction
+        func={functionToEdit || functionToDuplicate}
+        visible={showFunctionToEdit || showFunctionToDuplicate}
+        onClose={() => {
+          setSelectedFunctionToEdit('')
+          setSelectedFunctionIdToDuplicate('')
+          functionToDuplicate = undefined
+        }}
+        isDuplicating={selectedFunctionIdToDuplicate !== '' && !!functionToDuplicate}
+      />
+
+      <DeleteFunction
+        func={functionToDelete}
+        visible={showFunctionToDelete}
+        setVisible={setSelectedFunctionToDelete}
+      />
     </>
   )
 }
