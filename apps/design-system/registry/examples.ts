@@ -1274,9 +1274,14 @@ export const examples: Registry = [
     files: ['example/empty-state-zero-items-table.tsx'],
   },
   {
-    name: 'empty-state-initial-state',
+    name: 'empty-state-initial-state-presentational',
     type: 'components:example',
-    files: ['example/empty-state-initial-state.tsx'],
+    files: ['example/empty-state-initial-state-presentational.tsx'],
+  },
+  {
+    name: 'empty-state-initial-state-informational',
+    type: 'components:example',
+    files: ['example/empty-state-initial-state-informational.tsx'],
   },
   {
     name: 'empty-state-zero-items-data-grid',

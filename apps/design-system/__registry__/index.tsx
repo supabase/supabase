@@ -2315,13 +2315,24 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "empty-state-initial-state": {
-      name: "empty-state-initial-state",
+    "empty-state-initial-state-presentational": {
+      name: "empty-state-initial-state-presentational",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/empty-state-initial-state")),
+      component: React.lazy(() => import("@/registry/default/example/empty-state-initial-state-presentational")),
       source: "",
-      files: ["registry/default/example/empty-state-initial-state.tsx"],
+      files: ["registry/default/example/empty-state-initial-state-presentational.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "empty-state-initial-state-informational": {
+      name: "empty-state-initial-state-informational",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-initial-state-informational")),
+      source: "",
+      files: ["registry/default/example/empty-state-initial-state-informational.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
