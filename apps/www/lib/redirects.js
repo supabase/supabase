@@ -563,7 +563,17 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/reference/postgres/publications',
-    destination: '/docs/guides/database/replication',
+    destination: '/docs/guides/database/etl',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication',
+    destination: '/docs/guides/database/etl',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/:path*',
+    destination: '/docs/guides/database/etl/:path*',
   },
   {
     permanent: true,

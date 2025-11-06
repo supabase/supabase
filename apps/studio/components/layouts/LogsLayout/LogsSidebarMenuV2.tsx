@@ -12,7 +12,7 @@ import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQuer
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useContentQuery } from 'data/content/content-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { useReplicationSourcesQuery } from 'data/etl/sources-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {

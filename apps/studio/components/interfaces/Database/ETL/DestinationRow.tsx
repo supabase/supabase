@@ -6,12 +6,12 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
-import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { Pipeline } from 'data/replication/pipelines-query'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { useDeleteDestinationPipelineMutation } from 'data/etl/delete-destination-pipeline-mutation'
+import { useReplicationPipelineReplicationStatusQuery } from 'data/etl/pipeline-replication-status-query'
+import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from 'data/etl/pipeline-version-query'
+import { Pipeline } from 'data/etl/pipelines-query'
+import { useStopPipelineMutation } from 'data/etl/stop-pipeline-mutation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -176,7 +176,7 @@ export const DestinationRow = ({
           <Table.td>
             <div className="flex items-center justify-end gap-x-2">
               <Button asChild type="default" className="relative">
-                <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
+                <Link href={`/project/${projectRef}/database/etl/${pipeline?.id}`}>
                   <span className="inline-flex items-center gap-2">
                     <span>View status</span>
                     {hasTableErrors && (
