@@ -1,20 +1,21 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 /**
  * Ratchet ESLint violations for selected rules.
  *
  * Examples:
  *   # Initialize baselines for two rules
- *   node scripts/ratchet-eslint-rules.js --init \
- *     --rule exhaustive-deps --rule no-console
+ *   tsx scripts/ratchet-eslint-rules.ts --init \
+ *     --rule react-hooks/exhaustive-deps --rule no-console
  *
  *   # Compare current counts vs baselines
- *   node scripts/ratchet-eslint-rules.js \
- *     --rule exhaustive-deps --rule no-console
+ *   tsx scripts/ratchet-eslint-rules.ts \
+ *     --rule react-hooks/exhaustive-deps --rule no-console
  *
  * Flags:
  *   --metadata <path>     Path to baseline file (default .github/eslint-rule-baselines.json)
  *   --init                Write current counts for the provided --rule(s) into metadata and exit 0
- *   --eslint "<cmd>"      ESLint command to run (default "npx eslint")
- *   --eslint-args "<...>" Extra args/paths for ESLint (e.g., ".")
+ *   --eslint "<cmd>"      ESLint command to run (default "npx eslint"). Do not pass untrusted input.
+ *   --eslint-args "<...>" Extra args/paths for ESLint (e.g., "."). Do not pass untrusted input.
  *   --rule <id>[,<id>...] Rule id(s). Repeat flag or comma-separate. REQUIRED.
  *
  * Notes:
@@ -22,12 +23,37 @@
  * - Fails if any selected rule has currentCount > baselineCount.
  */
 
-const fs = require('fs')
-const path = require('path')
-const { spawnSync } = require('child_process')
+import { spawnSync } from 'node:child_process'
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import path from 'node:path'
 
-function parseArgs(argv) {
-  const args = {
+interface Args {
+  metadata: string
+  init: boolean
+  eslint: string
+  eslintArgs: string
+  rules: string[]
+}
+
+interface ESLintMessage {
+  ruleId?: string | null
+}
+
+interface ESLintResult {
+  messages?: ESLintMessage[]
+}
+
+interface ESLintExecutionResult {
+  results: ESLintResult[]
+  stderr: string
+}
+
+interface BaselineData {
+  rules: Record<string, number>
+}
+
+function parseArgs(argv: string[]): Args {
+  const args: Args = {
     metadata: '.github/eslint-rule-baselines.json',
     init: false,
     eslint: 'npx eslint',
@@ -35,7 +61,7 @@ function parseArgs(argv) {
     rules: [],
   }
 
-  for (let i = 2; i < argv.length; i++) {
+  for (let i = 2; i < argv.length; i += 1) {
     const a = argv[i]
     if (a === '--init') {
       args.init = true
@@ -46,33 +72,38 @@ function parseArgs(argv) {
     } else if (a === '--eslint-args') {
       args.eslintArgs = argv[++i]
     } else if (a === '--rule') {
-      const val = (argv[++i] || '').trim()
-      if (val)
+      const val = (argv[++i] ?? '').trim()
+      if (val) {
         args.rules.push(
           ...val
             .split(',')
             .map((s) => s.trim())
             .filter(Boolean)
         )
+      }
     } else {
       console.warn(`Unknown argument: ${a}`)
     }
   }
 
-  // Fail if no rules are provided
   if (args.rules.length === 0) {
     console.error('Error: You must provide at least one --rule <rule-id>.')
     console.error('Example: --rule exhaustive-deps --rule no-console')
     process.exit(2)
   }
 
-  // De-duplicate and preserve order
-  args.rules = [...new Set(args.rules)]
+  const dedupedRules = new Set(args.rules)
+  args.rules = Array.from(dedupedRules)
 
   return args
 }
 
-function runESLint(eslintCmd, eslintArgs) {
+/**
+ * SECURITY:
+ * Directly spawns a command from its arguments. Should **never** be
+ * called with untrusted input.
+ */
+function dangerouslyRunEsLint(eslintCmd: string, eslintArgs: string): ESLintExecutionResult {
   const fullCmd = `${eslintCmd} ${eslintArgs || ''} --format json`.trim()
   const proc = spawnSync(fullCmd, {
     shell: true,
@@ -82,17 +113,17 @@ function runESLint(eslintCmd, eslintArgs) {
     maxBuffer: 32 * 1024 * 1024, // allow large ESLint JSON payloads
   })
 
-  const stdout = proc.stdout || ''
-  const stderr = proc.stderr || ''
+  const stdout = typeof proc.stdout === 'string' ? proc.stdout : ''
+  const stderr = typeof proc.stderr === 'string' ? proc.stderr : ''
 
   if (!stdout.trim()) {
     console.error('ESLint did not produce JSON output. stderr:\n', stderr)
     process.exit(2)
   }
 
-  let results
+  let results: ESLintResult[]
   try {
-    results = JSON.parse(stdout)
+    results = JSON.parse(stdout) as ESLintResult[]
   } catch (e) {
     console.error('Failed to parse ESLint JSON output:', e)
     console.error('Raw output (truncated to 4k):\n', stdout.slice(0, 4096))
@@ -102,64 +133,74 @@ function runESLint(eslintCmd, eslintArgs) {
   return { results, stderr }
 }
 
-function countRules(results, ruleIds) {
+function countRules(results: ESLintResult[], ruleIds: string[]): Record<string, number> {
   const expanded = new Set(ruleIds)
+  const counts: Record<string, number> = {}
 
-  const counts = Object.fromEntries(ruleIds.map((id) => [id, 0]))
+  for (const id of ruleIds) {
+    counts[id] = 0
+  }
 
   for (const file of results) {
     if (!file || !Array.isArray(file.messages)) continue
     for (const msg of file.messages) {
-      const id = msg?.ruleId || ''
-      if (expanded.has(id)) {
-        if (counts[id] != null) counts[id] += 1
+      const id = msg?.ruleId ?? ''
+      if (id && expanded.has(id)) {
+        counts[id] += 1
       }
     }
   }
   return counts
 }
 
-function readBaselines(fp) {
-  if (!fs.existsSync(fp)) return { rules: {} }
+function readBaselines(fp: string): BaselineData {
+  if (!existsSync(fp)) return { rules: {} }
   try {
-    const data = JSON.parse(fs.readFileSync(fp, 'utf8'))
+    const data = JSON.parse(readFileSync(fp, 'utf8')) as Partial<BaselineData>
     if (data && typeof data === 'object' && data.rules && typeof data.rules === 'object') {
       return { rules: data.rules }
     }
-  } catch {}
+  } catch {
+    // ignore invalid metadata files and fall back to blank baselines
+  }
   return { rules: {} }
 }
 
-function writeBaselines(fp, updates, merge = true) {
+function writeBaselines(fp: string, updates: Record<string, number>, merge = true): void {
   const dir = path.dirname(fp)
-  fs.mkdirSync(dir, { recursive: true })
+  mkdirSync(dir, { recursive: true })
 
-  let current = { rules: {} }
-  if (merge && fs.existsSync(fp)) {
+  let current: BaselineData = { rules: {} }
+  if (merge && existsSync(fp)) {
     current = readBaselines(fp)
   }
 
-  const next = { rules: { ...current.rules, ...updates } }
-  fs.writeFileSync(fp, JSON.stringify(next, null, 2) + '\n', 'utf8')
+  const next: BaselineData = { rules: { ...current.rules, ...updates } }
+  writeFileSync(fp, `${JSON.stringify(next, null, 2)}\n`, 'utf8')
 }
 
-function writeSummary(markdown) {
+function writeSummary(markdown: string): void {
   const summaryFile = process.env.GITHUB_STEP_SUMMARY
   if (summaryFile) {
     try {
-      fs.appendFileSync(summaryFile, markdown + '\n', 'utf8')
-    } catch {}
+      appendFileSync(summaryFile, `${markdown}\n`, 'utf8')
+    } catch {
+      // ignore summary write errors because they shouldn't block the script
+    }
   }
 }
 
-;(function main() {
+function main(): void {
   const args = parseArgs(process.argv)
 
-  const { results, stderr } = runESLint(args.eslint, args.eslintArgs)
+  // SECURITY:
+  // Offloaded to user. Must document that they should not pass untrusted input
+  // via --eslint or --eslint-args.
+  const { results, stderr } = dangerouslyRunEsLint(args.eslint, args.eslintArgs)
   const currentCounts = countRules(results, args.rules)
 
   if (args.init) {
-    writeBaselines(args.metadata, currentCounts, /*merge*/ true)
+    writeBaselines(args.metadata, currentCounts, true)
 
     const rows = Object.entries(currentCounts)
       .map(([rule, count]) => `| \`${rule}\` | **${count}** |`)
@@ -195,21 +236,22 @@ function writeSummary(markdown) {
   }
 
   let failed = false
-  const tableRows = []
+  const tableRows: string[] = []
   for (const rule of args.rules) {
     const baseline = baselines[rule] ?? 0
     const current = currentCounts[rule] ?? 0
     const delta = current - baseline
 
     tableRows.push(
-      `| \`${rule}\` | **${baseline}** | **${current}** | ${delta >= 0 ? '+' : ''}${delta} |`
+      `| \`${rule}\` | **${baseline}** | **${current}** | ${delta >= 0 ? '+' : '-'}${delta} |`
     )
 
     if (current > baseline) {
       failed = true
-      const msg = `ESLint violations regressed for ${rule}: baseline=${baseline}, current=${current}`
+      const delta = current - baseline
+      const msg = `You added ${delta === 1 ? 'a new violation' : `${delta} new violations`} of ${rule}. Please fix it: baseline=${baseline}, current=${current}`
       console.error(msg)
-      console.log(`::error title=Rule regressed::${msg}`)
+      console.log(`::error title=New violations::${msg}`)
     }
   }
 
@@ -235,4 +277,6 @@ function writeSummary(markdown) {
     )
     process.exit(0)
   }
-})()
+}
+
+main()
