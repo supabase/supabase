@@ -2188,8 +2188,8 @@ export interface TableQuickstartAssistantOpenedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/settings/log-drains (LogDrainDestinationSheetForm)
  */
-export interface LogDrainDestinationSavedEvent {
-  action: 'log_drain_destination_saved'
+export interface LogDrainSaveButtonClickedEvent {
+  action: 'log_drain_save_button_clicked'
   properties: {
     /**
      * Type of the destination saved
@@ -2206,8 +2206,8 @@ export interface LogDrainDestinationSavedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/settings/log-drains (LogDrains)
  */
-export interface LogDrainDestinationConfirmedEvent {
-  action: 'log_drain_destination_confirmed'
+export interface LogDrainConfirmButtonSubmittedEvent {
+  action: 'log_drain_confirm_button_submitted'
   properties: {
     /**
      * Type of the destination confirmed
@@ -2341,5 +2341,5 @@ export type TelemetryEvent =
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | SidebarOpenedEvent
-  | LogDrainDestinationSavedEvent
-  | LogDrainDestinationConfirmedEvent
+  | LogDrainSaveButtonClickedEvent
+  | LogDrainConfirmButtonSubmittedEvent
