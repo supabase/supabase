@@ -80,7 +80,7 @@ export const EnumeratedTypes = () => {
       toast.error('Enumerated Type not found')
       setSelectedTypeToDelete('')
     }
-  }, [selectedTypeToDelete, typeToDelete])
+  }, [selectedTypeToDelete, typeToDelete, isLoading])
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
   const filteredEnumeratedTypes =

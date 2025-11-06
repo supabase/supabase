@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsJson, parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -77,19 +77,17 @@ $$;`)
   }
 
   const duplicateFunction = (fn: DatabaseFunction) => {
-    const dupFn = {
-      ...fn,
-      name: `${fn.name}_duplicate`,
-    }
-
     if (isInlineEditorEnabled) {
+      const dupFn = {
+        ...fn,
+        name: `${fn.name}_duplicate`,
+      }
       setEditorPanelInitialPrompt('Create new database function that...')
       setEditorPanelValue(dupFn.complete_statement)
       setEditorPanelTemplates([])
       openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
-      !selectedFunctionIdToDuplicate && setSelectedFunctionIdToDuplicate(dupFn.id.toString())
-      functionToDuplicate = dupFn
+      setSelectedFunctionIdToDuplicate(fn.id.toString())
     }
   }
 
@@ -186,11 +184,19 @@ $$;`)
   const showFunctionToEdit = selectedFunctionToEdit !== '' && !!functionToEdit
   const functionToEditNotFound = selectedFunctionToEdit !== '' && !functionToEdit
 
-  let functionToDuplicate = functions?.find(
+  // Derive the duplicate function from the data
+  const originalFunctionToDuplicate = functions?.find(
     (fn) => fn.id.toString() === selectedFunctionIdToDuplicate
   )
-  const showFunctionToDuplicate =
-    !isLoading && selectedFunctionIdToDuplicate !== '' && !!functionToDuplicate
+  const functionToDuplicate = originalFunctionToDuplicate
+    ? {
+        ...originalFunctionToDuplicate,
+        name: `${originalFunctionToDuplicate.name}_duplicate`,
+      }
+    : undefined
+
+  const showFunctionToDuplicate = selectedFunctionIdToDuplicate !== '' && !!functionToDuplicate
+  const functionToDuplicateNotFound = selectedFunctionIdToDuplicate !== '' && !functionToDuplicate
 
   const functionToDelete = functions?.find((fn) => fn.id.toString() === selectedFunctionToDelete)
   const showFunctionToDelete = selectedFunctionToDelete !== '' && !!functionToDelete
@@ -206,18 +212,11 @@ $$;`)
 
   // Error handling if duplicate panel is open and function is not found
   useEffect(() => {
-    if (selectedFunctionIdToDuplicate !== '') {
-      const fnToDuplicate = functions?.find(
-        (fn) => fn.id.toString() === selectedFunctionIdToDuplicate
-      )
-      if (fnToDuplicate) {
-        duplicateFunction(fnToDuplicate)
-      } else {
-        toast.error('Database Function not found')
-        setSelectedFunctionIdToDuplicate('')
-      }
+    if (!isLoading && functionToDuplicateNotFound) {
+      toast.error('Database Function not found')
+      setSelectedFunctionIdToDuplicate('')
     }
-  }, [functionToDuplicate, selectedFunctionToDelete, isLoading])
+  }, [selectedFunctionIdToDuplicate, functionToDuplicate, isLoading])
 
   // Error handling if delete panel is open and function is not found
   useEffect(() => {
@@ -232,7 +231,7 @@ $$;`)
 
   return (
     <>
-      {(functions ?? []).length == 0 ? (
+      {(functions ?? []).length === 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <ProductEmptyState
             title="Functions"
@@ -373,6 +372,7 @@ $$;`)
         </div>
       )}
 
+      {/* Create Function */}
       <CreateFunction
         visible={showCreateFunctionForm}
         onClose={() => {
@@ -380,15 +380,23 @@ $$;`)
         }}
       />
 
+      {/* Edit Function */}
       <CreateFunction
-        func={functionToEdit || functionToDuplicate}
-        visible={showFunctionToEdit || showFunctionToDuplicate}
+        func={functionToEdit}
+        visible={showFunctionToEdit}
         onClose={() => {
           setSelectedFunctionToEdit('')
-          setSelectedFunctionIdToDuplicate('')
-          functionToDuplicate = undefined
         }}
-        isDuplicating={selectedFunctionIdToDuplicate !== '' && !!functionToDuplicate}
+      />
+
+      {/* Duplicate Function */}
+      <CreateFunction
+        func={functionToDuplicate}
+        visible={showFunctionToDuplicate}
+        onClose={() => {
+          setSelectedFunctionIdToDuplicate('')
+        }}
+        isDuplicating={true}
       />
 
       <DeleteFunction
