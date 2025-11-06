@@ -1,7 +1,9 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -52,9 +54,14 @@ export const OAuthAppsList = () => {
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
   const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
 
-  // State for OAuth apps
-  const [showCreateSheet, setShowCreateSheet] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showCreateSheet, setShowCreateSheet] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [selectedOAuthAppToDelete, setSelectedOAuthAppToDelete] = useQueryState(
+    'delete',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
@@ -82,9 +89,22 @@ export const OAuthAppsList = () => {
   const oAuthApps = data?.clients || []
 
   const handleDeleteClick = (app: OAuthClient) => {
-    setSelectedApp(app)
-    setShowDeleteModal(true)
+    setSelectedOAuthAppToDelete(app.client_id)
   }
+
+  const oAuthAppToDelete = oAuthApps?.find(
+    (app) => app.client_id.toString() === selectedOAuthAppToDelete
+  )
+  const showoAuthAppToDelete = selectedOAuthAppToDelete !== '' && !!oAuthAppToDelete
+  const oAuthAppToDeleteNotFound = selectedOAuthAppToDelete !== '' && !oAuthAppToDelete
+
+  // Error handling if delete dialog is open and oAuth app is not found
+  useEffect(() => {
+    if (!isLoading && oAuthAppToDeleteNotFound) {
+      toast.error('OAuth App not found')
+      setSelectedOAuthAppToDelete('')
+    }
+  }, [selectedOAuthAppToDelete, oAuthAppToDelete, isLoading])
 
   const [filterString, setFilterString] = useState<string>('')
 
@@ -270,9 +290,9 @@ export const OAuthAppsList = () => {
       />
 
       <DeleteOAuthAppModal
-        visible={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        selectedApp={selectedApp}
+        visible={showoAuthAppToDelete}
+        onClose={() => setSelectedOAuthAppToDelete('')}
+        selectedApp={oAuthAppToDelete}
       />
 
       <ConfirmationModal
