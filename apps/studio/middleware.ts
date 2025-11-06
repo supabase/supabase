@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'lib/constants'
-import type { NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 
 export const config = {
   matcher: ['/api/:function*', '/org/:path*'],
@@ -40,6 +40,6 @@ export function middleware(request: NextRequest) {
 
   // Handle page blocking for local/self-hosted
   if (!IS_PLATFORM && pathname.startsWith('/org/')) {
-    return Response.redirect(new URL('/404', request.url))
+    return NextResponse.rewrite(new URL('/404', request.url))
   }
 }
