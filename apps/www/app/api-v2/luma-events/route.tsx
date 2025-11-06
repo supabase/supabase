@@ -23,6 +23,7 @@ export interface LumaPayloadEvent {
   end_at: string
   timezone: string
   url: string
+  cover_url: string
   visibility: string
   geo_address_json: LumaGeoAddressJson
 }
@@ -103,6 +104,7 @@ export async function GET(request: NextRequest) {
         country: event.geo_address_json?.country,
         url: event.url,
         timezone: event.timezone,
+        cover_url: event.cover_url,
       }))
       .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
 

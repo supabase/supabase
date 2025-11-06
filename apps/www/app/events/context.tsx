@@ -1,0 +1,203 @@
+'use client'
+
+import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react'
+import { SupabaseEvent, getLumaEvents } from 'lib/events'
+import { cover } from 'three/src/extras/TextureUtils.js'
+
+interface EventsContextValue {
+  // Events data
+  allEvents: SupabaseEvent[]
+  filteredEvents: SupabaseEvent[]
+  staticEvents: SupabaseEvent[]
+  lumaEvents: SupabaseEvent[]
+  featuredEvent: SupabaseEvent | undefined
+
+  // Loading states
+  isLoading: boolean
+
+  // Search & Filter
+  searchQuery: string
+  setSearchQuery: (query: string) => void
+  selectedCategory: string
+  setSelectedCategory: (category: string) => void
+
+  // Categories
+  categories: { [key: string]: number }
+}
+
+const EventsContext = createContext<EventsContextValue | undefined>(undefined)
+
+interface EventsProviderProps {
+  children: ReactNode
+  staticEvents: SupabaseEvent[]
+}
+
+export function EventsProvider({ children, staticEvents }: EventsProviderProps) {
+  const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+
+  useEffect(() => {
+    const fetchLumaEvents = async () => {
+      try {
+        setIsLoading(true)
+
+        const afterDate = new Date().toISOString()
+        const url = new URL('/api-v2/luma-events', window.location.origin)
+        url.searchParams.append('after', afterDate)
+
+        const res = await fetch(url.toString())
+        const data = await res.json()
+
+        if (data.success) {
+          const transformedEvents: SupabaseEvent[] = data.events.map((event: any) => {
+            let categories = []
+            if (event.name.toLowerCase().includes('meetup')) categories.push('meetup')
+
+            return {
+              slug: '',
+              type: 'event',
+              title: event?.name || '',
+              date: event?.start_at || '',
+              description: '',
+              thumb: '',
+              cover_url: event?.cover_url || '',
+              path: '',
+              url: event?.url || '',
+              tags: categories,
+              categories,
+              timezone: event?.timezone || 'America/Los_Angeles',
+              location: event?.location || '',
+              hosts: event?.hosts || [],
+              disable_page_build: true,
+              link: {
+                href: event?.url || '#',
+                target: '_blank',
+              },
+            }
+          })
+          setLumaEvents(transformedEvents)
+        }
+      } catch (error) {
+        console.error('Error fetching Luma events:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchLumaEvents()
+  }, [])
+
+  // Merge all events (static + luma)
+  const allEvents = useMemo(() => {
+    return [...staticEvents, ...lumaEvents]
+  }, [staticEvents, lumaEvents])
+
+  // Calculate categories with counts
+  const categories = useMemo(() => {
+    const categoryCounts: { [key: string]: number } = { all: 0 }
+
+    allEvents.forEach((event) => {
+      categoryCounts.all += 1
+
+      event.categories?.forEach((category) => {
+        categoryCounts[category] = (categoryCounts[category] || 0) + 1
+      })
+    })
+
+    return categoryCounts
+  }, [allEvents])
+
+  // Filter events by search query and category
+  const filteredEvents = useMemo(() => {
+    let filtered = allEvents
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter((event) => event.categories?.includes(selectedCategory))
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter((event) => {
+        const titleMatch = event.title?.toLowerCase().includes(query)
+        const descriptionMatch = event.description?.toLowerCase().includes(query)
+        const locationMatch = event.location?.toLowerCase().includes(query)
+        const tagsMatch = event.tags?.some((tag) => tag.toLowerCase().includes(query))
+
+        return titleMatch || descriptionMatch || locationMatch || tagsMatch
+      })
+    }
+
+    // Sort by date (upcoming events first)
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.date).getTime()
+      const dateB = new Date(b.date).getTime()
+      return dateA - dateB
+    })
+  }, [allEvents, selectedCategory, searchQuery])
+
+  // Featured event: nearest upcoming event, or if none, the most recent past event
+  const featuredEvent = useMemo(() => {
+    if (allEvents.length === 0) return undefined
+
+    const now = new Date()
+
+    // Separate upcoming and past events
+    const upcomingEvents = allEvents.filter((event) => {
+      const eventDate = new Date(event.end_date || event.date)
+      return eventDate >= now
+    })
+
+    const pastEvents = allEvents.filter((event) => {
+      const eventDate = new Date(event.end_date || event.date)
+      return eventDate < now
+    })
+
+    // If there are upcoming events, return the nearest one
+    if (upcomingEvents.length > 0) {
+      return upcomingEvents.sort((a, b) => {
+        const dateA = new Date(a.date).getTime()
+        const dateB = new Date(b.date).getTime()
+        return dateA - dateB
+      })[0]
+    }
+
+    // If no upcoming events, return the most recent past event
+    if (pastEvents.length > 0) {
+      return pastEvents.sort((a, b) => {
+        const dateA = new Date(a.date).getTime()
+        const dateB = new Date(b.date).getTime()
+        return dateB - dateA // Descending order for past events
+      })[0]
+    }
+
+    return undefined
+  }, [allEvents])
+
+  const value: EventsContextValue = {
+    allEvents,
+    filteredEvents,
+    staticEvents,
+    lumaEvents,
+    isLoading,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    categories,
+    featuredEvent,
+  }
+
+  return <EventsContext.Provider value={value}>{children}</EventsContext.Provider>
+}
+
+export function useEvents() {
+  const context = useContext(EventsContext)
+  if (context === undefined) {
+    throw new Error('useEvents must be used within an EventsProvider')
+  }
+  return context
+}
