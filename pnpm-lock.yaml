@@ -320,6 +320,9 @@ importers:
       '@shikijs/compat':
         specifier: ^1.1.7
         version: 1.29.2
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@3.4.1)
       '@types/lodash.template':
         specifier: 4.5.0
         version: 4.5.0

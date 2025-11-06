@@ -8,7 +8,7 @@ import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseB
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { PageHeader } from 'components/ui/PageHeader'
+import { PageHeader } from 'ui-patterns/PageHeader'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'

@@ -2,7 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { PageSection } from 'components/ui/PageSection'
+import { PageSection } from 'ui-patterns/PageSection'
 import AlertError from 'components/ui/AlertError'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'

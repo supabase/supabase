@@ -1,0 +1,46 @@
+---
+title: Page Section
+description: A compound component for organizing page content into distinct sections.
+fragment: true
+---
+
+<ComponentPreview
+  name="page-section-demo"
+  description="Basic page section with title, description, and content"
+  peekCode
+  wide
+/>
+
+## Sub-components
+
+- `PageSection.Root` - Root container with orientation variants (`horizontal` or `vertical`)
+- `PageSection.Summary` - Container for section title and description
+- `PageSection.Title` - Section heading (h2)
+- `PageSection.Description` - Supporting text below section title
+- `PageSection.Aside` - Container for section-level actions
+- `PageSection.Content` - Container for the main section content
+
+## Orientation Variants
+
+- `vertical` - Content stacks vertically (default)
+- `horizontal` - Summary and content arranged horizontally on larger screens
+
+## Examples
+
+### Horizontal Orientation
+
+<ComponentPreview
+  name="page-section-horizontal"
+  description="PageSection with horizontal layout - summary on left, content on right"
+  peekCode
+  wide
+/>
+
+### With Aside Actions
+
+<ComponentPreview
+  name="page-section-with-aside"
+  description="PageSection with multiple action buttons in the Aside component"
+  peekCode
+  wide
+/>

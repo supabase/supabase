@@ -10,8 +10,8 @@ import {
 } from 'components/interfaces/Functions/FunctionsEmptyState'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { PageContainer } from 'components/ui/PageContainer'
-import { PageHeader } from 'components/ui/PageHeader'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageHeader } from 'ui-patterns/PageHeader'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -19,7 +19,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
-import { PageSection } from 'components/ui/PageSection'
+import { PageSection } from 'ui-patterns/PageSection'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()

@@ -318,6 +318,18 @@
       "import": "./src/McpUrlBuilder/index.ts",
       "types": "./src/McpUrlBuilder/index.ts"
     },
+    "./PageContainer": {
+      "import": "./src/PageContainer/index.tsx",
+      "types": "./src/PageContainer/index.tsx"
+    },
+    "./PageHeader": {
+      "import": "./src/PageHeader/index.tsx",
+      "types": "./src/PageHeader/index.tsx"
+    },
+    "./PageSection": {
+      "import": "./src/PageSection/index.tsx",
+      "types": "./src/PageSection/index.tsx"
+    },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
       "types": "./src/MobileSheetNav/MobileSheetNav.tsx"

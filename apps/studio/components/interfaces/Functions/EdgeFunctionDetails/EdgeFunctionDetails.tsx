@@ -51,8 +51,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { PageContainer } from 'components/ui/PageContainer'
-import { PageSection } from 'components/ui/PageSection'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 
 const FormSchema = z.object({
   name: z.string().min(0, 'Name is required'),

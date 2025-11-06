@@ -11,7 +11,7 @@ import { useFlag } from 'common'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
-import { PageContainer } from 'components/ui/PageContainer'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'
@@ -30,7 +30,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
-import { PageSection } from 'components/ui/PageSection'
+import { PageSection } from 'ui-patterns/PageSection'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -135,7 +135,7 @@ const PageLayout: NextPageWithLayout = () => {
   return (
     <PageContainer size="full">
       <PageSection.Root>
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center gap-2 mb-4">
           <div className="flex items-center">
             {CHART_INTERVALS.map((item, i) => {
               const classes = []
