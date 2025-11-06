@@ -1,4 +1,4 @@
-import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 
 import { useParams } from 'common'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
@@ -37,11 +37,12 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const [{ search: searchQuery, roles }] = useQueryStates({
+  const [{ search: searchQuery, roles, minCalls }] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
+    minCalls: parseAsInteger,
   })
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
@@ -55,6 +56,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     preset: 'unified',
     roles,
     runIndexAdvisor: isIndexAdvisorEnabled,
+    minCalls: minCalls ?? undefined,
   })
 
   const isPgStatMonitorEnabled = project?.dbVersion === '17.4.1.076-psml-1'

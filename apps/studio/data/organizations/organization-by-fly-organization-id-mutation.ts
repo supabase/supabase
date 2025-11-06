@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type OrganizationByFlyOrgIdVariables = {
   flyOrganizationId: string
@@ -28,7 +28,11 @@ export const useOrganizationByFlyOrgIdMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationByFlyOrgIdData, ResponseError, OrganizationByFlyOrgIdVariables>,
+  UseCustomMutationOptions<
+    OrganizationByFlyOrgIdData,
+    ResponseError,
+    OrganizationByFlyOrgIdVariables
+  >,
   'mutationFn'
 > = {}) => {
   return useMutation<OrganizationByFlyOrgIdData, ResponseError, OrganizationByFlyOrgIdVariables>({

@@ -48,7 +48,7 @@ export function useSignOut() {
     clearLocalStorage()
     // Clear Assistant IndexedDB
     await clearAssistantStorage()
-    await queryClient.clear()
+    queryClient.clear()
 
     return result
   }, [queryClient, clearAssistantStorage])
