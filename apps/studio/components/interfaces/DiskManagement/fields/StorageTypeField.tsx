@@ -3,7 +3,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   buttonVariants,
@@ -33,7 +33,7 @@ type StorageTypeFieldProps = {
 
 export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) {
   const { control, trigger } = form
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
 
   const isIo2Supported = IO2_AVAILABLE_REGIONS.includes(project?.region ?? '')
@@ -101,7 +101,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                 {DISK_TYPE_OPTIONS.map((item) => {
                   const disableIo2 = item.type === 'io2' && !isIo2Supported
                   return (
-                    <Tooltip>
+                    <Tooltip key={item.type}>
                       <TooltipTrigger asChild>
                         <SelectItem_Shadcn_
                           key={item.type}

@@ -37,12 +37,12 @@ download.storage.v1:
 # 	curl -sS https://supabase.github.io/functions-js/v1/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/functions.json
 
 download.tsdoc.v2:
-	curl -sS https://supabase.github.io/supabase-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/supabase.json
-	curl -sS https://supabase.github.io/auth-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/gotrue.json
-	curl -sS https://supabase.github.io/postgrest-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/postgrest.json
-	curl -sS https://supabase.github.io/realtime-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/realtime.json
-	curl -sS https://supabase.github.io/storage-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/storage.json
-	curl -sS https://supabase.github.io/functions-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/functions.json
+	curl -sS https://supabase.github.io/supabase-js/supabase-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/supabase.json
+	curl -sS https://supabase.github.io/supabase-js/auth-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/gotrue.json
+	curl -sS https://supabase.github.io/supabase-js/postgrest-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/postgrest.json
+	curl -sS https://supabase.github.io/supabase-js/realtime-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/realtime.json
+	curl -sS https://supabase.github.io/supabase-js/storage-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/storage.json
+	curl -sS https://supabase.github.io/supabase-js/functions-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/functions.json
 
 download.analytics.v0:
 	curl -sS https://logflare.app/api/openapi > $(REPO_DIR)/analytics_v0_openapi.json
@@ -118,7 +118,7 @@ combine-raw.tsdoc.v2:
 generate: generate.sections.api.v1
 
 generate.sections.api.v1:
-	node $(REPO_DIR)/sections/generateMgmtApiSections.ts $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/common-api-sections.json
+	npx tsx $(REPO_DIR)/sections/generateMgmtApiSections.cts $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/common-api-sections.json
 
 ###############################################################################
 # Validate OpenAPI 3.0
@@ -131,4 +131,4 @@ validate.analytics.v0:
 # Format everything - easier for git to track changes.
 ###############################################################################
 format:
-	npx prettier --write .
+	npx prettier --cache --write .

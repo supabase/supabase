@@ -2,57 +2,70 @@
 id: 'functions-logging'
 title: 'Logging'
 description: 'How to access logs for your Edge Functions.'
-subtitle: 'How to access logs for your Edge Functions.'
+subtitle: 'Monitor your Edge Functions with logging to track execution, debug issues, and optimize performance.'
 ---
 
 Logs are provided for each function invocation, locally and in hosted environments.
 
-## How to access logs
+---
 
-### Hosted
+## Accessing logs
 
-You can access both tools from the [Functions section](https://supabase.com/dashboard/project/_/functions) of the Dashboard. Select your function from the list, and click `Invocations` or `Logs`:
+### Production
 
-- **Invocations**: shows the Request and Response for each execution. You can see the headers, body, status code, and duration of each invocation. You can also filter the invocations by date, time, or status code.
-- **Logs**: shows any platform events, uncaught exceptions, and custom log events. You can see the timestamp, level, and message of each log event. You can also filter the log events by date, time, or level.
+Access logs from the Functions section of your Dashboard:
+
+1. Navigate to the [Functions section](/dashboard/project/_/functions) of the Dashboard
+2. Select your function from the list
+3. Choose your log view:
+   - **Invocations:** Request/Response data including headers, body, status codes, and execution duration. Filter by date, time, or status code.
+   - **Logs:** Platform events, uncaught exceptions, and custom log messages. Filter by timestamp, level, or message content.
 
 ![Function invocations.](/docs/img/guides/functions/function-logs.png)
 
-### Local
+### Development
 
-When [developing locally](/docs/guides/functions/local-development) you will see error messages and console log statements printed to your local terminal window.
+When [developing locally](/docs/guides/functions/quickstart) you will see error messages and console log statements printed to your local terminal window.
 
-## Events that get logged
+---
+
+## Log event types
+
+### Automatic logs
+
+Your functions automatically capture several types of events:
 
 - **Uncaught exceptions**: Uncaught exceptions thrown by a function during execution are automatically logged. You can see the error message and stack trace in the Logs tool.
 - **Custom log events**: You can use `console.log`, `console.error`, and `console.warn` in your code to emit custom log events. These events also appear in the Logs tool.
 - **Boot and Shutdown Logs**: The Logs tool extends its coverage to include logs for the boot and shutdown of functions.
 
-<Admonition type="note">
-  A custom log message can contain up to 10,000 characters. A function can log up to 100 events
-  within a 10 second period.
-</Admonition>
+### Custom logs
 
-Here is an example of how to use custom logs events in your function:
+You can add your own log messages using standard console methods:
 
-```typescript
+```js
 Deno.serve(async (req) => {
   try {
     const { name } = await req.json()
 
     if (!name) {
-      console.warn('Empty name provided')
+      // Log a warning message
+      console.warn('Empty name parameter received')
     }
+
+    // Log a message
+    console.log(`Processing request for: ${name}`)
 
     const data = {
-      message: `Hello ${name || 'Guest'}!`, // Provide a default value if name is empty
+      message: `Hello ${name || 'Guest'}!`,
     }
 
-    console.log(`Name: ${name}`)
-
-    return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify(data), {
+      headers: { 'Content-Type': 'application/json' },
+    })
   } catch (error) {
-    console.error(`Error processing request: ${error.message}`)
+    // Log an error message
+    console.error(`Request processing failed: ${error.message}`)
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -61,6 +74,14 @@ Deno.serve(async (req) => {
 })
 ```
 
+<Admonition type="note">
+
+A custom log message can contain up to 10,000 characters. A function can log up to 100 events within a 10 second period.
+
+</Admonition>
+
+---
+
 ## Logging tips
 
 ### Logging request headers
@@ -68,47 +89,30 @@ Deno.serve(async (req) => {
 When debugging Edge Functions, a common mistake is to try to log headers to the developer console via code like this:
 
 ```ts index.ts
+// ❌ This doesn't work as expected
+
 Deno.serve(async (req) => {
-  const headers = JSON.stringify(req.headers)
-  console.log(`Request headers: ${headers}`)
-  // OR
-  console.log(`Request headers: ${JSON.stringify(req.headers)}`)
-  return new Response('ok', {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    status: 200,
-  })
+  console.log(`Headers: ${JSON.stringify(req.headers)}`) // Outputs: "{}"
 })
 ```
 
-Both attempts will give as output the string `"{}"`, even though retrieving the value using `request.headers.get("Your-Header-Name")` will indeed give you the correct value. This behavior mirrors that of browsers.
+The `req.headers` object appears empty because Headers objects don't store data in enumerable JavaScript properties, making them opaque to `JSON.stringify()`.
 
-The reason behind this behavior is that [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) objects don't store headers in JavaScript properties that can be enumerated. As a result, neither the developer console nor the JSON stringifier can properly interpret the names and values of the headers. Essentially, it's not an empty object, but rather an opaque one.
-
-However, `Headers` objects are iterable. You can utilize this feature to craft a couple of succinct one-liners for debugging and printing headers.
-
-### Convert headers into an object with `Object.fromEntries`:
-
-You can use `Object.fromEntries` which is a call to convert the headers into an object:
+Instead, you have to convert headers to a plain object first, for example using `Object.fromEntries`.
 
 ```ts index.ts
+// ✅ This works correctly
 Deno.serve(async (req) => {
-  let headersObject = Object.fromEntries(req.headers)
-  let requestHeaders = JSON.stringify(headersObject, null, 2)
-  console.log(`Request headers: ${requestHeaders}`)
-  return new Response('ok', {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    status: 200,
-  })
+  const headersObject = Object.fromEntries(req.headers)
+  const headersJson = JSON.stringify(headersObject, null, 2)
+
+  console.log(`Request headers:\n${headersJson}`)
 })
 ```
 
 This results in something like:
 
-```ts index.ts
+```json
 Request headers: {
     "accept": "*/*",
     "accept-encoding": "gzip",

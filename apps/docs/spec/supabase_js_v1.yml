@@ -27,7 +27,7 @@ functions:
             import { createClient } from '@supabase/supabase-js'
 
             // Create a single supabase client for interacting with your database
-            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+            const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')
           ```
       - id: with-additional-parameters
         name: With Additional Parameters
@@ -42,7 +42,7 @@ functions:
               persistSession: true,
               detectSessionInUrl: true,
             }
-            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+            const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', options)
           ```
       - id: api-schemas
         name: API schemas
@@ -57,7 +57,7 @@ functions:
               persistSession: true,
               detectSessionInUrl: true,
             }
-            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+            const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', options)
           ```
         description: |
           By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
@@ -70,7 +70,7 @@ functions:
           ```js
             import { createClient } from '@supabase/supabase-js'
 
-            const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
               fetch: fetch.bind(globalThis),
             })
           ```
@@ -330,7 +330,7 @@ functions:
             const { access_token } = req.get('X-Supabase-Auth')
 
             // You can now use it within a Supabase Client
-            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+            const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key")
             const { user, error } = supabase.auth.setAuth(access_token)
 
             // This client will now send requests as this user
@@ -368,7 +368,7 @@ functions:
             const { access_token } = req.get('X-Supabase-Auth')
 
             // You can now use it within a Supabase Client
-            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+            const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key")
             const { user, error } = supabase.auth.setAuth(access_token)
 
             // This client will now send requests as this user

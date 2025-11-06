@@ -2,8 +2,9 @@ import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
 
+import { isFeatureEnabled } from 'common'
 import ApiSchema from '~/components/ApiSchema'
-import { REFERENCES } from '~/content/navigation.references'
+import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import {
@@ -38,11 +39,20 @@ type RefSectionsProps = {
 
 async function RefSections({ libraryId, version }: RefSectionsProps) {
   let flattenedSections = await getFlattenedSections(libraryId, version)
-  flattenedSections = trimIntro(flattenedSections)
+  if (flattenedSections) {
+    flattenedSections = trimIntro(flattenedSections)
+  }
+
+  if (!isFeatureEnabled('sdk:auth') && clientSdkIds.includes(libraryId)) {
+    flattenedSections = flattenedSections?.filter(
+      (section) =>
+        'product' in section && section.product !== 'auth' && section.product !== 'auth-admin'
+    )
+  }
 
   return (
     <div className="flex flex-col my-16 gap-16">
-      {flattenedSections
+      {(flattenedSections || [])
         .filter((section) => section.type !== 'category')
         .map((section, idx) => (
           <Fragment key={`${section.id}-${idx}`}>
@@ -331,6 +341,18 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
             {endpointDetails.description}
           </ReactMarkdown>
         )}
+        {endpointDetails['x-oauth-scope'] && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">OAuth scopes</h3>
+            <ul>
+              <li key={endpointDetails['x-oauth-scope']} className="list-['-'] ml-2 pl-2">
+                <span className="font-mono text-sm font-medium text-foreground">
+                  {endpointDetails['x-oauth-scope']}
+                </span>
+              </li>
+            </ul>
+          </section>
+        )}
         {pathParameters.length > 0 && (
           <section>
             <h3 className="mb-3 text-base text-foreground">Path parameters</h3>
@@ -405,7 +427,7 @@ async function FunctionSection({
 }: FunctionSectionProps) {
   const fns = await getFunctionsList(sdkId, version)
 
-  const fn = fns.find((fn) => fn.id === section.id)
+  const fn = fns?.find((fn) => fn.id === section.id)
   if (!fn) return null
 
   let types: MethodTypes | undefined
@@ -470,7 +492,7 @@ async function FunctionSection({
             {fn.examples.map((example) => (
               <TabsContent_Shadcn_ key={example.id} value={example.id}>
                 <MDXRemoteRefs source={example.code} />
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 mt-2">
                   {!!example.data?.sql && (
                     <CollapsibleDetails title="Data source" content={example.data.sql} />
                   )}

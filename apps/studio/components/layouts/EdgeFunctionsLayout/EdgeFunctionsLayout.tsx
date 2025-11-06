@@ -4,7 +4,7 @@ import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { withAuth } from 'hooks/misc/withAuth'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout'
 
 const EdgeFunctionsProductMenu = () => {
   const { ref: projectRef = 'default' } = useParams()
@@ -18,7 +18,7 @@ const EdgeFunctionsProductMenu = () => {
         {
           name: 'Functions',
           key: 'main',
-          pages: [undefined, '[functionSlug]', 'new'],
+          pages: ['', '[functionSlug]', 'new'],
           url: `/project/${projectRef}/functions`,
           items: [],
         },

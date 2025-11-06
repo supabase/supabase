@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -12,13 +12,16 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
+import PartnerIcon from 'components/ui/PartnerIcon'
+import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH } from 'lib/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button } from 'ui'
+import { Alert, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import SpendCapSidePanel from './SpendCapSidePanel'
 
@@ -27,8 +30,9 @@ export interface CostControlProps {}
 const CostControl = ({}: CostControlProps) => {
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const canReadSubscriptions = useCheckPermissions(
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
@@ -49,6 +53,8 @@ const CostControl = ({}: CostControlProps) => {
   const canChangeTier =
     !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id || '')
 
+  const costControlDisabled = selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
+
   return (
     <>
       <ScaffoldSection>
@@ -57,14 +63,21 @@ const CostControl = ({}: CostControlProps) => {
             <div className="space-y-2">
               <p className="text-foreground text-base m-0">Cost Control</p>
               <p className="text-sm text-foreground-light m-0">
-                Control whether to use beyond your plans included quota
+                Allow scaling beyond your plan's{' '}
+                <Link
+                  href={`/org/${slug}/usage`}
+                  className="text-green-900 transition hover:text-green-1000"
+                >
+                  included quota
+                </Link>
+                .
               </p>
             </div>
             <div className="space-y-2">
               <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
                 <Link
-                  href="https://supabase.com/docs/guides/platform/cost-control#spend-cap"
+                  href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -78,7 +91,7 @@ const CostControl = ({}: CostControlProps) => {
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadSubscriptions ? (
+          {isPermissionsLoaded && !canReadSubscriptions ? (
             <NoPermission resourceText="update this organization's cost control" />
           ) : (
             <>
@@ -92,7 +105,22 @@ const CostControl = ({}: CostControlProps) => {
 
               {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
 
-              {isSuccess && (
+              {isSuccess && costControlDisabled && (
+                <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none">
+                  <PartnerIcon
+                    organization={{ managed_by: selectedOrganization?.managed_by }}
+                    showTooltip={false}
+                    size="large"
+                  />
+
+                  <AlertTitle_Shadcn_ className="text-sm">
+                    The Spend Cap is not available for organizations managed by{' '}
+                    {PARTNER_TO_NAME[selectedOrganization?.managed_by]}.
+                  </AlertTitle_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+
+              {isSuccess && !costControlDisabled && (
                 <div className="space-y-6">
                   {['team', 'enterprise'].includes(currentPlan?.id || '') ? (
                     <Alert
@@ -114,16 +142,8 @@ const CostControl = ({}: CostControlProps) => {
                     </Alert>
                   ) : (
                     <p className="text-sm text-foreground-light">
-                      You can control whether your organization is charged for additional usage
-                      beyond the{' '}
-                      <Link
-                        href={`/org/${slug}/usage`}
-                        className="text-green-900 transition hover:text-green-1000"
-                      >
-                        included quota
-                      </Link>{' '}
-                      of your subscription plan. If you need to go beyond the included quota, simply
-                      switch off your spend cap to pay for additional usage.
+                      If you need to go beyond the included quota, simply switch off your spend cap
+                      to pay for additional usage.
                     </p>
                   )}
 
@@ -152,7 +172,7 @@ const CostControl = ({}: CostControlProps) => {
                       </p>
                       <p className="text-sm text-foreground-light">
                         {isUsageBillingEnabled ? (
-                          <span>You will be charged for any usage above the included quota.</span>
+                          <span>You will be charged for usage beyond the included quota.</span>
                         ) : (
                           <span>
                             You won't be charged any extra for usage. However, your projects could
@@ -161,12 +181,6 @@ const CostControl = ({}: CostControlProps) => {
                           </span>
                         )}
                       </p>
-                      {isUsageBillingEnabled && (
-                        <p className="text-sm text-foreground-light mt-1">
-                          Your projects will never become unresponsive. Only when your usage reaches
-                          the quota limit will you be charged for any excess usage.
-                        </p>
-                      )}
                       <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                         <Button
                           type="default"

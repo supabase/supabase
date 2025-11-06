@@ -2,9 +2,10 @@ import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
+import { DEFAULT_SIDEBAR_BEHAVIOR } from 'components/interfaces/Sidebar'
 import Panel from 'components/ui/Panel'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BASE_PATH, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import {
   Label_Shadcn_,
   RadioGroup_Shadcn_,
@@ -19,7 +20,7 @@ import {
   Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { DEFAULT_SIDEBAR_BEHAVIOR } from 'components/interfaces/Sidebar'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
@@ -51,7 +52,7 @@ export const ThemeSettings = () => {
         >
           {singleThemes.map((theme: Theme) => (
             <RadioGroupLargeItem_Shadcn_
-              className="grow p-3"
+              className="p-3"
               key={theme.value}
               value={theme.value}
               label={theme.name}

@@ -11,15 +11,20 @@ import {
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 import UpcomingInvoice from './UpcomingInvoice'
 
 const BillingBreakdown = () => {
   const { slug: orgSlug } = useParams()
 
-  const canReadSubscriptions = useCheckPermissions(
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
@@ -36,23 +41,64 @@ const BillingBreakdown = () => {
   const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
   const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
 
+  const daysToCycleEnd = billingCycleEnd.diff(dayjs(), 'days')
+  const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
+
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12 pr-3">
-          <p className="text-foreground text-base m-0">Billing Breakdown</p>
-          <p className="text-sm text-foreground-light m-0">
-            Current billing cycle: {billingCycleStart.format('MMM DD')} -{' '}
-            {billingCycleEnd.format('MMM DD')}
+        <div className="sticky space-y-2 top-12 pr-6">
+          <p className="text-foreground text-base m-0">Upcoming Invoice</p>
+          <div className="py-2">
+            {selectedOrganization?.managed_by !== MANAGED_BY.AWS_MARKETPLACE && (
+              <SparkBar
+                type="horizontal"
+                value={daysWithinCycle - daysToCycleEnd}
+                max={daysWithinCycle}
+                barClass="bg-foreground"
+                labelBottom={`${billingCycleStart.format('MMMM DD')} - ${billingCycleEnd.format('MMMM DD')}`}
+                bgClass="bg-surface-300"
+                labelBottomClass="!text-foreground-light p-1 m-0"
+                labelTop={
+                  subscription
+                    ? `${daysToCycleEnd} ${daysToCycleEnd === 1 ? 'day' : 'days'} left`
+                    : ''
+                }
+                labelTopClass="p-1 m-0"
+              />
+            )}
+          </div>
+          <p className="prose text-sm">
+            {selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ? (
+              <>
+                <p>
+                  AWS Marketplace sends two invoices each month: one for your fixed subscription
+                  fee, billed on the day you subscribed, and one for your usage charges from the
+                  previous month, billed by the 3rd.
+                </p>
+
+                <p>
+                  For a more detailed breakdown, visit the{' '}
+                  <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
+                </p>
+              </>
+            ) : (
+              <>
+                Your upcoming invoice (excluding credits) will continue to update until the end of
+                your billing cycle on {billingCycleEnd.format('MMMM DD')}. For a more detailed
+                breakdown, visit the <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
+              </>
+            )}
           </p>
-          <p className="text-sm text-foreground-light m-0">
-            It may take up to an hour for addon changes or new projects to show up.
+          <br />
+          <p className="text-sm text-foreground-light mt-4">
+            Add-on changes or new projects may take up to an hour to appear.
           </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadSubscriptions ? (
-          <NoPermission resourceText="view this organization's billing breakdown" />
+        {isPermissionsLoaded && !canReadSubscriptions ? (
+          <NoPermission resourceText="view this organization's upcoming invoice" />
         ) : (
           <>
             {isLoadingSubscription && (
@@ -67,19 +113,7 @@ const BillingBreakdown = () => {
               <AlertError subject="Failed to retrieve subscription" error={subscriptionError} />
             )}
 
-            {invoiceFeatureEnabled && (
-              <>
-                <p className="prose text-sm">
-                  The table shows your upcoming invoice, excluding credits. This invoice will
-                  continue updating until the end of your billing period on{' '}
-                  {billingCycleEnd.format('MMMM DD')}. See{' '}
-                  <Link href={`/org/${orgSlug}/usage`}>usage page</Link> for a more detailed usage
-                  breakdown.
-                </p>
-
-                <UpcomingInvoice slug={orgSlug} />
-              </>
-            )}
+            {invoiceFeatureEnabled && <UpcomingInvoice slug={orgSlug} />}
           </>
         )}
       </ScaffoldSectionContent>

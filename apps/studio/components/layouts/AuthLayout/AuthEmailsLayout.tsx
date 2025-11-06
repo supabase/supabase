@@ -1,16 +1,15 @@
-import { ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import AuthLayout from './AuthLayout'
 
-interface AuthEmailsLayoutProps {
-  children: ReactNode
-}
-
-export const AuthEmailsLayout = ({ children }: AuthEmailsLayoutProps) => {
+export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
+
+  const showEmails = useIsFeatureEnabled('authentication:emails')
 
   const navItems = [
     {
@@ -24,8 +23,8 @@ export const AuthEmailsLayout = ({ children }: AuthEmailsLayoutProps) => {
   ]
 
   return (
-    <DefaultLayout>
-      <AuthLayout>
+    <AuthLayout>
+      {showEmails ? (
         <PageLayout
           title="Emails"
           subtitle="Configure what emails your users receive and how they are sent"
@@ -33,7 +32,9 @@ export const AuthEmailsLayout = ({ children }: AuthEmailsLayoutProps) => {
         >
           {children}
         </PageLayout>
-      </AuthLayout>
-    </DefaultLayout>
+      ) : (
+        <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
+      )}
+    </AuthLayout>
   )
 }

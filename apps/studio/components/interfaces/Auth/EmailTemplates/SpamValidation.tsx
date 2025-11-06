@@ -1,6 +1,7 @@
+import { Check, MailWarning } from 'lucide-react'
+
 import { Markdown } from 'components/interfaces/Markdown'
 import { ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
-import { Check, MailWarning } from 'lucide-react'
 import { Separator, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 interface SpamValidationProps {
@@ -25,7 +26,7 @@ export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
         )}
       </div>
       <div className="flex flex-col gap-2">
-        <h5 className="text-sm">
+        <h5>
           {hasSpamWarning
             ? 'Email has a high probability of being marked as spam - review issues below to improve deliverability.'
             : 'Email content is unlikely to be marked as spam'}

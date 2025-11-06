@@ -1,5 +1,5 @@
 import { createParser, useQueryState } from 'nuqs'
-import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
+
 import { Filters } from 'components/interfaces/Settings/Logs/Logs.types'
 
 interface LogsUrlState {

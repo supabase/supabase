@@ -1,71 +1,37 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import { getUsersCountSQL } from '@supabase/pg-meta/src/sql/studio/get-users-count'
+import { useQuery } from '@tanstack/react-query'
 
-import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
 import { authKeys } from './keys'
-import { Filter } from './users-infinite-query'
+import { type Filter } from './users-infinite-query'
 
 type UsersCountVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   keywords?: string
   filter?: Filter
   providers?: string[]
-}
+  forceExactCount?: boolean
 
-const getUsersCountSql = ({
-  filter,
-  keywords,
-  providers,
-}: {
-  filter?: Filter
-  keywords?: string
-  providers?: string[]
-}) => {
-  const hasValidKeywords = keywords && keywords !== ''
-
-  const conditions: string[] = []
-  const baseQueryCount = `select count(*) from auth.users`
-
-  if (hasValidKeywords) {
-    // [Joshen] Escape single quotes properly
-    const formattedKeywords = keywords.replaceAll("'", "''")
-    conditions.push(
-      `id::text ilike '%${formattedKeywords}%' or email ilike '%${formattedKeywords}%' or phone ilike '%${formattedKeywords}%'`
-    )
-  }
-
-  if (filter === 'verified') {
-    conditions.push(`email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL`)
-  } else if (filter === 'anonymous') {
-    conditions.push(`is_anonymous is true`)
-  } else if (filter === 'unverified') {
-    conditions.push(`email_confirmed_at IS NULL AND phone_confirmed_at IS NULL`)
-  }
-
-  if (providers && providers.length > 0) {
-    // [Joshen] This is arguarbly not fully optimized, but at the same time not commonly used
-    // JFYI in case we do eventually run into performance issues here when filtering for SAML provider
-    if (providers.includes('saml 2.0')) {
-      conditions.push(
-        `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => (p === 'saml 2.0' ? `'sso'` : `'${p}'`)).join(', ')}]`.trim()
-      )
-    } else {
-      conditions.push(
-        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => `'${p}'`).join(', ')}]`
-      )
-    }
-  }
-
-  const combinedConditions = conditions.map((x) => `(${x})`).join(' and ')
-
-  return `${baseQueryCount}${conditions.length > 0 ? ` where ${combinedConditions}` : ''};`
+  /** If set, uses optimized prefix search for the specified column */
+  column?: OptimizedSearchColumns
 }
 
 export async function getUsersCount(
-  { projectRef, connectionString, keywords, filter, providers }: UsersCountVariables,
+  {
+    projectRef,
+    connectionString,
+    keywords,
+    filter,
+    providers,
+    forceExactCount,
+    column,
+  }: UsersCountVariables,
   signal?: AbortSignal
 ) {
-  const sql = getUsersCountSql({ filter, keywords, providers })
+  const sql = getUsersCountSQL({ filter, keywords, providers, forceExactCount, column })
 
   const { result } = await executeSql(
     {
@@ -78,27 +44,55 @@ export async function getUsersCount(
   )
 
   const count = result?.[0]?.count
+  const isEstimate = result?.[0]?.is_estimate
 
   if (typeof count !== 'number') {
     throw new Error('Error fetching users count')
   }
 
-  return count
+  return {
+    count,
+    is_estimate: isEstimate ?? true,
+  }
 }
 
 export type UsersCountData = Awaited<ReturnType<typeof getUsersCount>>
 export type UsersCountError = ExecuteSqlError
 
+/** [Joshen] Be wary of using this as it could potentially cause a huge load on the user's DB */
 export const useUsersCountQuery = <TData = UsersCountData>(
-  { projectRef, connectionString, keywords, filter, providers }: UsersCountVariables,
-  { enabled = true, ...options }: UseQueryOptions<UsersCountData, UsersCountError, TData> = {}
+  {
+    projectRef,
+    connectionString,
+    keywords,
+    filter,
+    providers,
+    forceExactCount,
+    column,
+  }: UsersCountVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<UsersCountData, UsersCountError, TData> = {}
 ) =>
-  useQuery<UsersCountData, UsersCountError, TData>(
-    authKeys.usersCount(projectRef, { keywords, filter, providers }),
-    ({ signal }) =>
-      getUsersCount({ projectRef, connectionString, keywords, filter, providers }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<UsersCountData, UsersCountError, TData>({
+    queryKey: authKeys.usersCount(projectRef, {
+      keywords,
+      filter,
+      providers,
+      forceExactCount,
+      column,
+    }),
+    queryFn: ({ signal }) =>
+      getUsersCount(
+        {
+          projectRef,
+          connectionString,
+          keywords,
+          filter,
+          providers,
+          forceExactCount,
+          column,
+        },
+        signal
+      ),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

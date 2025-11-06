@@ -1,13 +1,13 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueMessageReadVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   queryName: string
   duration: number
   messageId: number
@@ -37,7 +37,7 @@ export const useDatabaseQueueMessageReadMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     DatabaseQueueMessageReadData,
     ResponseError,
     DatabaseQueueMessageReadVariables
@@ -50,12 +50,13 @@ export const useDatabaseQueueMessageReadMutation = ({
     DatabaseQueueMessageReadData,
     ResponseError,
     DatabaseQueueMessageReadVariables
-  >((vars) => readDatabaseQueueMessage(vars), {
+  >({
+    mutationFn: (vars) => readDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queryName } = variables
-      await queryClient.invalidateQueries(
-        databaseQueuesKeys.getMessagesInfinite(projectRef, queryName)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queryName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

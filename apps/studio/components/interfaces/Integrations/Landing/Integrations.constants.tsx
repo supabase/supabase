@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
 
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
@@ -87,7 +87,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
-        return dynamic(() => import('../Queues/QueueTab').then((mod) => mod.QueueTab), {
+        return dynamic(() => import('../Queues/QueuePage').then((mod) => mod.QueuePage), {
           loading: Loading,
         })
       }
@@ -121,7 +121,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     icon: ({ className, ...props } = {}) => (
       <Clock5 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
-    description: 'Schedule recurring Jobs in Postgres.',
+    description: 'Schedule recurring Jobs in Postgres',
     docsUrl: 'https://github.com/citusdata/pg_cron',
     author: {
       name: 'Citus Data',
@@ -143,12 +143,9 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
-        return dynamic(
-          () => import('../CronJobs/PreviousRunsTab').then((mod) => mod.PreviousRunsTab),
-          {
-            loading: Loading,
-          }
-        )
+        return dynamic(() => import('../CronJobs/CronJobPage').then((mod) => mod.CronJobPage), {
+          loading: Loading,
+        })
       }
       switch (pageId) {
         case 'overview':
@@ -180,16 +177,12 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
-    docsUrl: 'https://supabase.com/docs',
+    docsUrl: DOCS_URL,
     author: authorSupabase,
     navigation: [
       {
         route: 'overview',
         label: 'Overview',
-      },
-      {
-        route: 'keys',
-        label: 'Keys',
       },
       {
         route: 'secrets',
@@ -203,16 +196,6 @@ const supabaseIntegrations: IntegrationDefinition[] = [
             () =>
               import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
                 (mod) => mod.IntegrationOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
-        case 'keys':
-          return dynamic(
-            () =>
-              import('../Vault/Keys/EncryptionKeysManagement').then(
-                (mod) => mod.EncryptionKeysManagement
               ),
             {
               loading: Loading,
@@ -238,7 +221,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ),
     description:
       'Send real-time data from your database to another system when a table event occurs',
-    docsUrl: 'https://supabase.com/docs',
+    docsUrl: DOCS_URL,
     author: authorSupabase,
     requiredExtensions: [],
     navigation: [
@@ -292,7 +275,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       />
     ),
     description: 'Run GraphQL queries through our interactive in-browser IDE',
-    docsUrl: 'https://supabase.com/docs',
+    docsUrl: DOCS_URL,
     author: authorSupabase,
     navigation: [
       {

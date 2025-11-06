@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { authKeys } from './keys'
 
 export type AuthConfigUpdateVariables = {
@@ -32,27 +32,25 @@ export const useAuthConfigUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>,
+  UseCustomMutationOptions<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>(
-    (vars) => updateAuthConfig(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(authKeys.authConfig(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update auth configuration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>({
+    mutationFn: (vars) => updateAuthConfig(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update auth configuration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

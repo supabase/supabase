@@ -60,6 +60,10 @@ Setting up Figma logins for your application consists of 3 parts:
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `figma` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+// ---cut---
 async function signInWithFigma() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'figma',
@@ -84,6 +88,7 @@ Future<void> signInWithFigma() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Figma` as the `Provider`:
@@ -95,6 +100,7 @@ suspend fun signInWithFigma() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -111,6 +117,10 @@ suspend fun signInWithFigma() {
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
@@ -128,6 +138,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -139,6 +150,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources

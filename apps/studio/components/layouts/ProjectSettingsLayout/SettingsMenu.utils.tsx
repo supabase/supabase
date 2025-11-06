@@ -11,18 +11,39 @@ export const generateSettingsMenu = (
   organization?: Organization,
   features?: {
     auth?: boolean
+    authProviders?: boolean
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
-    newApiKeys?: boolean
+    legacyJwtKeys?: boolean
+    logDrains?: boolean
+    billing?: boolean
   }
 ): ProductMenuGroup[] => {
+  if (!IS_PLATFORM) {
+    return [
+      {
+        title: 'Project Settings',
+        items: [
+          {
+            name: `Log Drains`,
+            key: `log-drains`,
+            url: `/project/${ref}/settings/log-drains`,
+            items: [],
+          },
+        ],
+      },
+    ]
+  }
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
   const authEnabled = features?.auth ?? true
+  const authProvidersEnabled = features?.authProviders ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
+  const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
+  const billingEnabled = features?.billing ?? true
 
   return [
     {
@@ -34,43 +55,55 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Compute and Disk',
-                key: 'compute-and-disk',
-                url: `/project/${ref}/settings/compute-and-disk`,
-                items: [],
-              },
-            ]
-          : []),
+        {
+          name: 'Compute and Disk',
+          key: 'compute-and-disk',
+          url: `/project/${ref}/settings/compute-and-disk`,
+          items: [],
+        },
         {
           name: 'Infrastructure',
           key: 'infrastructure',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
           items: [],
         },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Integrations',
-                key: 'integrations',
-                url: `/project/${ref}/settings/integrations`,
-                items: [],
-              },
-              ...(features?.newApiKeys
-                ? [
-                    {
-                      name: 'API Keys',
-                      key: 'api-keys',
-                      url: `/project/${ref}/settings/api-keys`,
-                      items: [],
-                      label: 'NEW',
-                    },
-                  ]
-                : []),
-            ]
-          : []),
+
+        {
+          name: 'Integrations',
+          key: 'integrations',
+          url: `/project/${ref}/settings/integrations`,
+          items: [],
+        },
+
+        {
+          name: 'Data API',
+          key: 'api',
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
+          items: [],
+        },
+        {
+          name: 'API Keys',
+          key: 'api-keys',
+          url: `/project/${ref}/settings/api-keys`,
+          items: [],
+          label: 'NEW',
+        },
+        {
+          name: 'JWT Keys',
+          key: 'jwt',
+          url: legacyJwtKeysEnabled
+            ? `/project/${ref}/settings/jwt`
+            : `/project/${ref}/settings/jwt/signing-keys`,
+          items: [],
+          label: 'NEW',
+        },
+
+        {
+          name: `Log Drains`,
+          key: `log-drains`,
+          url: `/project/${ref}/settings/log-drains`,
+          items: [],
+        },
         {
           name: 'Add Ons',
           key: 'addons',
@@ -83,7 +116,7 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'Alpha',
+          label: 'ALPHA',
         },
       ],
     },
@@ -93,36 +126,35 @@ export const generateSettingsMenu = (
         {
           name: 'Database',
           key: 'database',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/database`,
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/database/settings`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
-        {
-          name: 'Data API',
-          key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
-        ...(IS_PLATFORM && authEnabled
+        ...(authEnabled
           ? [
               {
                 name: 'Authentication',
                 key: 'auth',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
+                url: authProvidersEnabled
+                  ? `/project/${ref}/auth/providers`
+                  : `/project/${ref}/auth/policies`,
                 items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },
             ]
           : []),
-        ...(IS_PLATFORM && storageEnabled
+        ...(storageEnabled
           ? [
               {
                 name: 'Storage',
                 key: 'storage',
-                url: `/project/${ref}/settings/storage`,
+                url: `/project/${ref}/storage/settings`,
                 items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },
             ]
           : []),
-        ...(IS_PLATFORM && edgeFunctionsEnabled
+        ...(edgeFunctionsEnabled
           ? [
               {
                 name: 'Edge Functions',
@@ -133,34 +165,29 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: `Log Drains`,
-                key: `log-drains`,
-                url: `/project/${ref}/settings/log-drains`,
-                items: [],
-              },
-            ]
-          : []),
       ],
     },
 
     {
       title: 'Billing',
       items: [
-        {
-          name: 'Subscription',
-          key: 'subscription',
-          url: `/org/${organization?.slug}/billing`,
-          items: [],
-        },
-
+        ...(billingEnabled
+          ? [
+              {
+                name: 'Subscription',
+                key: 'subscription',
+                url: `/org/${organization?.slug}/billing`,
+                items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+              },
+            ]
+          : []),
         {
           name: 'Usage',
           key: 'usage',
           url: `/org/${organization?.slug}/usage?projectRef=${ref}`,
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
       ],
     },

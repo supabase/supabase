@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import type { ResponseError } from 'types'
+import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type OrganizationAcceptInvitationVariables = {
   slug: string
@@ -29,7 +30,7 @@ export const useOrganizationAcceptInvitationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationAcceptInvitationVariables
@@ -37,15 +38,17 @@ export const useOrganizationAcceptInvitationMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   return useMutation<
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationAcceptInvitationVariables
-  >((vars) => acceptOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => acceptOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       await invalidateOrganizationsQuery(queryClient)
-
+      await invalidateProjectsQuery()
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -23,7 +23,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       flutter create my_app
       ```
 
@@ -43,7 +43,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```yaml pubspec.yaml
+      ```yaml name=pubspec.yaml
       supabase_flutter: ^2.0.0
       ```
 
@@ -58,13 +58,14 @@ hideToc: true
       Open `lib/main.dart` and edit the main function to initialize Supabase using your project URL and public API (anon) key:
 
       <ProjectConfigVariables variable="url" />
-      <ProjectConfigVariables variable="anonKey" />
+      <ProjectConfigVariables variable="publishable" />
+      <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```dart lib/main.dart
+      ```dart name=lib/main.dart
       import 'package:supabase_flutter/supabase_flutter.dart';
 
       Future<void> main() async {
@@ -72,7 +73,7 @@ hideToc: true
 
         await Supabase.initialize(
           url: 'YOUR_SUPABASE_URL',
-          anonKey: 'YOUR_SUPABASE_ANON_KEY',
+          anonKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
         );
         runApp(MyApp());
       }
@@ -94,7 +95,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```dart lib/main.dart
+      ```dart name=lib/main.dart
       class MyApp extends StatelessWidget {
         const MyApp({super.key});
 
@@ -161,7 +162,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       flutter run
       ```
 

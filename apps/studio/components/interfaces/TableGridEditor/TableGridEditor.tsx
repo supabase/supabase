@@ -1,75 +1,114 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isUndefined } from 'lodash'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
-import { useLoadTableEditorStateFromLocalStorageIntoUrl } from 'components/grid/SupabaseGrid.utils'
+import { useSyncTableEditorStateFromLocalStorageWithUrl } from 'components/grid/SupabaseGrid.utils'
 import {
   Entity,
+  isForeignTable,
   isMaterializedView,
   isTableLike,
   isView,
+  TableLike,
 } from 'data/table-editor/table-editor-types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import { makeActiveTabPermanent } from 'state/tabs'
-import { TableGridSkeletonLoader } from './LoadingState'
-import NotFoundState from './NotFoundState'
-import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
-import TableDefinition from './TableDefinition'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
+import { Button } from 'ui'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
+import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
+import { TableDefinition } from './TableDefinition'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
   selectedTable?: Entity
 }
 
-const TableGridEditor = ({
+export const TableGridEditor = ({
   isLoadingSelectedTable = false,
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
+  const { setLastVisitedTable } = useDashboardHistory()
+  const { selectedSchema } = useQuerySchemaState()
 
-  useLoadTableEditorStateFromLocalStorageIntoUrl({
+  const tabs = useTabsStateSnapshot()
+
+  useSyncTableEditorStateFromLocalStorageWithUrl({
     projectRef,
     table: selectedTable,
   })
 
   const [{ view: selectedView = 'data' }] = useUrlState()
-
-  const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const { can: canEditTables } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+  const { can: canEditColumns } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'columns'
+  )
   const isReadOnly = !canEditTables && !canEditColumns
+  const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
+  const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))
 
   const onTableCreated = useCallback(
     (table: { id: number }) => {
-      router.push(`/project/${projectRef}/editor/${table.id}`)
+      router.push(
+        `/project/${projectRef}/editor/${table.id}${!!selectedSchema ? `?schema=${selectedSchema}` : ''}`
+      )
     },
     [projectRef, router]
   )
 
+  const onTableDeleted = useCallback(async () => {
+    // For simplicity for now, we just open the first table within the same schema
+    if (selectedTable) {
+      // Close tab
+      const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
+      tabs.handleTabClose({
+        id: tabId,
+        router,
+        editor: 'table',
+        onClearDashboardHistory: () => setLastVisitedTable(undefined),
+      })
+    }
+  }, [router, selectedTable, tabs])
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
+
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {
-    return <TableGridSkeletonLoader />
-  }
-
-  if (isUndefined(selectedTable)) {
-    return <NotFoundState id={Number(id)} />
+    return (
+      <div className="flex flex-col">
+        <div className="h-10 bg-dash-sidebar dark:bg-surface-100" />
+        <div className="h-9 border-y" />
+        <div className="p-2 col-span-full">
+          <GenericSkeletonLoader />
+        </div>
+      </div>
+    )
   }
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
   const isTableSelected = isTableLike(selectedTable)
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
-  const canEditViaTableEditor = isTableSelected && !isLocked
+  const isForeignTableSelected = isForeignTable(selectedTable)
+
+  const canEditViaTableEditor = isTableSelected && !isSchemaLocked
   const editable = !isReadOnly && canEditViaTableEditor
 
-  const gridKey = `${selectedTable.schema}_${selectedTable.name}`
+  const gridKey = !!selectedTable
+    ? `${selectedTable.schema}_${selectedTable.name}`
+    : 'unknown-table'
 
   /** [Joshen] We're going to need to refactor SupabaseGrid eventually to make the code here more readable
    * For context we previously built the SupabaseGrid as a reusable npm component, but eventually decided
@@ -78,40 +117,94 @@ const TableGridEditor = ({
 
   return (
     // When any click happens in a table tab, the tab becomes permanent
-    <div className="h-full" onClick={() => makeActiveTabPermanent(project?.ref)}>
-      <TableEditorTableStateContextProvider
-        key={`table-editor-table-${selectedTable.id}`}
-        projectRef={projectRef}
-        table={selectedTable}
-        editable={editable}
-      >
-        <SupabaseGrid
-          key={gridKey}
-          gridProps={{ height: '100%' }}
-          customHeader={
-            (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
-              <div className="flex items-center space-x-2">
-                <p>
-                  SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
-                </p>
-                <p className="text-foreground-light text-sm">(Read only)</p>
-              </div>
-            ) : null
-          }
-        >
-          {(isViewSelected || isTableSelected) && selectedView === 'definition' && (
-            <TableDefinition entity={selectedTable} />
-          )}
-        </SupabaseGrid>
-
-        <SidePanelEditor
+    <div className="h-full" onClick={() => tabs.makeActiveTabPermanent()}>
+      {!selectedTable ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="w-[400px]">
+            <Admonition
+              type="default"
+              title={`Unable to find your table with ID ${id}`}
+              description="This table doesn't exist in your database"
+            >
+              {!!tabId ? (
+                <Button
+                  type="default"
+                  className="mt-2"
+                  onClick={() => {
+                    tabs.handleTabClose({
+                      id: tabId,
+                      router,
+                      editor: 'table',
+                      onClearDashboardHistory: () => setLastVisitedTable(undefined),
+                    })
+                  }}
+                >
+                  Close tab
+                </Button>
+              ) : openTabs.length > 0 ? (
+                <Button
+                  asChild
+                  type="default"
+                  className="mt-2"
+                  onClick={() => setLastVisitedTable(undefined)}
+                >
+                  <Link href={`/project/${projectRef}/editor/${openTabs[0].split('-')[1]}`}>
+                    Close tab
+                  </Link>
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  type="default"
+                  className="mt-2"
+                  onClick={() => setLastVisitedTable(undefined)}
+                >
+                  <Link href={`/project/${projectRef}/editor`}>Head back</Link>
+                </Button>
+              )}
+            </Admonition>
+          </div>
+        </div>
+      ) : (
+        <TableEditorTableStateContextProvider
+          key={`table-editor-table-${selectedTable.id}`}
+          projectRef={projectRef}
+          table={selectedTable}
           editable={editable}
-          selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
-          onTableCreated={onTableCreated}
-        />
-      </TableEditorTableStateContextProvider>
+        >
+          <SupabaseGrid
+            key={gridKey}
+            gridProps={{ height: '100%' }}
+            customHeader={
+              (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
+                <div className="flex items-center space-x-2">
+                  <p>
+                    SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
+                  </p>
+                  <p className="text-foreground-light text-sm">(Read only)</p>
+                </div>
+              ) : null
+            }
+          >
+            {(isViewSelected || isTableSelected) && selectedView === 'definition' && (
+              <TableDefinition entity={selectedTable} />
+            )}
+          </SupabaseGrid>
+
+          <DeleteConfirmationDialogs
+            selectedTable={isTableSelected ? selectedTable : undefined}
+            onTableDeleted={onTableDeleted}
+          />
+        </TableEditorTableStateContextProvider>
+      )}
+
+      <SidePanelEditor
+        editable={editable}
+        selectedTable={
+          isTableSelected || isForeignTableSelected ? (selectedTable as TableLike) : undefined
+        }
+        onTableCreated={onTableCreated}
+      />
     </div>
   )
 }
-
-export default TableGridEditor

@@ -4,40 +4,34 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useStorageArchiveCreateMutation } from 'data/storage/storage-archive-create-mutation'
 import { useStorageArchiveQuery } from 'data/storage/storage-archive-query'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Database, Storage } from 'icons'
-import { PROJECT_STATUS } from 'lib/constants'
+import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
-  WarningIcon,
 } from 'ui'
-import { useProjectContext } from '../ProjectContext'
+import { Admonition } from 'ui-patterns'
 
 export const PauseDisabledState = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [toastId, setToastId] = useState<string | number>()
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
   const dbVersion = project?.dbVersion?.replace('supabase-postgres-', '')
-  const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
-  const allowStorageObjectsDownload = useFlag('enableNinetyDayStorageDownload')
 
   const { data: pauseStatus } = useProjectPauseStatusQuery(
     { ref },
-    {
-      enabled: project?.status === PROJECT_STATUS.INACTIVE && enforceNinetyDayUnpauseExpiry,
-    }
+    { enabled: project?.status === PROJECT_STATUS.INACTIVE }
   )
   const latestBackup = pauseStatus?.latest_downloadable_backup_id
 
@@ -92,12 +86,6 @@ export const PauseDisabledState = () => {
         ref,
         backup: {
           id: latestBackup,
-          // [Joshen] Just FYI these params aren't required for the download backup request
-          // API types need to be updated
-          project_id: -1,
-          inserted_at: '',
-          isPhysicalBackup: false,
-          status: {},
         },
       },
       {
@@ -126,25 +114,56 @@ export const PauseDisabledState = () => {
   }
 
   return (
-    <Alert_Shadcn_ variant="warning">
-      <WarningIcon />
-      <AlertTitle_Shadcn_>Project cannot be restored through the dashboard</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
-        This project has been paused for over{' '}
-        <span className="text-foreground">
-          {pauseStatus?.max_days_till_restore_disabled ?? 90} days
-        </span>{' '}
-        and cannot be restored through the dashboard. However, your data remains intact and can be
-        downloaded as a backup.
-      </AlertDescription_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
+    <>
+      <Admonition
+        showIcon={false}
+        type="warning"
+        className="mb-0 rounded-none border-0 px-6"
+        title="Project can no longer be restored through the dashboard"
+      >
+        <p className="!leading-normal !mb-3">
+          This project has been paused for over{' '}
+          <span className="text-foreground">
+            {pauseStatus?.max_days_till_restore_disabled ?? 90} days
+          </span>{' '}
+          and cannot be restored through the dashboard. However, your data remains intact and can be
+          downloaded as a backup.
+        </p>
+
+        <div>
+          <p className="!leading-normal !mb-1">Recovery options:</p>
+          <ul className="flex flex-col gap-y-0.5">
+            <li className="flex items-center gap-x-2">
+              <ExternalLink size={14} />
+              <InlineLink
+                href={`${DOCS_URL}/guides/platform/migrating-within-supabase/dashboard-restore`}
+              >
+                Restore the backup to a new Supabase project
+              </InlineLink>
+            </li>
+            <li className="flex items-center gap-x-2">
+              <ExternalLink size={14} />
+              <InlineLink href={`${DOCS_URL}/guides/local-development/restoring-downloaded-backup`}>
+                Restore the backup on your local machine
+              </InlineLink>
+            </li>
+          </ul>
+        </div>
+      </Admonition>
+      <div className="border-t flex justify-between items-center px-6 py-4 bg-alternative">
+        <div>
+          <p className="text-sm">Export your data</p>
+          <p className="text-sm text-foreground-lighter">
+            Download backups for your database and storage objects
+          </p>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="default" icon={<Download />} iconRight={<ChevronDown />}>
               Download backups
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="start">
+          <DropdownMenuContent className="w-60" align="end">
             <DropdownMenuItemTooltip
               className="gap-x-2"
               disabled={!latestBackup}
@@ -159,20 +178,10 @@ export const PauseDisabledState = () => {
               <Database size={16} />
               Database backup (PG: {dbVersion})
             </DropdownMenuItemTooltip>
-            <DropdownMenuItemTooltip
-              className="gap-x-2"
-              disabled={!allowStorageObjectsDownload}
-              onClick={() => onSelectDownloadStorageArchive()}
-              tooltip={{
-                content: {
-                  side: 'right',
-                  text: 'This feature is not available yet, please reach out to support for assistance',
-                },
-              }}
-            >
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
               <Storage size={16} />
               Storage objects
-            </DropdownMenuItemTooltip>
+            </DropdownMenuItem>
             {/* [Joshen] Once storage object download is supported, can just use the below component */}
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
               <Storage size={16} />
@@ -180,16 +189,7 @@ export const PauseDisabledState = () => {
             </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button asChild type="default" icon={<ExternalLink />}>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
-          >
-            More information
-          </a>
-        </Button>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </div>
+    </>
   )
 }

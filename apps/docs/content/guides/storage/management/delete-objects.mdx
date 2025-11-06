@@ -19,8 +19,18 @@ Deleting objects should always be done via the **Storage API** and NOT via a **S
 To delete one or more objects, use the `remove` method.
 
 ```javascript
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 await supabase.storage.from('bucket').remove(['object-path-2', 'folder/avatar2.png'])
 ```
+
+<Admonition type="note">
+
+When deleting objects, there is a limit of 1000 objects at a time using the `remove` method.
+
+</Admonition>
 
 ## RLS
 

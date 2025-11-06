@@ -1,10 +1,8 @@
 import { forwardRef, HTMLAttributes } from 'react'
-
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { cn } from 'ui'
 
 export const MAX_WIDTH_CLASSES = 'mx-auto w-full max-w-[1200px]'
-export const PADDING_CLASSES = 'px-4 md:px-6 lg:px-14 xl:px-24 2xl:px-28'
+export const PADDING_CLASSES = 'px-4 @lg:px-6 @xl:px-10'
 export const MAX_WIDTH_CLASSES_COLUMN = 'min-w-[420px]'
 
 /**
@@ -24,8 +22,6 @@ export const ScaffoldContainer = forwardRef<
     size?: 'small' | 'default' | 'large' | 'full'
   }
 >(({ className, bottomPadding, size = 'default', ...props }, ref) => {
-  const snap = useAiAssistantStateSnapshot()
-
   const maxWidthClass = {
     small: 'max-w-[768px]',
     default: 'max-w-[1200px]',
@@ -38,11 +34,10 @@ export const ScaffoldContainer = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'mx-auto w-full',
+        'mx-auto w-full @container',
         maxWidthClass,
         PADDING_CLASSES,
         bottomPadding && 'pb-16',
-        snap.open ? 'xl:px-6' : '',
         className
       )}
     />
@@ -71,7 +66,7 @@ export const ScaffoldHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
  */
 export const ScaffoldTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => {
-    return <h1 ref={ref} {...props} className={cn('text-2xl', className)} />
+    return <h1 ref={ref} {...props} className={cn(className)} />
   }
 )
 
@@ -98,7 +93,7 @@ export const ScaffoldSection = forwardRef<
       {...props}
       className={cn(
         'flex flex-col first:pt-12 py-6',
-        isFullWidth ? 'w-full' : 'gap-3 lg:grid md:grid-cols-12',
+        isFullWidth ? 'w-full' : 'gap-3 @md:grid-cols-12 @lg:grid',
         className
       )}
     />

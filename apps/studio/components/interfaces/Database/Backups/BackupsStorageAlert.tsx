@@ -1,7 +1,6 @@
-import { AlertDescription_Shadcn_, Alert_Shadcn_ } from 'ui'
-import { WarningIcon } from 'ui'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 
-const BackupsStorageAlert = () => {
+export const BackupsStorageAlert = () => {
   return (
     <Alert_Shadcn_ variant="default">
       <WarningIcon />
@@ -13,5 +12,3 @@ const BackupsStorageAlert = () => {
     </Alert_Shadcn_>
   )
 }
-
-export default BackupsStorageAlert

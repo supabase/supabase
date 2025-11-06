@@ -24,7 +24,7 @@ You will need to [install](/docs/guides/local-development#quickstart) the Supaba
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase migration new create_employees_table
 ```
 
@@ -44,7 +44,7 @@ supabase migration new create_employees_table
 
     <StepHikeCompact.Code>
 
-```sql supabase/migrations/<timestamp>_create_employees_table.sql
+```sql name=supabase/migrations/<timestamp>_create_employees_table.sql
 create table if not exists employees (
   id bigint primary key generated always as identity,
   name text not null,
@@ -69,7 +69,7 @@ create table if not exists employees (
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase migration up
 ```
 
@@ -87,7 +87,7 @@ supabase migration up
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase migration new add_department_column
 ```
 
@@ -105,7 +105,7 @@ supabase migration new add_department_column
 
     <StepHikeCompact.Code>
 
-```sql supabase/migrations/<timestamp>_add_department_column.sql
+```sql name=supabase/migrations/<timestamp>_add_department_column.sql
 alter table if exists public.employees
 add department text default 'Hooli';
 ```
@@ -124,7 +124,7 @@ add department text default 'Hooli';
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase migration up
 ```
 
@@ -156,7 +156,7 @@ Now that you are managing your database with migrations scripts, it would be gre
 
     <StepHikeCompact.Code>
 
-```sql supabase/seed.sql
+```sql name=supabase/seed.sql
 insert into public.employees
   (name)
 values
@@ -179,7 +179,7 @@ values
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase db reset
 ```
 
@@ -205,7 +205,7 @@ This workflow is great if you know SQL and are comfortable creating tables and c
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase db diff -f create_cities_table
 ```
 
@@ -225,7 +225,7 @@ supabase db diff -f create_cities_table
 
     <StepHikeCompact.Code>
 
-```sql supabase/migrations/<timestamp>_create_cities_table.sql
+```sql name=supabase/migrations/<timestamp>_create_cities_table.sql
 create table "public"."cities" (
   "id" bigint primary key generated always as identity,
   "name" text,
@@ -247,7 +247,7 @@ create table "public"."cities" (
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase db reset
 ```
 
@@ -262,7 +262,7 @@ The last step is deploying these changes to a live Supabase project.
 
 You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users!
 
-Head over to [Supabase](https://supabase.com/dashboard) and create a new project to deploy to.
+Head over to [Supabase](/dashboard) and create a new project to deploy to.
 
 <StepHikeCompact>
 
@@ -273,7 +273,7 @@ Head over to [Supabase](https://supabase.com/dashboard) and create a new project
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase login
 ```
 
@@ -291,7 +291,7 @@ supabase login
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase link
 ```
 
@@ -303,13 +303,13 @@ supabase link
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Deploy database changes">
+    <StepHikeCompact.Details title="Deploy database migrations">
       [Push](/docs/reference/cli/supabase-db-push) your migrations to the remote database.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-```bash Terminal
+```bash name=Terminal
 supabase db push
 ```
 
@@ -318,4 +318,22 @@ supabase db push
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
-Visiting your live project on [Supabase](https://supabase.com/dashboard/project/_), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Deploy database seed data (optional)">
+      [Push](/docs/reference/cli/supabase-db-push) your migrations and seed the remote database.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash name=Terminal
+supabase db push --include-seed
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+Visiting your live project on [Supabase](/dashboard/project/_), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.

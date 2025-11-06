@@ -1,19 +1,18 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { Backup } from './backup-restore-mutation'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type BackupDownloadVariables = {
   ref: string
-  backup: Backup
+  backup: components['schemas']['DownloadBackupBody']
 }
 
 export async function downloadBackup({ ref, backup }: BackupDownloadVariables) {
   const { data, error } = await post('/platform/database/{ref}/backups/download', {
     params: { path: { ref } },
-    // @ts-ignore TODO(kamil): Remove ts-ignore once `DownloadBackupBody` changes lands
     body: {
       id: backup.id,
     },
@@ -29,23 +28,21 @@ export const useBackupDownloadMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BackupDownloadData, ResponseError, BackupDownloadVariables>,
+  UseCustomMutationOptions<BackupDownloadData, ResponseError, BackupDownloadVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupDownloadData, ResponseError, BackupDownloadVariables>(
-    (vars) => downloadBackup(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to download backup: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BackupDownloadData, ResponseError, BackupDownloadVariables>({
+    mutationFn: (vars) => downloadBackup(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to download backup: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

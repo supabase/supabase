@@ -17,12 +17,20 @@ Call the sign out method from the client library. It removes the active session 
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(
+  'https://your-project-id.supabase.co',
+  'sb_publishable_... or anon key'
+)
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -32,6 +40,8 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -39,6 +49,8 @@ try await supabase.auth.signOut()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -48,6 +60,8 @@ suspend fun logout() {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -55,6 +69,7 @@ supabase.auth.sign_out()
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Sign out and scopes
@@ -77,6 +92,13 @@ You can invoke these by providing the `scope` option:
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(
+  'https://your-project-id.supabase.co',
+  'sb_publishable_... or anon key'
+)
+
+// ---cut---
 // defaults to the global scope
 await supabase.auth.signOut()
 
@@ -85,6 +107,7 @@ await supabase.auth.signOut({ scope: 'local' })
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -96,6 +119,8 @@ await supabase.auth.signOut(scope: SignOutScope.global);
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -107,6 +132,7 @@ supabase.auth.signOut(SignOutScope.GLOBAL)
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 Upon sign out, all refresh tokens and potentially other database objects related to the affected sessions are destroyed and the client library removes the session stored in the local storage medium.

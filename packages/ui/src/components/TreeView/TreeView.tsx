@@ -2,7 +2,15 @@
 
 import { cva, VariantProps } from 'class-variance-authority'
 import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
-import { ComponentPropsWithoutRef, forwardRef, ReactNode, useEffect, useRef, useState } from 'react'
+import {
+  ComponentPropsWithoutRef,
+  FocusEvent,
+  forwardRef,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
@@ -90,41 +98,44 @@ const TreeViewItem = forwardRef<
   ) => {
     const [localValueState, setLocalValueState] = useState(name)
     const inputRef = useRef<HTMLInputElement>(null)
-
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
-          onEditSubmit?.(localValueState)
-        }
-      }
-      if (isEditing) document.addEventListener('mousedown', handleClickOutside)
-      return () => {
-        if (isEditing) document.removeEventListener('mousedown', handleClickOutside)
-      }
-    }, [isEditing])
+    const timeRef = useRef<number>(0)
 
     useEffect(() => {
       if (isEditing) {
-        inputRef.current?.focus()
+        // [Ivan] This component is supposed to focus on its input when it's rendered. The focus doesn't work every time because
+        // the initial render is triggered by a dropdown menu which at the end of the closing animation, steals focus from the input
+        //  and triggers the blur event (which closes the input). The issue is reported at https://github.com/radix-ui/primitives/issues/3106.
 
-        // When editing starts, select text up to the last dot
-        if (inputRef.current) {
+        // [Joshen] This is to prevent accidental onBlur callbacks by checking that the onBlur event is being triggered
+        // within 400ms of the input field being in an edit state. 400ms is just an arbitary value which I think
+        // represents an "accidental" on blur
+        timeRef.current = Number(new Date())
+
+        // The focus will be attempted after a slight delay to ensure that the dropdown closing animations are complete.
+        setTimeout(() => {
           const input = inputRef.current
-
-          // Need a slight delay to ensure focus is established
-          setTimeout(() => {
-            const fileName = input.value
-            const lastDotIndex = fileName.lastIndexOf('.')
-            const startPos = 0
-            const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
-
-            try {
-              input.setSelectionRange(startPos, endPos)
-            } catch (e) {
-              console.error('Could not set selection range', e)
+          if (input) {
+            // If the input is not the active element, focus it
+            if (document.activeElement !== input) {
+              input.focus()
             }
-          }, 50)
-        }
+
+            // Need a slight delay to ensure focus is established. When editing starts, select text up to the last dot
+            // When editing starts, select text up to the last dot
+            setTimeout(() => {
+              const fileName = input.value
+              const lastDotIndex = fileName.lastIndexOf('.')
+              const startPos = 0
+              const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
+
+              try {
+                input.setSelectionRange(startPos, endPos)
+              } catch (e) {
+                console.error('Could not set selection range', e)
+              }
+            }, 50)
+          }
+        }, 200)
       } else {
         setLocalValueState(name)
       }
@@ -136,8 +147,16 @@ const TreeViewItem = forwardRef<
       }
     }, [isLoading])
 
-    const handleBlur = () => {
-      onEditSubmit?.(localValueState)
+    const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
+      const timestamp = Number(new Date())
+      const timeDiff = timestamp - timeRef.current
+
+      if (timeDiff < 400) {
+        e.preventDefault()
+        inputRef.current?.focus()
+      } else {
+        onEditSubmit?.(localValueState)
+      }
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -163,7 +182,6 @@ const TreeViewItem = forwardRef<
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
         onDoubleClick={onDoubleClick}
-        {...props}
         className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }), props.className)}
         style={{
           paddingLeft: xPadding + ((level - 1) * levelPadding) / 2,
@@ -229,8 +247,9 @@ const TreeViewItem = forwardRef<
         <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
           {name}
         </span>
-        <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
+        <form onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
           <Input
+            autoFocus
             ref={inputRef}
             onChange={(e) => {
               setLocalValueState(e.target.value)
@@ -240,7 +259,7 @@ const TreeViewItem = forwardRef<
               // stop keyboard down bubbling up to TreeView.root
               // on enter key, send onEditSubmit callback
               if (e.key === 'Enter') {
-                onEditSubmit?.(localValueState)
+                inputRef.current?.blur()
               } else if (e.key === 'Escape') {
                 setLocalValueState(name)
                 onEditSubmit?.(name)
@@ -248,7 +267,7 @@ const TreeViewItem = forwardRef<
                 e.stopPropagation()
               }
             }}
-            className="block w-full text-sm px-2 py-1 h-7 w"
+            className="block w-full text-sm px-2 py-1 h-7"
             value={localValueState}
           />
         </form>

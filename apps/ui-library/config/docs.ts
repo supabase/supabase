@@ -36,13 +36,25 @@ export const aiEditorsRules: SidebarNavGroup = {
   ],
 }
 
+export const platformBlocks: SidebarNavGroup = {
+  title: 'Platform',
+  items: [
+    {
+      title: 'Platform Kit',
+      href: '/docs/platform/platform-kit',
+      items: [],
+      commandItemLabel: 'Platform Kit',
+    },
+  ],
+}
+
 // Component definitions with supported frameworks
 export const componentPages: SidebarNavGroup = {
   title: 'Components',
   items: [
     {
       title: 'Client',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/client',
       items: [],
       commandItemLabel: 'Supabase Client',
@@ -53,6 +65,14 @@ export const componentPages: SidebarNavGroup = {
       href: '/docs/nextjs/password-based-auth',
       items: [],
       commandItemLabel: 'Password-Based Auth',
+    },
+    {
+      title: 'Social Auth',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/social-auth',
+      items: [],
+      new: true,
+      commandItemLabel: 'Social Auth',
     },
     {
       title: 'Dropzone',
@@ -89,6 +109,14 @@ export const componentPages: SidebarNavGroup = {
       items: [],
       commandItemLabel: 'Realtime Chat',
     },
+    {
+      title: 'Infinite Query Hook',
+      supportedFrameworks: [],
+      href: '/docs/infinite-query-hook',
+      new: true,
+      items: [],
+      commandItemLabel: 'Infinite Query Hook',
+    },
   ],
 }
 
@@ -113,4 +141,6 @@ export const frameworkTitles: Record<string, string> = {
   'react-router': 'React Router',
   tanstack: 'TanStack Start',
   react: 'React SPA',
+  vue: 'Vue',
+  nuxtjs: 'Nuxt.js',
 }
