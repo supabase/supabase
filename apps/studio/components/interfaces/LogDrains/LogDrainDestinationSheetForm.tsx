@@ -41,6 +41,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { urlRegex } from '../Auth/Auth.constants'
 import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { useDisabledDrains } from './LogDrains.utils'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -174,7 +175,7 @@ export function LogDrainDestinationSheetForm({
   }
   const DEFAULT_HEADERS = mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultConfig?.headers || {}
 
-  const sentryEnabled = useFlag('SentryLogDrain')
+  const disabledDrains = useDisabledDrains();
 
   const { ref } = useParams()
   const { data: logDrains } = useLogDrainsQuery({
@@ -322,7 +323,7 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map(
+                        {LOG_DRAIN_TYPES.filter((t) => !disabledDrains.has(t.value)).map(
                           (type) => (
                             <SelectItem_Shadcn_
                               value={type.value}
