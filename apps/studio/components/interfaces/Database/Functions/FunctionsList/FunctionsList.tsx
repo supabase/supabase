@@ -380,23 +380,15 @@ $$;`)
         }}
       />
 
-      {/* Edit Function */}
+      {/* Edit or Duplicate Function */}
       <CreateFunction
-        func={functionToEdit}
-        visible={showFunctionToEdit}
+        func={functionToEdit || functionToDuplicate}
+        visible={showFunctionToEdit || showFunctionToDuplicate}
         onClose={() => {
           setSelectedFunctionToEdit('')
-        }}
-      />
-
-      {/* Duplicate Function */}
-      <CreateFunction
-        func={functionToDuplicate}
-        visible={showFunctionToDuplicate}
-        onClose={() => {
           setSelectedFunctionIdToDuplicate('')
         }}
-        isDuplicating={true}
+        isDuplicating={showFunctionToDuplicate}
       />
 
       <DeleteFunction

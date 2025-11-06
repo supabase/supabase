@@ -1,8 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQueryState, parseAsBoolean, parseAsString } from 'nuqs'
+import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -71,6 +72,16 @@ export const RolesList = () => {
   const roleToDelete = data?.find(
     (role) => role.id.toString() === selectedRoleToDelete
   ) as unknown as PostgresRole
+  const showroleToDelete = selectedRoleToDelete !== '' && !!roleToDelete
+  const roleToDeleteNotFound = selectedRoleToDelete !== '' && !roleToDelete
+
+  // Error handling if delete panel is open and role is not found
+  useEffect(() => {
+    if (!isLoading && roleToDeleteNotFound) {
+      toast.error('Database Role not found')
+      setSelectedRoleToDelete('')
+    }
+  }, [selectedRoleToDelete, roleToDelete, isLoading])
 
   return (
     <>
@@ -225,7 +236,7 @@ export const RolesList = () => {
 
       <DeleteRoleModal
         role={roleToDelete}
-        visible={!!selectedRoleToDelete}
+        visible={showroleToDelete}
         onClose={() => setSelectedRoleToDelete('')}
       />
     </>

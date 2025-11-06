@@ -113,6 +113,29 @@ const Indexes = () => {
     if (table !== undefined) setSearch(table)
   }, [table])
 
+  const indexToEdit = allIndexes?.find((idx) => idx.name === selectedIndexName)
+  const indexToEditNotFound = selectedIndexName !== '' && !indexToEdit
+
+  const indexToDelete = allIndexes?.find((idx) => idx.name === selectedIndexNameToDelete)
+  const showindexToDelete = selectedIndexNameToDelete !== '' && !!indexToDelete
+  const indexToDeleteNotFound = selectedIndexNameToDelete !== '' && !indexToDelete
+
+  // Error handling if edit panel is open and function is not found
+  useEffect(() => {
+    if (!isLoadingIndexes && indexToEditNotFound) {
+      toast.error('Database Function not found')
+      setSelectedIndexName('')
+    }
+  }, [selectedIndexName, indexToEdit, isLoadingIndexes])
+
+  // Error handling if delete panel is open and function is not found
+  useEffect(() => {
+    if (!isLoadingIndexes && indexToDeleteNotFound) {
+      toast.error('Database Function not found')
+      setSelectedIndexNameToDelete('')
+    }
+  }, [selectedIndexNameToDelete, indexToDelete, isLoadingIndexes])
+
   return (
     <>
       <div className="pb-8">
@@ -266,7 +289,7 @@ const Indexes = () => {
         variant="warning"
         size="medium"
         loading={isExecuting}
-        visible={!!selectedIndexToDelete}
+        visible={showindexToDelete}
         title={
           <>
             Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
