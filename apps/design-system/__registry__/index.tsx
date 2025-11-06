@@ -2326,6 +2326,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "empty-state-zero-items-data-grid": {
+      name: "empty-state-zero-items-data-grid",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-zero-items-data-grid")),
+      source: "",
+      files: ["registry/default/example/empty-state-zero-items-data-grid.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "chart-area-axes": {
       name: "chart-area-axes",
       type: "components:block",

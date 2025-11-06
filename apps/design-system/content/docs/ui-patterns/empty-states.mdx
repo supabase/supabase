@@ -3,7 +3,7 @@ title: Empty states
 description: Convey the absence of data and provide clear instruction for what to do about it.
 ---
 
-At a minimum, empty states convey the fact that there is nothing to list, perform, or display on the current page. They should also provide a clear call to action for the user to take.
+Empty states convey the fact that there is nothing to list, perform, or display on the current page. Ideally, they also provide a clear action for the user to take.
 
 ## Missing route
 
@@ -13,13 +13,19 @@ Users may accidentally navigate to a non-existent dynamic route, such as a non-e
 
 ## Zero results
 
-Tabular information without results—or perhaps no data to begin with—should have an empty state that matches the larger presentation.
+Tabular information without results—or perhaps no data to begin with—should have an empty state that matches its larger presentation.
 
-For instance, a [Table](../components/table) may just display a single row just like it would if it had data. Dulling the TableHead text color and removing the TableCell hover state can further reinforce the lack of usable data.
+### Table
+
+A [Table](../components/table) instance with zero results should display a single row. Dulling the TableHead text color and removing the TableCell hover state can further reinforce the lack of usable data.
 
 <ComponentPreview name="empty-state-zero-items-table" peekCode wide />
 
-The treatment for other layouts, such as the list of users in [Authentication](https://supabase.com/dashboard/project/_/auth/users), should match their own general styling.
+### DataGrid
+
+[DataGrid](../components/data-table) typically spans the full height and width of a container. A classic example is [Users](https://supabase.com/dashboard/project/_/auth/users), which displays a large DataGrid of the project’s registered users. Any instance with zero results should display a more prominent empty with a clear title, description, and supporting illustration.
+
+<ComponentPreview name="empty-state-zero-items-data-grid" peekCode wide />
 
 ## Initial state
 
