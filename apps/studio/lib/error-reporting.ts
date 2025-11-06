@@ -61,7 +61,6 @@ export function captureCriticalError(
   }
 
   handleUnknownError(error, context)
-  return
 }
 
 function handleResponseError(error: ResponseError, context: string) {
