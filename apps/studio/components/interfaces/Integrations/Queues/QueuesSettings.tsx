@@ -31,6 +31,7 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Switch,
+  TextLink,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -224,6 +225,18 @@ export const QueuesSettings = () => {
                               <code className="text-xs">archive</code>, and{' '}
                               <code className="text-xs">delete</code>
                             </p>
+                            {!IS_PLATFORM ? (
+                              <div className="mt-6 max-w-2xl">
+                                When running Supabase locally with the CLI or self-hosting using
+                                Docker Compose, you also need to update your configuration to expose
+                                the <code className="text-xs">{QUEUES_SCHEMA}</code> schema.{' '}
+                                <TextLink
+                                  className="mt-0"
+                                  label="Learn more"
+                                  url="https://supabase.com/docs/guides/queues/expose-self-hosted-queues"
+                                />
+                              </div>
+                            ) : null}
                           </>
                         }
                       >
