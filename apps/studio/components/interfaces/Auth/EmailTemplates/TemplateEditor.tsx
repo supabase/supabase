@@ -240,6 +240,47 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     }
   }
 
+  // Function to reset template to backend default
+  const handleResetToDefault = () => {
+    if (!projectRef || !messageProperty) return
+
+    setIsSavingTemplate(true)
+
+    // Get the subject key to include it in the payload
+    const [subjectKey] = Object.keys(properties)
+    const currentSubject =
+      form.getValues(subjectKey) ||
+      (authConfig?.[subjectKey as keyof typeof authConfig] as string) ||
+      ''
+
+    // Set content to empty string to tell backend to use its default template
+    // Include subject to maintain the current subject value
+    updateAuthConfig(
+      {
+        projectRef,
+        config: {
+          [subjectKey]: currentSubject,
+          [messageSlug]: '',
+        },
+      },
+      {
+        onSuccess: () => {
+          setIsSavingTemplate(false)
+          toast.success('Reset to default template')
+          setHasUnsavedChanges(false)
+          // The query will automatically refetch and update the UI
+        },
+        onError: (error) => {
+          setIsSavingTemplate(false)
+          toast.error(`Failed to reset template: ${error.message}`)
+        },
+      }
+    )
+  }
+
+  // Check if current value is already at default (empty/null)
+  const isAtDefault = !authConfig || !authConfig[messageSlug] || authConfig[messageSlug] === ''
+
   return (
     <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -353,29 +394,40 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
             <CardContent>
               <SpamValidation validationResult={validationResult} />
             </CardContent>
-            <CardFooter className="justify-end space-x-2">
-              {hasChanges && (
-                <Button
-                  type="default"
-                  onClick={() => {
-                    form.reset(INITIAL_VALUES)
-                    setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
-                    setHasUnsavedChanges(false)
-                  }}
-                >
-                  Cancel
-                </Button>
-              )}
+            <CardFooter className="justify-between space-x-2">
               <Button
-                type="primary"
-                htmlType="submit"
-                disabled={
-                  !canUpdateConfig || isSavingTemplate || !hasChanges || preventSaveFromSpamCheck
-                }
+                type="default"
+                onClick={handleResetToDefault}
+                disabled={!canUpdateConfig || isSavingTemplate || isAtDefault}
                 loading={isSavingTemplate}
               >
-                Save changes
+                Reset to default
               </Button>
+              <div className="flex gap-x-2">
+                {hasChanges && (
+                  <Button
+                    type="default"
+                    onClick={() => {
+                      form.reset(INITIAL_VALUES)
+                      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+                      setHasUnsavedChanges(false)
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                )}
+
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={
+                    !canUpdateConfig || isSavingTemplate || !hasChanges || preventSaveFromSpamCheck
+                  }
+                  loading={isSavingTemplate}
+                >
+                  Save changes
+                </Button>
+              </div>
             </CardFooter>
           </>
         )}
