@@ -229,9 +229,11 @@ export const QueuesSettings = () => {
                               <div className="mt-6 max-w-2xl">
                                 When running Supabase locally with the CLI or self-hosting using
                                 Docker Compose, you also need to update your configuration to expose
-                                the <code className="text-xs">{QUEUES_SCHEMA}</code> schema.{' '}
+                                the <code className="text-xs">{QUEUES_SCHEMA}</code> schema.
+                                <br />
                                 <TextLink
-                                  className="mt-0"
+                                  target="_blank"
+                                  className="mt-0 inline-block"
                                   label="Learn more"
                                   url="https://supabase.com/docs/guides/queues/expose-self-hosted-queues"
                                 />
