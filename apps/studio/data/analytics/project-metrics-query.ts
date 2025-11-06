@@ -7,16 +7,16 @@ import { analyticsKeys } from './keys'
 
 export type ProjectMetricsVariables = {
   projectRef?: string
-  isoTimestampStart: string
-  isoTimestampEnd: string
   interval?: '1hr' | '1day' | '7day'
 }
 
 const MetricsRow = z.object({
-  timestamp: z.number({
-    required_error: 'Timestamp is required',
-    invalid_type_error: 'Timestamp must be a number (microseconds since epoch)',
-  }).int('Timestamp must be an integer')
+  timestamp: z
+    .number({
+      required_error: 'Timestamp is required',
+      invalid_type_error: 'Timestamp must be a number (microseconds since epoch)',
+    })
+    .int('Timestamp must be an integer')
     .positive('Timestamp must be positive'),
   service: z.enum(['auth', 'db', 'functions', 'realtime', 'storage'], {
     required_error: 'Service field is required',
@@ -26,20 +26,26 @@ const MetricsRow = z.object({
     required_error: 'Time window field is required',
     invalid_type_error: 'Time window must be either "current" or "previous"',
   }),
-  ok_count: z.number({
-    required_error: 'ok_count is required',
-    invalid_type_error: 'ok_count must be a number',
-  }).int('ok_count must be an integer')
+  ok_count: z
+    .number({
+      required_error: 'ok_count is required',
+      invalid_type_error: 'ok_count must be a number',
+    })
+    .int('ok_count must be an integer')
     .nonnegative('ok_count cannot be negative'),
-  warning_count: z.number({
-    required_error: 'warning_count is required',
-    invalid_type_error: 'warning_count must be a number',
-  }).int('warning_count must be an integer')
+  warning_count: z
+    .number({
+      required_error: 'warning_count is required',
+      invalid_type_error: 'warning_count must be a number',
+    })
+    .int('warning_count must be an integer')
     .nonnegative('warning_count cannot be negative'),
-  error_count: z.number({
-    required_error: 'error_count is required',
-    invalid_type_error: 'error_count must be a number',
-  }).int('error_count must be an integer')
+  error_count: z
+    .number({
+      required_error: 'error_count is required',
+      invalid_type_error: 'error_count must be a number',
+    })
+    .int('error_count must be an integer')
     .nonnegative('error_count cannot be negative'),
 })
 
@@ -69,14 +75,12 @@ function microsecondsToIso(microseconds: number): string {
 }
 
 export async function getProjectMetrics(
-  { projectRef, isoTimestampStart, isoTimestampEnd, interval }: ProjectMetricsVariables,
+  { projectRef, interval }: ProjectMetricsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const search = new URLSearchParams()
-  search.set('iso_timestamp_start', isoTimestampStart)
-  search.set('iso_timestamp_end', isoTimestampEnd)
   if (interval) search.set('interval', interval)
 
   const url = IS_PLATFORM
@@ -148,22 +152,18 @@ export type ProjectMetricsError = unknown
 
 export const useProjectMetricsQuery = <TData = ProjectMetricsData>(
   vars: ProjectMetricsVariables,
-  { enabled = true, ...options }: UseQueryOptions<ProjectMetricsData, ProjectMetricsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<ProjectMetricsData, ProjectMetricsError, TData> = {}
 ) => {
-  const { projectRef, isoTimestampStart, isoTimestampEnd, interval } = vars
+  const { projectRef, interval } = vars
 
   return useQuery<ProjectMetricsData, ProjectMetricsError, TData>({
-    queryKey: analyticsKeys.projectMetrics(projectRef, {
-      startDate: isoTimestampStart,
-      endDate: isoTimestampEnd,
-      interval,
-    }),
-    queryFn: ({ signal }) =>
-      getProjectMetrics({ projectRef, isoTimestampStart, isoTimestampEnd, interval }, signal),
+    queryKey: analyticsKeys.projectMetrics(projectRef, { interval }),
+    queryFn: ({ signal }) => getProjectMetrics({ projectRef, interval }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     refetchOnWindowFocus: false,
     ...options,
   })
 }
-
-

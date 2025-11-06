@@ -109,36 +109,12 @@ export const ProjectUsageSection = () => {
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
-  const { timestampStart, timestampEnd, datetimeFormat } = useMemo(() => {
-    const startDateLocal = dayjs().subtract(
-      selectedInterval.startValue,
-      selectedInterval.startUnit as dayjs.ManipulateType
-    )
-    const endDateLocal = dayjs()
+  const { datetimeFormat } = useMemo(() => {
     const format = selectedInterval.format || 'MMM D, ha'
+    return { datetimeFormat: format }
+  }, [selectedInterval])
 
-    return {
-      timestampStart: startDateLocal.toISOString(),
-      timestampEnd: endDateLocal.toISOString(),
-      datetimeFormat: format,
-    }
-  }, [selectedInterval]) // Only recalculate when interval changes
-
-  const { previousStart, previousEnd } = useMemo(() => {
-    const currentStart = dayjs(timestampStart)
-    const currentEnd = dayjs(timestampEnd)
-    const durationMs = currentEnd.diff(currentStart)
-    const prevEnd = currentStart
-    const prevStart = currentStart.subtract(durationMs, 'millisecond')
-    return { previousStart: prevStart.toISOString(), previousEnd: prevEnd.toISOString() }
-  }, [timestampStart, timestampEnd])
-
-  const statsByService = useServiceStats(
-    projectRef as string,
-    timestampStart,
-    timestampEnd,
-    interval
-  )
+  const statsByService = useServiceStats(projectRef as string, interval)
 
   const serviceBase: ServiceEntry[] = useMemo(
     () => [

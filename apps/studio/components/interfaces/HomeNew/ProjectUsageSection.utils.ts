@@ -70,16 +70,9 @@ export const toServiceStatsMap = (args: {
 
 export const useServiceStats = (
   projectRef: string,
-  timestampStart: string,
-  timestampEnd: string,
   interval: '1hr' | '1day' | '7day'
 ): ServiceStatsMap => {
-  const { data, isLoading, error, refetch } = useProjectMetricsQuery({
-    projectRef,
-    isoTimestampStart: timestampStart,
-    isoTimestampEnd: timestampEnd,
-    interval,
-  })
+  const { data, isLoading, error, refetch } = useProjectMetricsQuery({ projectRef, interval })
 
   return toServiceStatsMap({
     data,
