@@ -471,9 +471,11 @@ export interface paths {
      * Gets project's logs
      * @description Executes a SQL query on the project's logs.
      *
-     *     Either the 'iso_timestamp_start' and 'iso_timestamp_end' parameters must be provided.
+     *     Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
      *     If both are not provided, only the last 1 minute of logs will be queried.
      *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *
+     *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.
      *
      */
     get: operations['v1-get-project-logs']
@@ -2537,6 +2539,7 @@ export interface components {
       /** @enum {string} */
       message: 'ok'
     }
+    DeleteSecretsBody: string[]
     DeployFunctionResponse: {
       /** Format: int64 */
       created_at?: number
@@ -3349,6 +3352,7 @@ export interface components {
         iceberg_catalog: boolean
         list_v2: boolean
       }
+      databasePoolMode: string
       external: {
         /** @enum {string} */
         upstreamTarget: 'main' | 'canary'
@@ -3366,6 +3370,7 @@ export interface components {
       }
       /** Format: int64 */
       fileSizeLimit: number
+      migrationVersion: string
     }
     StreamableFile: Record<string, never>
     SubdomainAvailabilityResponse: {
@@ -4300,7 +4305,7 @@ export interface components {
     V1RestorePointResponse: {
       name: string
       /** @enum {string} */
-      status: 'AVAILABLE' | 'PENDING' | 'REMOVED'
+      status: 'AVAILABLE' | 'PENDING' | 'REMOVED' | 'FAILED'
     }
     V1RunQueryBody: {
       parameters?: unknown[]
@@ -5517,6 +5522,7 @@ export interface operations {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
+        /** @description Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details. */
         sql?: string
       }
       header?: never
@@ -10399,7 +10405,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': string[]
+        'application/json': components['schemas']['DeleteSecretsBody']
       }
     }
     responses: {

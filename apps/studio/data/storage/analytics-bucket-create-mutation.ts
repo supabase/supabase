@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { components } from 'api-types'
-import { useIsNewStorageUIEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
@@ -41,17 +40,12 @@ export const useAnalyticsBucketCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const isStorageV2 = useIsNewStorageUIEnabled()
 
   return useMutation<AnalyticsBucketCreateData, ResponseError, AnalyticsBucketCreateVariables>({
     mutationFn: (vars) => createAnalyticsBucket(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      if (isStorageV2) {
-        await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
-      } else {
-        await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
-      }
+      await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

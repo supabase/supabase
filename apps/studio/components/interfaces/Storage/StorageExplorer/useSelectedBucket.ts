@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useIsAnalyticsBucketsEnabled } from 'data/config/project-storage-config-query'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useStorageV2Page } from '../Storage.utils'
@@ -7,9 +7,7 @@ import { useStorageV2Page } from '../Storage.utils'
 export const useSelectedBucket = () => {
   const { ref, bucketId } = useParams()
   const page = useStorageV2Page()
-
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
-  const hasIcebergEnabled = data?.features.icebergCatalog?.enabled
+  const hasIcebergEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
 
   const {
     data: analyticsBuckets = [],
@@ -36,9 +34,7 @@ export const useSelectedBucket = () => {
       ? buckets.find((b) => b.id === bucketId)
       : page === 'analytics'
         ? analyticsBuckets.find((b: any) => b.id === bucketId)
-        : // [Joshen] Remove typecasts bucket: any once infra changes for analytics bucket is in
-          // [Joshen] Temp fallback to buckets for backwards compatibility old UI
-          buckets.find((b) => b.id === bucketId)
+        : buckets.find((b) => b.id === bucketId)
 
   return { bucket, isSuccess, isError, error }
 }
