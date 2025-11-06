@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { coalesceRowsToArray, filterByList } from './helpers'
-import { TABLES_SQL } from './sql/tables'
-import { COLUMNS_SQL } from './sql/columns'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
+import { coalesceRowsToArray, filterByList } from './helpers'
 import { ident, literal } from './pg-format'
 import { pgColumnArrayZod } from './pg-meta-columns'
+import { COLUMNS_SQL } from './sql/columns'
+import { TABLES_SQL } from './sql/tables'
 
 const pgTablePrimaryKeyZod = z.object({
   table_id: z.number(),
@@ -139,15 +139,14 @@ const generateEnrichedTablesSql = ({ includeColumns }: { includeColumns?: boolea
 type TableCreateParams = {
   name: string
   schema?: string
-  comment?: string
+  comment?: string | null
 }
 
 function create({ name, schema = 'public', comment }: TableCreateParams): { sql: string } {
   const tableSql = `CREATE TABLE ${ident(schema)}.${ident(name)} ();`
-  const commentSql =
-    comment === undefined
-      ? ''
-      : `COMMENT ON TABLE ${ident(schema)}.${ident(name)} IS ${literal(comment)};`
+  const commentSql = comment
+    ? `COMMENT ON TABLE ${ident(schema)}.${ident(name)} IS ${literal(comment)};`
+    : ''
   const sql = `BEGIN; ${tableSql} ${commentSql} COMMIT;`
   return { sql }
 }
@@ -160,7 +159,7 @@ type TableUpdateParams = {
   replica_identity?: 'DEFAULT' | 'INDEX' | 'FULL' | 'NOTHING'
   replica_identity_index?: string
   primary_keys?: Array<{ name: string }>
-  comment?: string
+  comment?: string | null
 }
 
 function update(
@@ -231,10 +230,9 @@ $$;
         .join(',')});`
     }
   }
-  const commentSql =
-    comment === undefined
-      ? ''
-      : `COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
+  const commentSql = !!comment
+    ? `COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
+    : ''
   // nameSql must be last, right below schemaSql
   const sql = `
 BEGIN;
@@ -250,4 +248,4 @@ COMMIT;`
   return { sql }
 }
 
-export { list, retrieve, remove, create, update }
+export { create, list, remove, retrieve, update }
