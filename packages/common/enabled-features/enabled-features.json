@@ -29,7 +29,7 @@
 
   "branding:large_logo": false,
 
-  "cli:custom_profiles": true,
+  "cli:disable_custom_profiles": false,
 
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,

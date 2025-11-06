@@ -5,18 +5,17 @@ import Param from '~/components/Params'
 import { isFeatureEnabled } from 'common'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 
-const { cliCustomProfiles } = isFeatureEnabled(['cli:custom_profiles'])
+const { cliDisableCustomProfiles } = isFeatureEnabled(['cli:disable_custom_profiles'])
 const { cliProfile } = getCustomContent(['cli:profile'])
 
 const CliGlobalFlagsHandler = () => {
   // Transform the flags based on feature flags
   const processedFlags = spec.flags.map((flag: any) => {
-    if (flag.id === 'profile' && cliCustomProfiles) {
+    if (flag.id === 'profile' && !cliDisableCustomProfiles) {
       return {
         id: 'profile',
         name: `--profile ${cliProfile}`,
         description: `use ${cliProfile} profile for connecting to Supabase API`,
-        default_value: cliProfile,
       }
     }
     return flag
