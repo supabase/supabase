@@ -67,7 +67,7 @@ function handleResponseError(error: ResponseError, context: string) {
   const { code, message, requestPathname } = error
   if (!requestPathname || !code) {
     captureMessage({
-      message: `[CRITICAL][${context}] Failed w/ Response Error (no code or requestPathname): ${error.message}`,
+      message: `Response Error (no code or requestPathname) w/ message: ${error.message}`,
       context,
     })
     return
@@ -77,31 +77,33 @@ function handleResponseError(error: ResponseError, context: string) {
     // Only capture 5XX errors as critical errors
     captureMessage({
       context,
-      message: `[CRITICAL][${context}] Failed requestPathname: ${requestPathname}: ${message}`,
+      message: `requestPathname ${requestPathname} w/ message: ${message}`,
     })
     return
   }
 }
 
 function handleError(error: Error, context: string) {
-  const errorMessage = error.message
-  if (!errorMessage) {
+  const message = error.message
+  if (!message) {
     return
   }
 
   captureMessage({
-    message: `[CRITICAL][${context}] Failed: ${errorMessage}`,
+    message,
     context,
   })
 }
 
 function handleUnknownError(error: unknown, context: string) {
-  const hasMessage =
-    error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
-
-  if (hasMessage) {
+  if (
+    error &&
+    typeof error === 'object' &&
+    'message' in error &&
+    typeof error.message === 'string'
+  ) {
     captureMessage({
-      message: `[CRITICAL][${context}] Failed: ${error.message}`,
+      message: error.message,
       context,
     })
   }
@@ -111,5 +113,5 @@ function captureMessage({ message, context }: CaptureMessageOptions) {
   if (WHITELIST_ERRORS.some((whitelisted) => message.includes(whitelisted))) {
     return
   }
-  Sentry.captureMessage(`[CRITICAL][${context}] ${message}`)
+  Sentry.captureMessage(`[CRITICAL][${context}] ${message} Failed: ${message}`)
 }
