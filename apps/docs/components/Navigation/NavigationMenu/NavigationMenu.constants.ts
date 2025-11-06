@@ -1144,19 +1144,19 @@ export const database: NavMenuConstant = {
     ormQuickstarts,
     guiQuickstarts,
     {
-      name: 'ETL Replication',
+      name: 'Database replication',
       url: undefined,
       items: [
-        { name: 'Overview', url: '/guides/database/etl' },
+        { name: 'Overview', url: '/guides/database/replication' },
         {
           name: 'Setting up replication',
-          url: '/guides/database/etl/setting-up-replication' as `/${string}`,
+          url: '/guides/database/replication/setting-up-replication' as `/${string}`,
         },
         {
           name: 'Monitoring replication',
-          url: '/guides/database/etl/monitoring-replication' as `/${string}`,
+          url: '/guides/database/replication/monitoring-replication' as `/${string}`,
         },
-        { name: 'FAQ', url: '/guides/database/etl/faq' },
+        { name: 'FAQ', url: '/guides/database/replication/faq' },
       ],
     },
     {

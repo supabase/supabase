@@ -147,7 +147,7 @@ Compute instance size changes will not change your selected disk type or disk si
 
 ### Postgres replication slots, WAL senders, and connections
 
-[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/etl). Each compute instance also has limits on the maximum number of database connections and connection pooler clients it can handle.
+[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication). Each compute instance also has limits on the maximum number of database connections and connection pooler clients it can handle.
 
 The maximum number of replication slots, WAL senders, database connections, and pooler clients depends on your compute instance size, as follows:
 
