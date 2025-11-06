@@ -371,7 +371,7 @@ When `email_action_type` is `email_change`, the hook payload can include one or 
 - Secure Email Change enabled: two OTPs are generated, one for the current email (`user.email`) and one for the new email (`user.email_new`). You must send two emails.
 - Secure Email Change disabled: only one OTP is generated for the new email. You send a single email.
 
-<Admonition type="warning" title="Counterintuitive field naming">
+<Admonition type="caution" title="Counterintuitive field naming">
 
 The token hash field names are reversed due to backward compatibility. Pay careful attention to which token/hash pair goes with which email address:
 
