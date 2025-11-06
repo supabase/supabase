@@ -1872,7 +1872,7 @@ export const storage: NavMenuConstant = {
             { name: 'Introduction', url: '/guides/storage/vector/introduction' },
             {
               name: 'Creating Vector Buckets',
-              url: '/guides/storage/vector/creating-analytics-buckets' as `/${string}`,
+              url: '/guides/storage/vector/creating-vector-buckets' as `/${string}`,
             },
             {
               name: 'Connecting to Vector Buckets',
