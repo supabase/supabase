@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { PostgresEngine, ReleaseChannel } from './new-project.constants'
 
 export type ProjectRestoreVariables = {
@@ -34,7 +34,7 @@ export const useProjectRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectRestoreData, ResponseError, ProjectRestoreVariables>,
+  UseCustomMutationOptions<ProjectRestoreData, ResponseError, ProjectRestoreVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<ProjectRestoreData, ResponseError, ProjectRestoreVariables>({

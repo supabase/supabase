@@ -128,6 +128,7 @@ export const MyPageComponent = () => (
 - Use our `_Shadcn_` form primitives from `ui` and prefer `FormItemLayout` with layout="flex-row-reverse" for most controls (see `apps/studio/components/interfaces/Settings/Integrations/GithubIntegration/GitHubIntegrationConnectionForm.tsx`).
 - Keep imports from `ui` with `_Shadcn_` suffixes.
 - Forms should generally be wrapped in a Card unless specified
+- If the submit button is outside the form, add a new variable named formId outside the component, and set it as property id on the form element and formId on the button.
 
 ### Example (single field)
 
@@ -142,6 +143,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 const profileSchema = z.object({
   username: z.string().min(2, 'Username must be at least 2 characters'),
 })
+
+const formId = `profile-form`
 
 export function ProfileForm() {
   const form = useForm<z.infer<typeof profileSchema>>({
@@ -199,6 +202,11 @@ export function ProfileForm() {
 ## Sheets
 
 - Use a sheet when needing to reveal more complicated forms or information relating to an object and context switching away to a new page would be disruptive e.g. we list auth providers, clicking an auth provider opens a sheet with information about that provider and a form to enable, user can close sheet to go back to providers list
+
+## React Query
+
+- When doing a mutation, always use the mutate function. Always use onSuccess and onError with a toast.success and toast.error.
+- Use mutateAsync only if the mutation is part of multiple async actions. Wrap the mutateAsync call with try/catch block and add toast.success and toast.error.
 
 ## Tables
 

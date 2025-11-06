@@ -33,7 +33,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ColumnEditor from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
-import JsonEditor from './RowEditor/JsonEditor/JsonEditor'
+import { JsonEditor } from './RowEditor/JsonEditor'
 import RowEditor from './RowEditor/RowEditor'
 import { convertByteaToHex } from './RowEditor/RowEditor.utils'
 import { TextEditor } from './RowEditor/TextEditor'
@@ -62,7 +62,7 @@ export interface SidePanelEditorProps {
   onTableCreated?: (table: RetrieveTableResult) => void
 }
 
-const SidePanelEditor = ({
+export const SidePanelEditor = ({
   editable = true,
   selectedTable,
   includeColumns = false,
@@ -707,5 +707,3 @@ const SidePanelEditor = ({
     </>
   )
 }
-
-export default SidePanelEditor

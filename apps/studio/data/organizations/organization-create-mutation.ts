@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 import { castOrganizationResponseToOrganization } from './organizations-query'
 import type { CustomerAddress, CustomerTaxId } from './types'
@@ -53,7 +53,7 @@ export const useOrganizationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationCreateData, ResponseError, OrganizationCreateVariables>,
+  UseCustomMutationOptions<OrganizationCreateData, ResponseError, OrganizationCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -125,7 +125,7 @@ export const useAwsManagedOrganizationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     AwsManagedOrganizationCreateData,
     ResponseError,
     AwsManagedOrganizationCreateVariables

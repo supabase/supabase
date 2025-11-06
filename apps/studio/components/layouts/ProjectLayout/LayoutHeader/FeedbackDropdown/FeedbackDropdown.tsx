@@ -25,8 +25,8 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             setIsOpen((isOpen) => !isOpen)
             setStage('select')
           }}
-          type="outline"
-          className="rounded-full h-[32px] border-border"
+          type="text"
+          className="rounded-full h-[32px] text-foreground-light hover:text-foreground"
         >
           <span className={className}>Feedback</span>
         </Button>

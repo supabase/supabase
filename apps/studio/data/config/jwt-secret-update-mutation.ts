@@ -1,7 +1,7 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdateVariables = {
@@ -37,7 +37,7 @@ export const useJwtSecretUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<JwtSecretUpdateData, ResponseError, JwtSecretUpdateVariables>,
+  UseCustomMutationOptions<JwtSecretUpdateData, ResponseError, JwtSecretUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

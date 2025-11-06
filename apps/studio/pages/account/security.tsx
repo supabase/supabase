@@ -1,6 +1,6 @@
 import { Smartphone } from 'lucide-react'
 
-import { TOTPFactors } from 'components/interfaces/Account'
+import { TOTPFactors } from 'components/interfaces/Account/TOTPFactors'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'

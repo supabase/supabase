@@ -38,6 +38,14 @@ interface RegionSelectorProps {
 // I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
 // ^ can try again next time
 
+// Map backend region names to user-friendly display names
+const getDisplayNameForSmartRegion = (name: string): string => {
+  if (name === 'APAC') {
+    return 'Asia-Pacific'
+  }
+  return name
+}
+
 export const RegionSelector = ({
   form,
   instanceSize,
@@ -149,7 +157,9 @@ export const RegionSelector = ({
                           />
                         )}
                         <span className="text-foreground">
-                          {selectedRegion?.name ?? field.value}
+                          {selectedRegion?.name
+                            ? getDisplayNameForSmartRegion(selectedRegion.name)
+                            : field.value}
                         </span>
                       </div>
                     )}
@@ -159,7 +169,7 @@ export const RegionSelector = ({
                   {smartRegionEnabled && (
                     <>
                       <SelectGroup_Shadcn_>
-                        <SelectLabel_Shadcn_>Smart Region Selection</SelectLabel_Shadcn_>
+                        <SelectLabel_Shadcn_>General regions</SelectLabel_Shadcn_>
                         {smartRegions.map((value) => {
                           return (
                             <SelectItem_Shadcn_
@@ -174,7 +184,9 @@ export const RegionSelector = ({
                                     className="w-5 rounded-sm"
                                     src={`${BASE_PATH}/img/regions/${value.code}.svg`}
                                   />
-                                  <span className="text-foreground">{value.name}</span>
+                                  <span className="text-foreground">
+                                    {getDisplayNameForSmartRegion(value.name)}
+                                  </span>
                                 </div>
 
                                 <div>
@@ -194,7 +206,7 @@ export const RegionSelector = ({
                   )}
 
                   <SelectGroup_Shadcn_>
-                    <SelectLabel_Shadcn_>All Regions</SelectLabel_Shadcn_>
+                    <SelectLabel_Shadcn_>Specific regions</SelectLabel_Shadcn_>
                     {regionOptions.map((value) => {
                       return (
                         <SelectItem_Shadcn_

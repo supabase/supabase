@@ -108,7 +108,7 @@ function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: num
   ) as T
 }
 
-const PreviewFilterPanelWithUniversal = ({
+export const PreviewFilterPanelWithUniversal = ({
   isLoading,
   newCount,
   onRefresh,
@@ -380,5 +380,3 @@ const PreviewFilterPanelWithUniversal = ({
     </div>
   )
 }
-
-export { PreviewFilterPanelWithUniversal }

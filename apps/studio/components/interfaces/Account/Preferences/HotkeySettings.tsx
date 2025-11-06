@@ -6,7 +6,7 @@ import { KeyboardShortcut, Toggle } from 'ui'
 
 export const HotkeySettings = () => {
   const [inlineEditorEnabled, setInlineEditorEnabled] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.HOTKEY_INLINE_EDITOR,
+    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
     true
   )
   const [commandMenuEnabled, setCommandMenuEnabled] = useLocalStorageQuery(

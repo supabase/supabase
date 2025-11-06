@@ -1,14 +1,27 @@
-import { Github } from 'lucide-react'
+import { ChevronDown, RefreshCw, Unlink } from 'lucide-react'
 import Image from 'next/image'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 import Panel from 'components/ui/Panel'
+import { useGitHubAuthorizationDeleteMutation } from 'data/integrations/github-authorization-delete-mutation'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { BASE_PATH } from 'lib/constants'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
-import { Badge, Button, cn } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
-const AccountConnections = () => {
+export const AccountConnections = () => {
   const {
     data: gitHubAuthorization,
     isLoading,
@@ -17,10 +30,28 @@ const AccountConnections = () => {
     error,
   } = useGitHubAuthorizationQuery()
 
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
+
   const isConnected = gitHubAuthorization !== null
+
+  const { mutate: removeAuthorization, isLoading: isRemoving } =
+    useGitHubAuthorizationDeleteMutation({
+      onSuccess: () => {
+        toast.success('GitHub authorization removed successfully')
+        setIsRemoveModalOpen(false)
+      },
+    })
 
   const handleConnect = () => {
     openInstallGitHubIntegrationWindow('authorize')
+  }
+
+  const handleReauthenticate = () => {
+    openInstallGitHubIntegrationWindow('authorize')
+  }
+
+  const handleRemove = () => {
+    removeAuthorization()
   }
 
   return (
@@ -64,9 +95,37 @@ const AccountConnections = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-x-1">
+          <div className="flex items-center gap-x-2 ml-2">
             {isConnected ? (
-              <Badge variant="success">Connected</Badge>
+              <>
+                <Badge variant="success">Connected</Badge>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button iconRight={<ChevronDown size={14} />} type="default">
+                      <span>Manage</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="end">
+                    <DropdownMenuItem
+                      className="space-x-2"
+                      onSelect={(event) => {
+                        event.preventDefault()
+                        handleReauthenticate()
+                      }}
+                    >
+                      <RefreshCw size={14} />
+                      <p>Re-authenticate</p>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="space-x-2"
+                      onSelect={() => setIsRemoveModalOpen(true)}
+                    >
+                      <Unlink size={14} />
+                      <p>Remove connection</p>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
               <Button type="primary" onClick={handleConnect}>
                 Connect
@@ -75,8 +134,21 @@ const AccountConnections = () => {
           </div>
         </Panel.Content>
       )}
+      <ConfirmationModal
+        variant="destructive"
+        size="small"
+        visible={isRemoveModalOpen}
+        title="Confirm to remove GitHub authorization"
+        confirmLabel="Remove connection"
+        onCancel={() => setIsRemoveModalOpen(false)}
+        onConfirm={handleRemove}
+        loading={isRemoving}
+      >
+        <p className="text-sm text-foreground-light">
+          Removing this authorization will disconnect your GitHub account from Supabase. You can
+          reconnect at any time.
+        </p>
+      </ConfirmationModal>
     </Panel>
   )
 }
-
-export { AccountConnections }

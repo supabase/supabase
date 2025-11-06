@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { SecuritySettings } from 'components/interfaces/Organization/SecuritySettings/SecuritySettings'
+import { SecuritySettings } from 'components/interfaces/Organization/SecuritySettings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
