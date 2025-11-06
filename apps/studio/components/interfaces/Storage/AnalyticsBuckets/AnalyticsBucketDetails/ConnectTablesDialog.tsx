@@ -2,30 +2,30 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AnimatePresence, motion } from 'framer-motion'
 import { snakeCase } from 'lodash'
 import { Loader2, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
+import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
 import { useCreatePublicationMutation } from 'data/replication/publication-create-mutation'
-import { useDeletePublicationMutation } from 'data/replication/publication-delete-mutation'
+import { useUpdatePublicationMutation } from 'data/replication/publication-update-mutation'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
+import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -37,9 +37,11 @@ import {
   FormField_Shadcn_,
   Progress,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { getAnalyticsBucketPublicationName } from './AnalyticsBucketDetails.utils'
+import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 
 /**
@@ -55,28 +57,84 @@ import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperIn
  * - Error handling due to multiple async processes
  */
 
+const formId = 'connect-tables-form'
 const FormSchema = z.object({
   tables: z.array(z.string()).min(1, 'Select at least one table'),
 })
-
-const formId = 'connect-tables-form'
 const isEnabled = true // Kill switch if we wanna hold off supporting connecting tables
 
 type ConnectTablesForm = z.infer<typeof FormSchema>
 
-interface ConnectTablesDialogProps {
-  bucketId?: string
-  onSuccessConnectTables?: () => Promise<any>
+const PROGRESS_INDICATORS = {
+  CREATE: [
+    {
+      step: 1,
+      getDescription: (numTables: number) =>
+        `Creating replication publication with ${numTables} table${numTables > 1 ? 's' : ''}...`,
+    },
+    { step: 2, description: `Creating replication pipeline` },
+    { step: 3, description: `Starting replication pipeline` },
+  ],
+  UPDATE: [
+    {
+      step: 1,
+      getDescription: (numTables: number) =>
+        `Updating replication publication with ${numTables} table${numTables > 1 ? 's' : ''}...`,
+    },
+    { step: 2, description: 'Restarting replication pipeline...' },
+  ],
 }
 
-export const ConnectTablesDialog = ({
-  bucketId,
+interface ConnectTablesDialogProps {
+  onSuccessConnectTables: (tables: { schema: string; name: string }[]) => void
+}
+
+export const ConnectTablesDialog = ({ onSuccessConnectTables }: ConnectTablesDialogProps) => {
+  const { ref: projectRef, bucketId } = useParams()
+  const [visible, setVisible] = useState(false)
+
+  const { sourceId, pipeline, publication } = useAnalyticsBucketAssociatedEntities({
+    projectRef,
+    bucketId,
+  })
+  const isEditingExistingPublication = !!publication && !!pipeline
+
+  return (
+    <Dialog open={visible} onOpenChange={setVisible}>
+      <DialogTrigger asChild>
+        <ButtonTooltip
+          disabled={!isEnabled}
+          size="tiny"
+          type="primary"
+          icon={<Plus />}
+          onClick={() => setVisible(true)}
+          tooltip={{ content: { side: 'bottom', text: !isEnabled ? 'Coming soon' : undefined } }}
+        >
+          {isEditingExistingPublication ? 'Add tables' : 'Connect tables'}
+        </ButtonTooltip>
+      </DialogTrigger>
+
+      {!sourceId ? (
+        <EnableReplicationDialogContent onClose={() => setVisible(false)} />
+      ) : (
+        <ConnectTablesDialogContent
+          visible={visible}
+          onClose={() => setVisible(false)}
+          onSuccessConnectTables={onSuccessConnectTables}
+        />
+      )}
+    </Dialog>
+  )
+}
+
+export const ConnectTablesDialogContent = ({
+  visible,
+  onClose,
   onSuccessConnectTables,
-}: ConnectTablesDialogProps) => {
-  const { ref: projectRef } = useParams()
+}: ConnectTablesDialogProps & { visible: boolean; onClose: () => void }) => {
+  const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const [visible, setVisible] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [connectingStep, setConnectingStep] = useState(0)
 
@@ -93,47 +151,48 @@ export const ConnectTablesDialog = ({
   const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
   const { serviceKey } = getKeys(apiKeys)
 
-  const { data: tables } = useTablesQuery({
+  const { sourceId, pipeline, publication } = useAnalyticsBucketAssociatedEntities({
     projectRef,
-    connectionString: project?.connectionString,
-    includeColumns: false,
+    bucketId,
   })
+  const isEditingExistingPublication = !!publication && !!pipeline
 
-  const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+  const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId })
 
-  const { mutateAsync: createNamespace } = useIcebergNamespaceCreateMutation()
   const { mutateAsync: createPublication } = useCreatePublicationMutation()
+  const { mutateAsync: updatePublication } = useUpdatePublicationMutation()
   const { mutateAsync: createDestinationPipeline } = useCreateDestinationPipelineMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
-  // [Joshen] For debugging purposes to reset things
-  const { mutateAsync: deletePublication, isLoading: isDeletingPublication } =
-    useDeletePublicationMutation()
+  const progressIndicator = isEditingExistingPublication
+    ? PROGRESS_INDICATORS.UPDATE
+    : PROGRESS_INDICATORS.CREATE
+  const progressDescription = progressIndicator.find((x) => x.step === connectingStep)
 
-  const onSubmit: SubmitHandler<ConnectTablesForm> = async (values) => {
+  const onSubmitNewPublication: SubmitHandler<ConnectTablesForm> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!sourceId) return toast.error('Source ID is required')
     if (!bucketId) return toast.error('Bucket ID is required')
+    if (!sourceId) return toast.error('Replication has not been enabled for your project')
 
     try {
       setIsConnecting(true)
-      setConnectingStep(1)
 
       // Step 1: Create publication
+      setConnectingStep(1)
       const publicationName = getAnalyticsBucketPublicationName(bucketId)
+      const publicationTables = values.tables.map((table) => {
+        const [schema, name] = table.split('.')
+        return { schema, name }
+      })
       await createPublication({
         projectRef,
         sourceId,
         name: publicationName,
-        tables: values.tables.map((table) => {
-          const [schema, name] = table.split('.')
-          return { schema, name }
-        }),
+        tables: publicationTables,
       })
-      setConnectingStep(2)
 
       // Step 2: Create destination pipeline
+      setConnectingStep(2)
       const keysToDecrypt = Object.entries(wrapperValues)
         .filter(([name]) =>
           ['vault_aws_access_key_id', 'vault_aws_secret_access_key'].includes(name)
@@ -167,14 +226,15 @@ export const ConnectTablesDialog = ({
         sourceId,
         pipelineConfig: { publicationName },
       })
-      setConnectingStep(3)
 
       // Step 3: Start the destination pipeline
+      setConnectingStep(3)
       await startPipeline({ projectRef, pipelineId })
-      await onSuccessConnectTables?.()
+
+      onSuccessConnectTables?.(publicationTables)
       toast.success(`Connected ${values.tables.length} tables to Analytics bucket!`)
       form.reset()
-      setVisible(false)
+      onClose()
     } catch (error: any) {
       // [Joshen] JFYI there's several async processes here so if something goes wrong midway - we need to figure out how to roll back cleanly
       // e.g publication gets created, but namespace creation fails -> should the old publication get deleted?
@@ -187,150 +247,222 @@ export const ConnectTablesDialog = ({
     }
   }
 
-  const handleClose = () => {
-    form.reset()
-    setVisible(false)
+  const onSubmitUpdatePublication: SubmitHandler<ConnectTablesForm> = async (values) => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (!sourceId) return toast.error('Replication has not been enabled on this project')
+    if (!bucketId) return toast.error('Bucket ID is required')
+    if (!publication) return toast.error('Unable to find existing publication')
+    if (!pipeline) return toast.error('Unable to find existing pipeline')
+
+    try {
+      setIsConnecting(true)
+
+      setConnectingStep(1)
+      const publicationTables = publication.tables.concat(
+        values.tables.map((table) => {
+          const [schema, name] = table.split('.')
+          return { schema, name }
+        })
+      )
+      await updatePublication({
+        projectRef,
+        sourceId,
+        publicationName: publication.name,
+        tables: publicationTables,
+      })
+
+      setConnectingStep(2)
+      await startPipeline({ projectRef, pipelineId: pipeline.id })
+
+      onSuccessConnectTables?.(publicationTables)
+      toast.success('Successfully updated connected tables! Pipeline is being restarted')
+      onClose()
+    } catch (error: any) {
+      toast.error(`Failed to update tables: ${error.message}`)
+    } finally {
+      setIsConnecting(false)
+      setConnectingStep(0)
+    }
   }
 
+  const onSubmit: SubmitHandler<ConnectTablesForm> = async (values) => {
+    if (isEditingExistingPublication) {
+      onSubmitUpdatePublication(values)
+    } else {
+      onSubmitNewPublication(values)
+    }
+  }
+
+  useEffect(() => {
+    form.reset()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible])
+
   return (
-    <Dialog
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) handleClose()
-      }}
-    >
-      <DialogTrigger asChild>
-        <ButtonTooltip
-          disabled={!isEnabled}
-          size="tiny"
-          type="primary"
-          icon={<Plus size={14} />}
-          onClick={() => setVisible(true)}
-          tooltip={{ content: { side: 'bottom', text: !isEnabled ? 'Coming soon' : undefined } }}
-        >
-          Connect tables
-        </ButtonTooltip>
-      </DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>
+          {isEditingExistingPublication ? 'Connect more tables' : 'Connect tables'}
+        </DialogTitle>
+      </DialogHeader>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Connect tables</DialogTitle>
-        </DialogHeader>
+      <DialogSectionSeparator />
 
-        <DialogSectionSeparator />
-
-        <Form_Shadcn_ {...form}>
-          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-4">
-              <p className="text-sm">
-                Select the database tables to send data from. A destination analytics table will be
-                created for each, and data will replicate automatically.
-              </p>
-            </DialogSection>
-            <DialogSectionSeparator />
-            <DialogSection className="overflow-visible">
-              <FormField_Shadcn_
-                control={form.control}
-                name="tables"
-                render={({ field }) => (
-                  <FormItemLayout label="Tables">
-                    <FormControl_Shadcn_>
-                      <MultiSelector
-                        values={field.value}
-                        onValuesChange={field.onChange}
-                        disabled={isConnecting}
-                      >
-                        <MultiSelector.Trigger
-                          deletableBadge
-                          badgeLimit="wrap"
-                          mode="inline-combobox"
-                          label="Select tables..."
-                        />
-                        <MultiSelector.Content>
-                          <MultiSelector.List>
-                            {tables?.map((table) => (
+      <Form_Shadcn_ {...form}>
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+          <DialogSection className="flex flex-col gap-y-4">
+            <p className="text-sm">
+              Select the database tables to send data from. A destination analytics table will be
+              created for each, and data will replicate automatically.
+            </p>
+          </DialogSection>
+          <DialogSectionSeparator />
+          <DialogSection className="overflow-visible">
+            <FormField_Shadcn_
+              control={form.control}
+              name="tables"
+              render={({ field }) => (
+                <FormItemLayout label="Tables">
+                  <FormControl_Shadcn_>
+                    <MultiSelector
+                      values={field.value}
+                      onValuesChange={field.onChange}
+                      disabled={isConnecting}
+                    >
+                      <MultiSelector.Trigger
+                        deletableBadge
+                        badgeLimit="wrap"
+                        mode="inline-combobox"
+                        label="Select tables..."
+                      />
+                      <MultiSelector.Content>
+                        <MultiSelector.List>
+                          {tables?.map((table) => {
+                            const alreadyConnected = (publication?.tables ?? []).some(
+                              (x) => x.schema === table.schema && x.name === table.name
+                            )
+                            return (
                               <MultiSelector.Item
+                                disabled={alreadyConnected}
+                                className="[&>div]:flex [&>div]:items-center [&>div]:justify-between"
                                 key={`${table.schema}.${table.name}`}
                                 value={`${table.schema}.${table.name}`}
                               >
-                                {`${table.schema}.${table.name}`}
+                                <span>{`${table.schema}.${table.name}`}</span>
+                                {alreadyConnected && <span>Connected to analytics bucket</span>}
                               </MultiSelector.Item>
-                            ))}
-                          </MultiSelector.List>
-                        </MultiSelector.Content>
-                      </MultiSelector>
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
+                            )
+                          })}
+                        </MultiSelector.List>
+                      </MultiSelector.Content>
+                    </MultiSelector>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </DialogSection>
+        </form>
+      </Form_Shadcn_>
+
+      <AnimatePresence mode="wait">
+        {isConnecting && !!progressDescription && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <DialogSectionSeparator />
+            <DialogSection>
+              <div className="flex items-center gap-x-2 mb-2">
+                <p className="text-sm text-foreground-light">
+                  {'getDescription' in progressDescription
+                    ? progressDescription.getDescription?.(selectedTables.length)
+                    : progressDescription.description}
+                </p>
+                <Loader2 size={14} className="animate-spin" />
+              </div>
+              <Progress value={(connectingStep / 3) * 100} />
             </DialogSection>
-          </form>
-        </Form_Shadcn_>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <AnimatePresence mode="wait">
-          {isConnecting && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            >
-              <DialogSectionSeparator />
-              <DialogSection>
-                <div className="flex items-center gap-x-2 mb-2">
-                  <p className="text-sm text-foreground-light">
-                    {connectingStep === 1
-                      ? `Creating replication publication with ${selectedTables.length} table${selectedTables.length > 1 ? 's' : ''}...`
-                      : connectingStep === 2
-                        ? 'Creating destination pipeline...'
-                        : 'Starting destination pipeline...'}
-                  </p>
-                  <Loader2 size={14} className="animate-spin" />
-                </div>
-                <Progress value={(connectingStep / 3) * 100} />
-              </DialogSection>
-            </motion.div>
+      <DialogFooter>
+        <Button type="default" disabled={isConnecting} onClick={onClose}>
+          Cancel
+        </Button>
+        <Button form={formId} htmlType="submit" disabled={isConnecting}>
+          Connect
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
+
+const EnableReplicationDialogContent = ({ onClose }: { onClose: () => void }) => {
+  const { ref: projectRef } = useParams()
+  const enablePgReplicate = useFlag('enablePgReplicate')
+  const { error } = useReplicationSourcesQuery({ projectRef })
+  const noAccessToReplication =
+    !enablePgReplicate || error?.message.includes('feature flag is required')
+
+  const { mutateAsync: createTenantSource, isLoading: creatingTenantSource } =
+    useCreateTenantSourceMutation()
+
+  const onEnableReplication = async () => {
+    if (!projectRef) return console.error('Project ref is required')
+    await createTenantSource({ projectRef })
+  }
+
+  return (
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Database replication needs to be enabled</DialogTitle>
+        <DialogDescription>
+          Replication is used to sync data from your Postgres tables
+        </DialogDescription>
+      </DialogHeader>
+      <DialogSectionSeparator />
+      <DialogSection className="flex flex-col gap-y-2 !p-0">
+        <Admonition
+          type="warning"
+          className="rounded-none border-0 mb-0"
+          title={
+            noAccessToReplication
+              ? 'Replication is currently unavailable for your project'
+              : 'Replication is currently in Alpha'
+          }
+        >
+          {noAccessToReplication ? (
+            <p className="text-sm !leading-normal">
+              Access to database replication is currently not available yet for public use. If
+              you're interested, do reach out to us via support!
+            </p>
+          ) : (
+            <>
+              <p className="text-sm !leading-normal">
+                This feature is in active development and may change as we gather feedback.
+                Availability and behavior can evolve while in Alpha.
+              </p>
+              <p className="text-sm !leading-normal">
+                Pricing has not been finalized yet. You can enable replication now; we’ll announce
+                pricing later and notify you before any charges apply.
+              </p>
+            </>
           )}
-        </AnimatePresence>
-
-        <DialogFooter className="!justify-between items-center">
-          <p className="text-sm text-foreground-lighter">Debugging tools for Joshen</p>
-          <div className="flex items-center gap-x-2">
-            <Button
-              type="default"
-              loading={isDeletingPublication}
-              onClick={async () => {
-                if (!projectRef || !sourceId || !bucketId) return
-                const publicationName = getAnalyticsBucketPublicationName(bucketId)
-                await deletePublication(
-                  {
-                    projectRef,
-                    sourceId,
-                    publicationName,
-                  },
-                  {
-                    onSuccess: () => toast(`Deleted ${publicationName}`),
-                  }
-                )
-              }}
-            >
-              Delete publication
-            </Button>
-            <Button asChild type="default">
-              <Link href={`/project/${projectRef}/database/replication`}>View pipeline</Link>
-            </Button>
-          </div>
-        </DialogFooter>
-
-        <DialogFooter>
-          <Button type="default" disabled={isConnecting} onClick={() => setVisible(false)}>
-            Cancel
+        </Admonition>
+      </DialogSection>
+      <DialogFooter>
+        <Button type="default" disabled={creatingTenantSource} onClick={() => onClose()}>
+          {noAccessToReplication ? 'Understood' : 'Cancel'}
+        </Button>
+        {!noAccessToReplication && (
+          <Button type="primary" loading={creatingTenantSource} onClick={onEnableReplication}>
+            Enable replication
           </Button>
-          <Button form={formId} htmlType="submit" disabled={isConnecting}>
-            Connect
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        )}
+      </DialogFooter>
+    </DialogContent>
   )
 }

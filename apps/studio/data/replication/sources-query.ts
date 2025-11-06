@@ -36,5 +36,23 @@ export const useReplicationSourcesQuery = <TData = ReplicationSourcesData>(
     queryKey: replicationKeys.sources(projectRef),
     queryFn: ({ signal }) => fetchReplicationSources({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    retry: (failureCount, error) => {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        error.code === 503 &&
+        error.message.includes('feature flag is required')
+      ) {
+        return false
+      }
+
+      if (failureCount < 3) {
+        return true
+      }
+
+      return false
+    },
     ...options,
   })

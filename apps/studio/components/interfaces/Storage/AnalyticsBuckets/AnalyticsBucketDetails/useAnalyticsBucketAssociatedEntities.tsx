@@ -3,6 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import { FDW } from 'data/fdw/fdws-query'
+import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import {
   ReplicationPublication,
   useReplicationPublicationsQuery,
@@ -57,7 +58,10 @@ export const useAnalyticsBucketAssociatedEntities = (
     (p) => p.name === getAnalyticsBucketPublicationName(bucketId ?? '')
   )
 
-  return { icebergWrapper, icebergWrapperMeta, s3AccessKey, publication }
+  const { data: pipelines } = useReplicationPipelinesQuery({ projectRef })
+  const pipeline = pipelines?.pipelines.find((x) => x.config.publication_name === publication?.name)
+
+  return { icebergWrapper, icebergWrapperMeta, s3AccessKey, sourceId, publication, pipeline }
 }
 
 export const useAnalyticsBucketDeleteCleanUp = () => {

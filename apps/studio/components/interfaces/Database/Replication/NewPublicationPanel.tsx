@@ -139,7 +139,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                             </MultiSelector.Trigger>
                             <MultiSelector.Content>
                               <MultiSelector.List>
-                                {tables?.tables.map((table) => (
+                                {tables?.map((table) => (
                                   <MultiSelector.Item
                                     key={`${table.schema}.${table.name}`}
                                     value={`${table.schema}.${table.name}`}

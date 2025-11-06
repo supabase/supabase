@@ -1,5 +1,5 @@
 import { uniq } from 'lodash'
-import { SquarePlus } from 'lucide-react'
+import { Loader2, SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -38,6 +38,7 @@ import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
+import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
 import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
@@ -55,14 +56,60 @@ export const AnalyticBucketDetails = () => {
   const bucket = _bucket as undefined | AnalyticsBucket
 
   const [modal, setModal] = useState<'delete' | null>(null)
+  // [Joshen] Namespaces are now created asynchronously when the pipeline is started, so long poll after
+  // updating connected tables until namespaces + wrapper integrations are updated
+  // Namespace would just be the schema (Which is currently limited to public)
+  // Wrapper table would be {schema}_{table}_changelog
+  const [tablesToPoll, setTablesToPoll] = useState<{ schema: string; name: string }[]>([])
+  const [pollIntervalNamespaces, setPollIntervalNamespaces] = useState(0)
+  const [pollIntervalWrapper, setPollIntervalWrapper] = useState(0)
 
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
-  const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance({
+  const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance(
+    {
+      bucketId: bucket?.id,
+    },
+    {
+      refetchInterval: (data) => {
+        if (pollIntervalWrapper === 0) return false
+        if (tablesToPoll.length > 0) {
+          const wrapperTables = data?.[0].tables ?? []
+
+          // [Joshen ALPHA] I need to know whats the wrapper table name formats to deterministically find them here
+          // Or should I just use snakeCase here? Unsure at the moment
+          const hasTablesMissingFromWrapper = !tablesToPoll.some((x) =>
+            wrapperTables.find((y) => y.name.includes(`${x.schema}_${x.name}`))
+          )
+          if (!hasTablesMissingFromWrapper) {
+            setPollIntervalWrapper(0)
+            if (pollIntervalNamespaces === 0) setTablesToPoll([])
+            return false
+          }
+        }
+        return pollIntervalWrapper
+      },
+    }
+  )
+  const { pipeline } = useAnalyticsBucketAssociatedEntities({
+    projectRef,
     bucketId: bucket?.id,
   })
+
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
   const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta
+  const state = isLoading
+    ? 'loading'
+    : extensionState === 'installed'
+      ? wrapperInstance
+        ? 'added'
+        : 'missing'
+      : extensionState
+
+  const wrapperTables = useMemo(() => {
+    if (!wrapperInstance) return []
+    return formatWrapperTables(wrapperInstance, wrapperMeta!)
+  }, [wrapperInstance, wrapperMeta])
 
   const { data: extensionsData } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -79,24 +126,30 @@ export const AnalyticBucketDetails = () => {
     { enabled: wrapperValues.vault_token !== undefined }
   )
 
-  const {
-    data: namespacesData,
-    isLoading: isLoadingNamespaces,
-    refetch: refetchNamespaces,
-  } = useIcebergNamespacesQuery(
+  const { data: namespacesData, isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
     {
       catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
       token: token!,
     },
-    { enabled: isSuccessToken }
+    {
+      enabled: isSuccessToken,
+      refetchInterval: (data) => {
+        if (pollIntervalNamespaces === 0) return false
+        if (tablesToPoll.length > 0) {
+          const schemas = [...new Set(tablesToPoll.map((x) => x.schema))]
+          const hasSchemaMissingFromNamespace = !schemas.some((x) => (data ?? []).includes(x))
+
+          if (!hasSchemaMissingFromNamespace) {
+            setPollIntervalNamespaces(0)
+            if (pollIntervalWrapper === 0) setTablesToPoll([])
+            return false
+          }
+        }
+        return pollIntervalNamespaces
+      },
+    }
   )
-
-  const wrapperTables = useMemo(() => {
-    if (!wrapperInstance) return []
-
-    return formatWrapperTables(wrapperInstance, wrapperMeta!)
-  }, [wrapperInstance, wrapperMeta])
 
   const namespaces = useMemo(() => {
     const fdwNamespaces = wrapperTables.map((t) => t.table.split('.')[0]) as string[]
@@ -113,14 +166,6 @@ export const AnalyticBucketDetails = () => {
       }
     })
   }, [wrapperTables, namespacesData])
-
-  const state = isLoading
-    ? 'loading'
-    : extensionState === 'installed'
-      ? wrapperInstance
-        ? 'added'
-        : 'missing'
-      : extensionState
 
   return (
     <>
@@ -164,25 +209,68 @@ export const AnalyticBucketDetails = () => {
                       Analytics tables stored in this bucket
                     </ScaffoldSectionDescription>
                   </div>
-                  {namespaces.length > 0 && <ConnectTablesDialog bucketId={bucket?.id} />}
+                  <div className="flex items-center gap-x-2">
+                    {!!pipeline && (
+                      <Button asChild type="default">
+                        <Link
+                          href={`/project/${projectRef}/database/replication/${pipeline.replicator_id}`}
+                        >
+                          View replication
+                        </Link>
+                      </Button>
+                    )}
+                    {namespaces.length > 0 && (
+                      <ConnectTablesDialog
+                        onSuccessConnectTables={(tables) => {
+                          setTablesToPoll(tables)
+                          setPollIntervalNamespaces(4000)
+                          setPollIntervalWrapper(4000)
+                        }}
+                      />
+                    )}
+                  </div>
                 </ScaffoldHeader>
 
                 {isLoadingNamespaces || isLoading ? (
                   <GenericSkeletonLoader />
                 ) : namespaces.length === 0 ? (
-                  <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
-                    <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
-                    <div className="flex flex-col items-center text-center">
-                      <h3>Connect database tables</h3>
-                      <p className="text-foreground-light text-sm">
-                        Stream data from tables for archival, backups, or analytical queries.
-                      </p>
-                    </div>
-                    <ConnectTablesDialog
-                      bucketId={bucket?.id}
-                      onSuccessConnectTables={async () => await refetchNamespaces()}
-                    />
-                  </aside>
+                  <>
+                    {tablesToPoll.length > 0 ? (
+                      <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
+                        <Loader2
+                          size={24}
+                          strokeWidth={1.5}
+                          className="animate-spin text-foreground-muted"
+                        />
+                        <div className="flex flex-col items-center text-center">
+                          <h3>
+                            Connecting {tablesToPoll.length} table
+                            {tablesToPoll.length > 1 ? 's' : ''} to bucket
+                          </h3>
+                          <p className="text-foreground-light text-sm">
+                            Tables will be shown here once the connection is complete
+                          </p>
+                        </div>
+                      </aside>
+                    ) : (
+                      <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
+                        <SquarePlus size={24} strokeWidth={1.5} className="text-foreground-muted" />
+                        <div className="flex flex-col items-center text-center">
+                          <h3>Connect database tables</h3>
+                          <p className="text-foreground-light text-sm">
+                            Stream data from tables for archival, backups, or analytical queries.
+                          </p>
+                        </div>
+                        <ConnectTablesDialog
+                          onSuccessConnectTables={(tables) => {
+                            setTablesToPoll(tables)
+                            setPollIntervalNamespaces(4000)
+                            setPollIntervalWrapper(4000)
+                          }}
+                        />
+                      </aside>
+                    )}
+                  </>
                 ) : (
                   <div className="flex flex-col gap-y-10">
                     {namespaces.map(({ namespace, schema, tables }) => (
