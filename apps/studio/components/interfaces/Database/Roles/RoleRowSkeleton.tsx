@@ -6,7 +6,7 @@ export interface RoleRowSkeletonProps {
   index?: number
 }
 
-const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
+export const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
   return (
     <div
       className={cn([
@@ -40,5 +40,3 @@ const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
     </div>
   )
 }
-
-export default RoleRowSkeleton

@@ -7,7 +7,7 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "typescript": "~5.5.0",
+    "typescript": "catalog:",
     "@supabase/build-icons": "workspace:*"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import { Children } from 'react'
 
-const FormSection = ({
+export const FormSection = ({
   children,
   id,
   header,
@@ -28,7 +28,7 @@ const FormSection = ({
   )
 }
 
-const FormSectionLabel = ({
+export const FormSectionLabel = ({
   children,
   className = '',
   description,
@@ -62,28 +62,32 @@ const Shimmer = () => (
   </div>
 )
 
-const FormSectionContent = ({
+export const FormSectionContent = ({
   children,
   loading = true,
+  loaders,
   fullWidth,
   className,
 }: {
   children: React.ReactNode | string
   loading?: boolean
+  loaders?: number
   fullWidth?: boolean
   className?: string
 }) => {
   return (
     <div
       className={`
-        relative col-span-12 flex flex-col gap-6 lg:col-span-7
+        relative col-span-12 flex flex-col gap-6 @lg:col-span-7
         ${fullWidth && '!col-span-12'}
         ${className}
       `}
     >
-      {loading ? Children.map(children, () => <Shimmer />) : children}
+      {loading
+        ? !!loaders
+          ? new Array(loaders).fill(0).map((_, idx) => <Shimmer key={idx} />)
+          : Children.map(children, (_, idx) => <Shimmer key={idx} />)
+        : children}
     </div>
   )
 }
-
-export { FormSection, FormSectionContent, FormSectionLabel }

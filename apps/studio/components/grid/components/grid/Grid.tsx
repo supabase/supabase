@@ -1,19 +1,22 @@
 import { forwardRef, memo, Ref, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
+import { ref as valtioRef } from 'valtio'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
+import { GridError } from './GridError'
 import RowRenderer from './RowRenderer'
 
 const rowKeyGetter = (row: SupaRow) => {
@@ -53,6 +56,9 @@ export const Grid = memo(
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
 
+      const { data: org } = useSelectedOrganizationQuery()
+      const { data: project } = useSelectedProjectQuery()
+
       const onRowsChange = useOnRowsChange(rows)
 
       function onSelectedRowsChange(selectedRows: Set<number>) {
@@ -66,11 +72,33 @@ export const Grid = memo(
         snap.setSelectedCellPosition({ idx: args.column.idx, rowIdx: args.rowIdx })
       }
 
+      const page = snap.page
       const table = snap.table
+      const tableEntityType = snap.originalTable?.entity_type
+      const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
+      const isTableEmpty = (rows ?? []).length === 0
 
       const { mutate: sendEvent } = useSendEventMutation()
-      const org = useSelectedOrganization()
-      const { project } = useProjectContext()
+
+      const {
+        isValidFile: isValidFileDraggedOver,
+        isDraggedOver,
+        onDragOver,
+        onFileDrop,
+      } = useCsvFileDrop({
+        enabled: isTableEmpty && !isForeignTable,
+        onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
+        onTelemetryEvent: (eventName) => {
+          sendEvent({
+            action: eventName,
+            groups: {
+              project: project?.ref ?? 'Unknown',
+              organization: org?.slug ?? 'Unknown',
+            },
+          })
+        },
+      })
+
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
@@ -82,13 +110,13 @@ export const Grid = memo(
           table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
 
         const fk = data?.find(
-          (key: any) =>
+          (key) =>
             key.source_schema === table?.schema &&
             key.source_table === table?.name &&
             key.source_columns.includes(columnName) &&
             key.target_schema === targetTableSchema &&
             key.target_table === targetTableName &&
-            key.target_columns.includes(targetColumnName)
+            key.target_columns.includes(targetColumnName ?? '')
         )
 
         return fk !== undefined ? formatForeignKeys([fk])[0] : undefined
@@ -106,64 +134,94 @@ export const Grid = memo(
         }
       }
 
-      const removeAllFilters = () => {
-        onApplyFilters([])
-      }
+      const removeAllFilters = () => onApplyFilters([])
 
       return (
         <div
-          className={cn(`flex flex-col relative`, containerClass)}
+          className={cn('flex flex-col relative transition-colors', containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
             <div
+              className={cn(
+                'absolute top-9 p-2 w-full z-[1]',
+                isTableEmpty && isDraggedOver && 'border-2 border-dashed',
+                isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
+              )}
               style={{ height: `calc(100% - 35px)` }}
-              className="absolute top-9 p-2 w-full z-[1] pointer-events-none"
+              onDragOver={onDragOver}
+              onDragLeave={onDragOver}
+              onDrop={onFileDrop}
             >
               {isLoading && <GenericSkeletonLoader />}
-              {isError && (
-                <AlertError error={error} subject="Failed to retrieve rows from table">
-                  {filters.length > 0 && (
-                    <p>
-                      Verify that the filter values are correct, as the error may stem from an
-                      incorrectly applied filter
-                    </p>
-                  )}
-                </AlertError>
-              )}
+
+              {isError && <GridError error={error} />}
+
               {isSuccess && (
                 <>
-                  {(filters ?? []).length === 0 ? (
+                  {page > 1 ? (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
-                      <p className="text-sm text-light">This table is empty</p>
-                      <p className="text-sm text-light mt-1">
-                        Add rows to your table to get started.
-                      </p>
+                      <p className="text-sm text-light">This page does not have any data</p>
                       <div className="flex items-center space-x-2 mt-4">
-                        {
-                          <Button
-                            type="default"
-                            className="pointer-events-auto"
-                            onClick={() => {
-                              tableEditorSnap.onImportData()
-                              sendEvent({
-                                action: 'import_data_button_clicked',
-                                properties: { tableType: 'Existing Table' },
-                                groups: {
-                                  project: project?.ref ?? 'Unknown',
-                                  organization: org?.slug ?? 'Unknown',
-                                },
-                              })
-                            }}
-                          >
-                            Import data from CSV
-                          </Button>
-                        }
+                        <Button
+                          type="default"
+                          className="pointer-events-auto"
+                          onClick={() => snap.setPage(1)}
+                        >
+                          Head back to first page
+                        </Button>
                       </div>
                     </div>
+                  ) : (filters ?? []).length === 0 ? (
+                    <div className="flex flex-col items-center justify-center col-span-full h-full">
+                      <p className="text-sm text-light">
+                        {isDraggedOver ? (
+                          isValidFileDraggedOver ? (
+                            'Drop your CSV file here'
+                          ) : (
+                            <span className="text-destructive">Only CSV files are accepted</span>
+                          )
+                        ) : (
+                          'This table is empty'
+                        )}
+                      </p>
+                      {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
+                        <div className="flex items-center space-x-2 mt-4">
+                          <p className="text-sm text-light">
+                            This table is a foreign table. Add data to the connected source to get
+                            started.
+                          </p>
+                        </div>
+                      ) : (
+                        !isDraggedOver && (
+                          <div className="flex flex-col items-center gap-4 mt-4">
+                            <Button
+                              type="default"
+                              className="pointer-events-auto"
+                              onClick={() => {
+                                tableEditorSnap.onImportData()
+                                sendEvent({
+                                  action: 'import_data_button_clicked',
+                                  properties: { tableType: 'Existing Table' },
+                                  groups: {
+                                    project: project?.ref ?? 'Unknown',
+                                    organization: org?.slug ?? 'Unknown',
+                                  },
+                                })
+                              }}
+                            >
+                              Import data from CSV
+                            </Button>
+                            <p className="text-xs text-foreground-light">
+                              or drag and drop a CSV file here
+                            </p>
+                          </div>
+                        )
+                      )}
+                    </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center col-span-full">
+                    <div className="flex flex-col items-center justify-center col-span-full h-full">
                       <p className="text-sm text-light">
                         The filters applied have returned no results from this table
                       </p>

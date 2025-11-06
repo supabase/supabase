@@ -7,17 +7,15 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -28,8 +26,8 @@ import {
   Input_Shadcn_,
   PrePostTab,
   Switch,
-  WarningIcon,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 function HoursOrNeverText({ value }: { value: number }) {
@@ -44,10 +42,7 @@ function HoursOrNeverText({ value }: { value: number }) {
 
 const RefreshTokenSchema = z.object({
   REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
-  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce
-    .number()
-    .positive()
-    .min(0, 'Must be a value more than 0'),
+  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce.number().min(0, 'Must be a value more than 0'),
 })
 
 const UserSessionsSchema = z.object({
@@ -59,19 +54,30 @@ const UserSessionsSchema = z.object({
   SESSIONS_SINGLE_PER_USER: z.boolean(),
 })
 
-const SessionsAuthSettingsForm = () => {
+export const SessionsAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading,
+  } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   // Separate loading states for each form
   const [isUpdatingRefreshTokens, setIsUpdatingRefreshTokens] = useState(false)
   const [isUpdatingUserSessions, setIsUpdatingUserSessions] = useState(false)
 
-  const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canReadConfig } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
@@ -152,16 +158,26 @@ const SessionsAuthSettingsForm = () => {
 
   if (isError) {
     return (
-      <Alert_Shadcn_ variant="destructive">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <ScaffoldSection isFullWidth>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
     )
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view auth configuration settings" />
+    return (
+      <ScaffoldSection isFullWidth>
+        <NoPermission resourceText="view auth configuration settings" />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
+    )
   }
 
   return (
@@ -196,32 +212,30 @@ const SessionsAuthSettingsForm = () => {
                   )}
                 />
               </CardContent>
-              {refreshTokenForm.watch('REFRESH_TOKEN_ROTATION_ENABLED') && (
-                <CardContent>
-                  <FormField_Shadcn_
-                    control={refreshTokenForm.control}
-                    name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Refresh token reuse interval"
-                        description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
-                      >
-                        <FormControl_Shadcn_>
-                          <PrePostTab postTab="seconds">
-                            <Input_Shadcn_
-                              type="number"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig}
-                            />
-                          </PrePostTab>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
-              )}
+              <CardContent>
+                <FormField_Shadcn_
+                  control={refreshTokenForm.control}
+                  name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Refresh token reuse interval"
+                      description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
+                    >
+                      <FormControl_Shadcn_>
+                        <PrePostTab postTab="seconds">
+                          <Input_Shadcn_
+                            type="number"
+                            min={0}
+                            {...field}
+                            disabled={!canUpdateConfig}
+                          />
+                        </PrePostTab>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
               <CardFooter className="justify-end space-x-2">
                 {refreshTokenForm.formState.isDirty && (
                   <Button type="default" onClick={() => refreshTokenForm.reset()}>
@@ -256,15 +270,6 @@ const SessionsAuthSettingsForm = () => {
           >
             <Card>
               <CardContent>
-                {promptProPlanUpgrade && (
-                  <div className="mb-4">
-                    <UpgradeToPro
-                      primaryText="Upgrade to Pro"
-                      secondaryText="Configuring user sessions requires the Pro Plan."
-                    />
-                  </div>
-                )}
-
                 <FormField_Shadcn_
                   control={userSessionsForm.control}
                   name="SESSIONS_SINGLE_PER_USER"
@@ -338,6 +343,15 @@ const SessionsAuthSettingsForm = () => {
                   )}
                 />
               </CardContent>
+
+              {promptProPlanUpgrade && (
+                <UpgradeToPro
+                  fullWidth
+                  primaryText="Configuring user sessions is only available on the Pro Plan and above"
+                  secondaryText="Upgrade to the Pro plan to configure settings for user sessions"
+                />
+              )}
+
               <CardFooter className="justify-end space-x-2">
                 {userSessionsForm.formState.isDirty && (
                   <Button type="default" onClick={() => userSessionsForm.reset()}>
@@ -364,5 +378,3 @@ const SessionsAuthSettingsForm = () => {
     </>
   )
 }
-
-export default SessionsAuthSettingsForm

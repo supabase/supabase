@@ -17,6 +17,33 @@ Email sending depends on two settings: Email Provider and Auth Hook status.
 | Disabled       | Enabled   | Email Signups Disabled                                               |
 | Disabled       | Disabled  | Email Signups Disabled                                               |
 
+## Email change behavior and token hash mapping
+
+When `email_action_type` is `email_change`, the hook payload can include one or two OTPs and their hashes. This depends on your [Secure Email Change](/dashboard/project/_/auth/providers?provider=Email) setting.
+
+- Secure Email Change enabled: two OTPs are generated, one for the current email (`user.email`) and one for the new email (`user.email_new`). You must send two emails.
+- Secure Email Change disabled: only one OTP is generated for the new email. You send a single email.
+
+<Admonition type="note">
+
+Important quirk (backward compatibility):
+
+- `email_data.token_hash_new` = Hash(`user.email`, `email_data.token`)
+- `email_data.token_hash` = Hash(`user.email_new`, `email_data.token_new`)
+
+This naming is historical and kept for backward compatibility. Do not assume that the `_new` suffix refers to the new email.
+
+</Admonition>
+
+### What to send
+
+If both `token_hash` and `token_hash_new` are present, send two messages:
+
+- To the current email (`user.email`): use `token` with `token_hash_new`.
+- To the new email (`user.email_new`): use `token_new` with `token_hash`.
+
+If only one token/hash pair is present, send a single email. In non-secure mode, this is typically the new email OTP. Use `token` with `token_hash` or `token_new` with `token_hash`, depending on which fields are present in the payload.
+
 **Inputs**
 
 | Field   | Type                                              | Description                                                                        |
@@ -282,7 +309,15 @@ Email sending depends on two settings: Email Provider and Auth Hook status.
         },
         "email_action_type": {
           "type": "string",
-          "enum": ["signup", "invite", "magiclink", "recovery", "email_change", "email"]
+          "enum": [
+            "signup",
+            "invite",
+            "magiclink",
+            "recovery",
+            "email_change",
+            "email",
+            "reauthentication"
+          ]
         },
         "site_url": {
           "type": "string",
@@ -578,6 +613,7 @@ import { readAll } from 'https://deno.land/std/io/read_all.ts'
 const postmarkEndpoint = 'https://api.postmarkapp.com/email'
 // Replace this with your email
 const FROM_EMAIL = 'myemail@gmail.com'
+const PROJECT_REF = '<your-project-ref>'
 
 // Email Subjects
 const subjects = {
@@ -585,7 +621,7 @@ const subjects = {
     signup: 'Confirm Your Email',
     recovery: 'Reset Your Password',
     invite: 'You have been invited',
-    magic_link: 'Your Magic Link',
+    magiclink: 'Your Magic Link',
     email_change: 'Confirm Email Change',
     email_change_new: 'Confirm New Email Address',
     reauthentication: 'Confirm Reauthentication',
@@ -594,7 +630,7 @@ const subjects = {
     signup: 'Confirma tu correo electrónico',
     recovery: 'Restablece tu contraseña',
     invite: 'Has sido invitado',
-    magic_link: 'Tu enlace mágico',
+    magiclink: 'Tu enlace mágico',
     email_change: 'Confirma el cambio de correo electrónico',
     email_change_new: 'Confirma la Nueva Dirección de Correo',
     reauthentication: 'Confirma la reautenticación',
@@ -603,7 +639,7 @@ const subjects = {
     signup: 'Confirmez votre adresse e-mail',
     recovery: 'Réinitialisez votre mot de passe',
     invite: 'Vous avez été invité',
-    magic_link: 'Votre Lien Magique',
+    magiclink: 'Votre Lien Magique',
     email_change: 'Confirmez le changement d’adresse e-mail',
     email_change_new: 'Confirmez la nouvelle adresse e-mail',
     reauthentication: 'Confirmez la réauthentification',
@@ -616,7 +652,7 @@ const templates = {
     signup: `<h2>Confirm your email</h2><p>Follow this link to confirm your email:</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter the code: {{token}}</p>`,
     recovery: `<h2>Reset password</h2><p>Follow this link to reset the password for your user:</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter the code: {{token}}</p>`,
     invite: `<h2>You have been invited</h2><p>You have been invited to create a user on {{site_url}}. Follow this link to accept the invite:</p><p><a href="{{confirmation_url}}">Accept the invite</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    magic_link: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    magiclink: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
     email_change: `<h2>Confirm email address change</h2><p>Follow this link to confirm the update of your email address from {{old_email}} to {{new_email}}:</p><p><a href="{{confirmation_url}}">Change email address</a></p><p>Alternatively, enter the codes: {{token}} and {{new_token}}</p>`,
     email_change_new: `<h2>Confirm New Email Address</h2><p>Follow this link to confirm your new email address:</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter the code: {{new_token}}</p>`,
     reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`,
@@ -625,7 +661,7 @@ const templates = {
     signup: `<h2>Confirma tu correo electrónico</h2><p>Sigue este enlace para confirmar tu correo electrónico:</p><p><a href="{{confirmation_url}}">Confirma tu correo electrónico</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
     recovery: `<h2>Restablece tu contraseña</h2><p>Sigue este enlace para restablecer la contraseña de tu usuario:</p><p><a href="{{confirmation_url}}">Restablece tu contraseña</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
     invite: `<h2>Has sido invitado</h2><p>Has sido invitado para crear un usuario en {{site_url}}. Sigue este enlace para aceptar la invitación:</p><p><a href="{{confirmation_url}}">Aceptar la invitación</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
-    magic_link: `<h2>Tu enlace mágico</h2><p>Sigue este enlace para iniciar sesión:</p><p><a href="{{confirmation_url}}">Iniciar sesión</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
+    magiclink: `<h2>Tu enlace mágico</h2><p>Sigue este enlace para iniciar sesión:</p><p><a href="{{confirmation_url}}">Iniciar sesión</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
     email_change: `<h2>Confirma el cambio de correo electrónico</h2><p>Sigue este enlace para confirmar la actualización de tu correo electrónico de {{old_email}} a {{new_email}}:</p><p><a href="{{confirmation_url}}">Cambiar correo electrónico</a></p><p>Alternativamente, ingresa los códigos: {{token}} y {{new_token}}</p>`,
     email_change_new: `<h2>Confirma la Nueva Dirección de Correo</h2><p>Sigue este enlace para confirmar tu nueva dirección de correo electrónico:</p><p><a href="{{confirmation_url}}">Confirma la nueva dirección de correo</a></p><p>Alternativamente, ingresa el código: {{new_token}}</p>`,
     reauthentication: `<h2>Confirma la reautenticación</h2><p>Ingresa el código: {{token}}</p>`,
@@ -634,7 +670,7 @@ const templates = {
     signup: `<h2>Confirmez votre adresse e-mail</h2><p>Suivez ce lien pour confirmer votre adresse e-mail :</p><p><a href="{{confirmation_url}}">Confirmez votre adresse e-mail</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
     recovery: `<h2>Réinitialisez votre mot de passe</h2><p>Suivez ce lien pour réinitialiser votre mot de passe :</p><p><a href="{{confirmation_url}}">Réinitialisez votre mot de passe</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
     invite: `<h2>Vous avez été invité</h2><p>Vous avez été invité à créer un utilisateur sur {{site_url}}. Suivez ce lien pour accepter l'invitation :</p><p><a href="{{confirmation_url}}">Acceptez l'invitation</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
-    magic_link: `<h2>Votre Lien Magique</h2><p>Suivez ce lien pour vous connecter :</p><p><a href="{{confirmation_url}}">Connectez-vous</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
+    magiclink: `<h2>Votre Lien Magique</h2><p>Suivez ce lien pour vous connecter :</p><p><a href="{{confirmation_url}}">Connectez-vous</a></p><p>Vous pouvez aussi saisir le code : {{token}}</p>`,
     email_change: `<h2>Confirmez le changement d’adresse e-mail</h2><p>Suivez ce lien pour confirmer la mise à jour de votre adresse e-mail de {{old_email}} à {{new_email}} :</p><p><a href="{{confirmation_url}}">Changez d’adresse e-mail</a></p><p>Vous pouvez aussi saisir les codes : {{token}} et {{new_token}}</p>`,
     email_change_new: `<h2>Confirmez la nouvelle adresse e-mail</h2><p>Suivez ce lien pour confirmer votre nouvelle adresse e-mail :</p><p><a href="{{confirmation_url}}">Confirmez la nouvelle adresse e-mail</a></p><p>Vous pouvez aussi saisir le code : {{new_token}}</p>`,
     reauthentication: `<h2>Confirmez la réauthentification</h2><p>Saisissez le code : {{token}}</p>`,
@@ -642,8 +678,14 @@ const templates = {
 }
 
 function generateConfirmationURL(email_data) {
-  // TODO: replace the ref with your project ref
-  return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token_hash}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
+  const baseUrl = `https://${PROJECT_REF}.supabase.co/auth/v1/verify`
+  const params = new URLSearchParams({
+    token: email_data.token_hash,
+    type: email_data.email_action_type,
+    redirect_to: email_data.redirect_to,
+  })
+
+  return `${baseUrl}?${params.toString()}`
 }
 
 Deno.serve(async (req) => {
@@ -736,7 +778,7 @@ const subjects = {
     signup: 'Confirm Your Email',
     recovery: 'Reset Your Password',
     invite: 'You have been invited',
-    magic_link: 'Your Magic Link',
+    magiclink: 'Your Magic Link',
     email_change: 'Confirm Email Change',
     email_change_new: 'Confirm New Email Address',
     reauthentication: 'Confirm Reauthentication'
@@ -747,7 +789,7 @@ const templates = {
     signup: `<h2>Confirm your email</h2><p>Follow this link to confirm your email:</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter the code: {{token}}</p>`,
     recovery: `<h2>Reset password</h2><p>Follow this link to reset the password for your user:</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter the code: {{token}}</p>`,
     invite: `<h2>You have been invited</h2><p>You have been invited to create a user on {{site_url}}. Follow this link to accept the invite:</p><p><a href="{{confirmation_url}}">Accept the invite</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    magic_link: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
+    magiclink: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
     email_change: `<h2>Confirm email address change</h2><p>Follow this link to confirm the update of your email address from {{old_email}} to {{new_email}}:</p><p><a href="{{confirmation_url}}">Change email address</a></p><p>Alternatively, enter the codes: {{token}} and {{new_token}}</p>`,
     email_change_new: `<h2>Confirm New Email Address</h2><p>Follow this link to confirm your new email address:</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter the code: {{new_token}}</p>`,
     reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`

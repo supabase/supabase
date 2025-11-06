@@ -7,15 +7,17 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useIsAwsNimbusCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, InfoIcon } from 'ui'
 
@@ -25,9 +27,11 @@ export interface DiskSizeConfigurationProps {
 
 const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
-  const organization = useSelectedOrganization()
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
+  const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
   const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
   const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
@@ -36,11 +40,15 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     setUrlParams({ show_increase_disk_size_modal: show ? 'true' : undefined })
   }
 
-  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
@@ -76,9 +84,10 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       Supabase employs auto-scaling storage and allows for manual disk size
                       adjustments when necessary
                     </p>
-                    <div className="flex items-end justify-end">
+                    {!isAwsNimbus && (
                       <ButtonTooltip
                         type="default"
+                        className="w-min ml-auto"
                         disabled={!canUpdateDiskSizeConfig || disabled}
                         onClick={() => setShowIncreaseDiskSizeModal(true)}
                         tooltip={{
@@ -92,31 +101,33 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       >
                         Increase disk size
                       </ButtonTooltip>
-                    </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-12 gap-2 mt-12 items-start">
                     <div className="col-span-4 grid grid-cols-2 gap-x-12 gap-y-4 items-start">
                       <div className="grid gap-2 col-span-1">
-                        <h5 className="text-sm">Space used</h5>
+                        <h5>Space used</h5>
                         <span className="text-lg">
                           {formatBytes(databaseSizeBytesUsed, 2, 'GB')}
                         </span>
                       </div>
                       <div className="grid gap-2 col-span-1">
-                        <h5 className="text-sm">Total size</h5>
+                        <h5>Total size</h5>
                         <span className="text-lg">{currentDiskSize} GB</span>
                       </div>
 
-                      <div className="col-span-2 mt-4">
-                        <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                          <Link
-                            href={`/project/${projectRef}/reports/database#database-size-report`}
-                          >
-                            View detailed summary
-                          </Link>
-                        </Button>
-                      </div>
+                      {reportsAll && (
+                        <div className="col-span-2 mt-4">
+                          <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                            <Link
+                              href={`/project/${projectRef}/reports/database#database-size-report`}
+                            >
+                              View detailed summary
+                            </Link>
+                          </Button>
+                        </div>
+                      )}
                     </div>
 
                     <div className="col-span-8">
@@ -132,7 +143,7 @@ If you upload more than 1.5x the current size of your storage, your database wil
 into read-only mode. If you know how big your database is going to be, you can
 manually increase the size here.
 
-Read more about [disk management](https://supabase.com/docs/guides/platform/database-size#disk-management) and how to [free up storage space](https://supabase.com/docs/guides/platform/database-size#vacuum-operations).
+Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk-management) and how to [free up storage space](${DOCS_URL}/guides/platform/database-size#vacuum-operations).
 `}
                           />
                         </AlertDescription_Shadcn_>

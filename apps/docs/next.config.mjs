@@ -1,11 +1,11 @@
 // @ts-check
+import configureBundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
+import { withSentryConfig } from '@sentry/nextjs'
+import withYaml from 'next-plugin-yaml'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
-
-import configureBundleAnalyzer from '@next/bundle-analyzer'
-import withYaml from 'next-plugin-yaml'
-
+import { parse as parseToml } from 'smol-toml'
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -22,7 +22,6 @@ const withMDX = nextMdx({
 })
 
 /** @type {import('next').NextConfig} nextConfig */
-
 const nextConfig = {
   assetPrefix: getAssetPrefix(),
   // Append the default value with md extensions
@@ -31,21 +30,21 @@ const nextConfig = {
   // swcMinify: true,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     // @ts-ignore
     remotePatterns,
-  },
-  // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
-  // mdxRs: true,
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
   },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.include$/,
       type: 'asset/source',
+    })
+    config.module.rules.push({
+      test: /\.toml$/,
+      type: 'json',
+      parser: {
+        parse: parseToml,
+      },
     })
     return config
   },
@@ -157,9 +156,10 @@ const nextConfig = {
     ]
   },
   typescript: {
-    // WARNING: production builds can successfully complete even there are type errors
-    // Typechecking is checked separately via .github/workflows/typecheck.yml
-    ignoreBuildErrors: true,
+    // On previews, typechecking is run via GitHub Action only for efficiency
+    // On production, we turn it on to prevent errors from conflicting PRs getting into
+    // prod
+    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
   },
   eslint: {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
@@ -173,7 +173,31 @@ const configExport = () => {
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
 
-export default configExport
+export default withSentryConfig(configExport, {
+  // For all available options, see:
+  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
+
+  org: 'supabase',
+  project: 'docs',
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+
+  // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  // This can increase your server load as well as your hosting bill.
+  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+  // side errors will fail.
+  // tunnelRoute: "/monitoring",
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+})
 
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN

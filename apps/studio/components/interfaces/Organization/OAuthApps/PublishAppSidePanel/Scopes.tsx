@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps.constants'
 
 const ScopeDropdownCheckboxItem = ({
   children,
@@ -66,12 +67,12 @@ const Scope = ({
 
   return (
     <div
-      className="flex flex-row justify-between p-4 border first:rounded-t last:rounded-b"
+      className="flex flex-row justify-between p-4 border first:rounded-t last:rounded-b gap-x-2"
       key={title}
     >
       <div className="flex flex-col">
         <span className="text-foreground text-sm">{title}</span>
-        <span className="text-foreground-light text-xs">{description}</span>
+        <span className="text-foreground-light text-xs capitalize-sentence">{description}</span>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -109,7 +110,7 @@ export const ScopesPanel = ({
     <div className="-space-y-px">
       <Scope
         title="Analytics"
-        description="Analytics logs."
+        description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
         readScopeName={OAuthScope.ANALYTICS_READ}
         writeScopeName={OAuthScope.ANALYTICS_WRITE}
         scopes={scopes}
@@ -117,7 +118,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Auth"
-        description="Auth configurations and SSO providers."
+        description={PERMISSIONS_DESCRIPTIONS.AUTH}
         readScopeName={OAuthScope.AUTH_READ}
         writeScopeName={OAuthScope.AUTH_WRITE}
         scopes={scopes}
@@ -125,7 +126,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Database"
-        description="Postgres configurations, SQL snippets, SSL enforcement configurations and Typescript schema types."
+        description={PERMISSIONS_DESCRIPTIONS.DATABASE}
         readScopeName={OAuthScope.DATABASE_READ}
         writeScopeName={OAuthScope.DATABASE_WRITE}
         scopes={scopes}
@@ -133,7 +134,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Domains"
-        description="Custom domains and vanity subdomains."
+        description={PERMISSIONS_DESCRIPTIONS.DOMAINS}
         readScopeName={OAuthScope.DOMAINS_READ}
         writeScopeName={OAuthScope.DOMAINS_WRITE}
         scopes={scopes}
@@ -141,7 +142,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Edge Functions"
-        description="Edge functions."
+        description={PERMISSIONS_DESCRIPTIONS.EDGE_FUNCTIONS}
         readScopeName={OAuthScope.EDGE_FUNCTIONS_READ}
         writeScopeName={OAuthScope.EDGE_FUNCTIONS_WRITE}
         scopes={scopes}
@@ -149,7 +150,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Environment"
-        description="Environments/branches."
+        description={PERMISSIONS_DESCRIPTIONS.ENVIRONMENT}
         readScopeName={OAuthScope.ENVIRONMENT_READ}
         writeScopeName={OAuthScope.ENVIRONMENT_WRITE}
         scopes={scopes}
@@ -157,7 +158,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Organizations"
-        description="Organizations and all its members."
+        description={PERMISSIONS_DESCRIPTIONS.ORGANIZATIONS}
         readScopeName={OAuthScope.ORGANIZATIONS_READ}
         writeScopeName={OAuthScope.ORGANIZATIONS_WRITE}
         scopes={scopes}
@@ -165,7 +166,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Projects"
-        description="Metadata, upgrade status, network restrictions and network bans."
+        description={PERMISSIONS_DESCRIPTIONS.PROJECTS}
         readScopeName={OAuthScope.PROJECTS_READ}
         writeScopeName={OAuthScope.PROJECTS_WRITE}
         scopes={scopes}
@@ -173,7 +174,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="REST"
-        description="PostgREST configurations."
+        description={PERMISSIONS_DESCRIPTIONS.REST}
         readScopeName={OAuthScope.REST_READ}
         writeScopeName={OAuthScope.REST_WRITE}
         scopes={scopes}
@@ -181,7 +182,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Secrets"
-        description="API keys, secrets and pgsodium configurations."
+        description={PERMISSIONS_DESCRIPTIONS.SECRETS}
         readScopeName={OAuthScope.SECRETS_READ}
         writeScopeName={OAuthScope.SECRETS_WRITE}
         scopes={scopes}
@@ -189,7 +190,7 @@ export const ScopesPanel = ({
       />
       <Scope
         title="Storage"
-        description="Storage buckets and files."
+        description={PERMISSIONS_DESCRIPTIONS.STORAGE}
         readScopeName={OAuthScope.STORAGE_READ}
         writeScopeName={OAuthScope.STORAGE_WRITE}
         scopes={scopes}

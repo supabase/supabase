@@ -11,7 +11,7 @@ To enable Twitter Auth for your project, you need to set up a Twitter OAuth appl
 Setting up Twitter logins for your application consists of 3 parts:
 
 - Create and configure a Twitter Project and App on the [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard).
-- Add your Twitter `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
+- Add your Twitter `API Key` and `API Secret Key` to your [Supabase Project](/dashboard).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your Twitter Developer account
@@ -50,6 +50,24 @@ Setting up Twitter logins for your application consists of 3 parts:
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Twitter" }} />
 
+You can also configure the Twitter auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure Twitter auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_twitter_enabled": true,
+    "external_twitter_client_id": "your-twitter-api-key",
+    "external_twitter_secret": "your-twitter-api-secret-key"
+  }'
+```
+
 ## Add login code to your client app
 
 <Tabs
@@ -67,7 +85,10 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+const supabase = createClient(
+  'https://your-project-id.supabase.co',
+  'sb_publishable_... or anon key'
+)
 
 // ---cut---
 async function signInWithTwitter() {
@@ -94,6 +115,7 @@ Future<void> signInWithTwitter() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Twitter` as the `Provider`:
@@ -105,6 +127,7 @@ suspend fun signInWithTwitter() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -122,7 +145,10 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+const supabase = createClient(
+  'https://your-project-id.supabase.co',
+  'sb_publishable_... or anon key'
+)
 
 // ---cut---
 async function signOut() {
@@ -142,6 +168,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -153,6 +180,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources

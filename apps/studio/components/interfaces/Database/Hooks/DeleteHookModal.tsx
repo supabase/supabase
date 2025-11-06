@@ -1,8 +1,8 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteHookModalProps {
@@ -14,7 +14,7 @@ interface DeleteHookModalProps {
 const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProps) => {
   const { name, schema } = selectedHook ?? {}
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { mutate: deleteDatabaseTrigger, isLoading: isDeleting } = useDatabaseTriggerDeleteMutation(
     {
       onSuccess: () => {
@@ -53,9 +53,8 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       confirmString={name || ''}
       text={
         <>
-          This will delete the webhook
-          <span className="text-bold text-foreground">{name}</span> rom the schema
-          <span className="text-bold text-foreground">{schema}</span>
+          This will delete the webhook <span className="text-bold text-foreground">{name}</span>{' '}
+          from the schema <span className="text-bold text-foreground">{schema}</span>
         </>
       }
       alert={{ title: 'You cannot recover this webhook once deleted.' }}
