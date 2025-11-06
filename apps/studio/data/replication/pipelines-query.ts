@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicationKeys } from './keys'
+import { checkFeatureFlagRequiredError } from './utils'
 
 type ReplicationPipelinesParams = { projectRef?: string }
 
@@ -38,12 +39,8 @@ export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     retry: (failureCount, error) => {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        error.code === 503 &&
-        error.message.includes('feature flag is required')
-      ) {
+      const isFeatureFlagRequiredError = checkFeatureFlagRequiredError(error)
+      if (isFeatureFlagRequiredError) {
         return false
       }
 
