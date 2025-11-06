@@ -1397,6 +1397,10 @@ export const queues: NavMenuConstant = {
           name: 'Consuming Messages with Edge Functions',
           url: '/guides/queues/consuming-messages-with-edge-functions',
         },
+        {
+          name: 'Expose Queues for local and self-hosted Supabase',
+          url: '/guides/queues/expose-self-hosted-queues',
+        },
       ],
     },
     {
