@@ -10,8 +10,6 @@ import { formatHosts } from '~/lib/eventsUtils'
 export function EventBanner() {
   const { isLoading, allEvents, featuredEvent } = useEvents()
 
-  console.log(featuredEvent)
-
   if (isLoading) {
     return <section>Loading...</section>
   }
@@ -19,7 +17,7 @@ export function EventBanner() {
   if (!featuredEvent) return null
 
   return (
-    <section className={cn('grid grid-cols-[minmax(320px,30%),1fr] gap-12')}>
+    <section className={cn('grid grid-cols-[minmax(320px,30%),1fr] gap-12 items-center')}>
       <CoverImage url={featuredEvent.cover_url} />
 
       <article className="flex flex-col gap-8 py-2">
@@ -27,7 +25,7 @@ export function EventBanner() {
           <div className="flex flex-col gap-1.5">
             <h2 className="text-2xl font-medium">{featuredEvent.title}</h2>
             <p
-              className="text-lg font-medium text-foreground-muted"
+              className="text-lg font-medium text-foreground-light"
               title={`Hosted by ${formatHosts(featuredEvent.hosts).fullList}`}
             >
               {formatHosts(featuredEvent.hosts).displayText}
@@ -35,7 +33,7 @@ export function EventBanner() {
           </div>
 
           {featuredEvent.link && (
-            <Button className="hidden lg:block mt-1" asChild>
+            <Button className="hidden lg:block mt-1" size="medium" asChild>
               <Link
                 href={featuredEvent.link.href}
                 target={featuredEvent.link.target}
@@ -52,7 +50,9 @@ export function EventBanner() {
           <LocationWidget location={featuredEvent.location} />
         </div>
 
-        <p>{featuredEvent.description}</p>
+        <p className="whitespace-pre-line text-foreground-light mt-4">
+          {featuredEvent.description}
+        </p>
       </article>
     </section>
   )
@@ -131,7 +131,11 @@ const CoverImage = ({ url }: { url?: string }) => {
       </div>
     )
 
-  return <Image src={url} alt="Event Cover" />
+  return (
+    <div className="w-full bg-surface-100 aspect-square border rounded-lg overflow-hidden relative">
+      <img src={url} alt="Event Cover" className="object-cover" />
+    </div>
+  )
 }
 
 const Logo = () => (
