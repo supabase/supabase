@@ -24,6 +24,7 @@ import { getTables } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { useTrack } from 'lib/telemetry/track'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -131,6 +132,7 @@ export const SidePanelEditor = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
@@ -377,6 +379,14 @@ export const SidePanelEditor = ({
     if (!project) return console.error('Project is required')
     const realtimePublication = publications?.find((pub) => pub.name === 'supabase_realtime')
 
+    const trackRealtimeStateChange = () => {
+      track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
+        method: 'ui',
+        schema_name: table.schema,
+        table_name: table.name,
+      })
+    }
+
     try {
       if (realtimePublication === undefined) {
         const realtimeTables = enabled ? [`${table.schema}.${table.name}`] : []
@@ -389,6 +399,7 @@ export const SidePanelEditor = ({
           publish_delete: true,
           tables: realtimeTables,
         })
+        trackRealtimeStateChange()
         return
       }
       if (realtimePublication.tables === null) {
@@ -417,6 +428,7 @@ export const SidePanelEditor = ({
           connectionString: project.connectionString,
           tables: realtimeTables,
         })
+        trackRealtimeStateChange()
         return
       }
       const isAlreadyEnabled = realtimePublication.tables.some((x) => x.id == table.id)
@@ -439,6 +451,7 @@ export const SidePanelEditor = ({
         connectionString: project.connectionString,
         tables: realtimeTables,
       })
+      trackRealtimeStateChange()
     } catch (error: any) {
       toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
     }

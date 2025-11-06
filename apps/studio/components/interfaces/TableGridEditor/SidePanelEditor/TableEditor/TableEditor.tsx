@@ -1,4 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import dayjs from 'dayjs'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -8,12 +9,14 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTrack } from 'lib/telemetry/track'
+import { NEW_PROJECT_THRESHOLD_DAYS } from 'lib/constants'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { usePHFlag } from 'hooks/ui/useFlag'
+import { RealtimeButtonVariant } from 'types'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
@@ -72,14 +75,15 @@ export const TableEditor = ({
   const snap = useTableEditorStateSnapshot()
 
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
-
-  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
-  const { mutate: sendEvent } = useSendEventMutation()
-
   const isNewRecord = isUndefined(table)
+  const realtimeButtonVariant = usePHFlag<RealtimeButtonVariant | false | undefined>(
+    'realtimeButtonVariant'
+  )
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+  const track = useTrack()
+
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -109,6 +113,18 @@ export const TableEditor = ({
   const isRealtimeEnabled = isNewRecord
     ? false
     : realtimeEnabledTables.some((t) => t.id === table?.id)
+
+  const isNewProject = useMemo(() => {
+    if (!project?.inserted_at) return false
+    return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
+  }, [project?.inserted_at])
+
+  const activeRealtimeVariant = useMemo(() => {
+    if (!isNewProject) return null
+    if (!realtimeButtonVariant || realtimeButtonVariant === RealtimeButtonVariant.CONTROL)
+      return null
+    return realtimeButtonVariant
+  }, [isNewProject, realtimeButtonVariant])
 
   const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
@@ -396,23 +412,16 @@ export const TableEditor = ({
           </Admonition>
         )}
 
-        {realtimeEnabled && (
+        {activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON && realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
             label="Enable Realtime"
             description="Broadcast changes on this table to authorized subscribers"
             checked={tableFields.isRealtimeEnabled}
             onChange={() => {
-              sendEvent({
-                action: 'realtime_toggle_table_clicked',
-                properties: {
-                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                  origin: 'tableSidePanel',
-                },
-                groups: {
-                  project: project?.ref ?? 'Unknown',
-                  organization: org?.slug ?? 'Unknown',
-                },
+              track('realtime_toggle_table_clicked', {
+                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                origin: 'tableSidePanel',
               })
               onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
             }}
