@@ -1,12 +1,11 @@
-import type { Filters } from 'components/interfaces/Settings/Logs/Logs.types'
 import { useProjectMetricsQuery } from 'data/analytics/project-metrics-query'
+import type { ProjectMetricsByService } from 'data/analytics/project-metrics-query'
 
 type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
 
 export type StatsLike = {
-  error: string | Object | null
+  error: unknown | null
   isLoading: boolean
-  filters: Filters
   eventChartData: Array<{
     timestamp: string
     ok_count: number
@@ -24,56 +23,70 @@ type ServiceStatsMap = Record<
   }
 >
 
+/**
+ * Transform backend project metrics into a UI-friendly structure with consistent
+ * loading/error/refresh semantics per service.
+ *
+ * Why this exists
+ * - The backend returns a flattened time-series grouped by service with
+ *   separate "current" and "previous" windows. UI components expect a stable
+ *   shape by service with metadata (isLoading, error, refresh) attached to
+ *   each series. This adapter isolates that mapping and is easy to unit test.
+ */
+export const toServiceStatsMap = (args: {
+  data?: ProjectMetricsByService
+  isLoading: boolean
+  error?: unknown
+  onRefresh: () => void
+}): ServiceStatsMap => {
+  const { data, isLoading, error, onRefresh } = args
+
+  const base = {
+    error: error ?? null,
+    isLoading,
+    refresh: () => {
+      onRefresh()
+    },
+  }
+
+  const empty: StatsLike = { ...base, eventChartData: [] }
+
+  const toStats = (rows: StatsLike['eventChartData'] | undefined): StatsLike =>
+    rows ? { ...base, eventChartData: rows } : empty
+
+  const pair = (key: ServiceKey): { current: StatsLike; previous: StatsLike } => ({
+    current: toStats(data?.[key]?.current),
+    previous: toStats(data?.[key]?.previous),
+  })
+
+  return {
+    db: pair('db'),
+    functions: pair('functions'),
+    auth: pair('auth'),
+    storage: pair('storage'),
+    realtime: pair('realtime'),
+  }
+}
+
 export const useServiceStats = (
   projectRef: string,
   timestampStart: string,
   timestampEnd: string,
-  previousStart: string,
-  previousEnd: string
+  interval: '1hr' | '1day' | '7day'
 ): ServiceStatsMap => {
-  const durationMs = new Date(timestampEnd).getTime() - new Date(timestampStart).getTime()
-  const interval: '1hr' | '1day' | '7day' =
-    durationMs <= 60 * 60 * 1000 ? '1hr' : durationMs <= 24 * 60 * 60 * 1000 ? '1day' : '7day'
-
-  const { data, isLoading, refetch } = useProjectMetricsQuery({
+  const { data, isLoading, error, refetch } = useProjectMetricsQuery({
     projectRef,
     isoTimestampStart: timestampStart,
     isoTimestampEnd: timestampEnd,
     interval,
   })
 
-  const makeStatsLike = (arr: StatsLike['eventChartData']): StatsLike => ({
-    error: null,
+  return toServiceStatsMap({
+    data,
     isLoading,
-    filters: {} as Filters,
-    eventChartData: arr,
-    refresh: () => {
+    error,
+    onRefresh: () => {
       void refetch()
     },
   })
-
-  const empty: StatsLike = makeStatsLike([])
-
-  return {
-    db: {
-      current: data ? makeStatsLike(data.db.current) : empty,
-      previous: data ? makeStatsLike(data.db.previous) : empty,
-    },
-    functions: {
-      current: data ? makeStatsLike(data.functions.current) : empty,
-      previous: data ? makeStatsLike(data.functions.previous) : empty,
-    },
-    auth: {
-      current: data ? makeStatsLike(data.auth.current) : empty,
-      previous: data ? makeStatsLike(data.auth.previous) : empty,
-    },
-    storage: {
-      current: data ? makeStatsLike(data.storage.current) : empty,
-      previous: data ? makeStatsLike(data.storage.previous) : empty,
-    },
-    realtime: {
-      current: data ? makeStatsLike(data.realtime.current) : empty,
-      previous: data ? makeStatsLike(data.realtime.previous) : empty,
-    },
-  }
 }

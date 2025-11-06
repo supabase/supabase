@@ -137,8 +137,7 @@ export const ProjectUsageSection = () => {
     projectRef as string,
     timestampStart,
     timestampEnd,
-    previousStart,
-    previousEnd
+    interval
   )
 
   const serviceBase: ServiceEntry[] = useMemo(
