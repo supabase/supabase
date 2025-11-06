@@ -1,6 +1,6 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback, useEffect, useMemo } from 'react'
 import { useQueryState, parseAsString } from 'nuqs'
 import { toast } from 'sonner'
 
@@ -121,6 +121,13 @@ const PolicyTableRowComponent = ({
     })
   }
 
+  useEffect(() => {
+    if (selectedPolicyIdToDelete !== '' && !policyToDelete) {
+      toast.error('Policy not found')
+      setSelectedPolicyIdToDelete('')
+    }
+  }, [selectedPolicyIdToDelete, policyToDelete])
+
   return (
     <>
       <Card className={cn(isPubliclyReadableWritable && 'border-warning-500')}>
@@ -215,7 +222,7 @@ const PolicyTableRowComponent = ({
 
       <ConfirmModal
         danger
-        visible={selectedPolicyIdToDelete !== ''}
+        visible={selectedPolicyIdToDelete !== '' && policyToDelete !== undefined}
         title="Confirm to delete policy"
         description={`This is permanent! Are you sure you want to delete the policy "${policyToDelete?.name}"`}
         buttonLabel="Delete"

@@ -276,7 +276,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
         {/* Edit Policy */}
         <PolicyEditorPanel
-          visible={selectedPolicyIdToEdit !== ''}
+          visible={selectedPolicyIdToEdit !== '' && policyToEdit !== undefined}
           schema={schema}
           searchString={searchString}
           selectedPolicy={policyToEdit}
