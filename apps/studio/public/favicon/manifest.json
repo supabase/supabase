@@ -1,6 +1,6 @@
 {
   "name": "Supabase Studio",
-  "short_name": "Studio",
+  "short_name": "Supabase",
   "description": "The Postgres Development Platform.",
   "display_override": ["minimal-ui"],
   "display": "standalone",
