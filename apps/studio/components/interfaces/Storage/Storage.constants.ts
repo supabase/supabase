@@ -85,7 +85,7 @@ export const BUCKET_TYPES = {
     article: 'a',
     description: 'Purpose-built storage for vector data.',
     valueProp: 'Store, index, and query your vector embeddings at scale.',
-    docsUrl: `${DOCS_URL}/guides/storage/vectors`,
+    docsUrl: `${DOCS_URL}/guides/storage/vector/introductions`,
   },
 }
 export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
