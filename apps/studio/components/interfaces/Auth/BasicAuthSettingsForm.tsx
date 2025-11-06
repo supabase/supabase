@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { boolean, object, string } from 'yup'
 
 import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { PageSection } from 'components/ui/PageSection'
 import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
@@ -114,8 +114,11 @@ export const BasicAuthSettingsForm = () => {
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <ScaffoldSectionTitle className="mb-4">User Signups</ScaffoldSectionTitle>
+    <PageSection.Root>
+      <PageSection.Summary>
+        <PageSection.Title>User Signups</PageSection.Title>
+      </PageSection.Summary>
+      <PageSection.Content>
 
       {isError && (
         <AlertError
@@ -331,6 +334,7 @@ export const BasicAuthSettingsForm = () => {
           </form>
         </Form_Shadcn_>
       )}
-    </ScaffoldSection>
+      </PageSection.Content>
+    </PageSection.Root>
   )
 }

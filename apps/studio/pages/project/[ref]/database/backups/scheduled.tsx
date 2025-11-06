@@ -1,13 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Info } from 'lucide-react'
-import { useMemo } from 'react'
+import React from 'react'
 
 import { useParams } from 'common'
 import { BackupsList } from 'components/interfaces/Database/Backups/BackupsList'
+import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout, type NavigationItem } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { PageHeader } from 'components/ui/PageHeader'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
@@ -15,9 +16,9 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { cn } from 'ui'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 
@@ -100,39 +101,21 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
   )
 }
 
-DatabaseScheduledBackups.getLayout = (page) => {
+DatabaseScheduledBackups.getLayout = (page: React.ReactElement) => {
   const BackupPageLayout = () => {
-    const { ref, cloud_provider } = useSelectedProjectQuery()?.data || {}
-    const { databaseRestoreToNewProject } = useIsFeatureEnabled(['database:restore_to_new_project'])
-
-    const navigationItems: NavigationItem[] = useMemo(
-      () => [
-        {
-          label: 'Scheduled backups',
-          href: `/project/${ref}/database/backups/scheduled`,
-          active: true,
-        },
-        {
-          label: 'Point in time',
-          href: `/project/${ref}/database/backups/pitr`,
-        },
-        ...(databaseRestoreToNewProject && cloud_provider !== 'FLY'
-          ? [
-              {
-                label: 'Restore to new project',
-                href: `/project/${ref}/database/backups/restore-to-new-project`,
-                badge: 'Beta',
-              },
-            ]
-          : []),
-      ],
-      [ref, databaseRestoreToNewProject, cloud_provider]
-    )
-
     return (
-      <PageLayout title="Database Backups" size="large" navigationItems={navigationItems}>
+      <div className="w-full min-h-full flex flex-col items-stretch">
+        <PageHeader.Root size="large">
+          <PageHeader.Summary>
+            <PageHeader.Title>Database Backups</PageHeader.Title>
+          </PageHeader.Summary>
+          <PageHeader.Footer>
+            <DatabaseBackupsNav active="scheduled" />
+          </PageHeader.Footer>
+        </PageHeader.Root>
+
         {page}
-      </PageLayout>
+      </div>
     )
   }
 

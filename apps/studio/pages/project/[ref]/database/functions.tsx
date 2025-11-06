@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
+import { cn } from 'ui'
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
 import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
@@ -8,8 +9,8 @@ import FunctionsList from 'components/interfaces/Database/Functions/FunctionsLis
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { PageContainer } from 'components/ui/PageContainer'
+import { PageHeader } from 'components/ui/PageHeader'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
@@ -18,6 +19,7 @@ import { DOCS_URL } from 'lib/constants'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
+import { PageSection } from 'components/ui/PageSection'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
@@ -99,16 +101,16 @@ $$;`)
 
   return (
     <>
-      <ScaffoldContainer size="large">
-        <ScaffoldSection isFullWidth>
+      <PageContainer size="large">
+        <PageSection.Root>
           <FunctionsList
             createFunction={createFunction}
             duplicateFunction={duplicateFunction}
             editFunction={editFunction}
             deleteFunction={deleteFunction}
           />
-        </ScaffoldSection>
-      </ScaffoldContainer>
+        </PageSection.Root>
+      </PageContainer>
       <CreateFunction
         func={selectedFunction}
         visible={showCreateFunctionForm}
@@ -127,17 +129,19 @@ $$;`)
   )
 }
 
-DatabaseFunctionsPage.getLayout = (page) => (
+DatabaseFunctionsPage.getLayout = (page: React.ReactElement) => (
   <DefaultLayout>
     <DatabaseLayout title="Database">
-      <PageLayout
-        title="Database Functions"
-        subtitle="Manage your database functions"
-        secondaryActions={<DocsButton href={`${DOCS_URL}/guides/database/functions`} />}
-        size="large"
-      >
-        {page}
-      </PageLayout>
+      <PageHeader.Root size="large">
+        <PageHeader.Summary>
+          <PageHeader.Title>Database Functions</PageHeader.Title>
+          <PageHeader.Description>Manage your database functions</PageHeader.Description>
+        </PageHeader.Summary>
+        <PageHeader.Aside>
+          <DocsButton href={`${DOCS_URL}/guides/database/functions`} />
+        </PageHeader.Aside>
+      </PageHeader.Root>
+      {page}
     </DatabaseLayout>
   </DefaultLayout>
 )
