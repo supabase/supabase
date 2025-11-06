@@ -26,7 +26,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
@@ -97,8 +97,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   } = useEditorPanelStateSnapshot()
 
   const [selectedTable, setSelectedTable] = useState<string>()
-  const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
+  const [showCreatePolicy, setShowCreatePolicy] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [selectedPolicyIdToEdit, setSelectedPolicyIdToEdit] = useQueryState(
+    'edit',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
 
@@ -111,6 +117,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const policyToEdit: PostgresPolicy | undefined = useMemo(() => {
+    return policies?.find((policy) => policy.id.toString() === selectedPolicyIdToEdit)
+  }, [policies, selectedPolicyIdToEdit])
 
   const {
     data: tables,
@@ -143,7 +153,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const handleSelectCreatePolicy = useCallback(
     (table: string) => {
       setSelectedTable(table)
-      setSelectedPolicyToEdit(undefined)
+      setSelectedPolicyIdToEdit('')
+      setShowCreatePolicy(true)
 
       if (isInlineEditorEnabled) {
         const defaultSql = `create policy "replace_with_policy_name"
@@ -159,7 +170,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         setEditorPanelTemplates([])
         openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
       } else {
-        setShowPolicyAiEditor(true)
+        setShowCreatePolicy(true)
       }
     },
     [isInlineEditorEnabled, openSidebar, schema]
@@ -167,7 +178,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const handleSelectEditPolicy = useCallback(
     (policy: PostgresPolicy) => {
-      setSelectedPolicyToEdit(policy)
+      setSelectedPolicyIdToEdit(policy.id.toString())
       setSelectedTable(undefined)
 
       if (isInlineEditorEnabled) {
@@ -183,7 +194,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         setEditorPanelTemplates(templates)
         openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
       } else {
-        setShowPolicyAiEditor(true)
+        setSelectedPolicyIdToEdit(policy.id.toString())
       }
     },
     [isInlineEditorEnabled, openSidebar]
@@ -250,16 +261,28 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </PoliciesDataProvider>
         )}
 
+        {/* Create Policy */}
         <PolicyEditorPanel
-          visible={showPolicyAiEditor}
+          visible={showCreatePolicy}
           schema={schema}
           searchString={searchString}
           selectedTable={selectedTable}
-          selectedPolicy={selectedPolicyToEdit}
           onSelectCancel={() => {
             setSelectedTable(undefined)
-            setShowPolicyAiEditor(false)
-            setSelectedPolicyToEdit(undefined)
+            setShowCreatePolicy(false)
+          }}
+          authContext="database"
+        />
+
+        {/* Edit Policy */}
+        <PolicyEditorPanel
+          visible={selectedPolicyIdToEdit !== ''}
+          schema={schema}
+          searchString={searchString}
+          selectedPolicy={policyToEdit}
+          onSelectCancel={() => {
+            setSelectedTable(undefined)
+            setSelectedPolicyIdToEdit('')
           }}
           authContext="database"
         />
