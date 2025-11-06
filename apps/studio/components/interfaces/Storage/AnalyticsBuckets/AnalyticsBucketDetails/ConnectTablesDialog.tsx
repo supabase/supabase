@@ -64,23 +64,30 @@ const FormSchema = z.object({
 
 type ConnectTablesForm = z.infer<typeof FormSchema>
 
+enum PROGRESS_STAGE {
+  CREATE_PUBLICATION = 'CREATE_PUBLICATION',
+  CREATE_PIPELINE = 'CREATE_PIPELINE',
+  START_PIPELINE = 'START_PIPELINE',
+  UPDATE_PUBLICATION = 'CREATE_REPLICATION',
+}
+
 const PROGRESS_INDICATORS = {
   CREATE: [
     {
-      step: 1,
+      step: PROGRESS_STAGE.CREATE_PUBLICATION,
       getDescription: (numTables: number) =>
         `Creating replication publication with ${numTables} table${numTables > 1 ? 's' : ''}...`,
     },
-    { step: 2, description: `Creating replication pipeline` },
-    { step: 3, description: `Starting replication pipeline` },
+    { step: PROGRESS_STAGE.CREATE_PIPELINE, description: `Creating replication pipeline` },
+    { step: PROGRESS_STAGE.START_PIPELINE, description: `Starting replication pipeline` },
   ],
   UPDATE: [
     {
-      step: 1,
+      step: PROGRESS_STAGE.UPDATE_PUBLICATION,
       getDescription: (numTables: number) =>
         `Updating replication publication with ${numTables} table${numTables > 1 ? 's' : ''}...`,
     },
-    { step: 2, description: 'Restarting replication pipeline...' },
+    { step: PROGRESS_STAGE.START_PIPELINE, description: 'Restarting replication pipeline...' },
   ],
 }
 
@@ -137,7 +144,7 @@ export const ConnectTablesDialogContent = ({
   const { data: project } = useSelectedProjectQuery()
 
   const [isConnecting, setIsConnecting] = useState(false)
-  const [connectingStep, setConnectingStep] = useState(0)
+  const [connectingStep, setConnectingStep] = useState<PROGRESS_STAGE>()
 
   const form = useForm<ConnectTablesForm>({
     resolver: zodResolver(FormSchema),
@@ -168,6 +175,8 @@ export const ConnectTablesDialogContent = ({
   const progressIndicator = isEditingExistingPublication
     ? PROGRESS_INDICATORS.UPDATE
     : PROGRESS_INDICATORS.CREATE
+  const totalProgressSteps = progressIndicator.length
+  const currentStep = progressIndicator.findIndex((x) => x.step === connectingStep) + 1
   const progressDescription = progressIndicator.find((x) => x.step === connectingStep)
 
   const onSubmitNewPublication: SubmitHandler<ConnectTablesForm> = async (values) => {
@@ -179,7 +188,7 @@ export const ConnectTablesDialogContent = ({
       setIsConnecting(true)
 
       // Step 1: Create publication
-      setConnectingStep(1)
+      setConnectingStep(PROGRESS_STAGE.CREATE_PUBLICATION)
       const publicationName = getAnalyticsBucketPublicationName(bucketId)
       const publicationTables = values.tables.map((table) => {
         const [schema, name] = table.split('.')
@@ -193,7 +202,7 @@ export const ConnectTablesDialogContent = ({
       })
 
       // Step 2: Create destination pipeline
-      setConnectingStep(2)
+      setConnectingStep(PROGRESS_STAGE.CREATE_PIPELINE)
       const keysToDecrypt = Object.entries(wrapperValues)
         .filter(([name]) =>
           ['vault_aws_access_key_id', 'vault_aws_secret_access_key'].includes(name)
@@ -229,7 +238,7 @@ export const ConnectTablesDialogContent = ({
       })
 
       // Step 3: Start the destination pipeline
-      setConnectingStep(3)
+      setConnectingStep(PROGRESS_STAGE.START_PIPELINE)
       await startPipeline({ projectRef, pipelineId })
 
       onSuccessConnectTables?.(publicationTables)
@@ -244,7 +253,7 @@ export const ConnectTablesDialogContent = ({
       toast.error(`Failed to connect tables: ${error.message}`)
     } finally {
       setIsConnecting(false)
-      setConnectingStep(0)
+      setConnectingStep(undefined)
     }
   }
 
@@ -258,7 +267,7 @@ export const ConnectTablesDialogContent = ({
     try {
       setIsConnecting(true)
 
-      setConnectingStep(1)
+      setConnectingStep(PROGRESS_STAGE.UPDATE_PUBLICATION)
       const publicationTables = publication.tables.concat(
         values.tables.map((table) => {
           const [schema, name] = table.split('.')
@@ -272,7 +281,7 @@ export const ConnectTablesDialogContent = ({
         tables: publicationTables,
       })
 
-      setConnectingStep(2)
+      setConnectingStep(PROGRESS_STAGE.START_PIPELINE)
       await startPipeline({ projectRef, pipelineId: pipeline.id })
 
       onSuccessConnectTables?.(publicationTables)
@@ -282,7 +291,7 @@ export const ConnectTablesDialogContent = ({
       toast.error(`Failed to update tables: ${error.message}`)
     } finally {
       setIsConnecting(false)
-      setConnectingStep(0)
+      setConnectingStep(undefined)
     }
   }
 
@@ -383,7 +392,7 @@ export const ConnectTablesDialogContent = ({
                 </p>
                 <Loader2 size={14} className="animate-spin" />
               </div>
-              <Progress value={(connectingStep / 3) * 100} />
+              <Progress value={(currentStep / totalProgressSteps) * 100} />
             </DialogSection>
           </motion.div>
         )}
