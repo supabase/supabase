@@ -2,14 +2,16 @@ services:
   analytics:
     scale: 0
 
-  # db:
-  #   ports:
-  #     - 9876:5432
+  db:
+    ports:
+      - 7654:5432
 
   studio:
     depends_on: []
     environment:
-      LOGFLARE_URL: http://localhost:4000
+      LOGFLARE_URL: http://host.docker.internal:4000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   kong:
     depends_on: []
