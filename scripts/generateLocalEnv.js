@@ -30,6 +30,8 @@ const defaultEnv = {
   NEXT_PUBLIC_GOTRUE_URL: '$SUPABASE_PUBLIC_URL/auth/v1',
   NEXT_PUBLIC_HCAPTCHA_SITE_KEY: '10000000-ffff-ffff-ffff-000000000001',
   NEXT_PUBLIC_NODE_ENV: 'test',
+  CURRENT_CLI_VERSION: process.env.CURRENT_CLI_VERSION,
+  NEXT_PUBLIC_CURRENT_CLI_VERSION: '$CURRENT_CLI_VERSION',
 }
 
 const environment = { ...generatedEnv, ...defaultEnv }

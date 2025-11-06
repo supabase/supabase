@@ -33,7 +33,7 @@
     "e2e": "pnpm --prefix e2e/studio run e2e",
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
-    "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
+    "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && CURRENT_CLI_VERSION=$(supabase -v) node scripts/generateLocalEnv.js",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
     "knip": "pnpx knip@~5.50.0"
@@ -59,6 +59,13 @@
     "pnpm": "10.18",
     "node": ">=22"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "packageManager": "pnpm@10.18.0"
 }
