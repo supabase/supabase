@@ -1,5 +1,6 @@
 import { metadata as mainMetadata } from '@/app/layout'
 import { ChapterCompletion } from '@/components/chapter-completion'
+import { ExploreMore } from '@/components/explore-more'
 import { Mdx } from '@/components/mdx-components'
 import { NextUp } from '@/components/next-up'
 import { SourcePanel } from '@/components/source-panel'
@@ -74,12 +75,19 @@ export default async function DocPage(props: DocPageProps) {
   const toc = await getTableOfContents(doc.body.raw)
   const nextPage = getNextPage(doc.slugAsParams)
   const currentChapter = getCurrentChapter(doc.slugAsParams)
-console.log({currentChapter})
+
+  // Type-safe access to explore property
+  const exploreItems = (
+    doc as {
+      explore?: Array<{ title: string; link: string; itemType?: string; description?: string }>
+    }
+  ).explore
+
   return (
     <main className="relative lg:gap-10 xl:grid xl:grid-cols-[1fr_200px] px-8 md:px-16 py-20">
       <div className="mx-auto w-full min-w-0 max-w-4xl">
         <div className="mb-4 flex items-center space-x-1 text-sm text-foreground-muted">
-          <div className="overflow-hidden text-ellipsis whitespace-nowrap">Docs</div>
+          <div className="overflow-hidden text-ellipsis whitespace-nowrap">Learn</div>
           <ChevronRight className="h-4 w-4 text-foreground-muted" />
           <div className="text-foreground-lighter">{doc.title}</div>
         </div>
@@ -97,6 +105,7 @@ console.log({currentChapter})
         <div className="pb-12">
           <Mdx code={doc.body.code} />
         </div>
+        {exploreItems && exploreItems.length > 0 && <ExploreMore items={exploreItems} />}
         {currentChapter && nextPage && (
           <ChapterCompletion
             chapterNumber={currentChapter.chapterNumber!}

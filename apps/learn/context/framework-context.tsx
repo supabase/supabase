@@ -1,45 +1,41 @@
 'use client'
 
-import { frameworkTitles } from '@/config/docs'
+import { courses } from '@/config/docs'
 import { createContext, useContext, useEffect, useState } from 'react'
 
-type Framework = keyof typeof frameworkTitles
-type FrameworkContextType = {
-  framework: Framework
-  setFramework: (framework: Framework) => void
+type Course = keyof typeof courses
+type CourseContextType = {
+  course: Course
+  setCourse: (course: Course) => void
 }
 
-const FrameworkContext = createContext<FrameworkContextType | undefined>(undefined)
+const CourseContext = createContext<CourseContextType | undefined>(undefined)
 
 export function FrameworkProvider({ children }: { children: React.ReactNode }) {
-  const [framework, setFrameworkState] = useState<Framework>('nextjs')
+  const [course, setCourseState] = useState<Course>('foundations')
 
   // Initialize from localStorage on mount (client-side only)
   useEffect(() => {
-    const storedFramework = localStorage.getItem('preferredFramework')
-    if (storedFramework && Object.keys(frameworkTitles).includes(storedFramework)) {
-      setFrameworkState(storedFramework as Framework)
+    const storedCourse = localStorage.getItem('preferredCourse')
+    if (storedCourse && Object.keys(courses).includes(storedCourse)) {
+      setCourseState(storedCourse as Course)
     }
   }, [])
 
   // Update localStorage when framework changes
-  const setFramework = (newFramework: Framework) => {
-    setFrameworkState(newFramework)
-    localStorage.setItem('preferredFramework', newFramework)
+  const setCourse = (newCourse: Course) => {
+    setCourseState(newCourse)
+    localStorage.setItem('preferredCourse', newCourse)
   }
 
-  return (
-    <FrameworkContext.Provider value={{ framework, setFramework }}>
-      {children}
-    </FrameworkContext.Provider>
-  )
+  return <CourseContext.Provider value={{ course, setCourse }}>{children}</CourseContext.Provider>
 }
 
 // Custom hook to use the framework context
-export function useFramework() {
-  const context = useContext(FrameworkContext)
+export function useCourse() {
+  const context = useContext(CourseContext)
   if (context === undefined) {
-    throw new Error('useFramework must be used within a FrameworkProvider')
+    throw new Error('useCourse must be used within a CourseProvider')
   }
   return context
 }

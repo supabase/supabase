@@ -32,6 +32,28 @@ const LinksProperties = defineNestedType(() => ({
   },
 }))
 
+const ExploreItem = defineNestedType(() => ({
+  name: 'ExploreItem',
+  fields: {
+    title: {
+      type: 'string',
+      required: true,
+    },
+    link: {
+      type: 'string',
+      required: true,
+    },
+    itemType: {
+      type: 'string',
+      required: false,
+    },
+    description: {
+      type: 'string',
+      required: false,
+    },
+  },
+}))
+
 const NestedProperties = defineNestedType(() => ({
   name: 'NestedProperties',
   fields: {
@@ -96,6 +118,11 @@ export const Doc = defineDocumentType(() => ({
     },
     chapterNumber: {
       type: 'number',
+      required: false,
+    },
+    explore: {
+      type: 'list',
+      of: ExploreItem,
       required: false,
     },
     source: {
