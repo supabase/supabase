@@ -8,7 +8,7 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 interface DeleteTriggerProps {
   trigger?: PostgresTrigger
   visible: boolean
-  setVisible: (value: boolean) => void
+  setVisible: (value: string) => void
 }
 
 export const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => {
@@ -30,7 +30,7 @@ export const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerPro
       {
         onSuccess: () => {
           toast.success(`Successfully removed ${name}`)
-          setVisible(false)
+          setVisible('')
         },
       }
     )
@@ -40,7 +40,7 @@ export const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerPro
     <TextConfirmModal
       variant={'warning'}
       visible={visible}
-      onCancel={() => setVisible(!visible)}
+      onCancel={() => setVisible('')}
       onConfirm={handleDelete}
       title="Delete this trigger"
       loading={isLoading}
