@@ -21,7 +21,12 @@ const emptyData: ProjectMetricsByService = {
 describe('toServiceStatsMap', () => {
   it('returns empty arrays when no data', () => {
     const onRefresh = vi.fn()
-    const map = toServiceStatsMap({ data: emptyData, isLoading: false, error: undefined, onRefresh })
+    const map = toServiceStatsMap({
+      data: emptyData,
+      isLoading: false,
+      error: undefined,
+      onRefresh,
+    })
 
     expect(map.db.current.eventChartData).toEqual([])
     expect(map.functions.previous.eventChartData).toEqual([])
@@ -46,11 +51,14 @@ describe('toServiceStatsMap', () => {
 
   it('propagates errors to all services', () => {
     const err = new Error('boom')
-    const map = toServiceStatsMap({ data: emptyData, isLoading: false, error: err, onRefresh: () => {} })
+    const map = toServiceStatsMap({
+      data: emptyData,
+      isLoading: false,
+      error: err,
+      onRefresh: () => {},
+    })
 
     expect(map.db.current.error).toBe(err)
     expect(map.functions.previous.error).toBe(err)
   })
 })
-
-
