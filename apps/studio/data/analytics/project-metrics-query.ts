@@ -13,15 +13,40 @@ export type ProjectMetricsVariables = {
 }
 
 const MetricsRow = z.object({
-  timestamp: z.number(),
-  service: z.enum(['auth', 'db', 'functions', 'realtime', 'storage']),
-  time_window: z.enum(['current', 'previous']),
-  ok_count: z.number(),
-  warning_count: z.number(),
-  error_count: z.number(),
+  timestamp: z.number({
+    required_error: 'Timestamp is required',
+    invalid_type_error: 'Timestamp must be a number (microseconds since epoch)',
+  }).int('Timestamp must be an integer')
+    .positive('Timestamp must be positive'),
+  service: z.enum(['auth', 'db', 'functions', 'realtime', 'storage'], {
+    required_error: 'Service field is required',
+    invalid_type_error: 'Service must be one of: auth, db, functions, realtime, storage',
+  }),
+  time_window: z.enum(['current', 'previous'], {
+    required_error: 'Time window field is required',
+    invalid_type_error: 'Time window must be either "current" or "previous"',
+  }),
+  ok_count: z.number({
+    required_error: 'ok_count is required',
+    invalid_type_error: 'ok_count must be a number',
+  }).int('ok_count must be an integer')
+    .nonnegative('ok_count cannot be negative'),
+  warning_count: z.number({
+    required_error: 'warning_count is required',
+    invalid_type_error: 'warning_count must be a number',
+  }).int('warning_count must be an integer')
+    .nonnegative('warning_count cannot be negative'),
+  error_count: z.number({
+    required_error: 'error_count is required',
+    invalid_type_error: 'error_count must be a number',
+  }).int('error_count must be an integer')
+    .nonnegative('error_count cannot be negative'),
 })
 
-const MetricsRows = z.array(MetricsRow)
+const MetricsRows = z.array(MetricsRow, {
+  required_error: 'Metrics response must be an array',
+  invalid_type_error: 'Metrics response must be an array of metric rows',
+})
 
 export type ProjectMetricsRow = z.infer<typeof MetricsRow>
 
@@ -69,7 +94,11 @@ export async function getProjectMetrics(
   const payload = Array.isArray(response) ? response : (response as any)?.result
   const parsed = MetricsRows.safeParse(payload)
   if (!parsed.success) {
-    throw new Error('Invalid metrics response')
+    const firstError = parsed.error.errors[0]
+    const errorPath = firstError.path.length > 0 ? ` at path: ${firstError.path.join('.')}` : ''
+    throw new Error(
+      `Invalid metrics response${errorPath}: ${firstError.message}. Received: ${JSON.stringify(payload?.slice(0, 2))}`
+    )
   }
 
   const rows = parsed.data
