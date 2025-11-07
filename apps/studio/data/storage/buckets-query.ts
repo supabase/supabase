@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
+import { MAX_RETRY_FAILURE_COUNT } from 'data/query-client'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { ResponseError, type UseCustomQueryOptions } from 'types'
@@ -45,7 +46,7 @@ export const useBucketsQuery = <TData = BucketsData>(
         return false
       }
 
-      if (failureCount < 3) {
+      if (failureCount < MAX_RETRY_FAILURE_COUNT) {
         return true
       }
 
