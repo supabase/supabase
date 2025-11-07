@@ -67,7 +67,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
     label: 'Last 7 days',
     startValue: 7,
     startUnit: 'day',
-    format: 'MMM D',
+    format: 'MMM D, ha',
     availableIn: ['pro', 'team', 'enterprise'],
   },
 ]
