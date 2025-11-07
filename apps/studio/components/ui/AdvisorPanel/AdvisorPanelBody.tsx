@@ -107,7 +107,7 @@ export const AdvisorPanelBody = ({
               <Button
                 type="text"
                 className={cn(
-                  'justify-start w-full block rounded-none h-auto py-3 px-4 text-foreground-light hover:text-foreground',
+                  'justify-start w-full block rounded-none h-auto py-3 px-4 hover:text-foreground',
                   isUnread && 'bg-surface-100/50'
                 )}
                 onClick={() => onItemClick(item)}
