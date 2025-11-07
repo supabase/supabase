@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AnimatePresence, motion } from 'framer-motion'
 import { snakeCase } from 'lodash'
 import { Loader2, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -172,9 +172,13 @@ export const ConnectTablesDialogContent = ({
   const { mutateAsync: createDestinationPipeline } = useCreateDestinationPipelineMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
-  const progressIndicator = isEditingExistingPublication
-    ? PROGRESS_INDICATORS.UPDATE
-    : PROGRESS_INDICATORS.CREATE
+  const progressIndicator = useMemo(
+    () => (isEditingExistingPublication ? PROGRESS_INDICATORS.UPDATE : PROGRESS_INDICATORS.CREATE),
+    // [Joshen] This is to prevent the progressIndicator from flipping to UPDATE in the middle of CREATE
+    // since the publication and pipelines are getting created in the middle of CREATE
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isConnecting]
+  )
   const totalProgressSteps = progressIndicator.length
   const currentStep = progressIndicator.findIndex((x) => x.step === connectingStep) + 1
   const progressDescription = progressIndicator.find((x) => x.step === connectingStep)
@@ -267,13 +271,12 @@ export const ConnectTablesDialogContent = ({
     try {
       setIsConnecting(true)
 
+      const tablesToBeAdded = values.tables.map((table) => {
+        const [schema, name] = table.split('.')
+        return { schema, name }
+      })
       setConnectingStep(PROGRESS_STAGE.UPDATE_PUBLICATION)
-      const publicationTables = publication.tables.concat(
-        values.tables.map((table) => {
-          const [schema, name] = table.split('.')
-          return { schema, name }
-        })
-      )
+      const publicationTables = publication.tables.concat(tablesToBeAdded)
       await updatePublication({
         projectRef,
         sourceId,
@@ -284,7 +287,7 @@ export const ConnectTablesDialogContent = ({
       setConnectingStep(PROGRESS_STAGE.START_PIPELINE)
       await startPipeline({ projectRef, pipelineId: pipeline.id })
 
-      onSuccessConnectTables?.(publicationTables)
+      onSuccessConnectTables?.(tablesToBeAdded)
       toast.success('Successfully updated connected tables! Pipeline is being restarted')
       onClose()
     } catch (error: any) {
@@ -392,7 +395,7 @@ export const ConnectTablesDialogContent = ({
                 </p>
                 <Loader2 size={14} className="animate-spin" />
               </div>
-              <Progress value={(currentStep / totalProgressSteps) * 100} />
+              <Progress value={(currentStep / (totalProgressSteps + 1)) * 100} />
             </DialogSection>
           </motion.div>
         )}

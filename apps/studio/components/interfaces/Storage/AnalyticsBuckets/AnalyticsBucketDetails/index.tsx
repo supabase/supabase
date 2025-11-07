@@ -2,7 +2,7 @@ import { uniq } from 'lodash'
 import { Loader2, SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
@@ -57,39 +57,17 @@ export const AnalyticBucketDetails = () => {
 
   const [modal, setModal] = useState<'delete' | null>(null)
   // [Joshen] Namespaces are now created asynchronously when the pipeline is started, so long poll after
-  // updating connected tables until namespaces + wrapper integrations are updated
+  // updating connected tables until namespaces are updated
   // Namespace would just be the schema (Which is currently limited to public)
   // Wrapper table would be {schema}_{table}_changelog
   const [tablesToPoll, setTablesToPoll] = useState<{ schema: string; name: string }[]>([])
   const [pollIntervalNamespaces, setPollIntervalNamespaces] = useState(0)
-  const [pollIntervalWrapper, setPollIntervalWrapper] = useState(0)
+  const [pollIntervalNamespaceTables, setPollIntervalNamespaceTables] = useState(0)
 
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
-  const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance(
-    {
-      bucketId: bucket?.id,
-    },
-    {
-      refetchInterval: (data) => {
-        if (pollIntervalWrapper === 0) return false
-        if (tablesToPoll.length > 0) {
-          const wrapperTables = data?.[0].tables ?? []
-
-          // [Joshen ALPHA] I need to know whats the wrapper table name formats to deterministically find them here
-          // Or should I just use snakeCase here? Unsure at the moment
-          const hasTablesMissingFromWrapper = !tablesToPoll.some((x) =>
-            wrapperTables.find((y) => y.name.includes(`${x.schema}_${x.name}`))
-          )
-          if (!hasTablesMissingFromWrapper) {
-            setPollIntervalWrapper(0)
-            if (pollIntervalNamespaces === 0) setTablesToPoll([])
-            return false
-          }
-        }
-        return pollIntervalWrapper
-      },
-    }
-  )
+  const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance({
+    bucketId: bucket?.id,
+  })
   const { pipeline } = useAnalyticsBucketAssociatedEntities({
     projectRef,
     bucketId: bucket?.id,
@@ -142,7 +120,6 @@ export const AnalyticBucketDetails = () => {
 
           if (!hasSchemaMissingFromNamespace) {
             setPollIntervalNamespaces(0)
-            if (pollIntervalWrapper === 0) setTablesToPoll([])
             return false
           }
         }
@@ -166,6 +143,12 @@ export const AnalyticBucketDetails = () => {
       }
     })
   }, [wrapperTables, namespacesData])
+
+  useEffect(() => {
+    if (pollIntervalNamespaces === 0 && pollIntervalNamespaceTables === 0) {
+      setTablesToPoll([])
+    }
+  }, [pollIntervalNamespaces, pollIntervalNamespaceTables])
 
   return (
     <>
@@ -213,7 +196,7 @@ export const AnalyticBucketDetails = () => {
                     {!!pipeline && (
                       <Button asChild type="default">
                         <Link
-                          href={`/project/${projectRef}/database/replication/${pipeline.replicator_id}`}
+                          href={`/project/${projectRef}/database/etl/${pipeline.replicator_id}`}
                         >
                           View replication
                         </Link>
@@ -224,7 +207,7 @@ export const AnalyticBucketDetails = () => {
                         onSuccessConnectTables={(tables) => {
                           setTablesToPoll(tables)
                           setPollIntervalNamespaces(4000)
-                          setPollIntervalWrapper(4000)
+                          setPollIntervalNamespaceTables(4000)
                         }}
                       />
                     )}
@@ -265,7 +248,7 @@ export const AnalyticBucketDetails = () => {
                           onSuccessConnectTables={(tables) => {
                             setTablesToPoll(tables)
                             setPollIntervalNamespaces(4000)
-                            setPollIntervalWrapper(4000)
+                            setPollIntervalNamespaceTables(4000)
                           }}
                         />
                       </aside>
@@ -285,6 +268,9 @@ export const AnalyticBucketDetails = () => {
                         wrapperInstance={wrapperInstance}
                         wrapperValues={wrapperValues}
                         wrapperMeta={wrapperMeta}
+                        tablesToPoll={tablesToPoll}
+                        pollIntervalNamespaceTables={pollIntervalNamespaceTables}
+                        setPollIntervalNamespaceTables={setPollIntervalNamespaceTables}
                       />
                     ))}
                   </div>
