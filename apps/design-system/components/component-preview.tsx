@@ -11,19 +11,19 @@ import {
   cn,
 } from 'ui'
 import { useConfig } from '@/hooks/use-config'
-import {
-  // CopyButton,
-  CopyWithClassNames,
-} from '@/components/copy-button'
+// import {
+//   CopyButton,
+//   CopyWithClassNames,
+// } from '@/components/copy-button'
 // import { Icons } from '@/components/icons'
 // import { StyleSwitcher } from '@/components/style-switcher'
 // import { ThemeWrapper } from '@/components/theme-wrapper'
-import {
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-} from 'ui'
+// import {
+//   Tabs_Shadcn_ as Tabs,
+//   TabsContent_Shadcn_ as TabsContent,
+//   TabsList_Shadcn_ as TabsList,
+//   TabsTrigger_Shadcn_ as TabsTrigger,
+// } from 'ui'
 
 // import { LoaderCircle } from 'lucide-react'
 
@@ -85,12 +85,12 @@ export function ComponentPreview({
     return <Component />
   }, [name, config.style])
 
-  const codeString = React.useMemo(() => {
-    if (typeof Code?.props['data-rehype-pretty-code-fragment'] !== 'undefined') {
-      const [, Button] = React.Children.toArray(Code.props.children) as React.ReactElement[]
-      return Button?.props?.value || Button?.props?.__rawString__ || null
-    }
-  }, [Code])
+  // const codeString = React.useMemo(() => {
+  //   if (typeof Code?.props['data-rehype-pretty-code-fragment'] !== 'undefined') {
+  //     const [, Button] = React.Children.toArray(Code.props.children) as React.ReactElement[]
+  //     return Button?.props?.value || Button?.props?.__rawString__ || null
+  //   }
+  // }, [Code])
 
   const ComponentPreview = React.useMemo(() => {
     return (
@@ -220,39 +220,39 @@ export function ComponentPreview({
     </div>
   )
 
-  return (
-    <div
-      className={cn('group relative my-4 flex flex-col gap-2', wideClasses, className)}
-      {...props}
-    >
-      <Tabs defaultValue="preview" className="relative mr-auto w-full">
-        <div className="flex items-center justify-between pb-3">
-          <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
-            <TabsTrigger
-              value="preview"
-              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
-            >
-              Preview
-            </TabsTrigger>
-            <TabsTrigger
-              value="code"
-              className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
-            >
-              Code
-            </TabsTrigger>
-          </TabsList>
-        </div>
-        <TabsContent value="preview" className="relative rounded-md border bg-studio">
-          {ComponentPreview}
-        </TabsContent>
-        <TabsContent value="code">
-          <div className="flex flex-col space-y-4">
-            <div className="w-full rounded-md [&_pre]:my-0 [&_pre]:max-h-[350px] [&_pre]:overflow-auto">
-              {Code}
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
+  // return (
+  //   <div
+  //     className={cn('group relative my-4 flex flex-col gap-2', wideClasses, className)}
+  //     {...props}
+  //   >
+  //     <Tabs defaultValue="preview" className="relative mr-auto w-full">
+  //       <div className="flex items-center justify-between pb-3">
+  //         <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
+  //           <TabsTrigger
+  //             value="preview"
+  //             className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+  //           >
+  //             Preview
+  //           </TabsTrigger>
+  //           <TabsTrigger
+  //             value="code"
+  //             className="relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+  //           >
+  //             Code
+  //           </TabsTrigger>
+  //         </TabsList>
+  //       </div>
+  //       <TabsContent value="preview" className="relative rounded-md border bg-studio">
+  //         {ComponentPreview}
+  //       </TabsContent>
+  //       <TabsContent value="code">
+  //         <div className="flex flex-col space-y-4">
+  //           <div className="w-full rounded-md [&_pre]:my-0 [&_pre]:max-h-[350px] [&_pre]:overflow-auto">
+  //             {Code}
+  //           </div>
+  //         </div>
+  //       </TabsContent>
+  //     </Tabs>
+  //   </div>
+  // )
 }

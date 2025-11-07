@@ -16,12 +16,14 @@ const CHART_COLORS = {
   YELLOW_1: 'hsl(var(--warning-default))',
   YELLOW_2: 'hsl(var(--warning-500))',
 }
+
 type LogsBarChartDatum = {
   timestamp: string
   error_count: number
   ok_count: number
   warning_count: number
 }
+
 export const LogsBarChart = ({
   data,
   onBarClick,
