@@ -396,4 +396,3 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
     </>
   )
 }
-

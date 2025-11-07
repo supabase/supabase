@@ -20,5 +20,3 @@ export const RawAuthMetricsResponseSchema = z.object({
 
 export type RawAuthMetricsRow = z.infer<typeof RawAuthMetricsRowSchema>
 export type RawAuthMetricsResponse = z.infer<typeof RawAuthMetricsResponseSchema>
-
-
