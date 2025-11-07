@@ -187,7 +187,7 @@ export const TableRowComponent = ({
         table: table.name,
       })
 
-      toast.success('Succesfully removed table')
+      toast.success('Successfully removed table!')
       setShowRemoveTableModal(false)
     } catch (error: any) {
       toast.error(`Failed to remove table: ${error.message}`)

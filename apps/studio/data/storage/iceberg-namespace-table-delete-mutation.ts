@@ -36,25 +36,18 @@ async function deleteIcebergNamespaceTable({
     })
   }
 
-  const url = `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables/${table}`.replaceAll(
-    /(?<!:)\/\//g,
-    '/'
-  )
+  const url =
+    `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables/${table}?purgeRequested=true`.replaceAll(
+      /(?<!:)\/\//g,
+      '/'
+    )
 
   try {
     const response = await fetchHandler(url, {
       headers,
       method: 'DELETE',
     })
-
-    const result = await response.json()
-    if (result.error) {
-      if (result.error.message) {
-        throw new Error(result.error.message)
-      }
-      throw new Error('Failed to delete Iceberg namespace table')
-    }
-    return result
+    return response.status === 204
   } catch (error) {
     handleError(error)
   }
