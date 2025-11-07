@@ -254,10 +254,8 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   name={x}
                   render={({ field }) => (
                     <FormItemLayout
-                      className={
-                        isSecurityNotificationsEnabled ? 'md:py-2 md:items-center' : 'gap-y-3'
-                      }
-                      layout={isSecurityNotificationsEnabled ? 'flex-row-reverse' : 'vertical'}
+                      className="gap-y-3"
+                      layout="vertical"
                       label={property.title}
                       description={
                         property.description ? (
@@ -275,12 +273,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       }
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          id={x}
-                          {...field}
-                          disabled={!canUpdateConfig}
-                          className={`w-full ${isSecurityNotificationsEnabled && 'md:min-w-[300px] lg:min-w-[512px]'}`}
-                        />
+                        <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
