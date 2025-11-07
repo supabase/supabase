@@ -4,7 +4,7 @@ import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { ResponseError, type UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 export type BucketsVariables = { projectRef?: string }
@@ -41,11 +41,7 @@ export const useBucketsQuery = <TData = BucketsData>(
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,
     ...options,
     retry: (failureCount, error) => {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        error.message.includes('Missing tenant config')
-      ) {
+      if (error instanceof ResponseError && error.message.includes('Missing tenant config')) {
         return false
       }
 
