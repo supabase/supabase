@@ -156,11 +156,9 @@ export const useRegisterSidebar = (
   const handlersRef = useLatest(handlers)
 
   useEffect(() => {
-    if (enabled === false) {
-      return
+    if (enabled) {
+      sidebarManagerState.registerSidebar(id, () => componentRef.current(), handlersRef.current)
     }
-
-    sidebarManagerState.registerSidebar(id, () => componentRef.current(), handlersRef.current)
 
     return () => {
       sidebarManagerState.unregisterSidebar(id)
