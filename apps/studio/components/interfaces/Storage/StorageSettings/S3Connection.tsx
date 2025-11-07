@@ -275,9 +275,7 @@ export const S3Connection = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead key="description">Name</TableHead>
-                      <TableHead key="access-key-id" className="min-w-64 w-full">
-                        Key ID
-                      </TableHead>
+                      <TableHead key="access-key-id">Key ID</TableHead>
                       <TableHead key="created-at">Created at</TableHead>
                       <TableHead key="actions" />
                     </TableRow>
