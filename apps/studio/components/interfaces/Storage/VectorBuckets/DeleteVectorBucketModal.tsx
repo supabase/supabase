@@ -1,12 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { useParams } from 'common'
+import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { wrapperMetaComparator } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
 import { deleteVectorBucketIndex } from 'data/storage/vector-bucket-index-delete-mutation'
 import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Dialog,
@@ -23,6 +30,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { getVectorBucketFDWName } from './VectorBuckets.utils'
 
 export interface DeleteVectorBucketModalProps {
   visible: boolean
@@ -41,7 +49,30 @@ export const DeleteVectorBucketModal = ({
   onCancel,
   onSuccess,
 }: DeleteVectorBucketModalProps) => {
-  const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const { data } = useFDWsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: !!bucketName }
+  )
+  const integration = INTEGRATIONS.find(
+    (i) => i.id === 's3_vectors_wrapper' && i.type === 'wrapper'
+  )
+  const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta
+
+  const vectorBucketWrapper = useMemo(() => {
+    return data
+      ?.filter((wrapper) =>
+        wrapperMetaComparator(
+          { handlerName: WRAPPER_HANDLERS.S3_VECTORS, server: { options: [] } },
+          wrapper
+        )
+      )
+      .find((w) => w.name === getVectorBucketFDWName(bucketName ?? ''))
+  }, [data, bucketName])
 
   const schema = z.object({
     confirm: z.literal(bucketName, {
@@ -53,34 +84,45 @@ export const DeleteVectorBucketModal = ({
     resolver: zodResolver(schema),
   })
 
-  const { mutate: deleteBucket, isLoading } = useVectorBucketDeleteMutation({
+  const { mutate: deleteFDW } = useFDWDeleteMutation()
+
+  const { mutateAsync: deleteBucket, isLoading } = useVectorBucketDeleteMutation({
     onSuccess: async () => {
       toast.success(`Bucket "${bucketName}" deleted successfully`)
+      if (vectorBucketWrapper) {
+        deleteFDW({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          wrapper: vectorBucketWrapper,
+          wrapperMeta: wrapperMeta,
+        })
+      }
+      form.reset()
       onSuccess()
     },
   })
 
   const { data: { indexes = [] } = {} } = useVectorBucketsIndexesQuery({
-    projectRef,
+    projectRef: project?.ref,
     vectorBucketName: bucketName,
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
-    if (!projectRef) return console.error('Project ref is required')
+    if (!project?.ref) return console.error('Project ref is required')
     if (!bucketName) return console.error('No bucket is selected')
 
     try {
       // delete all indexes from the bucket first
       const promises = indexes.map((index) =>
         deleteVectorBucketIndex({
-          projectRef,
+          projectRef: project?.ref,
           bucketName: bucketName,
           indexName: index.indexName,
         })
       )
       await Promise.all(promises)
 
-      deleteBucket({ projectRef, bucketName })
+      deleteBucket({ projectRef: project?.ref, bucketName })
     } catch (error) {
       toast.error(
         `Failed to delete bucket: ${error instanceof Error ? error.message : 'Unknown error'}`
