@@ -1,0 +1,152 @@
+---
+id: 'billing-optimization'
+title: 'Optimizing Billing'
+description: 'This documentation covers advice on debugging and optimizing your costs on Supabase, based on the Products you use'
+subtitle: 'This documentation covers advice on debugging and optimizing your costs on Supabase, based on the Products you use'
+---
+
+## Viewing your egress
+
+As egress is calculated at the organization level, you can view it at the [Usage](https://supabase.com/dashboard/org/_/usage) page in the dashboard.
+
+The `Usage Summary` section shows your egress along with all other usage metrics. Hovering over it will show your usage for each project in the organization, with any allowance taken into account.
+
+Clicking it will take you down to the [egress section](https://supabase.com/dashboard/org/_/usage#egress) where you will see a summary for Clicking it will take you down to the [egress section](https://supabase.com/dashboard/org/_/usage#egress) where you will see a summary for each area counted for the selected billing period.
+You can use the dropdown menus on the top of the page to select the billing cycle and drill down into a single project.
+
+In this documentation, we will cover each of the measured areas of egress and provide advice on both measuring and reducing egress.
+
+## Areas of egress
+
+### Database
+
+Whether you are running queries by directly connecting to your database or you are connecting via Supavisor, you can identify, monitor and take different steps to reduce your egress costs.
+
+Some general advice:
+
+- **Avoid `select *`**: Select only the data that you need when querying tables, you may find that there are large strings or JSON objects in your responses that you do not need.
+- **Use pagination**: When showing a dashboard or summaries of data, it is common to need to select multiple rows. Avoid selecting all of those rows at once and only select them when you need them. Many ORMs and other frameworks have pagination built in.
+- **Select JSON fields**: Avoid selecting entire JSON objects, you can select fields within your JSON to reduce the size of the response. Read more about querying JSON [here](https://supabase.com/docs/guides/database/json?queryGroups=database-method&database-method=sql&queryGroups=language&language=sql#query-json-data)
+- **Cache responses**: Either by using client-side caching within your framework or using one of our [integrations](https://supabase.com/partners/integrations#caching%20/%20offline-first), this can speed up your application and save unnecessary trips to the database.
+
+#### Checking top query size using SQL
+
+If you want to see an estimate of the size of your queries, you can create a helper function in your project:
+
+```sql
+CREATE OR REPLACE FUNCTION explain_analyze_json(query_text text)
+RETURNS jsonb AS $$
+DECLARE
+    result jsonb;
+BEGIN
+    EXECUTE 'EXPLAIN (FORMAT JSON) ' || query_text INTO result;
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+now run this query whenever you want to see your top 500 `SELECT` queries by size:
+
+```sql
+WITH query_sizes AS (
+    SELECT
+        s.queryid,
+        s.query,
+        s.calls,
+        (explain_analyze_json(s.query)->0->'Plan'->>'Plan Rows')::int AS estimated_rows,
+        (explain_analyze_json(s.query)->0->'Plan'->>'Plan Width')::int AS estimated_width
+    FROM pg_stat_statements s
+    WHERE s.query ILIKE 'SELECT%' ORDER BY s.calls DESC LIMIT 500
+)
+SELECT
+    queryid,
+    query,
+    calls,
+    (estimated_rows * estimated_width * calls) AS total_result_size_bytes,
+    pg_size_pretty(estimated_rows * estimated_width * calls) AS single_result_size,
+    pg_size_pretty(estimated_rows * estimated_width * calls) AS total_result_size
+FROM query_sizes
+ORDER BY total_result_size_bytes DESC
+```
+
+### Storage
+
+Storage implements many tricks, like [Smart CDN](/docs/guides/storage/cdn/smart-cdn), to help optimize your egress.
+
+Using the Logs Explorer in the Dashboard, we have a [guide](/docs/guides/storage/serving/bandwidth#calculating-egress) on calculating and optimizing your egress in the Storage section of the docs.
+
+### Realtime
+
+It is quite likely that you will not see large egress from Realtime unnecessarily but, a large number of messages or clients can cause spikes.
+
+To optimize this:
+
+- **Use the right Realtime**: If you are sending updates to all connected clients and filtering them in your application, then you might be better off using your RLS policies to send messages to the right recipients
+- **Filter appropriately**: When you connect to [postgres changes](/docs/guides/realtime/postgres-changes), make sure you [filter](https://supabase.com/docs/guides/realtime/protocol) for only the data that you need
+- **Be conscious of message sizes**: Realtime [quotas](/docs/guides/realtime/quotas) allow for a lot of information to be encoded into a message. Make sure that you monitor this to ensure it does not grow without need
+
+### API
+
+The Data API can generate egress costs if it transfers large amounts of data. To optimize egress when using the Data API in Supabase, consider the following strategies:
+
+1. **Minimize data transfer**: Ensure that your API requests only transfer the necessary data. Avoid sending large payloads or unnecessary data in responses.
+
+2. **Use pagination**: When retrieving large datasets, use pagination to limit the amount of data returned in each request. This reduces the amount of data transferred and improves performance. You can reduce the default rows returned in your project's API [settings](https://supabase.com/dashboard/project/_/settings/api) (the default is 1000).
+
+   ```javascript
+   // Example: Use pagination to limit data transfer
+   const { data, error } = await supabase.from('users').select('*').range(0, 9) // Fetch 10 items per page
+   ```
+
+3. **Filter data**: Use filters to limit the amount of data returned by the API. This can help reduce egress by only transferring the data you need.
+
+   ```javascript
+   // Example: Filter data to limit data transfer
+   const { data, error } = await supabase.from('users').select('*').eq('status', 'active') // Only fetch active users
+   ```
+
+4. **Cache responses**: Use caching within your framework to reduce unnecessary data transfer. See [supabase-cache-helpers](https://supabase-cache-helpers.vercel.app/) for an excellent example of this.
+
+### Edge Functions
+
+Edge Functions can generate egress costs if they transfer large amounts of data or make frequent external API calls. To optimize egress when using Supabase Edge Functions, consider the following strategies:
+
+1. **Minimize data transfer**: Ensure that your Edge Functions only transfer the necessary data. Avoid sending large payloads or unnecessary data in responses.
+
+   ```javascript
+   // Example: Only send necessary data in the response
+   export default async function handler(req, res) {
+     const data = await fetchData()
+     res.json({ id: data.id, name: data.name }) // Only send required fields
+   }
+   ```
+
+2. **Optimize external API calls**: If your Edge Functions make external API calls, ensure that these calls are optimized to reduce data transfer. Use pagination, filtering, and other techniques to limit the amount of data retrieved from external APIs.
+
+   ```javascript
+   // Example: Optimize external API calls with pagination
+   export default async function handler(req, res) {
+     const page = req.query.page || 1
+     const data = await fetchExternalApi({ page, limit: 10 }) // Fetch 10 items per page
+     res.json(data)
+   }
+   ```
+
+3. **Compress data**: Use data compression techniques to reduce the size of data transferred by your Edge Functions. This can help minimize egress costs by reducing the amount of data sent over the network.
+
+   ```javascript
+   // Example: Compress response data
+   import zlib from 'zlib'
+
+   export default async function handler(req, res) {
+     const data = await fetchData()
+     const compressedData = zlib.gzipSync(JSON.stringify(data))
+     res.setHeader('Content-Encoding', 'gzip')
+     res.send(compressedData)
+   }
+   ```
+
+## Useful links
+
+- [How billing works](/docs/guides/platform/org-based-billing)
+- [Understanding the usage summary on the dashboard](https://github.com/orgs/supabase/discussions/27479)
