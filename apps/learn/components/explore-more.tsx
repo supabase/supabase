@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { BookOpen, Code, Users, ExternalLink, BookA, Video } from 'lucide-react'
+import { BookOpen, Code, Users, ExternalLink, BookA } from 'lucide-react'
+import { IconYoutubeSolid } from 'ui'
 
 interface ExploreItem {
   title: string
@@ -26,7 +27,7 @@ function getIcon(itemType?: string) {
     return Users
   }
   if (lowerType === 'video' || lowerType === 'tutorial') {
-    return Video
+    return IconYoutubeSolid
   }
   return BookA // default icon
 }

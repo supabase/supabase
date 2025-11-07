@@ -28,6 +28,10 @@ export const courses: SidebarNavGroup = {
           href: '/foundations/security',
         },
         {
+          title: 'Migrations',
+          href: '/foundations/migrations',
+        },
+        {
           title: 'Storage',
           href: '/foundations/storage',
         },
