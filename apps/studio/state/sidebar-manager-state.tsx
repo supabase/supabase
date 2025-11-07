@@ -1,4 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common/constants'
+import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { ReactNode, useEffect, useRef } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
@@ -151,11 +152,8 @@ export const useRegisterSidebar = (
     true
   )
 
-  const componentRef = useRef(component)
-  const handlersRef = useRef(handlers)
-
-  componentRef.current = component
-  handlersRef.current = handlers
+  const componentRef = useLatest(component)
+  const handlersRef = useLatest(handlers)
 
   useEffect(() => {
     if (enabled === false) {
