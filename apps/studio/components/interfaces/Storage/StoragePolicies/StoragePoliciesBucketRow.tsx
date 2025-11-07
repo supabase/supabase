@@ -43,8 +43,10 @@ export const StoragePoliciesBucketRow = ({
       <CardHeader className="flex flex-row w-full items-center justify-between gap-2 space-y-0">
         <div className="flex flex-1 min-w-0 items-center gap-3">
           <BucketIcon className="text-foreground-muted" size={16} strokeWidth={1.5} />
-          <CardTitle className="flex-1 min-w-0 truncate">{label}</CardTitle>
-          {bucket?.public && <Badge variant="warning">Public</Badge>}
+          <div className="flex flex-1 min-w-0 items-center gap-1.5">
+            <CardTitle className="truncate">{label}</CardTitle>
+            {bucket?.public && <Badge variant="warning">Public</Badge>}
+          </div>
         </div>
         <Button type="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
           New policy
