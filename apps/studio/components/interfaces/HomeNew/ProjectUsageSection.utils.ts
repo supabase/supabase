@@ -77,7 +77,7 @@ export const toServiceStatsMap = (args: {
   }
 
   const byTime = (a: { timestamp: string }, b: { timestamp: string }) =>
-    a.timestamp < b.timestamp ? -1 : a.timestamp > b.timestamp ? 1 : 0
+    a.timestamp - b.timestamp
   for (const key of Object.keys(grouped) as ServiceKey[]) {
     grouped[key].current.sort(byTime)
     grouped[key].previous.sort(byTime)
