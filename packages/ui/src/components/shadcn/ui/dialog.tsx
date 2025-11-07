@@ -162,6 +162,8 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn('text-base leading-none font-normal', className)}
+    // [Danny] Make space for the close button
+    style={{ maxWidth: 'calc(100% - 1rem)' }}
     {...props}
   />
 ))

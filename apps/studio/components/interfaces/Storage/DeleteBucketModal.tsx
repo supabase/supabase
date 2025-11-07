@@ -117,7 +117,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     >
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Confirm deletion of {bucket.id}</DialogTitle>
+          <DialogTitle>Delete bucket “{bucket.id}”</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />

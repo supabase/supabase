@@ -7,22 +7,9 @@ import {
 import { Bucket } from 'data/storage/buckets-query'
 import { Bucket as BucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
-import { ChevronRight, Edit, FolderOpen, MoreVertical, Trash2 } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import {
-  Badge,
-  Button,
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { Badge, cn, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
@@ -82,8 +69,6 @@ type BucketTableRowProps = {
   projectRef: string
   formattedGlobalUploadLimit: string
   getPolicyCount: (bucketName: string) => number
-  setSelectedBucket: (bucket: Bucket) => void
-  setModal: (modal: 'edit' | 'empty' | 'delete' | null) => void
 }
 
 export const BucketTableRow = ({
@@ -92,8 +77,6 @@ export const BucketTableRow = ({
   projectRef,
   formattedGlobalUploadLimit,
   getPolicyCount,
-  setSelectedBucket,
-  setModal,
 }: BucketTableRowProps) => {
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
@@ -148,55 +131,5 @@ export const BucketTableRow = ({
         </div>
       </BucketTableCell>
     </BucketTableRow>
-  )
-}
-
-type BucketDropdownMenuProps = {
-  bucket: Bucket
-  setSelectedBucket: (bucket: Bucket) => void
-  setModal: (modal: 'edit' | 'empty' | 'delete' | null) => void
-}
-
-const BucketDropdownMenu = ({ bucket, setSelectedBucket, setModal }: BucketDropdownMenuProps) => {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="default" className="px-1" icon={<MoreVertical />} />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-40">
-        <DropdownMenuItem
-          className="flex items-center space-x-2"
-          onClick={() => {
-            setModal('edit')
-            setSelectedBucket(bucket)
-          }}
-        >
-          <Edit size={12} />
-          <p>Edit bucket</p>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="flex items-center space-x-2"
-          onClick={() => {
-            setModal('empty')
-            setSelectedBucket(bucket)
-          }}
-        >
-          <FolderOpen size={12} />
-          <p>Empty bucket</p>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          className="flex items-center space-x-2"
-          onClick={() => {
-            setModal('delete')
-            setSelectedBucket(bucket)
-          }}
-        >
-          <Trash2 size={12} />
-          <p>Delete bucket</p>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   )
 }

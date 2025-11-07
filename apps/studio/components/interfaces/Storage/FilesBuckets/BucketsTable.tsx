@@ -8,8 +8,6 @@ type BucketsTableProps = {
   projectRef: string
   filterString: string
   formattedGlobalUploadLimit: string
-  setSelectedBucket: (bucket: Bucket) => void
-  setModal: (modal: 'edit' | 'empty' | 'delete' | null) => void
   getPolicyCount: (bucketName: string) => number
 }
 
@@ -27,8 +25,6 @@ const BucketsTableUnvirtualized = ({
   projectRef,
   filterString,
   formattedGlobalUploadLimit,
-  setSelectedBucket,
-  setModal,
   getPolicyCount,
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
@@ -50,8 +46,6 @@ const BucketsTableUnvirtualized = ({
               projectRef={projectRef}
               formattedGlobalUploadLimit={formattedGlobalUploadLimit}
               getPolicyCount={getPolicyCount}
-              setSelectedBucket={setSelectedBucket}
-              setModal={setModal}
             />
           ))
         )}
@@ -65,8 +59,6 @@ const BucketsTableVirtualized = ({
   projectRef,
   filterString,
   formattedGlobalUploadLimit,
-  setSelectedBucket,
-  setModal,
   getPolicyCount,
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
@@ -90,8 +82,6 @@ const BucketsTableVirtualized = ({
             projectRef={projectRef}
             formattedGlobalUploadLimit={formattedGlobalUploadLimit}
             getPolicyCount={getPolicyCount}
-            setSelectedBucket={setSelectedBucket}
-            setModal={setModal}
           />
         )}
       </VirtualizedTableBody>
