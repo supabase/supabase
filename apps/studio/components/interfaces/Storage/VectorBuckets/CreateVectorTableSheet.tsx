@@ -129,12 +129,14 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     name: 'metadataKeys',
   })
 
-  const { mutateAsync: createVectorBucketTable, isLoading: isCreating } =
+  const { mutateAsync: createVectorBucketTable, isLoading: isCreatingVectorBucketTable } =
     useVectorBucketIndexCreateMutation()
 
-  const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({
-    onError: () => {},
-  })
+  const { mutateAsync: importForeignSchema, isLoading: isImportingForeignSchema } =
+    useFDWImportForeignSchemaMutation({
+      onError: () => {},
+    })
+  const isCreating = isCreatingVectorBucketTable || isImportingForeignSchema
 
   const onSubmit: SubmitHandler<CreateVectorTableForm> = async (values) => {
     if (!project?.ref) return console.error('Project ref is required')
