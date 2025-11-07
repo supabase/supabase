@@ -43,10 +43,7 @@ describe('RawAuthMetricsResponseSchema', () => {
   test('rejects negative numbers', () => {
     const invalid = {
       ...validSample,
-      result: [
-        { ...validSample.result[0], active_users: -1 },
-        validSample.result[1],
-      ],
+      result: [{ ...validSample.result[0], active_users: -1 }, validSample.result[1]],
     }
     const parsed = RawAuthMetricsResponseSchema.safeParse(invalid)
     expect(parsed.success).toBe(false)
@@ -128,5 +125,3 @@ describe('OverviewUsage helpers', () => {
     expect(previous).toBeCloseTo(80)
   })
 })
-
-
