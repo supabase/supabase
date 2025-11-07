@@ -11,6 +11,11 @@
  *   tsx scripts/ratchet-eslint-rules.ts \
  *     --rule react-hooks/exhaustive-deps --rule no-console
  *
+	 # Decrease baselines when improvements occur
+ *   tsx scripts/ratchet-eslint-rules.ts \
+	 *   --rule react-hooks/exhaustive-deps --rule no-console \
+	 *   --decrease-baselines
+ *
  * Flags:
  *   --metadata <path>     Path to baseline file (default .github/eslint-rule-baselines.json)
  *   --init                Write current counts for the provided --rule(s) into metadata and exit 0
@@ -105,8 +110,8 @@ function parseArgs(argv: string[]): Args {
 
 /**
  * SECURITY:
- * Directly spawns a command from its arguments. Should **never** be
- * called with untrusted input.
+ * Directly spawns a command from its arguments. Should not be called with
+ * untrusted input.
  */
 function dangerouslyRunEsLint(eslintCmd: string, eslintArgs: string): ESLintExecutionResult {
   const fullCmd = `${eslintCmd} ${eslintArgs || ''} --format json`.trim()
@@ -139,7 +144,7 @@ function dangerouslyRunEsLint(eslintCmd: string, eslintArgs: string): ESLintExec
 }
 
 function countRules(results: ESLintResult[], ruleIds: string[]): Record<string, number> {
-  const expanded = new Set(ruleIds)
+  const checkedIds = new Set(ruleIds)
   const counts: Record<string, number> = {}
 
   for (const id of ruleIds) {
@@ -150,7 +155,7 @@ function countRules(results: ESLintResult[], ruleIds: string[]): Record<string, 
     if (!file || !Array.isArray(file.messages)) continue
     for (const msg of file.messages) {
       const id = msg?.ruleId ?? ''
-      if (id && expanded.has(id)) {
+      if (id && checkedIds.has(id)) {
         counts[id] += 1
       }
     }
