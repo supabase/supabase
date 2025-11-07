@@ -6,7 +6,7 @@ export type AdvisorItemSource = 'lint' | 'notification'
 
 const initialState = {
   activeTab: 'all' as AdvisorTab,
-  severityFilters: ['critical'] as AdvisorSeverity[],
+  severityFilters: ['critical', 'warning'] as AdvisorSeverity[],
   selectedItemId: undefined as string | undefined,
   selectedItemSource: undefined as AdvisorItemSource | undefined,
   // Notification filters
