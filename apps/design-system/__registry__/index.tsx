@@ -1919,17 +1919,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "page-components-integrated": {
-      name: "page-components-integrated",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/page-components-integrated")),
-      source: "",
-      files: ["registry/default/example/page-components-integrated.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "page-container-demo": {
       name: "page-container-demo",
       type: "components:example",
@@ -1948,17 +1937,6 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/page-layout-detail")),
       source: "",
       files: ["registry/default/example/page-layout-detail.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "page-layout-full-page": {
-      name: "page-layout-full-page",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/page-layout-full-page")),
-      source: "",
-      files: ["registry/default/example/page-layout-full-page.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

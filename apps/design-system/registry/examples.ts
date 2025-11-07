@@ -1079,11 +1079,6 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
-    name: 'page-components-integrated',
-    type: 'components:example',
-    files: ['example/page-components-integrated.tsx'],
-  },
-  {
     name: 'page-container-demo',
     type: 'components:example',
     files: ['example/page-container-demo.tsx'],
@@ -1092,11 +1087,6 @@ export const examples: Registry = [
     name: 'page-layout-detail',
     type: 'components:example',
     files: ['example/page-layout-detail.tsx'],
-  },
-  {
-    name: 'page-layout-full-page',
-    type: 'components:example',
-    files: ['example/page-layout-full-page.tsx'],
   },
   {
     name: 'page-layout-list',
