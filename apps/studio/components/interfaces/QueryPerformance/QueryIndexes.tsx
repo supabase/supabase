@@ -203,7 +203,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                       {isLinterWarning ? (
                         <Alert_Shadcn_
                           variant="default"
-                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
+                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand my-3"
                         >
                           <Lightbulb />
                           <AlertTitle_Shadcn_>
