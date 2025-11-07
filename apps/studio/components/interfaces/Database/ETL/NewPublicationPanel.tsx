@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
-import { useCreatePublicationMutation } from 'data/etl/create-publication-mutation'
+import { useCreatePublicationMutation } from 'data/etl/publication-create-mutation'
 import { useReplicationTablesQuery } from 'data/etl/tables-query'
 import {
   Button,
@@ -139,7 +139,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                             </MultiSelector.Trigger>
                             <MultiSelector.Content>
                               <MultiSelector.List>
-                                {tables?.tables.map((table) => (
+                                {tables?.map((table) => (
                                   <MultiSelector.Item
                                     key={`${table.schema}.${table.name}`}
                                     value={`${table.schema}.${table.name}`}

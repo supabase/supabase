@@ -18,6 +18,8 @@ const SKIP_RETRY_PATHNAME_MATCHERS = [
   '/v1/projects/:ref/analytics/endpoints/logs.all',
 ].map((pathname) => match(pathname))
 
+export const MAX_RETRY_FAILURE_COUNT = 3
+
 let queryClient: QueryClient | undefined
 
 export function getQueryClient() {
@@ -55,7 +57,7 @@ export function getQueryClient() {
               return false
             }
 
-            if (failureCount < 3) {
+            if (failureCount < MAX_RETRY_FAILURE_COUNT) {
               return true
             }
 
