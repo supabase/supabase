@@ -120,9 +120,9 @@ export const EmailTemplates = () => {
         </div>
       )}
       {isSuccess && (
-        <div className="my-12">
+        <>
           {builtInSMTP ? (
-            <div className="mb-12">
+            <div className="my-12">
               <EmailRateLimitsAlert />
             </div>
           ) : null}
@@ -265,7 +265,7 @@ export const EmailTemplates = () => {
               </Tabs_Shadcn_>
             </Card>
           )}
-        </div>
+        </>
       )}
     </ScaffoldSection>
   )
