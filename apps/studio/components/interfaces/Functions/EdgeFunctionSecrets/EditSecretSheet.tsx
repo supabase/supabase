@@ -158,7 +158,7 @@ const NameField = ({ form }: NameFieldProps): ReactNode => {
             <Input_Shadcn_
               {...field}
               readOnly
-              className="!text-foreground-light disabled:cursor-not-allowed"
+              className="!text-foreground-light cursor-not-allowed"
             />
           </FormControl_Shadcn_>
         </FormItemLayout>
@@ -188,7 +188,7 @@ const SecretField = ({ form }: SecretFieldProps): ReactNode => {
             <Input
               {...field}
               type={showSecretValue ? 'text' : 'password'}
-              placeholder="my-secret-password"
+              placeholder="my-secret-value"
               data-1p-ignore
               data-lpignore="true"
               data-form-type="other"
@@ -235,7 +235,7 @@ const useConfirmOnClose = ({
     }
   }, [checkIsDirty, onClose])
 
-  const onModalClose = () => {
+  const onConfirm = () => {
     setVisible(false)
     onClose()
   }
@@ -245,7 +245,7 @@ const useConfirmOnClose = ({
     modal: (
       <CloseConfirmationModal
         visible={visible}
-        onClose={onModalClose}
+        onClose={onConfirm}
         onCancel={() => setVisible(false)}
       />
     ),
