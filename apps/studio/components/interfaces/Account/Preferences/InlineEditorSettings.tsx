@@ -44,7 +44,7 @@ export const InlineEditorSettings = () => {
     form.setValue('inlineEditorEnabled', value)
 
     sendEvent({
-      action: 'inline_editor_setting_toggled',
+      action: 'inline_editor_setting_clicked',
       properties: {
         enabled: value,
       },
