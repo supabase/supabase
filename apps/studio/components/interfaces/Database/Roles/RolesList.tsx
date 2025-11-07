@@ -50,7 +50,7 @@ export const RolesList = () => {
     entities: data,
     isLoading,
     idField: 'id',
-    booleanOperations: [{ key: 'new' }],
+    booleanOperations: ['new'],
     entityOperations: ['delete'],
     entityName: 'Database Role',
     transformId: (id) => id.toString(),

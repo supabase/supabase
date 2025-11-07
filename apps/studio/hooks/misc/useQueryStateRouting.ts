@@ -4,16 +4,12 @@ import { toast } from 'sonner'
 
 type EntityOperation = 'edit' | 'delete' | 'duplicate'
 
-interface BooleanOperation {
-  key: string
-}
-
 interface UseQueryStateRoutingConfig<T> {
   /**
-   * Boolean operations with custom keys (e.g., [{ key: 'new' }, { key: 'invite' }])
+   * Boolean operations with custom keys (e.g., ['new', 'invite'])
    * These will create query params like ?new=true or ?invite=true
    */
-  booleanOperations?: BooleanOperation[]
+  booleanOperations?: string[]
   /**
    * Entity operations: 'edit', 'delete', 'duplicate'
    * These work with entity IDs in query params
@@ -80,7 +76,7 @@ interface UseQueryStateRoutingReturn<T> {
  * @example
  * // Boolean operations only (no entity required)
  * const routing = useQueryStateRouting({
- *   booleanOperations: [{ key: 'new' }],
+ *   booleanOperations: ['new'],
  * })
  *
  * <CreateDialog open={routing.booleans.new.show} onOpenChange={routing.booleans.new.setShow} />
@@ -88,11 +84,7 @@ interface UseQueryStateRoutingReturn<T> {
  * @example
  * // Multiple boolean operations for different actions
  * const routing = useQueryStateRouting({
- *   booleanOperations: [
- *     { key: 'new' },    // Creates ?new=true
- *     { key: 'invite' }, // Creates ?invite=true
- *     { key: 'import' }, // Creates ?import=true
- *   ],
+ *   booleanOperations: ['new', 'invite', 'import'], // Creates ?new=true, ?invite=true, ?import=true
  * })
  *
  * // Use different dialogs based on query params
@@ -106,7 +98,7 @@ interface UseQueryStateRoutingReturn<T> {
  *   entities: users,
  *   isLoading,
  *   idField: 'id',
- *   booleanOperations: [{ key: 'new' }],
+ *   booleanOperations: ['new'],
  *   entityOperations: ['edit', 'delete'],
  *   entityName: 'User',
  *   transformId: (id) => id.toString(),
@@ -123,7 +115,7 @@ interface UseQueryStateRoutingReturn<T> {
  *   entities: functions,
  *   isLoading,
  *   idField: 'id',
- *   booleanOperations: [{ key: 'new' }],
+ *   booleanOperations: ['new'],
  *   entityOperations: ['edit', 'delete', 'duplicate'],
  *   entityName: 'Database Function',
  *   transformDuplicate: (fn) => ({
@@ -138,8 +130,8 @@ interface UseQueryStateRoutingReturn<T> {
  * @param config.entities - Array of entities to search through
  * @param config.isLoading - Loading state used for error handling timing
  * @param config.idField - The field name to use as the unique identifier
- * @param config.booleanOperations - Array of boolean operation keys (e.g., ['new', 'invite'])
- * @param config.entityOperations - Array of entity operations ('edit', 'delete', 'duplicate')
+ * @param config.booleanOperations - Array of arbitrary boolean operation keys (e.g., ['new', 'invite'])
+ * @param config.entityOperations - Array of common entity operations ('edit', 'delete', 'duplicate')
  * @param config.entityName - Human-readable name for error messages
  * @param config.transformDuplicate - Optional function to transform entity when duplicating
  * @param config.transformId - Optional function to convert entity ID to string for comparison
@@ -158,7 +150,7 @@ export function useQueryStateRouting<T = any>({
   // Setup boolean operations
   const booleanStates: Record<string, BooleanOperationState> = {}
 
-  booleanOperations.forEach(({ key }) => {
+  booleanOperations.forEach((key) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [show, setShow] = useQueryState(
       key,

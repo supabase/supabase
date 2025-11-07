@@ -24,7 +24,7 @@ export const AddUserDropdown = () => {
   const {
     booleans: { invite: inviteQueryState, new: newQueryState },
   } = useQueryStateRouting({
-    booleanOperations: [{ key: 'invite' }, { key: 'new' }],
+    booleanOperations: ['invite', 'new'],
   })
 
   const inviteVisible = inviteQueryState.show

@@ -77,7 +77,7 @@ export const OAuthAppsList = () => {
     entities: oAuthApps,
     isLoading,
     idField: 'client_id',
-    booleanOperations: [{ key: 'new' }],
+    booleanOperations: ['new'],
     entityOperations: ['delete'],
     entityName: 'OAuth App',
   })

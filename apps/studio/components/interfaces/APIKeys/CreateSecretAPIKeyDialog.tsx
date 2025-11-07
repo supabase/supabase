@@ -51,7 +51,7 @@ const CreateSecretAPIKeyDialog = () => {
   const {
     booleans: { new: newQueryState },
   } = useQueryStateRouting({
-    booleanOperations: [{ key: 'new' }],
+    booleanOperations: ['new'],
   })
 
   const visible = newQueryState.show

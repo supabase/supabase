@@ -51,7 +51,7 @@ export const EnumeratedTypes = () => {
     entities: data,
     isLoading,
     idField: 'id',
-    booleanOperations: [{ key: 'new' }],
+    booleanOperations: ['new'],
     entityOperations: ['edit', 'delete'],
     entityName: 'Enumerated Type',
     transformId: (id) => id.toString(),

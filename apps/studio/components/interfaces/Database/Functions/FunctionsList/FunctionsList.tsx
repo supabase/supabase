@@ -37,7 +37,7 @@ import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
 import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
@@ -171,8 +171,8 @@ $$;`)
     entities: functions,
     isLoading,
     idField: 'id',
-    booleanOperations: [{ key: 'new' }],
-    entityOperations: ['edit', 'delete', 'duplicate'],
+    booleanOperations: ['new'], // can specify any and multiple boolean operations
+    entityOperations: ['edit', 'delete', 'duplicate'], // supports "edit", "delete", "duplicate" for entities
     entityName: 'Database Function',
     transformDuplicate: (fn) => ({
       ...fn,
@@ -183,15 +183,15 @@ $$;`)
 
   const showCreateFunctionForm = newQueryState.show
   const setShowCreateFunctionForm = newQueryState.setShow
-  const setSelectedFunctionToEdit = editQueryState?.setSelectedId!
-  const functionToEdit = editQueryState?.entity!
+  const setSelectedFunctionToEdit = editQueryState!.setSelectedId
+  const functionToEdit = editQueryState!.entity
   const showFunctionToEdit = editQueryState?.show
-  const setSelectedFunctionToDelete = deleteQueryState?.setSelectedId!
-  const functionToDelete = deleteQueryState?.entity!
-  const showFunctionToDelete = deleteQueryState?.show!
-  const setSelectedFunctionIdToDuplicate = duplicateQueryState?.setSelectedId!
-  const functionToDuplicate = duplicateQueryState?.entity!
-  const showFunctionToDuplicate = duplicateQueryState?.show!
+  const setSelectedFunctionToDelete = deleteQueryState!.setSelectedId
+  const functionToDelete = deleteQueryState!.entity
+  const showFunctionToDelete = deleteQueryState!.show
+  const setSelectedFunctionIdToDuplicate = duplicateQueryState!.setSelectedId
+  const functionToDuplicate = duplicateQueryState!.entity
+  const showFunctionToDuplicate = duplicateQueryState!.show
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />

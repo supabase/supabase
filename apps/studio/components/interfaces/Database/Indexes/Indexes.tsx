@@ -58,18 +58,18 @@ const Indexes = () => {
     entities: allIndexes,
     isLoading: isLoadingIndexes,
     idField: 'name',
-    booleanOperations: [{ key: 'new' }],
+    booleanOperations: ['new'],
     entityOperations: ['edit', 'delete'],
     entityName: 'Database Index',
   })
 
   const showCreateIndex = newQueryState.show
   const setShowCreateIndex = newQueryState.setShow
-  const setSelectedIndexName = edit?.setSelectedId!
-  const selectedIndex = edit?.entity!
-  const setSelectedIndexNameToDelete = deleteQueryState?.setSelectedId!
-  const selectedIndexToDelete = deleteQueryState?.entity!
-  const showindexToDelete = deleteQueryState?.show!
+  const setSelectedIndexName = edit!.setSelectedId
+  const selectedIndex = edit!.entity
+  const setSelectedIndexNameToDelete = deleteQueryState!.setSelectedId
+  const selectedIndexToDelete = deleteQueryState!.entity
+  const showindexToDelete = deleteQueryState!.show
 
   const {
     data: schemas,
