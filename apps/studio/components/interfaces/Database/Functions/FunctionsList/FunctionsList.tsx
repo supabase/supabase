@@ -163,29 +163,35 @@ $$;`)
   ]
 
   const {
-    showCreate: showCreateFunctionForm,
-    setShowCreate: setShowCreateFunctionForm,
-    setSelectedIdToEdit: setSelectedFunctionToEdit,
-    entityToEdit: functionToEdit,
-    showEntityToEdit: showFunctionToEdit,
-    setSelectedIdToDelete: setSelectedFunctionToDelete,
-    entityToDelete: functionToDelete,
-    showEntityToDelete: showFunctionToDelete,
-    setSelectedIdToDuplicate: setSelectedFunctionIdToDuplicate,
-    entityToDuplicate: functionToDuplicate,
-    showEntityToDuplicate: showFunctionToDuplicate,
+    booleans: { new: newQueryState },
+    edit: editQueryState,
+    delete: deleteQueryState,
+    duplicate: duplicateQueryState,
   } = useQueryStateRouting({
     entities: functions,
     isLoading,
     idField: 'id',
-    operations: ['new', 'edit', 'delete', 'duplicate'],
+    booleanOperations: [{ key: 'new' }],
+    entityOperations: ['edit', 'delete', 'duplicate'],
     entityName: 'Database Function',
     transformDuplicate: (fn) => ({
       ...fn,
       name: `${fn.name}_duplicate`,
     }),
-    idToString: (id) => id.toString(),
+    transformId: (id) => id.toString(),
   })
+
+  const showCreateFunctionForm = newQueryState.show
+  const setShowCreateFunctionForm = newQueryState.setShow
+  const setSelectedFunctionToEdit = editQueryState?.setSelectedId!
+  const functionToEdit = editQueryState?.entity!
+  const showFunctionToEdit = editQueryState?.show
+  const setSelectedFunctionToDelete = deleteQueryState?.setSelectedId!
+  const functionToDelete = deleteQueryState?.entity!
+  const showFunctionToDelete = deleteQueryState?.show!
+  const setSelectedFunctionIdToDuplicate = duplicateQueryState?.setSelectedId!
+  const functionToDuplicate = duplicateQueryState?.entity!
+  const showFunctionToDuplicate = duplicateQueryState?.show!
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />

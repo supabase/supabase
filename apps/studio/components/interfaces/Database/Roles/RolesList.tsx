@@ -44,19 +44,23 @@ export const RolesList = () => {
   })
 
   const {
-    showCreate: isCreatingRole,
-    setShowCreate: setIsCreatingRole,
-    setSelectedIdToDelete: setSelectedRoleToDelete,
-    entityToDelete: roleToDelete,
-    showEntityToDelete: showroleToDelete,
+    booleans: { new: newQueryState },
+    delete: deleteQueryState,
   } = useQueryStateRouting({
     entities: data,
     isLoading,
     idField: 'id',
-    operations: ['new', 'delete'],
+    booleanOperations: [{ key: 'new' }],
+    entityOperations: ['delete'],
     entityName: 'Database Role',
-    idToString: (id) => id.toString(),
+    transformId: (id) => id.toString(),
   })
+
+  const isCreatingRole = newQueryState.show
+  const setIsCreatingRole = newQueryState.setShow
+  const setSelectedRoleToDelete = deleteQueryState!.setSelectedId
+  const roleToDelete = deleteQueryState!.entity
+  const showroleToDelete = deleteQueryState!.show
 
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
 

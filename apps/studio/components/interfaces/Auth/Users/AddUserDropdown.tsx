@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Mail, UserPlus } from 'lucide-react'
-import { useQueryState, parseAsBoolean } from 'nuqs'
 
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
@@ -21,14 +21,16 @@ export const AddUserDropdown = () => {
     'create_user'
   )
 
-  const [inviteVisible, setInviteVisible] = useQueryState(
-    'invite',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [createVisible, setCreateVisible] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const {
+    booleans: { invite: inviteQueryState, new: newQueryState },
+  } = useQueryStateRouting({
+    booleanOperations: [{ key: 'invite' }, { key: 'new' }],
+  })
+
+  const inviteVisible = inviteQueryState.show
+  const setInviteVisible = inviteQueryState.setShow
+  const createVisible = newQueryState.show
+  const setCreateVisible = newQueryState.setShow
 
   return (
     <>

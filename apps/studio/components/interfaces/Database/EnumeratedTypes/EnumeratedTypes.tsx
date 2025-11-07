@@ -44,22 +44,27 @@ export const EnumeratedTypes = () => {
   })
 
   const {
-    showCreate: showCreateTypePanel,
-    setShowCreate: setShowCreateTypePanel,
-    setSelectedIdToEdit: setSelectedTypeToEdit,
-    entityToEdit: typeToEdit,
-    showEntityToEdit: showTypeToEdit,
-    setSelectedIdToDelete: setSelectedTypeToDelete,
-    entityToDelete: typeToDelete,
-    showEntityToDelete: showTypeToDelete,
+    booleans: { new: newQueryState },
+    edit: editQueryState,
+    delete: deleteQueryState,
   } = useQueryStateRouting({
     entities: data,
     isLoading,
     idField: 'id',
-    operations: ['new', 'edit', 'delete'],
+    booleanOperations: [{ key: 'new' }],
+    entityOperations: ['edit', 'delete'],
     entityName: 'Enumerated Type',
-    idToString: (id) => id.toString(),
+    transformId: (id) => id.toString(),
   })
+
+  const showCreateTypePanel = newQueryState.show
+  const setShowCreateTypePanel = newQueryState.setShow
+  const setSelectedTypeToEdit = editQueryState!.setSelectedId
+  const typeToEdit = editQueryState!.entity
+  const showTypeToEdit = editQueryState!.show
+  const setSelectedTypeToDelete = deleteQueryState!.setSelectedId
+  const typeToDelete = deleteQueryState!.entity
+  const showTypeToDelete = deleteQueryState!.show
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
   const filteredEnumeratedTypes =

@@ -51,20 +51,25 @@ const Indexes = () => {
   })
 
   const {
-    showCreate: showCreateIndex,
-    setShowCreate: setShowCreateIndex,
-    setSelectedIdToEdit: setSelectedIndexName,
-    entityToEdit: selectedIndex,
-    setSelectedIdToDelete: setSelectedIndexNameToDelete,
-    entityToDelete: selectedIndexToDelete,
-    showEntityToDelete: showindexToDelete,
+    booleans: { new: newQueryState },
+    edit,
+    delete: deleteQueryState,
   } = useQueryStateRouting({
     entities: allIndexes,
     isLoading: isLoadingIndexes,
     idField: 'name',
-    operations: ['new', 'edit', 'delete'],
+    booleanOperations: [{ key: 'new' }],
+    entityOperations: ['edit', 'delete'],
     entityName: 'Database Index',
   })
+
+  const showCreateIndex = newQueryState.show
+  const setShowCreateIndex = newQueryState.setShow
+  const setSelectedIndexName = edit?.setSelectedId!
+  const selectedIndex = edit?.entity!
+  const setSelectedIndexNameToDelete = deleteQueryState?.setSelectedId!
+  const selectedIndexToDelete = deleteQueryState?.entity!
+  const showindexToDelete = deleteQueryState?.show!
 
   const {
     data: schemas,

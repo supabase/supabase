@@ -71,18 +71,22 @@ export const OAuthAppsList = () => {
   const oAuthApps = data?.clients || []
 
   const {
-    showCreate: showCreateSheet,
-    setShowCreate: setShowCreateSheet,
-    setSelectedIdToDelete: setSelectedOAuthAppToDelete,
-    entityToDelete: oAuthAppToDelete,
-    showEntityToDelete: showoAuthAppToDelete,
+    booleans: { new: newQueryState },
+    delete: deleteQueryState,
   } = useQueryStateRouting({
     entities: oAuthApps,
     isLoading,
     idField: 'client_id',
-    operations: ['new', 'delete'],
+    booleanOperations: [{ key: 'new' }],
+    entityOperations: ['delete'],
     entityName: 'OAuth App',
   })
+
+  const showCreateSheet = newQueryState.show
+  const setShowCreateSheet = newQueryState.setShow
+  const setSelectedOAuthAppToDelete = deleteQueryState!.setSelectedId
+  const oAuthAppToDelete = deleteQueryState!.entity
+  const showoAuthAppToDelete = deleteQueryState!.show
 
   const { mutateAsync: regenerateSecret, isLoading: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
