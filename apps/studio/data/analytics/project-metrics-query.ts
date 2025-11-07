@@ -56,23 +56,7 @@ const MetricsRows = z.array(MetricsRow, {
 
 export type ProjectMetricsRow = z.infer<typeof MetricsRow>
 
-export type LogsBarChartDatum = {
-  timestamp: string
-  ok_count: number
-  warning_count: number
-  error_count: number
-}
-
 export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
-
-export type ProjectMetricsByService = Record<
-  ServiceKey,
-  { current: LogsBarChartDatum[]; previous: LogsBarChartDatum[] }
->
-
-function microsecondsToIso(microseconds: number): string {
-  return new Date(microseconds / 1000).toISOString()
-}
 
 export async function getProjectMetrics(
   { projectRef, interval }: ProjectMetricsVariables,
@@ -105,46 +89,7 @@ export async function getProjectMetrics(
     )
   }
 
-  const rows = parsed.data
-
-  const empty: ProjectMetricsByService[ServiceKey] = {
-    current: [],
-    previous: [],
-  }
-
-  const grouped: ProjectMetricsByService = {
-    db: { ...empty, current: [], previous: [] },
-    functions: { ...empty, current: [], previous: [] },
-    auth: { ...empty, current: [], previous: [] },
-    storage: { ...empty, current: [], previous: [] },
-    realtime: { ...empty, current: [], previous: [] },
-  }
-
-  for (const r of rows) {
-    const service = (r.service === 'db' ? 'db' : r.service) as ServiceKey
-    const datum: LogsBarChartDatum = {
-      timestamp: microsecondsToIso(r.timestamp),
-      ok_count: r.ok_count,
-      warning_count: r.warning_count,
-      error_count: r.error_count,
-    }
-    const bucket = grouped[service]
-    if (r.time_window === 'current') {
-      bucket.current.push(datum)
-    } else {
-      bucket.previous.push(datum)
-    }
-  }
-
-  // sort time series ascending by timestamp for stability
-  const byTime = (a: LogsBarChartDatum, b: LogsBarChartDatum) =>
-    a.timestamp < b.timestamp ? -1 : a.timestamp > b.timestamp ? 1 : 0
-  for (const key of Object.keys(grouped) as ServiceKey[]) {
-    grouped[key].current.sort(byTime)
-    grouped[key].previous.sort(byTime)
-  }
-
-  return grouped
+  return parsed.data
 }
 
 export type ProjectMetricsData = Awaited<ReturnType<typeof getProjectMetrics>>

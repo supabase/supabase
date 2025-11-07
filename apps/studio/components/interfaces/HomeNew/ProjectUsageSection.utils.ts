@@ -1,5 +1,5 @@
 import { useProjectMetricsQuery } from 'data/analytics/project-metrics-query'
-import type { ProjectMetricsByService } from 'data/analytics/project-metrics-query'
+import type { ProjectMetricsRow } from 'data/analytics/project-metrics-query'
 
 type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
 
@@ -25,16 +25,17 @@ type ServiceStatsMap = Record<
 
 /**
  * Transform backend project metrics into a UI-friendly structure with consistent
- * loading/error/refresh semantics per service.
+ * loading/error/refresh state per service.
  *
  * Why this exists
- * - The backend returns a flattened time-series grouped by service with
- *   separate "current" and "previous" windows. UI components expect a stable
- *   shape by service with metadata (isLoading, error, refresh) attached to
- *   each series. This adapter isolates that mapping and is easy to unit test.
+ *  - Backend returns flat rows: one record per (time_window, service, bucket_ts).
+ *  - UI needs per-service objects with two series (current/previous) to drive 5 cards and compute per-service totals.
+ *  - Charts expect ISO string timestamps; backend gives TIMESTAMP (coming to client as microseconds). We convert to ISO.
+ *  - We also need stable sorting and consistent empty arrays when a series has no points.
+ *  - We attach loading/error/refresh per service to keep UI simple.
  */
 export const toServiceStatsMap = (args: {
-  data?: ProjectMetricsByService
+  data?: ProjectMetricsRow[]
   isLoading: boolean
   error?: unknown
   onRefresh: () => void
@@ -51,20 +52,55 @@ export const toServiceStatsMap = (args: {
 
   const empty: StatsLike = { ...base, eventChartData: [] }
 
+  const grouped: Record<
+    ServiceKey,
+    { current: StatsLike['eventChartData']; previous: StatsLike['eventChartData'] }
+  > = {
+    db: { current: [], previous: [] },
+    functions: { current: [], previous: [] },
+    auth: { current: [], previous: [] },
+    storage: { current: [], previous: [] },
+    realtime: { current: [], previous: [] },
+  }
+
+  const toIso = (microseconds: number) => new Date(microseconds / 1000).toISOString()
+
+  for (const r of data ?? []) {
+    const bucket = grouped[r.service as ServiceKey]
+    const target = r.time_window === 'current' ? bucket.current : bucket.previous
+    target.push({
+      timestamp: toIso(r.timestamp),
+      ok_count: r.ok_count,
+      warning_count: r.warning_count,
+      error_count: r.error_count,
+    })
+  }
+
+  const byTime = (a: { timestamp: string }, b: { timestamp: string }) =>
+    a.timestamp < b.timestamp ? -1 : a.timestamp > b.timestamp ? 1 : 0
+  for (const key of Object.keys(grouped) as ServiceKey[]) {
+    grouped[key].current.sort(byTime)
+    grouped[key].previous.sort(byTime)
+  }
+
   const toStats = (rows: StatsLike['eventChartData'] | undefined): StatsLike =>
     rows ? { ...base, eventChartData: rows } : empty
 
-  const pair = (key: ServiceKey): { current: StatsLike; previous: StatsLike } => ({
-    current: toStats(data?.[key]?.current),
-    previous: toStats(data?.[key]?.previous),
-  })
-
   return {
-    db: pair('db'),
-    functions: pair('functions'),
-    auth: pair('auth'),
-    storage: pair('storage'),
-    realtime: pair('realtime'),
+    db: { current: toStats(grouped.db.current), previous: toStats(grouped.db.previous) },
+    functions: {
+      current: toStats(grouped.functions.current),
+      previous: toStats(grouped.functions.previous),
+    },
+    auth: { current: toStats(grouped.auth.current), previous: toStats(grouped.auth.previous) },
+    storage: {
+      current: toStats(grouped.storage.current),
+      previous: toStats(grouped.storage.previous),
+    },
+    realtime: {
+      current: toStats(grouped.realtime.current),
+      previous: toStats(grouped.realtime.previous),
+    },
   }
 }
 

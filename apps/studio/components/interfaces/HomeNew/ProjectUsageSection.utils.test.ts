@@ -1,28 +1,24 @@
 import { describe, it, expect, vi } from 'vitest'
 
 import { toServiceStatsMap } from './ProjectUsageSection.utils'
-import type { ProjectMetricsByService } from 'data/analytics/project-metrics-query'
+import type { ProjectMetricsRow } from 'data/analytics/project-metrics-query'
 
-const makeDatum = (n: number) => ({
-  timestamp: new Date(1700000000000 + n * 60000).toISOString(),
+const mkRow = (n: number, service: ProjectMetricsRow['service'], time_window: ProjectMetricsRow['time_window']): ProjectMetricsRow => ({
+  timestamp: (1700000000000 + n * 60000) * 1000, // microseconds
+  service,
+  time_window,
   ok_count: n,
   warning_count: 0,
   error_count: 0,
 })
 
-const emptyData: ProjectMetricsByService = {
-  db: { current: [], previous: [] },
-  functions: { current: [], previous: [] },
-  auth: { current: [], previous: [] },
-  storage: { current: [], previous: [] },
-  realtime: { current: [], previous: [] },
-}
+const emptyRows: ProjectMetricsRow[] = []
 
 describe('toServiceStatsMap', () => {
   it('returns empty arrays when no data', () => {
     const onRefresh = vi.fn()
     const map = toServiceStatsMap({
-      data: emptyData,
+      data: emptyRows,
       isLoading: false,
       error: undefined,
       onRefresh,
@@ -38,11 +34,12 @@ describe('toServiceStatsMap', () => {
   })
 
   it('maps data rows through for each service', () => {
-    const data: ProjectMetricsByService = {
-      ...emptyData,
-      db: { current: [makeDatum(1), makeDatum(2)], previous: [makeDatum(0)] },
-    }
-    const map = toServiceStatsMap({ data, isLoading: true, error: undefined, onRefresh: () => {} })
+    const rows: ProjectMetricsRow[] = [
+      mkRow(1, 'db', 'current'),
+      mkRow(2, 'db', 'current'),
+      mkRow(0, 'db', 'previous'),
+    ]
+    const map = toServiceStatsMap({ data: rows, isLoading: true, error: undefined, onRefresh: () => {} })
 
     expect(map.db.current.eventChartData.length).toBe(2)
     expect(map.db.previous.eventChartData.length).toBe(1)
@@ -52,7 +49,7 @@ describe('toServiceStatsMap', () => {
   it('propagates errors to all services', () => {
     const err = new Error('boom')
     const map = toServiceStatsMap({
-      data: emptyData,
+      data: emptyRows,
       isLoading: false,
       error: err,
       onRefresh: () => {},

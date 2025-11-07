@@ -35,7 +35,6 @@ import { useServiceStats } from './ProjectUsageSection.utils'
 import type { StatsLike } from './ProjectUsageSection.utils'
 import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 import {
-  toLogsBarChartData,
   sumTotal,
   sumWarnings,
   sumErrors,
@@ -160,7 +159,7 @@ export const ProjectUsageSection = () => {
     () =>
       serviceBase.map((s) => {
         const currentStats = statsByService[s.key].current
-        const data = toLogsBarChartData(currentStats.eventChartData)
+        const data = currentStats.eventChartData
         const total = sumTotal(data)
         const warn = sumWarnings(data)
         const err = sumErrors(data)
@@ -214,7 +213,7 @@ export const ProjectUsageSection = () => {
     () =>
       serviceBase.map((s) => {
         const previousStats = statsByService[s.key].previous
-        const data = toLogsBarChartData(previousStats.eventChartData)
+        const data = previousStats.eventChartData
         return {
           enabled: s.enabled,
           total: sumTotal(data),
