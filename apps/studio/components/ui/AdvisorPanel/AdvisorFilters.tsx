@@ -25,6 +25,7 @@ interface AdvisorFiltersProps {
   onStatusFiltersChange: (filters: string[]) => void
   hasProjectRef?: boolean
   onClose: () => void
+  isPlatform?: boolean
 }
 
 export const AdvisorFilters = ({
@@ -36,6 +37,7 @@ export const AdvisorFilters = ({
   onStatusFiltersChange,
   hasProjectRef = true,
   onClose,
+  isPlatform = false,
 }: AdvisorFiltersProps) => {
   return (
     <div className="border-b">
@@ -51,24 +53,28 @@ export const AdvisorFilters = ({
             <TabsTrigger_Shadcn_ value="performance" className="h-full text-xs">
               Performance
             </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_
-              value="messages"
-              className="h-full text-xs flex items-center gap-2"
-            >
-              Messages
-            </TabsTrigger_Shadcn_>
+            {isPlatform && (
+              <TabsTrigger_Shadcn_
+                value="messages"
+                className="h-full text-xs flex items-center gap-2"
+              >
+                Messages
+              </TabsTrigger_Shadcn_>
+            )}
           </TabsList_Shadcn_>
         </Tabs_Shadcn_>
         <div className="flex items-center gap-2">
-          <FilterPopover
-            name="Status"
-            options={statusOptions}
-            activeOptions={[...statusFilters]}
-            valueKey="value"
-            labelKey="label"
-            isMinimized={true}
-            onSaveFilters={onStatusFiltersChange}
-          />
+          {isPlatform && (
+            <FilterPopover
+              name="Status"
+              options={statusOptions}
+              activeOptions={[...statusFilters]}
+              valueKey="value"
+              labelKey="label"
+              isMinimized={true}
+              onSaveFilters={onStatusFiltersChange}
+            />
+          )}
           <FilterPopover
             name="Severity"
             options={severityOptions}

@@ -1,22 +1,23 @@
-import { useMemo, useRef } from 'react'
 import dayjs from 'dayjs'
+import { useMemo, useRef } from 'react'
 
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advisor-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Notification,
   NotificationData,
   useNotificationsV2Query,
 } from 'data/notifications/notifications-v2-query'
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
-import { AdvisorPanelHeader, AdvisorItem } from './AdvisorPanelHeader'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
+import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advisor-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AdvisorDetail } from './AdvisorDetail'
 import { AdvisorFilters } from './AdvisorFilters'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
-import { AdvisorDetail } from './AdvisorDetail'
+import { AdvisorItem, AdvisorPanelHeader } from './AdvisorPanelHeader'
 
 const severityOrder: Record<AdvisorSeverity, number> = {
   critical: 0,
@@ -79,7 +80,7 @@ export const AdvisorPanel = () => {
   )
 
   // Notifications should always load when sidebar is open (shown in both 'all' and 'messages' tabs)
-  const shouldLoadNotifications = isSidebarOpen
+  const shouldLoadNotifications = isSidebarOpen && IS_PLATFORM
 
   const notificationStatus = useMemo(() => {
     if (notificationFilterStatuses.includes('archived')) {
@@ -155,7 +156,8 @@ export const AdvisorPanel = () => {
   }, [lintData])
 
   const notificationItems = useMemo<AdvisorItem[]>(() => {
-    return notifications.map((notification): AdvisorItem => {
+    if (!IS_PLATFORM) return []
+    return notifications?.map((notification): AdvisorItem => {
       const data = notification.data as NotificationData
       return {
         id: notification.id,
@@ -309,6 +311,7 @@ export const AdvisorPanel = () => {
             }}
             hasProjectRef={hasProjectRef}
             onClose={handleClose}
+            isPlatform={IS_PLATFORM}
           />
           <div className="flex-1 overflow-y-auto">
             <AdvisorPanelBody
