@@ -2,7 +2,6 @@ import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useQueryState, parseAsBoolean, parseAsString } from 'nuqs'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -10,10 +9,11 @@ import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
-import { DatabaseIndex, useIndexesQuery } from 'data/database-indexes/indexes-query'
+import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -37,18 +37,6 @@ const Indexes = () => {
 
   const [search, setSearch] = useState('')
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [showCreateIndex, setShowCreateIndex] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [selectedIndexName, setSelectedIndexName] = useQueryState(
-    'edit',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [selectedIndexNameToDelete, setSelectedIndexNameToDelete] = useQueryState(
-    'delete',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
 
   const {
     data: allIndexes,
@@ -61,6 +49,23 @@ const Indexes = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const {
+    showCreate: showCreateIndex,
+    setShowCreate: setShowCreateIndex,
+    setSelectedIdToEdit: setSelectedIndexName,
+    entityToEdit: selectedIndex,
+    setSelectedIdToDelete: setSelectedIndexNameToDelete,
+    entityToDelete: selectedIndexToDelete,
+    showEntityToDelete: showindexToDelete,
+  } = useQueryStateRouting({
+    entities: allIndexes,
+    isLoading: isLoadingIndexes,
+    idField: 'name',
+    operations: ['new', 'edit', 'delete'],
+    entityName: 'Database Index',
+  })
+
   const {
     data: schemas,
     isLoading: isLoadingSchemas,
@@ -70,11 +75,6 @@ const Indexes = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const selectedIndex = allIndexes?.find((index) => index.name === selectedIndexName)
-  const selectedIndexToDelete = allIndexes?.find(
-    (index) => index.name === selectedIndexNameToDelete
-  )
 
   const { mutate: deleteIndex, isLoading: isExecuting } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
@@ -112,29 +112,6 @@ const Indexes = () => {
   useEffect(() => {
     if (table !== undefined) setSearch(table)
   }, [table])
-
-  const indexToEdit = allIndexes?.find((idx) => idx.name === selectedIndexName)
-  const indexToEditNotFound = selectedIndexName !== '' && !indexToEdit
-
-  const indexToDelete = allIndexes?.find((idx) => idx.name === selectedIndexNameToDelete)
-  const showindexToDelete = selectedIndexNameToDelete !== '' && !!indexToDelete
-  const indexToDeleteNotFound = selectedIndexNameToDelete !== '' && !indexToDelete
-
-  // Error handling if edit panel is open and function is not found
-  useEffect(() => {
-    if (!isLoadingIndexes && indexToEditNotFound) {
-      toast.error('Database Function not found')
-      setSelectedIndexName('')
-    }
-  }, [selectedIndexName, indexToEdit, isLoadingIndexes])
-
-  // Error handling if delete panel is open and function is not found
-  useEffect(() => {
-    if (!isLoadingIndexes && indexToDeleteNotFound) {
-      toast.error('Database Function not found')
-      setSelectedIndexNameToDelete('')
-    }
-  }, [selectedIndexNameToDelete, indexToDelete, isLoadingIndexes])
 
   return (
     <>

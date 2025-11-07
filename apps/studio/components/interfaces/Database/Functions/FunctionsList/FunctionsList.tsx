@@ -1,9 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { parseAsJson, parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { toast } from 'sonner'
+import { parseAsJson, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -17,6 +15,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -163,68 +162,30 @@ $$;`)
     ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
   ]
 
-  const [showCreateFunctionForm, setShowCreateFunctionForm] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [selectedFunctionToEdit, setSelectedFunctionToEdit] = useQueryState(
-    'edit',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [selectedFunctionIdToDuplicate, setSelectedFunctionIdToDuplicate] = useQueryState(
-    'duplicate',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [selectedFunctionToDelete, setSelectedFunctionToDelete] = useQueryState(
-    'delete',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
-
-  const functionToEdit = functions?.find((fn) => fn.id.toString() === selectedFunctionToEdit)
-  const showFunctionToEdit = selectedFunctionToEdit !== '' && !!functionToEdit
-  const functionToEditNotFound = selectedFunctionToEdit !== '' && !functionToEdit
-
-  // Derive the duplicate function from the data
-  const originalFunctionToDuplicate = functions?.find(
-    (fn) => fn.id.toString() === selectedFunctionIdToDuplicate
-  )
-  const functionToDuplicate = originalFunctionToDuplicate
-    ? {
-        ...originalFunctionToDuplicate,
-        name: `${originalFunctionToDuplicate.name}_duplicate`,
-      }
-    : undefined
-
-  const showFunctionToDuplicate = selectedFunctionIdToDuplicate !== '' && !!functionToDuplicate
-  const functionToDuplicateNotFound = selectedFunctionIdToDuplicate !== '' && !functionToDuplicate
-
-  const functionToDelete = functions?.find((fn) => fn.id.toString() === selectedFunctionToDelete)
-  const showFunctionToDelete = selectedFunctionToDelete !== '' && !!functionToDelete
-  const functionToDeleteNotFound = selectedFunctionToDelete !== '' && !functionToDelete
-
-  // Error handling if edit panel is open and function is not found
-  useEffect(() => {
-    if (!isLoading && functionToEditNotFound) {
-      toast.error('Database Function not found')
-      setSelectedFunctionToEdit('')
-    }
-  }, [selectedFunctionToEdit, functionToEdit, isLoading])
-
-  // Error handling if duplicate panel is open and function is not found
-  useEffect(() => {
-    if (!isLoading && functionToDuplicateNotFound) {
-      toast.error('Database Function not found')
-      setSelectedFunctionIdToDuplicate('')
-    }
-  }, [selectedFunctionIdToDuplicate, functionToDuplicate, isLoading])
-
-  // Error handling if delete panel is open and function is not found
-  useEffect(() => {
-    if (!isLoading && functionToDeleteNotFound) {
-      toast.error('Database Function not found')
-      setSelectedFunctionToDelete('')
-    }
-  }, [selectedFunctionToDelete, functionToDelete, isLoading])
+  const {
+    showCreate: showCreateFunctionForm,
+    setShowCreate: setShowCreateFunctionForm,
+    setSelectedIdToEdit: setSelectedFunctionToEdit,
+    entityToEdit: functionToEdit,
+    showEntityToEdit: showFunctionToEdit,
+    setSelectedIdToDelete: setSelectedFunctionToDelete,
+    entityToDelete: functionToDelete,
+    showEntityToDelete: showFunctionToDelete,
+    setSelectedIdToDuplicate: setSelectedFunctionIdToDuplicate,
+    entityToDuplicate: functionToDuplicate,
+    showEntityToDuplicate: showFunctionToDuplicate,
+  } = useQueryStateRouting({
+    entities: functions,
+    isLoading,
+    idField: 'id',
+    operations: ['new', 'edit', 'delete', 'duplicate'],
+    entityName: 'Database Function',
+    transformDuplicate: (fn) => ({
+      ...fn,
+      name: `${fn.name}_duplicate`,
+    }),
+    idToString: (id) => id.toString(),
+  })
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />

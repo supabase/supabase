@@ -1,7 +1,5 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { toast } from 'sonner'
+import { useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -13,6 +11,7 @@ import {
 } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -38,49 +37,29 @@ export const EnumeratedTypes = () => {
   const { data: project } = useSelectedProjectQuery()
   const [search, setSearch] = useState('')
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [showCreateTypePanel, setShowCreateTypePanel] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [selectedTypeToEdit, setSelectedTypeToEdit] = useQueryState(
-    'edit',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [selectedTypeToDelete, setSelectedTypeToDelete] = useQueryState(
-    'delete',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
 
   const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const typeToEdit = data?.find((type: EnumeratedType) => type.id.toString() === selectedTypeToEdit)
-  const showTypeToEdit = selectedTypeToEdit !== '' && !!typeToEdit
-  const typeToEditNotFound = selectedTypeToEdit !== '' && !typeToEdit
-
-  const typeToDelete = data?.find(
-    (type: EnumeratedType) => type.id.toString() === selectedTypeToDelete
-  )
-  const showTypeToDelete = selectedTypeToDelete !== '' && !!typeToDelete
-  const typeToDeleteNotFound = selectedTypeToDelete !== '' && !typeToDelete
-
-  // Error handling if edit panel is open and type is not found
-  useEffect(() => {
-    if (!isLoading && typeToEditNotFound) {
-      toast.error('Enumerated Type not found')
-      setSelectedTypeToEdit('')
-    }
-  }, [selectedTypeToEdit, typeToEdit, isLoading])
-
-  // Error handling if delete panel is open and type is not found
-  useEffect(() => {
-    if (!isLoading && typeToDeleteNotFound) {
-      toast.error('Enumerated Type not found')
-      setSelectedTypeToDelete('')
-    }
-  }, [selectedTypeToDelete, typeToDelete, isLoading])
+  const {
+    showCreate: showCreateTypePanel,
+    setShowCreate: setShowCreateTypePanel,
+    setSelectedIdToEdit: setSelectedTypeToEdit,
+    entityToEdit: typeToEdit,
+    showEntityToEdit: showTypeToEdit,
+    setSelectedIdToDelete: setSelectedTypeToDelete,
+    entityToDelete: typeToDelete,
+    showEntityToDelete: showTypeToDelete,
+  } = useQueryStateRouting({
+    entities: data,
+    isLoading,
+    idField: 'id',
+    operations: ['new', 'edit', 'delete'],
+    entityName: 'Enumerated Type',
+    idToString: (id) => id.toString(),
+  })
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
   const filteredEnumeratedTypes =

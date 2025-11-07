@@ -1,9 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useQueryState, parseAsBoolean, parseAsString } from 'nuqs'
-import { toast } from 'sonner'
+import { useState } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -12,6 +10,7 @@ import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CreateRolePanel } from './CreateRolePanel'
 import { DeleteRoleModal } from './DeleteRoleModal'
@@ -27,14 +26,6 @@ export const RolesList = () => {
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
-  const [isCreatingRole, setIsCreatingRole] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [selectedRoleToDelete, setSelectedRoleToDelete] = useQueryState(
-    'delete',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
 
   const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -51,6 +42,22 @@ export const RolesList = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const {
+    showCreate: isCreatingRole,
+    setShowCreate: setIsCreatingRole,
+    setSelectedIdToDelete: setSelectedRoleToDelete,
+    entityToDelete: roleToDelete,
+    showEntityToDelete: showroleToDelete,
+  } = useQueryStateRouting({
+    entities: data,
+    isLoading,
+    idField: 'id',
+    operations: ['new', 'delete'],
+    entityName: 'Database Role',
+    idToString: (id) => id.toString(),
+  })
+
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
 
   const filteredRoles = (
@@ -68,20 +75,6 @@ export const RolesList = () => {
     roles.filter((role) => role.activeConnections > 0),
     (r) => -r.activeConnections
   )
-
-  const roleToDelete = data?.find(
-    (role) => role.id.toString() === selectedRoleToDelete
-  ) as unknown as PostgresRole
-  const showroleToDelete = selectedRoleToDelete !== '' && !!roleToDelete
-  const roleToDeleteNotFound = selectedRoleToDelete !== '' && !roleToDelete
-
-  // Error handling if delete panel is open and role is not found
-  useEffect(() => {
-    if (!isLoading && roleToDeleteNotFound) {
-      toast.error('Database Role not found')
-      setSelectedRoleToDelete('')
-    }
-  }, [selectedRoleToDelete, roleToDelete, isLoading])
 
   return (
     <>
@@ -235,7 +228,7 @@ export const RolesList = () => {
       <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
 
       <DeleteRoleModal
-        role={roleToDelete}
+        role={roleToDelete as unknown as PostgresRole}
         visible={showroleToDelete}
         onClose={() => setSelectedRoleToDelete('')}
       />

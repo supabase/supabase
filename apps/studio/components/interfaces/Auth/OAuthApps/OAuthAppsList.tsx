@@ -1,9 +1,7 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { MoreVertical, Plus, RotateCw, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { toast } from 'sonner'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -14,6 +12,7 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
+import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
 import {
   Badge,
   Button,
@@ -53,19 +52,11 @@ export const OAuthAppsList = () => {
   const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
   const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
-
-  const [showCreateSheet, setShowCreateSheet] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [selectedOAuthAppToDelete, setSelectedOAuthAppToDelete] = useQueryState(
-    'delete',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
+  const [filterString, setFilterString] = useState<string>('')
 
   const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
@@ -77,6 +68,22 @@ export const OAuthAppsList = () => {
     { enabled: isOAuthServerEnabled }
   )
 
+  const oAuthApps = data?.clients || []
+
+  const {
+    showCreate: showCreateSheet,
+    setShowCreate: setShowCreateSheet,
+    setSelectedIdToDelete: setSelectedOAuthAppToDelete,
+    entityToDelete: oAuthAppToDelete,
+    showEntityToDelete: showoAuthAppToDelete,
+  } = useQueryStateRouting({
+    entities: oAuthApps,
+    isLoading,
+    idField: 'client_id',
+    operations: ['new', 'delete'],
+    entityName: 'OAuth App',
+  })
+
   const { mutateAsync: regenerateSecret, isLoading: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
       onSuccess: (data) => {
@@ -86,27 +93,9 @@ export const OAuthAppsList = () => {
       },
     })
 
-  const oAuthApps = data?.clients || []
-
   const handleDeleteClick = (app: OAuthClient) => {
     setSelectedOAuthAppToDelete(app.client_id)
   }
-
-  const oAuthAppToDelete = oAuthApps?.find(
-    (app) => app.client_id.toString() === selectedOAuthAppToDelete
-  )
-  const showoAuthAppToDelete = selectedOAuthAppToDelete !== '' && !!oAuthAppToDelete
-  const oAuthAppToDeleteNotFound = selectedOAuthAppToDelete !== '' && !oAuthAppToDelete
-
-  // Error handling if delete dialog is open and oAuth app is not found
-  useEffect(() => {
-    if (!isLoading && oAuthAppToDeleteNotFound) {
-      toast.error('OAuth App not found')
-      setSelectedOAuthAppToDelete('')
-    }
-  }, [selectedOAuthAppToDelete, oAuthAppToDelete, isLoading])
-
-  const [filterString, setFilterString] = useState<string>('')
 
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
