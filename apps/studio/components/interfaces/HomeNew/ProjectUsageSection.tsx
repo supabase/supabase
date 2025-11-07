@@ -113,7 +113,7 @@ export const ProjectUsageSection = () => {
     return { datetimeFormat: format }
   }, [selectedInterval])
 
-  const statsByService = useServiceStats(projectRef as string, interval)
+  const statsByService = useServiceStats(projectRef!, interval)
 
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
