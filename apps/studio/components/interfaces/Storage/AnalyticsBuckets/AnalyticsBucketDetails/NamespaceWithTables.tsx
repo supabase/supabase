@@ -1,21 +1,21 @@
+import { snakeCase } from 'lodash'
 import { ChevronRight, Info, MoreVertical, Pause, Play, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
+import { useUpdatePublicationMutation } from 'data/etl/publication-update-mutation'
+import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
+import { useReplicationTablesQuery } from 'data/etl/tables-query'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { FDW } from 'data/fdw/fdws-query'
-import { useUpdatePublicationMutation } from 'data/replication/publication-update-mutation'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor } from 'icons'
-import { snakeCase } from 'lodash'
-import { toast } from 'sonner'
 import {
   Button,
   Card,

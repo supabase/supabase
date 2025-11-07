@@ -35,6 +35,6 @@ While pointing out the exact cause for egress may not be straightforward, there 
 
 **Cached vs uncached egress**
 
-We differentiate between cached and uncached egress. Cached egress refers to egress that is served via our CDN and hits the cache. Uncached egress, on the other hand, refers to egress that is not served from the cache and requires a fresh request to the origin server.
+We differentiate between cached and uncached egress. Cached egress, which only applies to Supabase Storage, refers to egress that is served via our CDN and hits the cache. Uncached egress, on the other hand, refers to egress that is not served from the cache and requires a fresh request to the origin server.
 
 Your plan includes a quota for both cached and uncached egress and these are independent. Cached egress is also cheaper in case you exceed your quota.

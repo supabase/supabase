@@ -3,10 +3,10 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
-import { Pipeline } from 'data/replication/pipelines-query'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { ReplicationPipelineStatusData } from 'data/etl/pipeline-status-query'
+import { Pipeline } from 'data/etl/pipelines-query'
+import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
+import { useStopPipelineMutation } from 'data/etl/stop-pipeline-mutation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,

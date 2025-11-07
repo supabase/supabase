@@ -2,7 +2,7 @@ import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
 import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { generateTriggerCreateSQL } from 'components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'

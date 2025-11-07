@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
+import { useCreateTenantSourceMutation } from 'data/etl/create-tenant-source-mutation'
 import {
   Button,
   Dialog,

@@ -35,7 +35,7 @@ const BucketPage: NextPageWithLayout = () => {
   }
 
   // If the bucket is not found or the bucket type is ANALYTICS or VECTOR, show an error message
-  if (!bucket || bucket.type !== 'STANDARD') {
+  if (!bucket || ('type' in bucket && bucket.type !== 'STANDARD')) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <p className="text-sm text-foreground-light">Bucket "{bucketId}" cannot be found</p>

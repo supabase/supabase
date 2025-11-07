@@ -1,14 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import { FDW } from 'data/fdw/fdws-query'
-import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
+import { useReplicationPipelinesQuery } from 'data/etl/pipelines-query'
 import {
   ReplicationPublication,
   useReplicationPublicationsQuery,
-} from 'data/replication/publications-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+} from 'data/etl/publications-query'
+import { useReplicationSourcesQuery } from 'data/etl/sources-query'
+import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
+import { FDW } from 'data/fdw/fdws-query'
 import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
 import { S3AccessKey, useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
