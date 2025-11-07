@@ -150,39 +150,41 @@ const TableRowComponent = ({
     <>
       <TableRow>
         <TableCell className="min-w-[120px]">{table.name}</TableCell>
-        <TableCell colSpan={table.isConnected ? 1 : 2} className="min-w-[150px]">
-          <div className="flex flex-row items-center text-foregroung-lighter">
-            <div className="relative mr-2 align-middle w-3 h-3">
-              <span
-                className={`absolute inset-0 rounded-full ${
-                  isReplicating
-                    ? isLoading
-                      ? 'bg-brand/20 animate-ping'
-                      : 'bg-brand/20 animate-ping'
-                    : isLoading
-                      ? 'bg-selection/20 animate-ping'
-                      : 'hidden'
-                }`}
-                style={{
-                  animationDelay: `${1 + index * 0.15}s`,
-                  animationDuration: '2s',
-                }}
-              />
-              <span
-                className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 inline-block w-2 h-2 rounded-full ${
-                  isReplicating ? 'bg-brand' : 'bg-selection'
-                }`}
-              />
+        {!!publication && (
+          <TableCell colSpan={table.isConnected ? 1 : 2} className="min-w-[150px]">
+            <div className="flex flex-row items-center text-foregroung-lighter">
+              <div className="relative mr-2 align-middle w-3 h-3">
+                <span
+                  className={`absolute inset-0 rounded-full ${
+                    isReplicating
+                      ? isLoading
+                        ? 'bg-brand/20 animate-ping'
+                        : 'bg-brand/20 animate-ping'
+                      : isLoading
+                        ? 'bg-selection/20 animate-ping'
+                        : 'hidden'
+                  }`}
+                  style={{
+                    animationDelay: `${1 + index * 0.15}s`,
+                    animationDuration: '2s',
+                  }}
+                />
+                <span
+                  className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 inline-block w-2 h-2 rounded-full ${
+                    isReplicating ? 'bg-brand' : 'bg-selection'
+                  }`}
+                />
+              </div>
+              <span className="text-foreground-lighter">
+                {isLoading && !isReplicating
+                  ? '-'
+                  : isReplicating
+                    ? 'Replicating'
+                    : 'Not replicating'}
+              </span>
             </div>
-            <span className="text-foreground-lighter">
-              {isLoading && !isReplicating
-                ? '-'
-                : isReplicating
-                  ? 'Replicating'
-                  : 'Not replicating'}
-            </span>
-          </div>
-        </TableCell>
+          </TableCell>
+        )}
 
         {table.isConnected && (
           <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end">
@@ -277,8 +279,11 @@ export const NamespaceWithTables = ({
   wrapperValues,
   wrapperMeta,
 }: NamespaceWithTablesProps) => {
+  const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
+
+  const { publication } = useAnalyticsBucketAssociatedEntities({ projectRef, bucketId })
 
   const { data: tablesData, isLoading: isLoadingNamespaceTables } = useIcebergNamespaceTablesQuery(
     {
@@ -403,9 +408,11 @@ export const NamespaceWithTables = ({
             <TableHead className={allTables.length === 0 ? 'text-foreground-muted' : undefined}>
               Table name
             </TableHead>
-            <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>
-              Replication Status
-            </TableHead>
+            {!!publication && (
+              <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>
+                Replication Status
+              </TableHead>
+            )}
             <TableHead />
           </TableRow>
         </TableHeader>
