@@ -1,13 +1,21 @@
-import { snakeCase } from 'lodash'
-import { MoreVertical, Pause, Play } from 'lucide-react'
+import { snakeCase, uniq } from 'lodash'
+import { MoreVertical, Pause, Play, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import {
+  convertKVStringArrayToJson,
+  formatWrapperTables,
+} from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { getDecryptedParameters } from 'components/interfaces/Storage/ImportForeignSchemaDialog.utils'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useUpdatePublicationMutation } from 'data/etl/publication-update-mutation'
 import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import { useReplicationTablesQuery } from 'data/etl/tables-query'
+import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
+import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { SqlEditor } from 'icons'
 import {
@@ -22,24 +30,33 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
+import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
+
+interface TableRowComponentProps {
+  index: number
+  table: { id: number; name: string; isConnected: boolean }
+  schema: string
+  namespace: string
+  token: string
+  isLoading?: boolean
+}
 
 export const TableRowComponent = ({
   index,
   table,
   schema,
+  namespace,
+  token,
   isLoading,
-}: {
-  index: number
-  table: { id: number; name: string; isConnected: boolean }
-  schema: string
-  isLoading?: boolean
-}) => {
+}: TableRowComponentProps) => {
   const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const [showStopReplicationModal, setShowStopReplicationModal] = useState(false)
   const [showStartReplicationModal, setShowStartReplicationModal] = useState(false)
+  const [showRemoveTableModal, setShowRemoveTableModal] = useState(false)
   const [isUpdatingReplication, setIsUpdatingReplication] = useState(false)
+  const [isRemovingTable, setIsRemovingTable] = useState(false)
 
   const { sourceId, publication, pipeline } = useAnalyticsBucketAssociatedEntities({
     projectRef,
@@ -47,11 +64,16 @@ export const TableRowComponent = ({
   })
 
   const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId })
+  const { data: wrapperInstance, meta: wrapperMeta } = useAnalyticsBucketWrapperInstance({
+    bucketId: bucketId,
+  })
 
+  const { mutateAsync: updateFDW } = useFDWUpdateMutation()
+  const { mutateAsync: deleteNamespaceTable } = useIcebergNamespaceTableDeleteMutation()
   const { mutateAsync: updatePublication } = useUpdatePublicationMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
-  const isReplicating = publication?.tables.find(
+  const isReplicating = !!publication?.tables.find(
     (x) => table.name === snakeCase(`${x.schema}.${x.name}_changelog`)
   )
 
@@ -114,6 +136,63 @@ export const TableRowComponent = ({
       toast.error(`Failed to stop replication for table: ${error.message}`)
     } finally {
       setIsUpdatingReplication(false)
+    }
+  }
+
+  const onConfirmRemoveTable = async () => {
+    if (!wrapperInstance || !wrapperMeta) return toast.error('Unable to find wrapper')
+
+    try {
+      setIsRemovingTable(true)
+
+      const serverName = `${snakeCase(bucketId)}_fdw_server`
+      const serverOptions = await getDecryptedParameters({
+        ref: project?.ref,
+        connectionString: project?.connectionString ?? undefined,
+        wrapper: wrapperInstance,
+      })
+      const formValues: Record<string, string> = {
+        wrapper_name: wrapperInstance.name,
+        server_name: wrapperInstance.server_name,
+        ...serverOptions,
+      }
+      const targetSchemas = (formValues['supabase_target_schema'] || '')
+        .split(',')
+        .map((s) => s.trim())
+      const wrapperTables = formatWrapperTables(wrapperInstance, wrapperMeta).filter(
+        (x) => x.table_name !== table.name
+      )
+
+      await updateFDW({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        wrapper: wrapperInstance,
+        wrapperMeta,
+        formState: {
+          ...formValues,
+          server_name: serverName,
+          supabase_target_schema: uniq([...targetSchemas])
+            .filter(Boolean)
+            .join(','),
+        },
+        tables: wrapperTables,
+      })
+
+      const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
+      await deleteNamespaceTable({
+        token,
+        catalogUri: wrapperValues.catalog_uri,
+        warehouse: wrapperValues.warehouse,
+        namespace: namespace,
+        table: table.name,
+      })
+
+      toast.success('Succesfully removed table')
+      setShowRemoveTableModal(false)
+    } catch (error: any) {
+      toast.error(`Failed to remove table: ${error.message}`)
+    } finally {
+      setIsRemovingTable(false)
     }
   }
 
@@ -180,8 +259,6 @@ export const TableRowComponent = ({
                     </Link>
                   </DropdownMenuItem>
 
-                  <DropdownMenuSeparator />
-
                   {isReplicating ? (
                     <DropdownMenuItem
                       className="flex items-center gap-x-2"
@@ -199,6 +276,23 @@ export const TableRowComponent = ({
                       <p>Start replication</p>
                     </DropdownMenuItem>
                   )}
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItemTooltip
+                    disabled={isReplicating}
+                    className="flex items-center gap-x-2"
+                    onClick={() => setShowRemoveTableModal(true)}
+                    tooltip={{
+                      content: {
+                        side: 'left',
+                        text: 'Stop replication on this table before removing',
+                      },
+                    }}
+                  >
+                    <Trash size={12} className="text-foreground-lighter" />
+                    <p>Remove table</p>
+                  </DropdownMenuItemTooltip>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
@@ -220,6 +314,7 @@ export const TableRowComponent = ({
           restarting replication on the table will clear and re-sync all data in it. Are you sure?
         </p>
       </ConfirmationModal>
+
       <ConfirmationModal
         size="medium"
         variant="warning"
@@ -234,6 +329,20 @@ export const TableRowComponent = ({
           Restarting replication on the "{table.name}" table will clear and re-sync all data in it.
           Are you sure?
         </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        size="small"
+        variant="warning"
+        visible={showRemoveTableModal}
+        loading={isRemovingTable}
+        title="Confirm to remove table"
+        description="Data from the analytics table will be lost"
+        confirmLabel="Remove table"
+        onCancel={() => setShowRemoveTableModal(false)}
+        onConfirm={() => onConfirmRemoveTable()}
+      >
+        <p className="text-sm text-foreground-light">Are you sure? This action cannot be undone.</p>
       </ConfirmationModal>
     </>
   )
