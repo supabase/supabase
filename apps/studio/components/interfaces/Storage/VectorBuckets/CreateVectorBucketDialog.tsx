@@ -107,6 +107,7 @@ export const CreateVectorBucketDialog = () => {
       await createVectorBucket({ projectRef: ref, bucketName: values.name })
     } catch (error: any) {
       toast.error(`Failed to create vector bucket: ${error.message}`)
+      return
     }
 
     try {
