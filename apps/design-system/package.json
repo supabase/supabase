@@ -19,6 +19,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "contentlayer2": "0.4.6",
+    "dayjs": "1.11.13",
     "date-fns": "^2.30.0",
     "eslint-config-supabase": "workspace:*",
     "icons": "workspace:*",
@@ -35,7 +36,7 @@
     "react-hook-form": "^7.45.0",
     "react-inlinesvg": "^4.0.4",
     "react-wrap-balancer": "^1.1.0",
-    "recharts": "^2.12.7",
+    "recharts": "2.8.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-pretty-code": "^0.9.0",
     "rehype-slug": "^6.0.0",
@@ -65,5 +66,10 @@
     "tsx": "catalog:",
     "typescript": "catalog:",
     "unist-builder": "3.0.0"
-  }
+  },
+  "overrides": {
+    "recharts": {
+        "react-is": "$react-is"
+    }
+}
 }

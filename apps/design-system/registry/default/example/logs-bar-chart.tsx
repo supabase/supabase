@@ -1,3 +1,5 @@
+'use client'
+
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 export default function LogsBarChartDemo() {
@@ -12,6 +14,8 @@ export default function LogsBarChartDemo() {
       warning_count: Math.floor(Math.random() * 50), // Random value 0-50
     }
   }).reverse()
+
+  console.log(data)
 
   return (
     <div className="w-full h-64">
