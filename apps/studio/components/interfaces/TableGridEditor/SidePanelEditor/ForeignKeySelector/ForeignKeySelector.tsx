@@ -16,6 +16,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useTablesQuery as useTableRetrieveQuery } from 'data/tables/table-retrieve-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
@@ -69,16 +70,27 @@ export const ForeignKeySelector = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: tables } = useTablesQuery<PostgresTable[] | undefined>({
+  const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: fk.schema,
-    includeColumns: true,
+    includeColumns: false,
   })
 
-  const selectedTable = (tables ?? []).find((x) => x.name === fk.table && x.schema === fk.schema)
+  const { data: selectedTable, isLoading: isLoadingSelectedTable } =
+    useTableRetrieveQuery<PostgresTable>(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: fk.schema,
+        name: fk.table,
+      },
+      {
+        enabled: !!project?.ref && !!fk.schema && !!fk.table,
+      }
+    )
 
-  const disableApply = selectedTable === undefined || hasTypeErrors
+  const disableApply = isLoadingSelectedTable || selectedTable === undefined || hasTypeErrors
 
   const updateSelectedSchema = (schema: string) => {
     const updatedFk = { ...EMPTY_STATE, id: fk.id, schema }
@@ -299,27 +311,72 @@ export const ForeignKeySelector = ({
                   <div className="col-span-4 text-xs text-foreground-lighter text-right">
                     {fk.schema}.{fk.table}
                   </div>
-                  {fk.columns.length === 0 && (
+                  {isLoadingSelectedTable && (
+                    <Alert_Shadcn_ className="col-span-10 py-2 px-3">
+                      <AlertDescription_Shadcn_>Loading table columns...</AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
+                  {!isLoadingSelectedTable && fk.columns.length === 0 && (
                     <Alert_Shadcn_ className="col-span-10 py-2 px-3">
                       <AlertDescription_Shadcn_>
                         There are no foreign key relations between the tables
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   )}
-                  {fk.columns.map((_, idx) => (
-                    <Fragment key={`${uuidv4()}`}>
-                      <div className="col-span-4">
-                        <Listbox
-                          id="column"
-                          value={fk.columns[idx].source}
-                          onChange={(value: string) => updateSelectedColumn(idx, 'source', value)}
-                        >
-                          <Listbox.Option key="empty" value={''} label="---" className="!w-[170px]">
-                            ---
-                          </Listbox.Option>
-                          {(table?.columns ?? [])
-                            .filter((x) => x.name.length !== 0)
-                            .map((column) => (
+                  {!isLoadingSelectedTable &&
+                    fk.columns.map((_, idx) => (
+                      <Fragment key={`${uuidv4()}`}>
+                        <div className="col-span-4">
+                          <Listbox
+                            id="column"
+                            value={fk.columns[idx].source}
+                            onChange={(value: string) => updateSelectedColumn(idx, 'source', value)}
+                          >
+                            <Listbox.Option
+                              key="empty"
+                              value={''}
+                              label="---"
+                              className="!w-[170px]"
+                            >
+                              ---
+                            </Listbox.Option>
+                            {(table?.columns ?? [])
+                              .filter((x) => x.name.length !== 0)
+                              .map((column) => (
+                                <Listbox.Option
+                                  key={column.id}
+                                  value={column.name}
+                                  label={column.name}
+                                  className="!w-[170px]"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-foreground">{column.name}</span>
+                                    <span className="text-foreground-lighter">
+                                      {column.format === '' ? '-' : column.format}
+                                    </span>
+                                  </div>
+                                </Listbox.Option>
+                              ))}
+                          </Listbox>
+                        </div>
+                        <div className="col-span-1 flex justify-center items-center">
+                          <ArrowRight />
+                        </div>
+                        <div className="col-span-4">
+                          <Listbox
+                            id="column"
+                            value={fk.columns[idx].target}
+                            onChange={(value: string) => updateSelectedColumn(idx, 'target', value)}
+                          >
+                            <Listbox.Option
+                              key="empty"
+                              value={''}
+                              label="---"
+                              className="!w-[170px]"
+                            >
+                              ---
+                            </Listbox.Option>
+                            {(selectedTable?.columns ?? []).map((column) => (
                               <Listbox.Option
                                 key={column.id}
                                 value={column.name}
@@ -328,55 +385,26 @@ export const ForeignKeySelector = ({
                               >
                                 <div className="flex items-center gap-2">
                                   <span className="text-foreground">{column.name}</span>
-                                  <span className="text-foreground-lighter">
-                                    {column.format === '' ? '-' : column.format}
-                                  </span>
+                                  <span className="text-foreground-lighter">{column.format}</span>
                                 </div>
                               </Listbox.Option>
                             ))}
-                        </Listbox>
-                      </div>
-                      <div className="col-span-1 flex justify-center items-center">
-                        <ArrowRight />
-                      </div>
-                      <div className="col-span-4">
-                        <Listbox
-                          id="column"
-                          value={fk.columns[idx].target}
-                          onChange={(value: string) => updateSelectedColumn(idx, 'target', value)}
-                        >
-                          <Listbox.Option key="empty" value={''} label="---" className="!w-[170px]">
-                            ---
-                          </Listbox.Option>
-                          {(selectedTable?.columns ?? []).map((column) => (
-                            <Listbox.Option
-                              key={column.id}
-                              value={column.name}
-                              label={column.name}
-                              className="!w-[170px]"
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className="text-foreground">{column.name}</span>
-                                <span className="text-foreground-lighter">{column.format}</span>
-                              </div>
-                            </Listbox.Option>
-                          ))}
-                        </Listbox>
-                      </div>
-                      <div className="col-span-1 flex justify-end items-center">
-                        <Button
-                          type="default"
-                          className="px-1"
-                          icon={<X />}
-                          disabled={fk.columns.length === 1}
-                          onClick={() => onRemoveColumn(idx)}
-                        />
-                      </div>
-                    </Fragment>
-                  ))}
+                          </Listbox>
+                        </div>
+                        <div className="col-span-1 flex justify-end items-center">
+                          <Button
+                            type="default"
+                            className="px-1"
+                            icon={<X />}
+                            disabled={fk.columns.length === 1}
+                            onClick={() => onRemoveColumn(idx)}
+                          />
+                        </div>
+                      </Fragment>
+                    ))}
                 </div>
                 <div className="space-y-2">
-                  <Button type="default" onClick={addColumn}>
+                  <Button type="default" onClick={addColumn} disabled={isLoadingSelectedTable}>
                     Add another column
                   </Button>
                   {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
