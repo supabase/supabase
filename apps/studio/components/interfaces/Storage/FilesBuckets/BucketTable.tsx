@@ -1,6 +1,3 @@
-import { Edit, FolderOpen, MoreVertical, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-
 import {
   VirtualizedTableCell,
   VirtualizedTableHead,
@@ -8,7 +5,10 @@ import {
   VirtualizedTableRow,
 } from 'components/ui/VirtualizedTable'
 import { Bucket } from 'data/storage/buckets-query'
+import { Bucket as BucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
+import { ChevronRight, Edit, FolderOpen, MoreVertical, Trash2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import {
   Badge,
   Button,
@@ -40,7 +40,10 @@ export const BucketTableHeader = ({ mode }: BucketTableHeaderProps) => {
   return (
     <BucketTableHeader>
       <BucketTableRow>
-        <BucketTableHead className={cn('w-[280px]', stickyClasses)}>Name</BucketTableHead>
+        <BucketTableHead className={`${stickyClasses} w-2 pr-1`}>
+          <span className="sr-only">Icon</span>
+        </BucketTableHead>
+        <BucketTableHead className={cn('w-[280px]', stickyClasses)}>Bucket name</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Policies</BucketTableHead>
         <BucketTableHead className={stickyClasses}>File size limit</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Allowed MIME types</BucketTableHead>
@@ -65,7 +68,7 @@ export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptySt
     <BucketTableRow className="[&>td]:hover:bg-inherit">
       <BucketTableCell colSpan={5}>
         <p className="text-sm text-foreground">No results found</p>
-        <p className="text-sm text-foreground-light">
+        <p className="text-sm text-foreground-lighter">
           Your search for "{filterString}" did not return any results
         </p>
       </BucketTableCell>
@@ -95,17 +98,24 @@ export const BucketTableRow = ({
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
 
+  const router = useRouter()
+
   return (
-    <BucketTableRow key={bucket.id}>
-      <BucketTableCell>
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
-            title={bucket.id}
-            className="text-link-table-cell"
-          >
-            {bucket.id}
-          </Link>
+    <BucketTableRow
+      key={bucket.id}
+      className="cursor-pointer h-16"
+      onClick={(event) => {
+        const url = `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`
+        if (event.metaKey) window.open(url, '_blank')
+        else router.push(url)
+      }}
+    >
+      <BucketTableCell className="w-2 pr-1">
+        <BucketIcon size={16} className="text-foreground-muted" />
+      </BucketTableCell>
+      <BucketTableCell className="flex-1">
+        <div className="flex items-center gap-2.5">
+          <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
           {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
       </BucketTableCell>
@@ -115,7 +125,9 @@ export const BucketTableRow = ({
       </BucketTableCell>
 
       <BucketTableCell>
-        <p className={bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'}>
+        <p
+          className={`whitespace-nowrap ${bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'}`}
+        >
           {bucket.file_size_limit
             ? formatBytes(bucket.file_size_limit)
             : `Unset (${formattedGlobalUploadLimit})`}
@@ -131,19 +143,8 @@ export const BucketTableRow = ({
       </BucketTableCell>
 
       <BucketTableCell>
-        <div className="flex justify-end gap-2">
-          <Button asChild type="default">
-            <Link
-              href={`/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
-            >
-              View files
-            </Link>
-          </Button>
-          <BucketDropdownMenu
-            bucket={bucket}
-            setSelectedBucket={setSelectedBucket}
-            setModal={setModal}
-          />
+        <div className="flex justify-end items-center h-full">
+          <ChevronRight size={14} className="text-foreground-muted/60" />
         </div>
       </BucketTableCell>
     </BucketTableRow>
