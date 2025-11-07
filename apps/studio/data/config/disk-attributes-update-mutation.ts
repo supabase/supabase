@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { configKeys } from './keys'
 
 export const COOLDOWN_DURATION = 60 * 60 * 6
@@ -50,7 +50,7 @@ export const useUpdateDiskAttributesMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateDiskAttributesData, ResponseError, UpdateDiskAttributesVariables>,
+  UseCustomMutationOptions<UpdateDiskAttributesData, ResponseError, UpdateDiskAttributesVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

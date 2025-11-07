@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
 export type EdgeFunctionsUpdateVariables = {
   projectRef: string
@@ -39,7 +39,7 @@ export const useEdgeFunctionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>,
+  UseCustomMutationOptions<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

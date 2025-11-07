@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { profileKeys } from './keys'
 
 export type ProfileUpdateVariables = {
@@ -38,7 +38,7 @@ export const useProfileUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProfileUpdateData, ResponseError, ProfileUpdateVariables>,
+  UseCustomMutationOptions<ProfileUpdateData, ResponseError, ProfileUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

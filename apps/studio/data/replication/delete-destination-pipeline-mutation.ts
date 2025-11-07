@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
 
 export type DeleteDestinationPipelineParams = {
@@ -38,7 +38,11 @@ export const useDeleteDestinationPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteDestinationPipelineData, ResponseError, DeleteDestinationPipelineParams>,
+  UseCustomMutationOptions<
+    DeleteDestinationPipelineData,
+    ResponseError,
+    DeleteDestinationPipelineParams
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import { forwardRef } from 'react'
+import { forwardRef, ReactNode } from 'react'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 
 export interface AdmonitionProps {
@@ -20,6 +20,8 @@ export interface AdmonitionProps {
     title?: React.ComponentProps<typeof AlertTitle_Shadcn_>
     description?: React.ComponentProps<typeof AlertDescription_Shadcn_>
   }
+  layout?: 'horizontal' | 'vertical'
+  actions?: ReactNode
 }
 
 const admonitionToAlertMapping: Record<
@@ -91,7 +93,18 @@ export const Admonition = forwardRef<
   React.ComponentPropsWithoutRef<typeof Alert_Shadcn_> & AdmonitionProps
 >(
   (
-    { type = 'note', variant, showIcon = true, label, title, description, children, ...props },
+    {
+      type = 'note',
+      variant,
+      showIcon = true,
+      label,
+      title,
+      description,
+      children,
+      layout = 'vertical',
+      actions,
+      ...props
+    },
     ref
   ) => {
     const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
@@ -113,38 +126,49 @@ export const Admonition = forwardRef<
         ) : showIcon ? (
           <InfoIcon />
         ) : null}
-        {label || title ? (
-          <>
-            <AlertTitle_Shadcn_
-              {...props.childProps?.title}
-              className={cn(
-                'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
-                !label && 'flex-col',
-                props.childProps?.title?.className
-              )}
-            >
-              {label || title}
-            </AlertTitle_Shadcn_>
-            {description && (
-              <AlertDescription_Shadcn_ className={props.childProps?.description?.className}>
-                {description}
-              </AlertDescription_Shadcn_>
-            )}
-            {/* // children is to handle Docs and MDX issues with children and <p> elements */}
-            {children && (
-              <AlertDescription_Shadcn_
-                {...props.childProps?.description}
-                className={cn('[&_p]:mb-1.5 [&_p]:mt-0', props.childProps?.description?.className)}
+        <div
+          className={cn(
+            'flex',
+            layout === 'vertical' ? 'flex-col' : 'flex-row items-center justify-between gap-x-6'
+          )}
+        >
+          {label || title ? (
+            <div>
+              <AlertTitle_Shadcn_
+                {...props.childProps?.title}
+                className={cn(
+                  'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
+                  !label && 'flex-col',
+                  props.childProps?.title?.className
+                )}
               >
-                {children}
-              </AlertDescription_Shadcn_>
-            )}
-          </>
-        ) : (
-          <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
-            {children}
-          </div>
-        )}
+                {label || title}
+              </AlertTitle_Shadcn_>
+              {description && (
+                <AlertDescription_Shadcn_ className={props.childProps?.description?.className}>
+                  {description}
+                </AlertDescription_Shadcn_>
+              )}
+              {/* // children is to handle Docs and MDX issues with children and <p> elements */}
+              {children && (
+                <AlertDescription_Shadcn_
+                  {...props.childProps?.description}
+                  className={cn(
+                    '[&_p]:mb-1.5 [&_p]:mt-0',
+                    props.childProps?.description?.className
+                  )}
+                >
+                  {children}
+                </AlertDescription_Shadcn_>
+              )}
+            </div>
+          ) : (
+            <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
+              {children}
+            </div>
+          )}
+          {actions}
+        </div>
       </Alert_Shadcn_>
     )
   }

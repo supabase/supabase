@@ -13,9 +13,8 @@ import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
-import { NewStorageUIPreview } from './NewStorageUIPreview'
-import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { SecurityNotificationsPreview } from './SecurityNotificationsPreview'
+import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
@@ -25,7 +24,6 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI]: <NewStorageUIPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS]: <SecurityNotificationsPreview />,
 }
 

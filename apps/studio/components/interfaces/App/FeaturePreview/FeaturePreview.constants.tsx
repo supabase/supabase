@@ -9,13 +9,6 @@ export const FEATURE_PREVIEWS = [
     isPlatformOnly: true,
   },
   {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI,
-    name: 'New Storage interface',
-    discussionsUrl: undefined,
-    isNew: true,
-    isPlatformOnly: false,
-  },
-  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
     name: 'New Logs interface',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',

@@ -2188,8 +2188,8 @@ export interface TableQuickstartAssistantOpenedEvent {
  * @source studio
  * @page /dashboard/account/preferences
  */
-export interface InlineEditorSettingToggledEvent {
-  action: 'inline_editor_setting_toggled'
+export interface InlineEditorSettingClickedEvent {
+  action: 'inline_editor_setting_clicked'
   properties: {
     /**
      * Whether the inline editor was enabled or disabled
@@ -2197,6 +2197,42 @@ export interface InlineEditorSettingToggledEvent {
     enabled: boolean
   }
   groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the save destination button in add log drains sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/log-drains (LogDrainDestinationSheetForm)
+ */
+export interface LogDrainSaveButtonClickedEvent {
+  action: 'log_drain_save_button_clicked'
+  properties: {
+    /**
+     * Type of the destination saved
+     */
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User confirmed addition of log drain destination.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/log-drains (LogDrains)
+ */
+export interface LogDrainConfirmButtonSubmittedEvent {
+  action: 'log_drain_confirm_button_submitted'
+  properties: {
+    /**
+     * Type of the destination confirmed
+     */
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -2322,5 +2358,7 @@ export type TelemetryEvent =
   | CommandMenuOpenedEvent
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
-  | InlineEditorSettingToggledEvent
+  | InlineEditorSettingClickedEvent
   | SidebarOpenedEvent
+  | LogDrainSaveButtonClickedEvent
+  | LogDrainConfirmButtonSubmittedEvent

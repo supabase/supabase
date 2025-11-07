@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { patch, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMfaToggleVariables = {
@@ -29,7 +29,11 @@ export const useOrganizationMfaToggleMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationMfaToggleData, ResponseError, OrganizationMfaToggleVariables>,
+  UseCustomMutationOptions<
+    OrganizationMfaToggleData,
+    ResponseError,
+    OrganizationMfaToggleVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

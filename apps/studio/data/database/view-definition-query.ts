@@ -1,6 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 type GetViewDefinitionArgs = {
   id?: number
@@ -60,7 +61,7 @@ export const useViewDefinitionQuery = <TData = ViewDefinitionData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ViewDefinitionData, ViewDefinitionError, TData> = {}
+  }: UseCustomQueryOptions<ViewDefinitionData, ViewDefinitionError, TData> = {}
 ) =>
   useQuery<ViewDefinitionData, ViewDefinitionError, TData>({
     queryKey: databaseKeys.viewDefinition(projectRef, id),

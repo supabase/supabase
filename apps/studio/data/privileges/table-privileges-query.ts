@@ -1,8 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { QueryClient, UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
 import { privilegeKeys } from './keys'
 
 export type TablePrivilegesVariables = {
@@ -39,7 +40,7 @@ export const useTablePrivilegesQuery = <TData = TablePrivilegesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<TablePrivilegesData, TablePrivilegesError, TData> = {}
+  }: UseCustomQueryOptions<TablePrivilegesData, TablePrivilegesError, TData> = {}
 ) =>
   useQuery<TablePrivilegesData, TablePrivilegesError, TData>({
     queryKey: privilegeKeys.tablePrivilegesList(projectRef),
@@ -52,5 +53,5 @@ export function invalidateTablePrivilegesQuery(
   client: QueryClient,
   projectRef: string | undefined
 ) {
-  return client.invalidateQueries(privilegeKeys.tablePrivilegesList(projectRef))
+  return client.invalidateQueries({ queryKey: privilegeKeys.tablePrivilegesList(projectRef) })
 }
