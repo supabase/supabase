@@ -65,7 +65,7 @@ export const AuditLogs = () => {
     'notifications'
   )
 
-  const { hasAccess: hasAccessToAuditLogs } = useCheckEntitlements('security.audit_logs_days')
+  const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } = useCheckEntitlements('security.audit_logs_days')
 
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useOrganizationAuditLogsQuery(
@@ -82,7 +82,8 @@ export const AuditLogs = () => {
         },
       }
     )
-  const isLogsNotAvailableBasedOnPlan = isError && error.message.endsWith(logsUpgradeError)
+
+  const isLogsNotAvailableBasedOnPlan = isError && !hasAccessToAuditLogs
   const isRangeExceededError = isError && error.message.includes('range exceeded')
   const showFilters = !isLoading && !isLogsNotAvailableBasedOnPlan
 
@@ -147,7 +148,7 @@ export const AuditLogs = () => {
     return () => clearInterval(interval)
   }, [dateRange.from, dateRange.to])
 
-  if (!hasAccessToAuditLogs) {
+  if (isLogsNotAvailableBasedOnPlan) {
     return (
       <ScaffoldContainer>
         <ScaffoldSection isFullWidth>
@@ -264,7 +265,7 @@ export const AuditLogs = () => {
               </div>
             )}
 
-            {isLoading || isLoadingPermissions ? (
+            {isLoading || isLoadingPermissions || isLoadingEntitlements ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
