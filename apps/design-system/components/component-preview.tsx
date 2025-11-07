@@ -120,7 +120,7 @@ export function ComponentPreview({
     )
   }, [Preview, align])
 
-  const wideClasses = wide ? '2xl:-ml-32 2xl:-mr-32' : ''
+  const wideClasses = wide ? '2xl:-ml-20 2xl:-mr-20' : ''
 
   if (peekCode) {
     return (
