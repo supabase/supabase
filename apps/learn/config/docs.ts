@@ -47,9 +47,9 @@ export const courses: SidebarNavGroup = {
       commandItemLabel: 'Foundations',
     },
     {
-      title: 'Project: OpenDesk',
-      href: '/projects/open-desk',
-      commandItemLabel: 'Project: OpenDesk',
+      title: 'Project: Smart Office',
+      href: '/projects/smart-office',
+      commandItemLabel: 'Project: Smart Office',
     },
     {
       title: 'Performance & Scaling',

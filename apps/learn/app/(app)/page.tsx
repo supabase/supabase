@@ -20,7 +20,7 @@ export default function Home() {
     },
     {
       id: 2,
-      title: 'Project: OpenDesk 15',
+      title: 'Project: Smart Office',
       description: 'Build a realtime room-booking dashboard using Supabase.',
       chapters: 15,
       icon: Activity,

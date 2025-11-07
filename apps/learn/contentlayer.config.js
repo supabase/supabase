@@ -54,6 +54,24 @@ const ExploreItem = defineNestedType(() => ({
   },
 }))
 
+const CourseHero = defineNestedType(() => ({
+  name: 'CourseHero',
+  fields: {
+    title: {
+      type: 'string',
+      required: true,
+    },
+    subtitle: {
+      type: 'string',
+      required: true,
+    },
+    description: {
+      type: 'string',
+      required: true,
+    },
+  },
+}))
+
 const NestedProperties = defineNestedType(() => ({
   name: 'NestedProperties',
   fields: {
@@ -123,6 +141,11 @@ export const Doc = defineDocumentType(() => ({
     explore: {
       type: 'list',
       of: ExploreItem,
+      required: false,
+    },
+    courseHero: {
+      type: 'nested',
+      of: CourseHero,
       required: false,
     },
     source: {
