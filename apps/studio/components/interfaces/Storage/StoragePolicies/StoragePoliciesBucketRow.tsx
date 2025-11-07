@@ -1,8 +1,8 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
 
-import { Bucket } from 'data/storage/buckets-query'
 import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+import { Bucket } from 'data/storage/buckets-query'
 
 import { Bucket as BucketIcon } from 'icons'
 import {
@@ -40,10 +40,10 @@ export const StoragePoliciesBucketRow = ({
 }: StoragePoliciesBucketRowProps) => {
   return (
     <Card>
-      <CardHeader className="flex flex-row w-full items-center justify-between gap-0 space-y-0">
-        <div className="flex items-center gap-3">
+      <CardHeader className="flex flex-row w-full items-center justify-between gap-2 space-y-0">
+        <div className="flex flex-1 min-w-0 items-center gap-3">
           <BucketIcon className="text-foreground-muted" size={16} strokeWidth={1.5} />
-          <CardTitle>{label}</CardTitle>
+          <CardTitle className="flex-1 min-w-0 truncate">{label}</CardTitle>
           {bucket?.public && <Badge variant="warning">Public</Badge>}
         </div>
         <Button type="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
