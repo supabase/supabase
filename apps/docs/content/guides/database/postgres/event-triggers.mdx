@@ -5,30 +5,30 @@ description: 'Automatically execute SQL on database events.'
 subtitle: 'Automatically execute SQL on database events.'
 ---
 
-In Postgres, an [event trigger](https://www.postgresql.org/docs/current/event-triggers.html) is very similar to a [trigger](/docs/guides/database/postgres/triggers), except that it is triggered by database level events (and is usually reserved for [superusers](/docs/guides/database/postgres/roles-superuser))
+In Postgres, an [event trigger](https://www.postgresql.org/docs/current/event-triggers.html) is similar to a [trigger](/docs/guides/database/postgres/triggers), except that it is triggered by database level events (and is usually reserved for [superusers](/docs/guides/database/postgres/roles-superuser))
 
 With our `Supautils` extension (installed automatically for all Supabase projects), the `postgres` user has the ability to create and manage event triggers.
 
-Some use cases for event triggers ares:
+Some use cases for event triggers are:
 
 - Capturing Data Definition Language (DDL) changes - these are changes to your database schema (though the [pgAudit](/docs/guides/database/extensions/pgaudit) extension provides a more complete solution)
 - Enforcing/monitoring/preventing actions - such as preventing tables from being dropped in Production or enforcing RLS on all new tables
 
-In this guide, we will go through two example event triggers:
+The guide covers two example event triggers:
 
 1. Preventing accidental dropping of a table
 2. Automatically enabling Row Level Security on new tables in the `public` schema
 
 ## Creating an event trigger
 
-Event triggers can only be created by the `postgres` user so make sure you are authenticated as them. As with triggers, event triggers consist of 2 parts
+Only the `postgres` user can create event triggers, so make sure you are authenticated as them. As with triggers, event triggers consist of 2 parts
 
 1. A [Function](/docs/guides/database/functions) which will be executed when the triggering event occurs
 2. The actual Event Trigger object, with parameters around when the trigger should be run
 
 ### Example trigger function - prevent dropping tables
 
-This example protects any table from being dropped. It can be overridden by temporarily disabling the event trigger: `ALTER EVENT TRIGGER dont_drop_trigger DISABLE;`
+This example protects any table from being dropped. You can override it by temporarily disabling the event trigger: `ALTER EVENT TRIGGER dont_drop_trigger DISABLE;`
 
 ```sql
 -- Function
@@ -108,9 +108,9 @@ Event triggers run for each DDL command specified above and can consume resource
 
 </Admonition>
 
-Within each event trigger, helper functions exist to view the objects being modified or the command being run. For example, our example calls `pg_event_trigger_dropped_objects()` to view the object(s) being dropped. For a more comprehensive overview of these functions, see the [official documentation](https://www.postgresql.org/docs/current/event-trigger-definition.html)
+Within each event trigger, helper functions exist to view the objects being modified or the command being run. For example, our example calls `pg_event_trigger_dropped_objects()` to view the object(s) being dropped. For a more comprehensive overview of these functions, read the [official event trigger definition documentation](https://www.postgresql.org/docs/current/event-trigger-definition.html)
 
-To view the matrix commands that cause an event trigger to fire, see the [official documentation](https://www.postgresql.org/docs/current/event-trigger-matrix.html)
+To view the matrix commands that cause an event trigger to fire, read the [official event trigger matrix documentation](https://www.postgresql.org/docs/current/event-trigger-matrix.html)
 
 ## Disabling an event trigger
 
