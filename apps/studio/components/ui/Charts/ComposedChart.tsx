@@ -17,7 +17,7 @@ import {
 } from 'recharts'
 
 import { CategoricalChartState } from 'recharts/types/chart/types'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
 import { ChartHighlightActions, ChartHighlightAction } from './ChartHighlightActions'
 import {
@@ -68,6 +68,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   docsUrl?: string
   sql?: string
   highlightActions?: ChartHighlightAction[]
+  showNewBadge?: boolean
 }
 
 export function ComposedChart({
@@ -110,6 +111,7 @@ export function ComposedChart({
   sql,
   highlightActions,
   titleTooltip,
+  showNewBadge,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -319,6 +321,7 @@ export function ComposedChart({
       <ChartHeader
         hideHighlightedValue={hideHighlightedValue}
         title={title}
+        showNewBadge={showNewBadge}
         format={format}
         hideHighlightedLabel={hideHighlightedLabel}
         hideHighlightArea={hideHighlightArea}

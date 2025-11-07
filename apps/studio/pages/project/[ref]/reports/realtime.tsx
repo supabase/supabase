@@ -1,8 +1,8 @@
+import { useEffect, useState, useMemo } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
-import { useEffect, useState } from 'react'
 
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
@@ -14,20 +14,20 @@ import {
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { analyticsKeys } from 'data/analytics/keys'
-import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 
+import type { NextPageWithLayout } from 'types'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import type { NextPageWithLayout } from 'types'
+import { realtimeReports } from 'data/reports/v2/realtime.config'
+import { useChartHoverState } from 'components/ui/Charts/useChartHoverState'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -57,9 +57,8 @@ const RealtimeUsage = () => {
     datePickerHelpers,
     showUpgradePrompt,
     setShowUpgradePrompt,
-    handleDatePickerChange: handleDatePickerChangeFromHook,
+    handleDatePickerChange,
     isOrgPlanLoading,
-    orgPlan,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
   const queryClient = useQueryClient()
   const {
@@ -80,36 +79,32 @@ const RealtimeUsage = () => {
   })
 
   const state = useDatabaseSelectorStateSnapshot()
-
+  const { plan: orgPlan } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
-  const REALTIME_REPORT_ATTRIBUTES = getRealtimeReportAttributes(isFreePlan)
+
+  const chartSyncId = `realtime-${ref}`
+  useChartHoverState(chartSyncId)
+
+  const reportConfig = useMemo(() => {
+    return realtimeReports({
+      projectRef: ref!,
+      startDate: selectedDateRange?.period_start?.date ?? '',
+      endDate: selectedDateRange?.period_end?.date ?? '',
+      interval: selectedDateRange?.interval ?? 'minute',
+      databaseIdentifier: state.selectedDatabaseId,
+      isFreePlan,
+    })
+  }, [ref, selectedDateRange, state.selectedDatabaseId, isFreePlan])
 
   const onRefreshReport = async () => {
     if (!selectedDateRange) return
 
-    // [Joshen] Since we can't track individual loading states for each chart
-    // so for now we mock a loading state that only lasts for a second
     setIsRefreshing(true)
-
-    const { period_start, period_end, interval } = selectedDateRange
-    REALTIME_REPORT_ATTRIBUTES.forEach((attr) => {
-      queryClient.invalidateQueries({
-        queryKey: analyticsKeys.infraMonitoring(ref, {
-          attribute: attr?.id,
-          startDate: period_start.date,
-          endDate: period_end.date,
-          interval,
-          databaseIdentifier: state.selectedDatabaseId,
-        }),
-      })
-    })
-
+    queryClient.invalidateQueries(['report-v2'])
     refetch()
-
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
-  // [Joshen] Empty dependency array as we only want this running once
   useEffect(() => {
     if (db !== undefined) {
       setTimeout(() => {
@@ -125,11 +120,7 @@ const RealtimeUsage = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 200)
     }
-  }, [])
-
-  const handleDatePickerChange = (values: DatePickerValue) => {
-    const promptShown = handleDatePickerChangeFromHook(values)
-  }
+  }, [db, chart, state])
 
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     updateDateRangeFromHook(from, to)
@@ -179,19 +170,23 @@ const RealtimeUsage = () => {
           </div>
         }
       >
-        {selectedDateRange &&
-          REALTIME_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
-            <LazyComposedChartHandler
-              key={chart.id}
-              {...chart}
-              attributes={chart.attributes as MultiAttribute[]}
-              interval={selectedDateRange.interval}
-              startDate={selectedDateRange?.period_start?.date}
-              endDate={selectedDateRange?.period_end?.date}
-              updateDateRange={updateDateRange}
-              defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-            />
-          ))}
+        <div className="mt-8 grid md:grid-cols-2 gap-4">
+          {selectedDateRange &&
+            reportConfig
+              .filter((report) => !report.hide)
+              .map((report) => (
+                <ReportChartV2
+                  key={`${report.id}`}
+                  report={report}
+                  projectRef={ref!}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  syncId={chartSyncId}
+                />
+              ))}
+        </div>
         <div className="">
           <div className="mb-4">
             <h5 className="text-foreground mb-2">Realtime API Gateway</h5>
