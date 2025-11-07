@@ -52,6 +52,7 @@
   "docs:contribution": true,
   "docs:fdw": true,
   "docs:footer": true,
+  "docs:navigation_dropdown_links_home": true,
   "docs:self-hosting": true,
   "docs:framework_quickstarts": true,
   "docs:full_getting_started": true,
