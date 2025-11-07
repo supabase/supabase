@@ -37,6 +37,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateVectorTableSheet } from './CreateVectorTableSheet'
 import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
 import { DeleteVectorTableModal } from './DeleteVectorTableModal'
+import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
 
 export const VectorBucketDetails = () => {
   const router = useRouter()
@@ -164,7 +165,7 @@ export const VectorBucketDetails = () => {
                                 >
                                   {/* TODO: Proper URL for table editor */}
                                   <Link
-                                    href={`/project/${projectRef}/editor/${encodeURIComponent(name)}?schema=${bucketId}`}
+                                    href={`/project/${projectRef}/editor/${encodeURIComponent(name)}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
                                   >
                                     Table Editor
                                   </Link>

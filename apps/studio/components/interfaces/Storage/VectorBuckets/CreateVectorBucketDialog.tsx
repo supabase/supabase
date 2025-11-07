@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -8,11 +9,16 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
+import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
 import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -28,8 +34,11 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from '../CreateBucketModal.utils'
+import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
+import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
 
 const FormSchema = z.object({
   name: z
@@ -58,6 +67,7 @@ export type CreateBucketForm = z.infer<typeof FormSchema>
 export const CreateVectorBucketDialog = () => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
 
   const [visible, setVisible] = useState(false)
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -70,20 +80,19 @@ export const CreateVectorBucketDialog = () => {
   })
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: createVectorBucket, isLoading: isCreating } = useVectorBucketCreateMutation({
-    onSuccess: (values) => {
-      sendEvent({
-        action: 'storage_bucket_created',
-        properties: { bucketType: 'vector' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
-      toast.success(`Successfully created vector bucket ${values.name}`)
-      form.reset()
-      setVisible(false)
-    },
-    onError: (error) => {
-      toast.error(`Failed to create vector bucket: ${error.message}`)
-    },
+  const { mutateAsync: createVectorBucket, isLoading: isCreating } = useVectorBucketCreateMutation({
+    onError: () => {},
+  })
+
+  const { extension, state: wrappersExtensionState } = useS3VectorsWrapperExtension()
+  // [Joshen] Default version is what's on the DB, so if the installed version is already the default version
+  // but still doesnt meet the minimum extension version, then DB upgrade is required
+  const databaseNeedsUpgrading = extension?.installed_version === extension?.default_version
+
+  const { mutateAsync: createS3VectorsWrapper } = useS3VectorsWrapperCreateMutation()
+
+  const { mutateAsync: createSchema } = useSchemaCreateMutation({
+    onError: () => {},
   })
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
@@ -94,7 +103,34 @@ export const CreateVectorBucketDialog = () => {
     )
     if (hasExistingBucket) return toast.error('Bucket name already exists')
 
-    createVectorBucket({ projectRef: ref, bucketName: values.name })
+    try {
+      await createVectorBucket({ projectRef: ref, bucketName: values.name })
+    } catch (error: any) {
+      toast.error(`Failed to create vector bucket: ${error.message}`)
+    }
+
+    try {
+      if (wrappersExtensionState === 'not-installed' || wrappersExtensionState === 'installed') {
+        await createS3VectorsWrapper({ bucketName: values.name })
+
+        await createSchema({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          name: getVectorBucketFDWSchemaName(values.name),
+        })
+      }
+    } catch (error: any) {
+      toast.error(`Failed to create vector bucket: ${error.message}`)
+    }
+
+    sendEvent({
+      action: 'storage_bucket_created',
+      properties: { bucketType: 'vector' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
+    toast.success(`Successfully created vector bucket ${values.name}`)
+    form.reset()
+    setVisible(false)
   }
 
   useEffect(() => {
@@ -160,6 +196,43 @@ export const CreateVectorBucketDialog = () => {
                   </FormItemLayout>
                 )}
               />
+              {wrappersExtensionState === 'needs-upgrade' ? (
+                <Admonition type="warning" title="Outdated extension version" className="mb-0">
+                  <p>
+                    The S3 Vectors Wrapper requires a minimum extension version of 0.5.6. You have
+                    version {extension?.installed_version} installed. Please{' '}
+                    {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the
+                    extension by disabling and enabling the Wrappers extension.
+                  </p>
+                  <p>
+                    Before reinstalling the wrapper extension, you must first remove all existing
+                    wrappers. Afterward, you can recreate the wrappers.
+                  </p>
+                  <Button asChild type="default">
+                    <Link
+                      href={
+                        databaseNeedsUpgrading
+                          ? `/project/${ref}/settings/infrastructure`
+                          : `/project/${ref}/database/extensions?filter=wrappers`
+                      }
+                    >
+                      {databaseNeedsUpgrading ? 'Upgrade database' : 'Extensions'}
+                    </Link>
+                  </Button>
+                </Admonition>
+              ) : (
+                <Admonition type="default">
+                  <p>
+                    Supabase will install the{' '}
+                    {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
+                    S3 Vectors Wrapper integration on your behalf.{' '}
+                    <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/s3-vectors`}>
+                      Learn more
+                    </InlineLink>
+                    .
+                  </p>
+                </Admonition>
+              )}
             </DialogSection>
           </form>
         </Form_Shadcn_>
