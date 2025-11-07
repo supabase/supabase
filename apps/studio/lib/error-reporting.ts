@@ -113,5 +113,5 @@ function captureMessage({ message, context }: CaptureMessageOptions) {
   if (WHITELIST_ERRORS.some((whitelisted) => message.includes(whitelisted))) {
     return
   }
-  Sentry.captureMessage(`[CRITICAL][${context}] ${message} Failed: ${message}`)
+  Sentry.captureMessage(`[CRITICAL][${context}] Failed: ${message}`)
 }
