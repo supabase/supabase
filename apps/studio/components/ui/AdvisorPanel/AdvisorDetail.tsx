@@ -1,8 +1,9 @@
 import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { Lint } from 'data/lint/lint-query'
 import { Notification } from 'data/notifications/notifications-v2-query'
-import { NotificationDetail } from './NotificationDetail'
+import { noop } from 'lodash'
 import { AdvisorItem } from './AdvisorPanelHeader'
+import { NotificationDetail } from './NotificationDetail'
 
 interface AdvisorDetailProps {
   item: AdvisorItem
@@ -13,7 +14,7 @@ interface AdvisorDetailProps {
 export const AdvisorDetail = ({
   item,
   projectRef,
-  onUpdateNotificationStatus = () => {},
+  onUpdateNotificationStatus = noop,
 }: AdvisorDetailProps) => {
   if (item.source === 'lint') {
     const lint = item.original as Lint
