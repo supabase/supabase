@@ -885,9 +885,6 @@ importers:
       awesome-debounce-promise:
         specifier: ^2.1.0
         version: 2.1.0
-      class-variance-authority:
-        specifier: ^0.6.1
-        version: 0.6.1
       common:
         specifier: workspace:*
         version: link:../../packages/common
