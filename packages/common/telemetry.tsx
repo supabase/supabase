@@ -17,6 +17,8 @@ import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
 import { posthogClient } from './posthog-client'
 
+export { posthogClient }
+
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
 // Reexports GoogleTagManager with the right API key set
