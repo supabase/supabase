@@ -63,6 +63,9 @@ typings/
 # TypeScript cache
 *.tsbuildinfo
 
+# Next.js declaration files (auto-generated)
+next-env.d.ts
+
 # Optional npm cache directory
 .npm
 
@@ -113,6 +116,10 @@ typings/
 .idea
 .vercel
 
+# AI assistant local files
+.serena/
+CLAUDE.md
+
 #include template .env file for docker-compose
 !docker/.env
 !docker/supabase/.env
@@ -127,12 +134,19 @@ apps/new-docs/*
 # UI tokens
 packages/ui/tokens/**/*.json
 
-# UI Storybook build
-packages/ui/storybook-static
-
 # For self-hosted logs: https://github.com/supabase/supabase/blob/86e3ab20abfdb9c3e666334d3d2f8efeef9ccf2c/docker/docker-compose-logging.yml#L101
 gcloud.json
 
 # sitemaps
 # apps/www/public/*.xml
 # apps/docs/public/*.xml
+
+# CLI version file
+.temp/cli-latest
+
+.pnpm-store/*
+
+# Sentry CLI config
+**/.sentryclirc
+
+keys.json

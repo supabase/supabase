@@ -1,22 +1,37 @@
-import { useParams, useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useParams } from 'common'
+import { useState, useEffect } from 'react'
 
-import Telemetry from 'lib/telemetry'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
+import { EmptyRealtime } from './EmptyRealtime'
 
 /**
  * Acts as a container component for the entire log display
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
-  const [sendMessageShown, setSendMessageShown] = useState(false)
+  const { data: org } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
 
+  // Check if realtime publications are available
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
+  const isRealtimeAvailable =
+    !!realtimePublication &&
+    ((realtimePublication?.tables ?? []).length > 0 || realtimePublication?.tables === null)
+
+  const [sendMessageShown, setSendMessageShown] = useState(false)
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
     enabled: false,
     projectRef: ref!,
@@ -25,41 +40,47 @@ export const RealtimeInspector = () => {
     token: '', // will be filled out by RealtimeTokensPopover
     schema: 'public',
     table: '*',
+    isChannelPrivate: false,
     filter: undefined,
     bearer: null,
     enablePresence: true,
-    enableDbChanges: true,
+    enableDbChanges: isRealtimeAvailable, // Initialize based on publications availability
     enableBroadcast: true,
   })
 
+  const { mutate: sendEvent } = useSendEventMutation()
   const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
+
+  // Update enableDbChanges when publications change
+  useEffect(() => {
+    setRealtimeConfig((prev) => ({ ...prev, enableDbChanges: isRealtimeAvailable }))
+  }, [isRealtimeAvailable])
 
   return (
     <div className="flex flex-col grow h-full">
       <Header config={realtimeConfig} onChangeConfig={setRealtimeConfig} />
       <div className="relative flex flex-col grow">
         <div className="flex grow">
-          <MessagesTable
-            hasChannelSet={realtimeConfig.channelName.length > 0}
-            enabled={realtimeConfig.enabled}
-            data={logData}
-            showSendMessage={() => setSendMessageShown(true)}
-          />
+          {(logData ?? []).length > 0 ? (
+            <MessagesTable
+              hasChannelSet={realtimeConfig.channelName.length > 0}
+              enabled={realtimeConfig.enabled}
+              data={logData}
+              showSendMessage={() => setSendMessageShown(true)}
+            />
+          ) : (
+            <EmptyRealtime projectRef={ref!} />
+          )}
         </div>
       </div>
       <SendMessageModal
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          Telemetry.sendEvent(
-            {
-              category: 'realtime_inspector',
-              action: 'send_broadcast_message',
-              label: 'realtime_inspector_results',
-            },
-            telemetryProps,
-            router
-          )
+          sendEvent({
+            action: 'realtime_inspector_broadcast_sent',
+            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+          })
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />

@@ -1,18 +1,17 @@
 import { useState } from 'react'
 import { Button } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { ResponseError } from 'types'
 import { ForeignKeySelector } from '../../ForeignKeySelector/ForeignKeySelector'
+import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import type { TableField } from '../TableEditor.types'
 import { ForeignKeyRow } from './ForeignKeyRow'
-import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { checkIfRelationChanged } from './ForeignKeysManagement.utils'
-import { uuidv4 } from 'lib/helpers'
 
 interface ForeignKeysManagementProps {
   table: TableField
@@ -29,8 +28,8 @@ export const ForeignKeysManagement = ({
   setEditorDirty,
   onUpdateFkRelations,
 }: ForeignKeysManagementProps) => {
-  const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
 
   const [open, setOpen] = useState(false)
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
@@ -38,7 +37,7 @@ export const ForeignKeysManagement = ({
   const { data, error, isLoading, isSuccess, isError } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: snap.selectedSchemaName,
+    schema: selectedSchema,
   })
 
   const getRelationStatus = (fk: ForeignKey) => {

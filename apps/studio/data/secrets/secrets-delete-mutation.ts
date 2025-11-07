@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { del } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { secretsKeys } from './keys'
 
 export type SecretsDeleteVariables = {
@@ -18,7 +18,7 @@ export async function deleteSecrets({ projectRef, secrets }: SecretsDeleteVariab
     body: secrets,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -29,26 +29,24 @@ export const useSecretsDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SecretsDeleteData, ResponseError, SecretsDeleteVariables>,
+  UseCustomMutationOptions<SecretsDeleteData, ResponseError, SecretsDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<SecretsDeleteData, ResponseError, SecretsDeleteVariables>(
-    (vars) => deleteSecrets(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(secretsKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete secrets: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SecretsDeleteData, ResponseError, SecretsDeleteVariables>({
+    mutationFn: (vars) => deleteSecrets(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: secretsKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete secrets: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

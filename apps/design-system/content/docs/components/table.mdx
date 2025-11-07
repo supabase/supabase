@@ -1,0 +1,57 @@
+---
+title: Table
+description: A responsive table component for basic data.
+component: true
+---
+
+Table presents basic tabular data presentation within a [Card](/docs/components/card).
+
+<ComponentPreview name="table-demo" peekCode wide />
+
+Columns will naturally take the width of their content. Width specification is therefore not required unless you require columns to span a specific width. An example use-case may be when placing multiple Table instances on the one page, where columns on each table should optically align.
+
+`TableHead` includes a `whitespace-nowrap` utility class to prevent its text from wrapping. `TableCell` must have any custom width specified, as there are legitimate use cases for both wrapping (or truncated) text.
+
+## Usage
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+```
+
+```tsx
+<Table>
+  <TableCaption>A list of your recent invoices.</TableCaption>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Invoice</TableHead>
+      <TableHead>Status</TableHead>
+      <TableHead>Method</TableHead>
+      <TableHead className="text-right">Amount</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell className="font-medium">INV001</TableCell>
+      <TableCell>Paid</TableCell>
+      <TableCell>Credit Card</TableCell>
+      <TableCell className="text-right">$250.00</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```
+
+## Data Table
+
+You can use the `<Table />` component to build more complex data tables. Combine it with [@tanstack/react-table](https://tanstack.com/table/v8) to create tables with sorting, filtering and pagination.
+
+See the [Data Table](/docs/components/data-table) documentation for more information.
+
+You can also see an example of a data table in the [Tasks](/examples/tasks) demo.

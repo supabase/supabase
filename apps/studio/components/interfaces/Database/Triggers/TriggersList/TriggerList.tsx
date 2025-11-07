@@ -1,172 +1,252 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
+import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import Link from 'next/link'
+
+import { useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconCheck,
-  IconEdit3,
-  IconMoreVertical,
-  IconTrash,
-  IconX,
+  TableCell,
+  TableRow,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
-import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions } from 'hooks'
+import { generateTriggerCreateSQL } from './TriggerList.utils'
 
 interface TriggerListProps {
   schema: string
   filterString: string
   isLocked: boolean
-  editTrigger: (trigger: any) => void
-  deleteTrigger: (trigger: any) => void
+  editTrigger: (trigger: PostgresTrigger) => void
+  duplicateTrigger: (trigger: PostgresTrigger) => void
+  deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
-const TriggerList = ({
+export const TriggerList = ({
   schema,
   filterString,
   isLocked,
   editTrigger,
+  duplicateTrigger,
   deleteTrigger,
 }: TriggerListProps) => {
-  const { project } = useProjectContext()
+  const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
+
+  const { can: canUpdateTriggers } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
 
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter((x) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
+  const filteredTriggers = (triggers ?? []).filter(
+    (x) =>
+      includes(x.name.toLowerCase(), filterString.toLowerCase()) ||
+      (x.function_name && includes(x.function_name.toLowerCase(), filterString.toLowerCase()))
   )
-
   const _triggers = sortBy(
     filteredTriggers.filter((x) => x.schema == schema),
     (trigger) => trigger.name.toLocaleLowerCase()
   )
-  const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   if (_triggers.length === 0 && filterString.length === 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={6}>
+      <TableRow key={schema}>
+        <TableCell colSpan={7}>
           <p className="text-sm text-foreground">No triggers created yet</p>
           <p className="text-sm text-foreground-light">
             There are no triggers found in the schema "{schema}"
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
   if (_triggers.length === 0 && filterString.length > 0) {
     return (
-      <Table.tr key={schema}>
-        <Table.td colSpan={6}>
+      <TableRow key={schema}>
+        <TableCell colSpan={7}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
           </p>
-        </Table.td>
-      </Table.tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
   return (
     <>
-      {_triggers.map((x: any) => (
-        <Table.tr key={x.id}>
-          <Table.td className="space-x-2">
-            <p title={x.name} className="truncate">
+      {_triggers.map((x) => (
+        <TableRow key={x.id}>
+          <TableCell className="space-x-2">
+            <Button
+              type="text"
+              onClick={() => editTrigger(x)}
+              title={x.name}
+              className="text-link-table-cell text-left text-sm min-w-0 p-0 hover:bg-transparent font-medium max-w-48 title"
+            >
               {x.name}
-            </p>
-          </Table.td>
+            </Button>
+          </TableCell>
 
-          <Table.td className="hidden lg:table-cell break-all">
-            <p title={x.table} className="truncate">
-              {x.table}
-            </p>
-          </Table.td>
+          <TableCell className="break-all">
+            {x.table_id ? (
+              <Link
+                href={`/project/${projectRef}/editor/${x.table_id}`}
+                className="text-link-table-cell block max-w-40 text-foreground-light"
+              >
+                {x.table}
+              </Link>
+            ) : (
+              <p title={x.table} className="truncate">
+                {x.table}
+              </p>
+            )}
+          </TableCell>
 
-          <Table.td className="hidden space-x-2 xl:table-cell">
-            <p title={x.function_name} className="truncate">
-              {x.function_name}
-            </p>
-          </Table.td>
+          <TableCell className="space-x-2">
+            {x.function_name ? (
+              <Link
+                href={`/project/${projectRef}/database/functions?search=${x.function_name}&schema=${x.function_schema}`}
+                className="text-link-table-cell block max-w-40 text-foreground-light"
+              >
+                {x.function_name}
+              </Link>
+            ) : (
+              <p className="truncate text-foreground-light">-</p>
+            )}
+          </TableCell>
 
-          <Table.td className="hidden xl:table-cell">
+          <TableCell>
             <div className="flex gap-2 flex-wrap">
               {x.events.map((event: string) => (
                 <Badge key={event}>{`${x.activation} ${event}`}</Badge>
               ))}
             </div>
-          </Table.td>
+          </TableCell>
 
-          <Table.td className="hidden xl:table-cell">
+          <TableCell className="space-x-2">
+            <p title={x.orientation} className="truncate">
+              {x.orientation}
+            </p>
+          </TableCell>
+
+          <TableCell>
             <div className="flex items-center justify-center">
               {x.enabled_mode !== 'DISABLED' ? (
-                <IconCheck strokeWidth={2} className="text-brand" />
+                <Check strokeWidth={2} className="text-brand" />
               ) : (
-                <IconX strokeWidth={2} />
+                <X strokeWidth={2} />
               )}
             </div>
-          </Table.td>
+          </TableCell>
 
-          <Table.td className="text-right">
+          <TableCell className="text-right">
             {!isLocked && (
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1">
-                        <IconMoreVertical />
-                      </Button>
+                      <Button
+                        aria-label="More options"
+                        type="default"
+                        className="px-1"
+                        icon={<MoreVertical />}
+                      />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent side="bottom" align="end" className="w-36">
-                      <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
-                        <IconEdit3 size="tiny" />
+                    <DropdownMenuContent side="bottom" align="end" className="w-52">
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onClick={() => {
+                          const sql = generateTriggerCreateSQL(x)
+                          editTrigger(x)
+                        }}
+                      >
+                        <Edit2 size={14} />
                         <p>Edit trigger</p>
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onClick={() => {
+                          const sql = generateTriggerCreateSQL(x)
+                          openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                          aiSnap.newChat({
+                            name: `Update trigger ${x.name}`,
+                            initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
+                            suggestions: {
+                              title:
+                                'I can help you make a change to this trigger, here are a few example prompts to get you started:',
+                              prompts: [
+                                {
+                                  label: 'Rename Trigger',
+                                  description: 'Rename this trigger to ...',
+                                },
+                                {
+                                  label: 'Change Events',
+                                  description: 'Change the events this trigger responds to ...',
+                                },
+                                {
+                                  label: 'Modify Timing',
+                                  description:
+                                    'Modify this trigger to run after instead of before ...',
+                                },
+                              ],
+                            },
+                            sqlSnippets: [sql],
+                          })
+                        }}
+                      >
+                        <Edit size={14} />
+                        <p>Edit with Assistant</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="space-x-2" onClick={() => duplicateTrigger(x)}>
+                        <Copy size={14} />
+                        <p>Duplicate trigger</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
-                        <IconTrash stroke="red" size="tiny" />
+                        <Trash stroke="red" size={14} />
                         <p>Delete trigger</p>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button disabled type="default" icon={<IconMoreVertical />} />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="left">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You need additional permissions to update triggers
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
+                  <ButtonTooltip
+                    disabled
+                    type="default"
+                    className="px-1"
+                    icon={<MoreVertical />}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'You need additional permissions to update triggers',
+                      },
+                    }}
+                  />
                 )}
               </div>
             )}
-          </Table.td>
-        </Table.tr>
+          </TableCell>
+        </TableRow>
       ))}
     </>
   )
 }
-
-export default TriggerList

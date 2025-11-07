@@ -1,44 +1,76 @@
-import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useFlag, useParams } from 'common'
+import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
-import { withAuth } from 'hooks'
-import { ProjectLayout } from '../'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { withAuth } from 'hooks/misc/withAuth'
+import { ProjectLayout } from '../ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
 
-export interface AuthLayoutProps {
-  title?: string
-}
-
-const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
+const AuthProductMenu = () => {
+  const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
-  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
+
+  const authenticationShowOverview = useFlag('authOverviewPage')
+  const authenticationOauth21 = useFlag('EnableOAuth21')
+  const authenticationShowSecurityNotifications = useIsSecurityNotificationsEnabled()
+
+  const {
+    authenticationSignInProviders,
+    authenticationRateLimits,
+    authenticationEmails,
+    authenticationMultiFactor,
+    authenticationAttackProtection,
+    authenticationAdvanced,
+  } = useIsFeatureEnabled([
+    'authentication:sign_in_providers',
+    'authentication:rate_limits',
+    'authentication:emails',
+    'authentication:multi_factor',
+    'authentication:attack_protection',
+    'authentication:advanced',
+  ])
 
   useAuthConfigPrefetch({ projectRef })
-
-  const router = useRouter()
   const page = router.pathname.split('/')[4]
 
   return (
+    <ProductMenu
+      page={page}
+      menu={generateAuthMenu(projectRef, {
+        authenticationSignInProviders,
+        authenticationRateLimits,
+        authenticationEmails,
+        authenticationMultiFactor,
+        authenticationAttackProtection,
+        authenticationAdvanced,
+        authenticationShowOverview,
+        authenticationShowSecurityNotifications,
+        authenticationOauth21,
+      })}
+    />
+  )
+}
+
+const AuthLayout = ({ children }: PropsWithChildren<{}>) => {
+  return (
     <ProjectLayout
-      title={title || 'Authentication'}
+      title="Authentication"
       product="Authentication"
-      productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateAuthMenu(projectRef ?? 'default', { columnLevelPrivileges })}
-        />
-      }
+      productMenu={<AuthProductMenu />}
       isBlocking={false}
     >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {children}
     </ProjectLayout>
   )
 }
 
+/**
+ * Layout for all auth pages on the dashboard, wrapped with withAuth to verify logged in state
+ *
+ * Handles rendering the navigation for each section under the auth pages.
+ */
 export default withAuth(AuthLayout)

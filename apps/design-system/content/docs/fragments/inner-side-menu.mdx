@@ -1,0 +1,142 @@
+---
+title: Inner Side Menu
+description: InnerSideMenu is a component that provides a collapsible side menu with multiple sections.
+component: true
+---
+
+<ComponentPreview name="inner-side-menu-demo" peekCode wide />
+
+## Examples
+
+{/* ### Multiple sections */}
+
+{/* <ComponentPreview name="inner-side-menu-multiple-sections" peekCode /> */}
+
+### Collapsible menus
+
+Inner Side Menu uses the `<InnerSideMenuCollapsible />` component to wrap the menu items.
+This is a wrapper component around the `<Collapsible />` component.
+
+```jsx {10-12,16-17}
+import {
+  InnerSideMenuCollapsible,
+  InnerSideMenuCollapsibleTrigger,
+  InnerSideMenuCollapsibleContent,
+  InnerSideMenuItem,
+} from 'ui-patterns/InnerSideMenu'
+
+function app() {
+  return (
+    <InnerSideMenuCollapsible key={category} defaultOpen>
+      <InnerSideMenuCollapsibleTrigger title={category} />
+      <InnerSideMenuCollapsibleContent>
+        <InnerSideMenuItem href="/dashboard">Dashboard</InnerSideMenuItem>
+        <InnerSideMenuItem href="/team">Team</InnerSideMenuItem>
+        <InnerSideMenuItem href="/settings">Settings</InnerSideMenuItem>
+      </InnerSideMenuCollapsibleContent>
+    </InnerSideMenuCollapsible>
+  )
+}
+```
+
+### Static titles
+
+If you don't need the Collapsible features, you can instead use `<InnerSideBarTitle />`.
+This doesn't require the use of the `<InnerSideMenuCollapsible />` parent component wrapped around it.
+
+You can wrap the `<InnerSideBarItem />` components however you like. Below we've put a `<div/ >` around them.
+
+```jsx {1}
+<InnerSideBarTitle>Projects</InnerSideBarTitle>
+<div className="mt-2">
+    <InnerSideMenuItem href="/dashboard">Dashboard</InnerSideMenuItem>
+    <InnerSideMenuItem href="/team">Team</InnerSideMenuItem>
+    <InnerSideMenuItem href="/settings">Settings</InnerSideMenuItem>
+</div>
+```
+
+<ComponentPreview name="inner-side-menu-static-titles" />
+
+### Loading state
+
+Use `<InnerSideMenuItemLoading />` to show a loading state for menu items.
+
+This item is a wrapper around the `<Skeleton />` component, and also includes some y-padding so the items don't layout shift when shifting to loaded state and to look visually separated in a list.
+
+<ComponentPreview name="inner-side-menu-loading" />
+
+### With search
+
+Use the following components to add a search input to the menu.
+
+```jsx
+<InnerSideBarFilters>
+  <InnerSideBarFilterSearchInput
+    name="search-input"
+    placeholder="Search..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    aria-labelledby="Search items"
+  />
+</InnerSideBarFilters>
+```
+
+There is also a Filter Dropdown component that can be used to sort the menu items.
+This can be used inside `<InnerSideBarFilterSearchInput />`.
+
+```jsx {9-16}
+<InnerSideBarFilters>
+  <InnerSideBarFilterSearchInput
+    name="search-input"
+    placeholder="Search..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    aria-labelledby="Search items"
+  >
+    <InnerSideBarFilterSortDropdown value={sort} onValueChange={(value) => setSort(value)}>
+      <InnerSideBarFilterSortDropdownItem value="alphabetical">
+        Sort Alphabetically
+      </InnerSideBarFilterSortDropdownItem>
+      <InnerSideBarFilterSortDropdownItem value="reverse">
+        Sort Reverse Alphabetically
+      </InnerSideBarFilterSortDropdownItem>
+    </InnerSideBarFilterSortDropdown>
+  </InnerSideBarFilterSearchInput>
+</InnerSideBarFilters>
+```
+
+<ComponentPreview name="inner-side-menu-with-search" />
+
+### Empty list state
+
+Use `<InnerSideMenuEmptyState />` to show an empty state.
+
+Use the `actions` prop to add any actions like a `<Button />`.
+
+```jsx {4-7}
+<InnerSideBarEmptyPanel
+  title="No functions found"
+  description="Create your first serverless function to get started."
+  actions={
+    <Button type="default" onClick={createAction}>
+      Create Function
+    </Button>
+  }
+/>
+```
+
+You can also use the prop `illustration` to pass in a custom illustration, it accepts any React Node.
+
+```jsx {4-7}
+<InnerSideBarEmptyPanel
+  title="No functions found"
+  description="Create your first serverless function to get started."
+  illustration={
+    <figure>
+      <svg>../</svg>
+    </figure>
+  }
+/>
+```
+
+<ComponentPreview name="inner-side-menu-empty" />

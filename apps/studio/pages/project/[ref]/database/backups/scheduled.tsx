@@ -1,35 +1,37 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Info } from 'lucide-react'
 
-import { BackupsList } from 'components/interfaces/Database'
+import { useParams } from 'common'
+import { BackupsList } from 'components/interfaces/Database/Backups/BackupsList'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
-import { DatabaseLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms'
+import { DocsButton } from 'components/ui/DocsButton'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { IconInfo } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const ref = project?.ref || 'default'
+  const { ref: projectRef } = useParams()
 
-  const {
-    data: backups,
-    error,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useBackupsQuery({ projectRef: ref })
+  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
 
+  const isOrioleDbInAws = useIsOrioleDbInAws()
   const isPitrEnabled = backups?.pitr_enabled
-  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
-  const isPermissionsLoaded = usePermissionsLoaded()
+
+  const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'back_ups'
+  )
 
   return (
     <ScaffoldContainer>
@@ -38,53 +40,64 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
           <div className="space-y-6">
             <FormHeader className="!mb-0" title="Database Backups" />
 
-            <DatabaseBackupsNav active="scheduled" projRef={ref} />
-            <div className="space-y-8">
-              {isLoading && <GenericSkeletonLoader />}
+            <DatabaseBackupsNav active="scheduled" />
 
-              {isError && (
-                <AlertError error={error} subject="Failed to retrieve scheduled backups" />
-              )}
+            {isOrioleDbInAws ? (
+              <Admonition
+                type="default"
+                title="Database backups are not available for OrioleDB"
+                description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+              >
+                <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
+              </Admonition>
+            ) : (
+              <div className="flex flex-col gap-y-4">
+                {isLoading && <GenericSkeletonLoader />}
 
-              {isSuccess && (
-                <>
-                  {!isPitrEnabled && (
-                    <p className="text-sm text-foreground-light">
-                      Projects are backed up daily around midnight of your project's region and can
-                      be restored at any time.
-                    </p>
-                  )}
+                {isError && (
+                  <AlertError error={error} subject="Failed to retrieve scheduled backups" />
+                )}
 
-                  {isPitrEnabled && (
-                    <InformationBox
-                      hideCollapse
-                      defaultVisibility
-                      icon={<IconInfo strokeWidth={2} />}
-                      title="Point-In-Time-Recovery (PITR) enabled"
-                      description={
-                        <div>
-                          Your project uses PITR and full daily backups are no longer taken. They're
-                          not needed, as PITR supports a superset of functionality, in terms of the
-                          granular recovery that can be performed.{' '}
-                          <a
-                            className="text-brand transition-colors hover:text-brand-600"
-                            href="https://supabase.com/docs/guides/platform/backups"
-                          >
-                            Learn more
-                          </a>
-                        </div>
-                      }
-                    />
-                  )}
+                {isSuccess && (
+                  <>
+                    {!isPitrEnabled && (
+                      <p className="text-sm text-foreground-light">
+                        Projects are backed up daily around midnight of your project's region and
+                        can be restored at any time.
+                      </p>
+                    )}
 
-                  {isPermissionsLoaded && !canReadScheduledBackups ? (
-                    <NoPermission resourceText="view scheduled backups" />
-                  ) : (
-                    <BackupsList />
-                  )}
-                </>
-              )}
-            </div>
+                    {isPitrEnabled && (
+                      <InformationBox
+                        hideCollapse
+                        defaultVisibility
+                        icon={<Info strokeWidth={2} />}
+                        title="Point-In-Time-Recovery (PITR) enabled"
+                        description={
+                          <div>
+                            Your project uses PITR and full daily backups are no longer taken.
+                            They're not needed, as PITR supports a superset of functionality, in
+                            terms of the granular recovery that can be performed.{' '}
+                            <a
+                              className="text-brand transition-colors hover:text-brand-600"
+                              href={`${DOCS_URL}/guides/platform/backups`}
+                            >
+                              Learn more
+                            </a>
+                          </div>
+                        }
+                      />
+                    )}
+
+                    {isPermissionsLoaded && !canReadScheduledBackups ? (
+                      <NoPermission resourceText="view scheduled backups" />
+                    ) : (
+                      <BackupsList />
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </ScaffoldSection>
@@ -93,7 +106,9 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 }
 
 DatabaseScheduledBackups.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default DatabaseScheduledBackups

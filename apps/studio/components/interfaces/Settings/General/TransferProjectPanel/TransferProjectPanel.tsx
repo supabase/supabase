@@ -1,26 +1,26 @@
-import { IconTruck } from 'ui'
+import { Truck } from 'lucide-react'
 
-import { FormHeader } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
-import { useSelectedProject } from 'hooks'
-import TransferProjectButton from './TransferProjectButton'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { TransferProjectButton } from './TransferProjectButton'
 
-const TransferProjectPanel = () => {
-  const project = useSelectedProject()
+export const TransferProjectPanel = () => {
+  const { data: project } = useSelectedProjectQuery()
 
-  if (project === undefined) return <></>
+  if (project === undefined) return null
 
   return (
     <section id="transfer-project">
       <FormHeader
         title="Transfer Project"
-        description="Transfer your project to a different organization with no downtime."
+        description="Transfer your project to a different organization."
       />
       <Panel>
         <Panel.Content>
-          <div className="flex justify-between items-center gap-8">
+          <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
             <div className="flex space-x-4">
-              <IconTruck className="mt-1" />
+              <Truck className="mt-1" />
               <div className="space-y-1 xl:max-w-lg">
                 <p className="text-sm">Transfer project to another organization</p>
                 <p className="text-sm text-foreground-light">
@@ -38,5 +38,3 @@ const TransferProjectPanel = () => {
     </section>
   )
 }
-
-export default TransferProjectPanel

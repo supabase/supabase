@@ -1,16 +1,20 @@
-import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button, IconEye, IconEyeOff, Input, InputNumber, Listbox, Toggle } from 'ui'
 
+import { Markdown } from 'components/interfaces/Markdown'
+import { DatePicker } from 'components/ui/DatePicker'
 import { BASE_PATH } from 'lib/constants'
+import { Button, Input, InputNumber, Listbox, Toggle } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import type { Enum } from './AuthProvidersForm.types'
 
 interface FormFieldProps {
   name: string
   properties: any
   formValues: any
+  setFieldValue: (field: string, v: any) => any
   disabled?: boolean
 }
 
@@ -18,7 +22,13 @@ function formatDate(date: Date): string {
   return dayjs(date).format('dddd, MMMM D, YYYY HH:mm:ss Z')
 }
 
-const FormField = ({ name, properties, formValues, disabled = false }: FormFieldProps) => {
+const FormField = ({
+  name,
+  properties,
+  formValues,
+  disabled = false,
+  setFieldValue,
+}: FormFieldProps) => {
   const [hidden, setHidden] = useState(!!properties.isSecret)
   const [dateAsText, setDateAsText] = useState(
     formValues[name] ? formatDate(new Date(formValues[name])) : ''
@@ -26,7 +36,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
 
   useEffect(() => {
     if (properties.show && properties.show.key && !formValues[properties.show.key]) {
-      formValues[name] = ''
+      setFieldValue(name, '')
       setDateAsText('')
     }
   }, [properties.show && properties.show.key && !formValues[properties.show.key]])
@@ -75,11 +85,11 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
               to={formValues[name]}
               onChange={(date) => {
                 if (date && date.to) {
-                  formValues[name] = date.to
+                  setFieldValue(name, date.to)
                   setDateAsText(formatDate(new Date(date.to)))
                 } else {
                   setDateAsText('')
-                  formValues[name] = ''
+                  setFieldValue(name, '')
                 }
               }}
             >
@@ -101,22 +111,21 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           label={properties.title}
           labelOptional={
             properties.descriptionOptional ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.descriptionOptional}
-              </ReactMarkdown>
+              <Markdown
+                content={properties.descriptionOptional}
+                className="text-foreground-lighter"
+              />
             ) : null
           }
           descriptionText={
             properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
+              <Markdown content={properties.description} className="text-foreground-lighter" />
             ) : null
           }
           actions={
             !!properties.isSecret ? (
               <Button
-                icon={hidden ? <IconEye /> : <IconEyeOff />}
+                icon={hidden ? <Eye /> : <EyeOff />}
                 type="default"
                 onClick={() => setHidden(!hidden)}
               />
@@ -132,6 +141,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           }
         />
       )
+
     case 'multiline-string':
       return (
         <Input.TextArea
@@ -151,15 +161,13 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           }
           descriptionText={
             properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
+              <Markdown content={properties.description} className="text-foreground-lighter" />
             ) : null
           }
           actions={
             !!properties.isSecret ? (
               <Button
-                icon={hidden ? <IconEye /> : <IconEyeOff />}
+                icon={hidden ? <Eye /> : <EyeOff />}
                 type="default"
                 onClick={() => setHidden(!hidden)}
               />
@@ -175,6 +183,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           }
         />
       )
+
     case 'number':
       return (
         <InputNumber
@@ -193,9 +202,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           }
           descriptionText={
             properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
+              <Markdown content={properties.description} className="text-foreground-lighter" />
             ) : null
           }
           actions={
@@ -217,17 +224,18 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
           id={name}
           name={name}
           disabled={disabled}
-          label={properties.title}
+          label={
+            <div className="flex items-center gap-x-2">
+              <span>{properties.title}</span>
+              {properties.link && (
+                <a href={properties.link} target="_blank" rel="noreferrer noopener">
+                  <InfoTooltip side="bottom">Documentation</InfoTooltip>
+                </a>
+              )}
+            </div>
+          }
           descriptionText={
-            properties.description ? (
-              <ReactMarkdown
-                unwrapDisallowed
-                disallowedElements={['p']}
-                className="form-field-markdown"
-              >
-                {properties.description}
-              </ReactMarkdown>
-            ) : null
+            properties.description ? <Markdown content={properties.description} /> : null
           }
         />
       )
@@ -276,7 +284,7 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
       break
   }
 
-  return <></>
+  return null
 }
 
 export default FormField

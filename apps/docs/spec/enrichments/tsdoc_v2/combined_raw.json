@@ -6309,7 +6309,7 @@
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Generates email links and OTPs to be sent via a custom email provider."
+                    "shortText": "Generates email links and OTPs. This will not send links or OTPs to the end user. This function is for custom admin functionality."
                   },
                   "parameters": [
                     {

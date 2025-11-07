@@ -1,31 +1,27 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { useQuery } from '@tanstack/react-query'
+
+import { get, handleError } from 'data/fetchers'
 import { platformKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type PlatformStatusResponse = {
   isHealthy: boolean
 }
 
 export async function getPlatformStatus(signal?: AbortSignal) {
-  const response = await get(`${API_URL}/status`, {
-    signal,
-  })
-  if (response.error) {
-    throw response.error
-  }
-
-  return { isHealthy: response.is_healthy } as PlatformStatusResponse
+  const { data, error } = await get('/platform/status', { signal })
+  if (error) handleError(error)
+  return { isHealthy: (data as any).is_healthy } as PlatformStatusResponse
 }
 
 export type PlatformStatusData = Awaited<ReturnType<typeof getPlatformStatus>>
 export type PlatformStatusError = unknown
 
 export const usePlatformStatusQuery = <TData = PlatformStatusData>(
-  options: UseQueryOptions<PlatformStatusData, PlatformStatusError, TData> = {}
+  options: UseCustomQueryOptions<PlatformStatusData, PlatformStatusError, TData> = {}
 ) =>
-  useQuery<PlatformStatusData, PlatformStatusError, TData>(
-    platformKeys.status(),
-    ({ signal }) => getPlatformStatus(signal),
-    options
-  )
+  useQuery<PlatformStatusData, PlatformStatusError, TData>({
+    queryKey: platformKeys.status(),
+    queryFn: ({ signal }) => getPlatformStatus(signal),
+    ...options,
+  })

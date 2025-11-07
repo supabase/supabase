@@ -1,0 +1,194 @@
+name: Selfhosted Studio E2E Tests
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/pg-meta/**/*'
+      - 'apps/studio/**'
+      - 'e2e/studio/**'
+      - 'pnpm-lock.yaml'
+  pull_request:
+    paths:
+      - 'packages/pg-meta/**/*'
+      - 'apps/studio/**'
+      - 'e2e/studio/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/studio-e2e-test.yml'
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    # Require approval only for pull requests from forks
+    environment: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork && 'Studio E2E Tests' || '' }}
+
+    env:
+      EMAIL: ${{ secrets.CI_EMAIL }}
+      PASSWORD: ${{ secrets.CI_PASSWORD }}
+      NEXT_PUBLIC_API_URL: https://api.supabase.green
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      # Studio Self-Hosted project ID
+      VERCEL_PROJECT_ID: prj_CnatEuo7L6bUZAgmujMrm5P1rxtv
+      NEXT_PUBLIC_HCAPTCHA_SITE_KEY: 10000000-ffff-ffff-ffff-000000000001
+      VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}
+
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Verify Vercel bypass secret exists
+        run: |
+          if [ -z "${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}" ]; then
+            echo "Required secret VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO is not set" >&2
+            exit 1
+          fi
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        name: Install pnpm
+        with:
+          run_install: false
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Deploy a preview to Vercel (CLI mode) and capture the URL
+      - name: Install Vercel CLI
+        run: pnpm add --global vercel@latest
+
+      - name: Pull Vercel Environment Information (Preview)
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts for Vercel (is_platform=false)
+        env:
+          NEXT_PUBLIC_IS_PLATFORM: false
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project to Vercel and Get URL
+        id: deploy_vercel
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Vercel Preview URL: $DEPLOY_URL"
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
+
+      - name: Install Playwright Browsers
+        run: pnpm -C e2e/studio exec playwright install chromium --with-deps --only-shell
+
+      - name: 🚀 Run Playwright tests against Vercel Preview
+        id: playwright
+        continue-on-error: true
+        env:
+          AUTHENTICATION: false
+          STUDIO_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
+          API_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
+          VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO }}
+        run: pnpm e2e
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: playwright-artifacts
+          path: |
+            e2e/studio/playwright-report/
+            e2e/studio/test-results/
+          retention-days: 7
+
+      - name: Prepare summary (outputs)
+        if: always()
+        id: summarize
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const fs = require('fs')
+            const p = 'e2e/studio/test-results/test-results.json'
+            // Initialize a summary object to hold test statistics.
+            let s={total:0,passed:0,failed:0,skipped:0,timedOut:0,interrupted:0,flaky:0,durationMs:0,note:''}
+            try {
+              const data = JSON.parse(fs.readFileSync(p,'utf8'))
+              // Recursively walk through the test suites to process each test.
+              const walk=suite=>{
+                if(!suite)return;
+                suite.specs?.forEach(spec=>{
+                  spec.tests?.forEach(test=>{
+                    s.total++;
+                    // Get the last result of the test, as tests can be retried.
+                    const lastResult = test.results[test.results.length - 1];
+                    s.durationMs += lastResult.duration || 0;
+                    // A test is considered flaky if it has more than one run and the final status is 'passed'.
+                    if (test.results.length > 1 && lastResult.status === 'passed') {
+                      s.flaky++
+                    }
+                    const status = lastResult.status === 'passed' && s.flaky > 0 ? 'flaky' : lastResult.status
+                    s[status] = (s[status]||0)+1;
+                  })
+                })
+                suite.suites?.forEach(walk)
+              }
+              walk(data.suites?.[0])
+            } catch { s.note='No JSON report found or parse error.' }
+            // Generate the markdown for the summary comment.
+            const md = s.note ? `Note: ${s.note}` : `- Total: ${s.total}\n- Passed: ${s.passed||0}\n- Failed: ${s.failed||0}\n- Skipped: ${s.skipped||0}\n- Timed out: ${s.timedOut||0}\n- Interrupted: ${s.interrupted||0}\n- Flaky: ${s.flaky||0}\n- Duration: ${(s.durationMs/1000).toFixed(1)}s`
+            // Set the summary and flaky_count as outputs for subsequent steps.
+            core.setOutput('summary', md)
+            core.setOutput('flaky_count', s.flaky)
+
+      - name: Comment summary on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const issue_number = context.issue.number
+            const summary = `${{ steps.summarize.outputs.summary }}`.replace(/^"|"$/g,'')
+            const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+            const marker = '<!-- studio-e2e-summary -->'
+
+            const now = new Date()
+            const weekday = now.toLocaleString('en-US', { weekday: 'long', timeZone: 'UTC' })
+            const day = now.toLocaleString('en-US', { day: 'numeric', timeZone: 'UTC' })
+            const month = now.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' })
+            const year = now.toLocaleString('en-US', { year: 'numeric', timeZone: 'UTC' })
+            const time = now.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false,
+              timeZone: 'UTC',
+            })
+            const date = `${weekday} ${day}, ${month}, ${year} ${time} (UTC)`
+
+            const body = [
+              marker,
+              `**Studio E2E Results**`,
+              '',
+              summary,
+              '',
+              `Artifacts: ${runUrl}`,
+              '',
+              `Last updated: ${date}`
+            ].join('\n')
+
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number, per_page: 100 })
+            const existing = comments.find(c => c.body && c.body.includes(marker))
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body })
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body })
+            }
+
+      - name: Fail job if tests failed
+        if: steps.playwright.outcome != 'success' || steps.summarize.outputs.flaky_count > 0
+        run: |
+          echo "E2E tests failed" >&2
+          exit 1

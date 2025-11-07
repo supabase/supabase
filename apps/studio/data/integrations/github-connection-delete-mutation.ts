@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { del } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { integrationKeys } from './keys'
 
 type DeleteVariables = {
@@ -15,8 +15,8 @@ export async function deleteConnection({ connectionId }: DeleteVariables, signal
     params: { path: { connection_id: String(connectionId) } },
     signal,
   })
-  if (error) throw error
 
+  if (error) handleError(error)
   return data
 }
 
@@ -27,29 +27,27 @@ export const useGitHubConnectionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
+  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<DeleteContentData, ResponseError, DeleteVariables>(
-    (args) => deleteConnection(args),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(
-            integrationKeys.githubConnectionsList(variables.organizationId)
-          ),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete Github connection: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DeleteContentData, ResponseError, DeleteVariables>({
+    mutationFn: (args) => deleteConnection(args),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.githubConnectionsList(variables.organizationId),
+        }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete GitHub connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

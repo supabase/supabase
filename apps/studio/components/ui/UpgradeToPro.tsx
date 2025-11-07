@@ -1,37 +1,40 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
 import { ReactNode } from 'react'
-import { Button } from 'ui'
 
-import { useCheckPermissions, useFlag } from 'hooks'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useFlag } from 'common'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { cn } from 'ui'
+import { ButtonTooltip } from './ButtonTooltip'
+import { UpgradePlanButton } from './UpgradePlanButton'
 
 interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
-  projectRef?: string
-  organizationSlug?: string
   secondaryText: string
-  addon?: 'pitr' | 'customDomain' | 'computeInstance'
+  addon?: 'pitr' | 'customDomain'
   buttonText?: string
+  source?: string
   disabled?: boolean
+  fullWidth?: boolean
 }
 
 const UpgradeToPro = ({
   icon,
   primaryText,
-  projectRef,
-  organizationSlug,
   secondaryText,
   addon,
   buttonText,
+  source = 'upgrade',
   disabled = false,
+  fullWidth = false,
 }: UpgradeToProProps) => {
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organizationSlug })
-  const plan = subscription?.plan?.id
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const plan = organization?.plan?.id
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -39,67 +42,54 @@ const UpgradeToPro = ({
 
   return (
     <div
-      className={[
-        'block w-full rounded border border-opacity-20 py-4 px-6',
-        'border-overlay bg-surface-200',
-      ].join(' ')}
+      className={cn(
+        'block w-full py-4 px-6 bg-surface-200',
+        fullWidth ? 'border-b' : 'border border-opacity-20 border-overlay rounded'
+      )}
     >
-      <div className="flex space-x-3">
+      <div className="flex gap-x-3">
         {icon && <div className="mt-1">{icon}</div>}
-        <div className="flex w-full items-center justify-between space-x-32">
-          <div className="space-y-1">
+        <div className="flex flex-col @md:flex-row w-full @md:items-center justify-between gap-4 @md:gap-x-8">
+          <div className="space-y-1 flex-1 max-w-2xl">
             <p className="text-sm">{primaryText}</p>
             <div>
               <p className="text-sm text-foreground-light">{secondaryText}</p>
             </div>
           </div>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                type="primary"
-                disabled={!canUpdateSubscription || projectUpdateDisabled || disabled}
-                asChild
-              >
-                <Link
-                  href={
-                    plan === 'free'
-                      ? `/org/${organizationSlug ?? '_'}/billing?panel=subscriptionPlan`
-                      : `/project/${projectRef ?? '_'}/settings/addons?panel=${addon}`
-                  }
-                >
-                  {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon')}
-                </Link>
-              </Button>
-            </Tooltip.Trigger>
-            {!canUpdateSubscription ||
-              (projectUpdateDisabled && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'border border-background text-center', //border
-                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        {projectUpdateDisabled ? (
-                          <>
-                            Subscription changes are currently disabled.
-                            <br />
-                            Our engineers are working on a fix.
-                          </>
-                        ) : !canUpdateSubscription ? (
-                          'You need additional permissions to amend subscriptions'
-                        ) : (
-                          ''
-                        )}
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              ))}
-          </Tooltip.Root>
+          {!canUpdateSubscription || projectUpdateDisabled ? (
+            <ButtonTooltip
+              disabled
+              type="primary"
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: projectUpdateDisabled
+                    ? 'Subscription changes are currently disabled, our engineers are working on a fix'
+                    : !canUpdateSubscription
+                      ? 'You need additional permissions to amend subscriptions'
+                      : undefined,
+                },
+              }}
+            >
+              {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
+            </ButtonTooltip>
+          ) : (
+            <UpgradePlanButton
+              type="primary"
+              plan="Pro"
+              source={source}
+              disabled={disabled}
+              href={
+                plan === 'free'
+                  ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
+                  : addon == null
+                    ? `/org/${organization?.slug ?? '_'}/billing?panel=costControl&source=${source}`
+                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
+              }
+            >
+              {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
+            </UpgradePlanButton>
+          )}
         </div>
       </div>
     </div>

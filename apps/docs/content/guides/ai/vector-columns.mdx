@@ -7,7 +7,7 @@ sidebar_label: 'Vector columns'
 
 Supabase offers a number of different ways to store and query vectors within Postgres. The SQL included in this guide is applicable for clients in all programming languages. If you are a Python user see your [Python client options](/docs/guides/ai/python-clients) after reading the `Learn` section.
 
-Vectors in Supabase are enabled via [pgvector](https://github.com/pgvector/pgvector/), a PostgreSQL extension for storing and querying vectors in Postgres. It can be used to store [embeddings](/docs/guides/ai/concepts#what-are-embeddings).
+Vectors in Supabase are enabled via [pgvector](https://github.com/pgvector/pgvector/), a Postgres extension for storing and querying vectors in Postgres. It can be used to store [embeddings](/docs/guides/ai/concepts#what-are-embeddings).
 
 ## Usage
 
@@ -22,7 +22,7 @@ Vectors in Supabase are enabled via [pgvector](https://github.com/pgvector/pgvec
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "vector" and enable the extension.
 
@@ -55,15 +55,15 @@ create table documents (
   id serial primary key,
   title text not null,
   body text not null,
-  embedding vector(384)
+  embedding extensions.vector(384)
 );
 ```
 
 In the above SQL snippet, we create a `documents` table with a column called `embedding` (note this is just a regular Postgres column - you can name it whatever you like). We give the `embedding` column a `vector` data type with 384 dimensions. Change this to the number of dimensions produced by your embedding model. For example, if you are [generating embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) using the open source [`gte-small`](https://huggingface.co/Supabase/gte-small) model, you would set this number to 384 since that model produces 384 dimensions.
 
-<Admonition>
+<Admonition type="tip">
 
-In general, embeddings with fewer dimensions perform best. See our [analysis on fewer dimensions in pgvector](https://supabase.com/blog/fewer-dimensions-are-better-pgvector).
+In general, embeddings with fewer dimensions perform best. See our [analysis on fewer dimensions in pgvector](/blog/fewer-dimensions-are-better-pgvector).
 
 </Admonition>
 
@@ -109,24 +109,26 @@ Similarity search is the most common use case for vectors. `pgvector` support 3 
 
 Choosing the right operator depends on your needs. Dot product tends to be the fastest if your vectors are normalized. For more information on how embeddings work and how they relate to each other, see [What are Embeddings?](/docs/guides/ai/concepts#what-are-embeddings).
 
-Supabase client libraries like `supabase-js` connect to your Postgres instance via [PostgREST](docs/guides/getting-started/architecture#postgrest-api). PostgREST does not currently support `pgvector` similarity operators, so we'll need to wrap our query in a Postgres function and call it via the `rpc()` method:
+Supabase client libraries like `supabase-js` connect to your Postgres instance via [PostgREST](/docs/guides/getting-started/architecture#postgrest-api). PostgREST does not currently support `pgvector` similarity operators, so we'll need to wrap our query in a Postgres function and call it via the `rpc()` method:
 
 ```sql
 create or replace function match_documents (
-  query_embedding vector(384),
+  query_embedding extensions.vector(384),
   match_threshold float,
   match_count int
 )
 returns table (
   id bigint,
-  content text,
+  title text,
+  body text,
   similarity float
 )
 language sql stable
 as $$
   select
     documents.id,
-    documents.content,
+    documents.title,
+    documents.body,
     1 - (documents.embedding <=> query_embedding) as similarity
   from documents
   where 1 - (documents.embedding <=> query_embedding) > match_threshold
@@ -153,7 +155,7 @@ const { data: documents } = await supabaseClient.rpc('match_documents', {
 
 In this example `embedding` would be another embedding you wish to compare against your table of pre-generated embedding documents. For example if you were building a search engine, every time the user submits their query you would first generate an embedding on the search query itself, then pass it into the above `rpc()` function to match.
 
-<Admonition>
+<Admonition type="tip">
 
 Be sure to use embeddings produced from the same embedding model when calculating distance. Comparing embeddings from two different models will produce no meaningful result.
 

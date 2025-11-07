@@ -1,8 +1,16 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
-import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
+import { useQuery } from '@tanstack/react-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { CREATE_PG_GET_TABLEDEF_SQL } from './database-table-definition'
+import { databaseKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
-export const getEntityDefinitionsQuery = (limit = 100) => {
+export const getEntityDefinitionsSql = ({
+  schemas,
+  limit = 100,
+}: {
+  schemas: string[]
+  limit?: number
+}) => {
   const sql = /* SQL */ `
 ${CREATE_PG_GET_TABLEDEF_SQL}
 
@@ -18,20 +26,14 @@ with records as (
         'NO_TRIGGERS'
       )
       when 'v' then concat(
-        'create view ', concat(nc.nspname, '.', c.relname), ' as', 
+        'create view ', concat(nc.nspname, '.', c.relname), ' as',
         pg_get_viewdef(concat(nc.nspname, '.', c.relname), true)
       )
       when 'm' then concat(
         'create materialized view ', concat(nc.nspname, '.', c.relname), ' as',
         pg_get_viewdef(concat(nc.nspname, '.', c.relname), true)
       )
-      when 'f' then pg_temp.pg_get_tabledef(
-        concat(nc.nspname),
-        concat(c.relname),
-        false,
-        'FKEYS_INTERNAL',
-        'NO_TRIGGERS'
-      )
+      when 'f' then concat('create foreign table ', nc.nspname, '.', c.relname, ' ( ... )')
       when 'p' then pg_temp.pg_get_tabledef(
         concat(nc.nspname),
         concat(c.relname),
@@ -54,7 +56,7 @@ with records as (
       )
       or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
-    and nc.nspname = 'public'
+    and nc.nspname IN (${schemas.map((schema) => `'${schema}'`).join(', ')})
   order by c.relname asc
   limit ${limit}
   offset 0
@@ -77,31 +79,43 @@ from records r;
 export type EntityDefinitionsVariables = {
   limit?: number
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
+  schemas: string[]
+}
+
+export async function getEntityDefinitions(
+  { projectRef, connectionString, schemas, limit }: EntityDefinitionsVariables,
+  signal?: AbortSignal
+) {
+  const sql = getEntityDefinitionsSql({ schemas, limit })
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['entity-definitions', schemas],
+    },
+    signal
+  )
+
+  return result[0].data.definitions
 }
 
 type EntityDefinition = { id: number; sql: string }
 export type EntityDefinitionsData = EntityDefinition[]
-export type EntityDefinitionsError = unknown
+export type EntityDefinitionsError = ExecuteSqlError
 
-export const useEntityDefinitionsQuery = <
-  TData extends EntityDefinitionsData = EntityDefinitionsData,
->(
-  { limit, projectRef, connectionString }: EntityDefinitionsVariables,
-  options: UseQueryOptions<ExecuteSqlData, EntityDefinitionsError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
-    {
-      projectRef,
-      connectionString,
-      sql: getEntityDefinitionsQuery(limit),
-      queryKey: ['entity-definitions'],
-    },
-    {
-      select(data) {
-        return data.result[0].data.definitions
-      },
-      ...options,
-    }
-  )
-}
+export const useEntityDefinitionsQuery = <TData = EntityDefinitionsData>(
+  { projectRef, connectionString, schemas, limit }: EntityDefinitionsVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<EntityDefinitionsData, EntityDefinitionsError, TData> = {}
+) =>
+  useQuery<EntityDefinitionsData, EntityDefinitionsError, TData>({
+    queryKey: databaseKeys.entityDefinitions(projectRef, schemas),
+    queryFn: ({ signal }) =>
+      getEntityDefinitions({ projectRef, connectionString, schemas, limit }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && schemas.length > 0,
+    ...options,
+  })

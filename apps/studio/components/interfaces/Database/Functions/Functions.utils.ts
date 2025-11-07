@@ -5,15 +5,31 @@ import { isEmpty } from 'lodash'
  * to args = {value: [{name:'a', type:'integer'}, {name:'b', type:'integer'}]}
  */
 export function convertArgumentTypes(value: string) {
-  const items = value?.split(',')
-  if (isEmpty(value) || !items || items?.length == 0) return { value: [] }
-  const temp = items.map((x) => {
-    const str = x.trim()
-    const space = str.indexOf(' ')
-    const name = str.slice(0, space !== 1 ? space : 0)
-    const type = str.slice(space + 1)
-    return { name, type }
-  })
+  const items = value?.split(',').map((item) => item.trim())
+  if (isEmpty(value) || !items || items.length === 0) return { value: [] }
+
+  const temp = items
+    .map((x) => {
+      const regex = /(\w+)\s+([\w\[\]]+)(?:\s+DEFAULT\s+(.*))?/i
+      const match = x.match(regex)
+      if (match) {
+        const [, name, type, defaultValue] = match
+        let parsedDefaultValue = defaultValue ? defaultValue.trim() : undefined
+
+        if (
+          ['timestamp', 'time', 'timetz', 'timestamptz'].includes(type.toLowerCase()) &&
+          parsedDefaultValue
+        ) {
+          parsedDefaultValue = `'${parsedDefaultValue}'`
+        }
+
+        return { name, type, defaultValue: parsedDefaultValue }
+      } else {
+        console.error('Error while trying to parse function arguments', x)
+        return null
+      }
+    })
+    .filter(Boolean) as { name: string; type: string; defaultValue?: string }[]
   return { value: temp }
 }
 

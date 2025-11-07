@@ -1,7 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { QueryClient, useQuery } from '@tanstack/react-query'
+
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { analyticsKeys } from './keys'
-import type { ResponseError } from 'types'
 
 export type ProjectLogRequestsCountVariables = {
   projectRef?: string
@@ -18,19 +19,12 @@ export async function getProjectLogRequestsCountStats(
   const { data, error } = await get(
     '/platform/projects/{ref}/analytics/endpoints/usage.api-requests-count',
     {
-      params: {
-        path: {
-          ref: projectRef,
-        },
-      },
+      params: { path: { ref: projectRef } },
       signal,
     }
   )
 
-  if (error) {
-    throw error
-  }
-
+  if (error) handleError(error)
   return data
 }
 
@@ -44,13 +38,21 @@ export const useProjectLogRequestsCountQuery = <TData = ProjectLogRequestsCountD
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData> = {}
+  }: UseCustomQueryOptions<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData> = {}
 ) =>
-  useQuery<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData>(
-    analyticsKeys.usageApiRequestsCount(projectRef),
-    ({ signal }) => getProjectLogRequestsCountStats({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectLogRequestsCountData, ProjectLogRequestsCountError, TData>({
+    queryKey: analyticsKeys.usageApiRequestsCount(projectRef),
+    queryFn: ({ signal }) => getProjectLogRequestsCountStats({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
+
+export function prefetchProjectLogRequestsCount(
+  client: QueryClient,
+  { projectRef }: ProjectLogRequestsCountVariables
+) {
+  return client.fetchQuery({
+    queryKey: analyticsKeys.usageApiRequestsCount(projectRef),
+    queryFn: ({ signal }) => getProjectLogRequestsCountStats({ projectRef }, signal),
+  })
+}

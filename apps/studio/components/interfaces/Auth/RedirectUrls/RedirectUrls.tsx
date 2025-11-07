@@ -1,32 +1,26 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Form,
-  IconAlertCircle,
-  IconExternalLink,
-  Input,
-  Modal,
-} from 'ui'
-import { object, string } from 'yup'
+import { toast } from 'sonner'
 
-import { FormHeader } from 'components/ui/Forms'
+import { useParams } from 'common'
+import {
+  ScaffoldDescription,
+  ScaffoldSection,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
-import { urlRegex } from '../Auth.constants'
-import RedirectUrlList from './RedirectUrlList'
-import ValueContainer from './ValueContainer'
+import { DOCS_URL } from 'lib/constants'
+import { Button, Modal, ScrollArea, cn } from 'ui'
+import { AddNewURLModal } from './AddNewURLModal'
+import { RedirectUrlList } from './RedirectUrlList'
+import { ValueContainer } from './ValueContainer'
 
-const RedirectUrls = () => {
+const MAX_URLS_LENGTH = 2 * 1024
+
+export const RedirectUrls = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -44,106 +38,46 @@ const RedirectUrls = () => {
   }, [authConfig?.URI_ALLOW_LIST])
 
   const [open, setOpen] = useState(false)
-  const [selectedUrlToDelete, setSelectedUrlToDelete] = useState<string>()
+  const [openRemoveSelected, setOpenRemoveSelected] = useState(false)
+  const [selectedUrls, setSelectedUrls] = useState<string[]>([])
 
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const onConfirmDeleteUrl = async (urls?: string[]) => {
+    if (!urls || urls.length === 0) return
 
-  const newUrlSchema = object({
-    url: string().matches(urlRegex, 'URL is not valid').required(),
-  })
-
-  const onAddNewUrl = async (values: any) => {
-    if (!values.url) {
-      return
-    }
-
-    const payload = URI_ALLOW_LIST_ARRAY
-    // remove any trailing commas
-    payload.push(values.url.replace(/,\s*$/, ''))
-
-    const payloadString = payload.toString()
-
-    if (payloadString.length > 2 * 1024) {
+    // Remove selectedUrl from array and update
+    const payload = URI_ALLOW_LIST_ARRAY.filter((url: string) => !selectedUrls.includes(url))
+    const payloadString = payload.join(',')
+    if (payloadString.length > MAX_URLS_LENGTH) {
       return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
     }
-
     updateAuthConfig(
       { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
       {
         onError: (error) => {
-          toast.error(`Failed to update URL: ${error?.message}`)
+          toast.error(`Failed to remove URL(s): ${error?.message}`)
         },
         onSuccess: () => {
-          setOpen(false)
-          toast.success('Successfully added URL')
-        },
-      }
-    )
-  }
-
-  const onConfirmDeleteUrl = async (url?: string) => {
-    if (!url) return
-
-    // Remove selectedUrl from array and update
-    const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== url)
-
-    updateAuthConfig(
-      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payload.toString() } },
-      {
-        onError: (error) => {
-          toast.error(`Failed to remove URL: ${error?.message}`)
-        },
-        onSuccess: () => {
-          setSelectedUrlToDelete(undefined)
-          toast.success('Successfully removed URL')
+          setSelectedUrls([])
+          setOpenRemoveSelected(false)
+          toast.success('Successfully removed URL(s)')
         },
       }
     )
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <FormHeader
-          title="Redirect URLs"
-          description={`URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com`}
-        />
-        <div className="flex items-center gap-2 mb-6 ml-12">
-          <Button asChild type="default" icon={<IconExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </Link>
-          </Button>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
-                Add URL
-              </Button>
-            </Tooltip.Trigger>
-            {!canUpdateConfig && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to update redirect URLs
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
+    <ScaffoldSection isFullWidth>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <ScaffoldSectionTitle>Redirect URLs</ScaffoldSectionTitle>
+          <ScaffoldDescription>
+            URLs that auth providers are permitted to redirect to post authentication. Wildcards are
+            allowed, for example, https://*.domain.com
+          </ScaffoldDescription>
         </div>
+        <DocsButton href={`${DOCS_URL}/guides/auth/concepts/redirect-urls`} />
       </div>
+
       {isLoading && (
         <>
           <ValueContainer>
@@ -154,106 +88,82 @@ const RedirectUrls = () => {
           </ValueContainer>
         </>
       )}
+
       {isError && (
-        <Alert_Shadcn_ variant="destructive">
-          <IconAlertCircle strokeWidth={2} />
-          <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
       )}
+
       {isSuccess && (
         <RedirectUrlList
-          URI_ALLOW_LIST_ARRAY={URI_ALLOW_LIST_ARRAY}
-          canUpdate={canUpdateConfig}
-          onSelectUrlToDelete={setSelectedUrlToDelete}
+          allowList={URI_ALLOW_LIST_ARRAY}
+          selectedUrls={selectedUrls}
+          onSelectUrl={setSelectedUrls}
+          onSelectAddURL={() => setOpen(true)}
+          onSelectClearSelection={() => setSelectedUrls([])}
+          onSelectRemoveURLs={() => setOpenRemoveSelected(true)}
         />
       )}
-      <Modal
-        hideFooter
-        size="small"
+
+      <AddNewURLModal
         visible={open}
-        onCancel={() => setOpen(!open)}
-        header={<h3 className="text-sm">Add a new URL</h3>}
-      >
-        <Form
-          validateOnBlur
-          id="new-redirect-url-form"
-          initialValues={{ url: '' }}
-          validationSchema={newUrlSchema}
-          onSubmit={onAddNewUrl}
-        >
-          {() => {
-            return (
-              <div className="mb-4 space-y-4 pt-4">
-                <div className="px-5">
-                  <p className="text-sm text-foreground-light">
-                    This will add a URL to a list of allowed URLs that can interact with your
-                    Authentication services for this project.
-                  </p>
-                </div>
-                <div className="border-overlay-border border-t" />
-                <div className="px-5">
-                  <Input id="url" name="url" label="URL" placeholder="https://mydomain.com" />
-                </div>
-                <div className="border-overlay-border border-t" />
-                <div className="px-5">
-                  <Button
-                    block
-                    form="new-redirect-url-form"
-                    htmlType="submit"
-                    size="medium"
-                    disabled={isUpdatingConfig}
-                    loading={isUpdatingConfig}
-                  >
-                    Add URL
-                  </Button>
-                </div>
-              </div>
-            )
-          }}
-        </Form>
-      </Modal>
+        allowList={URI_ALLOW_LIST_ARRAY}
+        onClose={() => setOpen(false)}
+      />
+
       <Modal
         hideFooter
-        size="small"
-        visible={selectedUrlToDelete !== undefined}
-        header={<h3 className="text-sm">Remove URL</h3>}
-        onCancel={() => setSelectedUrlToDelete(undefined)}
+        size="large"
+        visible={openRemoveSelected}
+        header="Remove URLs"
+        onCancel={() => {
+          setSelectedUrls([])
+          setOpenRemoveSelected(false)
+        }}
       >
-        <div className="mb-4 space-y-4 pt-4">
-          <div className="px-5">
-            <p className="mb-2 text-sm text-foreground-light">
-              Are you sure you want to remove{' '}
-              <span className="text-foreground">{selectedUrlToDelete}</span>?
-            </p>
-            <p className="text-foreground-light text-sm">
-              This URL will no longer work with your authentication configuration.
-            </p>
-          </div>
-          <div className="border-overlay-border border-t"></div>
-          <div className="flex gap-3 px-5">
-            <Button
-              block
-              type="default"
-              size="medium"
-              onClick={() => setSelectedUrlToDelete(undefined)}
-            >
-              Cancel
-            </Button>
-            <Button
-              block
-              size="medium"
-              type="warning"
-              loading={isUpdatingConfig}
-              onClick={() => onConfirmDeleteUrl(selectedUrlToDelete)}
-            >
-              {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
-            </Button>
-          </div>
-        </div>
+        <Modal.Content className="flex flex-col gap-y-2">
+          <p className="mb-2 text-sm text-foreground-light">
+            Are you sure you want to remove the following {selectedUrls.length} URL
+            {selectedUrls.length > 1 ? 's' : ''}?
+          </p>
+          <ScrollArea className={cn(selectedUrls.length > 4 ? 'h-[250px]' : '')}>
+            <div className="flex flex-col -space-y-1">
+              {selectedUrls.map((url) => {
+                return (
+                  <ValueContainer key={url} className="px-4 py-3 hover:bg-surface-100">
+                    {url}
+                  </ValueContainer>
+                )
+              })}
+            </div>
+          </ScrollArea>
+          <p className="text-foreground-light text-sm">
+            These URLs will no longer work with your authentication configuration.
+          </p>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content className="flex items-center gap-x-2">
+          <Button
+            block
+            type="default"
+            size="medium"
+            onClick={() => {
+              setSelectedUrls([])
+              setOpenRemoveSelected(false)
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            block
+            size="medium"
+            type="warning"
+            loading={isUpdatingConfig}
+            onClick={() => onConfirmDeleteUrl(selectedUrls)}
+          >
+            {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
+          </Button>
+        </Modal.Content>
       </Modal>
-    </div>
+    </ScaffoldSection>
   )
 }
-
-export default RedirectUrls

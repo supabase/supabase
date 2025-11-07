@@ -1,4 +1,7 @@
-import { isUnixMicro, unixMicroToIsoTimestamp } from 'components/interfaces/Settings/Logs'
+import {
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
 import { useMemo } from 'react'
 
 /**

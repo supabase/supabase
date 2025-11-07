@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { invoicesKeys } from './keys'
-import type { ResponseError } from 'types'
+import { useQuery } from '@tanstack/react-query'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { invoicesKeys } from './keys'
 
 export type UpcomingInvoiceVariables = {
   orgSlug?: string
@@ -18,6 +18,7 @@ export type UpcomingInvoiceResponse = {
   billing_cycle_start: string
   lines: {
     amount: number
+    amount_before_discount: number
     description: string
     proration: boolean
     period: { start: string; end: string }
@@ -27,11 +28,16 @@ export type UpcomingInvoiceResponse = {
     usage_based: boolean
     usage_metric?: PricingMetric
     usage_original?: number
-    breakdown: {
+    breakdown?: {
       project_ref: string
       project_name: string
       usage: number
+      amount?: number
     }[]
+    metadata?: {
+      is_branch: boolean
+      is_read_replica: boolean
+    }
   }[]
 }
 
@@ -49,7 +55,8 @@ export async function getUpcomingInvoice(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
+
   return data as unknown as UpcomingInvoiceResponse
 }
 
@@ -61,13 +68,11 @@ export const useOrgUpcomingInvoiceQuery = <TData = UpcomingInvoiceData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<UpcomingInvoiceData, UpcomingInvoiceError, TData> = {}
+  }: UseCustomQueryOptions<UpcomingInvoiceData, UpcomingInvoiceError, TData> = {}
 ) =>
-  useQuery<UpcomingInvoiceData, UpcomingInvoiceError, TData>(
-    invoicesKeys.orgUpcomingPreview(orgSlug),
-    ({ signal }) => getUpcomingInvoice({ orgSlug }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<UpcomingInvoiceData, UpcomingInvoiceError, TData>({
+    queryKey: invoicesKeys.orgUpcomingPreview(orgSlug),
+    queryFn: ({ signal }) => getUpcomingInvoice({ orgSlug }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined',
+    ...options,
+  })

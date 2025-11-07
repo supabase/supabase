@@ -1,10 +1,11 @@
 import { memo } from 'react'
-import NavigationMenuHome from './HomeMenu'
+
+import type { NavMenuSection } from '../Navigation.types'
+import { useCloseMenuOnRouteChange } from './NavigationMenu.utils'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
 
 enum MenuId {
-  Home = 'home',
   GettingStarted = 'gettingstarted',
   Database = 'database',
   Api = 'api',
@@ -14,21 +15,29 @@ enum MenuId {
   Realtime = 'realtime',
   Storage = 'storage',
   Ai = 'ai',
+  Cron = 'cron',
+  Queues = 'queues',
   Platform = 'platform',
+  Deployment = 'deployment',
+  Telemetry = 'telemetry',
   Resources = 'resources',
+  Security = 'security',
   SelfHosting = 'self_hosting',
   Integrations = 'integrations',
-  Cli = 'supabase_cli',
+  LocalDevelopment = 'local_development',
+  Contributing = 'contributing',
   RefJavaScriptV1 = 'reference_javascript_v1',
   RefJavaScriptV2 = 'reference_javascript_v2',
   RefDartV1 = 'reference_dart_v1',
   RefDartV2 = 'reference_dart_v2',
   RefCSharpV0 = 'reference_csharp_v0',
+  RefCSharpV1 = 'reference_csharp_v1',
   RefPythonV2 = 'reference_python_v2',
   RefSwiftV1 = 'reference_swift_v1',
   RefSwiftV2 = 'reference_swift_v2',
   RefKotlinV1 = 'reference_kotlin_v1',
   RefKotlinV2 = 'reference_kotlin_v2',
+  RefKotlinV3 = 'reference_kotlin_v3',
   RefCli = 'reference_cli',
   RefApi = 'reference_api',
   SelfHostingAuth = 'reference_self_hosting_auth',
@@ -43,10 +52,6 @@ interface BaseMenu {
   type: string
 }
 
-interface HomeMenu extends BaseMenu {
-  type: 'home'
-}
-
 interface GuideMenu extends BaseMenu {
   type: 'guide'
 }
@@ -54,17 +59,12 @@ interface GuideMenu extends BaseMenu {
 interface ReferenceMenu extends BaseMenu {
   type: 'reference'
   path: string
-  commonSectionsFile: string
-  specFile?: string
+  commonSectionsFile?: string
 }
 
-type Menu = HomeMenu | GuideMenu | ReferenceMenu
+type Menu = GuideMenu | ReferenceMenu
 
 const menus: Menu[] = [
-  {
-    id: MenuId.Home,
-    type: 'home',
-  },
   {
     id: MenuId.GettingStarted,
     type: 'guide',
@@ -82,11 +82,19 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
+    id: MenuId.Queues,
+    type: 'guide',
+  },
+  {
     id: MenuId.Auth,
     type: 'guide',
   },
   {
     id: MenuId.Functions,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Telemetry,
     type: 'guide',
   },
   {
@@ -101,12 +109,17 @@ const menus: Menu[] = [
     id: MenuId.Ai,
     type: 'guide',
   },
+  { id: MenuId.Cron, type: 'guide' },
   {
     id: MenuId.Platform,
     type: 'guide',
   },
   {
     id: MenuId.Resources,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Security,
     type: 'guide',
   },
   {
@@ -118,154 +131,159 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
-    id: MenuId.Cli,
+    id: MenuId.LocalDevelopment,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Contributing,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Deployment,
     type: 'guide',
   },
   {
     id: MenuId.RefJavaScriptV1,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_js_v1.yml',
     type: 'reference',
     path: '/reference/javascript/v1',
   },
   {
     id: MenuId.RefJavaScriptV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_js_v2.yml',
     type: 'reference',
     path: '/reference/javascript',
   },
   {
     id: MenuId.RefDartV1,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v1.yml',
     type: 'reference',
     path: '/reference/dart/v1',
   },
   {
     id: MenuId.RefDartV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v2.yml',
     type: 'reference',
     path: '/reference/dart',
   },
   {
     id: MenuId.RefCSharpV0,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_csharp_v0.yml',
+    type: 'reference',
+    path: '/reference/csharp/v0',
+  },
+  {
+    id: MenuId.RefCSharpV1,
     type: 'reference',
     path: '/reference/csharp',
   },
   {
     id: MenuId.RefPythonV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_py_v2.yml',
     type: 'reference',
     path: '/reference/python',
   },
   {
     id: MenuId.RefSwiftV1,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_swift_v1.yml',
     type: 'reference',
     path: '/reference/swift',
   },
   {
     id: MenuId.RefSwiftV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_swift_v2.yml',
     type: 'reference',
     path: '/reference/swift',
   },
   {
     id: MenuId.RefKotlinV1,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_kt_v1.yml',
     type: 'reference',
     path: '/reference/kotlin/v1',
   },
   {
     id: MenuId.RefKotlinV2,
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_kt_v2.yml',
+    type: 'reference',
+    path: '/reference/kotlin/v2',
+  },
+  {
+    id: MenuId.RefKotlinV3,
     type: 'reference',
     path: '/reference/kotlin',
   },
   {
     id: MenuId.RefCli,
-    commonSectionsFile: 'common-cli-sections.json',
     type: 'reference',
     path: '/reference/cli',
+    commonSectionsFile: 'common-cli-sections.json',
   },
   {
     id: MenuId.RefApi,
-    commonSectionsFile: 'common-api-sections.json',
     type: 'reference',
     path: '/reference/api',
+    commonSectionsFile: 'common-api-sections.json',
   },
   {
     id: MenuId.SelfHostingAuth,
-    commonSectionsFile: 'common-self-hosting-auth-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-auth',
+    commonSectionsFile: 'common-self-hosting-auth-sections.json',
   },
   {
     id: MenuId.SelfHostingStorage,
-    commonSectionsFile: 'common-self-hosting-storage-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-storage',
+    commonSectionsFile: 'common-self-hosting-storage-sections.json',
   },
   {
     id: MenuId.SelfHostingRealtime,
-    commonSectionsFile: 'common-self-hosting-realtime-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-realtime',
+    commonSectionsFile: 'common-self-hosting-realtime-sections.json',
   },
   {
     id: MenuId.SelfHostingAnalytics,
-    commonSectionsFile: 'common-self-hosting-analytics-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-analytics',
+    commonSectionsFile: 'common-self-hosting-analytics-sections.json',
   },
   {
     id: MenuId.SelfHostingFunctions,
-    commonSectionsFile: 'common-self-hosting-functions-sections.json',
     type: 'reference',
     path: '/reference/self-hosting-functions',
+    commonSectionsFile: 'common-self-hosting-functions-sections.json',
   },
 ]
 
 function getMenuById(id: MenuId) {
-  return menus.find((menu) => menu.id === id) ?? menus.find((menu) => menu.id === MenuId.Home)
+  return menus.find((menu) => menu.id === id)
 }
 
-function getMenuElement(menu: Menu) {
-  const menuType = menu.type
+function getMenuElement(menu: Menu | undefined, props?: any) {
+  if (!menu) return null
+
+  const menuType = menu?.type
   switch (menuType) {
-    case 'home':
-      return <NavigationMenuHome />
     case 'guide':
-      return <NavigationMenuGuideList id={menu.id} />
+      return <NavigationMenuGuideList id={menu.id} {...props} />
     case 'reference':
       return (
         <NavigationMenuRefList
           id={menu.id}
           basePath={menu.path}
-          commonSectionsFile={menu.commonSectionsFile}
-          specFile={menu.specFile}
+          commonSectionsFile={menu.commonSectionsFile || ''}
         />
       )
     default:
-      throw new Error(`Unknown menu type '${menuType}'`)
+      return null
   }
 }
 
-const NavigationMenu = ({ menuId }: { menuId: MenuId }) => {
+const NavigationMenu = ({
+  menuId,
+  additionalNavItems,
+}: {
+  menuId: MenuId
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
+}) => {
   const level = menuId
   const menu = getMenuById(level)
 
-  return getMenuElement(menu)
+  useCloseMenuOnRouteChange()
+
+  return getMenuElement(menu, { additionalNavItems })
 }
 
-export { MenuId }
+export { getMenuById, MenuId }
 export default memo(NavigationMenu)

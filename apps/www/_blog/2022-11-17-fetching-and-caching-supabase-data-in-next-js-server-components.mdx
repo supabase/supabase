@@ -384,7 +384,7 @@ But now we have loading spinners! Yuck!
 
 # Realtime
 
-Realtime allows us to subscribe to changes in Supabase — inserted, updated or deleted posts — and update our UI dynamically. In order to receive realtime events, we need to [enable replication](https://supabase.com/dashboard/project/_/database/replication) on the posts table.
+Realtime allows us to subscribe to changes in Supabase — inserted, updated or deleted posts — and update our UI dynamically. In order to receive realtime events, we need to [enable replication](https://supabase.com/dashboard/project/_/database/publications) on the posts table.
 
 Let’s merge the two previous concepts and fetch the initial state of our posts in a Server Component, and then render a Client Component to do client-y things — like subscribe to changes in the DB and update the UI dynamically:
 

@@ -1,6 +1,6 @@
 {
-    "name": "design",
-    "short_name": "design",
+    "name": "canvas",
+    "short_name": "canvas",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

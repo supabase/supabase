@@ -1,0 +1,50 @@
+# All syncs from the repo to the DB will eventually be consolidated in a single
+# script run by this workflow.
+
+name: docs_sync
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      # Resync if the content changes
+      - 'apps/docs/content/**'
+      # Resync if the resource definition or sync scripts change
+      - 'apps/docs/resources/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          sparse-checkout: |
+            apps/docs
+            packages
+
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run sync script
+        run: pnpm run --filter docs sync

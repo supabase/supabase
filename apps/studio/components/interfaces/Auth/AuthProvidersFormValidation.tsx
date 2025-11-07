@@ -1,5 +1,7 @@
+import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
+import { DOCS_URL } from 'lib/constants'
 import { boolean, number, object, string } from 'yup'
-import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -11,15 +13,11 @@ const PROVIDER_EMAIL = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Email',
+  link: `${DOCS_URL}/guides/auth/passwords`,
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
       title: 'Enable Email provider',
       description: 'This will enable Email based signup and login for your application',
-      type: 'boolean',
-    },
-    MAILER_AUTOCONFIRM: {
-      title: 'Confirm email',
-      description: `Users will need to confirm their email address before signing in for the first time.`,
       type: 'boolean',
     },
     MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
@@ -30,42 +28,199 @@ const PROVIDER_EMAIL = {
     },
     SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
       title: 'Secure password change',
-      description: `Users will need to be recently logged in to change their password without requiring reauthentication.
+      description: `Users will need to be recently logged in to change their password without requiring reauthentication. (A user is considered recently logged in if the session was created within the last 24 hours.)
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
+    PASSWORD_HIBP_ENABLED: {
+      title: 'Prevent use of leaked passwords',
+      description:
+        'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
+      type: 'boolean',
+      link: 'https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection',
+      isPaid: true,
+    },
+    PASSWORD_MIN_LENGTH: {
+      title: 'Minimum password length',
+      type: 'number',
+      description:
+        'Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.',
+      units: 'characters',
+    },
+    PASSWORD_REQUIRED_CHARACTERS: {
+      type: 'select',
+      title: 'Password Requirements',
+      description: 'Passwords that do not have at least one of each will be rejected as weak.',
+      enum: [
+        {
+          label: 'No required characters (default)',
+          value: NO_REQUIRED_CHARACTERS,
+        },
+        {
+          label: 'Letters and digits',
+          value: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789',
+        },
+        {
+          label: 'Lowercase, uppercase letters and digits',
+          value: 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789',
+        },
+        {
+          label: 'Lowercase, uppercase letters, digits and symbols (recommended)',
+          value:
+            'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~',
+        },
+      ],
+    },
+
     MAILER_OTP_EXP: {
-      title: 'Mailer OTP Expiration',
+      title: 'Email OTP Expiration',
       type: 'number',
       description: 'Duration before an email otp / link expires.',
       units: 'seconds',
     },
-    PASSWORD_MIN_LENGTH: {
-      title: 'Min password length',
-      description: 'Users will not be able to use a password shorter than this.',
+    MAILER_OTP_LENGTH: {
+      title: 'Email OTP Length',
       type: 'number',
+      description: 'Number of digits in the email OTP',
+      units: 'number',
     },
   },
   validationSchema: object().shape({
-    PASSWORD_MIN_LENGTH: number()
-      .required('A password is required.')
-      .min(6, 'Password length must be at least 6 characters long'),
     MAILER_OTP_EXP: number()
       .min(0, 'Must be more than 0')
       .max(86400, 'Must be no more than 86400')
+      .required('This is required'),
+    MAILER_OTP_LENGTH: number().min(6, 'Must be at least 6').max(10, 'Must be no more than 10'),
+    PASSWORD_MIN_LENGTH: number()
+      .min(6, 'Must be greater or equal to 6.')
       .required('This is required'),
   }),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
-const PROVIDER_PHONE = {
+const smsProviderValidation = (config: ProjectAuthConfigData, provider: string) => {
+  return {
+    is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+      return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === provider && !config.HOOK_SEND_SMS_ENABLED
+    },
+  }
+}
+
+// getPhoneProviderValidationSchema generate the validation schema for the SMS providers
+// based on whether the SMS hook is enabled
+export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) => {
+  return object().shape({
+    EXTERNAL_PHONE_ENABLED: boolean().required(),
+    SMS_PROVIDER: string(),
+
+    // Twilio
+    SMS_TWILIO_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio'),
+      then: (schema) => schema.required('Twilio Account SID is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio'),
+      then: (schema) => schema.required('Twilio Auth Token is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio'),
+      then: (schema) => schema.required('Twilio Message Service SID is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Twilio Verify
+    SMS_TWILIO_VERIFY_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio_verify'),
+      then: (schema) => schema.required('Twilio Verify Account SID is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'twilio_verify'),
+      then: (schema) => schema.required('Twilio Verify Auth Token is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(
+      ['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'],
+      {
+        ...smsProviderValidation(config, 'twilio_verify'),
+        then: (schema) => schema.required('Twilio Verify Service SID is required'),
+        otherwise: (schema) => schema,
+      }
+    ),
+
+    // Messagebird
+    SMS_MESSAGEBIRD_ACCESS_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'messagebird'),
+      then: (schema) => schema.required('Messagebird Access Key is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_MESSAGEBIRD_ORIGINATOR: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'messagebird'),
+      then: (schema) => schema.required('Messagebird Originator is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Textlocal
+    SMS_TEXTLOCAL_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'textlocal'),
+      then: (schema) => schema.required('Textlocal API Key is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TEXTLOCAL_SENDER: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'textlocal'),
+      then: (schema) => schema.required('Textlocal Sender is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Vonage
+    SMS_VONAGE_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'vonage'),
+      then: (schema) => schema.required('Vonage API is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_VONAGE_API_SECRET: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'vonage'),
+      then: (schema) => schema.required('Vonage API Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_VONAGE_FROM: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      ...smsProviderValidation(config, 'vonage'),
+      then: (schema) => schema.required('Vonage From is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Phone SMS
+    SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
+    SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
+    SMS_TEMPLATE: string().required('SMS template is required.'),
+    SMS_TEST_OTP: string()
+      .matches(
+        /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
+        'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'
+      )
+      .trim()
+      .transform((value: string) => value.replace(/\s+/g, '')),
+    SMS_TEST_OTP_VALID_UNTIL: string().when(['SMS_TEST_OTP'], {
+      is: (SMS_TEST_OTP: string | null) => {
+        return !!SMS_TEST_OTP
+      },
+      then: (schema) => schema.required('You must provide a valid until date.'),
+      otherwise: (schema) => schema.transform((value: string) => ''),
+    }),
+  })
+}
+
+export const PROVIDER_PHONE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Phone',
+  link: `${DOCS_URL}/guides/auth/phone-login`,
   properties: {
     EXTERNAL_PHONE_ENABLED: {
       title: 'Enable Phone provider',
@@ -262,137 +417,11 @@ const PROVIDER_PHONE = {
       },
     },
   },
-  validationSchema: object().shape({
-    EXTERNAL_PHONE_ENABLED: boolean().required(),
-    SMS_PROVIDER: string().required(),
-
-    // Twilio
-    SMS_TWILIO_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
-      },
-      then: (schema) => schema.required('Twilio Account SID is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
-      },
-      then: (schema) => schema.required('Twilio Auth Token is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
-      },
-      then: (schema) => schema.required('Twilio Message Service SID is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Twilio Verify
-    SMS_TWILIO_VERIFY_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-      },
-      then: (schema) => schema.required('Twilio Verify Account SID is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_VERIFY_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-      },
-      then: (schema) => schema.required('Twilio Verify Auth Token is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(
-      ['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'],
-      {
-        is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-          return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-        },
-        then: (schema) => schema.required('Twilio Verify Service SID is required'),
-        otherwise: (schema) => schema,
-      }
-    ),
-
-    // Messagebird
-    SMS_MESSAGEBIRD_ACCESS_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'messagebird'
-      },
-      then: (schema) => schema.required('Messagebird Access Key is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_MESSAGEBIRD_ORIGINATOR: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'messagebird'
-      },
-      then: (schema) => schema.required('Messagebird Originator is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Textlocal
-    SMS_TEXTLOCAL_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'textlocal'
-      },
-      then: (schema) => schema.required('Textlocal API Key is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_TEXTLOCAL_SENDER: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'textlocal'
-      },
-      then: (schema) => schema.required('Textlocal Sender is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Vonage
-    SMS_VONAGE_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
-      },
-      then: (schema) => schema.required('Vonage API is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_VONAGE_API_SECRET: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
-      },
-      then: (schema) => schema.required('Vonage API Secret is required'),
-      otherwise: (schema) => schema,
-    }),
-    SMS_VONAGE_FROM: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
-      },
-      then: (schema) => schema.required('Vonage From is required'),
-      otherwise: (schema) => schema,
-    }),
-
-    // Phone SMS
-    SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
-    SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
-    SMS_TEMPLATE: string().required('SMS template is required.'),
-    SMS_TEST_OTP: string()
-      .matches(
-        /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
-        'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'
-      )
-      .trim()
-      .transform((value: string) => value.replace(/\s+/g, '')),
-    SMS_TEST_OTP_VALID_UNTIL: string().when(['SMS_TEST_OTP'], {
-      is: (SMS_TEST_OTP: string | null) => {
-        return !!SMS_TEST_OTP
-      },
-      then: (schema) => schema.required('You must provide a valid until date.'),
-      otherwise: (schema) => schema.transform((value: string) => ''),
-    }),
-  }),
+  validationSchema: null,
   misc: {
     iconKey: 'phone-icon4',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -400,6 +429,7 @@ const EXTERNAL_PROVIDER_APPLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Apple',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-apple`,
   properties: {
     EXTERNAL_APPLE_ENABLED: {
       title: 'Enable Sign in with Apple',
@@ -408,22 +438,21 @@ const EXTERNAL_PROVIDER_APPLE = {
       type: 'boolean',
     },
     EXTERNAL_APPLE_CLIENT_ID: {
-      title: 'Service ID (for OAuth)',
-      description: `Client identifier used in the OAuth flow on the web.
-[Learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+      title: 'Client IDs',
+      description: `Comma separated list of allowed Apple app (Web, OAuth, iOS, macOS, watchOS, or tvOS) bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/signinwithapplejs)`,
       type: 'string',
     },
     EXTERNAL_APPLE_SECRET: {
       title: 'Secret Key (for OAuth)',
-      description: `Secret key used in the OAuth flow.
-[Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
+      description: `Secret key used in the OAuth flow. [Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,
     },
-    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: {
-      title: 'Authorized Client IDs (iOS, macOS, watchOS, tvOS bundle IDs or service IDs)',
-      description: `Comma separated list of allowed Apple app bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js)`,
-      type: 'string',
+    EXTERNAL_APPLE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
     },
   },
   validationSchema: object().shape({
@@ -435,7 +464,6 @@ const EXTERNAL_PROVIDER_APPLE = {
         },
         then: (schema) =>
           schema
-            .required('Secret key is required when using the OAuth flow.')
             .matches(/^[a-z0-9_-]+([.][a-z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
             .test({
               message: 'Secret key is not a correctly generated JWT.',
@@ -482,55 +510,34 @@ const EXTERNAL_PROVIDER_APPLE = {
               },
             }),
       })
-      .when(
-        [
-          'EXTERNAL_APPLE_ENABLED',
-          'EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS',
-          'EXTERNAL_APPLE_CLIENT_ID',
-        ],
-        {
-          is: (
-            EXTERNAL_APPLE_ENABLED: boolean,
-            EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string,
-            EXTERNAL_APPLE_CLIENT_ID: string
-          ) => {
-            return (
-              EXTERNAL_APPLE_ENABLED &&
-              !!EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS &&
-              !EXTERNAL_APPLE_CLIENT_ID
-            )
-          },
-          then: (schema) =>
-            schema.matches(
-              /^$/,
-              'Secret Key should only be set if Service ID for OAuth is provided.'
-            ),
-        }
-      ),
-    EXTERNAL_APPLE_CLIENT_ID: string().matches(
-      /^[a-z0-9.-]+$/i,
-      'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app).'
-    ),
-    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string()
-      .matches(
-        /^([.a-z0-9-]+(,\s*[.a-z0-9-]+)*,*\s*)?$/i,
-        'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app). You must only use explicit bundle IDs, asterisks (*) are not allowed.'
-      )
       .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
         is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
           return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
         },
         then: (schema) =>
-          schema.required(
-            'At least one Authorized Client ID is required when not using the OAuth flow.'
+          schema.matches(
+            /^$/,
+            'Secret Key should only be set if Service ID for OAuth is provided.'
           ),
       }),
+    EXTERNAL_APPLE_CLIENT_ID: string()
+      .matches(/^\S+$/, 'Client IDs should not contain spaces.')
+      .matches(
+        /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+        'Invalid characters. Each ID should follow a reverse-domain style string (e.g. com.example.app). Use commas to separate multiple IDs.'
+      )
+      .when('EXTERNAL_APPLE_ENABLED', {
+        is: true,
+        then: (schema) =>
+          schema.required('At least one Client ID is required when Apple sign-in is enabled.'),
+      }),
+    EXTERNAL_APPLE_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'apple-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign in with Apple on the web in the Apple Developer Center.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-apple#configure-your-services-id)`,
     alert: {
       title: `Apple OAuth secret keys expire every 6 months`,
       description: `A new secret should be generated every 6 months, otherwise users on the web will not be able to sign in.`,
@@ -542,6 +549,7 @@ const EXTERNAL_PROVIDER_AZURE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Azure',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-azure`,
   properties: {
     EXTERNAL_AZURE_ENABLED: {
       title: 'Azure enabled',
@@ -555,7 +563,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     EXTERNAL_AZURE_SECRET: {
       // [TODO] Change docs
       title: 'Secret Value',
-      description: `Enter the data from Value, not the Secret ID. [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
+      description: `Enter the data from Value, not the Secret ID. [Learn more](${DOCS_URL}/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
       type: 'string',
       isSecret: true,
     },
@@ -564,6 +572,12 @@ const EXTERNAL_PROVIDER_AZURE = {
       title: 'Azure Tenant URL',
       descriptionOptional: 'Optional',
       type: 'string',
+    },
+    EXTERNAL_AZURE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
     },
   },
   validationSchema: object().shape({
@@ -578,7 +592,8 @@ const EXTERNAL_PROVIDER_AZURE = {
       then: (schema) => schema.required('Secret Value is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_AZURE_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    EXTERNAL_AZURE_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'microsoft-icon',
@@ -590,6 +605,7 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Bitbucket',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-bitbucket`,
   properties: {
     EXTERNAL_BITBUCKET_ENABLED: {
       title: 'Bitbucket enabled',
@@ -603,6 +619,12 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
       title: 'Secret',
       type: 'string',
       isSecret: true,
+    },
+    EXTERNAL_BITBUCKET_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
     },
   },
   validationSchema: object().shape({
@@ -628,6 +650,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Discord',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-discord?`,
   properties: {
     EXTERNAL_DISCORD_ENABLED: {
       title: 'Discord enabled',
@@ -642,6 +665,12 @@ const EXTERNAL_PROVIDER_DISCORD = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_DISCORD_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_DISCORD_ENABLED: boolean().required(),
@@ -655,6 +684,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_DISCORD_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'discord-icon',
@@ -666,6 +696,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Facebook',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-facebook`,
   properties: {
     EXTERNAL_FACEBOOK_ENABLED: {
       title: 'Facebook enabled',
@@ -680,6 +711,12 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_FACEBOOK_ENABLED: boolean().required(),
@@ -693,6 +730,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
       then: (schema) => schema.required('"Facebook secret" is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_FACEBOOK_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'facebook-icon',
@@ -704,6 +742,7 @@ const EXTERNAL_PROVIDER_FIGMA = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Figma',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-figma`,
   properties: {
     EXTERNAL_FIGMA_ENABLED: {
       title: 'Figma enabled',
@@ -718,6 +757,12 @@ const EXTERNAL_PROVIDER_FIGMA = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_FIGMA_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_FIGMA_ENABLED: boolean().required(),
@@ -731,6 +776,7 @@ const EXTERNAL_PROVIDER_FIGMA = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_FIGMA_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'figma-icon',
@@ -742,6 +788,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitHub',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-github`,
   properties: {
     EXTERNAL_GITHUB_ENABLED: {
       title: 'GitHub enabled',
@@ -756,6 +803,12 @@ const EXTERNAL_PROVIDER_GITHUB = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_GITHUB_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_GITHUB_ENABLED: boolean().required(),
@@ -769,6 +822,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_GITHUB_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'github-icon',
@@ -780,6 +834,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitLab',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-gitlab`,
   properties: {
     EXTERNAL_GITLAB_ENABLED: {
       title: 'GitLab enabled',
@@ -801,6 +856,12 @@ const EXTERNAL_PROVIDER_GITLAB = {
       descriptionOptional: 'Optional',
       type: 'string',
     },
+    EXTERNAL_GITLAB_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_GITLAB_ENABLED: boolean().required(),
@@ -814,7 +875,8 @@ const EXTERNAL_PROVIDER_GITLAB = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_GITLAB_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_GITLAB_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    EXTERNAL_GITLAB_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'gitlab-icon',
@@ -826,6 +888,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Google',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-google`,
   properties: {
     EXTERNAL_GOOGLE_ENABLED: {
       title: 'Enable Sign in with Google',
@@ -834,8 +897,9 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       type: 'boolean',
     },
     EXTERNAL_GOOGLE_CLIENT_ID: {
-      title: 'Client ID (for OAuth)',
-      description: 'Client ID to use with the OAuth flow on the web.',
+      title: 'Client IDs',
+      description:
+        'Comma-separated list of client IDs for Web, OAuth, Android apps, One Tap, and Chrome extensions.',
       type: 'string',
     },
     EXTERNAL_GOOGLE_SECRET: {
@@ -844,85 +908,48 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       type: 'string',
       isSecret: true,
     },
-    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: {
-      title: 'Authorized Client IDs (for Android, One Tap, and Chrome extensions)',
-      description:
-        'Comma separated list of client IDs of Android apps, One Tap or Chrome extensions that are allowed to log in to your project.',
-      type: 'string',
-    },
     EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: {
       title: 'Skip nonce checks',
       description:
-        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such with iOS.",
+        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such as with iOS.",
+      type: 'boolean',
+    },
+    EXTERNAL_GOOGLE_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
       type: 'boolean',
     },
   },
   validationSchema: object().shape({
     EXTERNAL_GOOGLE_ENABLED: boolean().required(),
-    EXTERNAL_GOOGLE_SECRET: string()
-      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
-        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
-          return EXTERNAL_GOOGLE_ENABLED && !!EXTERNAL_GOOGLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema
-            .matches(
-              /^[a-z0-9.\/_-]*$/i,
-              'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes and underscores.'
-            )
-            .required('Client Secret is required when using the OAuth flow.'),
-      })
-      .when(
-        [
-          'EXTERNAL_GOOGLE_ENABLED',
-          'EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS',
-          'EXTERNAL_GOOGLE_CLIENT_ID',
-        ],
-        {
-          is: (
-            EXTERNAL_GOOGLE_ENABLED: boolean,
-            EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string,
-            EXTERNAL_GOOGLE_CLIENT_ID: string
-          ) => {
-            return (
-              EXTERNAL_GOOGLE_ENABLED &&
-              !!EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS &&
-              !EXTERNAL_GOOGLE_CLIENT_ID
-            )
-          },
-          then: (schema) =>
-            schema.matches(
-              /^$/,
-              'Client Secret should only be set when Client ID for OAuth is set.'
-            ),
-        }
-      ),
-    EXTERNAL_GOOGLE_CLIENT_ID: string().matches(
-      /^([a-z0-9-]+([.][a-z0-9-]+)+)?$/i,
-      'Invalid characters. Google OAuth Client IDs are usually a domain-name (e.g. 01234567890-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com).'
-    ),
-    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string()
+    EXTERNAL_GOOGLE_CLIENT_ID: string()
+      .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(
-        /^([a-z0-9-]+([.][a-z0-9-]+)*(,\s*[a-z0-9-]+([.][a-z0-9-]+)*)*,*\s*)?$/i,
-        'Invalid characters. Google Client IDs are usually a domain-name style string (e.g. com.example.com.app or *.apps.googleusercontent.com).'
+        /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+        'Invalid characters. Google Client IDs should be a comma-separated list of domain-like strings.'
       )
-
-      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
-        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
-          return EXTERNAL_GOOGLE_ENABLED && !EXTERNAL_GOOGLE_CLIENT_ID
-        },
+      .when('EXTERNAL_GOOGLE_ENABLED', {
+        is: true,
         then: (schema) =>
-          schema.required(
-            'At least one Authorized Client ID is required when not using the OAuth flow.'
-          ),
+          schema.required('At least one Client ID is required when Google sign-in is enabled.'),
       }),
+    EXTERNAL_GOOGLE_SECRET: string().when('EXTERNAL_GOOGLE_ENABLED', {
+      is: true,
+      then: (schema) =>
+        schema.matches(
+          /^[a-z0-9.\/_-]*$/i,
+          'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes, and underscores.'
+        ),
+    }),
     EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean().required(),
+    EXTERNAL_GOOGLE_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'google-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
+[Learn more](${DOCS_URL}/guides/auth/social-login/auth-google#configure-your-services-id)`,
   },
 }
 
@@ -930,6 +957,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Kakao',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-kakao`,
   properties: {
     EXTERNAL_KAKAO_ENABLED: {
       title: 'Kakao enabled',
@@ -946,6 +974,12 @@ const EXTERNAL_PROVIDER_KAKAO = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_KAKAO_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_KAKAO_ENABLED: boolean().required(),
@@ -959,6 +993,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
       then: (schema) => schema.required('Client Secret Code is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_KAKAO_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'kakao-icon',
@@ -971,6 +1006,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'KeyCloak',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-keycloak`,
   properties: {
     EXTERNAL_KEYCLOAK_ENABLED: {
       title: 'Keycloak enabled',
@@ -990,6 +1026,12 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
       description: '',
       type: 'string',
     },
+    EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_KEYCLOAK_ENABLED: boolean().required(),
@@ -1006,9 +1048,10 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     EXTERNAL_KEYCLOAK_URL: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
       is: true,
       then: (schema) =>
-        schema.matches(urlRegex, 'Must be a valid URL').required('Realm URL is required'),
-      otherwise: (schema) => schema.matches(urlRegex, 'Must be a valid URL'),
+        schema.matches(urlRegex(), 'Must be a valid URL').required('Realm URL is required'),
+      otherwise: (schema) => schema.matches(urlRegex(), 'Must be a valid URL'),
     }),
+    EXTERNAL_KEYCLOAK_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'keycloak-icon',
@@ -1019,7 +1062,9 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
 const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
+  key: 'linkedin_oidc',
   title: 'LinkedIn (OIDC)',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-linkedin`,
   properties: {
     EXTERNAL_LINKEDIN_OIDC_ENABLED: {
       title: 'LinkedIn enabled',
@@ -1034,6 +1079,12 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean().required(),
@@ -1047,6 +1098,7 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
       then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_LINKEDIN_OIDC_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'linkedin-icon',
@@ -1058,6 +1110,7 @@ const EXTERNAL_PROVIDER_NOTION = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Notion',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-notion`,
   properties: {
     EXTERNAL_NOTION_ENABLED: {
       title: 'Notion enabled',
@@ -1072,6 +1125,12 @@ const EXTERNAL_PROVIDER_NOTION = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_NOTION_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_NOTION_ENABLED: boolean().required(),
@@ -1085,6 +1144,7 @@ const EXTERNAL_PROVIDER_NOTION = {
       then: (schema) => schema.required('OAuth client secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_NOTION_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'notion-icon',
@@ -1096,6 +1156,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitch',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-twitch`,
   properties: {
     EXTERNAL_TWITCH_ENABLED: {
       title: 'Twitch enabled',
@@ -1110,6 +1171,12 @@ const EXTERNAL_PROVIDER_TWITCH = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_TWITCH_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_TWITCH_ENABLED: boolean().required(),
@@ -1123,6 +1190,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
       then: (schema) => schema.required('Client secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_TWITCH_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'twitch-icon',
@@ -1134,6 +1202,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitter',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-twitter`,
   properties: {
     EXTERNAL_TWITTER_ENABLED: {
       title: 'Twitter enabled',
@@ -1148,6 +1217,12 @@ const EXTERNAL_PROVIDER_TWITTER = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_TWITTER_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_TWITTER_ENABLED: boolean().required(),
@@ -1161,6 +1236,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
       then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_TWITTER_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'twitter-icon',
@@ -1171,7 +1247,8 @@ const EXTERNAL_PROVIDER_TWITTER = {
 const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Slack',
+  title: 'Slack (Deprecated)',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-slack`,
   properties: {
     EXTERNAL_SLACK_ENABLED: {
       title: 'Slack enabled',
@@ -1186,6 +1263,12 @@ const EXTERNAL_PROVIDER_SLACK = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_SLACK_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_SLACK_ENABLED: boolean().required(),
@@ -1199,6 +1282,54 @@ const EXTERNAL_PROVIDER_SLACK = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_SLACK_EMAIL_OPTIONAL: boolean().optional(),
+  }),
+  misc: {
+    iconKey: 'slack-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_SLACK_OIDC = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Slack (OIDC)',
+  key: 'slack_oidc',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-slack`,
+  properties: {
+    EXTERNAL_SLACK_OIDC_ENABLED: {
+      title: 'Slack enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_SLACK_OIDC_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+    EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_SLACK_OIDC_ENABLED: boolean().required(),
+    EXTERNAL_SLACK_OIDC_CLIENT_ID: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_SLACK_OIDC_SECRET: string().when('EXTERNAL_SLACK_OIDC_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_SLACK_OIDC_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'slack-icon',
@@ -1210,6 +1341,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Spotify',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-spotify`,
   properties: {
     EXTERNAL_SPOTIFY_ENABLED: {
       title: 'Spotify enabled',
@@ -1224,6 +1356,12 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_SPOTIFY_ENABLED: boolean().required(),
@@ -1237,6 +1375,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_SPOTIFY_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'spotify-icon',
@@ -1248,6 +1387,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'WorkOS',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-workos`,
   properties: {
     EXTERNAL_WORKOS_ENABLED: {
       title: 'WorkOS enabled',
@@ -1270,7 +1410,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   validationSchema: object().shape({
     EXTERNAL_WORKOS_ENABLED: boolean().required(),
     EXTERNAL_WORKOS_URL: string()
-      .matches(urlRegex, 'Must be a valid URL')
+      .matches(urlRegex(), 'Must be a valid URL')
       .when('EXTERNAL_WORKOS_ENABLED', {
         is: true,
         then: (schema) => schema.required('WorkOS URL is required'),
@@ -1297,6 +1437,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Zoom',
+  link: `${DOCS_URL}/guides/auth/social-login/auth-zoom`,
   properties: {
     EXTERNAL_ZOOM_ENABLED: {
       title: 'Zoom enabled',
@@ -1311,6 +1452,12 @@ const EXTERNAL_PROVIDER_ZOOM = {
       type: 'string',
       isSecret: true,
     },
+    EXTERNAL_ZOOM_EMAIL_OPTIONAL: {
+      title: 'Allow users without an email',
+      description:
+        'Allows the user to successfully authenticate when the provider does not return an email address.',
+      type: 'boolean',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_ZOOM_ENABLED: boolean().required(),
@@ -1324,6 +1471,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
       then: (schema) => schema.required('Client secret is required'),
       otherwise: (schema) => schema,
     }),
+    EXTERNAL_ZOOM_EMAIL_OPTIONAL: boolean().optional(),
   }),
   misc: {
     iconKey: 'zoom-icon',
@@ -1335,19 +1483,63 @@ const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'SAML 2.0',
+  link: `${DOCS_URL}/guides/auth/enterprise-sso/auth-sso-saml`,
   properties: {
     SAML_ENABLED: {
       title: 'Enable SAML 2.0 Single Sign-on',
+      description: `You will need to use the [Supabase CLI](${DOCS_URL}/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it`,
+      type: 'boolean',
+    },
+    SAML_EXTERNAL_URL: {
+      title: 'SAML metadata URL',
       description:
-        'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
+        'You may use a different SAML metadata URL from what is defined with the API External URL. Please validate that your SAML External URL can reach the Custom Domain or Project URL.',
+      descriptionOptional: 'Optional',
+      type: 'string',
+    },
+    SAML_ALLOW_ENCRYPTED_ASSERTIONS: {
+      title: 'Allow encrypted SAML Assertions',
+      description:
+        'Some SAML Identity Providers require support for encrypted assertions. Usually this is not necessary.',
+      descriptionOptional: 'Optional',
       type: 'boolean',
     },
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
+    SAML_EXTERNAL_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean().optional(),
   }),
   misc: {
     iconKey: 'saml-icon',
+  },
+}
+
+const PROVIDER_WEB3 = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Web3 Wallet',
+  link: `${DOCS_URL}/guides/auth/auth-web3`,
+  properties: {
+    EXTERNAL_WEB3_ETHEREUM_ENABLED: {
+      title: 'Enable Sign in with Ethereum',
+      description:
+        'Allow Ethereum wallets to sign in to your project via the Sign in with Ethereum (EIP-4361). Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
+      type: 'boolean',
+    },
+    EXTERNAL_WEB3_SOLANA_ENABLED: {
+      title: 'Enable Sign in with Solana',
+      description:
+        'Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard. Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
+      type: 'boolean',
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_WEB3_ETHEREUM_ENABLED: boolean().required(),
+    EXTERNAL_WEB3_SOLANA_ENABLED: boolean().required(),
+  }),
+  misc: {
+    iconKey: 'web3-icon',
   },
 }
 
@@ -1355,6 +1547,7 @@ export const PROVIDERS_SCHEMAS = [
   PROVIDER_EMAIL,
   PROVIDER_PHONE,
   PROVIDER_SAML,
+  PROVIDER_WEB3,
   EXTERNAL_PROVIDER_APPLE,
   EXTERNAL_PROVIDER_AZURE,
   EXTERNAL_PROVIDER_BITBUCKET,
@@ -1370,6 +1563,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,
   EXTERNAL_PROVIDER_TWITTER,
+  EXTERNAL_PROVIDER_SLACK_OIDC,
   EXTERNAL_PROVIDER_SLACK,
   EXTERNAL_PROVIDER_SPOTIFY,
   EXTERNAL_PROVIDER_WORKOS,

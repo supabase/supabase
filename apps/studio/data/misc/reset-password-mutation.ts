@@ -1,8 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import { captureCriticalError } from 'lib/error-reporting'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type ResetPasswordVariables = {
   email: string
@@ -16,7 +17,7 @@ export async function resetPassword({ email, hcaptchaToken, redirectTo }: ResetP
     body: { email, hcaptchaToken, redirectTo },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -27,23 +28,22 @@ export const useResetPasswordMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ResetPasswordData, ResponseError, ResetPasswordVariables>,
+  UseCustomMutationOptions<ResetPasswordData, ResponseError, ResetPasswordVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ResetPasswordData, ResponseError, ResetPasswordVariables>(
-    (vars) => resetPassword(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to reset password: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ResetPasswordData, ResponseError, ResetPasswordVariables>({
+    mutationFn: (vars) => resetPassword(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to reset password: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+      captureCriticalError(data, 'send reset password email')
+    },
+    ...options,
+  })
 }

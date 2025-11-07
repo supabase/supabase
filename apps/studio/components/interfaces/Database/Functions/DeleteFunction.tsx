@@ -1,18 +1,19 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
+import { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteFunctionProps {
-  func?: any
+  func?: DatabaseFunction
   visible: boolean
   setVisible: (value: boolean) => void
 }
 
-const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
-  const { project } = useProjectContext()
-  const { id, name, schema } = func ?? {}
+export const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
+  const { data: project } = useSelectedProjectQuery()
+  const { name, schema } = func ?? {}
 
   const { mutate: deleteDatabaseFunction, isLoading } = useDatabaseFunctionDeleteMutation({
     onSuccess: () => {
@@ -22,11 +23,11 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
   })
 
   async function handleDelete() {
-    if (!id) return console.error('Function ID is require')
+    if (!func) return console.error('Function is required')
     if (!project) return console.error('Project is required')
 
     deleteDatabaseFunction({
-      id,
+      func,
       projectRef: project.ref,
       connectionString: project.connectionString,
     })
@@ -43,11 +44,11 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
         loading={isLoading}
         confirmLabel={`Delete function ${name}`}
         confirmPlaceholder="Type in name of function"
-        confirmString={name}
+        confirmString={name ?? 'Unknown'}
         text={
           <>
-            This will delete the function
-            <span className="text-bold text-foreground">{name}</span> from the schema
+            <span>This will delete the function</span>{' '}
+            <span className="text-bold text-foreground">{name}</span> <span>from the schema</span>{' '}
             <span className="text-bold text-foreground">{schema}</span>
           </>
         }
@@ -56,5 +57,3 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
     </>
   )
 }
-
-export default DeleteFunction

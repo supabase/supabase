@@ -1,9 +1,7 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
-
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { del, handleError } from 'data/fetchers'
+import { toast } from 'sonner'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationPaymentMethodDeleteVariables = {
@@ -15,9 +13,19 @@ export async function deletePaymentMethod({
   slug,
   cardId,
 }: OrganizationPaymentMethodDeleteVariables) {
-  const response = await delete_(`${API_URL}/organizations/${slug}/payments`, { card_id: cardId })
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await del(`/platform/organizations/{slug}/payments`, {
+    body: {
+      card_id: cardId,
+    },
+
+    params: {
+      path: {
+        slug,
+      },
+    },
+  })
+  if (error) handleError(error)
+  return data
 }
 
 type OrganizationPaymentMethodDeleteData = Awaited<ReturnType<typeof deletePaymentMethod>>
@@ -27,7 +35,7 @@ export const useOrganizationPaymentMethodDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationPaymentMethodDeleteData,
     ResponseError,
     OrganizationPaymentMethodDeleteVariables
@@ -40,10 +48,11 @@ export const useOrganizationPaymentMethodDeleteMutation = ({
     OrganizationPaymentMethodDeleteData,
     ResponseError,
     OrganizationPaymentMethodDeleteVariables
-  >((vars) => deletePaymentMethod(vars), {
+  >({
+    mutationFn: (vars) => deletePaymentMethod(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
-      await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
+      await queryClient.invalidateQueries({ queryKey: organizationKeys.paymentMethods(slug) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

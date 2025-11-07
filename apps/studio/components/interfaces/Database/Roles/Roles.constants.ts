@@ -6,15 +6,18 @@ export const SUPABASE_ROLES = [
   'dashboard_user',
   'supabase_admin',
   'supabase_auth_admin',
+  'supabase_functions_admin',
   'supabase_read_only_user',
+  'supabase_realtime_admin',
   'supabase_replication_admin',
   'supabase_storage_admin',
-  'supabase_functions_admin',
   'pgbouncer',
   'pgsodium_keyholder',
   'pgsodium_keyiduser',
   'pgsodium_keymaker',
   'pgtle_admin',
+  'cli_login_postgres',
+  'supabase_etl_admin',
 ] as const
 
 // [Joshen] This was originally in the Roles mobx store

@@ -1,3 +1,5 @@
+'use client'
+
 import * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
 import * as React from 'react'
@@ -8,10 +10,12 @@ import {
   FieldValues,
   FormProvider,
   useFormContext,
+  useWatch,
 } from 'react-hook-form'
 
 import { cn } from '../../../lib/utils/cn'
 import { Label } from './label'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const Form = FormProvider
 
@@ -66,17 +70,20 @@ type FormItemContextValue = {
 
 const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue)
 
-const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    const id = React.useId()
+const FormItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { asChild?: boolean }
+>(({ asChild, ...props }, ref) => {
+  const id = React.useId()
 
-    return (
-      <FormItemContext.Provider value={{ id }}>
-        <div ref={ref} className={cn('space-y-2', className)} {...props} />
-      </FormItemContext.Provider>
-    )
-  }
-)
+  const Comp = asChild ? Slot : 'div'
+
+  return (
+    <FormItemContext.Provider value={{ id }}>
+      <Comp ref={ref} {...props} />
+    </FormItemContext.Provider>
+  )
+})
 FormItem.displayName = 'FormItem'
 
 const FormLabel = React.forwardRef<
@@ -127,7 +134,7 @@ const FormDescription = React.forwardRef<
   const { formDescriptionId } = useFormField()
 
   return (
-    <p
+    <div
       ref={ref}
       id={formDescriptionId}
       className={cn('text-sm text-foreground-light', className)}
@@ -144,21 +151,30 @@ const FormMessage = React.forwardRef<
   const { error, formMessageId } = useFormField()
   const body = error ? String(error?.message) : children
 
-  if (!body) {
-    return null
-  }
-
   return (
-    <p
-      ref={ref}
-      id={formMessageId}
-      className={cn('text-sm text-destructive', className)}
-      {...props}
-    >
-      {body}
-    </p>
+    <AnimatePresence initial={false}>
+      {body ? ( // Only animate if there is a message body
+        <motion.div
+          key={formMessageId} // Use a unique key to help with animations
+          initial={{ opacity: 0, y: -5, height: 0 }} // Start slightly hidden
+          animate={{ opacity: 1, y: 0, height: 'auto' }} // Fade in and slide up
+          exit={{ opacity: 0, y: -5, height: 0 }} // Fade out and slide back up
+          transition={{ duration: 0.15, ease: 'easeInOut' }} // Smooth transition
+        >
+          <p
+            ref={ref}
+            id={formMessageId}
+            className={cn('text-sm text-destructive', className)}
+            {...props}
+          >
+            {body}
+          </p>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   )
 })
+
 FormMessage.displayName = 'FormMessage'
 
 export {
@@ -170,4 +186,5 @@ export {
   FormLabel,
   FormMessage,
   useFormField,
+  useWatch,
 }

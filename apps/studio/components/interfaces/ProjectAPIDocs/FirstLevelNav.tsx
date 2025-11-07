@@ -1,17 +1,18 @@
-import SVG from 'react-inlinesvg'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import { Button, IconBook, IconBookOpen } from 'ui'
+import SVG from 'react-inlinesvg'
 
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import { Book, BookOpen } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Button } from 'ui'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
-import { BASE_PATH } from 'lib/constants'
 
 const Separator = () => <div className="border-t !mt-3 pb-1 mx-3" />
 
@@ -168,9 +169,9 @@ const FirstLevelNav = () => {
             GraphiQL
           </Link>
         </Button>
-        <Button block asChild type="text" size="small" icon={<IconBookOpen />}>
+        <Button block asChild type="text" size="small" icon={<BookOpen />}>
           <Link
-            href="https://supabase.com/docs/guides/graphql"
+            href={`${DOCS_URL}/guides/graphql`}
             target="_blank"
             rel="noreferrer"
             className="!justify-start"
@@ -181,19 +182,14 @@ const FirstLevelNav = () => {
       </div>
 
       <div className="px-2 py-4">
-        <Button block asChild type="text" size="small" icon={<IconBook />}>
-          <Link
-            href="https://supabase.com/docs"
-            target="_blank"
-            rel="noreferrer"
-            className="!justify-start"
-          >
+        <Button block asChild type="text" size="small" icon={<Book />}>
+          <Link href={`${DOCS_URL}`} target="_blank" rel="noreferrer" className="!justify-start">
             Documentation
           </Link>
         </Button>
-        <Button block asChild type="text" size="small" icon={<IconBookOpen />}>
+        <Button block asChild type="text" size="small" icon={<BookOpen />}>
           <Link
-            href="https://supabase.com/docs/guides/api"
+            href={`${DOCS_URL}/guides/api`}
             target="_blank"
             rel="noreferrer"
             className="!justify-start"

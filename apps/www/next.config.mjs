@@ -1,14 +1,16 @@
 import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
+import { withSentryConfig } from '@sentry/nextjs'
 
-import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
 
-import rewrites from './lib/rewrites.js'
 import redirects from './lib/redirects.js'
+import remotePatterns from './lib/remotePatterns.js'
+import rewrites from './lib/rewrites.js'
 
 import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -39,45 +41,101 @@ const withBundleAnalyzer = bundleAnalyzer({
  */
 const nextConfig = {
   basePath: '',
+  assetPrefix: getAssetPrefix(),
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons'],
-  images: {
-    dangerouslyAllowSVG: true,
-    domains: [
-      'api.producthunt.com',
-      'avatars.githubusercontent.com',
-      'ca.slack-edge.com',
-      'colab.research.google.com',
-      'github.com',
-      'https://s3-us-west-2.amazonaws.com',
-      'images.unsplash.com',
-      'img.youtube.com',
-      'vercel.com',
-      'obuldanrptloktxcffvn.supabase.co',
-      'pbs.twimg.com',
-      'res.cloudinary.com',
-      's3-us-west-2.amazonaws.com',
-      'supabase.com',
-      'user-images.githubusercontent.com',
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'icons',
+    'api-types',
+    // needed to make the octokit packages work in /changelog
+    '@octokit/plugin-paginate-graphql',
+  ],
+  experimental: {
+    // needed to make the octokit packages work in /changelog
+    esmExternals: 'loose',
+  },
+  /**
+   * Exclude huge directories from being traced into serverless functions
+   * to avoid the max size limit for Serverless Functions on Vercel:
+   * https://vercel.com/guides/troubleshooting-function-250mb-limit
+   */
+  outputFileTracingExcludes: {
+    '*': [
+      // Next.js build artifacts
+      '.next/cache/**/*',
+      '.next/static/**/*',
+      // Static assets
+      'public/**/*',
     ],
+  },
+  reactStrictMode: true,
+  images: {
+    dangerouslyAllowSVG: false,
+    remotePatterns,
   },
   async headers() {
     return [
+      // Allow CMS preview iframe embedding by omitting X-Frame-Options for blog routes
       {
-        source: '/:path*',
+        source: '/blog/:slug*',
         headers: [
           {
-            key: 'Strict-Transport-Security',
-            value: '',
+            key: 'X-Robots-Tag',
+            value: 'all',
           },
+          // No X-Frame-Options header to allow iframe embedding
+        ],
+      },
+      {
+        source: '/api-v2/cms/preview',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'text/html',
+          },
+          // No X-Frame-Options header to allow iframe embedding
+        ],
+      },
+      // Default X-Frame-Options for all other paths
+      {
+        source: '/((?!blog|api-v2/cms/preview).*)',
+        headers: [
           {
             key: 'X-Robots-Tag',
             value: 'all',
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN',
+          },
+        ],
+      },
+      {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
+      },
+      {
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
+                ? 'max-age=31536000; includeSubDomains; preload'
+                : '',
           },
         ],
       },
@@ -89,10 +147,60 @@ const nextConfig = {
   async redirects() {
     return redirects
   },
+  typescript: {
+    // On previews, typechecking is run via GitHub Action only for efficiency
+    // On production, we turn it on to prevent errors from conflicting PRs getting into
+    // prod
+    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
+  },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel.
+    ignoreDuringBuilds: true,
+  },
 }
 
 // next.config.js.
-export default () => {
+const configExport = () => {
   const plugins = [withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
+}
+
+export default withSentryConfig(configExport, {
+  // For all available options, see:
+  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
+
+  org: 'supabase',
+  project: 'www',
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+
+  // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  // This can increase your server load as well as your hosting bill.
+  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+  // side errors will fail.
+  // tunnelRoute: "/monitoring",
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+})
+
+function getAssetPrefix() {
+  // If not force enabled, but not production env, disable CDN
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
+
+  // Force disable CDN
+  if (process.env.FORCE_ASSET_CDN === '-1') {
+    return undefined
+  }
+
+  return `https://frontend-assets.supabase.com/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
 }

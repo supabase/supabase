@@ -1,10 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-// import { post } from 'lib/common/fetch'
 import { handleError, post } from 'data/fetchers'
-import { API_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SendUpgradeFeedbackVariables = {
   orgSlug?: string
@@ -40,20 +38,18 @@ export const useSendUpgradeFeedbackMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SendUpgradeFeedbackData, ResponseError, SendUpgradeFeedbackVariables>,
+  UseCustomMutationOptions<SendUpgradeFeedbackData, ResponseError, SendUpgradeFeedbackVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendUpgradeFeedbackData, ResponseError, SendUpgradeFeedbackVariables>(
-    (vars) => sendUpgradeFeedback(vars),
-    {
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit upgrade survey: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SendUpgradeFeedbackData, ResponseError, SendUpgradeFeedbackVariables>({
+    mutationFn: (vars) => sendUpgradeFeedback(vars),
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to submit upgrade survey: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

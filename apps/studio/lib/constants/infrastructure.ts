@@ -1,40 +1,24 @@
+import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+
 import type { components } from 'data/api'
-
-export type CloudProvider = 'FLY' | 'AWS'
-export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
-
-// Alias regions remain as the starting point for project creation
-// they are immediately translated to their respective cloud regions
-// and are afterward never referred to
-
-export const AWS_REGIONS = {
-  WEST_US: 'West US (North California)',
-  EAST_US: 'East US (North Virginia)',
-  CENTRAL_CANADA: 'Canada (Central)',
-  WEST_EU: 'West EU (Ireland)',
-  WEST_EU_2: 'West EU (London)',
-  // 'North EU': 'North EU',
-  CENTRAL_EU: 'Central EU (Frankfurt)',
-  SOUTH_ASIA: 'South Asia (Mumbai)',
-  SOUTHEAST_ASIA: 'Southeast Asia (Singapore)',
-  NORTHEAST_ASIA: 'Northeast Asia (Tokyo)',
-  NORTHEAST_ASIA_2: 'Northeast Asia (Seoul)',
-  OCEANIA: 'Oceania (Sydney)',
-  SOUTH_AMERICA: 'South America (São Paulo)',
-  // SOUTH_AFRICA: 'South Africa (Cape Town)',
-} as const
-
-export type AWS_REGIONS_KEYS = keyof typeof AWS_REGIONS
-
-export const FLY_REGIONS = {
-  SOUTHEAST_ASIA: 'Singapore',
-} as const
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+    ? AWS_REGIONS.SOUTHEAST_ASIA
+    : AWS_REGIONS.EAST_US_2
 
 // TO DO, change default to US region for prod
-const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
+export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
+
+export const MANAGED_BY = {
+  VERCEL_MARKETPLACE: 'vercel-marketplace',
+  AWS_MARKETPLACE: 'aws-marketplace',
+  SUPABASE: 'supabase',
+}
+
+export type ManagedBy = (typeof MANAGED_BY)[keyof typeof MANAGED_BY]
 
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',
@@ -50,8 +34,21 @@ export const PRICING_TIER_PRODUCT_IDS = {
   ENTERPRISE: 'tier_enterprise',
 }
 
-export const DEFAULT_PROVIDER: CloudProvider =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
+export function useDefaultProvider() {
+  const defaultProvider: CloudProvider =
+    process.env.NEXT_PUBLIC_ENVIRONMENT &&
+    ['staging', 'preview'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT)
+      ? 'AWS_K8S'
+      : 'AWS'
+
+  const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+
+  if (validCloudProviders?.includes(defaultProvider)) {
+    return defaultProvider
+  }
+
+  return (validCloudProviders?.[0] ?? 'AWS') as CloudProvider
+}
 
 export const PROVIDERS = {
   FLY: {
@@ -64,6 +61,19 @@ export const PROVIDERS = {
     id: 'AWS',
     name: 'AWS',
     DEFAULT_SSH_KEY: 'supabase-app-instance',
+    default_region: AWS_REGIONS_DEFAULT,
+    regions: { ...AWS_REGIONS },
+  },
+  AWS_K8S: {
+    id: 'AWS_K8S',
+    name: 'AWS (Revamped)',
+    DEFAULT_SSH_KEY: 'supabase-app-instance',
+    default_region: AWS_REGIONS_DEFAULT,
+    regions: { ...AWS_REGIONS },
+  },
+  AWS_NIMBUS: {
+    id: 'AWS_NIMBUS',
+    name: 'AWS (Nimbus)',
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
   },
@@ -80,12 +90,13 @@ export const PROJECT_STATUS: {
   GOING_DOWN: 'GOING_DOWN',
   INIT_FAILED: 'INIT_FAILED',
   REMOVED: 'REMOVED',
+  RESTARTING: 'RESTARTING',
   RESTORING: 'RESTORING',
+  RESTORE_FAILED: 'RESTORE_FAILED',
   UPGRADING: 'UPGRADING',
-  // @ts-ignore [Joshen] API codegen seems to be wrong here, pausing is still a valid status
   PAUSING: 'PAUSING',
-  // @ts-ignore [Joshen] This is no longer part of the project status enum, but leaving here for now just in case
-  RESTORATION_FAILED: 'RESTORATION_FAILED',
+  PAUSE_FAILED: 'PAUSE_FAILED',
+  RESIZING: 'RESIZING',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4
@@ -116,11 +127,11 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1
 
-type InstanceSpecs = {
+export type InstanceSpecs = {
   baseline_disk_io_mbs: number
   connections_direct: number
   connections_pooler: number
-  cpu_cores: number
+  cpu_cores: number | 'Shared'
   cpu_dedicated: boolean
   max_disk_io_mbs: number
   memory_gb: number
@@ -130,7 +141,7 @@ export const INSTANCE_NANO_SPECS: InstanceSpecs = {
   baseline_disk_io_mbs: 43,
   connections_direct: 30,
   connections_pooler: 200,
-  cpu_cores: 2,
+  cpu_cores: 'Shared',
   cpu_dedicated: false,
   max_disk_io_mbs: 2085,
   memory_gb: 0.5,

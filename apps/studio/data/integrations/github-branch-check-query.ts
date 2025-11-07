@@ -1,32 +1,32 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { get } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type GithubBranchVariables = {
-  connectionId: number
+  repositoryId: number
   branchName: string
 }
 
 export async function checkGithubBranchValidity(
-  { connectionId, branchName }: GithubBranchVariables,
+  { repositoryId, branchName }: GithubBranchVariables,
   signal?: AbortSignal
 ) {
   const { data, error } = await get(
-    '/platform/integrations/github/branches/{connectionId}/{branchName}',
+    '/platform/integrations/github/repositories/{repository_id}/branches/{branch_name}',
     {
       params: {
         path: {
-          connectionId,
-          branchName,
+          repository_id: repositoryId,
+          branch_name: branchName,
         },
       },
       signal,
     }
   )
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -37,23 +37,21 @@ export const useCheckGithubBranchValidity = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<GitHubIntegrationCreateData, ResponseError, GithubBranchVariables>,
+  UseCustomMutationOptions<GitHubIntegrationCreateData, ResponseError, GithubBranchVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<GitHubIntegrationCreateData, ResponseError, GithubBranchVariables>(
-    (vars) => checkGithubBranchValidity(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to check Github branch: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<GitHubIntegrationCreateData, ResponseError, GithubBranchVariables>({
+    mutationFn: (vars) => checkGithubBranchValidity(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to check GitHub branch: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

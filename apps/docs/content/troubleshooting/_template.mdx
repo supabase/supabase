@@ -1,0 +1,48 @@
+---
+title = "Troubleshoot slow queries"
+topics = [
+  "ai",
+  "auth",
+  "branching",
+  "cli",
+  "database",
+  "functions",
+  "platform",
+  "realtime",
+  "self-hosting",
+  "storage",
+  "studio",
+  "supavisor",
+  "terraform",
+]
+keywords = [] # any strings (topics are automatically added so no need to duplicate)
+
+# Optionally, list the endpoints/commands/methods that are affected by this issue.
+#
+# Use the ID, which you can get from the API reference on supabase.com/docs by
+# navigating to the API and copying the last segment of the URL.
+#
+# Delete any sections that are not applicable.
+[api]
+sdk = ["auth-mfa-enroll", "auth-mfa-verify"]
+management_api = ["v1-get-postgres-config"]
+cli = ["supabase-migration-repair"]
+
+# Optionally, list the error messages associated with this issue.
+[[errors]]
+http_status_code = 404
+code = "not_found"
+message = "The resource was not found"
+
+[[errors]]
+http_status_code = 403
+code = "forbidden"
+message = "Not allowed to access this resource"
+---
+
+Freeform Markdown here. Some suggestions on what to include:
+
+- Why the issue occurs
+- How to diagnose it
+- How to fix it
+- How to prevent it

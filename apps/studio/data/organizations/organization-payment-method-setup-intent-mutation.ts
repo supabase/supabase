@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type OrganizationPaymentMethodSetupIntentVariables = {
   slug: string
@@ -19,7 +19,7 @@ export async function setupPaymentMethodIntent({
     // @ts-ignore [Joshen] API seems to be having the wrong spec
     body: { hcaptchaToken },
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -30,7 +30,7 @@ export const useOrganizationPaymentMethodSetupIntent = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationPaymentMethodSetupIntentData,
     ResponseError,
     OrganizationPaymentMethodSetupIntentVariables
@@ -41,7 +41,8 @@ export const useOrganizationPaymentMethodSetupIntent = ({
     OrganizationPaymentMethodSetupIntentData,
     ResponseError,
     OrganizationPaymentMethodSetupIntentVariables
-  >((vars) => setupPaymentMethodIntent(vars), {
+  >({
+    mutationFn: (vars) => setupPaymentMethodIntent(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

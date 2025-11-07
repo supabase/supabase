@@ -1,19 +1,23 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
+import { useFlag } from 'common'
+import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedProject, withAuth } from 'hooks'
-import { ProjectLayout } from '../'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
+import { ProjectLayout } from '../ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
 export interface DatabaseLayoutProps {
   title?: string
 }
 
-const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
-  const project = useSelectedProject()
+const DatabaseProductMenu = () => {
+  const { data: project } = useSelectedProjectQuery()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -26,21 +30,37 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
 
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
+  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
+  const enablePgReplicate = useFlag('enablePgReplicate')
+
+  const {
+    databaseReplication: showPgReplicate,
+    databaseRoles: showRoles,
+    integrationsWrappers: showWrappers,
+  } = useIsFeatureEnabled(['database:replication', 'database:roles', 'integrations:wrappers'])
 
   return (
-    <ProjectLayout
-      product="Database"
-      productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateDatabaseMenu(project, { pgNetExtensionExists, pitrEnabled })}
-        />
-      }
-      isBlocking={false}
-    >
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+    <>
+      <ProductMenu
+        page={page}
+        menu={generateDatabaseMenu(project, {
+          pgNetExtensionExists,
+          pitrEnabled,
+          columnLevelPrivileges,
+          enablePgReplicate,
+          showPgReplicate,
+          showRoles,
+          showWrappers,
+        })}
+      />
+    </>
+  )
+}
+
+const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
+  return (
+    <ProjectLayout product="Database" productMenu={<DatabaseProductMenu />} isBlocking={false}>
+      {children}
     </ProjectLayout>
   )
 }

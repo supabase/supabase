@@ -1,16 +1,27 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import type { Entity } from './entity-type-query'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
 
 export type EntityTypesVariables = {
   projectRef?: string
-  schema?: string
+  schemas?: string[]
   search?: string
   limit?: number
   page?: number
   sort?: 'alphabetical' | 'grouped-alphabetical'
+  filterTypes?: string[]
 } & Pick<ExecuteSqlVariables, 'connectionString'>
+
+export interface Entity {
+  id: number
+  schema: string
+  name: string
+  type: ENTITY_TYPE
+  comment: string | null
+  rls_enabled: boolean
+}
 
 export type EntityTypesResponse = {
   data: {
@@ -23,11 +34,12 @@ export async function getEntityTypes(
   {
     projectRef,
     connectionString,
-    schema = 'public',
+    schemas = ['public'],
     search,
     limit = 100,
     page = 0,
     sort = 'alphabetical',
+    filterTypes = Object.values(ENTITY_TYPE),
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
@@ -55,7 +67,7 @@ export async function getEntityTypes(
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
       where
-        c.relkind in ('r', 'v', 'm', 'f', 'p')
+        c.relkind in (${filterTypes.map((x) => `'${x}'`).join(', ')})
         and not pg_is_other_temp_schema(nc.oid)
         and (
           pg_has_role(c.relowner, 'USAGE')
@@ -65,7 +77,7 @@ export async function getEntityTypes(
           )
           or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
         )
-        and nc.nspname = '${schema}'
+        and nc.nspname in (${schemas.map((x) => `'${x}'`)})
         ${search ? `and c.relname ilike '%${search}%'` : ''}
       order by ${innerOrderBy}
       limit ${limit}
@@ -94,7 +106,7 @@ export async function getEntityTypes(
       projectRef,
       connectionString,
       sql,
-      queryKey: ['public', 'entity-types'],
+      queryKey: ['entity-types', ...schemas, page],
     },
     signal
   )
@@ -103,43 +115,82 @@ export async function getEntityTypes(
 }
 
 export type EntityTypesData = Awaited<ReturnType<typeof getEntityTypes>>
-export type EntityTypesError = unknown
+export type EntityTypesError = ResponseError
 
 export const useEntityTypesQuery = <TData = EntityTypesData>(
   {
     projectRef,
     connectionString,
-    schema = 'public',
+    schemas = ['public'],
     search,
     limit = 100,
     sort,
+    filterTypes,
   }: Omit<EntityTypesVariables, 'page'>,
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
-) =>
-  useInfiniteQuery<EntityTypesData, EntityTypesError, TData>(
-    entityTypeKeys.list(projectRef, { schema, search, sort, limit }),
-    ({ signal, pageParam }) =>
+  }: UseCustomInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
+) => {
+  return useInfiniteQuery<EntityTypesData, EntityTypesError, TData>({
+    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
-        { projectRef, connectionString, schema, search, limit, page: pageParam, sort },
+        {
+          projectRef,
+          connectionString,
+          schemas,
+          search,
+          limit,
+          page: pageParam,
+          sort,
+          filterTypes,
+        },
         signal
       ),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      staleTime: 0,
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        const currentTotalCount = page * limit
-        const totalCount = lastPage.data.count
+    enabled: enabled && typeof projectRef !== 'undefined',
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      const currentTotalCount = page * limit
+      const totalCount = lastPage.data.count
 
-        if (currentTotalCount >= totalCount) {
-          return undefined
-        }
+      if (currentTotalCount >= totalCount) {
+        return undefined
+      }
 
-        return page
-      },
-      ...options,
-    }
-  )
+      return page
+    },
+    ...options,
+  })
+}
+
+export function prefetchEntityTypes(
+  client: QueryClient,
+  {
+    projectRef,
+    connectionString,
+    schemas = ['public'],
+    search,
+    limit = 100,
+    sort,
+    filterTypes,
+  }: Omit<EntityTypesVariables, 'page'>
+) {
+  return client.prefetchInfiniteQuery({
+    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    queryFn: ({ signal, pageParam }) =>
+      getEntityTypes(
+        {
+          projectRef,
+          connectionString,
+          schemas,
+          search,
+          limit,
+          page: pageParam,
+          sort,
+          filterTypes,
+        },
+        signal
+      ),
+  })
+}

@@ -1,68 +1,80 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isArray } from 'lodash'
-import Link from 'next/link'
+import { Check, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import InformationBox from 'components/ui/InformationBox'
+import { useParams } from 'common'
+import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
+import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrganizationQuery } from 'data/organizations/organization-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import type { OrgPlan, SubscriptionTier } from 'data/subscriptions/types'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import type { OrgPlan } from 'data/subscriptions/types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { formatCurrency } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import {
-  Button,
-  IconCheck,
-  IconChevronRight,
-  IconExternalLink,
-  IconInfo,
-  Modal,
-  SidePanel,
-  cn,
-} from 'ui'
+import { Organization } from 'types/base'
+import { Button, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
-import EnterpriseCard from './EnterpriseCard'
-import ExitSurveyModal from './ExitSurveyModal'
-import UpgradeSurveyModal from './UpgradeModal'
+import { EnterpriseCard } from './EnterpriseCard'
+import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
-import PaymentMethodSelection from './PaymentMethodSelection'
-import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
+import UpgradeSurveyModal from './UpgradeModal'
 
-const PlanUpdateSidePanel = () => {
+const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
+  if (selectedOrganization.managed_by === MANAGED_BY.VERCEL_MARKETPLACE) {
+    return {
+      installationId: selectedOrganization?.partner_id,
+      path: '/settings',
+      message: 'Change Plan on Vercel Marketplace',
+    }
+  }
+  if (selectedOrganization.managed_by === MANAGED_BY.AWS_MARKETPLACE) {
+    return {
+      organizationSlug: selectedOrganization?.slug,
+    }
+  }
+}
+
+export const PlanUpdateSidePanel = () => {
   const router = useRouter()
-  const selectedOrganization = useSelectedOrganization()
-  const slug = selectedOrganization?.slug
+  const { slug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const originalPlanRef = useRef<string>()
 
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
-  const [usageFeesExpanded, setUsageFeesExpanded] = useState<string[]>([])
 
-  const canUpdateSubscription = useCheckPermissions(
+  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
-  const { data: allProjects } = useProjectsQuery()
-  const orgProjects = (allProjects || []).filter(
-    (it) => it.organization_id === selectedOrganization?.id
-  )
+
+  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const orgProjects =
+    useMemo(
+      () => orgProjectsData?.pages.flatMap((page) => page.projects),
+      [orgProjectsData?.pages]
+    ) || []
+
+  const { data } = useOrganizationQuery({ slug })
+  const hasOrioleProjects = !!data?.has_oriole_project
 
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
@@ -79,23 +91,6 @@ const PlanUpdateSidePanel = () => {
   })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
-    {
-      onSuccess: () => {
-        toast.success(`Successfully updated subscription to ${subscriptionPlanMeta?.name}!`)
-        setSelectedTier(undefined)
-        onClose()
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-        setShowUpgradeSurvey(true)
-      },
-      onError: (error) => {
-        toast.error(`Unable to update subscription: ${error.message}`)
-      },
-    }
-  )
-
-  const billingViaPartner = subscription?.billing_via_partner === true
-  const paymentViaInvoice = subscription?.payment_method_type === 'invoice'
 
   const {
     data: subscriptionPreview,
@@ -105,32 +100,30 @@ const PlanUpdateSidePanel = () => {
   } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
-  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
-  const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
-
-  const expandUsageFee = (fee: string) => {
-    setUsageFeesExpanded([...usageFeesExpanded, fee])
-  }
-
-  const collapseUsageFee = (fee: string) => {
-    setUsageFeesExpanded(usageFeesExpanded.filter((item) => item !== fee))
-  }
+  const hasMembersExceedingFreeTierLimit =
+    (membersExceededLimit || []).length > 0 &&
+    // [Joshen] Note that orgProjects is paginated so there's a chance this may omit certain projects
+    // Although I don't foresee this affecting a majority of users. Ideally perhaps we could return
+    // this data from the organization query
+    orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
 
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
-      Telemetry.sendActivity(
-        {
-          activity: 'Side Panel Viewed',
-          source: 'Dashboard',
-          data: {
-            title: 'Change Subscription Plan',
-            section: 'Subscription plan',
-          },
-          ...(slug && { orgSlug: slug }),
-        },
-        router
-      )
+      const source = Array.isArray(router.query.source)
+        ? router.query.source[0]
+        : router.query.source
+      const properties: StudioPricingSidePanelOpenedEvent['properties'] = {
+        currentPlan: subscription?.plan?.name,
+      }
+      if (source) {
+        properties.origin = source
+      }
+      sendEvent({
+        action: 'studio_pricing_side_panel_opened',
+        properties,
+        groups: { organization: slug ?? 'Unknown' },
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
@@ -150,22 +143,6 @@ const PlanUpdateSidePanel = () => {
     }
   }
 
-  const onUpdateSubscription = async () => {
-    if (!slug) return console.error('org slug is required')
-    if (!selectedTier) return console.error('Selected plan is required')
-    if (!selectedPaymentMethod && !paymentViaInvoice) {
-      return toast.error('Please select a payment method')
-    }
-
-    // If the user is downgrading from team, should have spend cap disabled by default
-    const tier =
-      subscription?.plan?.id === 'team' && selectedTier === PRICING_TIER_PRODUCT_IDS.PRO
-        ? (PRICING_TIER_PRODUCT_IDS.PAYG as SubscriptionTier)
-        : selectedTier
-
-    updateOrgSubscription({ slug, tier, paymentMethod: selectedPaymentMethod })
-  }
-
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
     : null
@@ -180,55 +157,63 @@ const PlanUpdateSidePanel = () => {
         header={
           <div className="flex items-center justify-between">
             <h4>Change subscription plan for {selectedOrganization?.name}</h4>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                 Pricing
-              </Link>
+              </a>
             </Button>
           </div>
         }
       >
+        {selectedOrganization && selectedOrganization.managed_by !== MANAGED_BY.SUPABASE && (
+          <PartnerManagedResource
+            managedBy={selectedOrganization.managed_by}
+            resource="Organization plans"
+            cta={getPartnerManagedResourceCta(selectedOrganization)}
+          />
+        )}
         <SidePanel.Content>
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
               const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
               const price = planMeta?.price ?? 0
-              const isDowngradeOption = planMeta?.change_type === 'downgrade'
+              const isDowngradeOption =
+                getPlanChangeType(subscription?.plan.id, plan?.planId) === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
-              const features = billingViaPartner ? plan.featuresPartner : plan.features
+              const features = plan.features
+              const footer = plan.footer
+
+              const source = Array.isArray(router.query.source)
+                ? router.query.source[0]
+                : router.query.source
+              const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_team'
 
               if (plan.id === 'tier_enterprise') {
-                return (
-                  <EnterpriseCard
-                    key={plan.id}
-                    plan={plan}
-                    isCurrentPlan={isCurrentPlan}
-                    billingViaPartner={billingViaPartner}
-                  />
-                )
+                return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
               }
 
               return (
                 <div
                   key={plan.id}
-                  className={
-                    'border rounded-md px-4 py-4 flex flex-col items-start justify-between col-span-12 md:col-span-4 bg-surface-200'
-                  }
+                  className={cn(
+                    'px-4 py-4 flex flex-col items-start justify-between',
+                    'border rounded-md col-span-12 md:col-span-4 bg-surface-200',
+                    shouldHighlight &&
+                      'ring-4 ring-brand animate-[pulse_1.5s_ease-in-out_1] shadow-md shadow-brand/40'
+                  )}
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
+                      <p className="text-brand text-sm uppercase">{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-400 text-brand-600 rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
-                      ) : (
-                        <></>
-                      )}
+                      ) : null}
                     </div>
                     <div className="mt-4 flex items-center space-x-1 mb-4">
                       {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
@@ -237,7 +222,9 @@ const PlanUpdateSidePanel = () => {
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
                         </div>
                       ) : (
-                        <p className="text-foreground text-lg">{formatCurrency(price)}</p>
+                        <p className="text-foreground text-lg" translate="no">
+                          {formatCurrency(price)}
+                        </p>
                       )}
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
@@ -246,56 +233,50 @@ const PlanUpdateSidePanel = () => {
                         Current plan
                       </Button>
                     ) : (
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Button
-                              block
-                              disabled={
-                                // No self-serve downgrades from Enterprise
-                                subscription?.plan?.id === 'enterprise' || !canUpdateSubscription
-                              }
-                              type={isDowngradeOption ? 'default' : 'primary'}
-                              onClick={() => {
-                                setSelectedTier(plan.id as any)
-                                Telemetry.sendActivity(
-                                  {
-                                    activity: 'Popup Viewed',
-                                    source: 'Dashboard',
-                                    data: {
-                                      title: isDowngradeOption
-                                        ? 'Downgrade'
-                                        : 'Upgrade' + ' to ' + plan.name,
-                                      section: 'Subscription plan',
-                                    },
-                                    ...(slug && { orgSlug: slug }),
-                                  },
-                                  router
-                                )
-                              }}
-                            >
-                              {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
-                            </Button>
-                          </div>
-                        </Tooltip.Trigger>
-                        {!canUpdateSubscription ? (
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  You do not have permission to change the subscription plan.
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        ) : null}
-                      </Tooltip.Root>
+                      <ButtonTooltip
+                        block
+                        type={isDowngradeOption ? 'default' : 'primary'}
+                        disabled={
+                          subscription?.plan?.id === 'enterprise' ||
+                          // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
+                          (selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE &&
+                            plan.id !== 'tier_free') ||
+                          // Orgs managed by AWS marketplace are not allowed to change the plan
+                          selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ||
+                          hasOrioleProjects ||
+                          !canUpdateSubscription
+                        }
+                        onClick={() => {
+                          setSelectedTier(plan.id as any)
+                          sendEvent({
+                            action: 'studio_pricing_plan_cta_clicked',
+                            properties: {
+                              selectedPlan: plan.name,
+                              currentPlan: subscription?.plan?.name,
+                            },
+                            groups: { organization: slug ?? 'Unknown' },
+                          })
+                        }}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            className: hasOrioleProjects ? 'w-96 text-center' : '',
+                            text:
+                              subscription?.plan?.id === 'enterprise'
+                                ? 'Reach out to us via support to update your plan from Enterprise'
+                                : hasOrioleProjects
+                                  ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
+                                  : !canUpdateSubscription
+                                    ? 'You do not have permission to change the subscription plan'
+                                    : selectedOrganization?.managed_by ===
+                                        MANAGED_BY.AWS_MARKETPLACE
+                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                      : undefined,
+                          },
+                        }}
+                      >
+                        {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
+                      </ButtonTooltip>
                     )}
 
                     <div className="border-t my-4" />
@@ -307,7 +288,7 @@ const PlanUpdateSidePanel = () => {
                           className="flex py-2"
                         >
                           <div className="w-[12px]">
-                            <IconCheck
+                            <Check
                               className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
@@ -326,11 +307,9 @@ const PlanUpdateSidePanel = () => {
                     </ul>
                   </div>
 
-                  {(plan.footer || (billingViaPartner && plan.footerPartner)) && (
+                  {footer && (
                     <div className="border-t pt-4 mt-4">
-                      <p className="text-foreground-light text-xs">
-                        {billingViaPartner ? plan.footerPartner || plan.footer : plan.footer}
-                      </p>
+                      <p className="text-foreground-light text-xs">{footer}</p>
                     </div>
                   )}
                 </div>
@@ -342,224 +321,29 @@ const PlanUpdateSidePanel = () => {
 
       <DowngradeModal
         visible={selectedTier === 'tier_free'}
-        selectedPlan={subscriptionPlanMeta}
         subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
         projects={orgProjects}
       />
 
-      <Modal
-        loading={isUpdating}
-        alignFooter="right"
-        size="xlarge"
-        visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
-        onCancel={() => setSelectedTier(undefined)}
-        onConfirm={onUpdateSubscription}
-        overlayClassName="pointer-events-none"
-        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
-      >
-        <Modal.Content className="mt-4">
-          {subscriptionPreviewError && (
-            <AlertError
-              error={subscriptionPreviewError}
-              subject="Failed to preview subscription."
-            />
-          )}
-          {subscriptionPreviewIsLoading && (
-            <div className="space-y-2">
-              <span className="text-sm">Estimating monthly costs...</span>
-              <ShimmeringLoader />
-              <ShimmeringLoader className="w-3/4" />
-              <ShimmeringLoader className="w-1/2" />
-            </div>
-          )}
-          {subscriptionPreviewInitialized && (
-            <div>
-              <Table
-                className="mt-2"
-                borderless={true}
-                head={[
-                  <Table.th key="header-item">Item</Table.th>,
-                  <Table.th key="header-count" className="text-right pr-4">
-                    Usage
-                  </Table.th>,
-                  <Table.th key="header-unit-price">Unit Price</Table.th>,
-                  <Table.th key="header-price" className="text-right">
-                    Cost
-                  </Table.th>,
-                ]}
-                body={
-                  <>
-                    {subscriptionPreview.breakdown.map((item) => (
-                      <>
-                        <Table.tr key={item.description}>
-                          <Table.td>
-                            {item.breakdown && item.breakdown.length > 0 && (
-                              <Button
-                                type="text"
-                                className="!pl-0 !pr-1"
-                                icon={
-                                  <IconChevronRight
-                                    className={cn(
-                                      'transition',
-                                      usageFeesExpanded.includes(item.description) && 'rotate-90'
-                                    )}
-                                  />
-                                }
-                                onClick={() =>
-                                  usageFeesExpanded.includes(item.description)
-                                    ? collapseUsageFee(item.description)
-                                    : expandUsageFee(item.description)
-                                }
-                              />
-                            )}
-                            {item.description ?? 'Unknown'}{' '}
-                            {item.description.endsWith('Compute') && ` (Hours)`}
-                          </Table.td>
-                          <Table.td className="text-right pr-4 tabular-nums">
-                            {item.quantity?.toLocaleString()}
-                          </Table.td>
-                          <Table.td>
-                            {item.unit_price_desc
-                              ? item.unit_price_desc
-                              : item.unit_price === 0
-                                ? 'FREE'
-                                : item.unit_price
-                                  ? `${formatCurrency(item.unit_price)}`
-                                  : ''}
-                          </Table.td>
-                          <Table.td className="text-right">
-                            {formatCurrency(item.total_price)}
-                          </Table.td>
-                        </Table.tr>
-
-                        {usageFeesExpanded.includes(item.description) &&
-                          item.breakdown &&
-                          item.breakdown.length > 0 &&
-                          item.breakdown.map((project) => (
-                            <Table.tr key={project.project_ref}>
-                              <Table.td className="!pl-12">{project.project_name}</Table.td>
-                              <Table.td className="text-right pr-4 tabular-nums">
-                                {project.usage}
-                              </Table.td>
-                              <Table.td />
-                              <Table.td />
-                            </Table.tr>
-                          ))}
-                      </>
-                    ))}
-
-                    <Table.tr>
-                      <Table.td className="font-medium">
-                        Monthly Costs (excluding over-usage and credits)
-                      </Table.td>
-                      <Table.td />
-                      <Table.td />
-                      <Table.td className="text-right font-medium">
-                        {formatCurrency(
-                          Math.round(
-                            subscriptionPreview.breakdown.reduce(
-                              (prev, cur) => prev + cur.total_price,
-                              0
-                            )
-                          ) ?? 0
-                        )}
-                      </Table.td>
-                    </Table.tr>
-                  </>
-                }
-              ></Table>
-
-              <InformationBox
-                className="mt-4"
-                title="Usage-billing for Compute"
-                icon={<IconInfo />}
-                defaultVisibility={true}
-                hideCollapse={true}
-                description={
-                  <div>
-                    <p className="text-sm mt-2">
-                      Each project is a dedicated server and database. Paid plans come with $10 of
-                      Compute Credits to cover one project on the default Micro Compute size or
-                      parts of any compute addon. Additional unpaused projects on paid plans will
-                      incur compute usage costs starting at $10 per month, billed hourly.
-                    </p>
-
-                    {subscription?.plan?.id === 'free' && (
-                      <p className="text-sm mt-2">
-                        Mixing paid and non-paid projects in a single organization is not possible.
-                        If you want projects to be on the free plan, use self-serve project
-                        transfers.
-                      </p>
-                    )}
-
-                    <div className="space-x-3 mt-2">
-                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/org-based-billing"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          How billing works
-                        </Link>
-                      </Button>
-                      {subscription?.plan?.id === 'free' && (
-                        <Button
-                          asChild
-                          type="default"
-                          icon={<IconExternalLink strokeWidth={1.5} />}
-                        >
-                          <Link
-                            href="https://supabase.com/docs/guides/platform/project-transfer"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Project transfers
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                }
-              />
-            </div>
-          )}
-        </Modal.Content>
-
-        <Modal.Content>
-          {!billingViaPartner ? (
-            <div className="py-4 space-y-2">
-              <p className="text-sm">
-                Upon clicking confirm, your monthly invoice will be adjusted and your credit card
-                will be charged immediately. Changing the plan resets your billing cycle and may
-                result in a prorated charge for previous usage.
-              </p>
-
-              <div className="!mt-4">
-                <PaymentMethodSelection
-                  selectedPaymentMethod={selectedPaymentMethod}
-                  onSelectPaymentMethod={setSelectedPaymentMethod}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="py-4 space-y-2">
-              <p className="text-sm">
-                This organization is billed through our partner{' '}
-                {billingPartnerLabel(subscription?.billing_partner)} and you will be charged by them
-                directly.
-              </p>
-              {subscriptionPreview?.billed_via_partner &&
-                subscriptionPreview?.plan_change_type === 'downgrade' && (
-                  <p className="text-sm">
-                    Your organization will be downgraded at the end of your current billing cycle.
-                  </p>
-                )}
-            </div>
-          )}
-        </Modal.Content>
-      </Modal>
+      <SubscriptionPlanUpdateDialog
+        selectedTier={selectedTier}
+        onClose={() => setSelectedTier(undefined)}
+        planMeta={planMeta}
+        subscriptionPreviewError={subscriptionPreviewError}
+        subscriptionPreviewIsLoading={subscriptionPreviewIsLoading}
+        subscriptionPreviewInitialized={subscriptionPreviewInitialized}
+        subscriptionPreview={subscriptionPreview}
+        subscription={subscription}
+        projects={orgProjects}
+        currentPlanMeta={{
+          ...availablePlans.find((p) => p.id === subscription?.plan?.id),
+          features:
+            subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)
+              ?.features || [],
+        }}
+      />
 
       <MembersExceedLimitModal
         visible={showDowngradeError}
@@ -568,7 +352,7 @@ const PlanUpdateSidePanel = () => {
 
       <ExitSurveyModal
         visible={showExitSurvey}
-        subscription={subscription}
+        projects={orgProjects}
         onClose={(success?: boolean) => {
           setShowExitSurvey(false)
           if (success) onClose()
@@ -587,5 +371,3 @@ const PlanUpdateSidePanel = () => {
     </>
   )
 }
-
-export default PlanUpdateSidePanel

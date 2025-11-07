@@ -1,6 +1,13 @@
 import { useParams } from 'common'
-import Link from 'next/link'
 import { useState } from 'react'
+
+import { DocsButton } from 'components/ui/DocsButton'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { DOCS_URL } from 'lib/constants'
+import { ChevronLeft, Code } from 'lucide-react'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -10,18 +17,10 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconChevronLeft,
-  IconCode,
-  IconExternalLink,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
@@ -45,22 +44,22 @@ const SecondLevelNav = () => {
     entities: {
       title: 'Tables & Views',
       options: tables,
-      docsUrl: 'https://supabase.com/docs/reference/javascript/select',
+      docsUrl: `${DOCS_URL}/reference/javascript/select`,
     },
     'stored-procedures': {
       title: 'Stored Procedures',
       options: functions,
-      docsUrl: 'https://supabase.com/docs/reference/javascript/rpc',
+      docsUrl: `${DOCS_URL}/reference/javascript/rpc`,
     },
     storage: {
       title: 'Storage',
       options: buckets ?? [],
-      docsUrl: 'https://supabase.com/docs/reference/javascript/storage-createbucket',
+      docsUrl: `${DOCS_URL}/reference/javascript/storage-createbucket`,
     },
     'edge-functions': {
       title: 'Edge Functions',
       options: edgeFunctions ?? [],
-      docsUrl: 'https://supabase.com/docs/reference/javascript/functions-invoke',
+      docsUrl: `${DOCS_URL}/reference/javascript/functions-invoke`,
     },
   }
 
@@ -79,7 +78,7 @@ const SecondLevelNav = () => {
         {isNewAPIDocsEnabled && (
           <Button
             type="text"
-            icon={<IconChevronLeft />}
+            icon={<ChevronLeft />}
             className="px-1"
             onClick={() => snap.setActiveDocsSection([snap.activeDocsSection[0]])}
           />
@@ -95,7 +94,7 @@ const SecondLevelNav = () => {
                 <div className="flex items-center justify-between w-full">
                   <p>{snap.activeDocsSection[1]}</p>
                   <div>
-                    <IconCode className="rotate-90" strokeWidth={1.5} size={12} />
+                    <Code className="rotate-90" strokeWidth={1.5} size={12} />
                   </div>
                 </div>
               </div>
@@ -157,17 +156,7 @@ const SecondLevelNav = () => {
             <p className="text-xs !leading-normal">
               Head over to our docs site for the full API documentation.
             </p>
-            <Button
-              asChild
-              className="!mt-2"
-              size="tiny"
-              type="default"
-              icon={<IconExternalLink strokeWidth={1.5} />}
-            >
-              <Link href={content[section].docsUrl} target="_blank" rel="noreferrer">
-                Documentation
-              </Link>
-            </Button>
+            <DocsButton className="!mt-2" href={content[section].docsUrl} />
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       </div>

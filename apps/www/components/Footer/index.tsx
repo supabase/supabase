@@ -1,15 +1,20 @@
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
-import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { CheckIcon } from '@heroicons/react/outline'
-import SectionContainer from '../Layouts/SectionContainer'
+'use client'
 
-import footerData from 'data/Footer'
+import { CheckIcon } from '@heroicons/react/outline'
+import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect } from 'react'
+
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import footerData from 'data/Footer'
+import { usePathname } from 'next/navigation'
+import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
+import supabase from '~/lib/supabase'
+import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
+import SectionContainer from '../Layouts/SectionContainer'
 
 interface Props {
   className?: string
@@ -17,12 +22,21 @@ interface Props {
 }
 
 const Footer = (props: Props) => {
-  const { resolvedTheme } = useTheme()
-  const { pathname } = useRouter()
+  const pathname = usePathname()
 
-  const isLaunchWeek = pathname.includes('/launch-week')
-  const isGAWeek = pathname.includes('/ga-week')
-  const forceDark = isLaunchWeek || pathname === '/'
+  const isDarkLaunchWeek = useDarkLaunchWeeks()
+  const isGAWeek = pathname?.includes('/ga-week')
+  const forceDark = isDarkLaunchWeek
+
+  useEffect(() => {
+    const channel = supabase.channel('footer')
+    if (channel.state === REALTIME_CHANNEL_STATES.closed) {
+      channel.subscribe()
+    }
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [])
 
   if (props.hideFooter) {
     return null
@@ -32,11 +46,10 @@ const Footer = (props: Props) => {
     <footer
       className={cn(
         'bg-alternative',
-        isLaunchWeek && 'bg-[#060809]',
+        isDarkLaunchWeek && 'bg-[#060809]',
         isGAWeek && 'dark:bg-alternative',
         props.className
       )}
-      aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
         Footer
@@ -45,7 +58,7 @@ const Footer = (props: Props) => {
         <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
-            <Link href="/security" className="text-brand hover:underline">
+            <Link href="/security" className="text-brand-link hover:underline">
               More on Security
             </Link>
           </div>
@@ -63,8 +76,8 @@ const Footer = (props: Props) => {
         <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
       <SectionContainer className="py-8">
-        <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-          <div className="space-y-8 xl:col-span-1">
+        <div className="xl:grid xl:grid-cols-7 xl:gap-4">
+          <div className="space-y-8 xl:col-span-2">
             <Link href="#" as="/" className="w-40">
               <Image
                 src={supabaseLogoWordmarkLight}
@@ -117,8 +130,8 @@ const Footer = (props: Props) => {
               </a>
             </div>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-5 xl:mt-0">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
               {footerData.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>

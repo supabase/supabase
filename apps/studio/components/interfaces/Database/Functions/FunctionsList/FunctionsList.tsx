@@ -1,27 +1,45 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
+import { noop } from 'lodash'
+import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Button, IconSearch, Input } from 'ui'
+import { parseAsJson, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useEffect } from 'react'
-import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import {
+  AiIconAnimation,
+  Card,
+  Input,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
+import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
 interface FunctionsListProps {
   createFunction: () => void
+  duplicateFunction: (fn: PostgresFunction) => void
   editFunction: (fn: PostgresFunction) => void
   deleteFunction: (fn: PostgresFunction) => void
 }
@@ -30,19 +48,27 @@ const FunctionsList = ({
   createFunction = noop,
   editFunction = noop,
   deleteFunction = noop,
+  duplicateFunction = noop,
 }: FunctionsListProps) => {
-  const { project } = useProjectContext()
   const router = useRouter()
-  const { schema, search } = useParams()
-  const selectedSchema = schema ?? 'public'
+  const { search } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+
   const filterString = search ?? ''
 
-  const setSelectedSchema = (s: string) => {
-    const url = new URL(document.URL)
-    url.searchParams.delete('search')
-    url.searchParams.set('schema', s)
-    router.push(url)
-  }
+  // Filters
+  const [returnTypeFilter, setReturnTypeFilter] = useQueryState(
+    'return_type',
+    parseAsJson(selectFilterSchema.parse)
+  )
+  const [securityFilter, setSecurityFilter] = useQueryState(
+    'security',
+    parseAsJson(selectFilterSchema.parse)
+  )
+
   const setFilterString = (str: string) => {
     const url = new URL(document.URL)
     if (str === '') {
@@ -53,27 +79,18 @@ const FunctionsList = ({
     router.push(url)
   }
 
-  // update the url to point to public schema
-  useEffect(() => {
-    if (schema !== selectedSchema) {
-      setSelectedSchema(selectedSchema)
-    }
-  }, [])
-
-  const canCreateFunctions = useCheckPermissions(
+  const { can: canCreateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
 
-  const { data: schemas } = useSchemasQuery({
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  // [Joshen] This is to preload the data for the Schema Selector
+  useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const foundSchema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === foundSchema?.id)
 
   const {
     data: functions,
@@ -85,8 +102,20 @@ const FunctionsList = ({
     connectionString: project?.connectionString,
   })
 
+  // Get unique return types from functions in the selected schema
+  const schemaFunctions = (functions ?? []).filter((fn) => fn.schema === selectedSchema)
+  const uniqueReturnTypes = Array.from(new Set(schemaFunctions.map((fn) => fn.return_type))).sort()
+
+  // Get security options based on what exists in the selected schema
+  const hasDefiner = schemaFunctions.some((fn) => fn.security_definer)
+  const hasInvoker = schemaFunctions.some((fn) => !fn.security_definer)
+  const securityOptions = [
+    ...(hasDefiner ? [{ label: 'Definer', value: 'definer' }] : []),
+    ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
+  ]
+
   if (isLoading) return <GenericSkeletonLoader />
-  if (isError) <AlertError error={error} subject="Failed to retrieve database functions" />
+  if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
 
   return (
     <>
@@ -110,84 +139,123 @@ const FunctionsList = ({
         </div>
       ) : (
         <div className="w-full space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
               <SchemaSelector
-                className="w-[260px]"
-                size="small"
+                className="w-full lg:w-[180px]"
+                size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
+                onSelectSchema={(schema) => {
+                  setFilterString('')
+                  // Wait for the filter to be cleared from the URL
+                  setTimeout(() => {
+                    setSelectedSchema(schema)
+                  }, 50)
+                }}
               />
               <Input
                 placeholder="Search for a function"
-                size="small"
-                icon={<IconSearch size="tiny" />}
+                size="tiny"
+                icon={<Search size={14} />}
                 value={filterString}
-                className="w-64"
+                className="w-full lg:w-52"
                 onChange={(e) => setFilterString(e.target.value)}
+              />
+              <ReportsSelectFilter
+                label="Return Type"
+                options={uniqueReturnTypes.map((type) => ({
+                  label: type,
+                  value: type,
+                }))}
+                value={returnTypeFilter ?? []}
+                onChange={setReturnTypeFilter}
+                showSearch
+              />
+              <ReportsSelectFilter
+                label="Security"
+                options={securityOptions}
+                value={securityFilter ?? []}
+                onChange={setSecurityFilter}
               />
             </div>
 
-            {!isLocked && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button disabled={!canCreateFunctions} onClick={() => createFunction()}>
+            <div className="flex items-center gap-x-2">
+              {!isSchemaLocked && (
+                <>
+                  <ButtonTooltip
+                    disabled={!canCreateFunctions}
+                    onClick={() => createFunction()}
+                    className="flex-grow"
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canCreateFunctions
+                          ? 'You need additional permissions to create functions'
+                          : undefined,
+                      },
+                    }}
+                  >
                     Create a new function
-                  </Button>
-                </Tooltip.Trigger>
-                {!canCreateFunctions && (
-                  <Tooltip.Portal>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You need additional permissions to create functions
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            )}
+                  </ButtonTooltip>
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canCreateFunctions}
+                    className="px-1 pointer-events-auto"
+                    icon={<AiIconAnimation size={16} />}
+                    onClick={() => {
+                      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+                      aiSnap.newChat({
+                        name: 'Create new function',
+                        initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
+                      })
+                    }}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canCreateFunctions
+                          ? 'You need additional permissions to create functions'
+                          : 'Create with Supabase Assistant',
+                      },
+                    }}
+                  />
+                </>
+              )}
+            </div>
           </div>
 
-          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
-
-          <Table
-            className="table-fixed"
-            head={
-              <>
-                <Table.th key="name">Name</Table.th>
-                <Table.th key="arguments" className="hidden md:table-cell">
-                  Arguments
-                </Table.th>
-                <Table.th key="return_type" className="hidden lg:table-cell">
-                  Return type
-                </Table.th>
-                <Table.th key="security" className="hidden lg:table-cell w-[100px]">
-                  Security
-                </Table.th>
-                <Table.th key="buttons" className="w-1/6"></Table.th>
-              </>
-            }
-            body={
-              <FunctionList
-                schema={selectedSchema}
-                filterString={filterString}
-                isLocked={isLocked}
-                editFunction={editFunction}
-                deleteFunction={deleteFunction}
-              />
-            }
-          />
+          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
+          <Card>
+            <Table className="table-fixed overflow-x-auto">
+              <TableHeader>
+                <TableRow>
+                  <TableHead key="name">Name</TableHead>
+                  <TableHead key="arguments" className="table-cell">
+                    Arguments
+                  </TableHead>
+                  <TableHead key="return_type" className="table-cell">
+                    Return type
+                  </TableHead>
+                  <TableHead key="security" className="table-cell w-[100px]">
+                    Security
+                  </TableHead>
+                  <TableHead key="buttons" className="w-1/6"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <FunctionList
+                  schema={selectedSchema}
+                  filterString={filterString}
+                  isLocked={isSchemaLocked}
+                  returnTypeFilter={returnTypeFilter ?? []}
+                  securityFilter={securityFilter ?? []}
+                  duplicateFunction={duplicateFunction}
+                  editFunction={editFunction}
+                  deleteFunction={deleteFunction}
+                />
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       )}
     </>

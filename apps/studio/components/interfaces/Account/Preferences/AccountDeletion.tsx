@@ -1,6 +1,6 @@
 import Panel from 'components/ui/Panel'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
-import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
+import { CriticalIcon } from 'ui'
 import { DeleteAccountButton } from './DeleteAccountButton'
 
 export const AccountDeletion = () => {

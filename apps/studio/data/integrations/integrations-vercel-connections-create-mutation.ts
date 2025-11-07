@@ -1,11 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { integrationKeys } from './keys'
-import type { IntegrationConnectionsCreateVariables } from './integrations.types'
+import { handleError, post } from 'data/fetchers'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import type { IntegrationConnectionsCreateVariables } from './integrations.types'
+import { integrationKeys } from './keys'
 
 export async function createIntegrationVercelConnections({
   organizationIntegrationId,
@@ -21,10 +21,8 @@ export async function createIntegrationVercelConnections({
       },
     },
   })
-  if (error) {
-    throw error
-  }
 
+  if (error) handleError(error)
   return data
 }
 
@@ -37,7 +35,7 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     IntegrationVercelConnectionsCreateData,
     ResponseError,
     IntegrationConnectionsCreateVariables
@@ -50,17 +48,20 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
     IntegrationVercelConnectionsCreateData,
     ResponseError,
     IntegrationConnectionsCreateVariables
-  >((vars) => createIntegrationVercelConnections(vars), {
+  >({
+    mutationFn: (vars) => createIntegrationVercelConnections(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries(integrationKeys.integrationsList()),
-        queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-        queryClient.invalidateQueries(
-          integrationKeys.vercelProjectList(variables.organizationIntegrationId)
-        ),
-        queryClient.invalidateQueries(
-          integrationKeys.vercelConnectionsList(variables.organizationIntegrationId)
-        ),
+        queryClient.invalidateQueries({ queryKey: integrationKeys.integrationsList() }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.integrationsListWithOrg(variables.orgSlug),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.vercelProjectList(variables.organizationIntegrationId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.vercelConnectionsList(variables.organizationIntegrationId),
+        }),
       ])
       await onSuccess?.(data, variables, context)
     },

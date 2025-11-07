@@ -1,32 +1,34 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import generator from 'generate-password-browser'
-import { debounce } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, Input, Modal } from 'ui'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
-import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
+import { useParams } from 'common'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import { passwordStrength } from 'lib/helpers'
+import { passwordStrength } from 'lib/password-strength'
+import { generateStrongPassword } from 'lib/project'
+import { Button, Input, Modal } from 'ui'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
   const isProjectActive = useIsProjectActive()
-  const { project } = useProjectContext()
-  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { data: project } = useSelectedProjectQuery()
+
+  const { can: canResetDbPassword } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
 
@@ -59,17 +61,13 @@ const ResetDbPassword = ({ disabled = false }) => {
     setPasswordStrengthMessage(message)
   }
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value) => checkPasswordStrength(value), 300)
-  ).current
-
   const onDbPassChange = (e: any) => {
     const value = e.target.value
     setPassword(value)
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
+    } else checkPasswordStrength(value)
   }
 
   const confirmResetDbPass = async () => {
@@ -80,14 +78,10 @@ const ResetDbPassword = ({ disabled = false }) => {
     }
   }
 
-  function generateStrongPassword() {
-    const password = generator.generate({
-      length: 16,
-      numbers: true,
-      uppercase: true,
-    })
+  function generatePassword() {
+    const password = generateStrongPassword()
     setPassword(password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   return (
@@ -105,90 +99,71 @@ const ResetDbPassword = ({ disabled = false }) => {
               </p>
             </div>
             <div className="flex items-end justify-end">
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button
-                    type="default"
-                    disabled={!canResetDbPassword || !isProjectActive || disabled}
-                    onClick={() => setShowResetDbPass(true)}
-                  >
-                    Reset database password
-                  </Button>
-                </Tooltip.Trigger>
-                {(!canResetDbPassword || !isProjectActive) && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                          'border border-background', //border
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          {!canResetDbPassword
-                            ? 'You need additional permissions to reset the database password'
-                            : !isProjectActive
-                              ? 'Unable to reset database password as project is not active'
-                              : ''}
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
+              <ButtonTooltip
+                type="default"
+                disabled={!canResetDbPassword || !isProjectActive || disabled}
+                onClick={() => setShowResetDbPass(true)}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canResetDbPassword
+                      ? 'You need additional permissions to reset the database password'
+                      : !isProjectActive
+                        ? 'Unable to reset database password as project is not active'
+                        : undefined,
+                  },
+                }}
+              >
+                Reset database password
+              </ButtonTooltip>
             </div>
           </div>
         </Panel.Content>
       </Panel>
       <Modal
         hideFooter
-        header={<h5 className="text-sm text-foreground">Reset database password</h5>}
+        header={<h5 className="text-foreground">Reset database password</h5>}
         confirmText="Reset password"
         size="medium"
         visible={showResetDbPass}
         loading={isUpdatingPassword}
         onCancel={() => setShowResetDbPass(false)}
       >
-        <Modal.Content>
-          <div className="w-full space-y-8 py-8">
-            <Input
-              type="password"
-              value={password}
-              copy={password.length > 0}
-              onChange={onDbPassChange}
-              error={passwordStrengthWarning}
-              // @ts-ignore
-              descriptionText={
-                <PasswordStrengthBar
-                  passwordStrengthScore={passwordStrengthScore}
-                  passwordStrengthMessage={passwordStrengthMessage}
-                  password={password}
-                  generateStrongPassword={generateStrongPassword}
-                />
-              }
-            />
-          </div>
+        <Modal.Content className="w-full space-y-8">
+          <Input
+            type="password"
+            value={password}
+            copy={password.length > 0}
+            onChange={onDbPassChange}
+            error={passwordStrengthWarning}
+            // @ts-ignore
+            descriptionText={
+              <PasswordStrengthBar
+                passwordStrengthScore={passwordStrengthScore}
+                passwordStrengthMessage={passwordStrengthMessage}
+                password={password}
+                generateStrongPassword={generatePassword}
+              />
+            }
+          />
         </Modal.Content>
         <Modal.Separator />
-        <Modal.Content>
-          <div className="flex items-center justify-end space-x-2 pt-1 pb-2">
-            <Button
-              type="default"
-              disabled={isUpdatingPassword}
-              onClick={() => setShowResetDbPass(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              loading={isUpdatingPassword}
-              disabled={isUpdatingPassword}
-              onClick={() => confirmResetDbPass()}
-            >
-              Reset password
-            </Button>
-          </div>
+        <Modal.Content className="flex items-center justify-end space-x-2">
+          <Button
+            type="default"
+            disabled={isUpdatingPassword}
+            onClick={() => setShowResetDbPass(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="primary"
+            loading={isUpdatingPassword}
+            disabled={isUpdatingPassword}
+            onClick={() => confirmResetDbPass()}
+          >
+            Reset password
+          </Button>
         </Modal.Content>
       </Modal>
     </>

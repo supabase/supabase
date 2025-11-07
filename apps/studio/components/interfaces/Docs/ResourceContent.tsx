@@ -1,51 +1,64 @@
-import { useParams } from 'common'
-import { IconTable } from 'ui'
+import { Table2 } from 'lucide-react'
 
+import { useParams } from 'common'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import Description from 'components/interfaces/Docs/Description'
 import Param from 'components/interfaces/Docs/Param'
 import Snippets from 'components/interfaces/Docs/Snippets'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useIsFeatureEnabled } from 'hooks'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from 'lib/constants'
 
-const ResourceContent = ({
-  autoApiService,
+interface ResourceContentProps {
+  apiEndpoint: string
+  resourceId: string
+  resources: { [key: string]: { id: string; displayName: string; camelCase: string } }
+  selectedLang: 'bash' | 'js'
+  showApiKey: string
+  refreshDocs: () => void
+}
+
+export const ResourceContent = ({
+  apiEndpoint,
   resourceId,
   resources,
-  definitions,
-  paths,
   selectedLang,
   showApiKey,
   refreshDocs,
-}: any) => {
+}: ResourceContentProps) => {
   const { ref } = useParams()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
 
+  const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
+  const { paths, definitions } = jsonSchema || {}
+
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}`
-      : autoApiService.endpoint
-
-  if (!paths || !definitions) return null
+      : apiEndpoint
 
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
-  const resourcePaths = paths[`/${resourceId}`]
-  const resourceDefinition = definitions[resourceId]
+  const resourcePaths = paths?.[`/${resourceId}`]
+  const resourceDefinition = definitions?.[resourceId]
   const resourceMeta = resources[resourceId]
-  const description = resourceDefinition?.description || null
-  const methods = Object.keys(resourcePaths).map((x) => x.toUpperCase())
-  const properties = Object.entries(resourceDefinition.properties || []).map(([id, val]: any) => ({
+  const description = resourceDefinition?.description || ''
+
+  const methods = Object.keys(resourcePaths ?? {}).map((x) => x.toUpperCase())
+  const properties = Object.entries(resourceDefinition?.properties ?? []).map(([id, val]: any) => ({
     ...val,
     id,
     required: resourceDefinition?.required?.includes(id),
   }))
 
+  if (!paths || !definitions) return null
+
   return (
     <>
       <h2 className="doc-section__table-name text-foreground mt-0 flex items-center px-6 gap-2">
         <span className="bg-slate-300 p-2 rounded-lg">
-          <IconTable size="small" />
+          <Table2 size={18} />
         </span>
         <span className="text-2xl font-bold">{resourceId}</span>
       </h2>
@@ -108,7 +121,7 @@ const ResourceContent = ({
               </p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/select"
+                  href={`${DOCS_URL}/reference/javascript/select`}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -145,7 +158,7 @@ const ResourceContent = ({
               <p>Supabase provides a wide range of filters.</p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/using-filters"
+                  href={`${DOCS_URL}/reference/javascript/using-filters`}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -176,7 +189,7 @@ const ResourceContent = ({
               </p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/insert"
+                  href={`${DOCS_URL}/reference/javascript/insert`}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -216,7 +229,7 @@ const ResourceContent = ({
               </p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/update"
+                  href={`${DOCS_URL}/reference/javascript/update`}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -244,7 +257,7 @@ const ResourceContent = ({
               </p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/delete"
+                  href={`${DOCS_URL}/reference/javascript/delete`}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -273,7 +286,7 @@ const ResourceContent = ({
                 </p>
                 <p>
                   <a
-                    href="https://supabase.com/docs/reference/javascript/subscribe"
+                    href={`${DOCS_URL}/reference/javascript/subscribe`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -314,5 +327,3 @@ const ResourceContent = ({
     </>
   )
 }
-
-export default ResourceContent

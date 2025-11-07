@@ -1,78 +1,243 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import generator from 'generate-password-browser'
-import { debounce } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox, Separator } from 'ui'
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
+import { CloudProviderSelector } from 'components/interfaces/ProjectCreation/CloudProviderSelector'
+import { ComputeSizeSelector } from 'components/interfaces/ProjectCreation/ComputeSizeSelector'
+import { CustomPostgresVersionInput } from 'components/interfaces/ProjectCreation/CustomPostgresVersionInput'
+import { DatabasePasswordInput } from 'components/interfaces/ProjectCreation/DatabasePasswordInput'
+import { DisabledWarningDueToIncident } from 'components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
+import { FreeProjectLimitWarning } from 'components/interfaces/ProjectCreation/FreeProjectLimitWarning'
+import { OrganizationSelector } from 'components/interfaces/ProjectCreation/OrganizationSelector'
 import {
-  FreeProjectLimitWarning,
-  NotOrganizationOwnerWarning,
-} from 'components/interfaces/Organization/NewProject'
+  extractPostgresVersionDetails,
+  PostgresVersionSelector,
+} from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { sizes } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { FormSchema } from 'components/interfaces/ProjectCreation/ProjectCreation.schema'
+import {
+  instanceLabel,
+  smartRegionToExactRegion,
+} from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
+import { ProjectCreationFooter } from 'components/interfaces/ProjectCreation/ProjectCreationFooter'
+import { ProjectNameInput } from 'components/interfaces/ProjectCreation/ProjectNameInput'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
+import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
-import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import type { components } from 'data/api'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
+import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
+import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
+import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
+import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import {
-  DbInstanceSize,
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useFlag, withAuth } from 'hooks'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { withAuth } from 'hooks/misc/withAuth'
 import {
-  AWS_REGIONS,
-  CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  DEFAULT_PROVIDER,
-  FLY_REGIONS,
+  DOCS_URL,
+  MANAGED_BY,
+  PROJECT_STATUS,
   PROVIDERS,
-  Region,
+  useDefaultProvider,
 } from 'lib/constants'
-import { passwordStrength, pluckObjectFields } from 'lib/helpers'
+import { useTrack } from 'lib/telemetry/track'
+import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
+import { Button, Form_Shadcn_, FormField_Shadcn_ } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
+const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
 const Wizard: NextPageWithLayout = () => {
+  const track = useTrack()
   const router = useRouter()
-  const { slug } = useParams()
+  const { slug, projectName } = useParams()
+  const defaultProvider = useDefaultProvider()
 
-  const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheckQuery({ slug })
+  const { data: currentOrg } = useSelectedOrganizationQuery()
+  const isFreePlan = currentOrg?.plan?.id === 'free'
+  const canChooseInstanceSize = !isFreePlan
 
-  const [projectName, setProjectName] = useState('')
-  const [postgresVersion, setPostgresVersion] = useState('')
-  const [cloudProvider, setCloudProvider] = useState<CloudProvider>(PROVIDERS[DEFAULT_PROVIDER].id)
-
-  const [dbPass, setDbPass] = useState('')
-  // Auto select region on staging/local for convenience as there's only one supported
-  const [dbRegion, setDbRegion] = useState(
-    ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
-      ? PROVIDERS[cloudProvider].default_region
-      : ''
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
   )
+  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+  const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
+
+  const smartRegionEnabled = useFlag('enableSmartRegion')
+  const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
+  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  const isHomeNew = useFlag('homeNew')
+
+  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
+  const isNotOnTeamOrEnterprisePlan = !['team', 'enterprise'].includes(currentOrg?.plan.id ?? '')
+
+  // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
+  if (slug === 'last-visited-org') {
+    if (lastVisitedOrganization) {
+      router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
+    } else {
+      router.replace(`/new/_`, undefined, { shallow: true })
+    }
+  }
+
+  const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
-  const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
+  const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
+    useState(false)
 
-  const [instanceSize, setInstanceSize] = useState<DbInstanceSize>('micro')
-
-  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o: any) => o.slug === slug)
-
-  const { data: orgSubscription } = useOrgSubscriptionQuery({
-    orgSlug: slug,
+  FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
+    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+      refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['dbPass'],
+        message: passwordStrengthWarning || 'Password not secure enough',
+      })
+    }
   })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    mode: 'onChange',
+    defaultValues: {
+      organization: slug,
+      projectName: projectName || '',
+      postgresVersion: '',
+      cloudProvider: PROVIDERS[defaultProvider].id,
+      dbPass: '',
+      dbPassStrength: 0,
+      dbRegion: undefined,
+      instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
+      dataApi: true,
+      useApiSchema: false,
+      postgresVersionSelection: '',
+      useOrioleDb: false,
+    },
+  })
+  const { instanceSize: watchedInstanceSize, cloudProvider, dbRegion, organization } = form.watch()
+
+  // [Charis] Since the form is updated in a useEffect, there is an edge case
+  // when switching from free to paid, where canChooseInstanceSize is true for
+  // an in-between render, but watchedInstanceSize is still undefined from the
+  // form state carried over from the free plan. To avoid this, we set a
+  // default instance size in this case.
+  const instanceSize = canChooseInstanceSize ? watchedInstanceSize ?? sizes[0] : undefined
+
+  const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
+    { slug },
+    { enabled: isFreePlan }
+  )
+  const hasMembersExceedingFreeTierLimit = membersExceededLimit.length > 0
+  const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
+
+  const { data: organizations = [], isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  const isEmptyOrganizations = isOrganizationsSuccess && organizations.length <= 0
+
+  const { data: approvedOAuthApps = [] } = useAuthorizedAppsQuery(
+    { slug },
+    { enabled: !isFreePlan && slug !== '_' }
+  )
+  const hasOAuthApps = approvedOAuthApps.length > 0
+
+  const { data: allOverdueInvoices = [] } = useOverdueInvoicesQuery({
+    enabled: isNotOnTeamOrEnterprisePlan,
+  })
+  const overdueInvoices = allOverdueInvoices.filter((x) => x.organization_id === currentOrg?.id)
+  const hasOutstandingInvoices = isNotOnTeamOrEnterprisePlan && overdueInvoices.length > 0
+
+  const { data: orgProjectsFromApi } = useOrgProjectsInfiniteQuery({ slug: currentOrg?.slug })
+  const allOrgProjects = useMemo(
+    () => orgProjectsFromApi?.pages.flatMap((page) => page.projects),
+    [orgProjectsFromApi?.pages]
+  )
+  const organizationProjects =
+    allProjects?.filter((project) => project.status !== PROJECT_STATUS.INACTIVE) ?? []
+  const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
+  const additionalMonthlySpend = isFreePlan
+    ? 0
+    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+
+  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+    {
+      cloudProvider: PROVIDERS[defaultProvider].id,
+    },
+    {
+      enabled: !smartRegionEnabled,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+      refetchOnReconnect: false,
+      retry: false,
+    }
+  )
+
+  const { data: availableRegionsData, error: availableRegionsError } =
+    useOrganizationAvailableRegionsQuery(
+      {
+        slug: slug,
+        cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
+        desiredInstanceSize: instanceSize as DesiredInstanceSize,
+      },
+      {
+        enabled: smartRegionEnabled,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchInterval: false,
+        refetchOnReconnect: false,
+      }
+    )
+  const recommendedSmartRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : undefined
+  const regionError =
+    smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
+      ? availableRegionsError
+      : defaultRegionError
+  const defaultRegion =
+    defaultProvider === 'AWS_NIMBUS'
+      ? AWS_REGIONS.EAST_US.displayName
+      : smartRegionEnabled
+        ? availableRegionsData?.recommendations.smartGroup.name
+        : _defaultRegion
+
+  const canCreateProject =
+    isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel && !hasOutstandingInvoices
+
+  const dbRegionExact = smartRegionToExactRegion(dbRegion)
+
+  const availableOrioleVersion = useAvailableOrioleImageVersion(
+    {
+      cloudProvider: cloudProvider as CloudProvider,
+      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion,
+      organizationSlug: organization,
+    },
+    { enabled: currentOrg !== null && !isManagedByVercel }
+  )
 
   const {
     mutate: createProject,
@@ -80,103 +245,79 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
-      router.push(`/project/${res.ref}/building`)
+      track(
+        'project_creation_simple_version_submitted',
+        {
+          instanceSize: form.getValues('instanceSize'),
+        },
+        {
+          project: res.ref,
+          organization: res.organization_slug,
+        }
+      )
+      router.push(isHomeNew ? `/project/${res.ref}` : `/project/${res.ref}/building`)
     },
   })
 
-  const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
-  const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
-  const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
-  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+  const onSubmitWithComputeCostsConfirmation = async (values: z.infer<typeof FormSchema>) => {
+    const launchingLargerInstance =
+      values.instanceSize &&
+      !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
-  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-
-  const freePlanWithExceedingLimits =
-    orgSubscription?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
-
-  const canCreateProject = isAdmin && !freePlanWithExceedingLimits
-
-  const canSubmit =
-    projectName !== '' &&
-    passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion !== undefined
-
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value) => checkPasswordStrength(value), 300)
-  ).current
-
-  useEffect(() => {
-    /*
-     * Handle no org
-     * redirect to new org route
-     */
-    if (isEmptyOrganizations) {
-      router.push(`/new`)
+    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
+      track('project_creation_simple_version_confirm_modal_opened', {
+        instanceSize: values.instanceSize,
+      })
+      setIsComputeCostsConfirmationModalVisible(true)
+    } else {
+      await onSubmit(values)
     }
-  }, [isEmptyOrganizations, router])
-
-  useEffect(() => {
-    /*
-     * Redirect to first org if the slug doesn't match an org slug
-     * this is mainly to capture the /new/new-project url, which is redirected from database.new
-     */
-    if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
-      router.push(`/new/${organizations?.[0].slug}`)
-    }
-  }, [isInvalidSlug, organizations])
-
-  useEffect(() => {
-    // User added a new payment method
-    if (router.query.setup_intent && router.query.redirect_status) {
-      toast.success('Successfully added new payment method')
-    }
-  }, [router.query.redirect_status, router.query.setup_intent])
-
-  function onProjectNameChange(e: any) {
-    e.target.value = e.target.value.replace(/\./g, '')
-    setProjectName(e.target.value)
   }
 
-  function onDbPassChange(e: any) {
-    const value = e.target.value
-    setDbPass(value)
-    if (value == '') {
-      setPasswordStrengthScore(-1)
-      setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
-  }
-
-  function onCloudProviderChange(cloudProviderId: CloudProvider) {
-    setCloudProvider(cloudProviderId)
-    // on local/staging quick-select the default region, don't wait for the cloudflare location
-    setDbRegion(
-      ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
-        ? PROVIDERS[cloudProviderId].default_region
-        : ''
-    )
-  }
-
-  async function checkPasswordStrength(value: any) {
-    const { message, warning, strength } = await passwordStrength(value)
-    setPasswordStrengthScore(strength)
-    setPasswordStrengthWarning(warning)
-    setPasswordStrengthMessage(message)
-  }
-
-  const onClickNext = async () => {
+  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
 
-    const data: ProjectCreateVariables = {
+    const {
       cloudProvider,
-      organizationId: currentOrg.id,
-      name: projectName.trim(),
-      dbPass: dbPass,
-      dbRegion: dbRegion,
+      projectName,
+      dbPass,
+      dbRegion,
+      postgresVersion,
+      instanceSize,
+      dataApi,
+      useApiSchema,
+      postgresVersionSelection,
+      useOrioleDb,
+    } = values
+
+    if (useOrioleDb && !availableOrioleVersion) {
+      return toast.error('No available OrioleDB image found, only Postgres is available')
+    }
+
+    const { postgresEngine, releaseChannel } =
+      extractPostgresVersionDetails(postgresVersionSelection)
+
+    const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+    const selectedRegion = smartRegionEnabled
+      ? smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
+      : undefined
+
+    const data: ProjectCreateVariables = {
+      dbPass,
+      cloudProvider,
+      organizationSlug: currentOrg.slug,
+      name: projectName,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
-      // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
-      dbInstanceSize: orgSubscription?.plan.id === 'free' ? undefined : instanceSize,
+      // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
+      dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
+      dataApiExposedSchemas: !dataApi ? [] : undefined,
+      dataApiUseApiSchema: !dataApi ? false : useApiSchema,
+      postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
+      releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
     }
+
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
         toast.error(
@@ -192,383 +333,222 @@ const Wizard: NextPageWithLayout = () => {
     createProject(data)
   }
 
-  // [Joshen] Refactor: DB Password could be a common component
-  // used in multiple pages with repeated logic
-  function generateStrongPassword() {
-    const password = generator.generate({
-      length: 16,
-      numbers: true,
-      uppercase: true,
-    })
-
-    setDbPass(password)
-    delayedCheckPasswordStrength(password)
-  }
-
-  // [Fran] Enforce APSE1 region on staging
-  function getAvailableRegions(cloudProvider: CloudProvider): Region {
-    if (cloudProvider === 'AWS') {
-      return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-        ? pluckObjectFields(AWS_REGIONS, ['SOUTHEAST_ASIA'])
-        : AWS_REGIONS
-      // to do - may need to pluck regions for staging for FLY also
-    } else if (cloudProvider === 'FLY') {
-      return FLY_REGIONS
+  useEffect(() => {
+    // Only set once to ensure compute credits dont change while project is being created
+    if (allOrgProjects && allOrgProjects.length > 0 && !allProjects) {
+      setAllProjects(allOrgProjects)
     }
+  }, [allOrgProjects, allProjects, setAllProjects])
 
-    throw new Error('Invalid cloud provider')
-  }
+  useEffect(() => {
+    // Handle no org: redirect to new org route
+    if (isEmptyOrganizations) {
+      router.push(`/new`)
+    }
+  }, [isEmptyOrganizations, router])
 
-  const sizes: DesiredInstanceSize[] = [
-    'micro',
-    'small',
-    'medium',
-    'large',
-    'xlarge',
-    '2xlarge',
-    '4xlarge',
-    '8xlarge',
-    '12xlarge',
-    '16xlarge',
-  ]
+  useEffect(() => {
+    // [Joshen] Cause slug depends on router which doesnt load immediately on render
+    // While the form data does load immediately
+    if (slug && slug !== '_') form.setValue('organization', slug)
+    if (projectName) form.setValue('projectName', projectName || '')
+  }, [slug])
 
-  const instanceSizeSpecs: Record<
-    DesiredInstanceSize,
-    { label: string; ram: string; cpu: string; price: string }
-  > = {
-    micro: {
-      label: 'Micro',
-      ram: '1 GB',
-      cpu: '2-core ARM',
-      price: '$0.01344/hour (~$10/month)',
-    },
-    small: {
-      label: 'Small',
-      ram: '2 GB',
-      cpu: '2-core ARM',
-      price: '$0.0206/hour (~$15/month)',
-    },
-    medium: {
-      label: 'Medium',
-      ram: '4 GB',
-      cpu: '2-core ARM',
-      price: '$0.0822/hour (~$60/month)',
-    },
-    large: {
-      label: 'Large',
-      ram: '8 GB',
-      cpu: '2-core ARM',
-      price: '$0.1517/hour (~$110/month)',
-    },
-    xlarge: {
-      label: 'XL',
-      ram: '16 GB',
-      cpu: '4-core ARM',
-      price: '$0.2877/hour (~$210/month)',
-    },
-    '2xlarge': {
-      label: '2XL',
-      ram: '32 GB',
-      cpu: '8-core ARM',
-      price: '$0.562/hour (~$410/month)',
-    },
-    '4xlarge': {
-      label: '4XL',
-      ram: '64 GB',
-      cpu: '16-core ARM',
-      price: '$1.32/hour (~$960/month)',
-    },
-    '8xlarge': {
-      label: '8XL',
-      ram: '128 GB',
-      cpu: '32-core ARM',
-      price: '$2.562/hour (~$1,870/month)',
-    },
-    '12xlarge': {
-      label: '12XL',
-      ram: '192 GB',
-      cpu: '48-core ARM',
-      price: '$3.836/hour (~$2,800/month)',
-    },
-    '16xlarge': {
-      label: '16XL',
-      ram: '256 GB',
-      cpu: '64-core ARM',
-      price: '$5.12/hour (~$3,730/month)',
-    },
-  }
+  useEffect(() => {
+    if (form.getValues('dbRegion') === undefined && defaultRegion) {
+      form.setValue('dbRegion', defaultRegion)
+    }
+  }, [defaultRegion])
+
+  useEffect(() => {
+    if (regionError) {
+      form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
+    }
+  }, [regionError])
+
+  useEffect(() => {
+    if (recommendedSmartRegion) {
+      form.setValue('dbRegion', recommendedSmartRegion)
+    }
+  }, [recommendedSmartRegion])
+
+  useEffect(() => {
+    if (watchedInstanceSize !== instanceSize) {
+      form.setValue('instanceSize', instanceSize, {
+        shouldDirty: false,
+        shouldValidate: false,
+        shouldTouch: false,
+      })
+    }
+  }, [instanceSize, watchedInstanceSize, form])
 
   return (
-    <Panel
-      loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
-      title={
-        <div key="panel-title">
-          <h3>Create a new project</h3>
-          <p className="text-sm text-foreground-lighter">
-            Your project will have its own dedicated instance and full postgres database.
-            <br />
-            An API will be set up so you can easily interact with your new database.
-            <br />
-          </p>
-        </div>
-      }
-      footer={
-        <div key="panel-footer" className="flex items-center justify-between w-full">
-          <Button
-            type="default"
-            disabled={isCreatingNewProject || isSuccessNewProject}
-            onClick={() => router.push('/projects')}
-          >
-            Cancel
-          </Button>
-          <div className="items-center space-x-3">
-            {!projectCreationDisabled && (
-              <span className="text-xs text-foreground-lighter">
-                You can rename your project later
-              </span>
-            )}
-            <Button
-              onClick={onClickNext}
-              loading={isCreatingNewProject || isSuccessNewProject}
-              disabled={isCreatingNewProject || isSuccessNewProject || !canSubmit}
-            >
-              Create new project
-            </Button>
-          </div>
-        </div>
-      }
-    >
-      <>
-        {projectCreationDisabled ? (
-          <Panel.Content className="pb-8">
-            <DisabledWarningDueToIncident title="Project creation is currently disabled" />
-          </Panel.Content>
-        ) : (
-          <div className="divide-y divide-border-muted">
-            <Panel.Content className={['space-y-4'].join(' ')}>
-              {(organizations?.length ?? 0) > 0 && (
-                <Listbox
-                  label="Organization"
-                  layout="horizontal"
-                  value={currentOrg?.slug}
-                  onChange={(slug) => router.push(`/new/${slug}`)}
-                >
-                  {organizations?.map((x: any) => (
-                    <Listbox.Option
-                      key={x.id}
-                      label={x.name}
-                      value={x.slug}
-                      addOnBefore={() => <IconUsers />}
-                    >
-                      {x.name}
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
-              )}
+    <Form_Shadcn_ {...form}>
+      <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
+        <Panel
+          loading={!isOrganizationsSuccess}
+          title={
+            <div key="panel-title">
+              <h3>Create a new project</h3>
+              <p className="text-sm text-foreground-lighter text-balance">
+                Your project will have its own dedicated instance and full Postgres database. An API
+                will be set up so you can easily interact with your new database.
+              </p>
+            </div>
+          }
+          footer={
+            <ProjectCreationFooter
+              form={form}
+              canCreateProject={canCreateProject}
+              instanceSize={instanceSize}
+              organizationProjects={organizationProjects}
+              isCreatingNewProject={isCreatingNewProject}
+              isSuccessNewProject={isSuccessNewProject}
+            />
+          }
+        >
+          <>
+            {projectCreationDisabled ? (
+              <DisabledWarningDueToIncident title="Project creation is currently disabled" />
+            ) : (
+              <div className="divide-y divide-border-muted">
+                <OrganizationSelector form={form} />
 
-              {!isAdmin && <NotOrganizationOwnerWarning />}
-            </Panel.Content>
+                {canCreateProject && (
+                  <>
+                    <ProjectNameInput form={form} />
 
-            {canCreateProject && (
-              <>
-                <Panel.Content>
-                  <Input
-                    id="project-name"
-                    layout="horizontal"
-                    label="Name"
-                    type="text"
-                    placeholder="Project name"
-                    value={projectName}
-                    onChange={onProjectNameChange}
-                    autoFocus
-                  />
-                </Panel.Content>
+                    {cloudProviderEnabled && showNonProdFields && (
+                      <CloudProviderSelector form={form} />
+                    )}
 
-                {showNonProdFields && (
+                    {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
+
+                    <DatabasePasswordInput
+                      form={form}
+                      passwordStrengthMessage={passwordStrengthMessage}
+                      setPasswordStrengthMessage={setPasswordStrengthMessage}
+                      setPasswordStrengthWarning={setPasswordStrengthWarning}
+                    />
+
+                    <RegionSelector
+                      form={form}
+                      instanceSize={instanceSize as DesiredInstanceSize}
+                    />
+
+                    {showPostgresVersionSelector && (
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="postgresVersionSelection"
+                          render={({ field }) => (
+                            <PostgresVersionSelector
+                              field={field}
+                              form={form}
+                              cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                              organizationSlug={slug}
+                              dbRegion={form.getValues('dbRegion')}
+                            />
+                          )}
+                        />
+                      </Panel.Content>
+                    )}
+
+                    {showNonProdFields && <CustomPostgresVersionInput form={form} />}
+
+                    <SecurityOptions form={form} />
+                    {showAdvancedConfig && !!availableOrioleVersion && (
+                      <AdvancedConfiguration form={form} />
+                    )}
+                  </>
+                )}
+
+                {freePlanWithExceedingLimits ? (
+                  isAdmin &&
+                  slug && (
+                    <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
+                  )
+                ) : isManagedByVercel ? (
                   <Panel.Content>
-                    <Input
-                      id="custom-postgres-version"
-                      layout="horizontal"
-                      label="Postgres Version"
-                      autoComplete="off"
-                      descriptionText={
-                        <p>
-                          Specify a custom version of Postgres (Defaults to the latest)
-                          <br />
-                          This is only applicable for local/staging projects
-                        </p>
-                      }
-                      type="text"
-                      placeholder="Postgres Version"
-                      value={postgresVersion}
-                      onChange={(event: any) => setPostgresVersion(event.target.value)}
+                    <PartnerManagedResource
+                      managedBy={MANAGED_BY.VERCEL_MARKETPLACE}
+                      resource="Projects"
+                      cta={{
+                        installationId: currentOrg?.partner_id,
+                        message: 'Visit Vercel to create a project',
+                      }}
                     />
                   </Panel.Content>
-                )}
-
-                {cloudProviderEnabled && showNonProdFields && (
+                ) : hasOutstandingInvoices ? (
                   <Panel.Content>
-                    <Listbox
-                      layout="horizontal"
-                      label="Cloud Provider"
-                      type="select"
-                      value={cloudProvider}
-                      onChange={(value) => onCloudProviderChange(value)}
-                      descriptionText="Cloud Provider (only for staging/local)"
-                    >
-                      {Object.values(PROVIDERS).map((providerObj) => {
-                        const label = providerObj['name']
-                        const value = providerObj['id']
-                        return (
-                          <Listbox.Option key={value} label={label} value={value}>
-                            <span className="text-foreground">{label}</span>
-                          </Listbox.Option>
-                        )
-                      })}
-                    </Listbox>
-                  </Panel.Content>
-                )}
+                    <Admonition
+                      type="default"
+                      title="Your organization has overdue invoices"
+                      description={
+                        <div className="space-y-3">
+                          <p className="text-sm leading-normal">
+                            Please resolve all outstanding invoices first before creating a new
+                            project
+                          </p>
 
-                {orgSubscription?.plan.id !== 'free' && (
-                  <Panel.Content>
-                    <Listbox
-                      layout="horizontal"
-                      label={
-                        <div className="space-y-4">
-                          <span>Instance Size</span>
-
-                          <div className="flex flex-col space-y-2">
-                            <Link
-                              href="https://supabase.com/docs/guides/platform/compute-add-ons"
-                              target="_blank"
-                            >
-                              <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                <p className="text-sm m-0">Compute Add-Ons</p>
-                                <IconExternalLink size={16} strokeWidth={1.5} />
-                              </div>
-                            </Link>
-
-                            <Link
-                              href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                              target="_blank"
-                            >
-                              <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                <p className="text-sm m-0">Compute Billing</p>
-                                <IconExternalLink size={16} strokeWidth={1.5} />
-                              </div>
-                            </Link>
+                          <div>
+                            <Button asChild type="default">
+                              <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
+                            </Button>
                           </div>
                         </div>
                       }
-                      type="select"
-                      value={instanceSize}
-                      onChange={(value) => setInstanceSize(value)}
-                      descriptionText={
-                        <>
-                          <p>
-                            Select the size for your dedicated database. You can always change this
-                            later.
-                          </p>
-                          <p className="mt-1">
-                            Your organization has $10/month in Compute Credits to cover one instance
-                            on Micro Compute or parts of any other instance size.
-                          </p>
-                        </>
-                      }
-                    >
-                      {sizes.map((option) => {
-                        return (
-                          <Listbox.Option
-                            key={option}
-                            label={`${instanceSizeSpecs[option].ram} RAM / ${instanceSizeSpecs[option].cpu} CPU (${instanceSizeSpecs[option].label})`}
-                            value={option}
-                          >
-                            <div className="flex space-x-2">
-                              <div className="text-center w-[80px]">
-                                <Badge
-                                  variant={option === 'micro' ? 'default' : 'brand'}
-                                  className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                                >
-                                  {instanceSizeSpecs[option].label}
-                                </Badge>
-                              </div>
-                              <div className="text-sm">
-                                <span className="text-foreground">
-                                  {instanceSizeSpecs[option].ram} RAM /{' '}
-                                  {instanceSizeSpecs[option].cpu} CPU
-                                </span>
-                                <p className="text-xs text-muted">
-                                  {instanceSizeSpecs[option].price}
-                                </p>
-                              </div>
-                            </div>
-                          </Listbox.Option>
-                        )
-                      })}
-                    </Listbox>
+                    />
                   </Panel.Content>
-                )}
-
-                <Panel.Content>
-                  <Input
-                    id="password"
-                    copy={dbPass.length > 0}
-                    layout="horizontal"
-                    label="Database Password"
-                    type="password"
-                    placeholder="Type in a strong password"
-                    value={dbPass}
-                    onChange={onDbPassChange}
-                    descriptionText={
-                      <PasswordStrengthBar
-                        passwordStrengthScore={passwordStrengthScore}
-                        password={dbPass}
-                        passwordStrengthMessage={passwordStrengthMessage}
-                        generateStrongPassword={generateStrongPassword}
-                      />
-                    }
-                    error={passwordStrengthWarning}
-                  />
-                </Panel.Content>
-
-                <Panel.Content>
-                  <RegionSelector
-                    cloudProvider={cloudProvider}
-                    selectedRegion={dbRegion}
-                    onSelectRegion={setDbRegion}
-                  />
-                </Panel.Content>
-              </>
+                ) : null}
+              </div>
             )}
+          </>
+        </Panel>
 
-            {isAdmin && freePlanWithExceedingLimits && slug && (
-              <Panel.Content>
-                <FreeProjectLimitWarning
-                  membersExceededLimit={membersExceededLimit || []}
-                  orgSlug={slug}
-                />
-              </Panel.Content>
-            )}
+        <ConfirmationModal
+          size="large"
+          loading={false}
+          visible={isComputeCostsConfirmationModalVisible}
+          title="Confirm compute costs"
+          confirmLabel="I understand"
+          onCancel={() => setIsComputeCostsConfirmationModalVisible(false)}
+          onConfirm={async () => {
+            const values = form.getValues()
+            await onSubmit(values)
+            setIsComputeCostsConfirmationModalVisible(false)
+          }}
+          variant={'warning'}
+        >
+          <div className="text-sm text-foreground-light space-y-1">
+            <p>
+              Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
+              monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
+              clicking "I understand", you agree to the additional costs.{' '}
+              <Link
+                href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
+                target="_blank"
+                className="underline"
+              >
+                Compute Costs
+              </Link>{' '}
+              are non-refundable.
+            </p>
           </div>
-        )}
-      </>
-    </Panel>
+        </ConfirmationModal>
+      </form>
+    </Form_Shadcn_>
   )
 }
 
 const PageLayout = withAuth(({ children }: PropsWithChildren) => {
-  const { slug } = useParams()
-
-  const { data: organizations } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o) => o.slug === slug)
-
-  return (
-    <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
-      {children}
-    </WizardLayoutWithoutAuth>
-  )
+  return <WizardLayoutWithoutAuth>{children}</WizardLayoutWithoutAuth>
 })
 
-Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
+Wizard.getLayout = (page) => (
+  <DefaultLayout headerTitle="New project">
+    <PageLayout>{page}</PageLayout>
+  </DefaultLayout>
+)
 
 export default Wizard

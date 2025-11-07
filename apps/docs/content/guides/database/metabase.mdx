@@ -1,0 +1,80 @@
+---
+id: 'metabase'
+title: 'Connecting to Metabase'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+[`Metabase`](https://www.metabase.com/) is an Open Source data visualization tool. You can use it to explore your data stored in Supabase.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Register">
+
+        Create a [Metabase account](https://store.metabase.com/checkout) or deploy locally with [Docker](https://www.docker.com/products/docker-desktop/)
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+        Deploying with Docker:
+        ```sh
+        docker pull metabase/metabase:latest
+        ```
+
+        Then run:
+        ```sh
+        docker run -d -p 3000:3000 --name metabase metabase/metabase
+        ```
+
+        The server should be available at [`http://localhost:3000/setup`](http://localhost:3000/setup)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Connect to Postgres">
+
+    Connect your Postgres server to Metabase.
+    - On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true)
+    - View parameters under "Session pooler"
+
+    <Admonition type="note" label="connection notice">
+
+            If you're in an [IPv6 environment](/docs/guides/platform/ipv4-address#checking-your-network-ipv6-support) or have the [IPv4 Add-On](/docs/guides/platform/ipv4-address#understanding-ip-addresses), you can use the direct connection string instead of Supavisor in Session mode.
+
+    </Admonition>
+
+    - Enter your database credentials into Metabase
+
+
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+     Example credentials:
+     ![Name Postgres Server.](/docs/img/guides/database/connecting-to-postgres/metabase/add-pg-server.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+    <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Explore">
+
+    Explore your data in Metabase
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![explore data](/docs/img/guides/database/connecting-to-postgres/metabase/explore.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>

@@ -1,43 +1,42 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
+import { Pause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Button, IconPause, Modal } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const PauseProjectButton = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { setProjectStatus } = useSetProjectStatus()
+
   const isProjectActive = useIsProjectActive()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const projectRef = project?.ref ?? ''
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-  const canPauseProject = useCheckPermissions(
+  const { can: canPauseProject } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
   )
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const isFreePlan = subscription?.plan.id === 'free'
+  const isAwsK8s = useIsAwsK8sCloudProvider()
+  const isFreePlan = organization?.plan.id === 'free'
+  const isPaidAndNotAwsK8s = !isFreePlan && !isAwsK8s
 
   const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
-    onSuccess: (res, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.PAUSING)
+    onSuccess: (_, variables) => {
+      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.PAUSING })
       toast.success('Pausing project...')
       router.push(`/project/${projectRef}`)
     },
@@ -51,48 +50,34 @@ const PauseProjectButton = () => {
   }
 
   const buttonDisabled =
-    !isFreePlan || project === undefined || isPaused || !canPauseProject || !isProjectActive
+    isPaidAndNotAwsK8s || project === undefined || isPaused || !canPauseProject || !isProjectActive
 
   return (
     <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
-          <Button
-            type="default"
-            icon={<IconPause />}
-            onClick={() => setIsModalOpen(true)}
-            loading={isPausing}
-            disabled={buttonDisabled}
-          >
-            Pause Project
-          </Button>
-        </Tooltip.Trigger>
-        {buttonDisabled ? (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  {isPaused
-                    ? 'Your project is already paused'
-                    : !canPauseProject
-                      ? 'You need additional permissions to pause this project'
-                      : !isProjectActive
-                        ? 'Unable to pause project as project is not active'
-                        : !isFreePlan
-                          ? 'Projects on a paid plan will always be running'
-                          : ''}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        ) : null}
-      </Tooltip.Root>
+      <ButtonTooltip
+        type="default"
+        icon={<Pause />}
+        onClick={() => setIsModalOpen(true)}
+        loading={isPausing}
+        disabled={buttonDisabled}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: isPaused
+              ? 'Your project is already paused'
+              : !canPauseProject
+                ? 'You need additional permissions to pause this project'
+                : !isProjectActive
+                  ? 'Unable to pause project as project is not active'
+                  : isPaidAndNotAwsK8s
+                    ? 'Projects on a paid plan will always be running'
+                    : undefined,
+          },
+        }}
+      >
+        Pause project
+      </ButtonTooltip>
+
       <ConfirmationModal
         variant={'destructive'}
         visible={isModalOpen}

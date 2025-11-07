@@ -1,5 +1,8 @@
+export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
+
 export interface PricingInformation {
   id: string
+  planId: PlanId
   name: string
   nameBadge?: string
   costUnit?: string
@@ -11,15 +14,14 @@ export interface PricingInformation {
   description: string
   preface: string
   features: (string | string[])[]
-  featuresPartner: (string | string[])[]
   footer?: string
-  footerPartner?: string
   cta: string
 }
 
 export const plans: PricingInformation[] = [
   {
     id: 'tier_free',
+    planId: 'free',
     name: 'Free',
     nameBadge: '',
     costUnit: '/ month',
@@ -31,25 +33,18 @@ export const plans: PricingInformation[] = [
     features: [
       'Unlimited API requests',
       '50,000 monthly active users',
-      ['500 MB database space', '2 Core shared CPU • 1 GB RAM'],
-      '5 GB bandwidth',
+      ['500 MB database size', 'Shared CPU • 500 MB RAM'],
+      ['5 GB egress'],
+      ['5 GB cached egress'],
       '1 GB file storage',
       'Community support',
     ],
-    featuresPartner: [
-      'Unlimited API requests',
-      '50,000 monthly active users',
-      ['500 MB database space', '2 Core shared CPU • 1 GB RAM'],
-      '5 GB bandwidth',
-      'Community support',
-    ],
     footer: 'Free projects are paused after 1 week of inactivity. Limit of 2 active projects.',
-    footerPartner:
-      'Free projects are paused after 1 week of inactivity. Limit of 1 active project.',
     cta: 'Start for Free',
   },
   {
     id: 'tier_pro',
+    planId: 'pro',
     name: 'Pro',
     nameBadge: 'Most Popular',
     costUnit: '/ month',
@@ -57,28 +52,23 @@ export const plans: PricingInformation[] = [
     priceLabel: 'From',
     warning: '$10 in compute credits included',
     priceMonthly: 25,
-    description: 'For production applications with the option to scale.',
+    description: 'For production applications with the power to scale.',
     features: [
       ['100,000 monthly active users', 'then $0.00325 per MAU'],
-      ['8 GB database space', 'then $0.125 per GB'],
-      ['250 GB bandwidth', 'then $0.09 per GB'],
+      ['8 GB disk size per project', 'then $0.125 per GB'],
+      ['250 GB egress', 'then $0.09 per GB'],
+      ['250 GB cached egress', 'then $0.03 per GB'],
       ['100 GB file storage', 'then $0.021 per GB'],
       'Email support',
       'Daily backups stored for 7 days',
       '7-day log retention',
     ],
-    featuresPartner: [
-      ['8 GB database space', 'then $0.125 per GB'],
-      ['250 GB bandwidth', 'then $0.09 per GB'],
-      'Email support',
-      'Daily backups stored for 7 days',
-      '7-day log retention',
-    ],
-    preface: 'Everything in the Free plan, plus:',
+    preface: 'Everything in the Free Plan, plus:',
     cta: 'Get Started',
   },
   {
     id: 'tier_team',
+    planId: 'team',
     name: 'Team',
     nameBadge: '',
     costUnit: '/ month',
@@ -86,45 +76,30 @@ export const plans: PricingInformation[] = [
     priceLabel: 'From',
     warning: '$10 in compute credits included',
     priceMonthly: 599,
-    description: 'Collaborate with different permissions and access patterns.',
+    description: 'Add features such as SSO, control over backups, and industry certifications.',
     features: [
       'SOC2',
+      'Project-scoped and read-only access',
       'HIPAA available as paid add-on',
-      'Read only and Billing member roles',
       'SSO for Supabase Dashboard',
       'Priority email support & SLAs',
       'Daily backups stored for 14 days',
       '28-day log retention',
+      ['Add Log Drains', 'additional $60 per drain, per project'],
     ],
-    featuresPartner: [
-      'SOC2',
-      'HIPAA available as paid add-on',
-      'Read only and Billing member roles',
-      'SSO for Supabase Dashboard',
-      'Priority email support & SLAs',
-      'Daily backups stored for 14 days',
-      '28-day log retention',
-    ],
-    preface: 'Everything in the Pro plan, plus:',
+    preface: 'Everything in the Pro Plan, plus:',
     cta: 'Get Started',
   },
   {
     id: 'tier_enterprise',
+    planId: 'enterprise',
     name: 'Enterprise',
     href: 'https://forms.supabase.com/enterprise',
-    description: 'For large-scale applications managing serious workloads.',
+    description: 'For large-scale applications running Internet scale workloads.',
     features: [
       'Designated Support manager',
       'Uptime SLAs',
-      'On-premise support',
-      '24×7×365 premium enterprise support',
-      'Private Slack channel',
-      'Custom Security Questionnaires',
-    ],
-    featuresPartner: [
-      'Designated Support manager',
-      'Uptime SLAs',
-      'On-premise support',
+      'BYO Cloud supported',
       '24×7×365 premium enterprise support',
       'Private Slack channel',
       'Custom Security Questionnaires',
@@ -132,7 +107,6 @@ export const plans: PricingInformation[] = [
     priceLabel: '',
     priceMonthly: 'Custom',
     preface: '',
-    footer: '',
     cta: 'Contact Us',
   },
-]
+] as const

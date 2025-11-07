@@ -1,12 +1,13 @@
 import 'dart:math';
 
-import 'package:canvas/canvas/canvas_object.dart';
 import 'package:canvas/canvas/canvas_painter.dart';
 import 'package:canvas/main.dart';
+import 'package:canvas/models/canvas_object.dart';
+import 'package:canvas/models/profile.dart';
+import 'package:canvas/models/project.dart';
 import 'package:canvas/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
+import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 /// Different input modes users can perform
 enum _DrawMode {
@@ -27,7 +28,12 @@ enum _DrawMode {
 
 /// Interactive art board page to draw and collaborate with other users.
 class CanvasPage extends StatefulWidget {
-  const CanvasPage({super.key});
+  const CanvasPage(
+    this.projectId, {
+    super.key,
+  });
+
+  final String projectId;
 
   @override
   State<CanvasPage> createState() => _CanvasPageState();
@@ -43,8 +49,8 @@ class _CanvasPageState extends State<CanvasPage> {
   /// Supabase realtime channel to communicate to other clients
   late final RealtimeChannel _canvasChanel;
 
-  /// Randomly generated UUID for the user
-  late final String _myId;
+  /// Username of each users
+  String? _myUsername;
 
   /// Whether the user is using the pointer to move things around, or in drawing mode.
   _DrawMode _currentMode = _DrawMode.pointer;
@@ -58,21 +64,51 @@ class _CanvasPageState extends State<CanvasPage> {
   /// Cursor position of the user.
   Offset _cursorPosition = const Offset(0, 0);
 
+  Project? _project;
+
+  final TextEditingController _addUserController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     _initialize();
   }
 
+  @override
+  void dispose() {
+    _canvasChanel.unsubscribe();
+    _addUserController.dispose();
+    super.dispose();
+  }
+
   Future<void> _initialize() async {
-    // Generate a random UUID for the user.
-    // We could replace this with Supabase auth user ID if we want to make it
-    // more like Figma.
-    _myId = const Uuid().v4();
+    final projectId = widget.projectId;
+    // Get the project data
+    _project = await supabase
+        .from('projects')
+        .select('*, profiles(*)')
+        .eq('id', widget.projectId)
+        .single()
+        .withConverter(Project.fromJson);
+
+    // Get the user's username
+    final profileMap = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', supabase.auth.currentUser!.id)
+        .maybeSingle();
+
+    _myUsername = profileMap?['username'] as String;
 
     // Start listening to broadcast messages to display other users' cursors and objects.
     _canvasChanel = supabase
-        .channel(Constants.channelName)
+        .channel(
+          projectId,
+          opts: const RealtimeChannelConfig(
+            private: true,
+            ack: true,
+          ),
+        )
         .onBroadcast(
             event: Constants.broadcastEventName,
             callback: (payload) {
@@ -85,11 +121,22 @@ class _CanvasPageState extends State<CanvasPage> {
               }
               setState(() {});
             })
-        .subscribe();
+        .subscribe((status, error) {
+      if (status == RealtimeSubscribeStatus.channelError) {
+        debugPrint('Error subscribing to channel: $error');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Error connecting'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    });
 
     final initialData = await supabase
         .from('canvas_objects')
         .select()
+        .eq('project_id', widget.projectId)
         .order('created_at', ascending: true);
     for (final canvasObjectData in initialData) {
       final canvasObject = CanvasObject.fromJson(canvasObjectData['object']);
@@ -100,12 +147,17 @@ class _CanvasPageState extends State<CanvasPage> {
 
   /// Syncs the user's cursor position and the currently drawing object with
   /// other users.
-  Future<void> _syncCanvasObject(Offset cursorPosition) {
+  ///
+  /// The return value indicates whether the sync was successful or not.
+  Future<void> _syncCanvasObject(Offset cursorPosition) async {
+    if (_myUsername == null) {
+      return;
+    }
     final myCursor = UserCursor(
       position: cursorPosition,
-      id: _myId,
+      id: _myUsername!,
     );
-    return _canvasChanel.sendBroadcastMessage(
+    await _canvasChanel.sendBroadcastMessage(
       event: Constants.broadcastEventName,
       payload: {
         'cursor': myCursor.toJson(),
@@ -126,25 +178,25 @@ class _CanvasPageState extends State<CanvasPage> {
         // Loop through the canvas objects to find if there are any
         // that intersects with the current mouse position.
         for (final canvasObject in _canvasObjects.values.toList().reversed) {
-          if (canvasObject.intersectsWith(details.globalPosition)) {
+          if (canvasObject.intersectsWith(details.localPosition)) {
             _currentlyDrawingObjectId = canvasObject.id;
             break;
           }
         }
         break;
       case _DrawMode.circle:
-        final newObject = Circle.createNew(details.globalPosition);
+        final newObject = Circle.createNew(details.localPosition);
         _canvasObjects[newObject.id] = newObject;
         _currentlyDrawingObjectId = newObject.id;
         break;
       case _DrawMode.rectangle:
-        final newObject = Rectangle.createNew(details.globalPosition);
+        final newObject = Rectangle.createNew(details.localPosition);
         _canvasObjects[newObject.id] = newObject;
         _currentlyDrawingObjectId = newObject.id;
         break;
     }
-    _cursorPosition = details.globalPosition;
-    _panStartPoint = details.globalPosition;
+    _cursorPosition = details.localPosition;
+    _panStartPoint = details.localPosition;
     setState(() {});
   }
 
@@ -167,9 +219,9 @@ class _CanvasPageState extends State<CanvasPage> {
             _canvasObjects[_currentlyDrawingObjectId!]! as Circle;
         _canvasObjects[_currentlyDrawingObjectId!] =
             currentlyDrawingCircle.copyWith(
-          center: (details.globalPosition + _panStartPoint!) / 2,
-          radius: min((details.globalPosition.dx - _panStartPoint!.dx).abs(),
-                  (details.globalPosition.dy - _panStartPoint!.dy).abs()) /
+          center: (details.localPosition + _panStartPoint!) / 2,
+          radius: min((details.localPosition.dx - _panStartPoint!.dx).abs(),
+                  (details.localPosition.dy - _panStartPoint!.dy).abs()) /
               2,
         );
         break;
@@ -178,7 +230,7 @@ class _CanvasPageState extends State<CanvasPage> {
       case _DrawMode.rectangle:
         _canvasObjects[_currentlyDrawingObjectId!] =
             (_canvasObjects[_currentlyDrawingObjectId!] as Rectangle).copyWith(
-          bottomRight: details.globalPosition,
+          bottomRight: details.localPosition,
         );
         break;
     }
@@ -186,16 +238,16 @@ class _CanvasPageState extends State<CanvasPage> {
     if (_currentlyDrawingObjectId != null) {
       setState(() {});
     }
-    _cursorPosition = details.globalPosition;
+    _cursorPosition = details.localPosition;
     _syncCanvasObject(_cursorPosition);
   }
 
   void onPanEnd(DragEndDetails _) async {
-    if (_currentlyDrawingObjectId != null) {
-      _syncCanvasObject(_cursorPosition);
-    }
-
     final drawnObjectId = _currentlyDrawingObjectId;
+
+    if (_currentlyDrawingObjectId != null) {
+      await _syncCanvasObject(_cursorPosition);
+    }
 
     setState(() {
       _panStartPoint = null;
@@ -206,8 +258,10 @@ class _CanvasPageState extends State<CanvasPage> {
     if (drawnObjectId == null) {
       return;
     }
+
     await supabase.from('canvas_objects').upsert({
       'id': drawnObjectId,
+      'project_id': widget.projectId,
       'object': _canvasObjects[drawnObjectId]!.toJson(),
     });
   }
@@ -215,46 +269,136 @@ class _CanvasPageState extends State<CanvasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          titleTextStyle: const TextStyle(color: Colors.white),
+          title: Text(_project?.name ?? ''),
+          leadingWidth: 300,
+          backgroundColor: Colors.grey[900],
+          leading: Row(
+            children: _DrawMode.values
+                .map((mode) => IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _currentMode = mode;
+                        });
+                      },
+                      icon: Icon(mode.iconData),
+                      color: _currentMode == mode ? Colors.green : Colors.white,
+                    ))
+                .toList(),
+          ),
+          // Displays the list of users currently drawing on the canvas
+          actions: [
+            ...[
+              ..._userCursors.values.map((e) => e.id),
+              if (_myUsername != null) _myUsername!
+            ]
+                .map(
+                  (id) => Align(
+                    widthFactor: 0.8,
+                    child: CircleAvatar(
+                      backgroundColor: RandomColor.getRandomFromId(id),
+                      child: Text(id.substring(0, 2)),
+                    ),
+                  ),
+                )
+                .toList(),
+            const SizedBox(width: 8),
+            TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Share the project'),
+                        content: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const ListTile(
+                              title: Text('Members'),
+                            ),
+                            ..._project!.profiles
+                                .map((profile) => ListTile(
+                                      title: Text(profile.username),
+                                      leading: CircleAvatar(
+                                        backgroundColor:
+                                            RandomColor.getRandomFromId(
+                                          profile.username,
+                                        ),
+                                        child: Text(
+                                            profile.username.substring(0, 2)),
+                                      ),
+                                    ))
+                                .toList(),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _addUserController,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Add people with username',
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    final username = _addUserController.text;
+                                    final profileMap = await supabase
+                                        .from('profiles')
+                                        .select()
+                                        .eq('username', username)
+                                        .maybeSingle();
+                                    if (profileMap == null) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text('User not found')));
+                                      return;
+                                    }
+                                    final profile =
+                                        Profile.fromJson(profileMap);
+                                    await supabase
+                                        .from('project_members')
+                                        .insert({
+                                      'project_id': widget.projectId,
+                                      'profile_id': profile.id,
+                                    });
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                '${profile.username} has been added')));
+                                  },
+                                  child: const Text('Invite'),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      );
+                    });
+              },
+              label: const Text('Share'),
+              icon: const Icon(Icons.lock),
+            ),
+            const SizedBox(width: 20),
+          ]),
       body: MouseRegion(
         onHover: (event) {
-          _syncCanvasObject(event.position);
+          _syncCanvasObject(event.localPosition);
         },
-        child: Stack(
-          children: [
-            // The main canvas
-            GestureDetector(
-              onPanDown: _onPanDown,
-              onPanUpdate: _onPanUpdate,
-              onPanEnd: onPanEnd,
-              child: CustomPaint(
-                size: MediaQuery.of(context).size,
-                painter: CanvasPainter(
-                  userCursors: _userCursors,
-                  canvasObjects: _canvasObjects,
-                ),
-              ),
+        child: GestureDetector(
+          onPanDown: _onPanDown,
+          onPanUpdate: _onPanUpdate,
+          onPanEnd: onPanEnd,
+          child: CustomPaint(
+            size: MediaQuery.of(context).size,
+            painter: CanvasPainter(
+              userCursors: _userCursors,
+              canvasObjects: _canvasObjects,
             ),
-
-            // Buttons to change the current mode.
-            Positioned(
-              top: 0,
-              left: 0,
-              child: Row(
-                children: _DrawMode.values
-                    .map((mode) => IconButton(
-                          iconSize: 48,
-                          onPressed: () {
-                            setState(() {
-                              _currentMode = mode;
-                            });
-                          },
-                          icon: Icon(mode.iconData),
-                          color: _currentMode == mode ? Colors.green : null,
-                        ))
-                    .toList(),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

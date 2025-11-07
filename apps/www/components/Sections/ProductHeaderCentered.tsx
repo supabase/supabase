@@ -1,9 +1,10 @@
-import { Button, IconPlayCircle, cn } from 'ui'
-import Link from 'next/link'
-import ProductIcon from '../ProductIcon'
 import Image from 'next/image'
+import Link from 'next/link'
+import { Button, cn } from 'ui'
 import styles from '~/styles/animations.module.css'
 import AnnouncementBadge from '../Announcement/Badge'
+import ProductIcon from '../ProductIcon'
+import { PlayCircle } from 'lucide-react'
 
 interface Types {
   h1: string | React.ReactNode
@@ -88,7 +89,7 @@ const ProductHeaderCentered = (props: Types) => (
             </Button>
           )}
           {props.video && (
-            <Button type="default" size="medium" icon={<IconPlayCircle />} asChild>
+            <Button type="default" size="medium" icon={<PlayCircle />} asChild>
               <Link href={props.video} as={props.video}>
                 Watch video
               </Link>

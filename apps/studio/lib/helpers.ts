@@ -1,5 +1,15 @@
-export { default as passwordStrength } from './password-strength'
-export { default as uuidv4 } from './uuid'
+import { UIEvent } from 'react'
+import { v4 as _uuidV4 } from 'uuid'
+
+import type { TablesData } from '../data/tables/tables-query'
+
+export const uuidv4 = () => {
+  return _uuidV4()
+}
+
+export const isAtBottom = ({ currentTarget }: UIEvent<HTMLElement>): boolean => {
+  return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
+}
 
 export const tryParseJson = (jsonString: any) => {
   try {
@@ -56,8 +66,9 @@ export const getURL = () => {
   const url =
     process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL !== ''
       ? process.env.NEXT_PUBLIC_SITE_URL
-      : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
-        ? process.env.VERCEL_URL
+      : process?.env?.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
+          process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL !== ''
+        ? process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
         : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
@@ -93,7 +104,8 @@ export const pluckObjectFields = (model: any, fields: any[]) => {
  */
 export const tryParseInt = (str: string) => {
   try {
-    return parseInt(str, 10)
+    const int = parseInt(str, 10)
+    return isNaN(int) ? undefined : int
   } catch (error) {
     return undefined
   }
@@ -125,37 +137,21 @@ export const formatBytes = (
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
   if (bytes === 0 || bytes === undefined) return size !== undefined ? `0 ${size}` : '0 bytes'
-  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+
+  // Handle negative values
+  const isNegative = bytes < 0
+  const absBytes = Math.abs(bytes)
+
+  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(absBytes) / Math.log(k))
+  const formattedValue = parseFloat((absBytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+
+  return isNegative ? '-' + formattedValue : formattedValue
 }
 
 export const snakeToCamel = (str: string) =>
   str.replace(/([-_][a-z])/g, (group: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')
   )
-
-/**
- * Copy text content (string or Promise<string>) into Clipboard.
- * Safari doesn't support write text into clipboard async, so if you need to load
- * text content async before coping, please use Promise<string> for the 1st arg.
- */
-export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
-  const focused = window.document.hasFocus()
-  if (focused) {
-    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-      const text = await Promise.resolve(str)
-      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
-
-      return
-    }
-
-    Promise.resolve(str)
-      .then((text) => window.navigator?.clipboard?.writeText(text))
-      .then(callback)
-  } else {
-    console.warn('Unable to copy to clipboard')
-  }
-}
 
 export const detectBrowser = () => {
   if (!navigator) return undefined
@@ -184,6 +180,64 @@ export const detectOS = () => {
   } else {
     return undefined
   }
+}
+
+/**
+ * Convert a list of tables to SQL
+ * @param t - The list of tables
+ * @returns The SQL string
+ */
+export function tablesToSQL(t: TablesData) {
+  if (!Array.isArray(t)) return ''
+  const warning =
+    '-- WARNING: This schema is for context only and is not meant to be run.\n-- Table order and constraints may not be valid for execution.\n\n'
+  const sql = t
+    .map((table) => {
+      if (!table || !Array.isArray((table as any).columns)) return ''
+
+      const columns = (table as { columns?: any[] }).columns ?? []
+      const columnLines = columns.map((c) => {
+        let line = `  ${c.name} ${c.data_type}`
+        if (c.is_identity) {
+          line += ' GENERATED ALWAYS AS IDENTITY'
+        }
+        if (c.is_nullable === false) {
+          line += ' NOT NULL'
+        }
+        if (c.default_value !== null && c.default_value !== undefined) {
+          line += ` DEFAULT ${c.default_value}`
+        }
+        if (c.is_unique) {
+          line += ' UNIQUE'
+        }
+        if (c.check) {
+          line += ` CHECK (${c.check})`
+        }
+        return line
+      })
+
+      const constraints: string[] = []
+
+      if (Array.isArray(table.primary_keys) && table.primary_keys.length > 0) {
+        const pkCols = table.primary_keys.map((pk: any) => pk.name).join(', ')
+        constraints.push(`  CONSTRAINT ${table.name}_pkey PRIMARY KEY (${pkCols})`)
+      }
+
+      if (Array.isArray(table.relationships)) {
+        table.relationships.forEach((rel: any) => {
+          if (rel && rel.source_table_name === table.name) {
+            constraints.push(
+              `  CONSTRAINT ${rel.constraint_name} FOREIGN KEY (${rel.source_column_name}) REFERENCES ${rel.target_table_schema}.${rel.target_table_name}(${rel.target_column_name})`
+            )
+          }
+        })
+      }
+
+      const allLines = [...columnLines, ...constraints]
+      return `CREATE TABLE ${table.schema}.${table.name} (\n${allLines.join(',\n')}\n);`
+    })
+    .join('\n')
+  return warning + sql
 }
 
 /**
@@ -259,7 +313,14 @@ export const getDistanceLatLonKM = (lat1: number, lon1: number, lat2: number, lo
   return d
 }
 
-const currencyFormatter = Intl.NumberFormat('en-US', {
+const currencyFormatterDefault = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+const currencyFormatterSmallValues = Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
   minimumFractionDigits: 0,
@@ -268,7 +329,28 @@ const currencyFormatter = Intl.NumberFormat('en-US', {
 export const formatCurrency = (amount: number | undefined | null): string | null => {
   if (amount === undefined || amount === null) {
     return null
+  } else if (amount > 0 && amount < 0.01) {
+    return currencyFormatterSmallValues.format(amount)
   } else {
-    return currencyFormatter.format(amount)
+    return currencyFormatterDefault.format(amount)
   }
 }
+
+/**
+ * [Joshen] This is to address an incredibly weird bug that's happening between Data Grid + Shadcn ContextMenu + Shadcn Overlay
+ * This trifecta is causing a pointer events none style getting left behind on the body element which makes the dashboard become
+ * unresponsive, hence the attempt to clean things up here
+ *
+ * Timeout is made configurable as I've observed it requires a higher timeout sometimes (e.g when closing the cron job sheet)
+ */
+export const cleanPointerEventsNoneOnBody = (timeoutMs: number = 300) => {
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      if (document.body.style.pointerEvents === 'none') {
+        document.body.style.pointerEvents = ''
+      }
+    }, timeoutMs)
+  }
+}
+
+export function neverGuard(_: never): any {}

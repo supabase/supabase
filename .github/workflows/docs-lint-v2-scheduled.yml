@@ -1,0 +1,61 @@
+name: '[Docs] Lint v2 (scheduled)'
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env:
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lint-all:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            supa-mdx-lint.config.toml
+            supa-mdx-lint
+            apps/docs/content
+      - name: cache cargo
+        id: cache-cargo
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: 301e0d4b35f8f0c8553b4e93917b8b2685ef2627
+      - name: install linter
+        if: steps.cache-cargo.outputs.cache-hit != 'true'
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 301e0d4b35f8f0c8553b4e93917b8b2685ef2627
+      - name: run linter
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          supa-mdx-lint apps/docs/content || {
+            echo "Linter failed, attempting to fix errors..."
+            git config --global user.name 'github-docs-bot'
+            git config --global user.email 'github-docs-bot@supabase.com'
+            BRANCH_NAME="bot/docs-lint-fixes"
+            EXISTING_BRANCH=$(git ls-remote --heads origin $BRANCH_NAME)
+            if [[ -n "$EXISTING_BRANCH" ]]; then
+                git push origin --delete $BRANCH_NAME
+            fi
+            git checkout -b $BRANCH_NAME
+            supa-mdx-lint apps/docs/content --fix || FIX_FAILED=1
+            git add .
+            git commit -m '[bot] fix lint errors' || true
+            git push origin $BRANCH_NAME
+            gh pr create --title '[bot] fix lint errors' --body 'This PR fixes lint errors in the documentation.' --head $BRANCH_NAME
+            if [ "${FIX_FAILED:-0}" -eq 1 ]; then
+              echo "Fix did not correct all errors."
+              exit 1
+            fi
+          }

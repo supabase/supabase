@@ -1,19 +1,29 @@
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
-import { SelectValue } from '@ui/components/shadcn/ui/select'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { CodeEditor } from 'components/ui/CodeEditor'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import { DocsButton } from 'components/ui/DocsButton'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useIndexesQuery } from 'data/database/indexes-query'
+import { useDatabaseIndexCreateMutation } from 'data/database-indexes/index-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
-  Input,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectSeparator_Shadcn_,
@@ -21,8 +31,11 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   SidePanel,
+  cn,
 } from 'ui'
-import MultiSelect, { MultiSelectOption } from 'ui-patterns/MultiSelect'
+import { Admonition } from 'ui-patterns'
+import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
 
@@ -32,25 +45,25 @@ interface CreateIndexSidePanelProps {
 }
 
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const isOrioleDb = useIsOrioleDb()
+
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
+  const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
+  const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
-  const { refetch: refetchIndexes } = useIndexesQuery({
-    schema: selectedSchema,
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: entities } = useEntityTypesQuery({
-    schema: selectedSchema,
+  const { data: entities, isLoading: isLoadingEntities } = useEntityTypesQuery({
+    schemas: [selectedSchema],
     sort: 'alphabetical',
-    search: undefined,
+    search: searchTerm,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -65,14 +78,10 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     connectionString: project?.connectionString,
   })
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: async () => {
-      await refetchIndexes()
+  const { mutate: createIndex, isLoading: isExecuting } = useDatabaseIndexCreateMutation({
+    onSuccess: () => {
       onClose()
       toast.success(`Successfully created index`)
-    },
-    onError: (error) => {
-      toast.error(`Failed to create index: ${error.message}`)
     },
   })
 
@@ -80,24 +89,40 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     () => entities?.pages.flatMap((page) => page.data.entities) || [],
     [entities?.pages]
   )
-  const columns = tableColumns?.result[0]?.columns ?? []
-  const columnOptions: MultiSelectOption[] = columns.map((column) => {
-    return { id: column.attname, value: column.attname, name: column.attname, disabled: false }
-  })
+
+  function handleSearchChange(value: string) {
+    setSearchTerm(value)
+  }
+
+  const columns = tableColumns?.[0]?.columns ?? []
+  const columnOptions: MultiSelectOption[] = columns
+    .filter((column): column is NonNullable<typeof column> => column !== null)
+    .map((column) => ({
+      id: column.attname,
+      value: column.attname,
+      name: column.attname,
+      disabled: false,
+    }))
 
   const generatedSQL = `
-CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns.join(
-    ', '
-  )});
+CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns
+    .map((column) => `"${column}"`)
+    .join(', ')});
 `.trim()
 
   const onSaveIndex = () => {
     if (!project) return console.error('Project is required')
+    if (!selectedEntity) return console.error('Entity is required')
 
-    execute({
+    createIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      sql: generatedSQL,
+      payload: {
+        schema: selectedSchema,
+        entity: selectedEntity,
+        type: selectedIndexType,
+        columns: selectedColumns,
+      },
     })
   }
 
@@ -136,22 +161,66 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
       <div className="py-6 space-y-6">
         <SidePanel.Content className="space-y-6">
           <FormItemLayout label="Select a schema" name="select-schema" isReactForm={false}>
-            <Select_Shadcn_
-              value={selectedSchema}
-              onValueChange={setSelectedSchema}
-              name="select-schema"
+            <Popover_Shadcn_
+              modal={false}
+              open={schemaDropdownOpen}
+              onOpenChange={setSchemaDropdownOpen}
             >
-              <SelectTrigger_Shadcn_ size="small">
-                <SelectValue_Shadcn_>{selectedSchema}</SelectValue_Shadcn_>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                {(schemas ?? []).map((schema) => (
-                  <SelectItem_Shadcn_ key={schema.name} value={schema.name}>
-                    {schema.name}
-                  </SelectItem_Shadcn_>
-                ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  type="default"
+                  size={'medium'}
+                  className={`w-full [&>span]:w-full text-left`}
+                  iconRight={
+                    <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                  }
+                >
+                  {selectedSchema !== undefined && selectedSchema !== ''
+                    ? selectedSchema
+                    : 'Choose a schema'}
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0"
+                side="bottom"
+                align="start"
+                sameWidthAsTrigger
+              >
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_
+                    placeholder="Find table..."
+                    value={searchTerm}
+                    onValueChange={handleSearchChange}
+                  />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
+                        {(schemas ?? []).map((schema) => (
+                          <CommandItem_Shadcn_
+                            key={schema.name}
+                            className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                            onSelect={() => {
+                              setSelectedSchema(schema.name)
+                              setSchemaDropdownOpen(false)
+                            }}
+                            onClick={() => {
+                              setSelectedSchema(schema.name)
+                              setSchemaDropdownOpen(false)
+                            }}
+                          >
+                            <span>{schema.name}</span>
+                            {selectedEntity === schema.name && (
+                              <Check className="text-brand" strokeWidth={2} size={16} />
+                            )}
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           </FormItemLayout>
 
           <FormItemLayout
@@ -159,42 +228,99 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             name="select-table"
             description={
               isSelectEntityDisabled &&
+              !isLoadingEntities &&
               'Create a table in this schema via the Table or SQL editor first'
             }
             isReactForm={false}
           >
-            <Select_Shadcn_
-              disabled={isSelectEntityDisabled}
-              value={selectedEntity}
-              onValueChange={setSelectedEntity}
-              name="select-table"
+            <Popover_Shadcn_
+              modal={false}
+              open={tableDropdownOpen}
+              onOpenChange={setTableDropdownOpen}
             >
-              <SelectTrigger_Shadcn_ size="small">
-                <SelectValue
-                  placeholder={
-                    isSelectEntityDisabled ? 'No tables available in schema' : 'Choose a table'
+              <PopoverTrigger_Shadcn_
+                asChild
+                disabled={isSelectEntityDisabled || isLoadingEntities}
+              >
+                <Button
+                  type="default"
+                  size="medium"
+                  className={cn(
+                    'w-full [&>span]:w-full text-left',
+                    selectedEntity === '' && 'text-foreground-lighter'
+                  )}
+                  iconRight={
+                    <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
                   }
                 >
-                  {selectedEntity}
-                </SelectValue>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                {(entityTypes ?? []).map((entity) => (
-                  <SelectItem_Shadcn_ key={entity.name} value={entity.name}>
-                    {entity.name}
-                  </SelectItem_Shadcn_>
-                ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+                  {selectedEntity !== undefined && selectedEntity !== ''
+                    ? selectedEntity
+                    : isSelectEntityDisabled
+                      ? 'No tables available in schema'
+                      : 'Choose a table'}
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0"
+                side="bottom"
+                align="start"
+                sameWidthAsTrigger
+              >
+                {/* [Terry] shouldFilter context:
+                https://github.com/pacocoursey/cmdk/issues/267#issuecomment-2252717107 */}
+                <Command_Shadcn_ shouldFilter={false}>
+                  <CommandInput_Shadcn_
+                    placeholder="Find table..."
+                    value={searchTerm}
+                    onValueChange={handleSearchChange}
+                  />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>
+                      {isLoadingEntities ? (
+                        <div className="flex items-center gap-2 text-center justify-center">
+                          <Loader2 size={12} className="animate-spin" />
+                          Loading...
+                        </div>
+                      ) : (
+                        'No tables found'
+                      )}
+                    </CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      <ScrollArea className={(entityTypes || []).length > 7 ? 'h-[210px]' : ''}>
+                        {(entityTypes ?? []).map((entity) => (
+                          <CommandItem_Shadcn_
+                            key={entity.name}
+                            className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                            onSelect={() => {
+                              setSelectedEntity(entity.name)
+                              setTableDropdownOpen(false)
+                            }}
+                            onClick={() => {
+                              setSelectedEntity(entity.name)
+                              setTableDropdownOpen(false)
+                            }}
+                          >
+                            <span>{entity.name}</span>
+                            {selectedEntity === entity.name && (
+                              <Check className="text-brand" strokeWidth={2} size={16} />
+                            )}
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           </FormItemLayout>
 
           {selectedEntity && (
             <FormItemLayout label="Select up to 32 columns" isReactForm={false}>
               {isLoadingTableColumns && <ShimmeringLoader className="py-4" />}
               {isSuccessTableColumns && (
-                <MultiSelect
+                <MultiSelectV2
                   options={columnOptions}
-                  placeholder=""
+                  placeholder="Choose which columns to create an index on"
                   searchPlaceholder="Search for a column"
                   value={selectedColumns}
                   onChange={setSelectedColumns}
@@ -214,6 +340,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 isReactForm={false}
               >
                 <Select_Shadcn_
+                  disabled={isOrioleDb}
                   value={selectedIndexType}
                   onValueChange={setSelectedIndexType}
                   name="selected-index-type"
@@ -225,8 +352,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   </SelectTrigger_Shadcn_>
                   <SelectContent_Shadcn_>
                     {INDEX_TYPES.map((index, i) => (
-                      <>
-                        <SelectItem_Shadcn_ key={index.name} value={index.value}>
+                      <Fragment key={index.name}>
+                        <SelectItem_Shadcn_ value={index.value}>
                           <div className="flex flex-col gap-0.5">
                             <span>{index.name}</span>
                             {index.description.split('\n').map((x, idx) => (
@@ -240,11 +367,22 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                           </div>
                         </SelectItem_Shadcn_>
                         {i < INDEX_TYPES.length - 1 && <SelectSeparator_Shadcn_ />}
-                      </>
+                      </Fragment>
                     ))}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
               </FormItemLayout>
+              {isOrioleDb && (
+                <Admonition
+                  type="default"
+                  className="!mt-2"
+                  title="OrioleDB currently only supports the B-tree index type"
+                  description="More index types may be supported when OrioleDB is no longer in preview"
+                >
+                  {/* [Joshen Oriole] Hook up proper docs URL */}
+                  <DocsButton className="mt-2" abbrev={false} href={`${DOCS_URL}`} />
+                </Admonition>
+              )}
             </SidePanel.Content>
             <SidePanel.Separator />
             <SidePanel.Content>

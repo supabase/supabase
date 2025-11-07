@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { useQuery } from '@tanstack/react-query'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { integrationKeys } from './keys'
-import type { ResponseError } from 'types'
 
 export type GitHubBranchesVariables = {
   connectionId?: number
@@ -13,12 +13,12 @@ export async function getGitHubBranches(
 ) {
   if (!connectionId) throw new Error('connectionId is required')
 
-  const { data, error } = await get(`/platform/integrations/github/branches/{connectionId}`, {
-    params: { path: { connectionId } },
+  const { data, error } = await get(`/platform/integrations/github/branches/{connection_id}`, {
+    params: { path: { connection_id: connectionId } },
     signal,
   })
 
-  if (error) throw new Error((error as ResponseError).message)
+  if (error) handleError(error)
   return data
 }
 
@@ -30,13 +30,11 @@ export const useGitHubBranchesQuery = <TData = GitHubBranchesData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<GitHubBranchesData, GitHubBranchesError, TData> = {}
+  }: UseCustomQueryOptions<GitHubBranchesData, GitHubBranchesError, TData> = {}
 ) =>
-  useQuery<GitHubBranchesData, GitHubBranchesError, TData>(
-    integrationKeys.githubBranchesList(connectionId),
-    ({ signal }) => getGitHubBranches({ connectionId }, signal),
-    {
-      enabled: enabled && typeof connectionId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<GitHubBranchesData, GitHubBranchesError, TData>({
+    queryKey: integrationKeys.githubBranchesList(connectionId),
+    queryFn: ({ signal }) => getGitHubBranches({ connectionId }, signal),
+    enabled: enabled && typeof connectionId !== 'undefined',
+    ...options,
+  })

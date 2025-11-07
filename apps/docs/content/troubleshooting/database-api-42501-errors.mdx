@@ -1,0 +1,68 @@
+---
+title = "Database API 42501 errors"
+topics = [ "database" ]
+github_url = "https://github.com/orgs/supabase/discussions/31293"
+database_id = "49b51a3a-9753-4747-a24e-8afcb075792b"
+
+[[errors]]
+http_status_code = 401
+code = "42501"
+
+[[errors]]
+http_status_code = 403
+code = "42501"
+---
+
+[Postgres 42501 errors](https://www.postgresql.org/docs/current/errcodes-appendix.html), often reported by clients as 401 or 403 errors, imply the request lacked adequate privileges. They can be viewed in the [log explorer](/dashboard/project/_/logs/explorer?q=select%0A++++cast%28postgres_logs.timestamp+as+datetime%29+as+timestamp%2C%0A++++event_message%2C%0A++++parsed.error_severity%2C%0A++++parsed.user_name%2C%0A++++parsed.query%2C%0A++++parsed.detail%2C%0A++++parsed.hint%2C%0A++++parsed.sql_state_code%2C%0A++++parsed.backend_type%0Afrom%0A++++postgres_logs%0A++++cross+join+unnest%28metadata%29+as+metadata%0A++++cross+join+unnest%28metadata.parsed%29+as+parsed%0Awhere%0A++++parsed.sql_state_code+%3D+%2742501%27%0Aorder+by%0A++++timestamp+desc%0Alimit+100%3B%0A) by running:
+
+```sql
+select
+  cast(postgres_logs.timestamp as datetime) as timestamp,
+  event_message,
+  parsed.error_severity,
+  parsed.user_name,
+  parsed.query,
+  parsed.detail,
+  parsed.hint
+from
+  postgres_logs
+  cross join unnest(metadata) as metadata
+  cross join unnest(metadata.parsed) as parsed
+where
+  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
+  and parsed.sql_state_code = '42501'
+order by timestamp desc
+limit 100;
+```
+
+They tend to be caused by one of the following factors.
+
+### Attempted to access a forbidden schema
+
+API roles cannot access certain schemas, most notably `auth` and `vault`. This restriction extends to Foreign Data Wrappers relying on `vault`. While you can bypass it using a [security definer function](/docs/guides/database/functions?queryGroups=language&language=sql&queryGroups=example-view&example-view=sql#security-definer-vs-invoker), these schemas are intentionally restricted for security reasons.
+
+### Attempted to access a custom schema
+
+If you created a custom schema, you will have to give the Database API permission to query it. Follow our [Using Custom Schemas guide](/docs/guides/api/using-custom-schemas) for more directions.
+
+### Revoked object level access:
+
+In rare cases, users may accidentally revoke object-level access in `public` from their API roles. To regrant full visibility, run the below code:
+
+```sql
+grant usage on schema public to anon, authenticated, service_role;
+grant all on all tables in schema public to anon, authenticated, service_role;
+grant all on all routines in schema public to anon, authenticated, service_role;
+grant all ON all sequences in schema public to anon, authenticated, service_role;
+alter default privileges for role postgres in schema public grant all on tables to anon, authenticated, service_role;
+alter default privileges for role postgres in schema public grant all on routines to anon, authenticated, service_role;
+alter default privileges for role postgres in schema public grant all on sequences to anon, authenticated, service_role;
+```
+
+### Configured column-level restrictions
+
+If you've set column-based access in the [Dashboard](/dashboard/project/_/database/column-privileges) or via SQL, queries will fail with a `42501` error when accessing restricted columns. This includes using `select *`, as it expands to include forbidden columns.
+
+### RLS:
+
+If the anon or authenticated roles attempt to UPDATE or INSERT values without the necessary RLS permissions, Postgres will return a 42501 error.

@@ -1,25 +1,30 @@
+import Image from 'next/image'
+
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import { BASE_PATH } from 'lib/constants'
-import Image from 'next/image'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertCircle } from 'ui'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 
-const CLSPreview = () => {
+export const CLSPreview = () => {
   const { ref } = useParams()
+
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   return (
     <div className="flex flex-col gap-2">
       <div className="mb-4 flex flex-col gap-y-2">
         <Markdown
           className="text-foreground-light max-w-full"
-          content={`[Postgres Column-Level Privileges](https://supabase.com/docs/guides/auth/column-level-security) is a feature of Postgres that allows you to grant or revoke privileges on tables and columns based on user roles.`}
+          content={`[Postgres Column-Level Privileges](${DOCS_URL}/guides/auth/column-level-security) is a feature of Postgres that allows you to grant or revoke privileges on tables and columns based on user roles.`}
         />
         <Markdown
           className="text-foreground-light max-w-full"
-          content={`This is an advanced feature and should be used with caution. Unless you have a very specific use case, we recommend just using [Row-Level Security](https://supabase.com/docs/guides/auth/row-level-security).`}
+          content={`This is an advanced feature and should be used with caution. Unless you have a very specific use case, we recommend just using [Row-Level Security](${DOCS_URL}${docsRowLevelSecurityGuidePath}).`}
         />
         <Alert_Shadcn_ variant="warning" className="mt-2">
-          <IconAlertCircle strokeWidth={2} />
+          <WarningIcon />
           <AlertTitle_Shadcn_>
             Changes to column privileges will not be reflected in migrations when running{' '}
             <code className="text-xs">supabase db diff</code>.
@@ -42,15 +47,11 @@ const CLSPreview = () => {
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
-            <Markdown
-              className="text-foreground-light"
-              content={`Grant access to a new UI for granting and/or revoking column-level privileges [here](/project/${ref}/auth/column-privileges).`}
-            />
+            Grant access to a new UI for granting and/or revoking column-level privileges{' '}
+            <InlineLink href={`/project/${ref}/database/column-privileges`}>here</InlineLink>.
           </li>
         </ul>
       </div>
     </div>
   )
 }
-
-export default CLSPreview

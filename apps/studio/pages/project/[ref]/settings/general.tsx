@@ -1,33 +1,62 @@
-import {
-  CustomDomainConfig,
-  DeleteProjectPanel,
-  General,
-  TransferProjectPanel,
-} from 'components/interfaces/Settings/General'
-import { SettingsLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useIsFeatureEnabled } from 'hooks'
+import { IS_PLATFORM } from 'common'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { ComplianceConfig } from 'components/interfaces/Settings/General/ComplianceConfig/ProjectComplianceMode'
+import { CustomDomainConfig } from 'components/interfaces/Settings/General/CustomDomainConfig/CustomDomainConfig'
+import { DeleteProjectPanel } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectPanel'
+import { General } from 'components/interfaces/Settings/General/General'
+import { TransferProjectPanel } from 'components/interfaces/Settings/General/TransferProjectPanel/TransferProjectPanel'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const isBranch = !!project?.parent_project_ref
-  const { projectsTransfer: projectTransferEnabled } = useIsFeatureEnabled(['projects:transfer'])
+  const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  // [Joshen] Opting for larger gap instead of gap-8 as compared to other pages for better grouping of content
+  const isBranch = !!project?.parent_project_ref
+  const { projectsTransfer: projectTransferEnabled, projectSettingsCustomDomains } =
+    useIsFeatureEnabled(['projects:transfer', 'project_settings:custom_domains'])
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      router.push(`/project/default/settings/log-drains`)
+    }
+  }, [router])
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
-      <General />
-      {!isBranch ? (
-        <>
-          <CustomDomainConfig />
-          {projectTransferEnabled && <TransferProjectPanel />}
-          <DeleteProjectPanel />
-        </>
-      ) : null}
-    </div>
+    <>
+      <ScaffoldContainer>
+        <ScaffoldHeader>
+          <ScaffoldTitle>Project Settings</ScaffoldTitle>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+        <General />
+
+        {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
+        {!isBranch && hasHipaaAddon && <ComplianceConfig />}
+        {projectSettingsCustomDomains && <CustomDomainConfig />}
+        {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
+        {!isBranch && <DeleteProjectPanel />}
+      </ScaffoldContainer>
+    </>
   )
 }
 
-ProjectSettings.getLayout = (page) => <SettingsLayout title="General">{page}</SettingsLayout>
+ProjectSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="General">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 export default ProjectSettings

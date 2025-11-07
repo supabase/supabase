@@ -1,3 +1,5 @@
+'use client'
+
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import * as React from 'react'
 
@@ -5,7 +7,6 @@ import { cn } from '../../../lib/utils/cn'
 import styles from './popover.module.css'
 
 const Popover = PopoverPrimitive.Root
-
 const PopoverTrigger = PopoverPrimitive.Trigger
 const PopoverAnchor = PopoverPrimitive.Anchor
 
@@ -51,4 +52,11 @@ const PopoverContent = React.forwardRef<
 )
 PopoverContent.displayName = 'PopoverContent'
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
+const PopoverSeparator = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, children, ...props }, ref) => (
+    <div ref={ref} {...props} className={cn('w-full h-px bg-border-overlay', className)} />
+  )
+)
+PopoverSeparator.displayName = 'PopoverSeparator'
+
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverSeparator }

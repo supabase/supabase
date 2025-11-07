@@ -1,8 +1,8 @@
-import type { RefObject } from 'react'
-import BackwardIterator from './BackwardIterator'
+import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import type { Schema } from 'data/database/schemas-query'
 import type { TableColumn } from 'data/database/table-columns-query'
-import type { DatabaseFunction } from 'data/database/functions-query'
+import type { RefObject } from 'react'
+import BackwardIterator from './BackwardIterator'
 
 // [Joshen] Needs to be fixed
 
@@ -200,8 +200,7 @@ function defaultScenarioSuggestions(monaco: any, pgInfoRef: RefObject<any>) {
       items.push({
         label: x.name,
         kind: monaco.languages.CompletionItemKind.Function,
-        detail: x.result_type,
-        documentation: x.description,
+        detail: x.return_type,
         insertText: x.name,
       })
     })

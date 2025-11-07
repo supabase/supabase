@@ -11,12 +11,12 @@ tags:
   - database
 date: '2024-04-17'
 toc_depth: 3
-launchweek: 11
+launchweek: '11'
 ---
 
 Supabase Auth now supports [anonymous sign-ins](/docs/guides/auth/auth-anonymous), one of our [most-requested features](https://github.com/supabase/auth/issues/68) by the community.
 
-Anonymous sign-ins can be used to create **temporary users** that haven’t signed up for your application yet. This lowers the friction for new users to try out your product since they don’t have to provide any signup credentials.
+Anonymous sign-ins can be used to create **temporary users** who haven’t signed up for your application yet. This lowers the friction for new users to try out your product since they don’t have to provide any signup credentials.
 
 <div className="video-container">
   <iframe
@@ -60,7 +60,7 @@ const { data, error } = await supabase
 
 ## Terminology
 
-Profiles created with anonymous sign-ins are also `authenticated` !
+Profiles created with anonymous sign-ins are also `authenticated`!
 
 Once you call `.signInAnonymously()` you have moved the user into an authentication flow, and we treat them like a signed in user:
 
@@ -161,7 +161,7 @@ const { data, error } = await supabase
 
 ### Link an OAuth identity
 
-To link an OAuth identity to an anonymous user, you need to [enable manual linking](/dashboard/project/_/settings/auth) for your project. Learn about about how [identity linking](/docs/guides/auth/auth-identity-linking) works with Supabase Auth.
+To link an OAuth identity to an anonymous user, you need to [enable manual linking](/dashboard/project/_/settings/auth) for your project. Learn about how [identity linking](/docs/guides/auth/auth-identity-linking) works with Supabase Auth.
 
 <Img
   alt="Allow anonymous sign ins"
@@ -197,7 +197,7 @@ When creating RLS policies to differentiate access for an anonymous user, you ca
   zoomable={false}
 />
 
-The [user management screen](/dashboard/project/_/auth/users) provides an option to filter by anonymous users, which can be helpful to know how many anonymous users have been created.
+The [user management screen](/dashboard/project/_/auth/users) provides an option to filter by anonymous users, which can help to know how many anonymous users have been created.
 
 <Img
   alt="Allow anonymous sign ins"

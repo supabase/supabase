@@ -1,8 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import { captureCriticalError } from 'lib/error-reporting'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SignUpVariables = {
   email: string
@@ -17,7 +18,7 @@ export async function signup({ email, password, hcaptchaToken, redirectTo }: Sig
     body: { email, password, hcaptchaToken, redirectTo },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -27,8 +28,12 @@ export const useSignUpMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<UseMutationOptions<SignUpData, ResponseError, SignUpVariables>, 'mutationFn'> = {}) => {
-  return useMutation<SignUpData, ResponseError, SignUpVariables>((vars) => signup(vars), {
+}: Omit<
+  UseCustomMutationOptions<SignUpData, ResponseError, SignUpVariables>,
+  'mutationFn'
+> = {}) => {
+  return useMutation<SignUpData, ResponseError, SignUpVariables>({
+    mutationFn: (vars) => signup(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },
@@ -38,6 +43,7 @@ export const useSignUpMutation = ({
       } else {
         onError(data, variables, context)
       }
+      captureCriticalError(data, 'sign up')
     },
     ...options,
   })

@@ -1,28 +1,14 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
+
+import { IS_PLATFORM } from 'common'
+import { get, handleError } from 'data/fetchers'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
-import type { ResponseError } from 'types'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
-}
-
-export type OrganizationCustomerProfileResponse = {
-  address: {
-    city: string | null
-    country: string | null
-    line1: string | null
-    line2: string | null
-    postal_code: string | null
-    state: string | null
-  } | null
-  balance: number
-  email: string
-  id: string
-  invoice_settings: {
-    default_payment_method: string | null
-  }
 }
 
 export async function getOrganizationCustomerProfile(
@@ -31,10 +17,17 @@ export async function getOrganizationCustomerProfile(
 ) {
   if (!slug) throw new Error('slug is required')
 
-  const data = await get(`${API_URL}/organizations/${slug}/customer`, { signal })
-  if (data.error) throw data.error
+  const { data, error } = await get(`/platform/organizations/{slug}/customer`, {
+    params: {
+      path: {
+        slug,
+      },
+    },
+    signal,
+  })
+  if (error) handleError(error)
 
-  return data as OrganizationCustomerProfileResponse
+  return data
 }
 
 export type OrganizationCustomerProfileData = Awaited<
@@ -47,13 +40,23 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData> = {}
-) =>
-  useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>(
-    organizationKeys.customerProfile(slug),
-    ({ signal }) => getOrganizationCustomerProfile({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
+  }: UseCustomQueryOptions<
+    OrganizationCustomerProfileData,
+    OrganizationCustomerProfileError,
+    TData
+  > = {}
+) => {
+  // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
+  // unnecessary requests, although this behaviour still needs handling on the UI
+  const { can: canReadCustomerProfile } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.customer'
   )
+
+  return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>({
+    queryKey: organizationKeys.customerProfile(slug),
+    queryFn: ({ signal }) => getOrganizationCustomerProfile({ slug }, signal),
+    enabled: IS_PLATFORM && enabled && canReadCustomerProfile && typeof slug !== 'undefined',
+    ...options,
+  })
+}

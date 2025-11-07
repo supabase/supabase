@@ -1,9 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useEnumeratedTypeCreateMutation } from 'data/enumerated-types/enumerated-type-create-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -16,17 +21,10 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
-  IconExternalLink,
-  IconPlus,
   Input_Shadcn_,
   SidePanel,
   cn,
 } from 'ui'
-import * as z from 'zod'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useEnumeratedTypeCreateMutation } from 'data/enumerated-types/enumerated-type-create-mutation'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 import { NATIVE_POSTGRES_TYPES } from './EnumeratedTypes.constants'
 
@@ -43,13 +41,17 @@ const CreateEnumeratedTypeSidePanel = ({
 }: CreateEnumeratedTypeSidePanelProps) => {
   const initialValues = { name: '', description: '', values: [{ value: '' }] }
   const submitRef = useRef<HTMLButtonElement>(null)
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { mutate: createEnumeratedType, isLoading: isCreating } = useEnumeratedTypeCreateMutation({
     onSuccess: (res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
       closePanel()
     },
   })
+
+  useEffect(() => {
+    form.reset(initialValues)
+  }, [visible])
 
   const FormSchema = z.object({
     name: z
@@ -159,7 +161,7 @@ const CreateEnumeratedTypeSidePanel = ({
                             </FormLabel_Shadcn_>
                             {index === 0 && (
                               <Alert_Shadcn_>
-                                <IconAlertCircle strokeWidth={1.5} />
+                                <AlertCircle strokeWidth={1.5} />
                                 <AlertTitle_Shadcn_>
                                   After creation, values cannot be deleted or sorted
                                 </AlertTitle_Shadcn_>
@@ -171,7 +173,7 @@ const CreateEnumeratedTypeSidePanel = ({
                                   <Button
                                     asChild
                                     type="default"
-                                    icon={<IconExternalLink strokeWidth={1.5} />}
+                                    icon={<ExternalLink strokeWidth={1.5} />}
                                     className="mt-2"
                                   >
                                     <Link
@@ -207,7 +209,7 @@ const CreateEnumeratedTypeSidePanel = ({
 
             <Button
               type="default"
-              icon={<IconPlus strokeWidth={1.5} />}
+              icon={<Plus strokeWidth={1.5} />}
               onClick={() => append({ value: '' })}
             >
               Add value

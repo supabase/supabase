@@ -1,15 +1,16 @@
 import Container from 'components/Container'
 
-import Layout from '~/components/Layouts/Default'
 import CTABanner from 'components/CTABanner/index'
-import { Button, IconDownload } from 'ui'
+import { Button } from 'ui'
+import Layout from '~/components/Layouts/Default'
 
 import { useRouter } from 'next/router'
 
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import * as supabaseLogoPreview from 'common/assets/images/logo-preview.jpg'
+import { Download } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
-import * as supabaseLogoPreview from 'common/assets/images/logo-preview.jpg'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const Index = () => {
   // base path for images
@@ -29,7 +30,7 @@ const Index = () => {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://supabase.com/images/og/supabase-og.png`,
             },
           ],
         }}
@@ -68,7 +69,7 @@ const Index = () => {
                       <p>Do not use any other color for the wordmark.</p>
                     </p>
                     <form method="get" action={`/brand-assets.zip`}>
-                      <Button htmlType="submit" type="default" iconRight={<IconDownload />}>
+                      <Button htmlType="submit" type="default" iconRight={<Download />}>
                         Download logo kit
                       </Button>
                     </form>
@@ -108,7 +109,7 @@ const Index = () => {
                       method="get"
                       action={`https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/supabase-brand-assets/connect-supabase/connect-supabase.zip`}
                     >
-                      <Button htmlType="submit" type="default" iconRight={<IconDownload />}>
+                      <Button htmlType="submit" type="default" iconRight={<Download />}>
                         Download button kit
                       </Button>
                     </form>

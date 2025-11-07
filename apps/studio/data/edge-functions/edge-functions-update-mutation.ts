@@ -1,11 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { patch } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
-
 export type EdgeFunctionsUpdateVariables = {
   projectRef: string
   slug: string
@@ -23,10 +21,15 @@ export async function updateEdgeFunction({
 }: EdgeFunctionsUpdateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await patch(`${API_ADMIN_URL}/projects/${projectRef}/functions/${slug}`, payload)
-  if (response.error) throw response.error
+  const { data, error } = await patch(`/v1/projects/{ref}/functions/{function_slug}`, {
+    params: {
+      path: { ref: projectRef, function_slug: slug },
+    },
+    body: payload,
+  })
 
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type EdgeFunctionsUpdateData = Awaited<ReturnType<typeof updateEdgeFunction>>
@@ -36,27 +39,28 @@ export const useEdgeFunctionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>,
+  UseCustomMutationOptions<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>(
-    (vars) => updateEdgeFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, slug } = variables
-        await queryClient.invalidateQueries(edgeFunctionsKeys.detail(projectRef, slug))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update edge function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>({
+    mutationFn: (vars) => updateEdgeFunction(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, slug } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: edgeFunctionsKeys.detail(projectRef, slug) }),
+        queryClient.invalidateQueries({ queryKey: edgeFunctionsKeys.list(projectRef) }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update edge function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

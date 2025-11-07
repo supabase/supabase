@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { integrationKeys } from './keys'
-import { toast } from 'react-hot-toast'
-import type { ResponseError } from 'types'
 
 export type VercelIntegrationCreateVariables = {
   code: string
@@ -24,19 +24,21 @@ export async function createVercelIntegration({
   source,
   teamId,
 }: VercelIntegrationCreateVariables) {
-  const response = await post(`${API_URL}/integrations/vercel`, {
-    code,
-    configuration_id: configurationId,
-    organization_slug: orgSlug,
-    metadata,
-    source,
-    teamId,
+  const { data, error } = await post('/platform/integrations/vercel', {
+    body: {
+      code,
+      configuration_id: configurationId,
+      organization_slug: orgSlug,
+      metadata: metadata as Record<string, never>,
+      source,
+      teamId,
+    },
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response
+  if (error) handleError(error)
+  // [Joshen] API isn't typed on this endpoint
+  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/integrations/vercel/vercel-integration.controller.ts#L50
+  return data as { id: string }
 }
 
 type VercelIntegrationCreateData = Awaited<ReturnType<typeof createVercelIntegration>>
@@ -46,29 +48,33 @@ export const useVercelIntegrationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>,
+  UseCustomMutationOptions<
+    VercelIntegrationCreateData,
+    ResponseError,
+    VercelIntegrationCreateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>(
-    (vars) => createVercelIntegration(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(integrationKeys.integrationsList()),
-          queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-          queryClient.invalidateQueries(integrationKeys.vercelProjectList(data.id)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create Vercel integration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>({
+    mutationFn: (vars) => createVercelIntegration(vars),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: integrationKeys.integrationsList() }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.integrationsListWithOrg(variables.orgSlug),
+        }),
+        queryClient.invalidateQueries({ queryKey: integrationKeys.vercelProjectList(data.id) }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create Vercel integration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Admonition, Button, Input } from 'ui'
+import { Button, Input } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 function base64URL(value: string) {
   return globalThis.btoa(value).replace(/[=]/g, '').replace(/[+]/g, '-').replace(/[\/]/g, '_')
@@ -103,7 +104,7 @@ const AppleSecretGenerator = () => {
   const [error, setError] = useState('')
 
   return (
-    <>
+    <div className="flex flex-col gap-3">
       <Input
         label="Account ID"
         labelOptional="required"
@@ -132,7 +133,7 @@ const AppleSecretGenerator = () => {
         <input
           type="file"
           onChange={(e) => {
-            setFile({ file: e.target.files[0] })
+            setFile({ file: e.target.files?.[0] || null })
           }}
         />
       </div>
@@ -155,7 +156,7 @@ const AppleSecretGenerator = () => {
               keyID,
               teamID,
               serviceID,
-              file.file
+              file.file!
             )
             setKeyID(kid)
             setSecretKey(jwt)
@@ -185,7 +186,7 @@ const AppleSecretGenerator = () => {
           />
         </>
       )}
-    </>
+    </div>
   )
 }
 

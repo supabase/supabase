@@ -1,42 +1,23 @@
-import { post } from '~/lib/fetchWrapper'
-import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
-import { NextRouter } from 'next/router'
+'use client'
 
-export interface TelemetryEvent {
-  category: string
-  action: string
-  label: string
-  value?: string
-}
+import { sendTelemetryEvent } from 'common'
+import type { TelemetryEvent } from 'common/telemetry-constants'
+import { API_URL } from 'lib/constants'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { useCallback } from 'react'
 
-export interface TelemetryProps {
-  screenResolution?: string
-  language: string
-}
+export function useSendTelemetryEvent() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-// This event is the same as in studio/lib/telemetry.tx
-// but uses different ENV variables for www
+  return useCallback(
+    (event: TelemetryEvent) => {
+      const url = new URL(API_URL ?? 'http://localhost:3000')
+      url.pathname = pathname ?? ''
+      url.search = searchParams?.toString() ?? ''
 
-const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextRouter) => {
-  if (!IS_PROD && !IS_PREVIEW) return
-
-  const { category, action, label, value } = event
-
-  return post(`${API_URL}/telemetry/event`, {
-    action: action,
-    category: category,
-    label: label,
-    value: value,
-    page_referrer: document?.referrer,
-    page_title: document?.title,
-    page_location: router.asPath,
-    ga: {
-      screen_resolution: gaProps?.screenResolution,
-      language: gaProps?.language,
+      return sendTelemetryEvent(API_URL, event, url.toString())
     },
-  })
-}
-
-export default {
-  sendEvent,
+    [pathname, searchParams]
+  )
 }

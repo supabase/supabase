@@ -14,7 +14,7 @@ Kakao OAuth consists of six broad steps:
 - Obtaining a `REST API key` - this will serve as the `client_id`.
 - Generating the `Client secret code` - this will serve as the `client_secret`.
 - Additional configurations on Kakao Developers Portal.
-- Add your `client id` and `client secret` keys to your [Supabase Project](https://supabase.com/dashboard).
+- Add your `client id` and `client secret` keys to your [Supabase Project](/dashboard).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your Kakao Developer account
@@ -45,14 +45,16 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 ## Find your callback URL
 
-<SocialProviderSetup provider="Kakao" />- To add callback URL on Kakao, go to `Product settings` >
-`Kakao Login` > `Redirect URI`.
+<$Partial path="social_provider_setup.mdx" variables={{ "provider": "Kakao" }} />
+
+- To add callback URL on Kakao, go to `Product settings` >
+  `Kakao Login` > `Redirect URI`.
 
 ## Generate and activate a `client_secret`
 
 - Go to `Product settings` > `Kakao Login` > `Security`.
 - Click on the `Kakao Login` switch to enable Kakao Login.
-- Click on `generate code` at the bottom to generate the `Client secret code` -- this will serve as a `client_secret` for your supabase project.
+- Click on `generate code` at the bottom to generate the `Client secret code` -- this will serve as a `client_secret` for your Supabase project.
 - Make sure you enabled `Client secret code` by selecting `enable` from the `Activation state` section.
 
 ## Additional configurations on Kakao Developers portal
@@ -64,7 +66,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 ## Add your OAuth credentials to Supabase
 
-<SocialProviderSettingsSupabase provider="Kakao" />
+<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Kakao" }} />
 
 ## Add login code to your client app
 
@@ -77,9 +79,15 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 >
 <TabPanel id="js" label="JavaScript">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `kakao` as the `provider`:
+<$Partial path="create_client_snippet.mdx" />
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `kakao` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+// ---cut---
 async function signInWithKakao() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'kakao',
@@ -88,6 +96,23 @@ async function signInWithKakao() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `kakao` as the `provider`:
+
+```dart
+Future<void> signInWithKakao() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.kakao,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
+}
+```
+
+</TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Kakao` as the `Provider`:
@@ -99,7 +124,10 @@ suspend fun signInWithKakao() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
+
+<$Partial path="oauth_pkce_flow.mdx" />
 
 <Tabs
   scrollable
@@ -119,9 +147,21 @@ async function signOut() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
@@ -130,7 +170,53 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
+
+## Using Kakao Login JS SDK
+
+[Kakao Login JS SDK](https://developers.kakao.com/docs/latest/en/kakaologin/js) is an official Kakao SDK for authenticating Kakao users on websites.
+
+Exchange the [authorization code returned by Kakao API](https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#request-code) for an [ID Token](https://developers.kakao.com/docs/latest/en/kakaologin/common#login-with-oidc).
+
+For example, this code shows a how to get ID Token:
+
+```
+const requestUrl = new URL(request.url);
+const code = requestUrl.searchParams.get('code');
+
+if (code) {
+  const res = await fetch('https://kauth.kakao.com/oauth/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+    },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: '<CLIENT_ID>',
+      redirect_uri: '<url>/api/auth/kakao/oidc',
+      code,
+      client_secret: '<CLIENT_SECRET>',
+    }),
+  });
+
+  const {id_token} = await res.json();
+}
+```
+
+Use the ID Token to sign in:
+
+```
+const res = await auth.signInWithIdToken({
+  provider: 'kakao',
+  token: id_token,
+});
+```
+
+### Configuration
+
+1. Set 'State' to 'ON' under [OpenID Connect Activation](https://developers.kakao.com/docs/latest/en/kakaologin/prerequisite#activate-oidc) on Kakao Developers portal Application Dashboard.
+2. Add `openid` to [scope](https://developers.kakao.com/docs/latest/en/kakaologin/common#additional-consent-scope) along with the scope values you wish to obtain consent for.
 
 ## Resources
 

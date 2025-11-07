@@ -1,15 +1,15 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
-import { get } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMembersVariables = {
   slug?: string
 }
 
-type Member = components['schemas']['Member']
+export type Member = components['schemas']['Member']
 export interface OrganizationMember extends Member {
   invited_at?: string
   invited_id?: number
@@ -23,20 +23,23 @@ export async function getOrganizationMembers(
 
   const [members, invites] = await Promise.all([
     get('/platform/organizations/{slug}/members', { params: { path: { slug } }, signal }),
-    get('/platform/organizations/{slug}/members/invite', { params: { path: { slug } }, signal }),
+    get('/platform/organizations/{slug}/members/invitations', {
+      params: { path: { slug } },
+      signal,
+    }),
   ])
 
   const { data: orgMembers, error: orgMembersError } = members
   const { data: orgInvites, error: orgInvitesError } = invites
 
-  if (orgMembersError) throw orgMembersError
-  if (orgInvitesError) throw orgInvitesError
+  if (orgMembersError) handleError(orgMembersError)
+  if (orgInvitesError) handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
-  const invitedMembers = orgInvites.map((invite) => {
+  const invitedMembers = orgInvites.invitations.map((invite) => {
     const member = {
       invited_at: invite.invited_at,
-      invited_id: invite.invited_id,
+      invited_id: invite.id,
       mfa_enabled: false,
       username: invite.invited_email.slice(0, 1),
       primary_email: invite.invited_email,
@@ -55,13 +58,11 @@ export const useOrganizationMembersQuery = <TData = OrganizationMembersData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationMembersData, OrganizationMembersError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationMembersData, OrganizationMembersError, TData> = {}
 ) =>
-  useQuery<OrganizationMembersData, OrganizationMembersError, TData>(
-    organizationKeys.members(slug),
-    ({ signal }) => getOrganizationMembers({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<OrganizationMembersData, OrganizationMembersError, TData>({
+    queryKey: organizationKeys.members(slug),
+    queryFn: ({ signal }) => getOrganizationMembers({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

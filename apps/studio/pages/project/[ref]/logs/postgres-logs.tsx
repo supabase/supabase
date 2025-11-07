@@ -1,7 +1,9 @@
 import { useRouter } from 'next/router'
 
-import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { LogsLayout } from 'components/layouts'
+import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
@@ -12,13 +14,16 @@ export const LogPage: NextPageWithLayout = () => {
     <LogsPreviewer
       projectRef={ref as string}
       condensedLayout={true}
-      // @ts-ignore
-      tableName={'postgres_logs'}
+      tableName={LogsTableName.POSTGRES}
       queryType={'database'}
     />
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Database">{page}</LogsLayout>
+LogPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Postgres Logs">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogPage

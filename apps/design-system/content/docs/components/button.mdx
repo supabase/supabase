@@ -1,0 +1,124 @@
+---
+title: Button
+description: Displays a button or a component that looks like a button.
+featured: true
+component: true
+---
+
+<ComponentPreview name="button-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { Button } from '@/components/ui/button'
+```
+
+```tsx
+<Button type="outline">Button</Button>
+```
+
+_It is likely that the `type` prop will be changed to `variant` in the future._
+
+## Link
+
+You can use the `buttonVariants` helper to create a link that looks like a button.
+
+```tsx
+import { buttonVariants } from '@/components/ui/button'
+```
+
+```tsx
+<Link className={buttonVariants({ variant: 'outline' })}>Click here</Link>
+```
+
+Alternatively, you can set the `asChild` parameter and nest the link component.
+
+```tsx
+<Button asChild>
+  <Link href="/login">Login</Link>
+</Button>
+```
+
+## Examples
+
+### Sizes
+
+Use the `size` prop to determine the size of the button.
+
+<ComponentPreview name="button-sizes" />
+
+### Types
+
+These are all the different `type` variations.
+
+#### Primary
+
+Used for data insertion actions, confirming purchases, strong positive actions.
+
+<ComponentPreview name="button-demo" />
+
+#### Default
+
+Used for opening dialogs, navigating to pages, and other non CRUD actions.
+
+This `type` will probably be the most used button type.
+It will probably be changed to be the default type in future.
+
+<ComponentPreview name="button-default" />
+
+#### Secondary
+
+Can be used for signaling a data or config change, but not as serious as a primary button.
+For destructive or side effect actions, use the `destructive` or `warning` type.
+
+<ComponentPreview name="button-secondary" />
+
+#### Warning
+
+Used for actions that might have a side effect, but not as serious as a destructive action.
+
+<ComponentPreview name="button-warning" />
+
+#### Destructive (currently `danger`)
+
+Used for actions that will have a serious destructive side effect, like deleting data.
+
+prop `type` will probably be changed to `destructive` in the future.
+
+<ComponentPreview name="button-destructive" />
+
+#### Outline
+
+Used for secondary actions, or actions that are not as important as the primary action.
+
+<ComponentPreview name="button-outline" />
+
+#### Ghost (currently `text`)
+
+Used for actions that are not as important as the primary action, or for actions that are not as important as the primary action.
+
+prop `type` will probably be changed to `ghost` in the future.
+
+<ComponentPreview name="button-ghost" />
+
+#### Link
+
+Used for actions that are not as important as the primary action, or for actions that are not as important as the primary action.
+
+<ComponentPreview name="button-link" />
+
+### Only an Icon
+
+Displaying only an Icon in a button.
+
+<Admonition type="note" title="This feature requires more support" className="mt-3">
+  We should update the button component to support this use case better.
+</Admonition>
+
+<ComponentPreview name="button-icon" />
+
+### As Child
+
+Supports slot behavior with `asChild` prop.
+
+<ComponentPreview name="button-as-child" />

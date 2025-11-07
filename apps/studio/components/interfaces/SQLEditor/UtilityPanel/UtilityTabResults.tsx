@@ -1,203 +1,191 @@
-import { useParams } from 'common'
-import toast from 'react-hot-toast'
-import { format } from 'sql-formatter'
-import { AiIconAnimation, Button } from 'ui'
+import { ExternalLink, Loader2 } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { forwardRef } from 'react'
 
+import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import CopyButton from 'components/ui/CopyButton'
+import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { isError } from 'data/utils/error-check'
-import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlEditor } from '../SQLEditor'
-import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
-import { DiffType } from '../SQLEditor.types'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
 
 export type UtilityTabResultsProps = {
   id: string
   isExecuting?: boolean
+  isDisabled?: boolean
+  onDebug: () => void
+  isDebugging?: boolean
 }
 
-const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
-  const { ref } = useParams()
-  const snap = useSqlEditorStateSnapshot()
-  const state = useDatabaseSelectorStateSnapshot()
-  const selectedProject = useSelectedProject()
-  const organization = useSelectedOrganization()
+const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
+  ({ id, isExecuting, isDisabled, isDebugging, onDebug }) => {
+    const { ref } = useParams()
+    const state = useDatabaseSelectorStateSnapshot()
+    const { data: organization } = useSelectedOrganizationQuery()
+    const snapV2 = useSqlEditorV2StateSnapshot()
+    const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const { sqlDiff, setDebugSolution, setAiInput, setSqlDiff, setSelectedDiffType } = useSqlEditor()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
+    const result = snapV2.results[id]?.[0]
+    const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
-  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
+    // Customers on HIPAA plans should not have access to Supabase AI
+    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
+    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
-  const { data } = useEntityDefinitionsQuery(
-    {
-      projectRef: selectedProject?.ref,
-      connectionString: selectedProject?.connectionString,
-    },
-    { enabled: includeSchemaMetadata }
-  )
+    const isTimeout =
+      result?.error?.message?.includes('canceling statement due to statement timeout') ||
+      result?.error?.message?.includes('upstream request timeout') ||
+      result?.error?.message?.includes('Query read timeout')
 
-  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
+    const isNetWorkError = result?.error?.message?.includes('EHOSTUNREACH')
 
-  const snippet = snap.snippets[id]
-  const result = snap.results[id]?.[0]
-  const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
+    if (isExecuting) {
+      return (
+        <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+          <Loader2 size={14} className="animate-spin" />
+          <p className="m-0 border-0 font-mono text-sm">Running...</p>
+        </div>
+      )
+    } else if (result?.error) {
+      const formattedError = (result.error?.formattedError?.split('\n') ?? []).filter(
+        (x: string) => x.length > 0
+      )
+      const readReplicaError =
+        state.selectedDatabaseId !== ref &&
+        result.error.message.includes('in a read-only transaction')
+      const payloadTooLargeError = result.error.message.includes(
+        'Query is too large to be run via the SQL Editor'
+      )
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+      return (
+        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+          <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
+            {isTimeout ? (
+              <div className="flex flex-col gap-y-1">
+                <p className="font-mono text-sm tracking-tight">
+                  Error: SQL query ran into an upstream timeout
+                </p>
+                <p className="text-sm text-foreground-light">
+                  You can either{' '}
+                  <InlineLink
+                    href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
+                  >
+                    optimize your query
+                  </InlineLink>
+                  , or{' '}
+                  <InlineLink href={`${DOCS_URL}/guides/database/timeouts`}>
+                    increase the statement timeout
+                  </InlineLink>
+                  {' or '}
+                  <span
+                    className={cn(InlineLinkClassName, 'cursor-pointer')}
+                    onClick={() => setShowConnect(true)}
+                  >
+                    connect to your database directly
+                  </span>
+                  .
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-y-1">
+                {formattedError.length > 0 ? (
+                  formattedError.map((x: string, i: number) => (
+                    <pre key={`error-${i}`} className="font-mono text-sm text-wrap">
+                      {x}
+                    </pre>
+                  ))
+                ) : (
+                  <p className="font-mono text-sm tracking-tight">Error: {result.error?.message}</p>
+                )}
+                {!isTimeout && !isNetWorkError && result.autoLimit && (
+                  <p className="text-sm text-foreground-light">
+                    Note: A limit of {result.autoLimit} was applied to your query. If this was the
+                    cause of a syntax error, try selecting "No limit" instead and re-run the query.
+                  </p>
+                )}
+                {readReplicaError && (
+                  <p className="text-sm text-foreground-light">
+                    Note: Read replicas are for read only queries. Run write queries on the primary
+                    database instead.
+                  </p>
+                )}
+                {payloadTooLargeError && (
+                  <p className="text-sm text-foreground-light flex items-center gap-x-1">
+                    Run this query by{' '}
+                    <span
+                      onClick={() => setShowConnect(true)}
+                      className={cn(InlineLinkClassName, 'flex items-center gap-x-1')}
+                    >
+                      connecting to your database directly
+                      <ExternalLink size={12} />
+                    </span>
+                    .
+                  </p>
+                )}
+              </div>
+            )}
 
-  // Customers on HIPAA plans should not have access to Supabase AI
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-
-  const isTimeout =
-    result?.error?.message?.includes('canceling statement due to statement timeout') ||
-    result?.error?.message?.includes('upstream request timeout')
-
-  if (isUtilityPanelCollapsed) return null
-
-  if (isExecuting) {
-    return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Running...</p>
-      </div>
-    )
-  } else if (result?.error) {
-    const formattedError = (result.error?.formattedError?.split('\n') ?? []).filter(
-      (x: string) => x.length > 0
-    )
-    const readReplicaError =
-      state.selectedDatabaseId !== ref &&
-      result.error.message.includes('in a read-only transaction')
-
-    return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
-          {isTimeout ? (
-            <div className="flex flex-col gap-y-1">
-              <p className="font-mono text-sm">SQL query ran into an upstream timeout</p>
-              <p className="font-mono text-sm text-foreground-light">
-                You can either{' '}
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline transition hover:text-foreground"
-                  href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+            <div className="flex items-center gap-x-2">
+              {readReplicaError && (
+                <Button
+                  className="py-2"
+                  type="default"
+                  onClick={() => {
+                    state.setSelectedDatabaseId(ref)
+                    snapV2.resetResult(id)
+                  }}
                 >
-                  optimize your query
-                </a>
-                , or{' '}
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline transition hover:text-foreground"
-                  href="https://supabase.com/docs/guides/database/timeouts"
+                  Switch to primary database
+                </Button>
+              )}
+              {formattedError.length > 0 && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <CopyButton iconOnly type="default" text={formattedError.join('\n')} />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="center">
+                    <span>Copy error</span>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              {!hasHipaaAddon && (
+                <Button
+                  icon={<AiIconAnimation size={16} loading={isDebugging} />}
+                  disabled={!!isDisabled || isDebugging}
+                  onClick={onDebug}
                 >
-                  increase the statement timeout
-                </a>
-                .
-              </p>
-            </div>
-          ) : (
-            <div className="">
-              {formattedError.length > 0 ? (
-                formattedError.map((x: string, i: number) => (
-                  <pre key={`error-${i}`} className="font-mono text-sm text-wrap">
-                    {x}
-                  </pre>
-                ))
-              ) : (
-                <>
-                  <p className="font-mono text-sm">Error: {result.error?.message}</p>
-                  {readReplicaError && (
-                    <p className="text-sm text-foreground-light">
-                      Note: Read replicas are for read only queries. Run write queries on the
-                      primary database instead.
-                    </p>
-                  )}
-                </>
+                  Debug with Assistant
+                </Button>
               )}
             </div>
-          )}
-
-          <div className="flex items-center gap-x-2">
-            {readReplicaError && (
-              <Button
-                className="py-2"
-                type="default"
-                onClick={() => {
-                  state.setSelectedDatabaseId(ref)
-                  snap.resetResult(id)
-                }}
-              >
-                Switch to primary database
-              </Button>
-            )}
-            {!hasHipaaAddon && (
-              <Button
-                icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugSqlLoading} />}
-                disabled={!!sqlDiff || isDebugSqlLoading}
-                onClick={async () => {
-                  try {
-                    const { solution, sql } = await debugSql({
-                      sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-                      errorMessage: result.error.message,
-                      entityDefinitions,
-                    })
-
-                    const formattedSql =
-                      sqlAiDisclaimerComment +
-                      '\n\n' +
-                      format(sql, {
-                        language: 'postgresql',
-                        keywordCase: 'lower',
-                      })
-                    setAiInput('')
-                    setDebugSolution(solution)
-                    setSqlDiff({
-                      original: snippet.snippet.content.sql,
-                      modified: formattedSql,
-                    })
-                    setSelectedDiffType(DiffType.Modification)
-                  } catch (error: unknown) {
-                    // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
-                    // that's not relevant for the user - so we prettify it here by avoiding to return the
-                    // entire error body from the assistant
-                    if (isError(error)) {
-                      toast.error(
-                        `Sorry, the assistant failed to debug your query! Please try again with a different one.`
-                      )
-                    }
-                  }
-                }}
-              >
-                Debug with Supabase AI
-              </Button>
-            )}
           </div>
         </div>
-      </div>
-    )
-  } else if (!result) {
-    return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 text-sm text-foreground-light">
-          Click <code>Run</code> to execute your query.
-        </p>
-      </div>
-    )
+      )
+    } else if (!result) {
+      return (
+        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+          <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
+            Click <code>Run</code> to execute your query.
+          </p>
+        </div>
+      )
+    } else if (result.rows.length <= 0) {
+      return (
+        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+          <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
+        </div>
+      )
+    }
+
+    return <Results rows={result.rows} />
   }
+)
 
-  return (
-    <div className="h-full flex flex-col">
-      <Results id={id} rows={result.rows} />
-    </div>
-  )
-}
-
+UtilityTabResults.displayName = 'UtilityTabResults'
 export default UtilityTabResults

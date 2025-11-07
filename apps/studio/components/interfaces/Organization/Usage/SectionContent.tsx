@@ -1,7 +1,8 @@
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-import { Badge, IconExternalLink } from 'ui'
+import { Badge } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
 
 export interface SectionContent {
@@ -9,7 +10,7 @@ export interface SectionContent {
   includedInPlan?: boolean
 }
 
-const SectionContent = ({
+export const SectionContent = ({
   section,
   includedInPlan,
   children,
@@ -19,7 +20,7 @@ const SectionContent = ({
   return (
     <>
       <ScaffoldContainer>
-        <div className="mx-auto flex flex-col gap-10 py-16">
+        <div className="mx-auto flex flex-col gap-10 py-8 md:py-16">
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-5">
               <div className="sticky top-32 space-y-6">
@@ -38,13 +39,15 @@ const SectionContent = ({
                 </div>
                 {links && links.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-sm text-foreground mb-2">More information</p>
+                    <p className="text-xs font-mono uppercase text-foreground-lighter mb-2">
+                      More information
+                    </p>
                     {links.map((link) => (
                       <div key={link.url}>
                         <Link href={link.url} target="_blank" rel="noreferrer">
-                          <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <div className="inline-flex items-center space-x-2 text-foreground-light hover:text-foreground transition">
                             <p className="text-sm">{link.name}</p>
-                            <IconExternalLink size={16} strokeWidth={1.5} />
+                            <ExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </Link>
                       </div>
@@ -61,5 +64,3 @@ const SectionContent = ({
     </>
   )
 }
-
-export default SectionContent

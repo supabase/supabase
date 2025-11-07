@@ -1,22 +1,17 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { head } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { invoicesKeys } from './keys'
 
 export type InvoicesCountVariables = {
-  customerId?: string
   slug?: string
 }
 
-export async function getInvoicesCount(
-  { customerId, slug }: InvoicesCountVariables,
-  signal?: AbortSignal
-) {
-  if (!customerId) throw new Error('Customer ID is required')
+export async function getInvoicesCount({ slug }: InvoicesCountVariables, signal?: AbortSignal) {
   if (!slug) throw new Error('Slug is required')
 
-  const res = await head(`/platform/stripe/invoices`, {
-    params: { query: { customer: customerId, slug } },
+  const res = await head('/platform/organizations/{slug}/billing/invoices', {
+    params: { path: { slug } },
     signal,
     parseAs: 'text',
   })
@@ -29,14 +24,15 @@ export type InvoicesCountData = Awaited<ReturnType<typeof getInvoicesCount>>
 export type InvoicesCountError = ResponseError
 
 export const useInvoicesCountQuery = <TData = InvoicesCountData>(
-  { customerId, slug }: InvoicesCountVariables,
-  { enabled = true, ...options }: UseQueryOptions<InvoicesCountData, InvoicesCountError, TData> = {}
+  { slug }: InvoicesCountVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<InvoicesCountData, InvoicesCountError, TData> = {}
 ) =>
-  useQuery<InvoicesCountData, InvoicesCountError, TData>(
-    invoicesKeys.count(customerId, slug),
-    ({ signal }) => getInvoicesCount({ customerId, slug }, signal),
-    {
-      enabled: enabled && typeof customerId !== 'undefined' && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<InvoicesCountData, InvoicesCountError, TData>({
+    queryKey: invoicesKeys.count(slug),
+    queryFn: ({ signal }) => getInvoicesCount({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

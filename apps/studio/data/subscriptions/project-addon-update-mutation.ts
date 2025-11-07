@@ -1,15 +1,16 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { subscriptionKeys } from './keys'
 import type { AddonVariantId, ProjectAddonType } from './types'
 
 export type ProjectAddonUpdateVariables = {
-  projectRef: string
+  projectRef?: string
   variant: AddonVariantId
   type: ProjectAddonType
+  suppressToast?: boolean
 }
 
 export async function updateSubscriptionAddon({
@@ -33,8 +34,7 @@ export async function updateSubscriptionAddon({
     },
   })
 
-  if (error) throw error
-
+  if (error) handleError(error)
   return data
 }
 
@@ -45,27 +45,25 @@ export const useProjectAddonUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>,
+  UseCustomMutationOptions<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>,
   'mutationFn'
-> = {}) => {
+> & { suppressToast?: boolean } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>(
-    (vars) => updateSubscriptionAddon(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update addon: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>({
+    mutationFn: (vars) => updateSubscriptionAddon(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update addon: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

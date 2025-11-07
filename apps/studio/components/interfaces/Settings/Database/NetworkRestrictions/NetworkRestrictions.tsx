@@ -1,8 +1,18 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import Link from 'next/link'
+import { AlertCircle, ChevronDown, Globe, Lock } from 'lucide-react'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import Panel from 'components/ui/Panel'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -10,19 +20,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconAlertCircle,
-  IconChevronDown,
-  IconExternalLink,
-  IconGlobe,
-  IconLock,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useCheckPermissions } from 'hooks'
 import AddRestrictionModal from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
 import DisallowAllModal from './DisallowAllModal'
@@ -34,73 +35,56 @@ interface AccessButtonProps {
 }
 
 const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
-  <Tooltip.Root delayDuration={0}>
-    <Tooltip.Trigger asChild>
+  <Tooltip>
+    <TooltipTrigger asChild>
       <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
         Allow all access
       </Button>
-    </Tooltip.Trigger>
+    </TooltipTrigger>
     {disabled && (
-      <Tooltip.Portal>
-        <Tooltip.Content align="center" side="bottom">
-          <Tooltip.Arrow className="radix-tooltip-arrow" />
-          <div
-            className={[
-              'rounded bg-alternative py-1 px-2 leading-none shadow',
-              'border border-background w-[250px]',
-            ].join(' ')}
-          >
-            <span className="text-xs text-foreground">
-              You need additional permissions to update network restrictions
-            </span>
-          </div>
-        </Tooltip.Content>
-      </Tooltip.Portal>
+      <TooltipContent side="bottom">
+        You need additional permissions to update network restrictions
+      </TooltipContent>
     )}
-  </Tooltip.Root>
+  </Tooltip>
 )
 
 const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
-  <Tooltip.Root delayDuration={0}>
-    <Tooltip.Trigger asChild>
-      <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
-        Restrict all access
-      </Button>
-    </Tooltip.Trigger>
-    {disabled && (
-      <Tooltip.Portal>
-        <Tooltip.Content align="center" side="bottom">
-          <Tooltip.Arrow className="radix-tooltip-arrow" />
-          <div
-            className={[
-              'rounded bg-alternative py-1 px-2 leading-none shadow',
-              'border border-background w-[250px]',
-            ].join(' ')}
-          >
-            <span className="text-xs text-foreground">
-              You need additional permissions to update network restrictions
-            </span>
-          </div>
-        </Tooltip.Content>
-      </Tooltip.Portal>
-    )}
-  </Tooltip.Root>
+  <ButtonTooltip
+    disabled={disabled}
+    type="default"
+    onClick={() => onClick(true)}
+    tooltip={{
+      content: {
+        side: 'bottom',
+        text: disabled
+          ? 'You need additional permissions to update network restrictions'
+          : undefined,
+      },
+    }}
+  >
+    Restrict all access
+  </ButtonTooltip>
 )
 
-const NetworkRestrictions = () => {
+export const NetworkRestrictions = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [isAddingAddress, setIsAddingAddress] = useState<undefined | 'IPv4' | 'IPv6'>()
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
 
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
-  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
@@ -114,74 +98,61 @@ const NetworkRestrictions = () => {
   const isAllowedAll = restrictedIps.includes('0.0.0.0/0') && restrictedIps.includes('::/0')
   const isDisallowedAll = restrictedIps.length === 0
 
-  if (!hasAccessToRestrictions) return <></>
+  if (!hasAccessToRestrictions) return null
 
   return (
     <>
       <section id="network-restrictions">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-6">
           <FormHeader
+            className="mb-0"
             title="Network Restrictions"
             description="Allow specific IP ranges to have access to your database."
           />
-          <div className="flex items-center space-x-2 mb-6">
-            <Button asChild type="default" icon={<IconExternalLink />}>
-              <Link
-                href="https://supabase.com/docs/guides/platform/network-restrictions"
-                target="_blank"
-                rel="noreferrer"
+          <div className="flex items-center gap-x-2">
+            <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
+            {!canUpdateNetworkRestrictions ? (
+              <ButtonTooltip
+                disabled
+                type="primary"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to update network restrictions',
+                  },
+                }}
               >
-                Documentation
-              </Link>
-            </Button>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="primary"
-                      disabled={!canUpdateNetworkRestrictions}
-                      iconRight={<IconChevronDown />}
-                    >
-                      Add restriction
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" side="bottom" className="w-48">
-                    <DropdownMenuItem
-                      key="IPv4"
-                      disabled={isLoading}
-                      onClick={() => setIsAddingAddress('IPv4')}
-                    >
-                      <p className="block text-foreground">Add IPv4 restriction</p>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      key="IPv6"
-                      disabled={isLoading}
-                      onClick={() => setIsAddingAddress('IPv6')}
-                    >
-                      <p className="block text-foreground">Add IPv6 restriction</p>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </Tooltip.Trigger>
-              {!canUpdateNetworkRestrictions && (
-                <Tooltip.Portal>
-                  <Tooltip.Content align="center" side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background w-[250px]',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to update network restrictions
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+                Add restriction
+              </ButtonTooltip>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="primary"
+                    disabled={!canUpdateNetworkRestrictions}
+                    iconRight={<ChevronDown size={14} />}
+                  >
+                    Add restriction
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" side="bottom" className="w-48">
+                  <DropdownMenuItem
+                    key="IPv4"
+                    disabled={isLoading}
+                    onClick={() => setIsAddingAddress('IPv4')}
+                  >
+                    <p className="block text-foreground">Add IPv4 restriction</p>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    key="IPv6"
+                    disabled={isLoading}
+                    onClick={() => setIsAddingAddress('IPv6')}
+                  >
+                    <p className="block text-foreground">Add IPv6 restriction</p>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
         {isLoading ? (
@@ -200,7 +171,7 @@ const NetworkRestrictions = () => {
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <IconAlertCircle strokeWidth={1.5} className="text-foreground-light" />
+                    <AlertCircle size={20} strokeWidth={1.5} className="text-foreground-light" />
                     <p className="text-sm">Your network restrictions were not applied correctly</p>
                   </div>
                   <p className="text-sm text-foreground-light">
@@ -245,7 +216,7 @@ const NetworkRestrictions = () => {
             ) : isDisallowedAll ? (
               <div className="px-8 py-8 flex items-center justify-between">
                 <div className="flex items-start space-x-4">
-                  <IconLock className="text-foreground-light" strokeWidth={1.5} />
+                  <Lock size={20} className="text-foreground-light" strokeWidth={1.5} />
                   <div className="space-y-1">
                     <p className="text-foreground-light text-sm">
                       Your database <span className="text-amber-900 opacity-80">cannot</span> be
@@ -297,7 +268,7 @@ const NetworkRestrictions = () => {
                   return (
                     <div key={ip} className="px-8 py-4 flex items-center justify-between">
                       <div className="flex items-center space-x-5">
-                        <IconGlobe size={16} className="text-foreground-light" />
+                        <Globe size={16} className="text-foreground-light" />
                         <Badge>{ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}</Badge>
                         <p className="text-sm font-mono">{ip}</p>
                       </div>
@@ -329,5 +300,3 @@ const NetworkRestrictions = () => {
     </>
   )
 }
-
-export default NetworkRestrictions

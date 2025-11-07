@@ -1,0 +1,59 @@
+packages:
+  - apps/*
+  - packages/*
+  - blocks/*
+  - e2e/*
+
+catalog:
+  '@supabase/auth-js': 2.78.0
+  '@supabase/realtime-js': 2.78.0
+  '@supabase/supabase-js': 2.78.0
+  '@supabase/postgrest-js': 2.78.0
+  '@types/node': ^22.0.0
+  '@types/react': ^18.3.0
+  '@types/react-dom': ^18.3.0
+  next: ^15.5.2
+  react: ^18.3.0
+  react-dom: ^18.3.0
+  tailwindcss: 3.4.1
+  tsx: 4.20.3
+  typescript: ~5.9.0
+  valtio: ^1.12.0
+  vite: ^7.1.11
+  vitest: ^3.2.0
+  zod: ^3.25.76
+
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - '@sentry/cli'
+  - contentlayer2
+  - core-js
+  - es5-ext
+  - esbuild
+  - libpg-query
+  - msw
+  - node-pty
+  - protobufjs
+  - sharp
+
+minimumReleaseAge: 10080
+
+minimumReleaseAgeExclude:
+  - '@ai-sdk/*'
+  - '@supabase/*'
+  - ai
+  - supabase
+
+onlyBuiltDependencies:
+  - supabase
+
+overrides:
+  '@react-router/dev>vite-node': 3.2.4
+  '@redocly/respect-core>form-data': ^4.0.4
+  '@supabase/supabase-js>@supabase/auth-js': 'catalog:'
+  '@tanstack/directive-functions-plugin>vite': 'catalog:'
+  '@tanstack/react-start-plugin>vite': 'catalog:'
+  'vinxi>vite': 'catalog:'
+  'refractor>prismjs': ^1.30.0 
+  esbuild: ^0.25.2
+  tmp: ^0.2.4

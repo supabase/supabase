@@ -1,70 +1,37 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common/hooks'
-import type { SupaTable } from 'components/grid/types'
-import { sqlKeys } from 'data/sql/keys'
-import { useEffect, useState } from 'react'
-import { Button, IconCheck, IconRefreshCw } from 'ui'
-import { SupabaseGridQueue } from '../../queue'
-import type { TableLike } from 'hooks/misc/useTable'
-import { Check, RefreshCw } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { tableRowKeys } from 'data/table-rows/keys'
 
 export type RefreshButtonProps = {
-  table: TableLike | SupaTable
+  tableId?: number
   isRefetching?: boolean
 }
 
-const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
+export const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-
-  const queryKey = sqlKeys.query(ref, [table.schema, table.name])
-  const [status, setStatus] = useState<string>()
-
-  useEffect(() => {
-    let isMounted = true
-    let timer: number | null
-
-    SupabaseGridQueue.on('active', () => {
-      if (timer) clearTimeout(timer)
-
-      if (isMounted) setStatus('saving')
-    })
-    SupabaseGridQueue.on('idle', () => {
-      if (timer) clearTimeout(timer)
-      timer = window.setTimeout(() => setStatus(undefined), 2000)
-
-      if (isMounted) setStatus('saved')
-    })
-
-    return () => {
-      isMounted = false
-      if (timer) clearTimeout(timer)
-    }
-  }, [])
+  const queryKey = tableRowKeys.tableRowsAndCount(ref, tableId)
 
   async function onClick() {
-    await queryClient.invalidateQueries(queryKey)
+    await queryClient.invalidateQueries({ queryKey })
   }
 
   return (
-    <Button
-      type="text"
-      icon={
-        !status ? (
-          <RefreshCw className="text-foreground-muted" strokeWidth={1.5} />
-        ) : status === 'saved' ? (
-          <Check className="text-brand" strokeWidth={3} />
-        ) : (
-          <></>
-        )
-      }
-      onClick={() => {
-        if (!status) onClick()
+    <ButtonTooltip
+      type="outline"
+      loading={isRefetching}
+      icon={<RefreshCw />}
+      onClick={() => onClick()}
+      className="w-7 h-7 p-0"
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: 'Refresh table data',
+        },
       }}
-      loading={isRefetching || status === 'saving'}
-    >
-      {!status ? 'Refresh' : status === 'saved' ? 'Changes saved' : 'Saving changes'}
-    </Button>
+    />
   )
 }
-export default RefreshButton

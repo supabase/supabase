@@ -1,0 +1,50 @@
+name: Update Mgmt Api Docs
+
+on:
+  schedule:
+    # Run at 00:00 UTC every Monday
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  update-docs:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          ref: master
+          sparse-checkout: |
+            apps/docs
+
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Change to apps/docs/spec directory and run make command
+        working-directory: apps/docs/spec
+        run: make download.api.v1 dereference.api.v1 generate.sections.api.v1 format
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'feat: update mgmt api docs'
+          title: 'feat: update mgmt api docs'
+          body: 'This PR updates mgmt api docs automatically.'
+          branch: 'gha/auto-update-mgmt-api-docs'
+          base: 'master'

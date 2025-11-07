@@ -1,14 +1,23 @@
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { useState } from 'react'
-import { Bar, BarChart as RechartBarChart, Cell, Tooltip, XAxis, Legend } from 'recharts'
-import type { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
-import ChartHeader from './ChartHeader'
+import { ComponentProps, useMemo, useState } from 'react'
+import {
+  Bar,
+  CartesianGrid,
+  Cell,
+  Legend,
+  BarChart as RechartBarChart,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
+
+import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
+import type { CategoricalChartState } from 'recharts/types/chart/types'
+import { ChartHeader } from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import ChartNoData from './NoDataPlaceholder'
-dayjs.extend(utc)
+import NoDataPlaceholder from './NoDataPlaceholder'
+import { useChartHoverState } from './useChartHoverState'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -19,6 +28,10 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   emptyStateMessage?: string
   showLegend?: boolean
   xAxisIsDate?: boolean
+  XAxisProps?: ComponentProps<typeof XAxis>
+  YAxisProps?: ComponentProps<typeof YAxis>
+  showGrid?: boolean
+  syncId?: string
 }
 
 const BarChart = ({
@@ -39,12 +52,36 @@ const BarChart = ({
   onBarClick,
   showLegend = false,
   xAxisIsDate = true,
+  XAxisProps,
+  YAxisProps,
+  showGrid = false,
+  syncId,
 }: BarChartProps) => {
+  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } =
+    useChartHoverState('default')
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  if (data.length === 0)
-    return <ChartNoData message={emptyStateMessage} size={size} className={className} />
+  // Transform data to ensure yAxisKey values are numbers
+  const transformedData = useMemo(() => {
+    return data.map((item) => ({
+      ...item,
+      [yAxisKey]: typeof item[yAxisKey] === 'string' ? Number(item[yAxisKey]) : item[yAxisKey],
+    }))
+  }, [data, yAxisKey])
+
+  // Default props
+  const _XAxisProps = XAxisProps || {
+    interval: data.length - 2,
+    angle: 0,
+    tick: false,
+  }
+
+  const _YAxisProps = YAxisProps || {
+    tickFormatter: (value) => numberFormatter(value, valuePrecision),
+    tick: false,
+    width: 0,
+  }
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
@@ -67,8 +104,21 @@ const BarChart = ({
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
+  if (data.length === 0) {
+    return (
+      <NoDataPlaceholder
+        message={emptyStateMessage}
+        description="It may take up to 24 hours for data to refresh"
+        size={size}
+        className={className}
+        attribute={title}
+        format={format}
+      />
+    )
+  }
+
   return (
-    <div className={['flex flex-col gap-3', className].join(' ')}>
+    <div className={['flex flex-col gap-y-3', className].join(' ')}>
       <ChartHeader
         title={title}
         format={format}
@@ -80,47 +130,69 @@ const BarChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
+        syncId={syncId}
+        data={data}
+        xAxisKey={xAxisKey}
+        yAxisKey={yAxisKey}
+        xAxisIsDate={xAxisIsDate}
+        displayDateInUtc={displayDateInUtc}
+        valuePrecision={valuePrecision}
+        attributes={[]}
       />
       <Container>
         <RechartBarChart
-          data={data}
-          margin={{
-            top: 0,
-            right: 0,
-            left: 0,
-            bottom: 0,
-          }}
+          data={transformedData}
           className="overflow-visible"
-          //   mouse hover focusing logic
           onMouseMove={(e: any) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
+
+            setHover(e.activeTooltipIndex)
           }}
-          onMouseLeave={() => setFocusDataIndex(null)}
+          onMouseLeave={() => {
+            setFocusDataIndex(null)
+
+            clearHover()
+          }}
           onClick={(tooltipData) => {
-            // receives tooltip data https://github.com/recharts/recharts/blob/2a3405ff64a0c050d2cf94c36f0beef738d9e9c2/src/chart/generateCategoricalChart.tsx
             const datum = tooltipData?.activePayload?.[0]?.payload
             if (onBarClick) onBarClick(datum, tooltipData)
           }}
         >
           {showLegend && <Legend />}
-          <XAxis
-            dataKey={xAxisKey}
-            interval={data.length - 2}
-            angle={0}
-            // hide the tick
-            tick={false}
-            // color the axis
+          {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
+          <YAxis
+            {..._YAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
+            key={yAxisKey}
           />
-          <Tooltip content={() => null} />
+          <XAxis
+            {..._XAxisProps}
+            axisLine={{ stroke: CHART_COLORS.AXIS }}
+            tickLine={{ stroke: CHART_COLORS.AXIS }}
+            key={xAxisKey}
+          />
+          <Tooltip
+            content={(props) =>
+              syncId && isHovered && isCurrentChart && hoveredIndex !== null ? (
+                <div className="bg-black/90 text-white p-2 rounded text-xs">
+                  <div className="font-medium">
+                    {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
+                  </div>
+                  <div>
+                    {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
+                    {typeof format === 'string' ? format : ''}
+                  </div>
+                </div>
+              ) : null
+            }
+          />
           <Bar
             dataKey={yAxisKey}
             fill={CHART_COLORS.GREEN_1}
             animationDuration={300}
-            // max bar size required to prevent bars from expanding to max width.
             maxBarSize={48}
           >
             {data?.map((_entry: Datum, index: any) => (

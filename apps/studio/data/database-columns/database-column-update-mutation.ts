@@ -1,40 +1,63 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import pgMeta from '@supabase/pg-meta'
+import { PGColumn } from '@supabase/pg-meta/src/pg-meta-columns'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { CreateColumnBody } from './database-column-create-mutation'
 
-export type UpdateColumnBody = components['schemas']['UpdateColumnBody']
+export type UpdateColumnBody = Partial<
+  Omit<CreateColumnBody, 'schema' | 'table' | 'isPrimaryKey'>
+> & {
+  dropDefault?: boolean
+}
 
 export type DatabaseColumnUpdateVariables = {
   projectRef: string
-  connectionString?: string
-  id: string
-  payload: components['schemas']['UpdateColumnBody']
+  connectionString?: string | null
+  originalColumn: Pick<
+    PGColumn,
+    | 'id'
+    | 'name'
+    | 'schema'
+    | 'table'
+    | 'table_id'
+    | 'ordinal_position'
+    | 'is_identity'
+    | 'is_unique'
+  >
+  payload: UpdateColumnBody
 }
 
 export async function updateDatabaseColumn({
   projectRef,
   connectionString,
-  id,
+  originalColumn,
   payload,
 }: DatabaseColumnUpdateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await patch('/platform/pg-meta/{ref}/columns', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    body: payload,
-    headers,
+  const { sql } = pgMeta.columns.update(originalColumn, {
+    name: payload.name,
+    type: payload.type,
+    drop_default: payload.dropDefault,
+    default_value: payload.defaultValue,
+    default_value_format: payload.defaultValueFormat,
+    is_identity: payload.isIdentity,
+    identity_generation: payload.identityGeneration,
+    is_nullable: payload.isNullable,
+    is_unique: payload.isUnique,
+    comment: payload.comment,
+    check: payload.check,
   })
 
-  if (error) throw error
-  return data
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['column', 'update', originalColumn.id],
+  })
+
+  return result
 }
 
 type DatabaseColumnUpdateData = Awaited<ReturnType<typeof updateDatabaseColumn>>
@@ -44,23 +67,21 @@ export const useDatabaseColumnUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>,
+  UseCustomMutationOptions<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>(
-    (vars) => updateDatabaseColumn(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update database column: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>({
+    mutationFn: (vars) => updateDatabaseColumn(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update database column: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

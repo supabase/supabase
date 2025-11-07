@@ -1,20 +1,27 @@
-import { useState } from 'react'
-import { IconCheck, IconClipboard } from 'ui'
+import { Check, Copy } from 'lucide-react'
+import { forwardRef, useState } from 'react'
 
-const CommandRender = ({ commands }: any) => {
-  return (
-    <div className="space-y-4">
-      {commands.map((item: any, idx: number) => {
-        return <Command key={`command-${idx}`} item={item} />
-      })}
-    </div>
-  )
-}
+import { cn, copyToClipboard } from 'ui'
+
+const CommandRender = forwardRef<HTMLDivElement, { commands: any[]; className?: string }>(
+  ({ commands, className }, ref) => {
+    return (
+      <div ref={ref} className={cn('space-y-4', className)}>
+        {commands.map((item: any, idx: number) => (
+          <Command key={`command-${idx}`} item={item} />
+        ))}
+      </div>
+    )
+  }
+)
+
+CommandRender.displayName = 'CommandRender'
 
 export default CommandRender
 
 const Command = ({ item }: any) => {
   const [isCopied, setIsCopied] = useState(false)
+
   return (
     <div className="space-y-1">
       <span className="font-mono text-sm text-foreground-lighter">{`> ${item.comment}`}</span>
@@ -29,24 +36,16 @@ const Command = ({ item }: any) => {
               onClick={() => {
                 function onCopy(value: any) {
                   setIsCopied(true)
-                  navigator.clipboard.writeText(value).then()
-                  setTimeout(function () {
-                    setIsCopied(false)
-                  }, 3000)
+                  copyToClipboard(value)
+                  setTimeout(() => setIsCopied(false), 3000)
                 }
                 onCopy(item.command)
               }}
             >
               {isCopied ? (
-                <div className="text-brand">
-                  <IconCheck size={14} strokeWidth={3} />
-                </div>
+                <Check size={14} strokeWidth={3} className="text-brand" />
               ) : (
-                <div className="relative">
-                  <div className="block">
-                    <IconClipboard size={14} />
-                  </div>
-                </div>
+                <Copy size={14} />
               )}
             </button>
           </span>

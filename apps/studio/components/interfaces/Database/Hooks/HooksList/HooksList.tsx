@@ -1,28 +1,35 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
-import Link from 'next/link'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Button, IconExternalLink, IconSearch, Input } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { noop } from 'lib/void'
-import HooksListEmpty from './HooksListEmpty'
-import SchemaTable from './SchemaTable'
+import { Input } from 'ui'
+import { HooksListEmpty } from './HooksListEmpty'
+import { SchemaTable } from './SchemaTable'
 
 export interface HooksListProps {
   createHook: () => void
-  editHook: (hook: any) => void
-  deleteHook: (hook: any) => void
+  editHook: (hook: PostgresTrigger) => void
+  deleteHook: (hook: PostgresTrigger) => void
 }
 
-const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: HooksListProps) => {
-  const { project } = useProjectContext()
+export const HooksList = ({
+  createHook = noop,
+  editHook = noop,
+  deleteHook = noop,
+}: HooksListProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const {
     data: hooks,
     isLoading,
@@ -40,57 +47,39 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
 
-  const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
-  const isPermissionsLoaded = usePermissionsLoaded()
+  const { can: canCreateWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'triggers'
+  )
 
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
         <Input
           placeholder="Search for a webhook"
-          size="small"
-          icon={<IconSearch size="tiny" />}
+          size="tiny"
+          icon={<Search size="14" />}
           value={filterString}
-          className="w-64"
+          className="w-52"
           onChange={(e) => setFilterString(e.target.value)}
         />
-        <div className="flex items-center space-x-2">
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-            <Link
-              href="https://supabase.com/docs/guides/database/webhooks"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </Link>
-          </Button>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                disabled={!isPermissionsLoaded || !canCreateWebhooks}
-                onClick={() => createHook()}
-              >
-                Create a new hook
-              </Button>
-            </Tooltip.Trigger>
-            {isPermissionsLoaded && !canCreateWebhooks && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to create webhooks
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
+        <div className="flex items-center gap-x-2">
+          <DocsButton href={`${DOCS_URL}/guides/database/webhooks`} />
+          <ButtonTooltip
+            onClick={() => createHook()}
+            disabled={!isPermissionsLoaded || !canCreateWebhooks}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text:
+                  isPermissionsLoaded && !canCreateWebhooks
+                    ? 'You need additional permissions to create webhooks'
+                    : undefined,
+              },
+            }}
+          >
+            Create a new hook
+          </ButtonTooltip>
         </div>
       </div>
 
@@ -127,5 +116,3 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
     </div>
   )
 }
-
-export default HooksList

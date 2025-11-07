@@ -1,7 +1,8 @@
+import { X } from 'lucide-react'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { extensions } from 'shared-data'
-import { IconX, Input } from 'ui'
+import { Badge, Input } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 
 type Extension = {
@@ -23,7 +24,7 @@ function getLinkTarget(link: string): LinkTarget {
 }
 
 function getUniqueTags(json: Extension[]): string[] {
-  const tags = []
+  const tags: string[] = []
   for (const item of json) {
     if (item.tags) {
       tags.push(...item.tags)
@@ -58,7 +59,7 @@ export default function Extensions() {
       </div>
       <div className="lg:grid lg:grid-cols-12">
         <div className="col-span-3 not-prose">
-          <div className="lg:sticky top-24">
+          <div className="lg:sticky top-32">
             <h3 className="text-sm text-foreground-light">Filter</h3>
             <ul className="mt-3 flex flex-wrap lg:grid gap-2 grow">
               {tags.sort().map((tag) => (
@@ -80,7 +81,7 @@ export default function Extensions() {
                         checked={filters.includes(tag)}
                       />
                       {tag}
-                      <span>{filters.includes(tag) && <IconX size={12} />}</span>
+                      <span>{filters.includes(tag) && <X size={12} />}</span>
                     </span>
                   </label>
                 </li>
@@ -115,6 +116,11 @@ export default function Extensions() {
                     <p className="mt-4">
                       {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
                     </p>
+                    {extension.deprecated && (
+                      <Badge variant="destructive">
+                        Deprecated in {extension.deprecated.join(', ')}
+                      </Badge>
+                    )}
                   </GlassPanel>
                 </Link>
               ))}

@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { useQuery } from '@tanstack/react-query'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { documentKeys } from './keys'
 
 export type DocType = 'standard-security-questionnaire' | 'soc2-type-2-report'
@@ -21,8 +21,8 @@ export async function getDocument({ orgSlug, docType }: DocumentVariables, signa
         signal,
       }
     )
-    if (error) throw error
 
+    if (error) handleError(error)
     return data as { fileUrl: string }
   }
 
@@ -45,13 +45,11 @@ export type DocumentError = ResponseError
 
 export const useDocumentQuery = <TData = DocumentData>(
   { orgSlug, docType }: DocumentVariables,
-  { enabled = true, ...options }: UseQueryOptions<DocumentData, DocumentError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<DocumentData, DocumentError, TData> = {}
 ) =>
-  useQuery<DocumentData, DocumentError, TData>(
-    documentKeys.resource(orgSlug, docType),
-    ({ signal }) => getDocument({ orgSlug, docType }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined' && typeof docType !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DocumentData, DocumentError, TData>({
+    queryKey: documentKeys.resource(orgSlug, docType),
+    queryFn: ({ signal }) => getDocument({ orgSlug, docType }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined' && typeof docType !== 'undefined',
+    ...options,
+  })

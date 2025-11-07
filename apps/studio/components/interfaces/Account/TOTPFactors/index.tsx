@@ -1,21 +1,16 @@
 import dayjs from 'dayjs'
+import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-} from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { DATETIME_FORMAT } from 'lib/constants'
-import AddNewFactorModal from './AddNewFactorModal'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
 
-const TOTPFactors = () => {
+export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
   const { data, isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
@@ -36,7 +31,7 @@ const TOTPFactors = () => {
             <>
               {data.totp.length === 1 && (
                 <Alert_Shadcn_ variant="default" className="mb-2">
-                  <IconAlertCircle className="h-4 w-4" />
+                  <AlertCircle className="h-4 w-4" />
                   <AlertTitle_Shadcn_>
                     We recommend configuring two authenticator apps across different devices
                   </AlertTitle_Shadcn_>
@@ -60,8 +55,6 @@ const TOTPFactors = () => {
                         <Button
                           size="tiny"
                           type="default"
-                          // className="px-1"
-                          // icon={<IconTrash />}
                           onClick={() => setFactorToBeDeleted(factor.id)}
                         >
                           Remove
@@ -95,5 +88,3 @@ const TOTPFactors = () => {
     </>
   )
 }
-
-export default TOTPFactors

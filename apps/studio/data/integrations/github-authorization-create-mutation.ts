@@ -1,19 +1,33 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { integrationKeys } from './keys'
 
 export type GitHubAuthorizationCreateVariables = {
   code: string
+  state: string
 }
 
-export async function createGitHubAuthorization({ code }: GitHubAuthorizationCreateVariables) {
+export async function createGitHubAuthorization({
+  code,
+  state,
+}: GitHubAuthorizationCreateVariables) {
+  const localState = localStorage.getItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE)
+
+  if (state !== localState) {
+    throw new Error('GitHub authorization state mismatch')
+  } else {
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE)
+  }
+
   const { data, error } = await post('/platform/integrations/github/authorization', {
     body: { code },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -24,7 +38,7 @@ export const useGitHubAuthorizationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     GitHubAuthorizationCreateData,
     ResponseError,
     GitHubAuthorizationCreateVariables
@@ -32,20 +46,21 @@ export const useGitHubAuthorizationCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-
   return useMutation<
     GitHubAuthorizationCreateData,
     ResponseError,
     GitHubAuthorizationCreateVariables
-  >((vars) => createGitHubAuthorization(vars), {
+  >({
+    mutationFn: (vars) => createGitHubAuthorization(vars),
     async onSuccess(data, variables, context) {
-      // const { projectRef, id } = variables
-
-      // await Promise.all([
-      //   queryClient.invalidateQueries(githubAuthorizationKeys.list(projectRef)),
-      //   queryClient.invalidateQueries(githubAuthorizationKeys.githubAuthorization(projectRef, id)),
-      // ])
-
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.githubAuthorization(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.githubRepositoriesList(),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

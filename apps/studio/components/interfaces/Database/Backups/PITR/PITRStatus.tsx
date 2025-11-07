@@ -1,13 +1,13 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Button, IconAlertCircle } from 'ui'
+import { AlertCircle } from 'lucide-react'
 
-import { FormPanel } from 'components/ui/Forms'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useCheckPermissions } from 'hooks'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
 
@@ -41,7 +41,7 @@ const PITRStatus = ({
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 
-  const canTriggerPhysicalBackup = useCheckPermissions(
+  const { can: canTriggerPhysicalBackup } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.walg.prepare_restore'
   )
@@ -53,44 +53,27 @@ const PITRStatus = ({
         footer={
           <div className="flex items-center justify-between p-6">
             <div className="flex items-center space-x-4">
-              <IconAlertCircle className="text-foreground-light" size={18} strokeWidth={1.5} />
+              <AlertCircle className="text-foreground-light" size={18} strokeWidth={1.5} />
               <span className="text-foreground-light text-sm">
                 You'll be able to pick the right date and time when you begin
               </span>
             </div>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                {/* [Joshen TODO] Double check if this is intentional */}
-                <Button
-                  disabled={hasReadReplicas || !canTriggerPhysicalBackup}
-                  onClick={() => onSetConfiguration()}
-                >
-                  Start a restore
-                </Button>
-              </Tooltip.Trigger>
-              {hasReadReplicas ||
-                (!canTriggerPhysicalBackup && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="left">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          {hasReadReplicas
-                            ? 'You will need to remove all read replicas first to trigger a PITR recovery'
-                            : !canTriggerPhysicalBackup
-                              ? 'You need additional permissions to trigger a PITR recovery'
-                              : null}
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                ))}
-            </Tooltip.Root>
+            <ButtonTooltip
+              disabled={hasReadReplicas || !canTriggerPhysicalBackup}
+              onClick={() => onSetConfiguration()}
+              tooltip={{
+                content: {
+                  side: 'left',
+                  text: hasReadReplicas
+                    ? 'You will need to remove all read replicas first to trigger a PITR recovery'
+                    : !canTriggerPhysicalBackup
+                      ? 'You need additional permissions to trigger a PITR recovery'
+                      : undefined,
+                },
+              }}
+            >
+              Start a restore
+            </ButtonTooltip>
           </div>
         }
       >

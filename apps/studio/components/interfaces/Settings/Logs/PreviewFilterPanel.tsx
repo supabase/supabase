@@ -1,25 +1,23 @@
+import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import {
-  Button,
-  IconEye,
-  IconEyeOff,
-  IconRefreshCw,
-  IconSearch,
-  IconTerminal,
-  Input,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import CSVButton from 'components/ui/CSVButton'
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
-import DatePickers from './Logs.DatePickers'
-import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
+import { IS_PLATFORM } from 'lib/constants'
+import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
+import {
+  FILTER_OPTIONS,
+  LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+} from './Logs.constants'
+import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
 
 interface PreviewFilterPanelProps {
@@ -42,6 +40,9 @@ interface PreviewFilterPanelProps {
   onFiltersChange: (filters: Filters) => void
   filters: Filters
   onSelectedDatabaseChange: (id: string) => void
+  className?: string
+  selectedDatePickerValue: DatePickerValue
+  setSelectedDatePickerValue: (value: DatePickerValue) => void
 }
 
 /**
@@ -53,8 +54,6 @@ const PreviewFilterPanel = ({
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
-  defaultToValue = '',
-  defaultFromValue = '',
   onExploreClick,
   queryUrl,
   condensedLayout,
@@ -65,17 +64,25 @@ const PreviewFilterPanel = ({
   filters,
   table,
   onSelectedDatabaseChange,
+  className,
+  selectedDatePickerValue,
+  setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
+  const { ref } = useParams()
   const [search, setSearch] = useState('')
-  const { project } = useProjectContext()
+
+  const logName = router.pathname.split('/').pop()
+
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
   // [Joshen] These are the routes tested that can show replica logs
   const showDatabaseSelector =
-    project?.is_read_replicas_enabled &&
-    ['/project/[ref]/logs/edge-logs', '/project/[ref]/logs/pooler-logs'].includes(router.pathname)
+    IS_PLATFORM && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
 
   const hasEdits = search !== defaultSearchValue
+
+  const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
   // Sync local state with provided default value
   useEffect(() => {
@@ -84,50 +91,15 @@ const PreviewFilterPanel = ({
     }
   }, [defaultSearchValue])
 
-  const RefreshButton = () => (
-    <Tooltip_Shadcn_ delayDuration={100}>
-      <TooltipTrigger_Shadcn_ asChild>
-        <Button
-          type="default"
-          className="px-1.5"
-          icon={
-            <div className="relative">
-              {newCount > 0 && (
-                <div className="absolute -top-3 right-3 flex items-center justify-center">
-                  <div className="absolute z-20">
-                    <p style={{ fontSize: '0.6rem' }} className="text-white">
-                      {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                    </p>
-                  </div>
-                  <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
-                  <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
-                </div>
-              )}
-              <IconRefreshCw />
-            </div>
-          }
-          loading={isLoading}
-          disabled={isLoading}
-          onClick={onRefresh}
-        />
-      </TooltipTrigger_Shadcn_>
-      <TooltipContent_Shadcn_ side="bottom" className="text-xs">
-        Refresh logs
-      </TooltipContent_Shadcn_>
-    </Tooltip_Shadcn_>
-  )
-
-  const handleDatepickerChange = ({ to, from }: Partial<Parameters<LogSearchCallback>[1]>) => {
-    onSearch('datepicker-change', { to, from })
-  }
-
-  const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
-
   return (
     <div
-      className={'flex w-full items-center justify-between' + (condensedLayout ? ' px-4 pt-4' : '')}
+      className={cn(
+        'flex w-full items-center justify-between overflow-x-scroll no-scrollbar',
+        condensedLayout ? ' p-3' : '',
+        className
+      )}
     >
-      <div className="flex flex-row items-center gap-x-2">
+      <div className="flex flex-row items-center gap-x-2 mr-2">
         <form
           id="log-panel-search"
           onSubmit={(e) => {
@@ -147,30 +119,75 @@ const PreviewFilterPanel = ({
             }}
             icon={
               <div className="text-foreground-lighter">
-                <IconSearch size={14} />
+                <Search size={14} />
               </div>
             }
             value={search}
             actions={
-              hasEdits && (
-                <button
-                  onClick={() => handleInputSearch(search)}
-                  className="mx-2 text-foreground-light hover:text-foreground"
-                >
-                  {'↲'}
-                </button>
-              )
+              <div className="flex items-center gap-x-1 mr-0.5">
+                {hasEdits && (
+                  <ButtonTooltip
+                    icon={<span>↲</span>}
+                    type="text"
+                    className="px-1 h-[20px]"
+                    onClick={() => handleInputSearch(search)}
+                    tooltip={{ content: { side: 'bottom', text: 'Search for events' } }}
+                  />
+                )}
+
+                {search.length > 0 && (
+                  <ButtonTooltip
+                    icon={<X />}
+                    type="text"
+                    className="p-[1px] h-[20px]"
+                    onClick={() => handleInputSearch('')}
+                    tooltip={{ content: { side: 'bottom', text: 'Clear search' } }}
+                  />
+                )}
+              </div>
             }
           />
         </form>
 
-        <RefreshButton />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              title="refresh"
+              type="default"
+              className="px-1.5"
+              icon={
+                <div className="relative">
+                  {newCount > 0 && (
+                    <div className="absolute -top-3 right-3 flex items-center justify-center">
+                      <div className="absolute z-20">
+                        <p style={{ fontSize: '0.6rem' }} className="text-white">
+                          {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
+                        </p>
+                      </div>
+                      <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
+                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                    </div>
+                  )}
+                  <RefreshCw />
+                </div>
+              }
+              loading={isLoading}
+              disabled={isLoading}
+              onClick={onRefresh}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            Refresh logs
+          </TooltipContent>
+        </Tooltip>
 
-        <DatePickers
-          onChange={handleDatepickerChange}
-          to={defaultToValue}
-          from={defaultFromValue}
+        <LogsDatePicker
           helpers={PREVIEWER_DATEPICKER_HELPERS}
+          onSubmit={(vals) => {
+            onSearch('datepicker-change', { to: vals.to, from: vals.from })
+            setSelectedDatePickerValue(vals)
+          }}
+          value={selectedDatePickerValue}
         />
 
         {FILTER_OPTIONS[table] !== undefined && (
@@ -189,6 +206,9 @@ const PreviewFilterPanel = ({
                   }
                 }
 
+                const lastItemIndex = Object.values(FILTER_OPTIONS[table]).length - 1
+                const align = i === 0 ? 'start' : i === lastItemIndex ? 'end' : 'center'
+
                 return (
                   <LogsFilterPopover
                     buttonClassName={classes.join(' ')}
@@ -196,6 +216,7 @@ const PreviewFilterPanel = ({
                     options={x}
                     onFiltersChange={onFiltersChange}
                     filters={filters}
+                    align={align}
                   />
                 )
               })}
@@ -205,27 +226,44 @@ const PreviewFilterPanel = ({
           <Button
             type="default"
             onClick={() => onToggleEventChart()}
-            icon={isShowingEventChart ? <IconEye /> : <IconEyeOff />}
+            icon={isShowingEventChart ? <Eye /> : <EyeOff />}
           >
             Chart
           </Button>
         </div>
-        <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
+        {Boolean(csvData) && (
+          <DownloadResultsButton
+            iconOnly
+            type="default"
+            align="center"
+            results={csvData ?? []}
+            fileName={`supabase-${logName}-${ref}.csv`}
+          />
+        )}
       </div>
 
       {showDatabaseSelector ? (
         <div className="flex items-center justify-center gap-x-2">
-          <Tooltip_Shadcn_ delayDuration={100}>
-            <TooltipTrigger_Shadcn_ asChild>
-              <Button asChild className="px-1" type="default" icon={<IconTerminal />}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
                 <Link href={queryUrl} />
               </Button>
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom" className="text-xs">
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs">
               Open query in Logs Explorer
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
-          <DatabaseSelector onSelectId={onSelectedDatabaseChange} />
+            </TooltipContent>
+          </Tooltip>
+          <DatabaseSelector
+            onSelectId={onSelectedDatabaseChange}
+            additionalOptions={
+              table === LogsTableName.EDGE
+                ? (loadBalancers ?? []).length > 0
+                  ? [{ id: `${ref}-all`, name: 'API Load Balancer' }]
+                  : []
+                : []
+            }
+          />
         </div>
       ) : (
         <Button asChild type="default" onClick={onExploreClick}>

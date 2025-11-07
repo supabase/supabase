@@ -1,16 +1,22 @@
 import { useParams } from 'common'
-import { Button, IconCopy, Input } from 'ui'
+import { Button, Input, copyToClipboard } from 'ui'
 
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Copy } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
-import { copyToClipboard } from 'lib/helpers'
-import { useEffect, useState } from 'react'
 
-const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
+export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
-  const { data } = useProjectApiQuery({ projectRef: ref })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
+  const { data } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [copied, setCopied] = useState<'anon' | 'service'>()
 
@@ -18,9 +24,9 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
     if (copied !== undefined) setTimeout(() => setCopied(undefined), 2000)
   }, [copied])
 
-  const serviceKey = showKeys
-    ? data?.autoApiService.serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY'
-    : 'SUPABASE_CLIENT_SERVICE_KEY'
+  const { anonKey, serviceKey } = getKeys(apiKeys)
+  const anonApiKey = anonKey?.api_key
+  const serviceApiKey = serviceKey?.api_key ?? 'SUPABASE_CLIENT_SERVICE_KEY'
 
   return (
     <>
@@ -48,12 +54,21 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                 <Button
                   key="copy"
                   type="default"
-                  icon={<IconCopy />}
+                  icon={<Copy />}
                   onClick={() => {
                     setCopied('anon')
-                    copyToClipboard(
-                      data?.autoApiService.defaultApiKey ?? 'SUPABASE_CLIENT_ANON_KEY'
-                    )
+                    copyToClipboard(anonApiKey ?? 'SUPABASE_CLIENT_ANON_KEY')
+                    sendEvent({
+                      action: 'api_docs_code_copy_button_clicked',
+                      properties: {
+                        title: 'Client API key',
+                        selectedLanguage: language,
+                      },
+                      groups: {
+                        project: ref ?? 'Unknown',
+                        organization: org?.slug ?? 'Unknown',
+                      },
+                    })
                   }}
                 >
                   {copied === 'anon' ? 'Copied' : 'Copy'}
@@ -67,7 +82,11 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
               disabled
               readOnly
               size="small"
-              value={showKeys ? serviceKey : 'Reveal API keys via dropdown in the header'}
+              value={
+                showKeys
+                  ? serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY'
+                  : 'Reveal API keys via dropdown in the header'
+              }
               className="w-full"
               descriptionText={
                 <p>
@@ -79,12 +98,21 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                 <Button
                   key="copy"
                   type="default"
-                  icon={<IconCopy />}
+                  icon={<Copy />}
                   onClick={() => {
                     setCopied('service')
-                    copyToClipboard(
-                      data?.autoApiService.serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY'
-                    )
+                    copyToClipboard(serviceApiKey)
+                    sendEvent({
+                      action: 'api_docs_code_copy_button_clicked',
+                      properties: {
+                        title: 'Service key',
+                        selectedLanguage: language,
+                      },
+                      groups: {
+                        project: ref ?? 'Unknown',
+                        organization: org?.slug ?? 'Unknown',
+                      },
+                    })
                   }}
                 >
                   {copied === 'service' ? 'Copied' : 'Copy'}
@@ -104,12 +132,10 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
 
       <ContentSnippet
         selectedLanguage={language}
-        apikey={serviceKey}
+        apikey={showKeys ? serviceApiKey : 'SUPABASE_CLIENT_SERVICE_KEY'}
         endpoint={endpoint}
         snippet={DOCS_CONTENT.serviceApiKeys}
       />
     </>
   )
 }
-
-export default Introduction

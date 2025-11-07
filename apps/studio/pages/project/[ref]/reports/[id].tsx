@@ -1,17 +1,21 @@
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import Reports from 'components/interfaces/Reports/Reports'
-import { ReportsLayout } from 'components/layouts'
-import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => (
-  <>
-    <div className="mx-auto flex flex-col gap-4 p-3">
+  <div className="mx-auto flex flex-col gap-4 w-full flex-grow">
+    <ReportPadding>
       <Reports />
-    </div>
-    <EditReportModal />
-  </>
+    </ReportPadding>
+  </div>
 )
 
-PageLayout.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <ReportsLayout>{page}</ReportsLayout>
+  </DefaultLayout>
+)
 
 export default PageLayout

@@ -1,9 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { put } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { handleError, put } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { sslEnforcementKeys } from './keys'
 
 export type SSLEnforcementUpdateVariables = {
@@ -23,12 +22,13 @@ export async function updateSSLEnforcement({
 }: SSLEnforcementUpdateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = (await put(`${API_ADMIN_URL}/projects/${projectRef}/ssl-enforcement`, {
-    requestedConfig,
-  })) as SSLEnforcementUpdateResponse
-  if (response.error) throw response.error
+  const { data, error } = await put(`/v1/projects/{ref}/ssl-enforcement`, {
+    params: { path: { ref: projectRef } },
+    body: { requestedConfig },
+  })
 
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type SSLEnforcementUpdateData = Awaited<ReturnType<typeof updateSSLEnforcement>>
@@ -38,27 +38,25 @@ export const useSSLEnforcementUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>,
+  UseCustomMutationOptions<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>(
-    (vars) => updateSSLEnforcement(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(sslEnforcementKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update SSL enforcement: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>({
+    mutationFn: (vars) => updateSSLEnforcement(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: sslEnforcementKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update SSL enforcement: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -5,7 +5,6 @@ hideTitle: true
 ---
 
 <div className="flex items-start gap-6 not-prose" id="introduction">
-  <img src="/docs/img/icons/menu/reference-analytics.svg" className="w-8 h-8 rounded" />
   <div className="flex flex-col gap-2">
     <h1 className="text-3xl text-foreground m-0">Self-Hosting Analytics</h1>
   </div>
@@ -44,7 +43,7 @@ Two compose services are required: Logflare, and Vector. Logflare is the HTTP An
 
 Regardless of the backend chosen, the following environment variables **must** be set for the `supabase/logflare` docker image:
 
-- `LOGFLARE_SINGLE_TENANT_MODE=true`: The feature flag for enabling single tenant mode for Logflare. Must be set to `true`
+- `LOGFLARE_SINGLE_TENANT=true`: The feature flag for enabling single tenant mode for Logflare. Must be set to `true`
 - `LOGFLARE_SUPABASE_MODE=true`: The feature flag for seeding Supabase-related data. Must be set to `true`
 
 For all other configuration environment variables, please refer to the [Logflare self-hosting documentation](https://docs.logflare.app/self-hosting/#configuration).
@@ -173,6 +172,14 @@ The self-hosted example is only used as a minimal example on running the entire 
 The current Postgres Ingestion backend isn't optimized for production usage. We recommend using Big Query for more heavy use cases.
 
 **We recommend using the BigQuery backend for production environments as it offers better scaling and querying/debugging experiences.**
+
+### Rotate Encryption Keys Regularly
+
+The Logflare server uses the a Base64 encryption key set on the `LOGFLARE_DB_ENCRYPTION_KEY` environment variable to perform encryption at rest for sensitive database columns.
+
+To perform encryption key rotation, move the retired key to the `LOGFLARE_DB_ENCRYPTION_KEY_RETIRED` environment variable, and replace the `LOGFLARE_DB_ENCRYPTION_KEY` environement variable with the new key. Perform a server restart and check `info` logs for the migration to be detected and performed.
+
+Once migration is complete, you can safely remove the retired key.
 
   </RefSubLayout.Details>
 

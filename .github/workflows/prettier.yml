@@ -10,67 +10,80 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   format:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Check out repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           sparse-checkout: apps
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        name: Install pnpm
+        with:
+          run_install: false
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
-      # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
+          cache: 'pnpm'
       - name: Download dependencies
         run: |
-          rm package.json
-          rm package-lock.json
-          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+          pnpm install --frozen-lockfile
       - name: Run prettier
         run: |-
-          npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+          pnpm run test:prettier
 
   # i18n is not a node package, so we handle that one separately
   format-i18n:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Check out repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           sparse-checkout: |
             i18n
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        name: Install pnpm
+        with:
+          run_install: false
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
-      # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
+          cache: 'pnpm'
       - name: Download dependencies
         run: |
-          rm package.json
-          rm package-lock.json
-          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+          pnpm install --frozen-lockfile
       - name: Run prettier
         run: |-
-          npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+          pnpm exec prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
 
   format-sql:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Check out repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           sparse-checkout: |
             apps/docs/pages
             apps/docs/content
-      # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        name: Install pnpm
+        with:
+          run_install: false
+      - name: Setup node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
       - name: Download dependencies
         run: |
-          rm package.json
-          rm package-lock.json
-          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+          pnpm install --frozen-lockfile
       - name: Run prettier
         run: |-
           # Check mdx files which contain sql code blocks
-          grep -lr '```sql' apps/docs/{pages,content}/**/*.mdx | xargs npx prettier -c
+          grep -lr '```sql' apps/docs/{pages,content}/**/*.mdx | xargs pnpm exec prettier -c

@@ -1,183 +1,173 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
+import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { number, object } from 'yup'
+import { SetStateAction } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms'
+import { Markdown } from 'components/interfaces/Markdown'
+import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { Alert, Button, Form, InputNumber, Modal } from 'ui'
+import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useIsAwsNimbusCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useUrlState } from 'hooks/ui/useUrlState'
+import { DOCS_URL } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, InfoIcon } from 'ui'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
 }
 
 const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
   const { ref: projectRef } = useParams()
-  const { lastDatabaseResizeAt } = project ?? {}
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
 
-  const timeTillNextAvailableDatabaseResize =
-    lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
-  const isAbleToResizeDatabase = timeTillNextAvailableDatabaseResize <= 0
-  const formattedTimeTillNextAvailableResize =
-    timeTillNextAvailableDatabaseResize < 60
-      ? `${timeTillNextAvailableDatabaseResize} minute(s)`
-      : `${Math.floor(timeTillNextAvailableDatabaseResize / 60)} hours and ${
-          timeTillNextAvailableDatabaseResize % 60
-        } minute(s)`
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
+  const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
-  const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
-  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
+  const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
+  const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
+  const setShowIncreaseDiskSizeModal = (value: SetStateAction<boolean>) => {
+    const show = typeof value === 'function' ? value(showIncreaseDiskSizeModal) : value
+    setUrlParams({ show_increase_disk_size_modal: show ? 'true' : undefined })
+  }
+
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
+
+  const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
+      setShowIncreaseDiskSizeModal(false)
     },
   })
 
-  const { data: projectSubscriptionData } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
-    useProjectDiskResizeMutation({
-      onSuccess: (res, variables) => {
-        toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
-        setShowResetDbPass(false)
-      },
-    })
-
-  const confirmResetDbPass = async (values: { [prop: string]: any }) => {
-    if (!projectRef) return console.error('Project ref is required')
-    const volumeSize = values['new-disk-size']
-    updateProjectUsage({ projectRef, volumeSize })
-  }
-
   const currentDiskSize = project?.volumeSizeGb ?? 0
-  // to do, update with max_disk_volume_size_gb
-  const maxDiskSize = 200
 
-  const INITIAL_VALUES = {
-    'new-disk-size': currentDiskSize,
-  }
-
-  const diskSizeValidationSchema = object({
-    'new-disk-size': number()
-      .required('Please enter a GB amount you want to resize the disk up to.')
-      .moreThan(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
-      // to do, update with max_disk_volume_size_gb
-      .lessThan(Number(maxDiskSize), 'Must be no more than 200 GB'),
+  const { data } = useDatabaseSizeQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
   })
+  const databaseSizeBytesUsed = data ?? 0
 
   return (
     <div id="diskManagement">
-      <FormHeader title="Disk management" />
-      {projectSubscriptionData?.usage_billing_enabled === true ? (
+      <FormHeader title="Disk Management" />
+      {organization?.usage_billing_enabled === true ? (
         <div className="flex flex-col gap-3">
           <Panel className="!m-0">
             <Panel.Content>
-              <div className="grid grid-cols-1 items-center lg:grid-cols-3">
-                <div className="col-span-2 space-y-1">
+              <div>
+                <div>
                   {currentDiskSize && (
                     <span className="text-foreground-light flex gap-2 items-baseline">
-                      <span className="text-foreground">Current Disk Storage Size:</span>
-                      <span className="text-foreground text-xl">
-                        {currentDiskSize}
-                        <span className="text-foreground text-sm">GB</span>
-                      </span>
+                      <h4 className="text-foreground">Current Disk Storage</h4>
                     </span>
                   )}
-                  <p className="text-sm opacity-50">
-                    Supabase employs auto-scaling storage and allows for manual disk size
-                    adjustments when necessary
-                  </p>
-                </div>
-                <div className="flex items-end justify-end">
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button
+                  <div className="grid grid-cols-2 items-center">
+                    <p className="text-sm text-lighter max-w-lg">
+                      Supabase employs auto-scaling storage and allows for manual disk size
+                      adjustments when necessary
+                    </p>
+                    {!isAwsNimbus && (
+                      <ButtonTooltip
                         type="default"
+                        className="w-min ml-auto"
                         disabled={!canUpdateDiskSizeConfig || disabled}
-                        onClick={() => setShowResetDbPass(true)}
+                        onClick={() => setShowIncreaseDiskSizeModal(true)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canUpdateDiskSizeConfig
+                              ? 'You need additional permissions to increase the disk size'
+                              : undefined,
+                          },
+                        }}
                       >
                         Increase disk size
-                      </Button>
-                    </Tooltip.Trigger>
-                    {!canUpdateDiskSizeConfig && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                              'border border-background', //border
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              You need additional permissions to increase the disk size
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
+                      </ButtonTooltip>
                     )}
-                  </Tooltip.Root>
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-2 mt-12 items-start">
+                    <div className="col-span-4 grid grid-cols-2 gap-x-12 gap-y-4 items-start">
+                      <div className="grid gap-2 col-span-1">
+                        <h5>Space used</h5>
+                        <span className="text-lg">
+                          {formatBytes(databaseSizeBytesUsed, 2, 'GB')}
+                        </span>
+                      </div>
+                      <div className="grid gap-2 col-span-1">
+                        <h5>Total size</h5>
+                        <span className="text-lg">{currentDiskSize} GB</span>
+                      </div>
+
+                      {reportsAll && (
+                        <div className="col-span-2 mt-4">
+                          <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                            <Link
+                              href={`/project/${projectRef}/reports/database#database-size-report`}
+                            >
+                              View detailed summary
+                            </Link>
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="col-span-8">
+                      <Alert_Shadcn_>
+                        <Info size={16} />
+                        <AlertTitle_Shadcn_>Importing a lot of data?</AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          <Markdown
+                            className="max-w-full"
+                            content={`
+We auto-scale your disk as you need more storage, but can only do this once every 6 hours.
+If you upload more than 1.5x the current size of your storage, your database will go
+into read-only mode. If you know how big your database is going to be, you can
+manually increase the size here.
+
+Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk-management) and how to [free up storage space](${DOCS_URL}/guides/platform/database-size#vacuum-operations).
+`}
+                          />
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    </div>
+                  </div>
                 </div>
               </div>
             </Panel.Content>
           </Panel>
-          <Alert withIcon variant="info" title={'Importing a lot of data?'}>
-            <p className=" max-w-2xl">
-              We auto-scale your disk as you need more storage, but can only do this every 6 hours.
-              If you upload more than 1.5x the current size of your storage, your database will go
-              into read-only mode. If you know how big your database is going to be, you can
-              manually increase the size here.
-            </p>
-
-            <p className="mt-4">
-              Read more about{' '}
-              <a
-                className="underline"
-                href="https://supabase.com/docs/guides/platform/database-size#disk-management"
-              >
-                disk management
-              </a>
-              .
-            </p>
-          </Alert>
         </div>
       ) : (
-        <Alert
-          withIcon
-          variant="info"
-          title={
-            projectSubscriptionData?.plan?.id === 'free'
-              ? 'Disk size configuration is not available for projects on the Free plan'
-              : 'Disk size configuration is only available when disabling the spend cap.'
-          }
-          actions={
-            <Button asChild type="default">
-              <Link
-                href={`/org/${organization?.slug}/billing?panel=${
-                  projectSubscriptionData?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
-                }`}
-                target="_blank"
-              >
-                {projectSubscriptionData?.plan?.id === 'free'
-                  ? 'Upgrade subscription'
-                  : 'Disable spend cap'}
-              </Link>
-            </Button>
-          }
-        >
-          <div>
-            {projectSubscriptionData?.plan?.id === 'free' ? (
+        <Alert_Shadcn_>
+          <InfoIcon />
+          <AlertTitle_Shadcn_>
+            {organization?.plan?.id === 'free'
+              ? 'Disk size configuration is not available for projects on the Free Plan'
+              : 'Disk size configuration is only available when the spend cap has been disabled'}
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
+            {organization?.plan?.id === 'free' ? (
               <p>
                 If you are intending to use more than 500MB of disk space, then you will need to
-                upgrade to at least the Pro plan.
+                upgrade to at least the Pro Plan.
               </p>
             ) : (
               <p>
@@ -185,79 +175,25 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                 disable your spend cap.
               </p>
             )}
-          </div>
-        </Alert>
+            <Button asChild type="default" className="mt-3">
+              <Link
+                href={`/org/${organization?.slug}/billing?panel=${
+                  organization?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                }`}
+                target="_blank"
+              >
+                {organization?.plan?.id === 'free' ? 'Upgrade subscription' : 'Disable spend cap'}
+              </Link>
+            </Button>
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
       )}
 
-      <Modal
-        header={<h5 className="text-sm text-foreground">Increase Disk Storage Size</h5>}
-        size="medium"
-        visible={showResetDbPass}
+      <DiskSizeConfigurationModal
+        visible={showIncreaseDiskSizeModal}
         loading={isUpdatingDiskSize}
-        onCancel={() => setShowResetDbPass(false)}
-        hideFooter
-      >
-        <Form
-          name="disk-resize-form"
-          initialValues={INITIAL_VALUES}
-          validationSchema={diskSizeValidationSchema}
-          onSubmit={confirmResetDbPass}
-        >
-          {() =>
-            currentDiskSize >= maxDiskSize ? (
-              <>
-                <Alert withIcon variant="warning" title="Maximum manual disk size increase reached">
-                  You cannot manually expand the disk size any more than {maxDiskSize} GB. If you
-                  need more than this, contact us to learn more about the Enterprise plan.
-                </Alert>
-              </>
-            ) : (
-              <>
-                <Modal.Content>
-                  <div className="w-full space-y-4 py-6">
-                    <Alert
-                      withIcon
-                      variant={isAbleToResizeDatabase ? 'info' : 'warning'}
-                      title="This operation is only possible every 6 hours"
-                    >
-                      {isAbleToResizeDatabase
-                        ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
-                            'DD MMM YYYY, HH:mm (ZZ)'
-                          )}`
-                        : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
-                            'DD MMM YYYY, HH:mm (ZZ)'
-                          )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
-                    </Alert>
-                    <InputNumber
-                      required
-                      id="new-disk-size"
-                      label="New disk size"
-                      labelOptional="GB"
-                      disabled={!isAbleToResizeDatabase}
-                    />
-                  </div>
-                </Modal.Content>
-                <Modal.Separator />
-                <Modal.Content>
-                  <div className="flex space-x-2 justify-end pt-1 pb-3">
-                    <Button type="default" onClick={() => setShowResetDbPass(false)}>
-                      Cancel
-                    </Button>
-                    <Button
-                      htmlType="submit"
-                      type="primary"
-                      disabled={!isAbleToResizeDatabase || isUpdatingDiskSize}
-                      loading={isUpdatingDiskSize}
-                    >
-                      Update disk size
-                    </Button>
-                  </div>
-                </Modal.Content>
-              </>
-            )
-          }
-        </Form>
-      </Modal>
+        hideModal={setShowIncreaseDiskSizeModal}
+      />
     </div>
   )
 }

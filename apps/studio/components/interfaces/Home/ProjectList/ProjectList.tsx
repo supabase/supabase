@@ -1,144 +1,110 @@
-import { groupBy } from 'lodash'
-import Link from 'next/link'
+import { UIEvent, useMemo } from 'react'
 
+import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import {
-  OverdueInvoicesResponse,
-  useOverdueInvoicesQuery,
-} from 'data/invoices/invoices-overdue-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
-import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { makeRandomString } from 'lib/helpers'
-import type { Organization, ResponseError } from 'types'
-import { Button, IconPlus } from 'ui'
-import ProjectCard from './ProjectCard'
-import ShimmeringCard from './ShimmeringCard'
+import { isAtBottom } from 'lib/helpers'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
+import type { Organization } from 'types'
+import {
+  Card,
+  cn,
+  LoadingLine,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import {
+  LoadingCardView,
+  LoadingTableRow,
+  LoadingTableView,
+  NoFilterResults,
+  NoProjectsState,
+} from './EmptyStates'
+import { ProjectCard } from './ProjectCard'
+import { ProjectTableRow } from './ProjectTableRow'
+import { ShimmeringCard } from './ShimmeringCard'
 
 export interface ProjectListProps {
+  organization?: Organization
   rewriteHref?: (projectRef: string) => string
-  search: string
 }
 
-const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
-  const { data: organizations, isLoading, isSuccess } = useOrganizationsQuery()
+export const ProjectList = ({ organization: organization_, rewriteHref }: ProjectListProps) => {
+  const { slug: urlSlug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const [search] = useQueryState('search', parseAsString.withDefault(''))
+  const debouncedSearch = useDebounce(search, 500)
+
+  const [filterStatus, setFilterStatus] = useQueryState(
+    'status',
+    parseAsArrayOf(parseAsString, ',').withDefault([])
+  )
+  const [viewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
+
+  const organization = organization_ ?? selectedOrganization
+  const slug = organization?.slug ?? urlSlug
+
   const {
-    data: allProjects,
-    isLoading: isLoadingProjects,
-    isError: isErrorProjects,
+    data,
     error: projectsError,
-  } = useProjectsQuery()
+    isLoading: isLoadingProjects,
+    isSuccess: isSuccessProjects,
+    isError: isErrorProjects,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useOrgProjectsInfiniteQuery(
+    {
+      slug,
+      search: search.length === 0 ? search : debouncedSearch,
+      statuses: filterStatus,
+    },
+    {
+      keepPreviousData: true,
+    }
+  )
+  const orgProjects =
+    useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
+
   const {
     isLoading: _isLoadingPermissions,
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()
-  const { data: resourceWarnings } = useResourceWarningsQuery()
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
-  const projectsByOrg = groupBy(allProjects, 'organization_id')
-  const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
-  const noResults =
-    search.length > 0 &&
-    allProjects !== undefined &&
-    allProjects.filter((project) => {
-      return (
-        project.name.toLowerCase().includes(search.toLowerCase()) ||
-        project.ref.includes(search.toLowerCase())
-      )
-    }).length === 0
+  const { data: resourceWarnings } = useResourceWarningsQuery({ slug })
 
-  if (isLoading) {
-    return (
-      <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-        <ShimmeringCard />
-        <ShimmeringCard />
-      </ul>
-    )
-  }
-
-  if (noResults) {
-    return <NoSearchResults searchString={search} />
-  }
-
-  return isSuccess && organizations && organizations?.length > 0 ? (
-    <>
-      {organizations?.map((organization) => {
-        return (
-          <OrganizationProjects
-            key={organization.id}
-            organization={organization}
-            projects={projectsByOrg[organization.id]}
-            overdueInvoices={(allOverdueInvoices ?? []).filter(
-              (it) => it.organization_id === organization.id
-            )}
-            resourceWarnings={resourceWarnings ?? []}
-            rewriteHref={rewriteHref}
-            isLoadingPermissions={isLoadingPermissions}
-            isErrorPermissions={isErrorPermissions}
-            permissionsError={permissionsError}
-            isLoadingProjects={isLoadingProjects}
-            isErrorProjects={isErrorProjects}
-            projectsError={projectsError}
-            search={search}
-          />
-        )
-      })}
-    </>
-  ) : (
-    <NoProjectsState slug={''} />
-  )
-}
-
-export default ProjectList
-
-type OrganizationProjectsProps = {
-  organization: Organization
-  projects: ProjectInfo[]
-  overdueInvoices: OverdueInvoicesResponse[]
-  resourceWarnings: ResourceWarning[]
-  isLoadingPermissions: boolean
-  isErrorPermissions: boolean
-  permissionsError: ResponseError | null
-  isLoadingProjects: boolean
-  isErrorProjects: boolean
-  projectsError: ResponseError | null
-  rewriteHref?: (projectRef: string) => string
-  search: string
-}
-
-const OrganizationProjects = ({
-  organization,
-  projects,
-  overdueInvoices,
-  resourceWarnings,
-  isLoadingPermissions,
-  isErrorPermissions,
-  permissionsError,
-  isLoadingProjects,
-  isErrorProjects,
-  projectsError,
-  rewriteHref,
-  search,
-}: OrganizationProjectsProps) => {
-  const isEmpty = !projects || projects.length === 0
-  const sortedProjects = [...(projects || [])].sort((a, b) => a.name.localeCompare(b.name))
-  const filteredProjects =
-    search.length > 0
-      ? sortedProjects.filter((project) => {
-          return (
-            project.name.toLowerCase().includes(search.toLowerCase()) ||
-            project.ref.includes(search.toLowerCase())
-          )
-        })
-      : sortedProjects
-
+  // Move all hooks to the top to comply with Rules of Hooks
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: organization?.id })
+
+  const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
+
+  const isEmpty =
+    debouncedSearch.length === 0 &&
+    filterStatus.length === 0 &&
+    (!orgProjects || orgProjects.length === 0)
+  const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
+
+  const noResultsFromSearch =
+    debouncedSearch.length > 0 && isSuccessProjects && orgProjects.length === 0
+  const noResultsFromStatusFilter =
+    filterStatus.length > 0 && isSuccessProjects && orgProjects.length === 0
+
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
     added_by: {
@@ -159,102 +125,139 @@ const OrganizationProjects = ({
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
 
-  if (search.length > 0 && filteredProjects.length === 0) return null
+  const handleScroll = (event: UIEvent<HTMLDivElement | HTMLUListElement>) => {
+    if (isLoadingProjects || isFetchingNextPage || !isAtBottom(event)) return
+    fetchNextPage()
+  }
+
+  if (isErrorPermissions) {
+    return (
+      <AlertError
+        subject="Failed to retrieve permissions for your account"
+        error={permissionsError}
+      />
+    )
+  }
+
+  if (isErrorProjects) {
+    return (
+      <AlertError
+        subject={`Failed to retrieve projects under ${organization?.name}`}
+        error={projectsError}
+      />
+    )
+  }
+
+  if (isLoadingPermissions || isLoadingProjects || !organization) {
+    return viewMode === 'table' ? <LoadingTableView /> : <LoadingCardView />
+  }
+
+  if (isEmpty) {
+    return <NoProjectsState slug={organization?.slug ?? ''} />
+  }
+
+  if (viewMode === 'table') {
+    return (
+      <Card className="flex-1 min-h-0 overflow-y-auto mb-8" onScroll={handleScroll}>
+        <Table>
+          {/* [Joshen] Ideally we can figure out sticky table headers here */}
+          <TableHeader className="[&>tr>th]:sticky [&>tr>th]:top-0">
+            <TableRow>
+              <TableHead>Project</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Compute</TableHead>
+              <TableHead>Region</TableHead>
+              <TableHead>Created</TableHead>
+            </TableRow>
+            <TableRow className="!border-b-0">
+              <TableCell colSpan={5} className="p-0">
+                <LoadingLine loading={isFetching} />
+              </TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {noResultsFromStatusFilter ? (
+              <TableRow>
+                <TableCell colSpan={5} className="p-0">
+                  <NoFilterResults
+                    filterStatus={filterStatus}
+                    resetFilterStatus={() => setFilterStatus([])}
+                    className="border-0"
+                  />
+                </TableCell>
+              </TableRow>
+            ) : noResultsFromSearch ? (
+              <TableRow>
+                <TableCell colSpan={5} className="p-0">
+                  <NoSearchResults searchString={search} className="border-0" />
+                </TableCell>
+              </TableRow>
+            ) : (
+              <>
+                {sortedProjects?.map((project) => (
+                  <ProjectTableRow
+                    key={project.ref}
+                    project={project}
+                    organization={organization}
+                    rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+                    resourceWarnings={resourceWarnings?.find(
+                      (resourceWarning) => resourceWarning.project === project.ref
+                    )}
+                    githubIntegration={githubConnections?.find(
+                      (connection) => connection.supabase_project_ref === project.ref
+                    )}
+                    vercelIntegration={vercelConnections?.find(
+                      (connection) => connection.supabase_project_ref === project.ref
+                    )}
+                  />
+                ))}
+                {hasNextPage && <LoadingTableRow />}
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+    )
+  }
 
   return (
-    <div className="space-y-3" key={organization.id}>
-      <div className="flex space-x-4 items-center">
-        <h4 className="text-lg flex items-center">{organization.name}</h4>
-
-        {!!overdueInvoices.length && (
-          <div>
-            <Button asChild type="danger">
-              <Link href={`/org/${organization.slug}/invoices`}>Outstanding Invoices</Link>
-            </Button>
-          </div>
-        )}
-        {organization?.restriction_status === 'grace_period' && (
-          <div>
-            <Button asChild type="warning">
-              <Link href={`/org/${organization.slug}/billing`}>Grace Period</Link>
-            </Button>
-          </div>
-        )}
-        {organization?.restriction_status === 'grace_period_over' && (
-          <div>
-            <Button asChild type="warning">
-              <Link href={`/org/${organization.slug}/billing`}>Grace Period Over</Link>
-            </Button>
-          </div>
-        )}
-        {organization?.restriction_status === 'restricted' && (
-          <div>
-            <Button asChild type="danger">
-              <Link href={`/org/${organization.slug}/billing`}>Services Restricted</Link>
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {isLoadingPermissions || isLoadingProjects ? (
-        <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          <ShimmeringCard />
-          <ShimmeringCard />
-        </ul>
+    <>
+      {noResultsFromStatusFilter ? (
+        <NoFilterResults
+          filterStatus={filterStatus}
+          resetFilterStatus={() => setFilterStatus([])}
+        />
+      ) : noResultsFromSearch ? (
+        <NoSearchResults searchString={search} />
       ) : (
-        <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {isErrorPermissions ? (
-            <div className="col-span-3">
-              <AlertError
-                subject="Failed to retrieve permissions for your account"
-                error={permissionsError}
-              />
-            </div>
-          ) : isErrorProjects ? (
-            <div className="col-span-3">
-              <AlertError
-                subject={`Failed to retrieve projects under ${name}`}
-                error={projectsError}
-              />
-            </div>
-          ) : isEmpty ? (
-            <NoProjectsState slug={organization.slug} />
-          ) : (
-            filteredProjects?.map((project) => (
-              <ProjectCard
-                key={makeRandomString(5)}
-                project={project}
-                rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
-                resourceWarnings={resourceWarnings.find(
-                  (resourceWarning) => resourceWarning.project === project.ref
-                )}
-                githubIntegration={githubConnections?.find(
-                  (connection) => connection.supabase_project_ref === project.ref
-                )}
-                vercelIntegration={vercelConnections?.find(
-                  (connection) => connection.supabase_project_ref === project.ref
-                )}
-              />
-            ))
+        <ul
+          onScroll={handleScroll}
+          className={cn(
+            'min-h-0 w-full mx-auto overflow-y-auto',
+            'grid grid-cols-1 gap-2 md:gap-4',
+            'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 pb-6'
           )}
+        >
+          {sortedProjects?.map((project) => (
+            <ProjectCard
+              key={project.ref}
+              slug={slug}
+              project={project}
+              rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+              resourceWarnings={resourceWarnings?.find(
+                (resourceWarning) => resourceWarning.project === project.ref
+              )}
+              githubIntegration={githubConnections?.find(
+                (connection) => connection.supabase_project_ref === project.ref
+              )}
+              vercelIntegration={vercelConnections?.find(
+                (connection) => connection.supabase_project_ref === project.ref
+              )}
+            />
+          ))}
+          {hasNextPage && [...Array(2)].map((_, i) => <ShimmeringCard key={i} />)}
         </ul>
       )}
-    </div>
-  )
-}
-
-const NoProjectsState = ({ slug }: { slug: string }) => {
-  return (
-    <div className="col-span-4 space-y-4 rounded-lg border border-dashed p-6 text-center">
-      <div className="space-y-1">
-        <p>No projects</p>
-        <p className="text-sm text-foreground-light">Get started by creating a new project.</p>
-      </div>
-      <div>
-        <Button asChild icon={<IconPlus />}>
-          <Link href={`/new/${slug}`}>New Project</Link>
-        </Button>
-      </div>
-    </div>
+    </>
   )
 }

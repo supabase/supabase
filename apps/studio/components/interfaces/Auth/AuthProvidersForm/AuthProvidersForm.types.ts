@@ -8,6 +8,7 @@ export interface Provider {
   $schema: string
   type: 'object'
   title: string
+  link: string
   properties: {
     [x: string]: {
       title: string
@@ -21,6 +22,8 @@ export interface Provider {
       descriptionOptional?: string
       units?: string
       isSecret?: boolean
+      isPaid?: boolean
+      link?: string
     }
   }
   validationSchema: any // todo: use Yup type

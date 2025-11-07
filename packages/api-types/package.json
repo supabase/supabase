@@ -1,0 +1,19 @@
+{
+  "name": "api-types",
+  "version": "0.0.0",
+  "description": "Types shared between Supabase apps and packages",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules",
+    "codegen": "openapi-typescript --redocly ./redocly.yaml --alphabetize --default-non-nullable=false && prettier --cache --write types/*.d.ts"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "openapi-typescript": "^7.4.3",
+    "prettier": "3.2.4",
+    "typescript": "catalog:"
+  }
+}

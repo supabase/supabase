@@ -1,18 +1,17 @@
-import React from 'react'
+import { NextSeo } from 'next-seo'
+import { useTheme } from 'next-themes'
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
-
-import { data as pageData } from '../data/ga'
-
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '../components/Layouts/SectionContainer'
+import React from 'react'
 import ReactMarkdown from 'react-markdown'
-import Image from 'next/image'
+
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import DefaultLayout from '~/components/Layouts/Default'
 import ImageGrid from '../components/ImageGrid'
-import { useTheme } from 'next-themes'
-import { ExpandableVideo } from 'ui-patterns'
+import SectionContainer from '../components/Layouts/SectionContainer'
+import { data as pageData } from '../data/ga'
 
 const ParagraphSection = dynamic(() => import('~/components/Sections/ParagraphSection'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))

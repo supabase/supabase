@@ -1,0 +1,118 @@
+---
+title: Icons
+description: Icons make actions and navigation across Supabase easier.
+---
+
+## Principles
+
+1. Paired: Icons should accompany text, as they aren’t often obvious enough on their own.
+2. Clear: Icons should be legible at small sizes and unembellished. Let the text do the heavy lifting.
+3. Consistent: Use the same icons for similar actions throughout Supabase. This makes the app easier to use.
+
+## Tints
+
+Use classes just like you would for [text](color-usage#text) to tint icons. For example:
+
+```jsx
+<BucketAdd className="text-foreground-muted" />
+```
+
+Just like text, don’t tint icons with `text-destructive` for destructive actions. There should be a confirmation dialog right after which can handle the destructive styling.
+
+## UI icons
+
+We rely on [Lucide](https://lucide.dev/icons/) for any standard UI icon needs.
+
+## Custom icons
+
+Create and use custom icons when Lucide doesn’t have the icon you need. Tap on an icon below to copy the JSX, SVG, or import path.
+
+<Icons />
+
+### Usage
+
+```jsx
+import { ReplaceCode, InsertCode, BucketAdd } from 'icons'
+
+function app() {
+  return (
+    <>
+      <ReplaceCode className="text-light" strokeWidth={1} size={16} />
+      <InsertCode className="text-light" strokeWidth={1} size={16} />
+      <BucketAdd size={24} className="text-foreground-muted" />
+    </>
+  )
+}
+```
+
+**Default props**: All icons have `strokeWidth={2}` and `size={24}` by default. Override these props as needed for your use case.
+
+### Adding new custom icons
+
+To add a new custom icon to the Supabase icon library:
+
+1. **Create SVG file**: Add your SVG file to `packages/icons/src/raw-icons/` with a kebab-case name (e.g., `my-new-icon.svg`). Make sure it has follows these exact requirements:
+
+   - Exported at 24x24px with `viewBox="0 0 24 24"`
+   - Uses `stroke="currentColor"` for strokes (no hardcoded colors)
+   - Uses `fill="none"` for fills (no hardcoded colors)
+   - Icon content is optically centered and around 18x18px within the 24x24 frame
+   - Any unnecessary elements like `<clipPath>`, `<defs>`, and `<g>` wrappers have been removed
+   - SVG structure is as simple as possible with just `<path>` elements
+
+Just leave attributes like `stroke-width` as they are. The conversion to camel-case (for React compatibility) is handled by the below build process.
+
+2. **Build the component**: Run `npm run build:icons` from inside the `packages/icons` directory
+
+3. **Use the icon**: Import and use like any other icon:
+
+   ```jsx
+   import { MyNewIcon } from 'icons'
+   ;<MyNewIcon size={16} strokeWidth={1} />
+   ```
+
+### SVG design guidelines
+
+Icons should:
+
+- Always be exported 24x24px
+- Have an icon inside that frame that’s around 18x18px(ish)
+- Use clean, simple paths without unnecessary wrapper elements
+
+#### Bad example ❌
+
+Notice the hardcoded colors, unnecessary backgrounds, and complex structure:
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="24" fill="#1E1E1E" /> <!-- ❌ Hardcoded color -->
+  <path d="M..." fill="#404040" /> <!-- ❌ Hardcoded color -->
+  <path d="M..." stroke="#EDEDED" stroke-linecap="round" /> <!-- ❌ Hardcoded color -->
+</svg>
+```
+
+#### Good example ✅
+
+Clean structure with `currentColor` and proper attributes:
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 7C6 4.2 8.2 2 11 2H13C15.8 2 18 4.2 18 7" />
+  <path d="M4.5 11H19.5" />
+  <path d="M6 11L6.8 20C6.9 21.1 7.9 22 9 22H12" />
+</svg>
+```
+
+{/* This is still wrong: */}
+
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path d="M6 7C6 4.2 8.2 2 11 2H13C15.8 2 18 4.2 18 7" />
+  <path d="M4.5 11H19.5" />
+  <path d="M6 11L6.8 20C6.9 21.1 7.9 22 9 22H12" />
+</svg>
+```
+
+### Troubleshooting
+
+If your SVG specifies `stroke-width` attributes, they will override the component's `strokeWidth` prop. Remove stroke attributes from individual paths to let the component control them.

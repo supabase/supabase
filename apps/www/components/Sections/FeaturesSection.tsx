@@ -1,10 +1,11 @@
-import Link from 'next/link'
-import React, { useRef, ReactNode } from 'react'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
+import { ReactNode, useRef } from 'react'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import { Button, cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { Button, IconArrowUpRight, cn } from 'ui'
 
 interface Feature {
   icon: string
@@ -49,7 +50,7 @@ const FeaturesSection = ({
               </h2>
               <p className="text-lighter mb-4">{paragraph}</p>
               {cta && (
-                <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
+                <Button asChild type="default" size="small" icon={<ArrowUpRight />}>
                   <Link href={cta.link}>{cta.label ?? 'Explore documentation'}</Link>
                 </Button>
               )}

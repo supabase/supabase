@@ -1,0 +1,256 @@
+---
+title: 'Build a Personalized AI Assistant with Postgres'
+description: 'Learn how to build a Supabase powered AI assistant that combines PostgreSQL with scheduling and external tools for long-term memory, structured data management and autonomous actions.'
+categories:
+  - product
+tags:
+  - postgres
+  - ai
+  - personal-assistant
+date: '2025-06-25:00:00'
+toc_depth: 3
+author: saxon_fletcher
+image: 2025-06-10-natural-db/og.png
+thumb: 2025-06-10-natural-db/thumb.png
+---
+
+Large Language Models are excellent at transforming unstructured text into structured data, but they face challenges when it comes to accurately retrieving that data over extended conversations. In this post, we'll leverage this core strength and combine it with Postgres, along with several complementary tools, to build a personalized AI assistant capable of long-term memory retention.
+
+At a high level, the system's flexibility is created by combining these core building blocks: An LLM owned database schema through an execute_sql tool, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for extended actions that may integrate with external tools.
+
+See it at work in the video below.
+
+<video className="rounded-sm m-0" autoPlay playsInline loop muted allowfullscreen>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/natural-db/natural-db-demo-combined.mp4"
+    type="video/mp4"
+  />
+</video>
+
+## Core Pieces
+
+### Scoped Database Control
+
+The assistant uses a dedicated Postgres schema called `memories` to store all of its structured data. To ensure security, the LLM operates under a specific role, `memories_role`, which is granted permissions only within this schema.
+
+- **Scoped Schema**: The LLM can create tables, store data, and perform operations exclusively within the `memories` schema by calling an execute_sql tool
+- **System Table Protection**: All other schemas, including `public`, are inaccessible to the LLM.
+
+### Messages Context
+
+Three complementary memory types maintain conversation continuity:
+
+- **Message History (Short-term Memory)**: Maintains a chronological list of recent messages for immediate context
+- **Semantic Memory (Vector Search using pgvector)**: Stores conversation embeddings using pgvector for fuzzy concept retrieval ("that productivity thing we talked about last month")
+- **Structured Memory (SQL Data)**: Stores concrete facts in LLM-created tables for precise queries ("How much did I spend on coffee last quarter?")
+
+### Scheduled Prompts
+
+The system achieves autonomy through scheduled prompts which are powered by pg_cron through a dedicated tool. Scheduled prompts call the same edge functions as a normal prompt via pg_net and can therefore use all the same tools.
+
+**Example**: "Every Sunday at 6 PM, analyze my portfolio performance and research market trends"
+
+1.  A cron job executes the prompt every Sunday at 6 PM.
+2.  The LLM retrieves data from relevant tables in your memories schema, like current portfolio holdings.
+3.  Web search is triggered to find relevant market news and competitor analysis based on data
+4.  Web search results are transformed into structured data and stored in your database
+5.  Sends a personalized email report using Zapier MCP.
+6.  Future queries like "How has my portfolio performed compared to market trends?" references this data
+
+### Web Search
+
+The system leverages built-in web search capabilities from LLMs like OpenAI's web search tool to access real-time information and current events.
+
+```sql
+-- Auto-generated from web search results
+CREATE TABLE research_findings (
+  topic TEXT,
+  source_url TEXT,
+  key_insights TEXT[],
+  credibility_score INTEGER,
+  search_date TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Zapier MCP Integration
+
+Through Zapier's MCP integration, your assistant can:
+
+- Read/send emails (Gmail)
+- Manage calendar events
+- Update spreadsheets
+- Send notifications (Slack, Discord, SMS)
+- Create tasks (Trello, Asana, Notion)
+- Control smart home devices
+
+### Input/Output Integration
+
+The system uses a Telegram Bot as the default interface which calls an edge function via webhook. You can change this to whatever interface you want, for example a web page, voice or other.
+
+### Self-Evolving System Prompt
+
+The assistant maintains two behavioral layers:
+
+- **Base Behavior**: Core functionality (database operations, scheduling, web search) remains consistent via a constant system prompt
+- **Personalized Behavior**: Communication style and preferences that evolve based on user feedback which can be changed via a dedicated tool and stored in a public.system_prompts table
+
+When you say "be more formal" or "address me by name," these preferences are stored with version history and persist across all conversations, creating a personalized experience.
+
+## Use Cases
+
+### Run Tracking
+
+![Run tracking dashboard showing activity history and statistics](/images/blog/2025-06-10-natural-db/runs.png)
+
+**Prompt**: "Help me track my daily runs by sending me a reminder each morning with details on my previous days run"
+
+1. LLM creates a `runs` table to store distance, duration, route, weather conditions, and personal notes for each run
+2. LLM also creates a cron job that fires daily
+3. Every morning a scheduled prompt is sent which triggers the LLM to query the runs table and send off a run reminder via Telegram with details
+4. User submits run details via Telegram which is stored in the runs table
+5. Opportunity for a monthly cron job that summaries running patterns, highlight achievements, and suggest training adjustments based on progress
+
+### Personal Recipe & Meal Planning
+
+**Prompt**: "Help me track my meals and suggest recipes based on what I have in my kitchen"
+
+1. LLM creates `recipes`, `ingredients`, `meal_history`, and `meal_ratings` tables to store cooking experiences, dietary preferences, and meal satisfaction
+2. LLM also creates a cron job that fires daily
+3. Every morning a scheduled prompt is sent which triggers the LLM to query the meal_history table and suggest recipes based on available ingredients via Telegram
+4. User submits meal details and ratings via Telegram which is stored in the meal_history and meal_ratings tables
+5. Opportunity for a weekly cron job that analyzes cooking patterns, suggests grocery lists, and recommends new recipes based on preferences
+
+### Company Feedback Analysis
+
+**Prompt**: "Help me track customer feedback by analyzing support tickets daily and giving me weekly summaries"
+
+1. LLM creates a `feedback` table to store ticket analysis, themes, sentiment scores, and product areas
+2. LLM also creates a cron job that fires daily
+3. Every morning a scheduled prompt is sent which triggers the LLM to fetch new tickets via MCP, analyze them, and store findings in the feedback table
+4. User receives daily feedback alerts via Telegram with key insights and ticket summaries
+5. Opportunity for a weekly cron job that generates comprehensive feedback reports, highlighting trends and actionable insights
+
+### Interest-Based Article Bookmarker
+
+**Prompt**: "Help me track interesting articles about AI and climate change, reminding me of important ones I haven't read"
+
+1. LLM creates an `articles` table to store article metadata, read status, relevance scores, and user interests
+2. LLM also creates a cron job that fires daily
+3. Every morning a scheduled prompt is sent which triggers the LLM to search for new articles via web search, analyze relevance, and store them in the articles table
+4. User receives daily article recommendations via Telegram with personalized reading suggestions
+5. Opportunity for a weekly cron job that summarizes reading patterns, highlights must-read articles, and suggests new topics based on interests
+
+## Implementation Guide
+
+### Prerequisites
+
+- Supabase account (free tier sufficient)
+- OpenAI API key
+- Telegram bot token
+- Zapier account (optional)
+
+### Optional: Using the CLI
+
+If you prefer the command line, you can use the Supabase CLI to set up your database and Edge Functions. This replaces **Step 1** and **Step 2**.
+
+1.  **Clone the repository**.
+    ```bash
+    git clone https://github.com/supabase-community/natural-db.git
+    cd natural-db
+    ```
+2.  **Log in to the Supabase CLI and link your project**.
+    Create a new project on the [Supabase Dashboard](https://supabase.com/dashboard), then run:
+    ```bash
+    supabase login
+    supabase link --project-ref <YOUR-PROJECT-ID>
+    ```
+3.  **Push the database schema**.
+    ```bash
+    supabase db push
+    ```
+4.  **Deploy Edge Functions**.
+    ```bash
+    supabase functions deploy --no-verify-jwt
+    ```
+
+After completing these steps, you can proceed to **Step 3: Telegram Bot**.
+
+### Step 1: Database Setup
+
+Run the migration SQL in your Supabase SQL editor: [migration.sql](https://github.com/supabase-community/natural-db/blob/main/supabase/migrations/001_create_initial_schema.sql)
+
+- Sets up required extensions like `pgvector` and `pg_cron`.
+- Creates the `memories` schema for the assistant's data.
+- Creates the `memories_role` with scoped permissions to the `memories` schema.
+- Configures cron job scheduling.
+
+### Step 2: Edge Functions
+
+Create three functions in Supabase dashboard:
+
+**natural-db**: Main AI brain handling all processing, database operations, scheduling, and tool integration
+
+- [natural-db/index.ts](https://github.com/supabase-community/natural-db/blob/main/supabase/functions/natural-db/index.ts)
+- [natural-db/db-utils.ts](https://github.com/supabase-community/natural-db/blob/main/supabase/functions/natural-db/db-utils.ts)
+- [natural-db/tools.ts](https://github.com/supabase-community/natural-db/blob/main/supabase/functions/natural-db/tools.ts)
+
+**telegram-input**: Webhook handler for incoming messages with user validation and timezone management
+
+- [telegram-input/index.ts](https://github.com/supabase-community/natural-db/blob/main/supabase/functions/telegram-input/index.ts)
+
+**telegram-outgoing**: Response formatter and delivery handler with error management
+
+- [telegram-outgoing/index.ts](https://github.com/supabase-community/natural-db/blob/main/supabase/functions/telegram-outgoing/index.ts)
+
+### Step 3: Telegram Bot
+
+1. Create bot via [@BotFather](https://t.me/botfather)
+2. Set webhook: `https://api.telegram.org/bot[TOKEN]/setWebhook?url=https://[PROJECT].supabase.co/functions/v1/telegram-input`
+
+### Step 4: Environment Variables
+
+Set the following environment variables in your Supabase project settings (Project Settings → Edge Functions):
+
+##### Required Variables:
+
+- `OPENAI_API_KEY`: Your OpenAI API key
+- `TELEGRAM_BOT_TOKEN`: Bot token from @BotFather
+- `ALLOWED_USERNAMES`: Comma-separated list of allowed Telegram usernames
+- `TELEGRAM_WEBHOOK_SECRET`: Secret token for webhook validation
+
+##### Optional Variables:
+
+- `OPENAI_MODEL`: OpenAI model to use (defaults to "gpt-4.1-mini")
+- `ZAPIER_MCP_URL`: MCP server URL for Zapier integrations
+
+### Step 5: Test Integration
+
+Try these commands with your bot:
+
+- "Store my grocery budget as $400 monthly"
+- "What's the weather today?" (web search)
+- "Remind me to exercise every Monday at 7 AM"
+- "Be more enthusiastic when I discuss hobbies" (personality)
+
+## Cost Considerations
+
+Based on 10 messages per day (300 messages/month):
+
+- **Supabase**: Free tier (500MB database, 5GB bandwidth) - $0/month
+- **OpenAI GPT-4.1-mini**: $0.40 per 1M input tokens, $1.60 per 1M output tokens
+  - Average 1200 input + 800 output tokens per message
+  - Input: 300 messages × 1200 tokens × $0.40/1M = $0.144/month
+  - Output: 300 messages × 800 tokens × $1.60/1M = $0.384/month
+  - Total OpenAI: $0.53/month
+- **Telegram**: Free API usage
+- **Zapier**: Free tier (300 tasks/month) - $0/month
+- **Vector Embeddings**: $0.02 per 1M tokens (text-embedding-3-small)
+  - 300 messages × 1200 tokens × $0.02/1M = $0.0072/month
+
+**Total monthly cost: ~$0.54**
+
+## Make it your own
+
+This project showcases how combining modular components—with LLMs as just one piece—can create systems that are greater than the sum of their parts. I hope this inspires you to build and deploy your own personalized AI assistant while maintaining full control over your code and data. For additional inspiration, check out [this excellent post by Geoffrey Litt](https://www.geoffreylitt.com/2025/04/12/how-i-made-a-useful-ai-assistant-with-one-sqlite-table-and-a-handful-of-cron-jobs).
+
+Ready to build your own AI assistant? Check out the [GitHub repository](https://github.com/supabase-community/natural-db) to get started, contribute improvements, or share your own use cases.

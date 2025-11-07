@@ -1,25 +1,11 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
+import { ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Checkbox,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconPlus,
-  Input,
-  SidePanel,
-  Toggle,
-} from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { useParams } from 'common'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import {
   CONSTRAINT_TYPE,
   Constraint,
@@ -30,8 +16,11 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import type { Dictionary } from 'types'
+import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -47,15 +36,15 @@ import {
   generateColumnFieldFromPostgresColumn,
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
+  getPlaceholderText,
   validateFields,
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
-import toast from 'react-hot-toast'
 
 export interface ColumnEditorProps {
-  column?: PostgresColumn
+  column?: Readonly<PostgresColumn>
   selectedTable: PostgresTable
   visible: boolean
   closePanel: () => void
@@ -82,25 +71,28 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  const [placeholder, setPlaceholder] = useState(
+    getPlaceholderText(columnFields?.format, columnFields?.name)
+  )
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const enumTypes = (types ?? []).filter(
-    (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+    (type) => !protectedSchemas.find((s) => s.name === type.schema)
   )
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: selectedTable?.schema,
-    table: selectedTable?.name,
+    id: selectedTable?.id,
   })
   const primaryKey = (constraints ?? []).find(
     (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
@@ -128,7 +120,7 @@ const ColumnEditor = ({
       setErrors({})
       const columnFields = isNewRecord
         ? generateColumnField({ schema: selectedTable.schema, table: selectedTable.name })
-        : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
+        : generateColumnFieldFromPostgresColumn(column, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
       setFkRelations(formatForeignKeys(foreignKeys))
     }
@@ -142,7 +134,30 @@ const ColumnEditor = ({
       changes.defaultValue = null
     }
 
-    const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
+    const changedName = 'name' in changes && changes.name !== columnFields.name
+    const changedFormat = 'format' in changes && changes.format !== columnFields.format
+
+    if (
+      changedName &&
+      fkRelations.find((fk) => fk.columns.find(({ source }) => source === columnFields?.name))
+    ) {
+      setFkRelations(
+        fkRelations.map((relation) => ({
+          ...relation,
+          columns: relation.columns.map((col) =>
+            col.source === columnFields?.name ? { ...col, source: changes.name! } : col
+          ),
+        }))
+      )
+    }
+
+    if (changedName || changedFormat) {
+      setPlaceholder(
+        getPlaceholderText(changes.format || columnFields.format, changes.name || columnFields.name)
+      )
+    }
+
+    const updatedColumnFields: ColumnField = { ...columnFields, ...changes }
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
 
@@ -160,7 +175,7 @@ const ColumnEditor = ({
 
       if (isEmpty(errors)) {
         const payload = isNewRecord
-          ? generateCreateColumnPayload(selectedTable.id, columnFields)
+          ? generateCreateColumnPayload(selectedTable, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
         const configuration = {
           columnId: column?.id,
@@ -221,12 +236,7 @@ const ColumnEditor = ({
             className="lg:!col-span-4"
             description={
               <div className="space-y-2">
-                <Button
-                  asChild
-                  type="default"
-                  size="tiny"
-                  icon={<IconPlus size={14} strokeWidth={2} />}
-                >
+                <Button asChild type="default" size="tiny" icon={<Plus strokeWidth={2} />}>
                   <Link href={`/project/${ref}/database/types`} target="_blank" rel="noreferrer">
                     Create enum types
                   </Link>
@@ -235,10 +245,10 @@ const ColumnEditor = ({
                   asChild
                   type="default"
                   size="tiny"
-                  icon={<IconExternalLink size={14} strokeWidth={2} />}
+                  icon={<ExternalLink size={14} strokeWidth={2} />}
                 >
                   <Link
-                    href="https://supabase.com/docs/guides/database/tables#data-types"
+                    href={`${DOCS_URL}/guides/database/tables#data-types`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -304,7 +314,9 @@ const ColumnEditor = ({
           />
         </FormSectionContent>
       </FormSection>
+
       <SidePanel.Separator />
+
       <FormSection
         header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
       >
@@ -313,7 +325,13 @@ const ColumnEditor = ({
             column={columnFields}
             relations={fkRelations}
             closePanel={closePanel}
-            onUpdateColumnType={(format: string) => onUpdateField({ format, defaultValue: null })}
+            onUpdateColumnType={(format: string) => {
+              if (format[0] === '_') {
+                onUpdateField({ format: format.slice(1), isArray: true, isIdentity: false })
+              } else {
+                onUpdateField({ format })
+              }
+            }}
             onUpdateFkRelations={setFkRelations}
           />
         </FormSectionContent>
@@ -344,7 +362,7 @@ const ColumnEditor = ({
           <Input
             label="CHECK Constraint"
             labelOptional="Optional"
-            placeholder={`e.g length(${columnFields?.name || 'column_name'}) < 500`}
+            placeholder={placeholder}
             type="text"
             value={columnFields?.check ?? ''}
             onChange={(event: any) => onUpdateField({ check: event.target.value })}
@@ -352,74 +370,6 @@ const ColumnEditor = ({
           />
         </FormSectionContent>
       </FormSection>
-
-      {isNewRecord && (
-        <>
-          <SidePanel.Separator />
-          <FormSection
-            header={<FormSectionLabel className="lg:!col-span-4">Security</FormSectionLabel>}
-          >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
-              <Alert_Shadcn_>
-                <IconAlertCircle />
-                <AlertTitle_Shadcn_>
-                  Column encryption has been removed from the GUI
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p className="!leading-normal">
-                    You may still encrypt new columns through the SQL editor using{' '}
-                    <Link
-                      href={`/project/${ref}/database/extensions?filter=pgsodium`}
-                      className="text-brand hover:underline"
-                    >
-                      pgsodium's
-                    </Link>{' '}
-                    Transparent Column Encryption (TCE).
-                  </p>
-                  <Button asChild type="default" icon={<IconExternalLink />} className="mt-2">
-                    <Link
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://github.com/orgs/supabase/discussions/18849"
-                    >
-                      Learn more
-                    </Link>
-                  </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            </FormSectionContent>
-          </FormSection>
-          <SidePanel.Separator />
-
-          {/* TODO: need to pull column privileges in here
-          if any columns are using column-level privileges, show this warning */}
-          <FormSection
-            header={
-              <FormSectionLabel className="lg:!col-span-4">Column privileges</FormSectionLabel>
-            }
-          >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
-              <Alert_Shadcn_ variant="warning">
-                <IconAlertTriangle strokeWidth={2} />
-                <AlertTitle_Shadcn_>This table uses column-privileges</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p>
-                    Several columns in this table have column-level privileges. This new column will
-                    have privileges set to on by default.
-                  </p>
-                  <p className="mt-3">
-                    <Link href={`/project/${ref}/database/privileges`} passHref>
-                      <Button asChild type="default" size="tiny">
-                        <a>Column-level privileges</a>
-                      </Button>
-                    </Link>
-                  </p>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            </FormSectionContent>
-          </FormSection>
-        </>
-      )}
     </SidePanel>
   )
 }

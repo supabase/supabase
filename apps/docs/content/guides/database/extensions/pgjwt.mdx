@@ -4,7 +4,15 @@ title: 'pgjwt: JSON Web Tokens'
 description: 'Encode and decode JWTs in PostgreSQL'
 ---
 
-The [`pgjwt`](https://github.com/michelp/pgjwt) (PostgreSQL JSON Web Token) extension allows you to create and parse [JSON Web Tokens (JWTs)](https://en.wikipedia.org/wiki/JSON_Web_Token) within a PostgreSQL database. JWTs are commonly used for authentication and authorization in web applications and services.
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+
+<Admonition type="deprecation">
+
+The `pgjwt` extension is deprecated in projects using Postgres 17. It continues to be supported in projects using Postgres 15, but will need to dropped before those projects are upgraded to Postgres 17. See the [Upgrading to Postgres 17 notes](/docs/guides/platform/upgrading#upgrading-to-postgres-17) for more information.
+
+</Admonition>
+
+The [`pgjwt`](https://github.com/michelp/pgjwt) (Postgres JSON Web Token) extension allows you to create and parse [JSON Web Tokens (JWTs)](https://en.wikipedia.org/wiki/JSON_Web_Token) within a Postgres database. JWTs are commonly used for authentication and authorization in web applications and services.
 
 ## Enable the extension
 
@@ -17,7 +25,7 @@ The [`pgjwt`](https://github.com/michelp/pgjwt) (PostgreSQL JSON Web Token) exte
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for `pgjwt` and enable the extension.
 

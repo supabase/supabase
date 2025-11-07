@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import { toast } from 'react-hot-toast'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainReverifyVariables = {
@@ -14,7 +14,7 @@ export async function reverifyCustomDomain({ projectRef }: CustomDomainReverifyV
     params: { path: { ref: projectRef } },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -25,27 +25,25 @@ export const useCustomDomainReverifyMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CustomDomainReverifyData, ResponseError, CustomDomainReverifyVariables>,
+  UseCustomMutationOptions<CustomDomainReverifyData, ResponseError, CustomDomainReverifyVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CustomDomainReverifyData, ResponseError, CustomDomainReverifyVariables>(
-    (vars) => reverifyCustomDomain(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(customDomainKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to reverify custom domain: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<CustomDomainReverifyData, ResponseError, CustomDomainReverifyVariables>({
+    mutationFn: (vars) => reverifyCustomDomain(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: customDomainKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to reverify custom domain: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

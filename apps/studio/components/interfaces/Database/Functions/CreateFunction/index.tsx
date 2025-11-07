@@ -1,19 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresFunction } from '@supabase/postgres-meta'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
-import { useEffect, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
-import z from 'zod'
 import { Plus, Trash } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import z from 'zod'
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
+import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -25,8 +25,8 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Modal,
   Radio,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
@@ -34,7 +34,6 @@ import {
   Select_Shadcn_,
   Separator,
   Sheet,
-  ScrollArea,
   SheetContent,
   SheetFooter,
   SheetSection,
@@ -50,9 +49,10 @@ import { FunctionEditor } from './FunctionEditor'
 const FORM_ID = 'create-function-sidepanel'
 
 interface CreateFunctionProps {
-  func?: PostgresFunction
+  func?: DatabaseFunction
+  isDuplicating?: boolean
   visible: boolean
-  setVisible: (value: boolean) => void
+  onClose: () => void
 }
 
 const FormSchema = z.object({
@@ -60,7 +60,7 @@ const FormSchema = z.object({
   schema: z.string().trim().min(1),
   args: z.array(z.object({ name: z.string().trim().min(1), type: z.string().trim() })),
   behavior: z.enum(['IMMUTABLE', 'STABLE', 'VOLATILE']),
-  definition: z.string().trim(),
+  definition: z.string().trim().min(1),
   language: z.string().trim(),
   return_type: z.string().trim(),
   security_definer: z.boolean(),
@@ -69,19 +69,23 @@ const FormSchema = z.object({
     .optional(),
 })
 
-const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
-  const { project } = useProjectContext()
+export const CreateFunction = ({
+  func,
+  visible,
+  isDuplicating = false,
+  onClose,
+}: CreateFunctionProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
-  // For now, there's no AI assistant for functions
-  const [assistantVisible, setAssistantVisible] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
-  const isEditing = !!func?.id
+  const isEditing = !isDuplicating && !!func?.id
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
+  const language = form.watch('language')
 
   const { mutate: createDatabaseFunction, isLoading: isCreating } =
     useDatabaseFunctionCreateMutation()
@@ -89,7 +93,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     useDatabaseFunctionUpdateMutation()
 
   function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
+    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
@@ -103,7 +107,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     if (isEditing) {
       updateDatabaseFunction(
         {
-          id: func.id,
+          func,
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
@@ -111,7 +115,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully updated function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -125,7 +129,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully created function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -134,6 +138,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
 
   useEffect(() => {
     if (visible) {
+      setFocusedEditor(false)
       form.reset({
         name: func?.name ?? '',
         schema: func?.schema ?? 'public',
@@ -148,23 +153,17 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     }
   }, [visible, func])
 
+  const { data: protectedSchemas } = useProtectedSchemas()
+
   return (
     <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
       <SheetContent
         showClose={false}
-        size={assistantVisible ? 'lg' : 'default'}
-        className={cn(
-          // 'bg-surface-200',
-          'p-0 flex flex-row gap-0',
-          assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
-        )}
+        size={'default'}
+        className={'p-0 flex flex-row gap-0 !min-w-screen lg:!min-w-[600px]'}
       >
-        <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
-          <CreateFunctionHeader
-            selectedFunction={func?.name}
-            assistantVisible={assistantVisible}
-            setAssistantVisible={setAssistantVisible}
-          />
+        <div className="flex flex-col grow w-full">
+          <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
           <Separator />
           <Form_Shadcn_ {...form}>
             <form
@@ -183,7 +182,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       layout="horizontal"
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} />
+                        <Input_Shadcn_ {...field} placeholder="Name of function" />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -202,8 +201,9 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     >
                       <FormControl_Shadcn_>
                         <SchemaSelector
+                          portal={false}
                           selectedSchemaName={field.value}
-                          excludedSchemas={EXCLUDED_SCHEMAS}
+                          excludedSchemas={protectedSchemas?.map((s) => s.name)}
                           size="small"
                           onSelectSchema={(name) => field.onChange(name)}
                         />
@@ -255,7 +255,9 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                           Definition
                         </FormLabel_Shadcn_>
                         <FormDescription_Shadcn_ className="text-sm text-foreground-light">
-                          <p>The language below should be written in `plpgsql`.</p>
+                          <p>
+                            The language below should be written in <code>{language}</code>.
+                          </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription_Shadcn_>
                       </div>
@@ -267,12 +269,13 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       >
                         <FunctionEditor
                           field={field}
+                          language={language}
                           focused={focusedEditor}
                           setFocused={setFocusedEditor}
                         />
                       </div>
 
-                      <FormMessage_Shadcn_ />
+                      <FormMessage_Shadcn_ className="px-content" />
                     </FormItem_Shadcn_>
                   )}
                 />
@@ -394,15 +397,10 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               disabled={isCreating || isUpdating}
               loading={isCreating || isUpdating}
             >
-              Confirm
+              {isEditing ? 'Save' : 'Create'} function
             </Button>
           </SheetFooter>
         </div>
-        {assistantVisible ? (
-          <div className="border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10 w-[50%] bg-studio">
-            {/* This is where the AI assistant would be added */}
-          </div>
-        ) : null}
         <ConfirmationModal
           visible={isClosingPanel}
           title="Discard changes"
@@ -410,7 +408,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
           onCancel={() => setIsClosingPanel(false)}
           onConfirm={() => {
             setIsClosingPanel(false)
-            setVisible(!visible)
+            onClose()
           }}
         >
           <p className="text-sm text-foreground-light">
@@ -422,8 +420,6 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     </Sheet>
   )
 }
-
-export default CreateFunction
 
 interface FormFieldConfigParamsProps {
   readonly?: boolean
@@ -591,15 +587,32 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
   )
 }
 
+const ALL_ALLOWED_LANGUAGES = ['plpgsql', 'sql', 'plcoffee', 'plv8', 'plls']
+
 const FormFieldLanguage = () => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
-  const { data } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: enabledExtensions } = useDatabaseExtensionsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      select(data) {
+        return partition(data, (ext) => !isNull(ext.installed_version))[0]
+      },
+    }
+  )
 
-  const [enabledExtensions] = partition(data ?? [], (ext) => !isNull(ext.installed_version))
+  const allowedLanguages = useMemo(() => {
+    return ALL_ALLOWED_LANGUAGES.filter((lang) => {
+      if (lang.startsWith('pl')) {
+        return enabledExtensions?.find((ex) => ex.name === lang) !== undefined
+      }
+
+      return true
+    })
+  }, [enabledExtensions])
 
   return (
     <FormField_Shadcn_
@@ -612,15 +625,11 @@ const FormFieldLanguage = () => {
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
-              {enabledExtensions
-                .filter((ex) => {
-                  return ex.name.startsWith('pl')
-                })
-                .map((option) => (
-                  <SelectItem_Shadcn_ value={option.name} key={option.name}>
-                    {option.name}
-                  </SelectItem_Shadcn_>
-                ))}
+              {allowedLanguages.map((option) => (
+                <SelectItem_Shadcn_ value={option} key={option}>
+                  {option}
+                </SelectItem_Shadcn_>
+              ))}
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
         </FormItemLayout>

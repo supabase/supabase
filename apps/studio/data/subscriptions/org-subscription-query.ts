@@ -1,7 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
+
+import { get, handleError } from 'data/fetchers'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { subscriptionKeys } from './keys'
-import type { ResponseError } from 'types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
@@ -18,7 +21,7 @@ export async function getOrgSubscription(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -30,13 +33,25 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrgSubscriptionData, OrgSubscriptionError, TData> = {}
-) =>
-  useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>(
-    subscriptionKeys.orgSubscription(orgSlug),
-    ({ signal }) => getOrgSubscription({ orgSlug }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined',
-      ...options,
-    }
+  }: UseCustomQueryOptions<OrgSubscriptionData, OrgSubscriptionError, TData> = {}
+) => {
+  // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
+  // unnecessary requests, although this behaviour still needs handling on the UI
+  const { can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
   )
+
+  return useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>({
+    queryKey: subscriptionKeys.orgSubscription(orgSlug),
+    queryFn: ({ signal }) => getOrgSubscription({ orgSlug }, signal),
+    enabled: enabled && canReadSubscriptions && typeof orgSlug !== 'undefined',
+    staleTime: 60 * 60 * 1000,
+    ...options,
+  })
+}
+
+export const useHasAccessToProjectLevelPermissions = (slug: string) => {
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  return subscription?.plan.id === 'enterprise' || subscription?.plan.id === 'team'
+}

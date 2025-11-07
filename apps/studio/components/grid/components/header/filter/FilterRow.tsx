@@ -1,12 +1,13 @@
+import { ChevronDown, X } from 'lucide-react'
 import { KeyboardEvent, memo } from 'react'
-import { Button, IconChevronDown, IconX, Input } from 'ui'
 
-import { DropdownControl } from 'components/grid/components/common'
-import type { Filter, FilterOperator, SupaTable } from 'components/grid/types'
+import { DropdownControl } from 'components/grid/components/common/DropdownControl'
+import type { Filter, FilterOperator } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Button, Input } from 'ui'
 import { FilterOperatorOptions } from './Filter.constants'
 
 export interface FilterRowProps {
-  table: SupaTable
   filterIdx: number
   filter: Filter
   onChange: (index: number, filter: Filter) => void
@@ -14,10 +15,11 @@ export interface FilterRowProps {
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void
 }
 
-const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
-  const column = table.columns.find((x) => x.name === filter.column)
+const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+  const column = snap.table.columns.find((x) => x.name === filter.column)
   const columnOptions =
-    table.columns?.map((x) => {
+    snap.table.columns?.map((x) => {
       return { value: x.name, label: x.name, postLabel: x.dataType }
     }) || []
 
@@ -29,7 +31,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
         : 'Enter a value'
 
   return (
-    <div className="sb-grid-filter-row px-3">
+    <div className="flex w-full items-center justify-between gap-x-1 px-3">
       <DropdownControl
         align="start"
         options={columnOptions}
@@ -40,7 +42,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
           type="outline"
           icon={
             <div className="text-foreground-lighter">
-              <IconChevronDown strokeWidth={1.5} size={14} />
+              <ChevronDown strokeWidth={1.5} />
             </div>
           }
           className="w-32 justify-start"
@@ -63,7 +65,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
           type="outline"
           icon={
             <div className="text-foreground-lighter">
-              <IconChevronDown strokeWidth={1.5} size={14} />
+              <ChevronDown strokeWidth={1.5} />
             </div>
           }
         >
@@ -84,9 +86,9 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
         onKeyDown={onKeyDown}
       />
       <Button
-        icon={<IconX strokeWidth={1.5} size={14} />}
-        size="tiny"
         type="text"
+        className="px-1"
+        icon={<X strokeWidth={1.5} />}
         onClick={() => onDelete(filterIdx)}
       />
     </div>

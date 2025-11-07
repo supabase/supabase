@@ -1,5 +1,7 @@
-import { snakeCase } from 'lodash'
 import { IS_PLATFORM } from 'lib/constants'
+import { snakeCase } from 'lodash'
+import type { IncomingHttpHeaders } from 'node:http'
+import z from 'zod'
 
 /**
  * Construct headers for api request.
@@ -13,6 +15,7 @@ export function constructHeaders(headers: { [prop: string]: any }) {
     const cleansedHeaders = {
       Accept: headers.Accept,
       Authorization: headers.Authorization,
+      cookie: headers.cookie,
       'Content-Type': headers['Content-Type'],
       'x-connection-encrypted': headers['x-connection-encrypted'],
     } as any
@@ -65,4 +68,54 @@ export const toSnakeCase = (object) => {
   } else {
     return object
   }
+}
+
+/**
+ * Converts Node.js `IncomingHttpHeaders` to Fetch API `Headers`.
+ */
+export function fromNodeHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
+  const headers = new Headers()
+  for (const [key, value] of Object.entries(nodeHeaders)) {
+    if (Array.isArray(value)) {
+      value.forEach((v) => headers.append(key, v))
+    } else if (value !== undefined) {
+      headers.append(key, value)
+    }
+  }
+  return headers
+}
+
+/**
+ * Zod transformer to parse boolean values from strings.
+ *
+ * Use when accepting a boolean value in a query parameter.
+ */
+export function zBooleanString(errorMsg?: string) {
+  return z.string().transform((value, ctx) => {
+    if (value === 'true') {
+      return true
+    }
+
+    if (value === 'false') {
+      return false
+    }
+
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: errorMsg || 'must be a boolean string',
+    })
+    return z.NEVER
+  })
+}
+
+/**
+ * Transform a comma-separated string into an array of strings.
+ *
+ * Use when accepting a list of values in a query parameter.
+ */
+export function commaSeparatedStringIntoArray(value: string): string[] {
+  return value
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean)
 }

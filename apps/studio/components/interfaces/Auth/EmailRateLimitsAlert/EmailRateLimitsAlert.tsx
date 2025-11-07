@@ -1,23 +1,30 @@
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertTriangle } from 'ui'
+import Link from 'next/link'
+
+import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 export function EmailRateLimitsAlert() {
+  const { ref } = useParams()
+
   return (
-    <Alert_Shadcn_ variant="warning">
-      <IconAlertTriangle strokeWidth={2} />
-      <AlertTitle_Shadcn_>Built-in email service is rate-limited!</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
-        You're using the built-in email service. The service has rate limits and it's not meant to
-        be used for production apps. Check the{' '}
-        <a
-          href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits"
-          className="underline"
-          target="_blank"
-        >
-          documentation
-        </a>{' '}
-        for an up-to-date information on the current rate limits. Please use a custom SMTP server if
-        you're planning on having large number of users.
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+    <Admonition
+      type="warning"
+      title="Set up custom SMTP"
+      className="bg-warning-200 border-warning-400"
+    >
+      <p>
+        You’re using the built-in email service. This service has rate limits and is not meant to be
+        used for production apps.{' '}
+        <InlineLink href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}>
+          Learn more
+        </InlineLink>{' '}
+      </p>
+      <Button asChild type="default" className="mt-2">
+        <Link href={`/project/${ref}/auth/smtp`}>Set up SMTP</Link>
+      </Button>
+    </Admonition>
   )
 }

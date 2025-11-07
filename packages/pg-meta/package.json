@@ -5,12 +5,27 @@
   "author": "Supabase",
   "main": "./src/index.ts",
   "repository": "supabase/supabase",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules",
+    "test": "run-s db:clean db:run test:run db:clean",
+    "db:clean": "cd test/db && docker compose down",
+    "db:run": "cd test/db && docker compose up --detach --wait",
+    "test:run": "vitest run --coverage",
+    "test:update": "vitest run --update",
+    "lint": "tsc --noEmit"
+  },
   "dependencies": {
-    "pg-format": "^1.0.4",
-    "zod": "^3.22.4"
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/pg-format": "^1.0.1",
-    "typescript": "^5.4.3"
+    "@types/pg": "^8.11.11",
+    "@vitest/coverage-v8": "^3.2.0",
+    "npm-run-all": "^4.1.5",
+    "pg": "^8.13.1",
+    "postgres-array": "^3.0.2",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }

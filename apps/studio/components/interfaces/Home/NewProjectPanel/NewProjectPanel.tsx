@@ -1,16 +1,18 @@
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import SVG from 'react-inlinesvg'
-import { Button, IconActivity, IconArchive, IconCode, IconExternalLink, IconKey } from 'ui'
 
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
-import { useIsFeatureEnabled } from 'hooks'
-import APIKeys from './APIKeys'
-import GetStartedHero from './GetStartedHero'
+import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
+import { DOCS_URL } from 'lib/constants'
+import { Button } from 'ui'
+import { APIKeys } from './APIKeys'
+import { GetStartedHero } from './GetStartedHero'
 
-const NewProjectPanel = () => {
-  const router = useRouter()
-  const { ref } = router.query
+export const NewProjectPanel = () => {
+  const { ref } = useParams()
 
   const {
     projectAuthAll: authEnabled,
@@ -21,10 +23,10 @@ const NewProjectPanel = () => {
   return (
     <div className="grid grid-cols-12 gap-4 lg:gap-20">
       <div className="col-span-12">
-        <div className="flex flex-col space-y-20">
+        <div className="flex flex-col space-y-12 md:space-y-20">
           <div className="flex h-full flex-col justify-between">
             <div className="space-y-2">
-              <h3 className="text-xl text-foreground">Welcome to your new project</h3>
+              <h2>Welcome to your new project</h2>
               <p className="text-base text-foreground-light">
                 Your project has been deployed on its own instance, with its own API all set up and
                 ready to use.
@@ -35,9 +37,7 @@ const NewProjectPanel = () => {
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 flex flex-col justify-center space-y-8 lg:col-span-7">
               <div className="space-y-2">
-                <h3 className="text-xl text-foreground">
-                  Get started by building out your database
-                </h3>
+                <h2>Get started by building out your database</h2>
                 <p className="text-base text-foreground-light">
                   Start building your app by creating tables and inserting data. Our Table Editor
                   makes Postgres as easy to use as a spreadsheet, but there's also our SQL Editor if
@@ -45,42 +45,14 @@ const NewProjectPanel = () => {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  asChild
-                  type="default"
-                  icon={
-                    <SVG
-                      src={`${router.basePath}/img/table-editor.svg`}
-                      style={{ width: `${14}px`, height: `${14}px` }}
-                      preProcessor={(code) =>
-                        code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                      }
-                    />
-                  }
-                >
-                  <Link href={`/project/${ref}/editor`}>Table Editor</Link>
+                <Button asChild type="default" icon={<TableEditor strokeWidth={1.5} />}>
+                  <EditorIndexPageLink projectRef={ref}>Table Editor</EditorIndexPageLink>
                 </Button>
-                <Button
-                  asChild
-                  type="default"
-                  icon={
-                    <SVG
-                      src={`${router.basePath}/img/sql-editor.svg`}
-                      style={{ width: `${14}px`, height: `${14}px` }}
-                      preProcessor={(code) =>
-                        code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                      }
-                    />
-                  }
-                >
-                  <Link href={`/project/${ref}/sql/new`}>SQL editor</Link>
+                <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
+                  <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
-                <Button asChild type="default" icon={<IconExternalLink size={14} />}>
-                  <Link
-                    href="https://supabase.com/docs/guides/database"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                <Button asChild type="default" icon={<ExternalLink />}>
+                  <Link href={`${DOCS_URL}/guides/database`} target="_blank" rel="noreferrer">
                     About Database
                   </Link>
                 </Button>
@@ -94,7 +66,7 @@ const NewProjectPanel = () => {
           {authEnabled && edgeFunctionsEnabled && storageEnabled && (
             <div className="flex h-full flex-col justify-between space-y-6">
               <div className="max-w-2xl space-y-2">
-                <h3 className="text-xl text-foreground">Explore our other products</h3>
+                <h2>Explore our other products</h2>
                 <p className="text-base text-foreground-light">
                   Supabase provides all the backend features you need to build a product. You can
                   use it completely, or just the features you need.
@@ -105,7 +77,7 @@ const NewProjectPanel = () => {
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
                       <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                        <IconKey strokeWidth={2} size={16} />
+                        <Auth size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Authentication</h5>
                     </div>
@@ -121,15 +93,11 @@ const NewProjectPanel = () => {
 
                       <Button
                         className="translate-y-[1px]"
-                        icon={<IconExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
-                        <Link
-                          href="https://supabase.com/docs/guides/auth"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <Link href={`${DOCS_URL}/guides/auth`} target="_blank" rel="noreferrer">
                           About Auth
                         </Link>
                       </Button>
@@ -141,7 +109,7 @@ const NewProjectPanel = () => {
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
                       <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                        <IconArchive strokeWidth={2} size={16} />
+                        <Storage size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Storage</h5>
                     </div>
@@ -157,15 +125,11 @@ const NewProjectPanel = () => {
 
                       <Button
                         className="translate-y-[1px]"
-                        icon={<IconExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
-                        <Link
-                          href="https://supabase.com/docs/guides/storage"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <Link href={`${DOCS_URL}/guides/storage`} target="_blank" rel="noreferrer">
                           About Storage
                         </Link>
                       </Button>
@@ -177,7 +141,7 @@ const NewProjectPanel = () => {
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
                       <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                        <IconCode strokeWidth={2} size={16} />
+                        <EdgeFunctions size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Edge Functions</h5>
                     </div>
@@ -193,12 +157,12 @@ const NewProjectPanel = () => {
                       </Button>
                       <Button
                         className="translate-y-[1px]"
-                        icon={<IconExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
                         <Link
-                          href="https://supabase.com/docs/guides/functions"
+                          href={`${DOCS_URL}/guides/functions`}
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -212,7 +176,7 @@ const NewProjectPanel = () => {
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-4">
                       <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                        <IconActivity strokeWidth={2} size={16} />
+                        <Realtime size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Realtime</h5>
                     </div>
@@ -222,17 +186,16 @@ const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
+                      <Button type="default" asChild>
+                        <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
+                      </Button>
                       <Button
                         className="translate-y-[1px]"
-                        icon={<IconExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
-                        <Link
-                          href="https://supabase.com/docs/guides/realtime"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <Link href={`${DOCS_URL}/guides/realtime`} target="_blank" rel="noreferrer">
                           About Realtime
                         </Link>
                       </Button>
@@ -248,10 +211,10 @@ const NewProjectPanel = () => {
       <div className="col-span-12 lg:col-span-4">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h3 className="text-xl text-foreground">Connecting to your new project</h3>
+            <h2>Connecting to your new project</h2>
             <p className="text-base text-foreground-light lg:max-w-sm">
               Interact with your database through the{' '}
-              <Link href="https://supabase.com/docs/reference" className="text-brand">
+              <Link href={`${DOCS_URL}/reference`} className="text-brand">
                 Supabase client libraries
               </Link>{' '}
               with your API keys.
@@ -265,17 +228,8 @@ const NewProjectPanel = () => {
             <Button asChild type="default">
               <Link href={`/project/${ref}/settings/api`}>View API settings</Link>
             </Button>
-            <Button
-              asChild
-              className="translate-y-[1px]"
-              type="default"
-              icon={<IconExternalLink />}
-            >
-              <Link
-                href="https://supabase.com/docs/guides/database/api"
-                target="_blank"
-                rel="noreferrer"
-              >
+            <Button asChild className="translate-y-[1px]" type="default" icon={<ExternalLink />}>
+              <Link href={`${DOCS_URL}/guides/database/api`} target="_blank" rel="noreferrer">
                 About APIs
               </Link>
             </Button>
@@ -288,5 +242,3 @@ const NewProjectPanel = () => {
     </div>
   )
 }
-
-export default NewProjectPanel

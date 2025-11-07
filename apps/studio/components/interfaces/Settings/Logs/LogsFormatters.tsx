@@ -5,10 +5,11 @@
  */
 
 import CopyButton from 'components/ui/CopyButton'
-import dayjs from 'dayjs'
 import React from 'react'
-import { IconAlertCircle, IconInfo } from 'ui'
-import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
+import { AlertCircle, Info } from 'lucide-react'
+import dayjs from 'dayjs'
+import { cn } from 'ui'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -30,20 +31,20 @@ export const SelectionDetailedRow = ({
   valueRender?: React.ReactNode
 }) => {
   return (
-    <div className="grid grid-cols-12 group">
+    <div className="group flex items-center gap-2 flex-wrap">
       <span className="text-foreground-lighter text-sm col-span-3 whitespace-pre-wrap">
         {label}
       </span>
       <span
         title={value}
-        className="truncate text-foreground text-sm col-span-8 whitespace-pre-wrap break-all"
+        className="truncate font-mono text-foreground text-sm whitespace-pre-wrap break-all"
       >
         {valueRender ?? value}
       </span>
       <CopyButton
         iconOnly
         text={value}
-        className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6 col-span-1"
+        className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6"
         type="text"
         title="Copy to clipboard"
       />
@@ -55,9 +56,13 @@ export const SelectionDetailedRow = ({
 export const TextFormatter: React.FC<{ className?: string; value: string }> = ({
   value,
   className,
-}) => <span className={'font-mono text-xs truncate ' + className}>{value}</span>
+}) => (
+  <span className={cn('font-mono text-xs truncate select-text cursor-text', className)}>
+    {value}
+  </span>
+)
 
-export const ResponseCodeFormatter = ({ value }: any) => {
+export const ResponseCodeFormatter = ({ value }: { value: string }) => {
   if (!value) {
     return (
       <div>
@@ -66,66 +71,49 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     )
   }
 
+  const ResponseCodeItem = ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode
+    className?: string
+  }) => (
+    <div className="flex h-full items-center">
+      <div
+        className={cn(
+          `relative flex h-6 items-center rounded-md justify-center px-2 py-1 text-center`,
+          className
+        )}
+      >
+        <label className="block font-mono text-sm">{children}</label>
+      </div>
+    </div>
+  )
+
   const split = value.toString().split('')[0]
 
   switch (split) {
     // 2XX || 1XX responses
     case '1':
+      return <ResponseCodeItem>{value}</ResponseCodeItem>
     case '2':
-      return (
-        <div className="flex h-full items-center">
-          <div className="relative flex h-6 items-center justify-center rounded border bg-surface-200 px-2 py-1 text-center">
-            <label className="block font-mono text-sm text-foreground-lighter">{value}</label>
-          </div>
-        </div>
-      )
-      break
+      return <ResponseCodeItem className="bg-surface-100 text-brand">{value}</ResponseCodeItem>
     // 5XX responses
     case '5':
-      return (
-        <div className="flex h-full items-center">
-          <div
-            className="relative flex h-6 items-center justify-center rounded bg-red-400 px-2 py-1
-            text-center
+      return <ResponseCodeItem className="bg-red-300 text-red-1100">{value}</ResponseCodeItem>
 
-            "
-          >
-            <label className="block font-mono text-sm text-red-1100">{value}</label>
-          </div>
-        </div>
-      )
-      break
     // 4XX || 3XX responses
     case '4':
     case '3':
-      return (
-        <div className="flex h-full items-center">
-          <div
-            className="relative flex h-6 items-center justify-center rounded bg-amber-400 px-2 py-1
-            text-center
+      return <ResponseCodeItem className="bg-amber-300 text-amber-1100">{value}</ResponseCodeItem>
 
-            "
-          >
-            <label className="block font-mono text-sm text-amber-1100">{value}</label>
-          </div>
-        </div>
-      )
-      break
     // All other responses
     default:
       return (
-        <div className="flex h-full items-center">
-          <div
-            className="relative flex h-6 items-center justify-center rounded bg-surface-100 px-2 py-1
-            text-center
-
-            "
-          >
-            <label className="block font-mono text-sm text-foreground-lighter">{value}</label>
-          </div>
-        </div>
+        <ResponseCodeItem className="bg-surface-100 text-foreground-lighter">
+          {value}
+        </ResponseCodeItem>
       )
-      break
   }
 }
 
@@ -165,7 +153,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-red-900">
-            <IconAlertCircle size={14} strokeWidth={2} />
+            <AlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-red-900 !block titlecase">{text}</span>
         </Layout>
@@ -178,7 +166,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
-            <IconAlertCircle size={14} strokeWidth={2} />
+            <AlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-blue-900 !block titlecase">{text}</span>
         </Layout>
@@ -189,7 +177,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
-            <IconInfo size={14} strokeWidth={2} />
+            <Info size={14} strokeWidth={2} />
           </div>
           <span className="!text-blue-900 !block titlecase">{text}</span>
         </Layout>
@@ -200,7 +188,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded !text-amber-900">
-            <IconAlertCircle size={14} strokeWidth={2} />
+            <AlertCircle size={14} strokeWidth={2} />
           </div>
           <span className="!text-amber-900 !block titlecase">{text}</span>
         </Layout>
@@ -220,26 +208,6 @@ export const SeverityFormatter = ({
   }
 }
 
-/**
- * Formats a timestamp into a local timestamp display
- *
- * Accepts either unix microsecond or iso timestamp.
- * For LogTable column rendering
- */
-export const TimestampLocalFormatter = ({
-  value,
-  className,
-}: {
-  className?: string
-  value: string | number
-}) => {
-  return <span className={`text-xs ${className}`}>{timestampLocalFormatter(value)}</span>
-}
-
-/**
- * Formats a string to local timestamp display
- * Accepts unix microsecond or iso timestamp
- */
 export const timestampLocalFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
   return dayjs(timestamp).format('DD MMM  HH:mm:ss')

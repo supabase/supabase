@@ -1,28 +1,40 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { AnalyticsData } from './constants'
+
+import { get, handleError } from 'data/fetchers'
+import type { AnalyticsData, AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
+
+export type InfraMonitoringAttribute =
+  | 'max_cpu_usage'
+  | 'avg_cpu_usage'
+  | 'disk_io_budget'
+  | 'ram_usage'
+  | 'disk_io_consumption'
+  | 'pg_stat_database_num_backends'
+  | 'supavisor_connections_active'
 
 export type InfraMonitoringVariables = {
   projectRef?: string
-  attribute:
-    | 'max_cpu_usage'
-    | 'avg_cpu_usage'
-    | 'disk_io_budget'
-    | 'ram_usage'
-    | 'disk_io_consumption'
-    | 'swap_usage'
+  attribute: InfraMonitoringAttribute
   startDate?: string
   endDate?: string
-  interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+  interval?: AnalyticsInterval
   dateFormat?: string
+  databaseIdentifier?: string
   modifier?: (x: number) => number
 }
 
 export async function getInfraMonitoring(
-  { projectRef, attribute, startDate, endDate, interval = '1d' }: InfraMonitoringVariables,
+  {
+    projectRef,
+    attribute,
+    startDate,
+    endDate,
+    interval = '1h',
+    databaseIdentifier,
+  }: InfraMonitoringVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -30,15 +42,22 @@ export async function getInfraMonitoring(
   if (!startDate) throw new Error('Start date is required')
   if (!endDate) throw new Error('End date is required')
 
-  const data = await get(
-    `${API_URL}/projects/${projectRef}/infra-monitoring?attribute=${attribute}&startDate=${encodeURIComponent(
-      startDate
-    )}&endDate=${encodeURIComponent(endDate)}&interval=${interval}`,
-    { signal }
-  )
+  const { data, error } = await get('/platform/projects/{ref}/infra-monitoring', {
+    params: {
+      path: { ref: projectRef },
+      query: {
+        attribute,
+        startDate,
+        endDate,
+        interval,
+        databaseIdentifier,
+      },
+    },
+    signal,
+  })
 
-  if (data.error) throw data.error
-  return data as AnalyticsData
+  if (error) handleError(error)
+  return data as unknown as AnalyticsData
 }
 
 export type InfraMonitoringData = Awaited<ReturnType<typeof getInfraMonitoring>>
@@ -50,40 +69,48 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
     attribute,
     startDate,
     endDate,
-    interval = '1d',
-    dateFormat = 'DD MMM',
+    interval = '1h',
+    dateFormat = 'HH:mm DD MMM',
+    databaseIdentifier,
     modifier,
   }: InfraMonitoringVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
+  }: UseCustomQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
 ) =>
-  useQuery<InfraMonitoringData, InfraMonitoringError, TData>(
-    analyticsKeys.infraMonitoring(projectRef, { attribute, startDate, endDate, interval }),
-    ({ signal }) =>
-      getInfraMonitoring({ projectRef, attribute, startDate, endDate, interval }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof attribute !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined',
-      select(data) {
-        return {
-          ...data,
-          data: data.data.map((x) => {
-            return {
-              ...x,
-              [attribute]:
-                modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-              periodStartFormatted: dayjs(x.period_start).format(dateFormat),
-            }
-          }),
-        } as TData
-      },
-      staleTime: 1000 * 60, // default good for a minute
-      ...options,
-    }
-  )
+  useQuery<InfraMonitoringData, InfraMonitoringError, TData>({
+    queryKey: analyticsKeys.infraMonitoring(projectRef, {
+      attribute,
+      startDate,
+      endDate,
+      interval,
+      databaseIdentifier,
+    }),
+    queryFn: ({ signal }) =>
+      getInfraMonitoring(
+        { projectRef, attribute, startDate, endDate, interval, databaseIdentifier },
+        signal
+      ),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof attribute !== 'undefined' &&
+      typeof startDate !== 'undefined' &&
+      typeof endDate !== 'undefined',
+    select(data) {
+      return {
+        ...data,
+        data: data.data.map((x) => {
+          return {
+            ...x,
+            [attribute]:
+              modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
+            periodStartFormatted: dayjs(x.period_start).format(dateFormat),
+          }
+        }),
+      } as TData
+    },
+    staleTime: 1000 * 60,
+    ...options,
+  })

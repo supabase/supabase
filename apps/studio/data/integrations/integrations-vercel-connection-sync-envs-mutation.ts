@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type IntegrationsVercelConnectionSyncEnvsVariables = {
   connectionId: string
@@ -19,10 +19,8 @@ export async function syncEnvsIntegrationsVercelConnection({
       },
     }
   )
-  if (error) {
-    throw error
-  }
 
+  if (error) handleError(error)
   return data
 }
 
@@ -35,7 +33,7 @@ export const useIntegrationsVercelConnectionSyncEnvsMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     IntegrationsVercelConnectionSyncEnvsData,
     ResponseError,
     IntegrationsVercelConnectionSyncEnvsVariables
@@ -46,7 +44,8 @@ export const useIntegrationsVercelConnectionSyncEnvsMutation = ({
     IntegrationsVercelConnectionSyncEnvsData,
     ResponseError,
     IntegrationsVercelConnectionSyncEnvsVariables
-  >((vars) => syncEnvsIntegrationsVercelConnection(vars), {
+  >({
+    mutationFn: (vars) => syncEnvsIntegrationsVercelConnection(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

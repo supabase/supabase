@@ -1,9 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { projectKeys } from './keys'
 
 export type ProjectUpdateVariables = {
@@ -18,9 +17,12 @@ export type ProjectUpdateResponse = {
 }
 
 export async function updateProject({ ref, name }: ProjectUpdateVariables) {
-  const response = await patch(`${API_URL}/projects/${ref}`, { name })
-  if (response.error) throw response.error
-  return response as ProjectUpdateResponse
+  const { data, error } = await patch('/platform/projects/{ref}', {
+    params: { path: { ref } },
+    body: { name },
+  })
+  if (error) handleError(error)
+  return data
 }
 
 type ProjectUpdateData = Awaited<ReturnType<typeof updateProject>>
@@ -30,30 +32,28 @@ export const useProjectUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectUpdateData, ResponseError, ProjectUpdateVariables>,
+  UseCustomMutationOptions<ProjectUpdateData, ResponseError, ProjectUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectUpdateData, ResponseError, ProjectUpdateVariables>(
-    (vars) => updateProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { ref } = variables
-        await Promise.all([
-          queryClient.invalidateQueries(projectKeys.list()),
-          queryClient.invalidateQueries(projectKeys.detail(ref)),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ProjectUpdateData, ResponseError, ProjectUpdateVariables>({
+    mutationFn: (vars) => updateProject(vars),
+    async onSuccess(data, variables, context) {
+      const { ref } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: projectKeys.detail(ref) }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

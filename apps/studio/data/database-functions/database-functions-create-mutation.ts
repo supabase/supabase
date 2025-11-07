@@ -1,25 +1,16 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { databaseFunctionsKeys } from './keys'
-import type { Dictionary } from 'types'
+import pgMeta from '@supabase/pg-meta'
+import { databaseKeys } from 'data/database/keys'
+import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
-  connectionString?: string
-  payload: {
-    name: string
-    schema: string
-    args: string[]
-    behavior: string // 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-    definition: string
-    language: string
-    return_type: string
-    security_definer: boolean
-    config_params?: Dictionary<string>
-  }
+  connectionString?: string | null
+  payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
 }
 
 export async function createDatabaseFunction({
@@ -27,20 +18,16 @@ export async function createDatabaseFunction({
   connectionString,
   payload,
 }: DatabaseFunctionCreateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql, zod } = pgMeta.functions.create(payload)
 
-  const { data, error } = await post('/platform/pg-meta/{ref}/functions', {
-    params: {
-      path: { ref: projectRef },
-    },
-    // @ts-ignore API codegen is typed wrongly, i suspect its using the body for edge functions instead
-    body: payload,
-    headers,
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['functions', 'create'],
   })
 
-  if (error) throw error
-  return data
+  return result as z.infer<typeof zod>
 }
 
 type DatabaseFunctionCreateData = Awaited<ReturnType<typeof createDatabaseFunction>>
@@ -50,27 +37,29 @@ export const useDatabaseFunctionCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseFunctionCreateData, ResponseError, DatabaseFunctionCreateVariables>,
+  UseCustomMutationOptions<
+    DatabaseFunctionCreateData,
+    ResponseError,
+    DatabaseFunctionCreateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionCreateData, ResponseError, DatabaseFunctionCreateVariables>(
-    (vars) => createDatabaseFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseFunctionsKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create database function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseFunctionCreateData, ResponseError, DatabaseFunctionCreateVariables>({
+    mutationFn: (vars) => createDatabaseFunction(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.databaseFunctions(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create database function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

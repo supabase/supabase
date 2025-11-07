@@ -1,14 +1,15 @@
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
-import toast from 'react-hot-toast'
-import { Button, IconExternalLink, cn } from 'ui'
+import { toast } from 'sonner'
 
-import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IntegrationConnectionItem } from 'components/interfaces/Integrations/VercelGithub/IntegrationConnection'
 import {
   EmptyIntegrationConnection,
   IntegrationConnectionHeader,
   IntegrationInstallation,
-} from 'components/interfaces/Integrations/IntegrationPanels'
+} from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import {
   ScaffoldContainer,
@@ -16,6 +17,8 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
+import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
@@ -23,20 +26,33 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { Button, cn } from 'ui'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
 
 const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
-  const project = useSelectedProject()
-  const org = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
-
   const isBranch = project?.parent_project_ref !== undefined
+
+  const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.vercel_connections')
+  const { can: canCreateVercelConnection } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'integrations.vercel_connections'
+  )
+  const { can: canUpdateVercelConnection } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'integrations.vercel_connections'
+  )
 
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
     {
@@ -122,8 +138,8 @@ You can change the scope of the access for Supabase by configuring
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? 'https://vercel.com/integrations/supabase'
       : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-        ? `https://vercel.com/integrations/supabase-v2-staging`
-        : 'https://vercel.com/integrations/supabase-v2-local'
+        ? `https://vercel.com/integrations/supabase-staging`
+        : 'https://vercel.com/integrations/supabase-local'
 
   let connections =
     (isProjectScoped
@@ -145,77 +161,92 @@ You can change the scope of the access for Supabase by configuring
           <IntegrationImageHandler title="vercel" />
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          <Markdown content={VercelContentSectionTop} />
-          {vercelIntegration ? (
-            <div key={vercelIntegration.id}>
-              <IntegrationInstallation title={'Vercel'} integration={vercelIntegration} />
-              {connections.length > 0 ? (
-                <>
-                  <IntegrationConnectionHeader
-                    title={ConnectionHeaderTitle}
-                    markdown={`Repository connections for Vercel`}
-                  />
-                  <ul className="flex flex-col">
-                    {connections.map((connection) => (
-                      <div
-                        key={connection.id}
-                        className={cn(
-                          isProjectScoped && 'relative flex flex-col -gap-[1px] [&>li]:pb-0'
-                        )}
-                      >
-                        <IntegrationConnectionItem
-                          connection={connection}
-                          type={'Vercel' as IntegrationName}
-                          onDeleteConnection={onDeleteVercelConnection}
-                          className={cn(isProjectScoped && '!rounded-b-none !mb-0')}
-                        />
-                        {isProjectScoped ? (
-                          <div className="relative pl-8 ml-6 border-l border-muted pb-6">
-                            <div className="border-b border-l border-r rounded-b-lg">
-                              <VercelIntegrationConnectionForm
-                                connection={connection}
-                                integration={vercelIntegration}
-                              />
-                            </div>
+          {isLoadingPermissions ? (
+            <GenericSkeletonLoader />
+          ) : !canReadVercelConnection ? (
+            <NoPermission resourceText="view this organization's Vercel connections" />
+          ) : (
+            <>
+              <Markdown content={VercelContentSectionTop} />
+              {vercelIntegration ? (
+                <div key={vercelIntegration.id}>
+                  <IntegrationInstallation title={'Vercel'} integration={vercelIntegration} />
+                  {connections.length > 0 ? (
+                    <>
+                      <IntegrationConnectionHeader
+                        title={ConnectionHeaderTitle}
+                        markdown={`Repository connections for Vercel`}
+                      />
+                      <ul className="flex flex-col">
+                        {connections.map((connection) => (
+                          <div
+                            key={connection.id}
+                            className={cn(
+                              isProjectScoped && 'relative flex flex-col -gap-[1px] [&>li]:pb-0'
+                            )}
+                          >
+                            <IntegrationConnectionItem
+                              connection={connection}
+                              disabled={isBranch || !canUpdateVercelConnection}
+                              type={'Vercel' as IntegrationName}
+                              onDeleteConnection={onDeleteVercelConnection}
+                              className={cn(isProjectScoped && '!rounded-b-none !mb-0')}
+                            />
+                            {isProjectScoped ? (
+                              <div className="relative pl-8 ml-6 border-l border-muted pb-6">
+                                <div className="border-b border-l border-r rounded-b-lg">
+                                  <VercelIntegrationConnectionForm
+                                    connection={connection}
+                                    integration={vercelIntegration}
+                                    disabled={isBranch || !canUpdateVercelConnection}
+                                  />
+                                </div>
+                              </div>
+                            ) : null}
                           </div>
-                        ) : null}
-                      </div>
-                    ))}
-                  </ul>
-                </>
+                        ))}
+                      </ul>
+                    </>
+                  ) : (
+                    <IntegrationConnectionHeader
+                      title={ConnectionHeaderTitle}
+                      className="pb-0"
+                      markdown={`Repository connections for Vercel`}
+                    />
+                  )}
+                  <EmptyIntegrationConnection
+                    disabled={isBranch || !canCreateVercelConnection}
+                    onClick={() => onAddVercelConnection(vercelIntegration.id)}
+                  >
+                    Add new project connection
+                  </EmptyIntegrationConnection>
+                </div>
               ) : (
-                <IntegrationConnectionHeader
-                  title={ConnectionHeaderTitle}
-                  markdown={`Repository connections for Vercel`}
+                <div>
+                  <Button
+                    icon={<ExternalLink />}
+                    asChild={!isBranch}
+                    type="default"
+                    disabled={isBranch}
+                  >
+                    {isBranch ? (
+                      <p>Install Vercel Integration</p>
+                    ) : (
+                      <Link href={integrationUrl} target="_blank" rel="noreferrer">
+                        Install Vercel Integration
+                      </Link>
+                    )}
+                  </Button>
+                </div>
+              )}
+              {VercelContentSectionBottom && (
+                <Markdown
+                  extLinks
+                  content={VercelContentSectionBottom}
+                  className="text-foreground-lighter"
                 />
               )}
-              <EmptyIntegrationConnection
-                onClick={() => onAddVercelConnection(vercelIntegration.id)}
-                orgSlug={org?.slug}
-              >
-                Add new project connection
-              </EmptyIntegrationConnection>
-            </div>
-          ) : (
-            <div>
-              <Button
-                asChild={!isBranch}
-                type="default"
-                disabled={isBranch}
-                iconRight={<IconExternalLink />}
-              >
-                {isBranch ? (
-                  <p>Install Vercel Integration</p>
-                ) : (
-                  <Link href={integrationUrl} target="_blank" rel="noreferrer">
-                    Install Vercel Integration
-                  </Link>
-                )}
-              </Button>
-            </div>
-          )}
-          {VercelContentSectionBottom && (
-            <Markdown content={VercelContentSectionBottom} className="text-foreground-lighter" />
+            </>
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>

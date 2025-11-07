@@ -1,14 +1,17 @@
 import { ExternalLink } from 'lucide-react'
 
 import Indexes from 'components/interfaces/Database/Indexes/Indexes'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms'
+import { DocsButton } from 'components/ui/DocsButton'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 
@@ -23,25 +26,19 @@ const IndexesPage: NextPageWithLayout = () => {
             description="Improve query performance against your database"
           />
         </ScaffoldSectionContent>
-        <ScaffoldSectionDetail className="flex items-center justify-end gap-x-2">
-          <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+        <ScaffoldSectionDetail className="flex items-center lg:justify-end gap-2 flex-wrap">
+          <DocsButton
+            className="no-underline"
+            href={`${DOCS_URL}/guides/database/query-optimization`}
+          />
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <a
               target="_blank"
               rel="noreferrer"
               className="no-underline"
-              href="https://supabase.com/docs/guides/database/query-optimization"
+              href={`${DOCS_URL}/guides/database/extensions/index_advisor`}
             >
-              Documentation
-            </a>
-          </Button>
-          <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              className="no-underline"
-              href="https://supabase.com/docs/guides/database/extensions/index_advisor"
-            >
-              Optimization with index_advisor
+              Index Advisor
             </a>
           </Button>
         </ScaffoldSectionDetail>
@@ -53,6 +50,10 @@ const IndexesPage: NextPageWithLayout = () => {
   )
 }
 
-IndexesPage.getLayout = (page) => <DatabaseLayout title="Indexes">{page}</DatabaseLayout>
+IndexesPage.getLayout = (page) => (
+  <DefaultLayout>
+    <DatabaseLayout title="Indexes">{page}</DatabaseLayout>
+  </DefaultLayout>
+)
 
 export default IndexesPage

@@ -1,20 +1,23 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
-export type GenerateTypesVariables = { ref?: string }
+export type GenerateTypesVariables = { ref?: string; included_schemas?: string }
 
-export async function generateTypes({ ref }: GenerateTypesVariables, signal?: AbortSignal) {
+export async function generateTypes(
+  { ref, included_schemas }: GenerateTypesVariables,
+  signal?: AbortSignal
+) {
   if (!ref) throw new Error('Project ref is required')
 
   const { data, error } = await get(`/v1/projects/{ref}/types/typescript`, {
-    params: { path: { ref } },
+    params: { path: { ref }, query: { included_schemas } },
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -22,11 +25,15 @@ export type GenerateTypesData = Awaited<ReturnType<typeof generateTypes>>
 export type GenerateTypesError = ResponseError
 
 export const useGenerateTypesQuery = <TData = GenerateTypesData>(
-  { ref }: GenerateTypesVariables,
-  { enabled = true, ...options }: UseQueryOptions<GenerateTypesData, GenerateTypesError, TData> = {}
+  { ref, included_schemas }: GenerateTypesVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<GenerateTypesData, GenerateTypesError, TData> = {}
 ) =>
-  useQuery<GenerateTypesData, GenerateTypesError, TData>(
-    projectKeys.types(ref),
-    ({ signal }) => generateTypes({ ref }, signal),
-    { enabled: enabled && typeof ref !== 'undefined', ...options }
-  )
+  useQuery<GenerateTypesData, GenerateTypesError, TData>({
+    queryKey: projectKeys.types(ref),
+    queryFn: ({ signal }) => generateTypes({ ref, included_schemas }, signal),
+    enabled: enabled && typeof ref !== 'undefined',
+    ...options,
+  })

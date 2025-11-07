@@ -1,51 +1,64 @@
-import React, { FC } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { Button, IconCheck, cn } from 'ui'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 
-import gaEvents from '~/lib/gaEvents'
+import { Check } from 'lucide-react'
 import { plans } from 'shared-data/plans'
+import { Button, cn } from 'ui'
+import { Organization } from '~/data/organizations'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import UpgradePlan from './UpgradePlan'
 
-const PricingPlans: FC = () => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
+interface PricingPlansProps {
+  organizations?: Organization[]
+  hasExistingOrganizations?: boolean
+}
 
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansProps) => {
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
       <div className="relative z-10 mx-auto w-full px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-0">
           {plans.map((plan) => {
-            const isPromoPlan = plan.name === 'Pro'
+            const isProPlan = plan.name === 'Pro'
             const isTeamPlan = plan.name === 'Team'
+            const isUpgradablePlan = isProPlan || isTeamPlan
+            const features = plan.features
+            const footer = plan.footer
+
+            const sendPricingEvent = () => {
+              sendTelemetryEvent({
+                action: 'www_pricing_plan_cta_clicked',
+                properties: {
+                  plan: plan.name,
+                  showUpgradeText: isUpgradablePlan && hasExistingOrganizations ? true : false,
+                  section: 'main',
+                },
+              })
+            }
 
             return (
               <div
                 key={`row-${plan.name}`}
                 className={cn(
-                  'flex flex-col border xl:border-r-0 last:border-r bg-surface-100 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
-                  isPromoPlan && 'border-brand !border-2 !rounded-xl xl:-my-8',
+                  'flex flex-col border xl:border-r-0 last:border-r bg-surface-75 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
+                  isProPlan && 'border-foreground-muted !border-2 !rounded-xl xl:-my-8',
                   isTeamPlan && 'xl:border-l-0'
                 )}
               >
                 <div
                   className={cn(
                     'px-8 xl:px-4 2xl:px-8 pt-6',
-                    isPromoPlan ? 'rounded-tr-[9px] rounded-tl-[9px]' : ''
+                    isProPlan ? 'rounded-tr-[9px] rounded-tl-[9px]' : ''
                   )}
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2 pb-2">
-                      <h3 className="text-2xl font-normal uppercase flex items-center gap-4 font-mono">
+                      <h3 className="text-foreground text-2xl font-normal uppercase flex items-center gap-4 font-mono">
                         {plan.name}
                       </h3>
                       {plan.nameBadge && (
-                        <span className="bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
+                        <span className="bg-foreground-light text-background rounded-md py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
                           {plan.nameBadge}
                         </span>
                       )}
@@ -54,28 +67,29 @@ const PricingPlans: FC = () => {
                   <p
                     className={cn(
                       'text-foreground-light mb-4 text-sm 2xl:pr-4',
-                      isPromoPlan && 'xl:mb-12'
+                      isProPlan && 'xl:mb-12'
                     )}
                   >
                     {plan.description}
                   </p>
-                  <Button
-                    block
-                    size="small"
-                    type={plan.name === 'Enterprise' ? 'default' : 'primary'}
-                    asChild
-                  >
-                    <Link
-                      href={plan.href}
-                      onClick={() =>
-                        sendTelemetryEvent(
-                          gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`]
-                        )
-                      }
+                  {isUpgradablePlan && hasExistingOrganizations ? (
+                    <UpgradePlan
+                      planId={plan.planId}
+                      organizations={organizations}
+                      onClick={sendPricingEvent}
+                    />
+                  ) : (
+                    <Button
+                      block
+                      size="large"
+                      type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                      asChild
                     >
-                      {plan.cta}
-                    </Link>
-                  </Button>
+                      <Link href={plan.href} onClick={sendPricingEvent}>
+                        {plan.cta}
+                      </Link>
+                    </Button>
+                  )}
 
                   <div
                     className={cn(
@@ -97,6 +111,7 @@ const PricingPlans: FC = () => {
                               className={`mt-2 pb-1 font-mono ${
                                 plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                               }`}
+                              translate="no"
                             >
                               {plan.name !== 'Enterprise' ? '$' : ''}
                               {plan.priceMonthly}
@@ -133,21 +148,21 @@ const PricingPlans: FC = () => {
                 <div
                   className={cn(
                     'border-default flex rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6',
-                    isPromoPlan && 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]'
+                    isProPlan && 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]'
                   )}
                 >
                   {plan.preface && (
                     <p className="text-foreground-lighter text-[13px] mt-2 mb-4">{plan.preface}</p>
                   )}
                   <ul className="text-[13px] flex-1 text-foreground-lighter">
-                    {plan.features.map((feature) => (
+                    {features.map((feature) => (
                       <li
                         key={typeof feature === 'string' ? feature : feature[0]}
                         className="flex flex-col py-2 first:mt-0"
                       >
                         <div className="flex items-center">
                           <div className="flex w-6">
-                            <IconCheck
+                            <Check
                               className={cn(
                                 'h-4 w-4',
                                 plan.name === 'Enterprise' ? 'text-foreground' : 'text-brand'
@@ -169,9 +184,9 @@ const PricingPlans: FC = () => {
 
                   <div className="flex flex-col gap-6 mt-auto prose">
                     <div className="space-y-2 mt-12">
-                      {plan.footer && (
+                      {footer && (
                         <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
-                          {plan.footer}
+                          {footer}
                         </p>
                       )}
                     </div>

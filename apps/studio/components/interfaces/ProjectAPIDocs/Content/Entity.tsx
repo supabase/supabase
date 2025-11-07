@@ -4,11 +4,11 @@ import { useEffect } from 'react'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useAppStateSnapshot } from 'state/app-state'
+import LanguageSelector from '../LanguageSelector'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
 import { tempRemovePostgrestText } from './Content.utils'
-import LanguageSelector from '../LanguageSelector'
 
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead
@@ -30,12 +30,13 @@ function getColumnType(type: string, format: string) {
   }
 }
 
-const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
+export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const resource = snap.activeDocsSection[1]
 
   const { data: jsonSchema, refetch } = useProjectJsonSchemaQuery({ projectRef: ref })
+
   const definition = jsonSchema?.definitions?.[resource]
   const columns =
     definition !== undefined
@@ -56,7 +57,7 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
     <div className="divide-y relative">
       <div className="flex items-center justify-between px-4 py-4 sticky top-0 bg-surface-100 z-10 border-b shadow-md">
         <div className="flex flex-col gap-y-1">
-          <h2 className="text-xl">{resource}</h2>
+          <h2>{resource}</h2>
           <p className="text-sm text-foreground-light">
             {definition?.description ?? 'No description available'}
           </p>
@@ -143,5 +144,3 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
     </div>
   )
 }
-
-export default Entity

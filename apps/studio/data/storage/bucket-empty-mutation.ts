@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 export type BucketEmptyVariables = {
@@ -18,7 +18,7 @@ export async function emptyBucket({ projectRef, id }: BucketEmptyVariables) {
     params: { path: { id, ref: projectRef } },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -29,27 +29,25 @@ export const useBucketEmptyMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketEmptyData, ResponseError, BucketEmptyVariables>,
+  UseCustomMutationOptions<BucketEmptyData, ResponseError, BucketEmptyVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketEmptyData, ResponseError, BucketEmptyVariables>(
-    (vars) => emptyBucket(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to empty bucket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BucketEmptyData, ResponseError, BucketEmptyVariables>({
+    mutationFn: (vars) => emptyBucket(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to empty bucket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

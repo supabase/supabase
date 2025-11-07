@@ -1,26 +1,29 @@
 // Import Swiper styles if swiper used on page
 import 'swiper/css'
 
-import { useState } from 'react'
-import { Button, IconArrowUpRight, Tabs } from 'ui'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import CodeBlock from '../CodeBlock/CodeBlock'
 import Link from 'next/link'
+import { useState } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button, Tabs } from 'ui'
+import CodeBlock, { LANG } from '../CodeBlock/CodeBlock'
+import { ArrowUpRight } from 'lucide-react'
 
-interface Example {
-  lang: 'js' | 'py' | 'sql'
+export interface APIExample {
+  lang: LANG
   title: string
   code: string
 }
 
 interface Props {
   size?: 'small' | 'large'
-  content: Example[]
+  content: APIExample[]
   title: string | React.ReactNode
   footer?: React.ReactNode
   text?: React.ReactNode
   autoHeight?: boolean
   documentation_link?: string
+  showLineNumbers?: boolean
+  ctaLabel?: string
 }
 
 function APISection(props: Props) {
@@ -37,12 +40,12 @@ function APISection(props: Props) {
   return (
     <div className="grid grid-cols-12 lg:gap-16">
       <div className="col-span-12 pb-8 lg:col-span-5 xl:col-span-5">
-        <h2 className="h3">{props.title}</h2>
+        <h2 className="h2">{props.title}</h2>
         <div className="p">{props.text}</div>
         {props.documentation_link && (
-          <Button asChild size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
+          <Button asChild size="small" className="mt-4" type="default" icon={<ArrowUpRight />}>
             <Link href={props.documentation_link} as={props.documentation_link}>
-              Explore documentation
+              {props.ctaLabel ? props.ctaLabel : 'Explore documentation'}
             </Link>
           </Button>
         )}
@@ -55,7 +58,7 @@ function APISection(props: Props) {
           onChange={(id: string) => handleApiSwiperNavChange(Number(id))}
         >
           {props.content &&
-            props.content.map((content: Example, i) => (
+            props.content.map((content: APIExample, i) => (
               <Tabs.Panel label={content.title} id={i.toString()} key={i}>
                 <span key={i}></span>
               </Tabs.Panel>
@@ -74,9 +77,14 @@ function APISection(props: Props) {
             autoHeight={props.autoHeight ? props.autoHeight : false}
           >
             {props.content &&
-              props.content.map((content: Example, i) => (
+              props.content.map((content: APIExample, i) => (
                 <SwiperSlide key={i}>
-                  <CodeBlock key={i} lang={content.lang} size={props.size ? props.size : 'small'}>
+                  <CodeBlock
+                    key={i}
+                    lang={content.lang}
+                    size={props.size ? props.size : 'small'}
+                    showLineNumbers={props.showLineNumbers}
+                  >
                     {content.code}
                   </CodeBlock>
                 </SwiperSlide>

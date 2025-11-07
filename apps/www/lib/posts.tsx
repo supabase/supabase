@@ -3,11 +3,30 @@ import path from 'path'
 import matter from 'gray-matter'
 import { generateReadingTime } from './helpers'
 
-type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives'
+type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
 
 // substring amount for file names
 // based on YYYY-MM-DD format
-const FILENAME_SUBSTRING = 11
+export const FILENAME_SUBSTRING = 11
+
+export type Post = {
+  slug: string
+  title?: string
+  description?: string
+  author?: string
+  image?: string
+  thumb?: string
+  categories?: string[]
+  tags?: string[]
+  date?: string
+  toc_depth?: number
+  formattedDate: string
+  readingTime: string
+  url: string
+  path: string
+
+  [key: string]: any // Allow additional properties from frontmatter
+}
 
 type GetSortedPostsParams = {
   directory: Directories
@@ -24,7 +43,7 @@ export const getSortedPosts = ({
   tags,
   categories,
   currentPostSlug,
-}: GetSortedPostsParams) => {
+}: GetSortedPostsParams): Post[] => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
@@ -34,7 +53,7 @@ export const getSortedPosts = ({
   const allPosts = fileNames
     .map((filename) => {
       const slug =
-        directory === '_blog'
+        directory === '_blog' || directory === '_events'
           ? filename.replace('.mdx', '').substring(FILENAME_SUBSTRING)
           : filename.replace('.mdx', '')
 
@@ -57,9 +76,8 @@ export const getSortedPosts = ({
 
       const frontmatter = {
         ...data,
-        date: formattedDate,
+        formattedDate,
         readingTime,
-        publishedAt: data.published_at ?? null,
         url: url,
         path: contentPath,
       }
@@ -74,15 +92,9 @@ export const getSortedPosts = ({
 
   let sortedPosts = [...allPosts]
 
-  sortedPosts = sortedPosts.sort((a: any, b: any) => {
-    const isPublishedAtBefore =
-      a.publishedAt && b.publishedAt && Date.parse(a.publishedAt) < Date.parse(b.publishedAt)
-    if (isPublishedAtBefore || new Date(a.date) < new Date(b.date)) {
-      return 1
-    } else {
-      return -1
-    }
-  })
+  sortedPosts = sortedPosts.sort(
+    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
 
   if (categories) {
     sortedPosts = sortedPosts.filter((post: any) => {
@@ -125,7 +137,7 @@ export const getAllPostSlugs = (directory: Directories) => {
         ...dates,
         slug: filename
           .replace('.mdx', '')
-          .substring(directory === '_blog' ? FILENAME_SUBSTRING : 0),
+          .substring(directory === '_blog' || directory === '_events' ? FILENAME_SUBSTRING : 0),
       },
     }
   })

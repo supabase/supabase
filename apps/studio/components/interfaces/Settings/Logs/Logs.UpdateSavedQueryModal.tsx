@@ -1,6 +1,6 @@
 import { Button, Form, Input, Modal } from 'ui'
 
-type SavedQuery = { name: string; description: string | null }
+type SavedQuery = { name: string; description?: string }
 
 export interface UpdateSavedQueryProps {
   visible: boolean
@@ -31,7 +31,7 @@ export const UpdateSavedQueryModal = ({
       onCancel={onCancel}
       hideFooter
       header="Update saved query"
-      size="small"
+      size="medium"
     >
       <Form
         onReset={onCancel}
@@ -41,7 +41,7 @@ export const UpdateSavedQueryModal = ({
         onSubmit={onSubmit}
       >
         {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <div className="space-y-4 py-4">
+          <>
             <Modal.Content>
               <Input label="Name" id="name" name="name" />
             </Modal.Content>
@@ -55,17 +55,15 @@ export const UpdateSavedQueryModal = ({
               />
             </Modal.Content>
             <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-end gap-2">
-                <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                  Save query
-                </Button>
-              </div>
+            <Modal.Content className="flex items-center justify-end gap-2">
+              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                Save query
+              </Button>
             </Modal.Content>
-          </div>
+          </>
         )}
       </Form>
     </Modal>

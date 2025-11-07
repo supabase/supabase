@@ -1,61 +1,116 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isNil } from 'lodash'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import { object, string } from 'yup'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as z from 'zod'
 
 import { useParams } from 'common'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-import type { OrganizationMember } from 'data/organizations/organization-members-query'
-import { doPermissionsCheck, useGetPermissions } from 'hooks'
-import type { Role } from 'types'
-import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import InformationBox from 'components/ui/InformationBox'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
+import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
+import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
+import { useProfile } from 'lib/profile'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  Select_Shadcn_,
+  Switch,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
-export interface InviteMemberButtonProps {
-  orgId: number
-  userId: number
-  members: OrganizationMember[]
-  roles: Role[]
-  rolesAddable: Number[]
-}
-
-const InviteMemberButton = ({
-  orgId,
-  userId,
-  members = [],
-  roles = [],
-  rolesAddable = [],
-}: InviteMemberButtonProps) => {
+export const InviteMemberButton = () => {
   const { slug } = useParams()
-  const [isOpen, setIsOpen] = useState(false)
-  const { permissions: allPermissions } = useGetPermissions()
+  const { profile } = useProfile()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { permissions: permissions } = useGetPermissions()
 
-  const canInviteMembers = roles.some(({ id: role_id }) =>
-    doPermissionsCheck(
-      allPermissions,
-      PermissionAction.CREATE,
-      'user_invites',
-      { resource: { role_id } },
-      orgId
-    )
+  const { organizationMembersCreate: organizationMembersCreationEnabled } = useIsFeatureEnabled([
+    'organization_members:create',
+  ])
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
+
+  const { data: members } = useOrganizationMembersQuery({ slug })
+  const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
+  const orgScopedRoles = allRoles?.org_scoped_roles ?? []
+
+  const currentPlan = organization?.plan
+  const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
+
+  const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
+  const hasOrgRole =
+    (userMemberData?.role_ids ?? []).length === 1 &&
+    orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
+
+  const { rolesAddable } = useGetRolesManagementPermissions(
+    organization?.slug,
+    orgScopedRoles,
+    permissions ?? []
   )
 
-  const initialValues = { email: '', role: '' }
-  const schema = object({
-    email: string().email('Must be a valid email address').required('Email is required'),
-    role: string().required('Role is required'),
+  const canInviteMembers =
+    hasOrgRole &&
+    rolesAddable.length > 0 &&
+    orgScopedRoles.some(({ id: role_id }) =>
+      doPermissionsCheck(
+        permissions,
+        PermissionAction.CREATE,
+        'user_invites',
+        { resource: { role_id } },
+        organization?.slug
+      )
+    )
+
+  const { mutate: inviteMember, isLoading: isInviting } = useOrganizationCreateInvitationMutation()
+
+  const FormSchema = z.object({
+    email: z.string().email('Must be a valid email address').min(1, 'Email is required'),
+    role: z.string().min(1, 'Role is required'),
+    applyToOrg: z.boolean(),
+    projectRef: z.string(),
   })
 
-  const { mutateAsync: inviteMember, isLoading: isInviting } =
-    useOrganizationMemberInviteCreateMutation()
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { email: '', role: '', applyToOrg: true, projectRef: '' },
+  })
 
-  const onInviteMember = async (values: any, { resetForm }: any) => {
-    if (!slug) {
-      throw new Error('slug is required')
-    }
+  const { applyToOrg, projectRef } = form.watch()
 
-    const existingMember = members.find(
+  const onInviteMember = async (values: z.infer<typeof FormSchema>) => {
+    if (!slug) return console.error('Slug is required')
+    if (profile?.id === undefined) return console.error('Profile ID required')
+
+    const developerRole = orgScopedRoles.find((role) => role.name === 'Developer')
+    const existingMember = (members ?? []).find(
       (member) => member.primary_email === values.email.toLowerCase()
     )
     if (existingMember !== undefined) {
@@ -66,140 +121,212 @@ const InviteMemberButton = ({
       }
     }
 
-    const roleId = Number(values.role)
-
-    try {
-      const response = await inviteMember({
+    inviteMember(
+      {
         slug,
-        invitedEmail: values.email.toLowerCase(),
-        ownerId: userId,
-        roleId,
-      })
-      if (isNil(response)) {
-        toast.error('Failed to add member')
-      } else {
-        toast.success('Successfully added new member')
-        setIsOpen(!isOpen)
-        resetForm({ initialValues: { ...initialValues, role: roleId } })
+        email: values.email.toLowerCase(),
+        roleId: Number(values.role),
+        ...(!values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}),
+      },
+      {
+        onSuccess: () => {
+          toast.success('Successfully sent invitation to new member')
+          setIsOpen(!isOpen)
+
+          form.reset({
+            email: '',
+            role: developerRole?.id.toString() ?? '',
+            applyToOrg: true,
+            projectRef: '',
+          })
+        },
       }
-    } catch (error) {}
+    )
   }
 
+  useEffect(() => {
+    if (isSuccess && isOpen) {
+      const developerRole = orgScopedRoles.find((role) => role.name === 'Developer')
+      if (developerRole !== undefined) form.setValue('role', developerRole.id.toString())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, isOpen])
+
   return (
-    <>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
-          <Button disabled={!canInviteMembers} onClick={() => setIsOpen(true)}>
-            Invite
-          </Button>
-        </Tooltip.Trigger>
-        {!canInviteMembers && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  You need additional permissions to invite a member to this organization
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        )}
-      </Tooltip.Root>
-      <Modal
-        hideFooter
-        size="medium"
-        layout="vertical"
-        className="!overflow-visible"
-        visible={isOpen}
-        onCancel={() => setIsOpen(false)}
-        header="Invite a member to this organization"
-      >
-        <Form validationSchema={schema} initialValues={initialValues} onSubmit={onInviteMember}>
-          {({ values, resetForm }: any) => {
-            // [Alaister] although this "technically" is breaking the rules of React hooks
-            // it won't error because the hooks are always rendered in the same order
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            useEffect(() => {
-              // Catches 'roles' when its available and then adds a default value for role select
-              if (roles) {
-                resetForm({
-                  values: {
-                    ...initialValues,
-                    role: roles.find((role) => role.name === 'Developer')?.id,
-                  },
-                  initialValues: {
-                    ...initialValues,
-                    role: roles.find((role) => role.name === 'Developer')?.id,
-                  },
-                })
-              }
-            }, [roles])
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <ButtonTooltip
+          type="primary"
+          disabled={!canInviteMembers}
+          className="pointer-events-auto flex-grow md:flex-grow-0"
+          onClick={() => setIsOpen(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !organizationMembersCreationEnabled
+                ? 'Inviting members is currently disabled'
+                : !canInviteMembers
+                  ? 'You need additional permissions to invite a member to this organization'
+                  : undefined,
+            },
+          }}
+        >
+          Invite member
+        </ButtonTooltip>
+      </DialogTrigger>
+      <DialogContent size="medium">
+        <DialogHeader>
+          <DialogTitle>Invite a member to this organization</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form_Shadcn_ {...form}>
+          <form
+            id="organization-invitation"
+            className="flex flex-col gap-y-4"
+            onSubmit={form.handleSubmit(onInviteMember)}
+          >
+            <DialogSection className="flex flex-col gap-y-4 pb-2">
+              {hasAccessToProjectLevelPermissions && (
+                <FormField_Shadcn_
+                  name="applyToOrg"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex"
+                      label="Apply role to all projects in the organization"
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={(value) => form.setValue('applyToOrg', value)}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
+              <FormField_Shadcn_
+                name="role"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout label="Member role">
+                    <FormControl_Shadcn_>
+                      <Select_Shadcn_
+                        value={field.value}
+                        onValueChange={(value) => form.setValue('role', value)}
+                      >
+                        <SelectTrigger_Shadcn_ className="text-sm capitalize">
+                          {orgScopedRoles.find((role) => role.id === Number(field.value))?.name ??
+                            'Unknown'}
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          <SelectGroup_Shadcn_>
+                            {orgScopedRoles.map((role) => {
+                              const canAssignRole = rolesAddable.includes(role.id)
 
-            const selectedRole = roles.find((role) => role.id === Number(values.role))
-            const invalidRoleSelected = values.role && !rolesAddable.includes(Number(values.role))
-
-            return (
-              <>
-                <Modal.Content>
-                  <div className="w-full py-4">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        {roles && (
-                          <Listbox
-                            id="role"
-                            name="role"
-                            label="Member role"
-                            error={
-                              invalidRoleSelected
-                                ? `You need additional permissions to assign users the role of ${selectedRole?.name}`
-                                : ''
-                            }
-                          >
-                            {roles.map((role: any) => (
-                              <Listbox.Option key={role.id} value={role.id} label={role.name}>
-                                {role.name}
-                              </Listbox.Option>
-                            ))}
-                          </Listbox>
-                        )}
-                      </div>
-
-                      <Input
+                              return (
+                                <SelectItem_Shadcn_
+                                  key={role.id}
+                                  value={role.id.toString()}
+                                  className="text-sm [&>span:nth-child(2)]:w-full [&>span:nth-child(2)]:flex [&>span:nth-child(2)]:items-center [&>span:nth-child(2)]:justify-between"
+                                  disabled={!canAssignRole}
+                                >
+                                  <span>{role.name}</span>
+                                  {!canAssignRole && (
+                                    <span>Additional permissions required to assign role</span>
+                                  )}
+                                </SelectItem_Shadcn_>
+                              )
+                            })}
+                          </SelectGroup_Shadcn_>
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+              {!applyToOrg && (
+                <FormField_Shadcn_
+                  name="projectRef"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Select a project"
+                      description="You can assign roles to multiple projects once the invite is accepted"
+                    >
+                      <FormControl_Shadcn_>
+                        <OrganizationProjectSelector
+                          fetchOnMount
+                          sameWidthAsTrigger
+                          checkPosition="left"
+                          selectedRef={projectRef}
+                          open={projectDropdownOpen}
+                          setOpen={setProjectDropdownOpen}
+                          searchPlaceholder="Search project..."
+                          onSelect={(project) => field.onChange(project.ref)}
+                          onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
+              <FormField_Shadcn_
+                name="email"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout label="Email address">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
                         autoFocus
-                        id="email"
-                        icon={<IconMail />}
+                        {...field}
+                        autoComplete="off"
+                        disabled={isInviting}
                         placeholder="Enter email address"
-                        label="Email address"
                       />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+              <InformationBox
+                defaultVisibility={false}
+                title="Single Sign-on (SSO) login option available"
+                hideCollapse={false}
+                description={
+                  <div className="space-y-4 mb-1">
+                    <p>
+                      Supabase offers single sign-on (SSO) as a login option to provide additional
+                      account security for your team. This allows company administrators to enforce
+                      the use of an identity provider when logging into Supabase.
+                    </p>
+                    <p>This is only available for organizations on Team Plan or above.</p>
+                    <div className="flex items-center space-x-2">
+                      <Button asChild type="default">
+                        <Link
+                          href={`${DOCS_URL}/guides/platform/sso`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Learn more
+                        </Link>
+                      </Button>
+                      {(currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
+                        <UpgradePlanButton source="inviteMemberSSO" plan="Team" />
+                      )}
                     </div>
                   </div>
-                </Modal.Content>
-                <Modal.Separator />
-                <Modal.Content>
-                  <div className="pt-2 pb-3">
-                    <Button
-                      block
-                      size="medium"
-                      htmlType="submit"
-                      disabled={isInviting || invalidRoleSelected}
-                      loading={isInviting}
-                    >
-                      Invite new member
-                    </Button>
-                  </div>
-                </Modal.Content>
-              </>
-            )
-          }}
-        </Form>
-      </Modal>
-    </>
+                }
+              />
+            </DialogSection>
+            <DialogSectionSeparator />
+            <DialogSection className="pt-0">
+              <Button block htmlType="submit" loading={isInviting}>
+                Send invitation
+              </Button>
+            </DialogSection>
+          </form>
+        </Form_Shadcn_>
+      </DialogContent>
+    </Dialog>
   )
 }
-export default InviteMemberButton

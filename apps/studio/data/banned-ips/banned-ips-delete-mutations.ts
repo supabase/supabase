@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { del } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { BannedIPKeys } from './keys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import toast from 'react-hot-toast'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { BannedIPKeys } from './keys'
 
 export type IPDeleteVariables = {
   projectRef: string
@@ -19,7 +19,7 @@ export async function deleteBannedIPs({ projectRef, ips }: IPDeleteVariables) {
     body: { ipv4_addresses: ips },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -29,26 +29,27 @@ export const useBannedIPsDeleteMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<UseMutationOptions<IPDeleteData, ResponseError, IPDeleteVariables>, 'mutationFn'> = {}) => {
+}: Omit<
+  UseCustomMutationOptions<IPDeleteData, ResponseError, IPDeleteVariables>,
+  'mutationFn'
+> = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<IPDeleteData, ResponseError, IPDeleteVariables>(
-    (vars) => deleteBannedIPs(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<IPDeleteData, ResponseError, IPDeleteVariables>({
+    mutationFn: (vars) => deleteBannedIPs(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await queryClient.invalidateQueries(BannedIPKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: BannedIPKeys.list(projectRef) })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to unban ips: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to unban ips: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

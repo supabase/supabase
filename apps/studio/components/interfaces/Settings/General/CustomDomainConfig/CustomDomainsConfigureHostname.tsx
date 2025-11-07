@@ -1,21 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
 import * as yup from 'yup'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { DocsButton } from 'components/ui/DocsButton'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
-import { useCheckPermissions } from 'hooks'
-import { Button, Form, IconExternalLink, Input } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
+import { Form, Input } from 'ui'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
@@ -23,19 +20,23 @@ const schema = yup.object({
 
 const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
-  const { data: settings } = useProjectApiQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
-  const endpoint = settings?.autoApiService.endpoint
-  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const endpoint = settings?.app_config?.endpoint
+  const { can: canConfigureCustomDomain } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
+  )
 
   const onCreateCustomDomain = async (values: yup.InferType<typeof schema>) => {
     if (!ref) return console.error('Project ref is required')
@@ -77,15 +78,7 @@ const CustomDomainsConfigureHostname = () => {
                       !canConfigureCustomDomain ? (
                         "You need additional permissions to update your project's custom domain settings"
                       ) : (
-                        <Button asChild type="default" icon={<IconExternalLink />}>
-                          <Link
-                            href="https://supabase.com/docs/guides/platform/custom-domains"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Documentation
-                          </Link>
-                        </Button>
+                        <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
                       )
                     }
                   />
@@ -96,7 +89,7 @@ const CustomDomainsConfigureHostname = () => {
                 <FormSectionContent loading={false}>
                   <Input
                     id="domain"
-                    disabled={!canConfigureCustomDomain}
+                    disabled={!canConfigureCustomDomain || isCheckingRecord || isCreating}
                     className="w-full"
                     type="text"
                     name="domain"
@@ -111,14 +104,14 @@ const CustomDomainsConfigureHostname = () => {
                     <code className="text-xs">{values.domain}</code>
                   ) : (
                     'your custom domain'
-                  )}
-                  , resolving to{' '}
+                  )}{' '}
+                  resolving to{' '}
                   {endpoint ? (
                     <code className="text-xs">{endpoint}</code>
                   ) : (
                     "your project's API URL"
-                  )}
-                  , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                  )}{' '}
+                  with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
                   disable the proxy option.
                 </p>
               </FormSection>

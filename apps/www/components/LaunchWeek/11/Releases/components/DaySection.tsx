@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRightIcon } from '@heroicons/react/outline'
@@ -7,12 +7,19 @@ import { Edit } from 'lucide-react'
 import { useBreakpoint } from 'common'
 
 import { WeekDayProps } from '../data'
-import CountdownComponent from '../../Countdown'
 import { DayLink } from '.'
 
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
   const isMobile = useBreakpoint(639)
   const cssGroup = 'group/d' + day.d
+
+  const [isMounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!isMounted) return null
 
   return (
     <section
@@ -53,7 +60,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
             href={day.blog!}
             className={cn(
               `
-              dark:bg-[#111415] hover:dark:bg-[#121516] sm:!bg-transparent
+              bg-default sm:!bg-transparent
               min-h-[210px] group sm:aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               hover:border-strong transition-colors border border-muted
               rounded-xl text-2xl bg-contain shadow-lg`,
@@ -87,6 +94,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                             object-center sm:object-right
                           `}
                           fill
+                          sizes="100%"
                           quality={100}
                           alt={day.title}
                         />
@@ -121,7 +129,6 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                   />
                 </g>
               </svg>
-              {day.hasCountdown && <CountdownComponent date={day.published_at} showCard={false} />}
             </div>
           </div>
         )}

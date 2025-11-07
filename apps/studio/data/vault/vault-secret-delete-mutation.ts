@@ -1,15 +1,14 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { vaultSecretsKeys } from './keys'
-import { sqlKeys } from 'data/sql/keys'
 
 export type VaultSecretDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
 }
 
@@ -30,29 +29,25 @@ export const useVaultSecretDeleteMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<VaultSecretDeleteData, ResponseError, VaultSecretDeleteVariables>,
+  UseCustomMutationOptions<VaultSecretDeleteData, ResponseError, VaultSecretDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VaultSecretDeleteData, ResponseError, VaultSecretDeleteVariables>(
-    (vars) => deleteVaultSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(
-          sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete key: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<VaultSecretDeleteData, ResponseError, VaultSecretDeleteVariables>({
+    mutationFn: (vars) => deleteVaultSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete key: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }
