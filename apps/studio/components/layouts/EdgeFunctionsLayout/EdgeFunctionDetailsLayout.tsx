@@ -1,15 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import React from 'react'
 import { Download, FileArchive, Send } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useState, type PropsWithChildren } from 'react'
+import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
-import { PageHeader } from 'ui-patterns/PageHeader'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
@@ -22,6 +20,10 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import {
+  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
+  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
+  BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
   NavMenu,
   NavMenuItem,
@@ -29,12 +31,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Separator,
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageHeader } from 'ui-patterns/PageHeader'
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 

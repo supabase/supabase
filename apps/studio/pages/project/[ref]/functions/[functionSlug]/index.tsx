@@ -11,7 +11,6 @@ import { useFlag } from 'common'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
-import { PageContainer } from 'ui-patterns/PageContainer'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'
@@ -30,6 +29,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection } from 'ui-patterns/PageSection'
 
 const CHART_INTERVALS: ChartIntervals[] = [
