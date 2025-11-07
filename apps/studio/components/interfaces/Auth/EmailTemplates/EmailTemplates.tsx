@@ -149,11 +149,8 @@ export const EmailTemplates = () => {
                             )}
                           </div>
 
-                          <div className="flex items-center gap-4 group">
-                            <ChevronRight
-                              size={16}
-                              className="text-foreground-muted group-hover:text-foreground transition-colors"
-                            />
+                          <div className="flex items-center gap-4">
+                            <ChevronRight size={16} className="text-foreground-muted" />
                           </div>
                         </Link>
                       </CardContent>
@@ -191,7 +188,7 @@ export const EmailTemplates = () => {
                               )}
                             </Link>
 
-                            <div className="flex items-center gap-4 group h-full pl-2">
+                            <div className="flex items-center gap-4 h-full pl-2">
                               <FormField_Shadcn_
                                 control={notificationsForm.control}
                                 name={templateEnabledKey}
@@ -210,10 +207,7 @@ export const EmailTemplates = () => {
                                 href={`/project/${projectRef}/auth/templates/${templateSlug}`}
                                 className="py-6 pr-6"
                               >
-                                <ChevronRight
-                                  size={16}
-                                  className="text-foreground-muted hover:text-foreground transition-colors"
-                                />
+                                <ChevronRight size={16} className="text-foreground-muted" />
                               </Link>
                             </div>
                           </CardContent>
