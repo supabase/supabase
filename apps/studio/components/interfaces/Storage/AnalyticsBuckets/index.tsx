@@ -44,10 +44,10 @@ export const AnalyticsBuckets = () => {
   return (
     <ScaffoldSection isFullWidth>
       <Admonition
-        type="warning"
+        type="note"
         layout="horizontal"
-        className="mb-12 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
-        title="Analytics buckets are in alpha"
+        className="-mt-4 mb-8 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
+        title="Private alpha"
         actions={
           <Button asChild type="default" icon={<ExternalLink />}>
             <a
@@ -55,15 +55,16 @@ export const AnalyticsBuckets = () => {
               rel="noopener noreferrer"
               href="https://github.com/orgs/supabase/discussions/40116"
             >
-              Leave feedback
+              Share feedback
             </a>
           </Button>
         }
       >
-        <p className="!leading-normal !mb-0">
-          Expect rapid changes, limited features, and possible breaking updates as we expand access.
+        <p className="!leading-normal !mb-0 text-balance">
+          Analytics buckets are now in private alpha. Expect rapid changes, limited features, and
+          possible breaking updates. Please share feedback as we refine the experience and expand
+          access.
         </p>
-        <p className="!leading-normal !mb-0">Please share feedback as we refine the experience!</p>
       </Admonition>
 
       {!isLoadingBuckets &&
