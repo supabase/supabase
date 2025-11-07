@@ -1824,9 +1824,6 @@ importers:
       nuxt:
         specifier: ^4.0.3
         version: 4.1.2(@electric-sql/pglite@0.2.15)(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@22.13.14)(@vue/compiler-sfc@3.5.21)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(eslint@9.37.0(jiti@2.6.1)(supports-color@8.1.1))(ioredis@5.7.0(supports-color@8.1.1))(magicast@0.3.5)(rollup@4.50.2)(sass@1.77.4)(stylus@0.57.0(supports-color@8.1.1))(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(typescript@5.9.2)(vite@7.1.12(@types/node@22.13.14)(jiti@2.6.1)(sass@1.77.4)(stylus@0.57.0(supports-color@8.1.1))(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1))(yaml@2.8.1)
-      shadcn-vue:
-        specifier: ^2.2.0
-        version: 2.3.2(babel-plugin-macros@3.1.0)(eslint@9.37.0(jiti@2.6.1)(supports-color@8.1.1))(magicast@0.3.5)(supports-color@8.1.1)(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2))
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
@@ -18184,10 +18181,6 @@ packages:
 
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
-
-  shadcn-vue@2.3.2:
-    resolution: {integrity: sha512-2li6UKRMQw9YCoeLjoynp+whNfTy/HFCPJSTzRO98MbCc59tyo3QsON74QRv6DnYTeC1JDEGLW4bK+ICNQE+uw==}
-    hasBin: true
 
   shadcn@3.3.1:
     resolution: {integrity: sha512-sgai5gahy/TiyTiqJEwIFpAuPhmkpt7sGVdRfcmNH53Yc3yI57+zFVmIaqbTST0jP/7tSqZuI0aSllXL2HIw5w==}
@@ -41037,48 +41030,6 @@ snapshots:
   setimmediate@1.0.5: {}
 
   setprototypeof@1.2.0: {}
-
-  shadcn-vue@2.3.2(babel-plugin-macros@3.1.0)(eslint@9.37.0(jiti@2.6.1)(supports-color@8.1.1))(magicast@0.3.5)(supports-color@8.1.1)(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2)):
-    dependencies:
-      '@dotenvx/dotenvx': 1.51.0
-      '@modelcontextprotocol/sdk': 1.20.2(supports-color@8.1.1)
-      '@unovue/detypes': 0.8.5(supports-color@8.1.1)
-      '@vue/compiler-sfc': 3.5.21
-      c12: 3.3.1(magicast@0.3.5)
-      commander: 14.0.1
-      consola: 3.4.2
-      dedent: 1.7.0(babel-plugin-macros@3.1.0)
-      deepmerge: 4.3.1
-      diff: 8.0.2
-      fs-extra: 11.3.2
-      fuzzysort: 3.1.0
-      get-tsconfig: 4.13.0
-      magic-string: 0.30.19
-      nypm: 0.6.2
-      ofetch: 1.4.1
-      ora: 9.0.0
-      pathe: 2.0.3
-      postcss: 8.5.6
-      prompts: 2.4.2
-      reka-ui: 2.6.0(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2))
-      semver: 7.7.3
-      stringify-object: 6.0.0
-      tailwindcss: 4.1.16
-      tinyexec: 1.0.1
-      tinyglobby: 0.2.15
-      ts-morph: 27.0.2
-      undici: 7.16.0
-      vue-metamorph: 3.3.3(eslint@9.37.0(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)
-      zod: 3.25.76
-      zod-to-json-schema: 3.24.6(zod@3.25.76)
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - babel-plugin-macros
-      - eslint
-      - magicast
-      - supports-color
-      - typescript
-      - vue
 
   shadcn@3.3.1(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(supports-color@8.1.1)(typescript@5.9.2):
     dependencies:

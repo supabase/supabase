@@ -13,7 +13,6 @@
     "h3": "^1.15.4",
     "nuxt": "^4.0.3",
     "class-variance-authority": "^0.7.1",
-    "shadcn-vue": "^2.2.0",
     "tailwind-merge": "^3.3.1",
     "clsx": "^2.1.1",
     "vue": "^3.5.21",
