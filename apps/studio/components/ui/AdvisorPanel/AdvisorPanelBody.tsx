@@ -1,12 +1,12 @@
+import dayjs from 'dayjs'
 import { AlertTriangle, ChevronRight, Gauge, Inbox, Shield } from 'lucide-react'
 
-import { Button } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import { EmptyAdvisor } from './EmptyAdvisor'
-import { AdvisorItem } from './AdvisorPanelHeader'
 import { Notification } from 'data/notifications/notifications-v2-query'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import { AdvisorItem } from './AdvisorPanelHeader'
+import { EmptyAdvisor } from './EmptyAdvisor'
 
 const NoProjectNotice = () => {
   return (
@@ -107,7 +107,7 @@ export const AdvisorPanelBody = ({
               <Button
                 type="text"
                 className={cn(
-                  'justify-start w-full block rounded-none h-auto py-3 px-4 text-foreground-light hover:text-foreground',
+                  'justify-start w-full block rounded-none h-auto py-3 px-4 hover:text-foreground',
                   isUnread && 'bg-surface-100/50'
                 )}
                 onClick={() => onItemClick(item)}
@@ -119,7 +119,20 @@ export const AdvisorPanelBody = ({
                       strokeWidth={1.5}
                       className={cn('flex-shrink-0', severityClass)}
                     />
-                    <span className="truncate">{item.title.replace(/[`\\]/g, '')}</span>
+                    <div className="text-left flex flex-col gap-0.5 truncate flex-1 min-w-0">
+                      <div className="truncate">{item.title.replace(/[`\\]/g, '')}</div>
+                      {item.createdAt && (
+                        <span className="text-xs text-foreground-light capitalize-sentence">
+                          {(() => {
+                            const insertedAt = item.createdAt
+                            const daysFromNow = dayjs().diff(dayjs(insertedAt), 'day')
+                            const formattedTimeFromNow = dayjs(insertedAt).fromNow()
+                            const formattedInsertedAt = dayjs(insertedAt).format('MMM DD, YYYY')
+                            return daysFromNow > 1 ? formattedInsertedAt : formattedTimeFromNow
+                          })()}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <ChevronRight
                     size={16}
