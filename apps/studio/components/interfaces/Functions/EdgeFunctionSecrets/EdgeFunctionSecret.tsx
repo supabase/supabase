@@ -64,7 +64,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
                 icon={<MoreVertical />}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" className="w-52">
+            <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem asChild>
                 <ButtonTooltip
                   type="text"

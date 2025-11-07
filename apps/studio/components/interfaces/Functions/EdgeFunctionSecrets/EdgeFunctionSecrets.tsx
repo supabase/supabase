@@ -140,14 +140,14 @@ const EdgeFunctionSecrets = () => {
 
       <EditSecretSheet
         secret={selectedSecret?.secret}
-        visible={selectedSecret !== undefined && selectedSecret.op === 'edit'}
+        visible={selectedSecret?.op === 'edit'}
         onClose={() => setSelectedSecret(undefined)}
       />
 
       <ConfirmationModal
         variant="destructive"
         loading={isDeleting}
-        visible={selectedSecret !== undefined && selectedSecret.op === 'delete'}
+        visible={selectedSecret?.op === 'delete'}
         confirmLabel="Delete secret"
         confirmLabelLoading="Deleting secret"
         title={`Confirm to delete secret "${selectedSecret?.secret.name}"`}
