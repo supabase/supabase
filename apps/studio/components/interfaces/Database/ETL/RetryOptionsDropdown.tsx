@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { RollbackType, useRollbackTableMutation } from 'data/replication/rollback-table-mutation'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { RollbackType, useRollbackTableMutation } from 'data/etl/rollback-table-mutation'
+import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import {
   Button,
   DropdownMenu,
