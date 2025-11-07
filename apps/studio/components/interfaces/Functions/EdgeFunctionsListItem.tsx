@@ -37,9 +37,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       className="cursor-pointer"
     >
       <TableCell>
-        <div className="flex items-center gap-2">
-          <p className="text-sm text-foreground">{item.name}</p>
-        </div>
+        <p className="text-sm text-foreground whitespace-nowrap">{item.name}</p>
       </TableCell>
       <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
@@ -80,7 +78,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       </TableCell>
       <TableCell className="lg:table-cell">
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <div className="flex items-center space-x-2">
               <p className="text-sm text-foreground-light">{dayjs(item.updated_at).fromNow()}</p>
             </div>
