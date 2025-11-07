@@ -10,6 +10,9 @@ import { formatHosts } from '~/lib/eventsUtils'
 export function EventBanner() {
   const { isLoading, allEvents, featuredEvent } = useEvents()
 
+  console.log('featuredEvent', featuredEvent)
+  console.log('desc', featuredEvent?.description)
+
   if (isLoading) {
     return <section>Loading...</section>
   }
@@ -17,10 +20,10 @@ export function EventBanner() {
   if (!featuredEvent) return null
 
   return (
-    <section className={cn('grid grid-cols-[minmax(320px,30%),1fr] gap-12 items-center')}>
+    <section className={cn('grid grid-cols-[minmax(320px,30%),1fr] gap-12')}>
       <CoverImage url={featuredEvent.cover_url} />
 
-      <article className="flex flex-col gap-8 py-2">
+      <article className="flex flex-col gap-6 py-2">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1.5">
             <h2 className="text-2xl font-medium">{featuredEvent.title}</h2>
@@ -133,7 +136,7 @@ const CoverImage = ({ url }: { url?: string }) => {
 
   return (
     <div className="w-full bg-surface-100 aspect-square border rounded-lg overflow-hidden relative">
-      <img src={url} alt="Event Cover" className="object-cover" />
+      <img src={url} alt="Event Cover" className="object-cover w-full" />
     </div>
   )
 }

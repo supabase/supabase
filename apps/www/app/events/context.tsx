@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react'
-import { SupabaseEvent, getLumaEvents } from 'lib/events'
+import { SupabaseEvent, SUPABASE_HOST } from '~/lib/eventsTypes'
 import { cover } from 'three/src/extras/TextureUtils.js'
 
 interface EventsContextValue {
@@ -53,14 +53,15 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
         if (data.success) {
           const transformedEvents: SupabaseEvent[] = data.events.map((event: any) => {
             let categories = []
-            if (event.name.toLowerCase().includes('meetup')) categories.push('meetup')
+            const isMeetup = event.name.toLowerCase().includes('meetup')
+            if (isMeetup) categories.push('meetup')
 
             return {
               slug: '',
               type: 'event',
               title: event?.name || '',
               date: event?.start_at || '',
-              description: '',
+              description: event?.description || '',
               thumb: '',
               cover_url: event?.cover_url || '',
               path: '',
@@ -69,7 +70,8 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
               categories,
               timezone: event?.timezone || 'America/Los_Angeles',
               location: event?.location || '',
-              hosts: event?.hosts || [],
+              hosts: isMeetup ? [SUPABASE_HOST] : event?.hosts || [],
+              source: 'luma',
               disable_page_build: true,
               link: {
                 href: event?.url || '#',
@@ -175,7 +177,7 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
     }
 
     return undefined
-  }, [allEvents])
+  }, [allEvents, isLoading])
 
   const value: EventsContextValue = {
     allEvents,

@@ -4,57 +4,37 @@
  */
 import supabase from 'lib/supabase'
 import { getSortedPosts } from 'lib/posts'
+import authors from 'lib/authors.json'
+import { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
+
+// Re-export types and constants for backward compatibility
+export { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
 
 /**
- * Host information for events
+ * Parse hosts from a comma-separated string of author IDs
+ * Maps author IDs to EventHost objects using the authors.json file
  */
-export interface EventHost {
-  id: string
-  email: string
-  name: string | null
-  first_name: string | null
-  last_name: string | null
-  avatar_url: string
-}
+function parseHostsFromAuthors(hostsString?: string): EventHost[] {
+  if (!hostsString) return [SUPABASE_HOST]
 
-/**
- * Default host for Supabase-hosted events
- */
-export const SUPABASE_HOST: EventHost = {
-  id: 'supabase',
-  email: 'events@supabase.com',
-  name: 'Supabase',
-  first_name: 'Supabase',
-  last_name: null,
-  avatar_url: 'https://supabase.com/images/supabase-logo-icon.svg',
-}
+  const hostIds = hostsString.split(',').map((id) => id.trim())
+  const hosts = hostIds
+    .map((hostId) => {
+      const author = authors.find((a: any) => a.author_id === hostId)
+      if (!author) return null
 
-/**
- * Unified event interface for all events in the system
- */
-export interface SupabaseEvent {
-  slug: string
-  type: string
-  title: string
-  date: string
-  description: string
-  thumb: string
-  cover_url: string
-  path: string
-  url: string
-  tags: string[]
-  categories: string[]
-  timezone: string
-  location: string
-  hosts: EventHost[]
-  end_date?: string
-  onDemand?: boolean
-  disable_page_build?: boolean
-  link?: {
-    href: string
-    target?: '_blank' | '_self'
-    label?: string
-  }
+      return {
+        id: (author as any).author_id || hostId,
+        email: (author as any).author_url || '',
+        name: (author as any).author || null,
+        first_name: (author as any).author?.split(' ')[0] || null,
+        last_name: (author as any).author?.split(' ').slice(1).join(' ') || null,
+        avatar_url: (author as any).author_image_url || '',
+      }
+    })
+    .filter((host): host is EventHost => host !== null)
+
+  return hosts.length > 0 ? hosts : [SUPABASE_HOST]
 }
 
 interface LumaEvent {
@@ -148,7 +128,8 @@ export const getLumaEvents = async (): Promise<SupabaseEvent[]> => {
     if (data.success) {
       const transformedEvents: SupabaseEvent[] = data.events.map((event: LumaEvent) => {
         let categories = []
-        if (event.name.toLowerCase().includes('meetup')) categories.push('meetup')
+        const isMeetup = event.name.toLowerCase().includes('meetup')
+        if (isMeetup) categories.push('meetup')
 
         return {
           slug: '',
@@ -164,7 +145,8 @@ export const getLumaEvents = async (): Promise<SupabaseEvent[]> => {
           categories,
           timezone: event?.timezone || 'America/Los_Angeles',
           location: event?.location || '',
-          hosts: event?.hosts || [],
+          hosts: isMeetup ? [SUPABASE_HOST] : event?.hosts || [],
+          source: 'luma',
           disable_page_build: true,
           link: {
             href: event?.url || '#',
@@ -210,6 +192,7 @@ export const getStaticEvents = async (): Promise<{
       timezone: meetup.timezone || 'America/Los_Angeles',
       location: `${meetup.city}, ${meetup.country}`,
       hosts: [SUPABASE_HOST],
+      source: 'supabase',
       disable_page_build: true,
       link: {
         href: meetup.link || '#',
@@ -238,7 +221,8 @@ export const getStaticEvents = async (): Promise<{
         categories: post.categories || [],
         timezone: (post as any).timezone || 'America/Los_Angeles',
         location: (post as any).location || '',
-        hosts: (post as any).hosts || [SUPABASE_HOST],
+        hosts: parseHostsFromAuthors((post as any).hosts),
+        source: 'file',
         end_date: (post as any).end_date,
         onDemand: (post as any).onDemand,
         disable_page_build: (post as any).disable_page_build,

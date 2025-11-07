@@ -1,4 +1,4 @@
-import { EventHost } from './events'
+import { EventHost } from './eventsTypes'
 
 /**
  * Formats hosts array for display
