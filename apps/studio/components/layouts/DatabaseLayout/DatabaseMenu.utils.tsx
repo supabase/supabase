@@ -81,7 +81,6 @@ export const generateDatabaseMenu = (
                 name: 'ETL Replication',
                 key: 'etl',
                 url: `/project/${ref}/database/etl`,
-                label: !enablePgReplicate ? 'Coming soon' : undefined,
                 items: [],
               },
             ]
@@ -101,7 +100,6 @@ export const generateDatabaseMenu = (
                 key: 'column-privileges',
                 url: `/project/${ref}/database/column-privileges`,
                 items: [],
-                label: 'ALPHA',
               },
             ]
           : []),

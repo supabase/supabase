@@ -336,6 +336,7 @@ allow_list = [
     "dotenv",
     "e.g.",
     "gte-small",
+    "halfvec",
     "hCaptcha",
     "https?:\\/\\/\\S+",
     "i.e.",
