@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
-import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn } from 'ui'
+import { TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 
 const severityOptions = [
   { label: 'Critical', value: 'critical' },

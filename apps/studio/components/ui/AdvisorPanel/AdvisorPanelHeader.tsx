@@ -1,10 +1,9 @@
-import { ChevronLeft, X } from 'lucide-react'
 import dayjs from 'dayjs'
+import { ChevronLeft, X } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Notification } from 'data/notifications/notifications-v2-query'
-import { AdvisorSeverity, AdvisorItemSource } from 'state/advisor-state'
-import { Badge, cn } from 'ui'
+import { AdvisorItemSource, AdvisorSeverity } from 'state/advisor-state'
+import { Badge } from 'ui'
 
 export type AdvisorItem = {
   id: string
