@@ -91,7 +91,7 @@ export default function TableDemo() {
         </TableBody>
         <TableFooter className="border-t">
           <TableRow>
-            <TableCell colSpan={3}>Total</TableCell>
+            <TableCell colSpan={4}>Total</TableCell>
             <TableCell className="text-right">$2,250.00</TableCell>
           </TableRow>
         </TableFooter>
