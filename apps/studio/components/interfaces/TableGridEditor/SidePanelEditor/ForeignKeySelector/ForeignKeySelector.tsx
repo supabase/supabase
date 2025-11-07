@@ -270,6 +270,7 @@ export const ForeignKeySelector = ({
             label="Select a table to reference to"
             value={selectedTable?.id ?? 1}
             onChange={(value: string) => updateSelectedTable(Number(value))}
+            disabled={isLoadingSelectedTable}
           >
             <Listbox.Option key="empty" className="min-w-96" value={1} label="---">
               ---
