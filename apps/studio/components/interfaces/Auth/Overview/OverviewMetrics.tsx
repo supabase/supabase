@@ -24,6 +24,8 @@ import {
   getChangeColor,
   getMetricValues,
   AuthMetricsResponse,
+  getApiSuccessRates,
+  getAuthSuccessRates,
 } from './OverviewUsage.constants'
 import {
   fetchTopAuthErrorCodes,
@@ -181,38 +183,10 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
   const activeUsersChange = calculatePercentageChange(activeUsersCurrent, activeUsersPrevious)
   const signUpsChange = calculatePercentageChange(signUpsCurrent, signUpsPrevious)
 
-  const { current: apiTotalCurrent, previous: apiTotalPrevious } = getMetricValues(
-    metrics,
-    'apiTotalRequests'
-  )
-
-  const { current: apiErrorCurrent, previous: apiErrorPrevious } = getMetricValues(
-    metrics,
-    'apiErrorRequests'
-  )
-
-  const { current: authTotalRequestsCurrent, previous: authTotalRequestsPrevious } =
-    getMetricValues(metrics, 'authTotalRequests')
-
-  const { current: authTotalErrorsCurrent, previous: authTotalErrorsPrevious } = getMetricValues(
-    metrics,
-    'authTotalErrors'
-  )
-
-  const apiErrorRateCurrent = apiTotalCurrent > 0 ? (apiErrorCurrent / apiTotalCurrent) * 100 : 0
-  const authErrorRateCurrent =
-    authTotalRequestsCurrent > 0 ? (authTotalErrorsCurrent / authTotalRequestsCurrent) * 100 : 0
-
-  const apiErrorRatePrevious = apiTotalPrevious > 0 ? (apiErrorPrevious / apiTotalPrevious) * 100 : 0
-  const authErrorRatePrevious =
-    authTotalRequestsPrevious > 0
-      ? (authTotalErrorsPrevious / authTotalRequestsPrevious) * 100
-      : 0
-
-  const apiSuccessRateCurrent = Math.max(0, 100 - apiErrorRateCurrent)
-  const apiSuccessRatePrevious = Math.max(0, 100 - apiErrorRatePrevious)
-  const authSuccessRateCurrent = Math.max(0, 100 - authErrorRateCurrent)
-  const authSuccessRatePrevious = Math.max(0, 100 - authErrorRatePrevious)
+  const { current: apiSuccessRateCurrent, previous: apiSuccessRatePrevious } =
+    getApiSuccessRates(metrics)
+  const { current: authSuccessRateCurrent, previous: authSuccessRatePrevious } =
+    getAuthSuccessRates(metrics)
 
   const apiSuccessRateChange = calculatePercentageChange(
     apiSuccessRateCurrent,
