@@ -30,13 +30,6 @@ export const FEATURE_PREVIEWS = [
     isPlatformOnly: true,
   },
   {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    name: 'Directly edit database entities',
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
-    isNew: false,
-    isPlatformOnly: false,
-  },
-  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',

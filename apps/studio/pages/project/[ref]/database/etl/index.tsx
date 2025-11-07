@@ -1,6 +1,6 @@
 import { useFlag, useParams } from 'common'
-import { ReplicationComingSoon } from 'components/interfaces/Database/Replication/ComingSoon'
-import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
+import { ReplicationComingSoon } from 'components/interfaces/Database/ETL/ComingSoon'
+import { Destinations } from 'components/interfaces/Database/ETL/Destinations'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -28,7 +28,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
               <div className="col-span-12">
                 <FormHeader
                   className="[&>div>p]:max-w-full"
-                  title="Replication"
+                  title="ETL Replication"
                   description="Automatically replicate your database changes to external data warehouses and analytics platforms in real-time"
                 />
                 <Destinations />
@@ -41,7 +41,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
           <ScaffoldContainer>
             <ScaffoldSection>
               <div className="col-span-12">
-                <FormHeader title="Replication" description="Send data to other destinations" />
+                <FormHeader title="ETL Replication" description="Send data to other destinations" />
               </div>
             </ScaffoldSection>
           </ScaffoldContainer>
@@ -54,7 +54,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database Replication">{page}</DatabaseLayout>
+    <DatabaseLayout title="Database ETL Replication">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 
