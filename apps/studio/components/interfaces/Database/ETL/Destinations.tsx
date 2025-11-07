@@ -117,8 +117,6 @@ export const Destinations = () => {
       </div>
 
       <div className="w-full overflow-hidden overflow-x-auto">
-        {(isSourcesLoading || isDestinationsLoading) && <GenericSkeletonLoader />}
-
         {(isSourcesError || isDestinationsError) && (
           <AlertError
             error={sourcesError || destinationsError}
@@ -126,7 +124,9 @@ export const Destinations = () => {
           />
         )}
 
-        {replicationNotEnabled ? (
+        {isSourcesLoading || isDestinationsLoading ? (
+          <GenericSkeletonLoader />
+        ) : replicationNotEnabled ? (
           <div className="border rounded-md p-4 md:p-12 flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-1">
               <h3>Stream data to external destinations in real-time</h3>
