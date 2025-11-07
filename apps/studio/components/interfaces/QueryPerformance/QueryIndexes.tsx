@@ -124,8 +124,8 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
 
   return (
     <QueryPanelContainer className="h-full">
-      <QueryPanelSection className="mb-6">
-        <div className="mb-4">
+      <QueryPanelSection className="pt-2 mb-6">
+        <div className="mb-4 flex flex-col gap-y-1">
           <h4>Indexes in use</h4>
           <p className="text-sm text-foreground-light">
             This query is using the following index{(usedIndexes ?? []).length > 1 ? 's' : ''}:
@@ -172,7 +172,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         )}
       </QueryPanelSection>
       <QueryPanelSection className="flex flex-col gap-y-6 py-6 border-t">
-        <div className="flex flex-col gap-y-2">
+        <div className="flex flex-col gap-y-1">
           <h4>New index recommendations</h4>
           {isLoadingExtensions ? (
             <GenericSkeletonLoader />
@@ -235,10 +235,10 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                           '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                         )}
                       />
-                      <p className="text-sm text-foreground-light">
+                      <p className="text-sm text-foreground-light mt-3">
                         This recommendation serves to prevent your queries from slowing down as your
                         application grows, and hence the index may not be used immediately after
-                        it's created. (e.g If your table is still small at this time)
+                        it's created (e.g If your table is still small at this time).
                       </p>
                     </>
                   )}
@@ -251,9 +251,9 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       {isIndexAdvisorEnabled && hasIndexRecommendation && (
         <>
           <QueryPanelSection className="py-6 border-t">
-            <div className="flex flex-col gap-y-2">
+            <div className="flex flex-col gap-y-1">
               <h4>Query costs</h4>
-              <div className="border rounded-md flex flex-col bg-surface-100">
+              <div className="border rounded-md flex flex-col bg-surface-100 mt-3">
                 <QueryPanelScoreSection
                   name="Total cost of query"
                   description="An estimate of how long it will take to return all the rows (Includes start up cost)"
