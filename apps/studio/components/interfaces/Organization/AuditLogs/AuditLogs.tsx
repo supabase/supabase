@@ -65,7 +65,8 @@ export const AuditLogs = () => {
     'notifications'
   )
 
-  const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } = useCheckEntitlements('security.audit_logs_days')
+  const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('security.audit_logs_days')
 
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useOrganizationAuditLogsQuery(
@@ -131,7 +132,7 @@ export const AuditLogs = () => {
       }
     })
 
-  // This feature depends on the subscription tier of the user. 
+  // This feature depends on the subscription tier of the user.
   // The API limits the logs to maximum of 62 days and 5 minutes so when the page is
   // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
   // higher tiers.The user will see a loading shimmer.
