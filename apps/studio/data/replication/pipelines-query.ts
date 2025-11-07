@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { replicationKeys } from './keys'
-import { checkFeatureFlagRequiredError } from './utils'
+import { checkReplicationFeatureFlagRetry } from './utils'
 
 type ReplicationPipelinesParams = { projectRef?: string }
 
@@ -38,17 +38,6 @@ export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
     enabled: enabled && typeof projectRef !== 'undefined',
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    retry: (failureCount, error) => {
-      const isFeatureFlagRequiredError = checkFeatureFlagRequiredError(error)
-      if (isFeatureFlagRequiredError) {
-        return false
-      }
-
-      if (failureCount < 3) {
-        return true
-      }
-
-      return false
-    },
+    retry: checkReplicationFeatureFlagRetry,
     ...options,
   })
