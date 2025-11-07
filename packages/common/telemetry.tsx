@@ -243,7 +243,11 @@ export const PageTelemetry = ({
     if (router !== null) return
 
     // Only track if pathname actually changed (not initial mount)
-    if (appPathname && previousAppPathnameRef.current !== null && previousAppPathnameRef.current !== appPathname) {
+    if (
+      appPathname &&
+      previousAppPathnameRef.current !== null &&
+      previousAppPathnameRef.current !== appPathname
+    ) {
       sendPageTelemetry()
     }
 
