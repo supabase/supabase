@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, put } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { orgSSOKeys } from './keys'
 
 export type SSOConfigUpdateVariables = {
@@ -28,7 +28,7 @@ export const useSSOConfigUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>,
+  UseCustomMutationOptions<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

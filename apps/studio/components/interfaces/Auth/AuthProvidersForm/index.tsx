@@ -9,7 +9,7 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
+import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import {
   Alert_Shadcn_,

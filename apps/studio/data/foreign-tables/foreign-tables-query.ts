@@ -1,10 +1,10 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { PostgresView } from '@supabase/postgres-meta'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { foreignTableKeys } from './keys'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type ForeignTablesVariables = {
   projectRef?: string
@@ -46,7 +46,10 @@ export type ForeignTablesError = ResponseError
 
 export const useForeignTablesQuery = <TData = ForeignTablesData>(
   { projectRef, connectionString, schema }: ForeignTablesVariables,
-  { enabled = true, ...options }: UseQueryOptions<ForeignTablesData, ForeignTablesError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ForeignTablesData, ForeignTablesError, TData> = {}
 ) =>
   useQuery<ForeignTablesData, ForeignTablesError, TData>({
     queryKey: schema

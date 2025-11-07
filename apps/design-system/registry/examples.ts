@@ -1263,4 +1263,19 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/logs-bar-chart.tsx'],
   },
+  {
+    name: 'empty-state-missing-route',
+    type: 'components:example',
+    files: ['example/empty-state-missing-route.tsx'],
+  },
+  {
+    name: 'empty-state-zero-items-table',
+    type: 'components:example',
+    files: ['example/empty-state-zero-items-table.tsx'],
+  },
+  {
+    name: 'empty-state-initial-state',
+    type: 'components:example',
+    files: ['example/empty-state-initial-state.tsx'],
+  },
 ]

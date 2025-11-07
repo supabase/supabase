@@ -7,7 +7,7 @@ import type { IntegrationProjectConnection } from 'data/integrations/integration
 import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import { TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { inferProjectStatus } from './ProjectCard.utils'

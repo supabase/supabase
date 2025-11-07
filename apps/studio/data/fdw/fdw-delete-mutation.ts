@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
@@ -7,7 +7,7 @@ import { foreignTableKeys } from 'data/foreign-tables/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { FDW } from './fdws-query'
 import { fdwKeys } from './keys'
 
@@ -99,7 +99,7 @@ export const useFDWDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<FDWDeleteData, ResponseError, FDWDeleteVariables>,
+  UseCustomMutationOptions<FDWDeleteData, ResponseError, FDWDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

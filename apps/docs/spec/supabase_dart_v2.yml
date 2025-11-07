@@ -2428,7 +2428,7 @@ functions:
   - id: generate-link
     title: 'generateLink()'
     notes: |
-      Generates email links and OTPs to be sent via a custom email provider.
+      Generates email links and OTPs. This will not send links or OTPs to the end user. This function is for custom admin functionality.
       - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `emailChangeCurrent`, `emailChangeNew`, `phoneChange`.
       - `generateLink()` only generates the email link for `email_change_email` if the "Secure email change" setting is enabled under the "Email" provider in your Supabase project.
       - `generateLink()` handles the creation of the user for `signup`, `invite` and `magiclink`.

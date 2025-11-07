@@ -5,25 +5,34 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
 import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
-import { LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
+import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
+import {
+  useCreateLogDrainMutation,
+  LogDrainCreateVariables,
+} from 'data/log-drains/create-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { Alert_Shadcn_, Button } from 'ui'
+import {
+  Alert_Shadcn_,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ChevronDown } from 'lucide-react'
+import { cloneElement } from 'react'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -34,6 +43,9 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false)
   const { ref } = useParams() as { ref: string }
   const [selectedLogDrain, setSelectedLogDrain] = useState<Partial<LogDrainData> | null>(null)
+  const [isCreateConfirmModalOpen, setIsCreateConfirmModalOpen] = useState(false)
+  const [pendingLogDrainValues, setPendingLogDrainValues] =
+    useState<LogDrainCreateVariables | null>(null)
   const [mode, setMode] = useState<'create' | 'update'>('create')
 
   const { plan, isLoading: planLoading } = useCurrentOrgPlan()
@@ -78,39 +90,8 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     setOpen(true)
   }
 
-  return (
-    <>
-      <ScaffoldContainer>
-        {(logDrainsEnabled || planLoading) && (
-          <ScaffoldHeader className="flex flex-row justify-between">
-            <div>
-              <ScaffoldTitle>Log Drains</ScaffoldTitle>
-              <ScaffoldDescription>
-                Send your project logs to third party destinations
-              </ScaffoldDescription>
-            </div>
-
-            <div className="flex items-center justify-end gap-2">
-              <DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />
-
-              {!(logDrains?.length === 0) && (
-                <Button
-                  disabled={!logDrainsEnabled || !canManageLogDrains}
-                  onClick={() => {
-                    setSelectedLogDrain(null)
-                    setMode('create')
-                    setOpen(true)
-                  }}
-                  type="primary"
-                >
-                  Add destination
-                </Button>
-              )}
-            </div>
-          </ScaffoldHeader>
-        )}
-      </ScaffoldContainer>
-
+  const content = (
+    <ScaffoldSection isFullWidth id="log-drains" className="gap-6">
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         <LogDrainDestinationSheetForm
           mode={mode}
@@ -138,7 +119,8 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             }
 
             if (mode === 'create') {
-              createLogDrain(logDrainValues)
+              setPendingLogDrainValues(logDrainValues)
+              setIsCreateConfirmModalOpen(true)
             } else {
               if (!logDrainValues.id || !selectedLogDrain?.token) {
                 throw new Error('Log drain ID and token is required')
@@ -159,8 +141,100 @@ const LogDrainsSettings: NextPageWithLayout = () => {
           <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
         )}
       </ScaffoldContainer>
-    </>
+
+      <ConfirmationModal
+        confirmLabel="Add destination"
+        variant="default"
+        title="Confirm Log Drain Creation"
+        visible={isCreateConfirmModalOpen}
+        onConfirm={() => {
+          if (pendingLogDrainValues) {
+            createLogDrain(pendingLogDrainValues)
+            setPendingLogDrainValues(null)
+          }
+          setIsCreateConfirmModalOpen(false)
+          setOpen(false)
+        }}
+        onCancel={() => {
+          setIsCreateConfirmModalOpen(false)
+          setPendingLogDrainValues(null)
+        }}
+      >
+        <div className="text-foreground-light text-sm space-y-2">
+          <p>
+            You are about to create a new log drain destination:{' '}
+            <span className="text-foreground">{pendingLogDrainValues?.name}</span>
+          </p>
+          <p>
+            This will incur an additional <span className="text-foreground">$60 per month</span>{' '}
+            charge to your subscription.
+          </p>
+          <p>Are you sure you want to proceed?</p>
+        </div>
+      </ConfirmationModal>
+    </ScaffoldSection>
   )
+
+  // [kemal]: Ordinarily <PageLayout /> would be bundled with the getLayout function below, however in this case we need access to some bits for the "Add destination" button to render as part of the in-built page header in <PageLayout />.
+  if (logDrainsEnabled && !planLoading) {
+    return (
+      <PageLayout
+        title="Log Drains"
+        subtitle="Send your project logs to third party destinations"
+        primaryActions={
+          <>
+            {!(logDrains?.length === 0) && (
+              <div className="flex items-center">
+                <Button
+                  disabled={!logDrainsEnabled || !canManageLogDrains}
+                  onClick={() => {
+                    setSelectedLogDrain(null)
+                    setMode('create')
+                    setOpen(true)
+                  }}
+                  type="primary"
+                  className="rounded-r-none px-3"
+                >
+                  Add destination
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="primary"
+                      title="Choose token scope"
+                      className="rounded-l-none px-[4px] py-[5px]"
+                      icon={<ChevronDown />}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" side="bottom">
+                    {LOG_DRAIN_TYPES.map((drainType) => (
+                      <DropdownMenuItem
+                        key={drainType.value}
+                        onClick={() => handleNewClick(drainType.value)}
+                      >
+                        <div className="flex items-center gap-3">
+                          {cloneElement(drainType.icon, { height: 16, width: 16 })}
+                          <div className="space-y-1">
+                            <p className="block text-foreground">{drainType.name}</p>
+                            <p className="text-xs text-foreground-lighter">Additional $60</p>
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
+          </>
+        }
+        secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/log-drains`} />}
+      >
+        {content}
+      </PageLayout>
+    )
+  }
+
+  return content
 }
 
 LogDrainsSettings.getLayout = (page) => (
@@ -168,4 +242,5 @@ LogDrainsSettings.getLayout = (page) => (
     <SettingsLayout title="Log Drains">{page}</SettingsLayout>
   </DefaultLayout>
 )
+
 export default LogDrainsSettings

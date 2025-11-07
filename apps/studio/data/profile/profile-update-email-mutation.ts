@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, put } from 'data/fetchers'
 import { auth } from 'lib/gotrue'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { profileKeys } from './keys'
 
 export type EmailUpdateVariables = {
@@ -27,7 +27,7 @@ export const useEmailUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EmailUpdateData, ResponseError, EmailUpdateVariables>,
+  UseCustomMutationOptions<EmailUpdateData, ResponseError, EmailUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
