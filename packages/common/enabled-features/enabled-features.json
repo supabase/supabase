@@ -29,6 +29,8 @@
 
   "branding:large_logo": false,
 
+  "cli:disable_custom_profiles": true,
+
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,
   "dashboard_auth:sign_in_with_sso": true,
@@ -50,6 +52,7 @@
   "docs:contribution": true,
   "docs:fdw": true,
   "docs:footer": true,
+  "docs:navigation_dropdown_links_home": true,
   "docs:self-hosting": true,
   "docs:framework_quickstarts": true,
   "docs:full_getting_started": true,

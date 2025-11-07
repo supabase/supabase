@@ -1,23 +1,13 @@
-import * as Sentry from '@sentry/nextjs'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
+import { captureCriticalError } from 'lib/error-reporting'
 import { PROVIDERS } from 'lib/constants'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { projectKeys } from './keys'
 import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
-
-const WHITELIST_ERRORS = [
-  'The following organization members have reached their maximum limits for the number of active free projects',
-  'db_pass must be longer than or equal to 4 characters',
-  'There are overdue invoices in the organization(s)',
-  'name should not contain a . string',
-  'Project creation in the Supabase dashboard is disabled for this Vercel-managed organization.',
-  'Your account, which is handled by the Fly Supabase extension, cannot access this endpoint.',
-  'already exists in your organization.',
-]
 
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CloudProvider = CreateProjectBody['cloud_provider']
@@ -112,9 +102,7 @@ export const useProjectCreateMutation = ({
       } else {
         onError(data, variables, context)
       }
-      if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-        Sentry.captureMessage('[CRITICAL] Failed to create project: ' + data.message)
-      }
+      captureCriticalError(data, 'create project')
     },
     ...options,
   })
