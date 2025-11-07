@@ -1,6 +1,7 @@
 // Ignore barrel file rule here since it's just exporting more constants
 // eslint-disable-next-line barrel-files/avoid-re-export-all
 export * from './infrastructure'
+export * from './experiments'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 

@@ -5,8 +5,10 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { usePHFlag } from 'hooks/ui/useFlag'
+import { RealtimeButtonVariant } from 'types'
+import { NEW_PROJECT_THRESHOLD_DAYS } from 'lib/constants'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
@@ -26,7 +28,6 @@ import {
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTrack } from 'lib/telemetry/track'
@@ -53,12 +54,9 @@ export interface GridHeaderActionsProps {
   isRefetching: boolean
 }
 
-const NEW_PROJECT_THRESHOLD_DAYS = 7
-
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const track = useTrack()
 
   const [showWarning, setShowWarning] = useQueryState(
@@ -74,8 +72,9 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isView = isTableLikeView(table)
   const isMaterializedView = isTableLikeMaterializedView(table)
 
-  const triggersInsteadOfRealtime = useFlag<boolean>('triggersInsteadOfRealtime')
-  const hideRealtimeButton = usePHFlag<boolean>('hideRealtimeButton')
+  const realtimeButtonVariant = usePHFlag<RealtimeButtonVariant | false | undefined>(
+    'realtimeButtonVariant'
+  )
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
@@ -83,6 +82,19 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     if (!project?.inserted_at) return false
     return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
   }, [project?.inserted_at])
+
+  const activeRealtimeVariant = useMemo(() => {
+    if (!isTable || !isNewProject) return null
+    if (!realtimeButtonVariant || realtimeButtonVariant === RealtimeButtonVariant.CONTROL)
+      return null
+    return realtimeButtonVariant
+  }, [isTable, isNewProject, realtimeButtonVariant])
+
+  const shouldTrackExposure =
+    isTable &&
+    isNewProject &&
+    realtimeButtonVariant !== false &&
+    realtimeButtonVariant !== undefined
 
   const hasTrackedExposure = useRef(false)
 
@@ -187,14 +199,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
   useEffect(() => {
-    if (
-      !hasTrackedExposure.current &&
-      project &&
-      org &&
-      isTable &&
-      isNewProject &&
-      hideRealtimeButton !== undefined
-    ) {
+    if (shouldTrackExposure && !hasTrackedExposure.current && project) {
       hasTrackedExposure.current = true
 
       const daysSinceCreation = Math.floor(
@@ -202,24 +207,24 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       )
 
       track('realtime_experiment_exposed', {
-        variant: hideRealtimeButton ? 'hide_enable_button' : 'control',
+        variant: realtimeButtonVariant as RealtimeButtonVariant,
         table_has_realtime_enabled: isRealtimeEnabled,
         days_since_project_creation: daysSinceCreation,
       })
     }
-  }, [hideRealtimeButton, project, org, isTable, isNewProject, isRealtimeEnabled, track])
+  }, [shouldTrackExposure, realtimeButtonVariant, project, isRealtimeEnabled, track])
 
   const toggleRealtime = async () => {
     if (!project) return console.error('Project is required')
     if (!realtimePublication) return console.error('Unable to find realtime publication')
 
-    const exists = realtimeEnabledTables.some((x: any) => x.id == table.id)
+    const exists = realtimeEnabledTables.some((x: any) => x.id === table.id)
     const tables = !exists
       ? [`${table.schema}.${table.name}`].concat(
           realtimeEnabledTables.map((t: any) => `${t.schema}.${t.name}`)
         )
       : realtimeEnabledTables
-          .filter((x: any) => x.id != table.id)
+          .filter((x: any) => x.id !== table.id)
           .map((x: any) => `${x.schema}.${x.name}`)
 
     track('realtime_toggle_table_clicked', {
@@ -373,7 +378,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             )
           ) : null}
 
-          {isTable && triggersInsteadOfRealtime ? (
+          {isTable && activeRealtimeVariant === RealtimeButtonVariant.TRIGGERS ? (
             <Button
               asChild
               type={'default'}
@@ -396,7 +401,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               </Link>
             </Button>
           ) : (
-            !(isNewProject && hideRealtimeButton) &&
+            activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON &&
             realtimeEnabled && (
               <ButtonTooltip
                 type="default"

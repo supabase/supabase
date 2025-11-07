@@ -1611,7 +1611,7 @@ export interface RealtimeExperimentExposedEvent {
     /**
      * The experiment variant shown to the user
      */
-    variant: 'control' | 'hide_enable_button'
+    variant: 'control' | 'hide-button' | 'triggers'
     /**
      * Whether the table already has realtime enabled
      */

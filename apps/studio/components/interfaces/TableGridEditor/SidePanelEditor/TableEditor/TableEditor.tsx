@@ -17,12 +17,13 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useTrack } from 'lib/telemetry/track'
+import { NEW_PROJECT_THRESHOLD_DAYS } from 'lib/constants'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { usePHFlag } from 'hooks/ui/useFlag'
+import { RealtimeButtonVariant } from 'types'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
@@ -77,8 +78,6 @@ export interface TableEditorProps {
   updateEditorDirty: () => void
 }
 
-const NEW_PROJECT_THRESHOLD_DAYS = 7
-
 export const TableEditor = ({
   table,
   isDuplicating,
@@ -90,10 +89,11 @@ export const TableEditor = ({
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
-  const hideRealtimeButton = usePHFlag<boolean>('hideRealtimeButton')
+  const realtimeButtonVariant = usePHFlag<RealtimeButtonVariant | false | undefined>(
+    'realtimeButtonVariant'
+  )
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const track = useTrack()
 
@@ -132,6 +132,13 @@ export const TableEditor = ({
     if (!project?.inserted_at) return false
     return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
   }, [project?.inserted_at])
+
+  const activeRealtimeVariant = useMemo(() => {
+    if (!isNewProject) return null
+    if (!realtimeButtonVariant || realtimeButtonVariant === RealtimeButtonVariant.CONTROL)
+      return null
+    return realtimeButtonVariant
+  }, [isNewProject, realtimeButtonVariant])
 
   const [errors, setErrors] = useState<any>({})
   const [tableFields, setTableFields] = useState<TableField>()
@@ -381,7 +388,7 @@ export const TableEditor = ({
           </Admonition>
         )}
 
-        {!(isNewProject && hideRealtimeButton) && realtimeEnabled && (
+        {activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON && realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
             label="Enable Realtime"
