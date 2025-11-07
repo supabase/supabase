@@ -1,37 +1,23 @@
-import { ExternalLink, MoreVertical, Search, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+import { ChevronRight, ExternalLink, Search } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { AnalyticsBucket, useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
-import {
-  Button,
-  Card,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
+import { Bucket as BucketIcon } from 'icons'
+import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
-import { DeleteAnalyticsBucketModal } from './DeleteAnalyticsBucketModal'
 
 export const AnalyticsBuckets = () => {
   const { ref } = useParams()
+  const router = useRouter()
 
   const [filterString, setFilterString] = useState('')
-  const [selectedBucket, setSelectedBucket] = useState<AnalyticsBucket>()
-  const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
 
   const { data: buckets = [], isLoading: isLoadingBuckets } = useAnalyticsBucketsQuery({
     projectRef: ref,
@@ -95,9 +81,16 @@ export const AnalyticsBuckets = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    {analyticsBuckets.length > 0 && (
+                      <TableHead className="w-2 pr-1">
+                        <span className="sr-only">Icon</span>
+                      </TableHead>
+                    )}
                     <TableHead>Name</TableHead>
                     <TableHead>Created at</TableHead>
-                    <TableHead />
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -112,15 +105,20 @@ export const AnalyticsBuckets = () => {
                     </TableRow>
                   )}
                   {analyticsBuckets.map((bucket) => (
-                    <TableRow key={bucket.id}>
+                    <TableRow
+                      key={bucket.id}
+                      className="cursor-pointer h-16"
+                      onClick={(event) => {
+                        const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`
+                        if (event.metaKey) window.open(url, '_blank')
+                        else router.push(url)
+                      }}
+                    >
+                      <TableCell className="w-2 pr-1">
+                        <BucketIcon size={16} className="text-foreground-muted" />
+                      </TableCell>
                       <TableCell>
-                        <Link
-                          href={`/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`}
-                          title={bucket.id}
-                          className="text-link-table-cell"
-                        >
-                          {bucket.id}
-                        </Link>
+                        <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
                       </TableCell>
 
                       <TableCell>
@@ -133,31 +131,8 @@ export const AnalyticsBuckets = () => {
                       </TableCell>
 
                       <TableCell>
-                        <div className="flex justify-end gap-2">
-                          <Button asChild type="default">
-                            <Link
-                              href={`/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`}
-                            >
-                              View contents
-                            </Link>
-                          </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1" icon={<MoreVertical />} />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent side="bottom" align="end" className="w-40">
-                              <DropdownMenuItem
-                                className="flex items-center space-x-2"
-                                onClick={(e) => {
-                                  setModal('delete')
-                                  setSelectedBucket(bucket)
-                                }}
-                              >
-                                <Trash2 size={12} />
-                                <p>Delete bucket</p>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <div className="flex justify-end items-center h-full">
+                          <ChevronRight size={14} className="text-foreground-muted/60" />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -167,14 +142,6 @@ export const AnalyticsBuckets = () => {
             </Card>
           )}
         </div>
-      )}
-
-      {selectedBucket && (
-        <DeleteAnalyticsBucketModal
-          visible={modal === 'delete'}
-          bucketId={selectedBucket.id}
-          onClose={() => setModal(null)}
-        />
       )}
     </ScaffoldSection>
   )

@@ -9,15 +9,16 @@ import { Bucket as BucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Badge, cn, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
 type BucketTableHeaderProps = {
   mode: BucketTableMode
+  hasBuckets?: boolean
 }
 
-export const BucketTableHeader = ({ mode }: BucketTableHeaderProps) => {
+export const BucketTableHeader = ({ mode, hasBuckets = true }: BucketTableHeaderProps) => {
   const BucketTableHeader = mode === 'standard' ? TableHeader : VirtualizedTableHeader
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableHead = mode === 'standard' ? TableHead : VirtualizedTableHead
@@ -27,10 +28,12 @@ export const BucketTableHeader = ({ mode }: BucketTableHeaderProps) => {
   return (
     <BucketTableHeader>
       <BucketTableRow>
-        <BucketTableHead className={`${stickyClasses} w-2 pr-1`}>
-          <span className="sr-only">Icon</span>
-        </BucketTableHead>
-        <BucketTableHead className={cn('w-[280px]', stickyClasses)}>Bucket name</BucketTableHead>
+        {hasBuckets && (
+          <BucketTableHead className={`${stickyClasses} w-2 pr-1`}>
+            <span className="sr-only">Icon</span>
+          </BucketTableHead>
+        )}
+        <BucketTableHead className={stickyClasses}>Name</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Policies</BucketTableHead>
         <BucketTableHead className={stickyClasses}>File size limit</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Allowed MIME types</BucketTableHead>
@@ -56,7 +59,7 @@ export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptySt
       <BucketTableCell colSpan={5}>
         <p className="text-sm text-foreground">No results found</p>
         <p className="text-sm text-foreground-lighter">
-          Your search for "{filterString}" did not return any results
+          Your search for “{filterString}” did not return any results
         </p>
       </BucketTableCell>
     </BucketTableRow>

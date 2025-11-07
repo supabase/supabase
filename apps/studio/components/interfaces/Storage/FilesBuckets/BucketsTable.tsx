@@ -33,7 +33,7 @@ const BucketsTableUnvirtualized = ({
     <Table
       containerProps={{ containerClassName: 'h-full overflow-auto', className: 'overflow-visible' }}
     >
-      <BucketTableHeader mode="standard" />
+      <BucketTableHeader mode="standard" hasBuckets={buckets.length > 0} />
       <TableBody>
         {showSearchEmptyState ? (
           <BucketTableEmptyState mode="standard" filterString={filterString} />
@@ -65,7 +65,7 @@ const BucketsTableVirtualized = ({
 
   return (
     <VirtualizedTable data={buckets} estimateSize={() => 59} getItemKey={(bucket) => bucket.id}>
-      <BucketTableHeader mode="virtualized" />
+      <BucketTableHeader mode="virtualized" hasBuckets={buckets.length > 0} />
       <VirtualizedTableBody<Bucket>
         paddingColSpan={5}
         emptyContent={
