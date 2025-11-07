@@ -29,6 +29,7 @@ import {
   TableRow,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { getAnalyticsBucketFDWServerName } from '../AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
 
@@ -140,12 +141,13 @@ export const TableRowComponent = ({
   }
 
   const onConfirmRemoveTable = async () => {
+    if (!bucketId) return console.error('Bucket ID is required')
     if (!wrapperInstance || !wrapperMeta) return toast.error('Unable to find wrapper')
 
     try {
       setIsRemovingTable(true)
 
-      const serverName = `${snakeCase(bucketId)}_fdw_server`
+      const serverName = getAnalyticsBucketFDWServerName(bucketId)
       const serverOptions = await getDecryptedParameters({
         ref: project?.ref,
         connectionString: project?.connectionString ?? undefined,
@@ -163,6 +165,8 @@ export const TableRowComponent = ({
         (x) => x.table_name !== table.name
       )
 
+      // [Joshen] Once Ivan's PR goes through, swap these out to just use useFDWDropForeignTableMutation
+      // https://github.com/supabase/supabase/pull/40206
       await updateFDW({
         projectRef: project?.ref,
         connectionString: project?.connectionString,

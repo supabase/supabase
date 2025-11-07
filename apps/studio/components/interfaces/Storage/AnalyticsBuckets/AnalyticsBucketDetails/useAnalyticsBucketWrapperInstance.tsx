@@ -1,4 +1,3 @@
-import { snakeCase } from 'lodash'
 import { useMemo } from 'react'
 
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
@@ -8,6 +7,7 @@ import {
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { type FDW, useFDWsQuery } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { getAnalyticsBucketFDWName } from './AnalyticsBucketDetails.utils'
 
 export const useAnalyticsBucketWrapperInstance = (
   { bucketId }: { bucketId?: string },
@@ -36,7 +36,7 @@ export const useAnalyticsBucketWrapperInstance = (
           wrapper
         )
       )
-      .find((w) => w.name === snakeCase(`${bucketId}_fdw`))
+      .find((w) => w.name === getAnalyticsBucketFDWName(bucketId ?? ''))
   }, [data, bucketId])
 
   const icebergWrapperMeta = getWrapperMetaForWrapper(icebergWrapper)
