@@ -78,9 +78,9 @@ export const generateDatabaseMenu = (
         ...(showPgReplicate
           ? [
               {
-                name: 'Replication',
-                key: 'replication',
-                url: `/project/${ref}/database/replication`,
+                name: 'ETL Replication',
+                key: 'etl',
+                url: `/project/${ref}/database/etl`,
                 items: [],
               },
             ]
