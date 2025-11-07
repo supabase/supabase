@@ -81,7 +81,7 @@ BEGIN
       END;
      ELSE
         RAISE LOG 'rls_auto_enable: skip % (either system schema or not in enforced list: %.)', cmd.object_identity, cmd.schema_name;
-     END IF;  
+     END IF;
   END LOOP;
 END;
 $$;
