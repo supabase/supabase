@@ -1094,6 +1094,11 @@ export const examples: Registry = [
     files: ['example/page-layout-list.tsx'],
   },
   {
+    name: 'page-layout-list-simple',
+    type: 'components:example',
+    files: ['example/page-layout-list-simple.tsx'],
+  },
+  {
     name: 'page-layout-settings',
     type: 'components:example',
     files: ['example/page-layout-settings.tsx'],
