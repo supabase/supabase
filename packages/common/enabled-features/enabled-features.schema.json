@@ -181,6 +181,10 @@
       "type": "boolean",
       "description": "Enable footer on docs site"
     },
+    "docs:navigation_dropdown_links_home": {
+      "type": "boolean",
+      "description": "Should the navigation dropdown homepage link go to Supabase.com or the dashboard"
+    },
     "docs:framework_quickstarts": {
       "type": "boolean",
       "description": "Enable framework quickstarts documentation"
