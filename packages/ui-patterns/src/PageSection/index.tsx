@@ -1,7 +1,7 @@
 'use client'
 
-import React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import React from 'react'
 
 import { cn } from 'ui'
 
@@ -217,4 +217,3 @@ export const PageSection = Object.assign(PageSectionRoot, {
   Aside: PageSectionAside,
   Content: PageSectionContent,
 })
-

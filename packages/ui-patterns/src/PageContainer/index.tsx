@@ -1,7 +1,7 @@
 'use client'
 
-import { forwardRef, HTMLAttributes } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { forwardRef, HTMLAttributes } from 'react'
 
 import { cn } from 'ui'
 
@@ -51,4 +51,3 @@ export const PageContainer = forwardRef<HTMLDivElement, PageContainerProps>(
 )
 
 PageContainer.displayName = 'PageContainer'
-

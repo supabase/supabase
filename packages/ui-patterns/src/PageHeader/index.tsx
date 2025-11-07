@@ -1,9 +1,9 @@
 'use client'
 
-import React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import React from 'react'
 
-import { cn, NavMenu } from 'ui'
+import { cn } from 'ui'
 import { Breadcrumb } from 'ui/src/components/shadcn/ui/breadcrumb'
 import { PageContainer } from '../PageContainer'
 
