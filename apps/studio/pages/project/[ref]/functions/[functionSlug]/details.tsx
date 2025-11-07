@@ -1,13 +1,11 @@
 import { EdgeFunctionDetails } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection } from 'ui-patterns/PageSection'
 import type { NextPageWithLayout } from 'types'
 
-const PageLayout: NextPageWithLayout = () => (
-  <div className="px-6">
-    <EdgeFunctionDetails />
-  </div>
-)
+const PageLayout: NextPageWithLayout = () => <EdgeFunctionDetails />
 
 PageLayout.getLayout = (page) => (
   <DefaultLayout>
