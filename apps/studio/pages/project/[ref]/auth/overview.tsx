@@ -43,7 +43,6 @@ const AuthOverview: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer size="large">
       <div className="mb-4 flex flex-col gap-2">
-        <pre>{JSON.stringify(metrics, null, 2)}</pre>
         <OverviewMetrics metrics={metrics} isLoading={isLoading} error={error} />
         <OverviewLearnMore />
       </div>
