@@ -3,7 +3,11 @@ import { describe, it, expect, vi } from 'vitest'
 import { toServiceStatsMap } from './ProjectUsageSection.utils'
 import type { ProjectMetricsRow } from 'data/analytics/project-metrics-query'
 
-const mkRow = (n: number, service: ProjectMetricsRow['service'], time_window: ProjectMetricsRow['time_window']): ProjectMetricsRow => ({
+const mkRow = (
+  n: number,
+  service: ProjectMetricsRow['service'],
+  time_window: ProjectMetricsRow['time_window']
+): ProjectMetricsRow => ({
   timestamp: (1700000000000 + n * 60000) * 1000, // microseconds
   service,
   time_window,
@@ -39,7 +43,12 @@ describe('toServiceStatsMap', () => {
       mkRow(2, 'db', 'current'),
       mkRow(0, 'db', 'previous'),
     ]
-    const map = toServiceStatsMap({ data: rows, isLoading: true, error: undefined, onRefresh: () => {} })
+    const map = toServiceStatsMap({
+      data: rows,
+      isLoading: true,
+      error: undefined,
+      onRefresh: () => {},
+    })
 
     expect(map.db.current.eventChartData.length).toBe(2)
     expect(map.db.previous.eventChartData.length).toBe(1)
