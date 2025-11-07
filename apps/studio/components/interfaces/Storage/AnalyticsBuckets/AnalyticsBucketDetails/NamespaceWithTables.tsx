@@ -125,7 +125,7 @@ const TableRowComponent = ({
                   <p>Query in SQL Editor</p>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="flex items-center gap-x-2">
-                  <Link href={`/project/${project?.ref}/database/replication/${tableName}`}>
+                  <Link href={`/project/${project?.ref}/database/etl/${tableName}`}>
                     <Replace size={12} className="text-foreground-lighter" />
                     <p>View replication status</p>
                   </Link>

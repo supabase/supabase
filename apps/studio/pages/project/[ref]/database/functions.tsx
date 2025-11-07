@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
 import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
@@ -19,10 +19,6 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
-  const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
-  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
-  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
-  const [isDuplicating, setIsDuplicating] = useState(false)
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const { openSidebar } = useSidebarManagerSnapshot()
   const {
@@ -35,6 +31,11 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'functions'
   )
+
+  const [isDuplicating, setIsDuplicating] = useState(false)
+  const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
+  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
 
   const createFunction = () => {
     setIsDuplicating(false)

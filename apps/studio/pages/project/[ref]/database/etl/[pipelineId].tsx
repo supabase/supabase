@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 
 import { FeatureFlagContext, useFlag, useParams } from 'common'
-import { ReplicationPipelineStatus } from 'components/interfaces/Database/Replication/ReplicationPipelineStatus/ReplicationPipelineStatus'
+import { ReplicationPipelineStatus } from 'components/interfaces/Database/ETL/ReplicationPipelineStatus/ReplicationPipelineStatus'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -18,7 +18,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (hasLoaded && !enablePgReplicate) {
-      router.replace(`/project/${ref}/database/replication}`)
+      router.replace(`/project/${ref}/database/etl}`)
     }
   }, [router, hasLoaded, ref, enablePgReplicate])
 
@@ -29,7 +29,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
           <ScaffoldContainer>
             <ScaffoldSection>
               <div className="col-span-12">
-                <FormHeader title="Replication" />
+                <FormHeader title="ETL Replication" />
                 <ReplicationPipelineStatus />
               </div>
             </ScaffoldSection>
@@ -42,7 +42,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database Replication">{page}</DatabaseLayout>
+    <DatabaseLayout title="Database ETL Replication">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

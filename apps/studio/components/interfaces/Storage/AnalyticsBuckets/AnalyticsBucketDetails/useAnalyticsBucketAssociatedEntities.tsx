@@ -6,8 +6,8 @@ import { FDW } from 'data/fdw/fdws-query'
 import {
   ReplicationPublication,
   useReplicationPublicationsQuery,
-} from 'data/replication/publications-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+} from 'data/etl/publications-query'
+import { useReplicationSourcesQuery } from 'data/etl/sources-query'
 import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
 import { S3AccessKey, useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'

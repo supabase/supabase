@@ -143,18 +143,22 @@ export const useRegisterSidebar = (
   id: string,
   component: () => ReactNode,
   handlers: SidebarHandlers = {},
-  hotKey?: string
+  hotKey?: string,
+  enabled?: boolean
 ) => {
   const [isSidebarHotkeyEnabled] = useLocalStorageQuery<boolean>(
     LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(id),
     true
   )
 
-  useEffect(() => {
-    const { registerSidebar, unregisterSidebar, sidebars } = sidebarManagerState
+  const { sidebars, registerSidebar, unregisterSidebar } = useSidebarManagerSnapshot()
 
-    if (!sidebars[id]) {
+  useEffect(() => {
+    const isEnabled = enabled !== false
+    if (!sidebars[id] && isEnabled) {
       registerSidebar(id, component, handlers)
+    } else if (sidebars[id] && !isEnabled) {
+      unregisterSidebar(id)
     }
 
     return () => {
@@ -162,7 +166,7 @@ export const useRegisterSidebar = (
         unregisterSidebar(id)
       }
     }
-  }, [id])
+  }, [id, enabled])
 
   useEffect(() => {
     if (!hotKey) return

@@ -20,12 +20,12 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
-import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { useReplicationPipelineByIdQuery } from 'data/etl/pipeline-by-id-query'
+import { useReplicationPipelineReplicationStatusQuery } from 'data/etl/pipeline-replication-status-query'
+import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from 'data/etl/pipeline-version-query'
+import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
+import { useStopPipelineMutation } from 'data/etl/stop-pipeline-mutation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -184,7 +184,7 @@ export const ReplicationPipelineStatus = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-x-3">
             <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
-              <Link href={`/project/${projectRef}/database/replication`} />
+              <Link href={`/project/${projectRef}/database/etl`} />
             </Button>
             <div className="flex items-center gap-x-3">
               <h3 className="text-xl font-semibold">{destinationName || 'Pipeline'}</h3>
