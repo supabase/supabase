@@ -1,101 +1,26 @@
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React from 'react'
-
-import { useParams } from 'common'
 import { AuthProvidersForm } from 'components/interfaces/Auth/AuthProvidersForm'
 import { BasicAuthSettingsForm } from 'components/interfaces/Auth/BasicAuthSettingsForm'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import { AuthProvidersLayout } from 'components/layouts/AuthLayout/AuthProvidersLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageContainer } from 'ui-patterns/PageContainer'
-import { PageHeader } from 'ui-patterns/PageHeader'
-import { NavMenu, NavMenuItem } from 'ui'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
 import type { NextPageWithLayout } from 'types'
 
 const ProvidersPage: NextPageWithLayout = () => {
   const showProviders = useIsFeatureEnabled('authentication:show_providers')
 
   return (
-    <PageContainer>
+    <ScaffoldContainer>
       <BasicAuthSettingsForm />
       {showProviders && <AuthProvidersForm />}
-    </PageContainer>
+    </ScaffoldContainer>
   )
 }
 
-ProvidersPage.getLayout = (page: React.ReactElement) => {
-  const AuthProvidersPageLayout = () => {
-    const { ref } = useParams()
-    const router = useRouter()
-    const { authenticationSignInProviders, authenticationThirdPartyAuth } = useIsFeatureEnabled([
-      'authentication:sign_in_providers',
-      'authentication:third_party_auth',
-    ])
-
-    const navItems = [
-      {
-        label: 'Supabase Auth',
-        href: `/project/${ref}/auth/providers`,
-      },
-      ...(authenticationThirdPartyAuth
-        ? [
-            {
-              label: 'Third Party Auth',
-              href: `/project/${ref}/auth/third-party`,
-            },
-          ]
-        : []),
-    ]
-
-    if (!authenticationSignInProviders) {
-      return (
-        <DefaultLayout>
-          <AuthLayout>
-            <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
-          </AuthLayout>
-        </DefaultLayout>
-      )
-    }
-
-    return (
-      <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader.Root>
-          <PageHeader.Summary>
-            <PageHeader.Title>Sign In / Providers</PageHeader.Title>
-            <PageHeader.Description>
-              Configure authentication providers and login methods for your users
-            </PageHeader.Description>
-          </PageHeader.Summary>
-          {navItems.length > 0 && (
-            <PageHeader.Footer>
-              <NavMenu>
-                {navItems.map((item) => {
-                  const isActive = router.asPath.split('?')[0] === item.href
-                  return (
-                    <NavMenuItem key={item.label} active={isActive}>
-                      <Link href={item.href}>{item.label}</Link>
-                    </NavMenuItem>
-                  )
-                })}
-              </NavMenu>
-            </PageHeader.Footer>
-          )}
-        </PageHeader.Root>
-
-        {page}
-      </div>
-    )
-  }
-
-  return (
-    <DefaultLayout>
-      <AuthLayout>
-        <AuthProvidersPageLayout />
-      </AuthLayout>
-    </DefaultLayout>
-  )
-}
+ProvidersPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthProvidersLayout>{page}</AuthProvidersLayout>
+  </DefaultLayout>
+)
 
 export default ProvidersPage

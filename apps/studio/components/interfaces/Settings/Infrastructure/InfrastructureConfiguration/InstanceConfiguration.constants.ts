@@ -33,6 +33,7 @@ export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   NORTHEAST_ASIA_2: [126.98, 37.56],
   CENTRAL_CANADA: [-73.6, 45.5],
   WEST_US: [-121.96, 37.35],
+  WEST_US_2: [-122.67, 45.51],
   EAST_US: [-78.45, 38.13],
   WEST_EU: [-8, 53],
   WEST_EU_2: [-0.1, 51],

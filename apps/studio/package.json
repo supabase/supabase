@@ -81,7 +81,6 @@
     "cron-parser": "^4.9.0",
     "cronstrue": "^2.50.0",
     "crypto-js": "^4.2.0",
-    "class-variance-authority": "^0.6.1",
     "dayjs": "^1.11.10",
     "dnd-core": "^16.0.1",
     "file-saver": "^2.0.5",

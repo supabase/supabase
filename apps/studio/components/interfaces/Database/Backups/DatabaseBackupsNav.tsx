@@ -29,24 +29,29 @@ function DatabaseBackupsNav({ active }: Props) {
       enabled: databaseRestoreToNewProject && cloud_provider !== 'FLY',
       id: 'rtnp',
       label: (
-        <div className="flex items-center gap-2">
-          Restore to new project <Badge size="small">Beta</Badge>
+        <div className="flex items-center gap-1">
+          Restore to new project{' '}
+          <Badge size="small" className="!text-[10px] px-1.5 py-0">
+            Beta
+          </Badge>
         </div>
       ),
       href: `/project/${ref}/database/backups/restore-to-new-project`,
     },
   ] as const
 
-  const menuItems = navMenuItems.map(
-    (item) =>
-      item.enabled && (
-        <NavMenuItem key={item.id} active={item.id === active}>
-          <Link href={item.href}>{item.label}</Link>
-        </NavMenuItem>
-      )
+  return (
+    <NavMenu className="overflow-hidden overflow-x-auto">
+      {navMenuItems.map(
+        (item) =>
+          item.enabled && (
+            <NavMenuItem key={item.id} active={item.id === active}>
+              <Link href={item.href}>{item.label}</Link>
+            </NavMenuItem>
+          )
+      )}
+    </NavMenu>
   )
-
-  return <NavMenu className="overflow-hidden overflow-x-auto">{menuItems}</NavMenu>
 }
 
 export default DatabaseBackupsNav

@@ -10,9 +10,8 @@ import { TriggersList } from 'components/interfaces/Database/Triggers/TriggersLi
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
@@ -100,14 +99,21 @@ execute function function_name();`)
 
   return (
     <>
-      <ScaffoldContainer size="large">
-        <ScaffoldSection isFullWidth>
-          <TriggersList
-            createTrigger={createTrigger}
-            editTrigger={editTrigger}
-            duplicateTrigger={duplicateTrigger}
-            deleteTrigger={deleteTrigger}
-          />
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            <FormHeader
+              title="Database Triggers"
+              description="Execute a set of actions automatically on specified table events"
+              docsUrl={`${DOCS_URL}/guides/database/postgres/triggers`}
+            />
+            <TriggersList
+              createTrigger={createTrigger}
+              editTrigger={editTrigger}
+              duplicateTrigger={duplicateTrigger}
+              deleteTrigger={deleteTrigger}
+            />
+          </div>
         </ScaffoldSection>
       </ScaffoldContainer>
       <TriggerSheet
@@ -130,16 +136,7 @@ execute function function_name();`)
 
 TriggersPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">
-      <PageLayout
-        title="Database Triggers"
-        subtitle="Execute a set of actions automatically on specified table events"
-        secondaryActions={<DocsButton href={`${DOCS_URL}/guides/database/postgres/triggers`} />}
-        size="large"
-      >
-        {page}
-      </PageLayout>
-    </DatabaseLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

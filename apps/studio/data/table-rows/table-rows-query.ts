@@ -6,6 +6,7 @@ import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
+import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   RoleImpersonationState,
@@ -248,8 +249,27 @@ export async function getTableRows(
 
   const table = parseSupaTable(entity)
 
+  const equalityFilterColumns = filters
+    ?.filter((filter) => filter.operator === '=' || filter.operator === 'is')
+    .flatMap((filter) => filter.column)
+
+  // There is an edge case for MS SQL foreign tables, where the Postgres query
+  // planner may drop sorts that are redundant with filters, resulting in
+  // invalid MS SQL syntax. To prevent this, we exclude potentially conflicting
+  // columns from potential default sort columns.
+  const excludedColumns = isMsSqlForeignTable(entity)
+    ? Array.from(new Set(equalityFilterColumns))
+    : undefined
+
   const sql = wrapWithRoleImpersonation(
-    getTableRowsSql({ table: entity, filters, sorts, limit, page }),
+    getTableRowsSql({
+      table: entity,
+      filters,
+      sorts,
+      limit,
+      page,
+      sortExcludedColumns: excludedColumns,
+    }),
     roleImpersonationState
   )
 

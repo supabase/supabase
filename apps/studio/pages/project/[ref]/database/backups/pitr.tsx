@@ -1,22 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertCircle } from 'lucide-react'
-import { useMemo } from 'react'
 
 import { useParams } from 'common'
+import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { PITRNotice } from 'components/interfaces/Database/Backups/PITR/PITRNotice'
 import { PITRSelection } from 'components/interfaces/Database/Backups/PITR/PITRSelection'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout, type NavigationItem } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
@@ -26,60 +25,27 @@ import { Admonition } from 'ui-patterns'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer size="large">
-      <ScaffoldSection isFullWidth>
-        <div className="space-y-8">
-          <PITR />
+    <ScaffoldContainer>
+      <ScaffoldSection>
+        <div className="col-span-12">
+          <div className="space-y-6">
+            <FormHeader className="!mb-0" title="Database Backups" />
+            <DatabaseBackupsNav active="pitr" />
+            <div className="space-y-8">
+              <PITR />
+            </div>
+          </div>
         </div>
       </ScaffoldSection>
     </ScaffoldContainer>
   )
 }
 
-DatabasePhysicalBackups.getLayout = (page) => {
-  const BackupPageLayout = () => {
-    const { ref, cloud_provider } = useSelectedProjectQuery()?.data || {}
-    const { databaseRestoreToNewProject } = useIsFeatureEnabled(['database:restore_to_new_project'])
-
-    const navigationItems: NavigationItem[] = useMemo(
-      () => [
-        {
-          label: 'Scheduled backups',
-          href: `/project/${ref}/database/backups/scheduled`,
-        },
-        {
-          label: 'Point in time',
-          href: `/project/${ref}/database/backups/pitr`,
-          active: true,
-        },
-        ...(databaseRestoreToNewProject && cloud_provider !== 'FLY'
-          ? [
-              {
-                label: 'Restore to new project',
-                href: `/project/${ref}/database/backups/restore-to-new-project`,
-                badge: 'Beta',
-              },
-            ]
-          : []),
-      ],
-      [ref, databaseRestoreToNewProject, cloud_provider]
-    )
-
-    return (
-      <PageLayout title="Database Backups" size="large" navigationItems={navigationItems}>
-        {page}
-      </PageLayout>
-    )
-  }
-
-  return (
-    <DefaultLayout>
-      <DatabaseLayout title="Database">
-        <BackupPageLayout />
-      </DatabaseLayout>
-    </DefaultLayout>
-  )
-}
+DatabasePhysicalBackups.getLayout = (page) => (
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
+)
 
 const PITR = () => {
   const { ref: projectRef } = useParams()
