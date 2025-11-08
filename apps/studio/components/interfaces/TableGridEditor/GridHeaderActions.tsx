@@ -90,12 +90,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     return realtimeButtonVariant
   }, [isTable, isNewProject, realtimeButtonVariant])
 
-  const shouldTrackExposure =
-    isTable &&
-    isNewProject &&
-    realtimeButtonVariant !== false &&
-    realtimeButtonVariant !== undefined
-
   const hasTrackedExposure = useRef(false)
 
   const { mutate: updateTable } = useTableUpdateMutation({
@@ -199,20 +193,21 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
   useEffect(() => {
-    if (shouldTrackExposure && !hasTrackedExposure.current && project) {
-      hasTrackedExposure.current = true
+    if (!isTable || !isNewProject || !project || hasTrackedExposure.current) return
+    if (realtimeButtonVariant === false || realtimeButtonVariant === undefined) return
 
-      const daysSinceCreation = Math.floor(
-        (Date.now() - new Date(project.inserted_at).getTime()) / (1000 * 60 * 60 * 24)
-      )
+    hasTrackedExposure.current = true
 
-      track('realtime_experiment_exposed', {
-        variant: realtimeButtonVariant as RealtimeButtonVariant,
-        table_has_realtime_enabled: isRealtimeEnabled,
-        days_since_project_creation: daysSinceCreation,
-      })
-    }
-  }, [shouldTrackExposure, realtimeButtonVariant, project, isRealtimeEnabled, track])
+    const daysSinceCreation = Math.floor(
+      (Date.now() - new Date(project.inserted_at).getTime()) / (1000 * 60 * 60 * 24)
+    )
+
+    track('realtime_experiment_exposed', {
+      variant: realtimeButtonVariant,
+      table_has_realtime_enabled: isRealtimeEnabled,
+      days_since_project_creation: daysSinceCreation,
+    })
+  }, [isTable, isNewProject, realtimeButtonVariant, project, isRealtimeEnabled, track])
 
   const toggleRealtime = async () => {
     if (!project) return console.error('Project is required')
