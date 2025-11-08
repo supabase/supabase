@@ -28,8 +28,8 @@ export const courses: SidebarNavGroup = {
           href: '/foundations/security',
         },
         {
-          title: 'Migrations',
-          href: '/foundations/migrations',
+          title: 'Realtime',
+          href: '/foundations/realtime',
         },
         {
           title: 'Storage',
@@ -41,7 +41,7 @@ export const courses: SidebarNavGroup = {
         },
         {
           title: 'Vector Search',
-          href: '/foundations/vector-search',
+          href: '/foundations/vector',
         },
       ],
       commandItemLabel: 'Foundations',
