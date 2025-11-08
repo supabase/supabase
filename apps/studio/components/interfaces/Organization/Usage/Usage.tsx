@@ -158,6 +158,7 @@ export const Usage = () => {
                     open={openProjectSelector}
                     setOpen={setOpenProjectSelector}
                     selectedRef={selectedProjectRef}
+                    portal={true}
                     onSelect={(project) => {
                       setSelectedProjectRef(project.ref)
                     }}

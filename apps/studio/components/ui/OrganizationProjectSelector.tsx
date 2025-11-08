@@ -28,6 +28,7 @@ interface OrganizationProjectSelectorSelectorProps {
   selectedRef?: string | null
   searchPlaceholder?: string
   sameWidthAsTrigger?: boolean
+  portal?: boolean
   checkPosition?: 'right' | 'left'
   setOpen?: (value: boolean) => void
   renderRow?: (project: OrgProject) => ReactNode
@@ -51,6 +52,7 @@ export const OrganizationProjectSelector = ({
   selectedRef,
   searchPlaceholder = 'Find project...',
   sameWidthAsTrigger = false,
+  portal = false,
   checkPosition = 'right',
   renderRow,
   renderTrigger,
@@ -149,6 +151,7 @@ export const OrganizationProjectSelector = ({
         className="p-0"
         side="bottom"
         align="start"
+        portal={portal}
       >
         <Command_Shadcn_ shouldFilter={false}>
           <CommandInput_Shadcn_
