@@ -27,6 +27,12 @@ export const handle: Handle = async ({ event, resolve }) => {
    * `getUser` and aborts early if the JWT signature is invalid.
    */
   event.locals.safeGetSession = async () => {
+     const {
+      data: { session },
+    } = await event.locals.supabase.auth.getSession()
+    return { session, user }
+  }
+  
     const {
       data: { user },
       error,
@@ -35,12 +41,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       return { session: null, user: null }
     }
 
-    const {
-      data: { session },
-    } = await event.locals.supabase.auth.getSession()
-    return { session, user }
-  }
-
+   
   return resolve(event, {
     filterSerializedResponseHeaders(name: string) {
       return name === 'content-range' || name === 'x-supabase-api-version'
