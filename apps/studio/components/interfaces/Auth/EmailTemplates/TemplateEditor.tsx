@@ -75,6 +75,10 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
+  const [lastAttemptedSaveValues, setLastAttemptedSaveValues] = useState<{
+    formValues: { [key: string]: string }
+    bodyValue: string
+  } | null>(null)
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 
@@ -101,6 +105,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
       })
       form.reset(values)
       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+      setLastAttemptedSaveValues(null) // Clear last attempted save values when authConfig changes
     }
   }, [authConfig, properties, messageSlug, form])
 
@@ -114,6 +119,10 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     // its state is kept separately from the form state, hence why we manually inject it here
     delete payload[messageSlug]
     if (messageProperty) payload[messageSlug] = bodyValue
+
+    // Capture the current values for comparison if spam is detected
+    const currentFormValues = { ...values }
+    const currentBodyValue = bodyValue
 
     const [subjectKey] = Object.keys(properties)
 
@@ -132,6 +141,11 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
           if (preventSaveFromSpamCheck) {
             setIsSavingTemplate(false)
+            // Set the last attempted save values so the button is disabled until a new change is made
+            setLastAttemptedSaveValues({
+              formValues: currentFormValues,
+              bodyValue: currentBodyValue,
+            })
             toast.error(
               'Please rectify all spam warnings before saving while using the built-in email service'
             )
@@ -141,8 +155,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               {
                 onSuccess: () => {
                   setIsSavingTemplate(false)
-                  toast.success('Successfully updated email template')
                   setHasUnsavedChanges(false) // Reset the unsaved changes state
+                  setLastAttemptedSaveValues(null) // Clear the last attempted save values on successful save
+                  toast.success('Successfully updated email template')
                 },
               }
             )
@@ -208,8 +223,11 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
   // Check if form values have changed
   const formValues = form.watch()
-  const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(INITIAL_VALUES)
-  const hasChanges = hasFormChanges || ((authConfig && authConfig[messageSlug]) ?? '') !== bodyValue
+  const baselineValues = lastAttemptedSaveValues?.formValues ?? INITIAL_VALUES
+  const baselineBodyValue =
+    lastAttemptedSaveValues?.bodyValue ?? (authConfig && authConfig[messageSlug]) ?? ''
+  const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
+  const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
 
   // Function to insert text at cursor position
   const insertTextAtCursor = (text: string) => {
@@ -366,6 +384,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     form.reset(INITIAL_VALUES)
                     setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
                     setHasUnsavedChanges(false)
+                    setLastAttemptedSaveValues(null) // Clear last attempted save values on cancel
                   }}
                 >
                   Cancel
