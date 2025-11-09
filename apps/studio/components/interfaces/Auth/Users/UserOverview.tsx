@@ -44,6 +44,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isEmailAuth = user.email !== null
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
+  const isVerified = user.confirmed_at != null
 
   const providers = ((user.raw_app_meta_data?.providers as string[]) ?? []).map(
     (provider: string) => {
@@ -96,10 +97,10 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const { mutate: sendMagicLink, isLoading: isSendingMagicLink } = useUserSendMagicLinkMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_magic_link')
-      toast.success(`Sent magic link to ${vars.user.email}`)
+      toast.success(isVerified ? `Sent magic link to ${vars.user.email}` : `Sent confirmation email to ${vars.user.email}`)
     },
     onError: (err) => {
-      toast.error(`Failed to send magic link: ${err.message}`)
+      toast.error(isVerified ? `Failed to send magic link: ${err.message}` : `Failed to send confirmation email: ${err.message}`)
     },
   })
   const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
@@ -278,11 +279,11 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 }
               />
               <RowAction
-                title="Send magic link"
-                description="Passwordless login via email for the user"
+                title={isVerified ? 'Send Magic Link' : 'Send confirmation email'}
+                description={isVerified ? 'Passwordless login via email for the user' : 'Send a confirmation email to the user'}
                 button={{
                   icon: <Mail />,
-                  text: 'Send magic link',
+                  text: isVerified ? 'Send magic link' : 'Send confirmation email',
                   isLoading: isSendingMagicLink,
                   disabled: !canSendMagicLink,
                   onClick: () => {
@@ -292,8 +293,8 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 success={
                   successAction === 'send_magic_link'
                     ? {
-                        title: 'Magic link sent',
-                        description: `The link in the email is valid for ${formattedExpiry}`,
+                        title: isVerified ? 'Magic link sent' : 'Confirmation email sent',
+                        description: isVerified ? `The link in the email is valid for ${formattedExpiry}` : 'The confirmation email has been sent to the user',
                       }
                     : undefined
                 }
