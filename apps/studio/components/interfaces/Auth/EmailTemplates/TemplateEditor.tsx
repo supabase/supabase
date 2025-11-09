@@ -77,7 +77,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
-  const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
   // Create form values
   const INITIAL_VALUES = useMemo(() => {
@@ -375,9 +374,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={
-                  !canUpdateConfig || isSavingTemplate || !hasChanges || preventSaveFromSpamCheck
-                }
+                disabled={!canUpdateConfig || isSavingTemplate || !hasChanges}
                 loading={isSavingTemplate}
               >
                 Save changes
