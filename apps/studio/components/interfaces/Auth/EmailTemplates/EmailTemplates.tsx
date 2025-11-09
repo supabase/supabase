@@ -188,7 +188,7 @@ export const EmailTemplates = () => {
                               )}
                             </Link>
 
-                            <div className="flex items-center gap-4 h-full pl-2">
+                            <div className="flex items-center gap-4 h-full pl-2 relative">
                               <FormField_Shadcn_
                                 control={notificationsForm.control}
                                 name={templateEnabledKey}
