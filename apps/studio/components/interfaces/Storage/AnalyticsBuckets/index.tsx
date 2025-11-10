@@ -107,11 +107,21 @@ export const AnalyticsBuckets = () => {
                   {analyticsBuckets.map((bucket) => (
                     <TableRow
                       key={bucket.id}
-                      className="cursor-pointer h-16"
+                      role="button"
+                      tabIndex={0}
+                      className="cursor-pointer h-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong focus-visible:bg-surface-200"
                       onClick={(event) => {
                         const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`
                         if (event.metaKey) window.open(url, '_blank')
                         else router.push(url)
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault()
+                          const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`
+                          if (event.metaKey) window.open(url, '_blank')
+                          else router.push(url)
+                        }
                       }}
                     >
                       <TableCell className="w-2 pr-1">
