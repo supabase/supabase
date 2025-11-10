@@ -1,5 +1,6 @@
 import { ChevronRight, ExternalLink, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import type React from 'react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -34,6 +35,18 @@ export const VectorsBuckets = () => {
       : bucketsList.filter((bucket) =>
           bucket.vectorBucketName.toLowerCase().includes(filterString.toLowerCase())
         )
+
+  const handleBucketNavigation = (
+    bucketName: string,
+    event: React.MouseEvent | React.KeyboardEvent
+  ) => {
+    const url = `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(bucketName)}`
+    if (event.metaKey || event.ctrlKey) {
+      window.open(url, '_blank')
+    } else {
+      router.push(url)
+    }
+  }
 
   return (
     <ScaffoldSection isFullWidth>
@@ -120,11 +133,15 @@ export const VectorsBuckets = () => {
                     return (
                       <TableRow
                         key={id}
-                        className="cursor-pointer h-16"
-                        onClick={(event) => {
-                          const url = `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`
-                          if (event.metaKey) window.open(url, '_blank')
-                          else router.push(url)
+                        role="button"
+                        tabIndex={0}
+                        className="cursor-pointer h-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong focus-visible:bg-surface-200"
+                        onClick={(event) => handleBucketNavigation(name, event)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            event.preventDefault()
+                            handleBucketNavigation(name, event)
+                          }
                         }}
                       >
                         <TableCell className="w-2 pr-1">

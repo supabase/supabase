@@ -9,6 +9,7 @@ import { Bucket as BucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import type React from 'react'
 import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
@@ -86,14 +87,30 @@ export const BucketTableRow = ({
 
   const router = useRouter()
 
+  const handleBucketNavigation = (
+    bucketId: string,
+    event: React.MouseEvent | React.KeyboardEvent
+  ) => {
+    const url = `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId)}`
+    if (event.metaKey || event.ctrlKey) {
+      window.open(url, '_blank')
+    } else {
+      router.push(url)
+    }
+  }
+
   return (
     <BucketTableRow
       key={bucket.id}
-      className="cursor-pointer h-16"
-      onClick={(event) => {
-        const url = `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`
-        if (event.metaKey) window.open(url, '_blank')
-        else router.push(url)
+      role="button"
+      tabIndex={0}
+      className="cursor-pointer h-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong focus-visible:bg-surface-200"
+      onClick={(event) => handleBucketNavigation(bucket.id, event)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault()
+          handleBucketNavigation(bucket.id, event)
+        }
       }}
     >
       <BucketTableCell className="w-2 pr-1">
