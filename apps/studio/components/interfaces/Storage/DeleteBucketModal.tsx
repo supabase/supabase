@@ -81,6 +81,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   return (
     <TextConfirmModal
       visible={visible}
+      size="medium"
       variant="destructive"
       title={`Confirm deletion of ${bucket.id}`}
       loading={isDeletingBucket || isDeletingPolicies}
@@ -96,7 +97,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     >
       <p className="text-sm">
         Your bucket <span className="font-bold text-foreground">{bucket.id}</span> and all of its
-        contents will be permanently deleted. Are you sure?
+        contents will be permanently deleted.
       </p>
     </TextConfirmModal>
   )
