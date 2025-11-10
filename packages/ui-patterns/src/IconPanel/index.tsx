@@ -3,7 +3,7 @@
 import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import * as React from 'react'
-import ReactTooltip from 'react-tooltip'
+import { Tooltip } from 'react-tooltip'
 
 interface Props {
   title?: string
@@ -56,9 +56,15 @@ export const IconPanel = ({
     )
   }
 
+  const tooltipId = React.useId()
+
   return (
     <>
-      <div className={['relative', 'group'].join(' ')} data-tip={tooltip}>
+      <div
+        className={['relative', 'group'].join(' ')}
+        data-tooltip-id={tooltip ? tooltipId : undefined}
+        data-tooltip-content={tooltip}
+      >
         <div className={['peer relative', 'flex flex-col', icon ? 'gap-6' : 'gap-2'].join(' ')}>
           <div
             className={[
@@ -114,11 +120,9 @@ export const IconPanel = ({
         ></div>
       </div>
       {tooltip && (
-        <ReactTooltip
-          effect="solid"
-          backgroundColor="hsl(var(--background-alternative-default))"
-          textColor="hsl(var(--foreground-light))"
-          className="!py-2 !px-4"
+        <Tooltip
+          id={tooltipId}
+          className="!py-2 !px-4 !bg-[hsl(var(--background-alternative-default))] !text-[hsl(var(--foreground-light))]"
         />
       )}
     </>
