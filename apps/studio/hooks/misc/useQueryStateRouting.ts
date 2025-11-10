@@ -131,7 +131,7 @@ export function useQueryStateRouting<T = any>({
 export function useQueryStateWithData<T, K extends keyof T & string>(
   urlKey: string,
   data: T[] = [],
-  dataKey: K
+  dataKeySelector: K
 ) {
   const [selectedId, setSelectedId] = useQueryState(
     urlKey,
@@ -146,7 +146,7 @@ export function useQueryStateWithData<T, K extends keyof T & string>(
       return
     }
 
-    const keyValue = String(value[dataKey])
+    const keyValue = String(value[dataKeySelector])
     setSelectedId(keyValue)
     setVal(value)
   }
@@ -154,10 +154,10 @@ export function useQueryStateWithData<T, K extends keyof T & string>(
   useEffect(() => {
     // Set the value if the selected ID is not null and we have data
     if (selectedId != null && data.length > 0) {
-      const initialValue = data.find((item) => String(item[dataKey]) === selectedId)
+      const initialValue = data.find((item) => String(item[dataKeySelector]) === selectedId)
       setVal(initialValue)
     }
-  }, [selectedId, data, dataKey])
+  }, [selectedId, data, dataKeySelector])
 
   return {
     val,
