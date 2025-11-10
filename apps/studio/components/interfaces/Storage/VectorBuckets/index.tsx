@@ -127,7 +127,15 @@ export const VectorsBuckets = () => {
 
                     return (
                       <TableRow key={id}>
-                        <TableCell>{name}</TableCell>
+                        <TableCell>
+                          <Link
+                            href={`/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`}
+                            title={name}
+                            className="text-link-table-cell"
+                          >
+                            {name}
+                          </Link>
+                        </TableCell>
                         <TableCell>
                           <p className="text-foreground-light">
                             <TimestampInfo

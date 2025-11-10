@@ -578,7 +578,7 @@ This feature is particularly useful for teams looking to enhance their security 
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },

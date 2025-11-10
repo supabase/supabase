@@ -51,7 +51,7 @@ export interface TextConfirmModalProps {
   errorMessage?: string
 }
 
-const TextConfirmModal = forwardRef<
+export const TextConfirmModal = forwardRef<
   React.ElementRef<typeof DialogContent>,
   React.ComponentPropsWithoutRef<typeof Dialog> & TextConfirmModalProps
 >(
@@ -98,6 +98,8 @@ const TextConfirmModal = forwardRef<
         confirmValue: '',
       },
     })
+
+    const isFormValid = form.formState.isValid
 
     // 2. Define a submit handler.
     function onSubmit(values: z.infer<typeof formSchema>) {
@@ -197,7 +199,7 @@ const TextConfirmModal = forwardRef<
                   }
                   htmlType="submit"
                   loading={loading}
-                  disabled={loading}
+                  disabled={!isFormValid || loading}
                   className="truncate"
                 >
                   {confirmLabel}

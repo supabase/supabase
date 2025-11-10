@@ -172,7 +172,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     requiredExtensions: ['supabase_vault'],
     missingExtensionsAlert: <UpgradeDatabaseAlert />,
     name: `Vault`,
-    status: 'alpha',
+    status: 'beta',
     icon: ({ className, ...props } = {}) => (
       <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
