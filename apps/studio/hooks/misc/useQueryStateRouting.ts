@@ -1,11 +1,6 @@
 import { useEffect } from 'react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsString, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
-
-// Boolean state configuration
-interface BooleanStateConfig {
-  key: string
-}
 
 // Entity state configuration
 interface EntityStateConfig<T> {
@@ -18,12 +13,6 @@ interface EntityStateConfig<T> {
   transformDuplicate?: (entity: T) => T
 }
 
-// Boolean state return type
-interface BooleanState {
-  show: boolean
-  setShow: (value: boolean | null) => Promise<URLSearchParams>
-}
-
 // Entity state return type
 interface EntityState<T> {
   selectedId: string | null
@@ -33,22 +22,18 @@ interface EntityState<T> {
   notFound: boolean
 }
 
-// Function overloads for type safety
-export function useQueryStateRouting(config: BooleanStateConfig): BooleanState
-export function useQueryStateRouting<T>(config: EntityStateConfig<T>): EntityState<T>
-
 /**
- * Hook for managing URL query parameters for UI state.
+ * Hook for managing URL query parameters for entity-based operations.
  *
- * This hook provides a declarative way to handle routing state using URL query parameters.
- * It supports two modes:
- * 1. Boolean state - Simple on/off state (e.g., ?new=true)
- * 2. Entity state - Track which entity is selected (e.g., ?edit=123)
+ * This hook provides entity state management with automatic entity lookup,
+ * error handling, and URL synchronization. Use this for edit/delete/duplicate
+ * operations where you need to track which entity is selected.
  *
- * @example
- * // Boolean state (for create dialogs, etc.)
- * const { show, setShow } = useQueryStateRouting({ key: 'new' })
- * <CreateDialog open={show} onOpenChange={setShow} />
+ * For simple boolean state (e.g., create dialogs), use `useQueryState` from nuqs directly:
+ * ```
+ * import { parseAsBoolean, useQueryState } from 'nuqs'
+ * const [show, setShow] = useQueryState('new', parseAsBoolean.withDefault(false))
+ * ```
  *
  * @example
  * // Entity state (for edit/delete/duplicate)
@@ -77,23 +62,7 @@ export function useQueryStateRouting<T>(config: EntityStateConfig<T>): EntitySta
  *   }),
  * })
  */
-export function useQueryStateRouting<T = any>(
-  config: BooleanStateConfig | EntityStateConfig<T>
-): BooleanState | EntityState<T> {
-  // Check if this is entity state by looking for entity-specific properties
-  const isEntityState = 'idField' in config || 'entityName' in config
-
-  // Boolean state mode
-  if (!isEntityState) {
-    const { key } = config as BooleanStateConfig
-    const [show, setShow] = useQueryState(
-      key,
-      parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-    )
-    return { show, setShow }
-  }
-
-  // Entity state mode
+export function useQueryStateRouting<T = any>(config: EntityStateConfig<T>): EntityState<T> {
   const {
     key,
     entities,
@@ -102,7 +71,7 @@ export function useQueryStateRouting<T = any>(
     entityName,
     transformId = (id: unknown) => String(id),
     transformDuplicate,
-  } = config as EntityStateConfig<T>
+  } = config
 
   const [selectedId, setSelectedId] = useQueryState(
     key,

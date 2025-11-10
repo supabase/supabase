@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -43,9 +44,10 @@ export const RolesList = () => {
     connectionString: project?.connectionString,
   })
 
-  const { show: isCreatingRole, setShow: setIsCreatingRole } = useQueryStateRouting({
-    key: 'new',
-  })
+  const [isCreatingRole, setIsCreatingRole] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     setSelectedId: setSelectedRoleIdToDelete,

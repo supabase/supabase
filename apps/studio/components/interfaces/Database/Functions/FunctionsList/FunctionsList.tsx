@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { parseAsJson, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsJson, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -164,10 +164,9 @@ const FunctionsList = () => {
     ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
   ]
 
-  const { show: showCreateFunctionForm, setShow: setShowCreateFunctionForm } = useQueryStateRouting(
-    {
-      key: 'new',
-    }
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const {

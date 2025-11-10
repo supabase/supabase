@@ -1,5 +1,6 @@
 import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -50,9 +51,10 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const { show: showCreateIndex, setShow: setShowCreateIndex } = useQueryStateRouting({
-    key: 'new',
-  })
+  const [showCreateIndex, setShowCreateIndex] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { setSelectedId: setSelectedIndexName, entity: selectedIndex } = useQueryStateRouting({
     key: 'edit',

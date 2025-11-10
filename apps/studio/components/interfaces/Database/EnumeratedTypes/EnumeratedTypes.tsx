@@ -1,4 +1,5 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
@@ -40,9 +41,10 @@ export const EnumeratedTypes = () => {
     connectionString: project?.connectionString,
   })
 
-  const { show: showCreateTypePanel, setShow: setShowCreateTypePanel } = useQueryStateRouting({
-    key: 'new',
-  })
+  const [showCreateTypePanel, setShowCreateTypePanel] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     setSelectedId: setSelectedTypeIdToEdit,
