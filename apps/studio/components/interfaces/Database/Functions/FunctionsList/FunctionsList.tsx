@@ -181,17 +181,25 @@ $$;`)
     transformId: (id) => id.toString(),
   })
 
-  const showCreateFunctionForm = newQueryState.show
-  const setShowCreateFunctionForm = newQueryState.setShow
-  const setSelectedFunctionToEdit = editQueryState!.setSelectedId
-  const functionToEdit = editQueryState!.entity
-  const showFunctionToEdit = editQueryState?.show
-  const setSelectedFunctionToDelete = deleteQueryState!.setSelectedId
-  const functionToDelete = deleteQueryState!.entity
-  const showFunctionToDelete = deleteQueryState!.show
-  const setSelectedFunctionIdToDuplicate = duplicateQueryState!.setSelectedId
-  const functionToDuplicate = duplicateQueryState!.entity
-  const showFunctionToDuplicate = duplicateQueryState!.show
+  const { show: showCreateFunctionForm, setShow: setShowCreateFunctionForm } = newQueryState
+
+  const {
+    setSelectedId: setSelectedFunctionToEdit,
+    entity: functionToEdit,
+    show: showFunctionToEdit,
+  } = editQueryState!
+
+  const {
+    setSelectedId: setSelectedFunctionToDelete,
+    entity: functionToDelete,
+    show: showFunctionToDelete,
+  } = deleteQueryState!
+
+  const {
+    setSelectedId: setSelectedFunctionIdToDuplicate,
+    entity: functionToDuplicate,
+    show: showFunctionToDuplicate,
+  } = duplicateQueryState!
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
