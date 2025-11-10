@@ -164,8 +164,8 @@ export const CreateAnalyticsBucketModal = ({
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
 
-      toast.success(`Created bucket “${values.name}”`)
       form.reset()
+      toast.success(`Created bucket “${values.name}”`)
       setVisible(false)
       router.push(`/project/${ref}/storage/analytics/buckets/${values.name}`)
     } catch (error: any) {
