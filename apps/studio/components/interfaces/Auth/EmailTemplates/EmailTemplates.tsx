@@ -122,12 +122,12 @@ export const EmailTemplates = () => {
       {isSuccess && (
         <>
           {builtInSMTP ? (
-            <div className="my-12">
+            <div className="mt-12">
               <EmailRateLimitsAlert />
             </div>
           ) : null}
           {isSecurityNotificationsEnabled ? (
-            <div className="space-y-12">
+            <div className="mt-12 space-y-12">
               <div>
                 <ScaffoldSectionTitle className="mb-4">Authentication</ScaffoldSectionTitle>
                 <Card>
