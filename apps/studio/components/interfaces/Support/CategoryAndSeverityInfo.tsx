@@ -22,6 +22,7 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
 
 interface CategoryAndSeverityInfoProps {
   form: UseFormReturn<SupportFormValues>
@@ -83,7 +84,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
                 </SelectTrigger_Shadcn_>
                 <SelectContent_Shadcn_>
                   <SelectGroup_Shadcn_>
-                    {CATEGORY_OPTIONS.map((option) => (
+                    {CATEGORY_OPTIONS.filter((option) => !option.hidden).map((option) => (
                       <SelectItem_Shadcn_ key={option.value} value={option.value}>
                         {option.label}
                         <span className="block text-xs text-foreground-lighter">
@@ -148,7 +149,7 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
 }
 
 const IssueSuggestion = ({ category, projectRef }: { category: string; projectRef?: string }) => {
-  const baseUrl = `/project/${projectRef === 'no-project' ? '_' : projectRef}`
+  const baseUrl = `/project/${projectRef === NO_PROJECT_MARKER ? '_' : projectRef}`
 
   const className = 'col-span-2 mb-0'
 

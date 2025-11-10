@@ -1,9 +1,9 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { projectKeys } from './keys'
 
 const DEFAULT_LIMIT = 100
@@ -50,25 +50,24 @@ export const useProjectsInfiniteQuery = <TData = ProjectsInfiniteData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<ProjectsInfiniteData, ProjectsInfiniteError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<ProjectsInfiniteData, ProjectsInfiniteError, TData> = {}
 ) => {
   const { profile } = useProfile()
-  return useInfiniteQuery<ProjectsInfiniteData, ProjectsInfiniteError, TData>(
-    projectKeys.infiniteList({ limit, sort, search }),
-    ({ signal, pageParam }) => getProjects({ limit, page: pageParam, sort, search }, signal),
-    {
-      enabled: enabled && profile !== undefined,
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        const currentTotalCount = page * limit
-        // @ts-ignore [Joshen] API type issue for Version 2 endpoints
-        const totalCount = lastPage.pagination.count
+  return useInfiniteQuery<ProjectsInfiniteData, ProjectsInfiniteError, TData>({
+    queryKey: projectKeys.infiniteList({ limit, sort, search }),
+    queryFn: ({ signal, pageParam }) =>
+      getProjects({ limit, page: pageParam, sort, search }, signal),
+    enabled: enabled && profile !== undefined,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      const currentTotalCount = page * limit
+      // @ts-ignore [Joshen] API type issue for Version 2 endpoints
+      const totalCount = lastPage.pagination.count
 
-        if (currentTotalCount >= totalCount) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
+      if (currentTotalCount >= totalCount) return undefined
+      return page
+    },
+    ...options,
+  })
 }

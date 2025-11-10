@@ -1,7 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { snakeCase } from 'lodash'
 
 import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import {
+  getAnalyticsBucketFDWName,
+  getAnalyticsBucketS3KeyName,
+} from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import {
   getCatalogURI,
   getConnectionURL,
@@ -40,10 +43,10 @@ export const useIcebergWrapperCreateMutation = () => {
   const mutateAsync = async ({ bucketName }: { bucketName: string }) => {
     const createS3KeyData = await createS3AccessKey({
       projectRef: project?.ref,
-      description: `${snakeCase(bucketName)}_keys`,
+      description: getAnalyticsBucketS3KeyName(bucketName),
     })
 
-    const wrapperName = `${snakeCase(bucketName)}_fdw`
+    const wrapperName = getAnalyticsBucketFDWName(bucketName)
 
     const params: FDWCreateVariables = {
       projectRef: project?.ref,

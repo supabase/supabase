@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { RolesList } from 'components/interfaces/Database'
+import { RolesList } from 'components/interfaces/Database/Roles/RolesList'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'

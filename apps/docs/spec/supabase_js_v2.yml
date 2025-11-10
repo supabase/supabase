@@ -6571,7 +6571,7 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('countries')
+            .from('characters')
             .select('name')
             .range(0, 1)
           ```
@@ -7375,12 +7375,7 @@ functions:
           ```js
           supabase
             .channel('room1')
-            .send({
-              type: 'broadcast',
-              event: 'cursor-pos',
-              payload: { x: Math.random(), y: Math.random()
-              },
-            })
+            .httpSend('cursor-pos', { x: Math.random(), y: Math.random() })
           ```
   - id: get-channels
     title: getChannels()

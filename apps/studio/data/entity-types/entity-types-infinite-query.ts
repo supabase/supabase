@@ -1,6 +1,6 @@
-import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
 
@@ -130,11 +130,11 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
 ) => {
-  return useInfiniteQuery<EntityTypesData, EntityTypesError, TData>(
-    entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery<EntityTypesData, EntityTypesError, TData>({
+    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
         {
           projectRef,
@@ -148,22 +148,20 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
         },
         signal
       ),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        const currentTotalCount = page * limit
-        const totalCount = lastPage.data.count
+    enabled: enabled && typeof projectRef !== 'undefined',
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      const currentTotalCount = page * limit
+      const totalCount = lastPage.data.count
 
-        if (currentTotalCount >= totalCount) {
-          return undefined
-        }
+      if (currentTotalCount >= totalCount) {
+        return undefined
+      }
 
-        return page
-      },
-      ...options,
-    }
-  )
+      return page
+    },
+    ...options,
+  })
 }
 
 export function prefetchEntityTypes(
@@ -178,9 +176,9 @@ export function prefetchEntityTypes(
     filterTypes,
   }: Omit<EntityTypesVariables, 'page'>
 ) {
-  return client.prefetchInfiniteQuery(
-    entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
-    ({ signal, pageParam }) =>
+  return client.prefetchInfiniteQuery({
+    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
         {
           projectRef,
@@ -193,6 +191,6 @@ export function prefetchEntityTypes(
           filterTypes,
         },
         signal
-      )
-  )
+      ),
+  })
 }

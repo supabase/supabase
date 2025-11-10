@@ -385,12 +385,30 @@ export const examples: Registry = [
     registryDependencies: ['context-menu'],
     files: ['example/context-menu-demo.tsx'],
   },
-  // {
-  //   name: 'data-table-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['data-table'],
-  //   files: ['example/data-table-demo.tsx'],
-  // },
+  {
+    name: 'data-input-demo',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-demo.tsx'],
+  },
+  {
+    name: 'data-input-with-copy',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-copy.tsx'],
+  },
+  {
+    name: 'data-input-with-copy-secret',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-copy-secret.tsx'],
+  },
+  {
+    name: 'data-input-with-reveal-copy',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy.tsx'],
+  },
   {
     name: 'date-picker-demo',
     type: 'components:example',
@@ -1244,5 +1262,20 @@ export const examples: Registry = [
     name: 'logs-bar-chart',
     type: 'components:example',
     files: ['example/logs-bar-chart.tsx'],
+  },
+  {
+    name: 'empty-state-missing-route',
+    type: 'components:example',
+    files: ['example/empty-state-missing-route.tsx'],
+  },
+  {
+    name: 'empty-state-zero-items-table',
+    type: 'components:example',
+    files: ['example/empty-state-zero-items-table.tsx'],
+  },
+  {
+    name: 'empty-state-initial-state',
+    type: 'components:example',
+    files: ['example/empty-state-initial-state.tsx'],
   },
 ]

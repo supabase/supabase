@@ -1,7 +1,7 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 type GetNamespacesVariables = {
@@ -10,6 +10,7 @@ type GetNamespacesVariables = {
   token: string
 }
 
+// [Joshen] Investigate if we can use the temp API keys here
 async function getNamespaces({ catalogUri, warehouse, token }: GetNamespacesVariables) {
   let headers = new Headers()
   // handle both secret key and service role key
@@ -54,11 +55,11 @@ export type IcebergNamespacesError = ResponseError
 
 export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
   params: GetNamespacesVariables,
-  { ...options }: UseQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
+  { ...options }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
-  return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>(
-    storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
-    () => getNamespaces(params),
-    { ...options }
-  )
+  return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
+    queryKey: storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
+    queryFn: () => getNamespaces(params),
+    ...options,
+  })
 }

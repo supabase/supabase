@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
+import { DASHBOARD_LOG_BUCKET } from 'components/interfaces/Support/dashboard-logs'
 import apiWrapper from 'lib/api/apiWrapper'
 import { getUserClaims } from 'lib/gotrue'
 
@@ -9,6 +10,9 @@ export const maxDuration = 120
 
 const GenerateAttachmentUrlSchema = z.object({
   filenames: z.array(z.string()),
+  bucket: z
+    .enum(['support-attachments', 'feedback-attachments', DASHBOARD_LOG_BUCKET])
+    .default('support-attachments'),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -51,9 +55,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   )
 
+  const bucket = parseResult.data.bucket
   // Create signed URLs for 10 years
   const { data, error: signedUrlError } = await adminSupabase.storage
-    .from('support-attachments')
+    .from(bucket)
     .createSignedUrls(filenames, 10 * 365 * 24 * 60 * 60)
   if (signedUrlError) {
     console.error('Failed to sign URLs for attachments', signedUrlError)

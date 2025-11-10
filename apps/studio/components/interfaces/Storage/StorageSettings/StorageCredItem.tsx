@@ -1,9 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { differenceInDays } from 'date-fns'
-import { MoreVertical, TrashIcon } from 'lucide-react'
-
-import CopyButton from 'components/ui/CopyButton'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { MoreVertical, TrashIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -13,6 +11,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 export const StorageCredItem = ({
   description,
@@ -52,14 +51,11 @@ export const StorageCredItem = ({
         <span className="text-foreground">{description}</span>
       </TableCell>
       <TableCell>
-        <div className="flex items-center justify-between">
-          <span className="text-ellipsis font-mono cursor-default">{access_key}</span>
-          <span className="w-24 text-right opacity-0 group-hover:opacity-100 transition-opacity">
-            <CopyButton text={access_key} type="default" />
-          </span>
-        </div>
+        <Input readOnly copy value={access_key} className="font-mono" />
       </TableCell>
-      <TableCell className="text-foreground-lighter">{daysSince(created_at)}</TableCell>
+      <TableCell className="text-foreground-lighter whitespace-nowrap">
+        {daysSince(created_at)}
+      </TableCell>
       <TableCell className="text-right">
         {canRemoveAccessKey && (
           <DropdownMenu>

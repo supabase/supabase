@@ -125,7 +125,7 @@ export const S3Connection = () => {
           <div>
             <ScaffoldSectionTitle>Connection</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
-              Connect to your bucket using any S3-compatible service via the S3 protocol.
+              Connect to your bucket using any S3-compatible service via the S3 protocol
             </ScaffoldSectionDescription>
           </div>
           <DocsButton href={`${DOCS_URL}/guides/storage/s3/authentication`} />
@@ -153,7 +153,7 @@ export const S3Connection = () => {
                       <FormItemLayout
                         layout="horizontal"
                         className="[&>*>label]:text-foreground"
-                        label="Enable connection via S3 protocol"
+                        label="S3 protocol connection"
                         description="Allow clients to connect to Supabase Storage via the S3 protocol"
                       >
                         <FormControl_Shadcn_>
@@ -172,11 +172,19 @@ export const S3Connection = () => {
                 <CardContent className="py-6">
                   <div className="flex flex-col gap-y-4">
                     <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
-                      <Input readOnly copy disabled value={s3connectionUrl} />
+                      <Input readOnly copy value={s3connectionUrl} />
                     </FormItemLayout>
                     {!projectIsLoading && (
                       <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
-                        <Input className="input-mono" copy disabled value={project?.region} />
+                        <Input
+                          readOnly
+                          copy
+                          value={project?.region}
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                        />
                       </FormItemLayout>
                     )}
                   </div>
@@ -234,7 +242,7 @@ export const S3Connection = () => {
           <div>
             <ScaffoldSectionTitle>Access keys</ScaffoldSectionTitle>
             <ScaffoldSectionDescription>
-              Manage your access keys for this project.
+              Manage your access keys for this project
             </ScaffoldSectionDescription>
           </div>
           <CreateCredentialModal visible={openCreateCred} onOpenChange={setOpenCreateCred} />
@@ -266,15 +274,9 @@ export const S3Connection = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead key="description" className="min-w-40 lg:min-w-64">
-                        Description
-                      </TableHead>
-                      <TableHead key="access-key-id" className="min-w-64 w-full">
-                        Access key ID
-                      </TableHead>
-                      <TableHead key="created-at" className="min-w-48">
-                        Created at
-                      </TableHead>
+                      <TableHead key="description">Name</TableHead>
+                      <TableHead key="access-key-id">Key ID</TableHead>
+                      <TableHead key="created-at">Created at</TableHead>
                       <TableHead key="actions" />
                     </TableRow>
                   </TableHeader>

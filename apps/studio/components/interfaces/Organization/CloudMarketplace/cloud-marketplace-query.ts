@@ -1,6 +1,6 @@
+import { useQuery } from '@tanstack/react-query'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { get, handleError } from '../../../../data/fetchers'
-import type { ResponseError } from '../../../../types'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { useProfile } from '../../../../lib/profile'
 import { cloudMarketplaceKeys } from './keys'
 
@@ -35,16 +35,18 @@ export const useCloudMarketplaceOnboardingInfoQuery = <TData = CloudMarketplaceO
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     CloudMarketplaceOnboardingInfo,
     CloudMarketplaceOnboardingInfoError,
     TData
   > = {}
 ) => {
   const { profile } = useProfile()
-  return useQuery<CloudMarketplaceOnboardingInfo, CloudMarketplaceOnboardingInfoError, TData>(
-    cloudMarketplaceKeys.onboardingInfo(buyerId),
-    ({ signal }) => getCloudMarketplaceOnboardingInfo({ buyerId }, signal),
-    { enabled: enabled && profile !== undefined, ...options, staleTime: 30 * 60 * 1000 }
-  )
+  return useQuery<CloudMarketplaceOnboardingInfo, CloudMarketplaceOnboardingInfoError, TData>({
+    queryKey: cloudMarketplaceKeys.onboardingInfo(buyerId),
+    queryFn: ({ signal }) => getCloudMarketplaceOnboardingInfo({ buyerId }, signal),
+    enabled: enabled && profile !== undefined,
+    ...options,
+    staleTime: 30 * 60 * 1000,
+  })
 }

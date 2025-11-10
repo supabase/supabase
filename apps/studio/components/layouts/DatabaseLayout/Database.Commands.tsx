@@ -81,10 +81,10 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
       ...(databaseReplication
         ? [
             {
-              id: 'nav-database-replication',
-              name: 'Replication',
-              value: 'Database: Replication',
-              route: `/project/${ref}/database/replication`,
+              id: 'nav-database-etl',
+              name: 'ETL Replication',
+              value: 'Database: ETL Replication',
+              route: `/project/${ref}/database/etl`,
               defaultHidden: true,
             } as IRouteCommand,
           ]
@@ -93,7 +93,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'nav-database-hooks',
         name: 'Webhooks',
         value: 'Database: Webhooks',
-        route: `/project/${ref}/integrations/hooks`,
+        route: `/project/${ref}/integrations/webhooks`,
         defaultHidden: true,
       },
       {

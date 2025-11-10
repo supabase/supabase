@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type SqlCronGenerateResponse = string
 
@@ -41,23 +41,21 @@ export const useSqlCronGenerateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>,
+  UseCustomMutationOptions<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>(
-    (vars) => generateSqlCron(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to generate cron expression: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>({
+    mutationFn: (vars) => generateSqlCron(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to generate cron expression: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

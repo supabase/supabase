@@ -20,6 +20,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
@@ -63,7 +64,6 @@ import {
 } from 'ui'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
-import { LOAD_TAB_FROM_CACHE_PARAM } from 'components/grid/SupabaseGrid.utils'
 
 interface TableListProps {
   onAddTable: () => void
@@ -325,7 +325,7 @@ export const TableList = ({
                   <TableHead key="size" className="hidden text-right xl:table-cell">
                     Size (Estimated)
                   </TableHead>
-                  <TableHead key="realtime" className="hidden xl:table-cell text-center">
+                  <TableHead key="realtime" className="hidden xl:table-cell text-right">
                     Realtime Enabled
                   </TableHead>
                   <TableHead key="buttons"></TableHead>
@@ -457,11 +457,11 @@ export const TableList = ({
                           {(realtimePublication?.tables ?? []).find(
                             (table) => table.id === x.id
                           ) ? (
-                            <div className="flex justify-center">
+                            <div className="flex justify-end">
                               <Check size={18} strokeWidth={2} className="text-brand" />
                             </div>
                           ) : (
-                            <div className="flex justify-center">
+                            <div className="flex justify-end">
                               <X size={18} strokeWidth={2} className="text-foreground-lighter" />
                             </div>
                           )}

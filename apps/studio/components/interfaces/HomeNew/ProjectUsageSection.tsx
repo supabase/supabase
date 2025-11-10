@@ -8,7 +8,6 @@ import { useParams } from 'common'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import useProjectUsageStats from 'hooks/analytics/useProjectUsageStats'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -33,6 +32,16 @@ import {
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { useServiceStats } from './ProjectUsageSection.utils'
+import type { StatsLike } from './ProjectUsageSection.utils'
+import type { LogsBarChartDatum } from './ProjectUsage.metrics'
+import {
+  sumTotal,
+  sumWarnings,
+  sumErrors,
+  computeSuccessAndNonSuccessRates,
+  computeChangePercent,
+  formatDelta,
+} from './ProjectUsage.metrics'
 
 const LOG_RETENTION = { free: 1, pro: 7, team: 28, enterprise: 90 }
 
@@ -58,19 +67,12 @@ const CHART_INTERVALS: ChartIntervals[] = [
     label: 'Last 7 days',
     startValue: 7,
     startUnit: 'day',
-    format: 'MMM D',
+    format: 'MMM D, ha',
     availableIn: ['pro', 'team', 'enterprise'],
   },
 ]
 
 type ChartIntervalKey = '1hr' | '1day' | '7day'
-
-type LogsBarChartDatum = {
-  timestamp: string
-  error_count: number
-  ok_count: number
-  warning_count: number
-}
 
 type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
 
@@ -87,7 +89,7 @@ type ServiceComputed = ServiceEntry & {
   total: number
   warn: number
   err: number
-  stats: ReturnType<typeof useProjectUsageStats>
+  stats: StatsLike
 }
 
 export const ProjectUsageSection = () => {
@@ -106,52 +108,12 @@ export const ProjectUsageSection = () => {
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
-  const { timestampStart, timestampEnd, datetimeFormat } = useMemo(() => {
-    const startDateLocal = dayjs().subtract(
-      selectedInterval.startValue,
-      selectedInterval.startUnit as dayjs.ManipulateType
-    )
-    const endDateLocal = dayjs()
+  const { datetimeFormat } = useMemo(() => {
     const format = selectedInterval.format || 'MMM D, ha'
+    return { datetimeFormat: format }
+  }, [selectedInterval])
 
-    return {
-      timestampStart: startDateLocal.toISOString(),
-      timestampEnd: endDateLocal.toISOString(),
-      datetimeFormat: format,
-    }
-  }, [selectedInterval]) // Only recalculate when interval changes
-
-  const { previousStart, previousEnd } = useMemo(() => {
-    const currentStart = dayjs(timestampStart)
-    const currentEnd = dayjs(timestampEnd)
-    const durationMs = currentEnd.diff(currentStart)
-    const prevEnd = currentStart
-    const prevStart = currentStart.subtract(durationMs, 'millisecond')
-    return { previousStart: prevStart.toISOString(), previousEnd: prevEnd.toISOString() }
-  }, [timestampStart, timestampEnd])
-
-  const statsByService = useServiceStats(
-    projectRef as string,
-    timestampStart,
-    timestampEnd,
-    previousStart,
-    previousEnd
-  )
-
-  const toLogsBarChartData = (rows: any[] = []): LogsBarChartDatum[] => {
-    return rows.map((r) => ({
-      timestamp: String(r.timestamp),
-      ok_count: Number(r.ok_count || 0),
-      warning_count: Number(r.warning_count || 0),
-      error_count: Number(r.error_count || 0),
-    }))
-  }
-
-  const sumTotal = (data: LogsBarChartDatum[]) =>
-    data.reduce((acc, r) => acc + r.ok_count + r.warning_count + r.error_count, 0)
-  const sumWarnings = (data: LogsBarChartDatum[]) =>
-    data.reduce((acc, r) => acc + r.warning_count, 0)
-  const sumErrors = (data: LogsBarChartDatum[]) => data.reduce((acc, r) => acc + r.error_count, 0)
+  const statsByService = useServiceStats(projectRef!, interval)
 
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
@@ -197,7 +159,7 @@ export const ProjectUsageSection = () => {
     () =>
       serviceBase.map((s) => {
         const currentStats = statsByService[s.key].current
-        const data = toLogsBarChartData(currentStats.eventChartData)
+        const data = currentStats.eventChartData
         const total = sumTotal(data)
         const warn = sumWarnings(data)
         const err = sumErrors(data)
@@ -240,17 +202,21 @@ export const ProjectUsageSection = () => {
   const enabledServices = services.filter((s) => s.enabled)
   const totalRequests = enabledServices.reduce((sum, s) => sum + (s.total || 0), 0)
   const totalErrors = enabledServices.reduce((sum, s) => sum + (s.err || 0), 0)
-  const errorRate = totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0
+  const totalWarnings = enabledServices.reduce((sum, s) => sum + (s.warn || 0), 0)
+  const { successRate, nonSuccessRate } = computeSuccessAndNonSuccessRates(
+    totalRequests,
+    totalWarnings,
+    totalErrors
+  )
 
   const prevServiceTotals = useMemo(
     () =>
       serviceBase.map((s) => {
         const previousStats = statsByService[s.key].previous
-        const data = toLogsBarChartData(previousStats.eventChartData)
+        const data = previousStats.eventChartData
         return {
           enabled: s.enabled,
           total: sumTotal(data),
-          err: sumErrors(data),
         }
       }),
     [serviceBase, statsByService]
@@ -258,24 +224,10 @@ export const ProjectUsageSection = () => {
 
   const enabledPrev = prevServiceTotals.filter((s) => s.enabled)
   const prevTotalRequests = enabledPrev.reduce((sum, s) => sum + (s.total || 0), 0)
-  const prevTotalErrors = enabledPrev.reduce((sum, s) => sum + (s.err || 0), 0)
-  const prevErrorRate = prevTotalRequests > 0 ? (prevTotalErrors / prevTotalRequests) * 100 : 0
 
-  const totalRequestsChangePct =
-    prevTotalRequests === 0
-      ? totalRequests > 0
-        ? 100
-        : 0
-      : ((totalRequests - prevTotalRequests) / prevTotalRequests) * 100
-  const errorRateChangePct =
-    prevErrorRate === 0
-      ? errorRate > 0
-        ? 100
-        : 0
-      : ((errorRate - prevErrorRate) / prevErrorRate) * 100
-  const formatDelta = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`
+  const totalRequestsChangePct = computeChangePercent(totalRequests, prevTotalRequests)
   const totalDeltaClass = totalRequestsChangePct >= 0 ? 'text-brand' : 'text-destructive'
-  const errorDeltaClass = errorRateChangePct <= 0 ? 'text-brand' : 'text-destructive'
+  const nonSuccessClass = nonSuccessRate > 0 ? 'text-destructive' : 'text-brand'
 
   return (
     <div className="space-y-6">
@@ -289,11 +241,9 @@ export const ProjectUsageSection = () => {
             </span>
           </div>
           <div className="flex items-start gap-2 heading-section text-foreground-light">
-            <span className="text-foreground">{errorRate.toFixed(1)}%</span>
-            <span>Error Rate</span>
-            <span className={cn('text-sm', errorDeltaClass)}>
-              {formatDelta(errorRateChangePct)}
-            </span>
+            <span className="text-foreground">{successRate.toFixed(1)}%</span>
+            <span>Success Rate</span>
+            <span className={cn('text-sm', nonSuccessClass)}>{formatDelta(nonSuccessRate)}</span>
           </div>
         </div>
         <DropdownMenu>

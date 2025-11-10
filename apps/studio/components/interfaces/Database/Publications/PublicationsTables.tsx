@@ -7,12 +7,11 @@ import { useParams } from 'common'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Loading } from 'components/ui/Loading'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Card, LogoLoader, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PublicationsTableItem } from './PublicationsTableItem'
@@ -87,7 +86,7 @@ export const PublicationsTables = () => {
 
       {(isLoading || isLoadingPermissions) && (
         <div className="mt-8">
-          <Loading />
+          <LogoLoader />
         </div>
       )}
 
@@ -103,7 +102,7 @@ export const PublicationsTables = () => {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Schema</TableHead>
-                  <TableHead>Description</TableHead>
+                  <TableHead className="hidden lg:table-cell">Description</TableHead>
                   {/* 
                       We've disabled All tables toggle for publications. 
                       See https://github.com/supabase/supabase/pull/7233. 

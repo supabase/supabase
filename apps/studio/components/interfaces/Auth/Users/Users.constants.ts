@@ -1,7 +1,10 @@
 import { BASE_PATH } from 'lib/constants'
 import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
+
+export type SpecificFilterColumn = OptimizedSearchColumns | 'freeform'
 
 export const UUIDV4_LEFT_PREFIX_REGEX =
   /^(?:[0-9a-f]{1,8}|[0-9a-f]{8}-|[0-9a-f]{8}-[0-9a-f]{1,4}|[0-9a-f]{8}-[0-9a-f]{4}-|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{0,3}|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{0,3}|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{0,12})$/i

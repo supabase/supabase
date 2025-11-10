@@ -75,12 +75,19 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
         <Copy size={12} />
         <span className="ml-2 text-xs">Copy row</span>
       </Item>
-      <DialogSectionSeparator className="my-1.5" />
+
+      {/* We can't just wrap this entire section in a fragment conditional
+		  on snap.editable because of a bug in react-contexify. Only the
+		  top-level children of Menu are cloned with the necessary bound props,
+		  so Items must be direct children of Menu:
+		  https://github.com/fkhadra/react-contexify/blob/8d9fc63ac13040d3250e8eefd593d50a3ebdd1e6/src/components/Menu.tsx#L295
+		*/}
+      {snap.editable && <DialogSectionSeparator className="my-1.5" />}
       <Item onClick={onEditRowClick} hidden={!snap.editable} data="edit">
         <Edit size={12} />
         <span className="ml-2 text-xs">Edit row</span>
       </Item>
-      <DialogSectionSeparator className="my-1.5" />
+      {snap.editable && <DialogSectionSeparator className="my-1.5" />}
       <Item onClick={onDeleteRow} hidden={!snap.editable} data="delete">
         <Trash size={12} />
         <span className="ml-2 text-xs">Delete row</span>

@@ -1,7 +1,9 @@
+import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { getUsersCountSQL } from '@supabase/pg-meta/src/sql/studio/get-users-count'
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from 'types'
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
 
@@ -12,6 +14,9 @@ type UsersCountVariables = {
   filter?: Filter
   providers?: string[]
   forceExactCount?: boolean
+
+  /** If set, uses optimized prefix search for the specified column */
+  column?: OptimizedSearchColumns
 }
 
 export async function getUsersCount(
@@ -22,10 +27,11 @@ export async function getUsersCount(
     filter,
     providers,
     forceExactCount,
+    column,
   }: UsersCountVariables,
   signal?: AbortSignal
 ) {
-  const sql = getUsersCountSQL({ filter, keywords, providers, forceExactCount })
+  const sql = getUsersCountSQL({ filter, keywords, providers, forceExactCount, column })
 
   const { result } = await executeSql(
     {
@@ -62,17 +68,19 @@ export const useUsersCountQuery = <TData = UsersCountData>(
     filter,
     providers,
     forceExactCount,
+    column,
   }: UsersCountVariables,
-  { enabled = true, ...options }: UseQueryOptions<UsersCountData, UsersCountError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<UsersCountData, UsersCountError, TData> = {}
 ) =>
-  useQuery<UsersCountData, UsersCountError, TData>(
-    authKeys.usersCount(projectRef, {
+  useQuery<UsersCountData, UsersCountError, TData>({
+    queryKey: authKeys.usersCount(projectRef, {
       keywords,
       filter,
       providers,
       forceExactCount,
+      column,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       getUsersCount(
         {
           projectRef,
@@ -81,11 +89,10 @@ export const useUsersCountQuery = <TData = UsersCountData>(
           filter,
           providers,
           forceExactCount,
+          column,
         },
         signal
       ),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -1,26 +1,28 @@
-import { ArrowDown, ArrowUp, ChevronDown, ArrowRight, TextSearch } from 'lucide-react'
+import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
+  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Sheet,
   SheetContent,
+  SheetTitle,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
   cn,
-  CodeBlock,
-  SheetTitle,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import { hasIndexRecommendations } from './IndexAdvisor/index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexAdvisor/IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
@@ -30,10 +32,8 @@ import {
   QUERY_PERFORMANCE_REPORT_TYPES,
   QUERY_PERFORMANCE_ROLE_DESCRIPTION,
 } from './QueryPerformance.constants'
-import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
-import { formatDuration } from './QueryPerformance.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { QueryPerformanceRow } from './QueryPerformance.types'
+import { formatDuration } from './QueryPerformance.utils'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
@@ -72,7 +72,7 @@ export const QueryPerformanceGrid = ({
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
-  const { sort: urlSort, order, roles, search } = useParams()
+  const { sort: urlSort, order, roles, search, minCalls } = useParams()
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
@@ -280,11 +280,14 @@ export const QueryPerformanceGrid = ({
         }
 
         if (col.id === 'cache_hit_rate') {
+          const numericValue = typeof value === 'number' ? value : parseFloat(value)
           return (
             <div className="w-full flex flex-col justify-center text-xs text-right tabular-nums font-mono">
-              {typeof value === 'number' && !isNaN(value) && isFinite(value) ? (
-                <p className={cn(value.toFixed(2) === '0.00' && 'text-foreground-lighter')}>
-                  {value.toLocaleString(undefined, {
+              {typeof numericValue === 'number' &&
+              !isNaN(numericValue) &&
+              isFinite(numericValue) ? (
+                <p className={cn(numericValue.toFixed(2) === '0.00' && 'text-foreground-lighter')}>
+                  {numericValue.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -338,6 +341,11 @@ export const QueryPerformanceGrid = ({
       data = data.filter((row) => row.rolname && roles.includes(row.rolname))
     }
 
+    const minCallsNum = Number(minCalls)
+    if (!Number.isNaN(minCallsNum) && minCallsNum > 0) {
+      data = data.filter((row) => (row.calls || 0) >= minCallsNum)
+    }
+
     if (sort?.column === 'prop_total_time') {
       data.sort((a, b) => {
         const aValue = a.prop_total_time || 0
@@ -357,7 +365,7 @@ export const QueryPerformanceGrid = ({
     }
 
     return data
-  }, [aggregatedData, sort, search, roles])
+  }, [aggregatedData, sort, search, roles, minCalls])
 
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
@@ -369,8 +377,7 @@ export const QueryPerformanceGrid = ({
 
   useEffect(() => {
     setSelectedRow(undefined)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, roles, urlSort, order])
+  }, [search, roles, urlSort, order, minCalls])
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
