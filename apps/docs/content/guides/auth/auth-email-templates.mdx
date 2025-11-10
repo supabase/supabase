@@ -4,7 +4,9 @@ description: 'Learn how to manage the email templates in Supabase.'
 subtitle: 'Learn how to manage the email templates in Supabase.'
 ---
 
-You can customize the email messages used for the authentication flows and security notifications. The following authentication-related email templates can be configured:
+Email templates in Supabase fall into two categories: authentication and security notifications.
+
+Authentication emails:
 
 - Confirm sign up
 - Invite user
@@ -13,7 +15,7 @@ You can customize the email messages used for the authentication flows and secur
 - Reset password
 - Reauthentication
 
-The following security-related email notification templates can also be configured:
+Security notification emails:
 
 - Password changed
 - Email address changed
@@ -22,6 +24,8 @@ The following security-related email notification templates can also be configur
 - Identity unlinked
 - Multi-factor authentication (MFA) method added
 - Multi-factor authentication (MFA) method removed
+
+Security emails are only sent to users if the respective security notifications have been enabled at a project-level.
 
 ## Terminology
 
