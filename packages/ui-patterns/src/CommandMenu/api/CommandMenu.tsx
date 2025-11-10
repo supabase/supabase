@@ -192,7 +192,7 @@ function CommandMenuTriggerInput({
         )}
       >
         <div className="flex items-center space-x-1.5 text-foreground-lighter">
-          <Search size={16} strokeWidth={1.5} />
+          <Search size={16} strokeWidth={1.5} className="group-hover:text-foreground-light" />
           <p className="flex text-sm pr-2 text-foreground-muted">{placeholder}</p>
         </div>
         <div className="command-shortcut hidden md:flex items-center space-x-1">

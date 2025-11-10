@@ -205,7 +205,7 @@ export const LayoutHeader = ({
           </div>
           <div className="flex items-center gap-x-2">
             {customHeaderComponents && customHeaderComponents}
-            {!IS_PLATFORM ? (
+            {IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />
 
@@ -236,19 +236,19 @@ export const LayoutHeader = ({
               <>
                 <LocalVersionPopover />
                 <div className="flex items-center gap-2">
+                  <CommandMenuTriggerInput
+                    placeholder="Search..."
+                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
+                        [&_.command-shortcut>div]:border-none
+                        [&_.command-shortcut>div]:pr-2
+                        [&_.command-shortcut>div]:bg-transparent
+                        [&_.command-shortcut>div]:text-foreground-lighter
+                      "
+                  />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <CommandMenuTriggerInput
-                          placeholder="Search..."
-                          className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
-                            [&_.command-shortcut>div]:border-none
-                            [&_.command-shortcut>div]:pr-2
-                            [&_.command-shortcut>div]:bg-transparent
-                            [&_.command-shortcut>div]:text-foreground-lighter
-                          "
-                        />
                         <InlineEditorButton />
                         <AssistantButton />
                       </>
