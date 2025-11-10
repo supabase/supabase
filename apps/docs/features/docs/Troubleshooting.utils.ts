@@ -2,8 +2,7 @@ import { cache } from 'react'
 import { z } from 'zod'
 
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
-import { IS_PLATFORM } from '~/lib/constants'
-import { supabaseAdmin } from '~/lib/supabaseAdmin'
+import { supabase } from '~/lib/supabase'
 import {
   getAllTroubleshootingEntriesInternal,
   getArticleSlug as getArticleSlugInternal,
@@ -27,10 +26,9 @@ export interface ITroubleshootingEntry {
 export const getArticleSlug = getArticleSlugInternal
 
 async function getAllTroubleshootingEntriesTyped() {
-  const result: ITroubleshootingEntry[] = (
-    IS_PLATFORM ? await getAllTroubleshootingEntriesInternal() : []
-  ) as ITroubleshootingEntry[]
-  return result
+  const result: ITroubleshootingEntry[] =
+    (await getAllTroubleshootingEntriesInternal()) as ITroubleshootingEntry[]
+  return result ?? []
 }
 export const getAllTroubleshootingEntries = cache_fullProcess_withDevCacheBust(
   getAllTroubleshootingEntriesTyped,
@@ -67,7 +65,7 @@ export async function getAllTroubleshootingErrors() {
   const entries = await getAllTroubleshootingEntries()
   const allErrors = new Set(
     entries
-      .flatMap((entry) => entry.data.errors)
+      .flatMap((entry) => entry.data.errors ?? [])
       .filter((error) => error?.http_status_code || error?.code)
   )
 
@@ -81,8 +79,8 @@ export async function getAllTroubleshootingErrors() {
   }
 
   function sortErrors(
-    a: ITroubleshootingMetadata['errors'][number],
-    b: ITroubleshootingMetadata['errors'][number]
+    a: NonNullable<ITroubleshootingMetadata['errors']>[number],
+    b: NonNullable<ITroubleshootingMetadata['errors']>[number]
   ) {
     return formatError(a).localeCompare(formatError(b))
   }
@@ -91,15 +89,11 @@ export async function getAllTroubleshootingErrors() {
 }
 
 async function getTroubleshootingUpdatedDatesInternal() {
-  if (!IS_PLATFORM) {
-    return new Map<string, Date>()
-  }
-
   const databaseIds = (await getAllTroubleshootingEntries())
     .map((entry) => entry.data.database_id)
     .filter((id) => !id.startsWith('pseudo-'))
 
-  const { data, error } = await supabaseAdmin()
+  const { data, error } = await supabase()
     .from('troubleshooting_entries')
     .select('id, date_updated')
     .in('id', databaseIds)
@@ -113,3 +107,60 @@ async function getTroubleshootingUpdatedDatesInternal() {
   }, new Map<string, Date>())
 }
 export const getTroubleshootingUpdatedDates = cache(getTroubleshootingUpdatedDatesInternal)
+
+async function getTroubleshootingEntriesByTopicImpl(
+  topic: ITroubleshootingMetadata['topics'][number]
+) {
+  const allEntries = await getAllTroubleshootingEntries()
+  return allEntries.filter((entry) => entry.data.topics.includes(topic))
+}
+export const getTroubleshootingEntriesByTopic = cache_fullProcess_withDevCacheBust(
+  getTroubleshootingEntriesByTopicImpl,
+  TROUBLESHOOTING_DIRECTORY,
+  () => JSON.stringify([])
+)
+
+export async function getTroubleshootingKeywordsByTopic(
+  topic: ITroubleshootingMetadata['topics'][number]
+) {
+  const entries = await getTroubleshootingEntriesByTopic(topic)
+  const keywords = new Set<string>()
+  for (const entry of entries) {
+    for (const entryTopic of entry.data.topics) {
+      keywords.add(entryTopic)
+    }
+    for (const keyword of entry.data.keywords ?? []) {
+      keywords.add(keyword)
+    }
+  }
+  return Array.from(keywords).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+}
+
+export async function getTroubleshootingErrorsByTopic(
+  topic: ITroubleshootingMetadata['topics'][number]
+) {
+  const entries = await getTroubleshootingEntriesByTopic(topic)
+  const allErrors = new Set(
+    entries
+      .flatMap((entry) => entry.data.errors ?? [])
+      .filter((error) => error?.http_status_code || error?.code)
+  )
+
+  const seen = new Set<string>()
+  for (const error of allErrors) {
+    const key = formatError(error)
+    if (seen.has(key)) {
+      allErrors.delete(error)
+    }
+    seen.add(key)
+  }
+
+  function sortErrors(
+    a: NonNullable<ITroubleshootingMetadata['errors']>[number],
+    b: NonNullable<ITroubleshootingMetadata['errors']>[number]
+  ) {
+    return formatError(a).localeCompare(formatError(b))
+  }
+
+  return Array.from(allErrors).sort(sortErrors)
+}

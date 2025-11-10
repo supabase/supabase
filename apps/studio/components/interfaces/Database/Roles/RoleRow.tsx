@@ -15,9 +15,9 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
 import { PgRole } from 'data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ChevronUp, HelpCircle, MoreVertical, Trash } from 'lucide-react'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
@@ -27,8 +27,8 @@ interface RoleRowProps {
   onSelectDelete: (role: PgRole) => void
 }
 
-const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
-  const { project } = useProjectContext()
+export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
 
   const { mutate: updateDatabaseRole, isLoading: isUpdating } = useDatabaseRoleUpdateMutation()
@@ -219,5 +219,3 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
     </Form>
   )
 }
-
-export default RoleRow

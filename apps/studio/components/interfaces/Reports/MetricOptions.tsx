@@ -6,9 +6,9 @@ import { useParams } from 'common'
 import { useContentQuery } from 'data/content/content-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Metric, METRIC_CATEGORIES, METRICS } from 'lib/constants/metrics'
-import { Dashboards } from 'types'
+import type { Dashboards } from 'types'
 import {
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
@@ -39,7 +39,7 @@ interface MetricOptionsProps {
 
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [search, setSearch] = useState('')
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([

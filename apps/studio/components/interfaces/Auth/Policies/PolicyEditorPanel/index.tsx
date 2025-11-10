@@ -15,8 +15,8 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -33,9 +33,9 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { checkIfPolicyHasChanged, generateCreatePolicyQuery } from './PolicyEditorPanel.utils'
 import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
 import { PolicyDetailsV2 } from './PolicyDetailsV2'
+import { checkIfPolicyHasChanged, generateCreatePolicyQuery } from './PolicyEditorPanel.utils'
 import { PolicyEditorPanelHeader } from './PolicyEditorPanelHeader'
 import { PolicyTemplates } from './PolicyTemplates'
 import { QueryError } from './QueryError'
@@ -65,9 +65,12 @@ export const PolicyEditorPanel = memo(function ({
 }: PolicyEditorPanelProps) {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject } = useSelectedProjectQuery()
 
-  const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
   const [using, setUsing] = useState('')
@@ -122,7 +125,7 @@ export const PolicyEditorPanel = memo(function ({
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async () => {
       // refresh all policies
-      await queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
+      await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(ref) })
       toast.success('Successfully created new policy')
       onSelectCancel()
     },
@@ -217,9 +220,9 @@ export const PolicyEditorPanel = memo(function ({
 
       if (selectedPolicy.command === 'INSERT') {
         // [Joshen] Cause editorOneRef will be the check statement in this scenario
-        if (selectedPolicy.check !== null && selectedPolicy.check !== using) payload.check = using
+        if (selectedPolicy.check !== using) payload.check = using
       } else {
-        if (selectedPolicy.check !== null && selectedPolicy.check !== check) payload.check = check
+        if (selectedPolicy.check !== check) payload.check = check
       }
 
       if (Object.keys(payload).length === 0) return onSelectCancel()
@@ -371,6 +374,9 @@ export const PolicyEditorPanel = memo(function ({
                         <p className="font-mono tracking-tighter">
                           {showCheckBlock ? (
                             <>
+                              {supportWithCheck && showCheckBlock && (
+                                <span className="text-[#ffd700]">) </span>
+                              )}
                               <span className="text-[#569cd6]">with check</span>{' '}
                               <span className="text-[#ffd700]">(</span>
                             </>

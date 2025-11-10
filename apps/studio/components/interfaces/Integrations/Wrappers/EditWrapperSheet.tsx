@@ -4,19 +4,20 @@ import { Edit, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { FDW } from 'data/fdw/fdws-query'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
   convertKVStringArrayToJson,
+  FormattedWrapperTable,
   formatWrapperTables,
   makeValidateRequired,
 } from './Wrappers.utils'
@@ -40,7 +41,7 @@ export const EditWrapperSheet = ({
   onClose,
 }: EditWrapperSheetProps) => {
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: secrets, isLoading: isSecretsLoading } = useVaultSecretsQuery({
     projectRef: project?.ref,
@@ -57,11 +58,13 @@ export const EditWrapperSheet = ({
     },
   })
 
-  const [wrapperTables, setWrapperTables] = useState<any[]>(
+  const [wrapperTables, setWrapperTables] = useState(() =>
     formatWrapperTables(wrapper, wrapperMeta)
   )
   const [isEditingTable, setIsEditingTable] = useState(false)
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState()
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
+    undefined
+  )
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
   const initialValues = {
@@ -92,7 +95,8 @@ export const EditWrapperSheet = ({
 
     const { wrapper_name } = values
     if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
-    if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
+    if (!wrapperMeta.canTargetSchema && wrapperTables.length === 0)
+      errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
     updateFDW({
@@ -273,15 +277,18 @@ export const EditWrapperSheet = ({
                                   </p>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <Button
-                                    type="default"
-                                    className="px-1"
-                                    icon={<Edit />}
-                                    onClick={() => {
-                                      setIsEditingTable(true)
-                                      setSelectedTableToEdit({ ...table, tableIndex: i })
-                                    }}
-                                  />
+                                  {/* Wrappers which import foreign schema don't have tables and their tables can't be edited */}
+                                  {wrapperMeta.tables.length !== 0 && (
+                                    <Button
+                                      type="default"
+                                      className="px-1"
+                                      icon={<Edit />}
+                                      onClick={() => {
+                                        setIsEditingTable(true)
+                                        setSelectedTableToEdit({ ...table, tableIndex: i })
+                                      }}
+                                    />
+                                  )}
                                   <Button
                                     type="default"
                                     className="px-1"

@@ -1,7 +1,7 @@
 import { fetchHandler } from 'data/fetchers'
 import type { Integration } from 'data/integrations/integrations.types'
 import { ResponseError, type SupaResponse } from 'types'
-import { isResponseOk } from './common/fetch'
+import { isResponseOk } from './api/apiWrapper'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
   const response = await fetchHandler(url)

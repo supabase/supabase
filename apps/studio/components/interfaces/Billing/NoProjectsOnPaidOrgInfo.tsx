@@ -1,16 +1,15 @@
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import Link from 'next/link'
 import type { Organization } from 'types'
 import { Admonition } from 'ui-patterns'
-import Link from 'next/link'
 
 interface NoProjectsOnPaidOrgInfoProps {
   organization?: Organization
 }
 
 export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInfoProps) => {
-  const { data: allProjects } = useProjectsQuery({})
-  const projectCount =
-    allProjects?.filter((project) => project.organization_id === organization?.id).length ?? 0
+  const { data } = useOrgProjectsInfiniteQuery({ slug: organization?.slug })
+  const projectCount = data?.pages[0].pagination.count ?? 0
 
   if (
     projectCount > 0 ||

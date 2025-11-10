@@ -1,11 +1,11 @@
 ---
 id: 'build-a-supabase-integration'
-title: 'Build a Supabase Integration (Beta)'
+title: 'Build a Supabase Integration'
 subtitle: "This guide steps through building a Supabase Integration using OAuth2 and the management API, allowing you to manage users' organizations and projects on their behalf."
 description: 'Build a Supabase Integration using OAuth2 and the Management API.'
 ---
 
-Using OAuth2.0 you can retrieve an access and refresh token that grant your application full access to the [Management API](https://supabase.com/docs/reference/api/introduction) on behalf of the user.
+Using OAuth2.0 you can retrieve an access and refresh token that grant your application full access to the [Management API](/docs/reference/api/introduction) on behalf of the user.
 
 ## Create an OAuth app
 
@@ -27,14 +27,15 @@ You can use your preferred OAuth2 client or follow the steps below. You can see 
 
 ### Redirecting to the authorize URL
 
-Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/authorize`](<https://api.supabase.com/api/v1#/oauth%20(beta)/authorize>). Make sure to include all required query parameters such as:
+Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/authorize`](https://api.supabase.com/api/v1#tag/oauth/GET/v1/oauth/authorize). Make sure to include all required query parameters such as:
 
 - `client_id`: Your client id from the app creation above.
 - `redirect_uri`: The URL where Supabase will redirect the user to after providing consent.
 - `response_type`: Set this to `code`.
 - `state`: Information about the state of your app. Note that `redirect_uri` and `state` together cannot exceed 4kB in size.
-- (Recommended) PKCE: We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `S256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
-- [deprecated] `scope`: Scopes are configured when you create your OAuth app. Read the [docs](/docs/guides/platform/oauth-apps/oauth-scopes) for more details.
+- `organization_slug`: The slug of the organization you want to connect to. This is optional, but if provided, it will pre-select the organization for the user.
+- [Recommended] PKCE: We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `S256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
+- [Deprecated] `scope`: Scopes are configured when you create your OAuth app. Read the [docs](/docs/guides/platform/oauth-apps/oauth-scopes) for more details.
 
 ```ts
 router.get('/connect-supabase/login', async (ctx) => {
@@ -60,7 +61,7 @@ Once the user consents to providing API access to your OAuth App, Supabase will 
 - `code`: An authorization code you should exchange with Supabase to get the access and refresh token.
 - `state`: The value you provided in the previous step, to help you associate the request with the user. The `state` property returned here should be compared to the `state` you sent previously.
 
-Exchange the authorization code for an access and refresh token by calling [`POST https://api.supabase.com/v1/oauth/token`](<https://api.supabase.com/api/v1#/oauth%20(beta)/token>) with the following query parameters as content-type `application/x-www-form-urlencoded`:
+Exchange the authorization code for an access and refresh token by calling [`POST https://api.supabase.com/v1/oauth/token`](https://api.supabase.com/api/v1#tag/oauth/POST/v1/oauth/token) with the following query parameters as content-type `application/x-www-form-urlencoded`:
 
 - `grant_type`: The value `authorization_code`.
 - `code`: The `code` returned in the previous step.
@@ -111,7 +112,7 @@ Find the full example on [GitHub](https://github.com/supabase/supabase/tree/mast
 
 ## Refreshing an access token
 
-You can use the [`POST /v1/oauth/token`](<https://api.supabase.com/api/v1#/oauth%20(beta)/token>) endpoint to refresh an access token using the refresh token returned at the end of the previous section.
+You can use the [`POST /v1/oauth/token`](https://api.supabase.com/api/v1#tag/oauth/POST/v1/oauth/token) endpoint to refresh an access token using the refresh token returned at the end of the previous section.
 
 If the user has revoked access to your application, you will not be able to refresh a token. Furthermore, access tokens will stop working. Make sure you handle HTTP Unauthorized errors when calling any Supabase API.
 
@@ -157,7 +158,7 @@ When creating a new project, you can either ask the user to provide a database p
 
 ### Configure custom Auth SMTP
 
-You can configure the user's [custom SMTP settings](https://supabase.com/docs/guides/auth/auth-smtp) using the [`/config/auth` endpoint](https://api.supabase.com/api/v1#/projects%20config/updateV1AuthConfig).
+You can configure the user's [custom SMTP settings](/docs/guides/auth/auth-smtp) using the [`/config/auth` endpoint](https://api.supabase.com/api/v1#/projects%20config/updateV1AuthConfig).
 
 ### Handling dynamic redirect URLs
 

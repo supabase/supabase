@@ -63,6 +63,9 @@ typings/
 # TypeScript cache
 *.tsbuildinfo
 
+# Next.js declaration files (auto-generated)
+next-env.d.ts
+
 # Optional npm cache directory
 .npm
 
@@ -113,6 +116,10 @@ typings/
 .idea
 .vercel
 
+# AI assistant local files
+.serena/
+CLAUDE.md
+
 #include template .env file for docker-compose
 !docker/.env
 !docker/supabase/.env
@@ -138,3 +145,8 @@ gcloud.json
 .temp/cli-latest
 
 .pnpm-store/*
+
+# Sentry CLI config
+**/.sentryclirc
+
+keys.json

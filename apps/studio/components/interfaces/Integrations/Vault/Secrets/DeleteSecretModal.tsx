@@ -1,7 +1,7 @@
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDeleteMutation } from 'data/vault/vault-secret-delete-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { VaultSecret } from 'types'
 import { Modal } from 'ui'
 
@@ -11,7 +11,7 @@ interface DeleteSecretModalProps {
 }
 
 const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { mutate: deleteSecret, isLoading: isDeleting } = useVaultSecretDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted secret ${selectedSecret?.name}`)

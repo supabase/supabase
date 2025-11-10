@@ -36,7 +36,8 @@ export type FeatureKey =
   | 'database.pitr'
   | 'database.pausing'
   | 'database.branching'
-  | 'database.bandwidth'
+  | 'database.egress'
+  | 'database.cachedEgress'
   | 'auth.totalUsers'
   | 'auth.maus'
   | 'auth.userDataOwnership'
@@ -175,19 +176,30 @@ export const pricing: Pricing = {
         title: 'Branching',
         plans: {
           free: false,
-          pro: '$0.32 per branch, per day',
-          team: '$0.32 per branch, per day',
+          pro: '$0.01344 per branch, per hour',
+          team: '$0.01344 per branch, per hour',
           enterprise: 'Custom',
         },
         usage_based: true,
       },
       {
-        key: 'database.bandwidth',
-        title: 'Bandwidth',
+        key: 'database.egress',
+        title: 'Egress',
         plans: {
           free: '5 GB included',
           pro: ['250 GB included', 'then $0.09 per GB'],
           team: ['250 GB included', 'then $0.09 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
+        key: 'database.cachedEgress',
+        title: 'Cached Egress',
+        plans: {
+          free: '5 GB included',
+          pro: ['250 GB included', 'then $0.03 per GB'],
+          team: ['250 GB included', 'then $0.03 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -421,8 +433,8 @@ export const pricing: Pricing = {
         title: 'Max file upload size',
         plans: {
           free: '50 MB',
-          pro: '50 GB',
-          team: '50 GB',
+          pro: '500 GB',
+          team: '500 GB',
           enterprise: 'Custom',
         },
         usage_based: false,
@@ -589,11 +601,7 @@ export const pricing: Pricing = {
         plans: {
           free: false,
           pro: false,
-          team: [
-            '$60 per drain per month',
-            '+ $0.20 per million events',
-            '+ $0.09 per GB bandwidth',
-          ],
+          team: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           enterprise: 'Custom',
         },
         usage_based: true,

@@ -1,14 +1,18 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
+import type { CustomerAddress, CustomerTaxId } from './types'
 
 export type OrganizationCreditTopUpVariables = {
   payment_method_id: string
   amount: number
   slug?: string
   hcaptchaToken?: string | null
+  address?: CustomerAddress | null
+  tax_id?: CustomerTaxId | null
+  billing_name?: string | null
 }
 
 export async function topUpCredits({
@@ -16,6 +20,9 @@ export async function topUpCredits({
   amount,
   slug,
   hcaptchaToken,
+  address,
+  tax_id,
+  billing_name,
 }: OrganizationCreditTopUpVariables) {
   if (!payment_method_id) {
     throw new Error('Payment method id required')
@@ -35,7 +42,14 @@ export async function topUpCredits({
         slug,
       },
     },
-    body: { payment_method_id, amount, hcaptcha_token: hcaptchaToken },
+    body: {
+      payment_method_id,
+      amount,
+      hcaptcha_token: hcaptchaToken,
+      address: address ?? undefined,
+      tax_id: tax_id ?? undefined,
+      billing_name: billing_name ?? undefined,
+    },
   })
 
   if (error) handleError(error)
@@ -50,23 +64,25 @@ export const useOrganizationCreditTopUpMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationTaxIdUpdateData, ResponseError, OrganizationCreditTopUpVariables>,
+  UseCustomMutationOptions<
+    OrganizationTaxIdUpdateData,
+    ResponseError,
+    OrganizationCreditTopUpVariables
+  >,
   'mutationFn'
 > = {}) => {
-  return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationCreditTopUpVariables>(
-    (vars) => topUpCredits(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to top up credits: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<OrganizationTaxIdUpdateData, ResponseError, OrganizationCreditTopUpVariables>({
+    mutationFn: (vars) => topUpCredits(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to top up credits: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

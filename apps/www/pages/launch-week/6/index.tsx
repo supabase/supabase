@@ -15,7 +15,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Accordion, Badge } from 'ui'
 import { SITE_ORIGIN } from '~/lib/constants'
-import { WeekDayProps } from './types6'
+import type { WeekDayProps } from '~/types/launch-week-6'
 
 import styles from './styles/launchWeek6.module.css'
 import styleUtils from './styles/utils6.module.css'
