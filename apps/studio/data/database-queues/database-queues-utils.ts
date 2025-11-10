@@ -1,5 +1,4 @@
 /**
- * Validates queue name to prevent SQL injection
  * Queue names should only contain alphanumeric characters, underscores, and hyphens
  * @throws {Error} If queue name contains invalid characters
  */
