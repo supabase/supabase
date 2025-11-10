@@ -27,6 +27,18 @@ export const AnalyticsBuckets = () => {
     filterString.length === 0 ? true : bucket.id.toLowerCase().includes(filterString.toLowerCase())
   )
 
+  const handleBucketNavigation = (
+    bucketId: string,
+    event: React.MouseEvent | React.KeyboardEvent
+  ) => {
+    const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucketId)}`
+    if (event.metaKey || event.ctrlKey) {
+      window.open(url, '_blank')
+    } else {
+      router.push(url)
+    }
+  }
+
   return (
     <ScaffoldSection isFullWidth>
       <Admonition
@@ -110,17 +122,11 @@ export const AnalyticsBuckets = () => {
                       role="button"
                       tabIndex={0}
                       className="cursor-pointer h-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong focus-visible:bg-surface-200"
-                      onClick={(event) => {
-                        const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`
-                        if (event.metaKey) window.open(url, '_blank')
-                        else router.push(url)
-                      }}
+                      onClick={(event) => handleBucketNavigation(bucket.id, event)}
                       onKeyDown={(event) => {
                         if (event.key === 'Enter') {
                           event.preventDefault()
-                          const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucket.id)}`
-                          if (event.metaKey) window.open(url, '_blank')
-                          else router.push(url)
+                          handleBucketNavigation(bucket.id, event)
                         }
                       }}
                     >
