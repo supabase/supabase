@@ -154,6 +154,7 @@ export function useQueryStateWithData<T, K extends keyof T & string>(
   useEffect(() => {
     // Set the value if the selected ID is not null and we have data
     if (selectedId != null && data.length > 0) {
+      // since we store strings in the URL, we need to convert the data key lookup value to a string
       const initialValue = data.find((item) => String(item[dataKeySelector]) === selectedId)
       setVal(initialValue)
     }
