@@ -1,8 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
 import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
 import { OverviewMetrics } from 'components/interfaces/Auth/Overview/OverviewMetrics'
-import { fetchAllAuthMetrics } from 'components/interfaces/Auth/Overview/OverviewUsage.constants'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
@@ -12,6 +10,7 @@ import { DOCS_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { useAuthOverviewQuery } from 'data/auth/auth-overview-query'
 
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()
@@ -23,11 +22,7 @@ const AuthOverview: NextPageWithLayout = () => {
     data: metrics,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ['auth-metrics', ref],
-    queryFn: () => fetchAllAuthMetrics(ref as string),
-    enabled: !!ref,
-  })
+  } = useAuthOverviewQuery({ projectRef: ref }, { enabled: !!ref })
 
   useEffect(() => {
     if (hasLoaded && !authOverviewPageEnabled) {
