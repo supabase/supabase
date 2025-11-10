@@ -9,7 +9,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
+import { useQueryStateRouting, useQueryStateWithValue } from 'hooks/misc/useQueryStateRouting'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -46,17 +46,11 @@ export const EnumeratedTypes = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const {
-    setSelectedId: setSelectedTypeIdToEdit,
-    entity: typeToEdit,
-    show: showTypeToEdit,
-  } = useQueryStateRouting({
-    key: 'edit',
-    lookup: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
-    lookupDeps: [data],
-    isLoading,
-    entityName: 'Enumerated Type',
-  })
+  const { val: typeToEditValue, setValue: setTypeToEditValue } = useQueryStateWithValue(
+    'edit',
+    data,
+    'id'
+  )
 
   const {
     setSelectedId: setSelectedTypeIdToDelete,
@@ -176,7 +170,7 @@ export const EnumeratedTypes = () => {
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem
                                   className="space-x-2"
-                                  onClick={() => setSelectedTypeIdToEdit(type.id.toString())}
+                                  onClick={() => setTypeToEditValue(type)}
                                 >
                                   <Edit size={14} />
                                   <p>Update type</p>
@@ -208,9 +202,9 @@ export const EnumeratedTypes = () => {
       />
 
       <EditEnumeratedTypeSidePanel
-        visible={showTypeToEdit}
-        selectedEnumeratedType={typeToEdit}
-        onClose={() => setSelectedTypeIdToEdit(null)}
+        visible={typeToEditValue !== undefined}
+        selectedEnumeratedType={typeToEditValue}
+        onClose={() => setTypeToEditValue(undefined)}
       />
 
       <DeleteEnumeratedTypeModal

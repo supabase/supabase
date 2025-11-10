@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 
@@ -125,5 +125,42 @@ export function useQueryStateRouting<T = any>({
     entity,
     show,
     notFound,
+  }
+}
+
+export function useQueryStateWithValue<T, K extends keyof T & string>(
+  urlKey: string,
+  data: T[] = [],
+  dataKey: K
+) {
+  const [selectedId, setSelectedId] = useQueryState(
+    urlKey,
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [val, setVal] = useState<T | undefined>(undefined)
+
+  const setValue = (value: T | undefined) => {
+    if (value == null) {
+      setSelectedId(null)
+      setVal(undefined)
+      return
+    }
+
+    const keyValue = String(value[dataKey])
+    setSelectedId(keyValue)
+    setVal(value)
+  }
+
+  useEffect(() => {
+    // Set the value if the selected ID is not null and we have data
+    if (selectedId != null && data.length > 0) {
+      const initialValue = data.find((item) => String(item[dataKey]) === selectedId)
+      setVal(initialValue)
+    }
+  }, [selectedId, data, dataKey])
+
+  return {
+    val,
+    setValue,
   }
 }
