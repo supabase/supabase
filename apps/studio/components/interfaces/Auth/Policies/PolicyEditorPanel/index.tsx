@@ -125,7 +125,7 @@ export const PolicyEditorPanel = memo(function ({
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async () => {
       // refresh all policies
-      await queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
+      await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(ref) })
       toast.success('Successfully created new policy')
       onSelectCancel()
     },
@@ -220,9 +220,9 @@ export const PolicyEditorPanel = memo(function ({
 
       if (selectedPolicy.command === 'INSERT') {
         // [Joshen] Cause editorOneRef will be the check statement in this scenario
-        if (selectedPolicy.check !== null && selectedPolicy.check !== using) payload.check = using
+        if (selectedPolicy.check !== using) payload.check = using
       } else {
-        if (selectedPolicy.check !== null && selectedPolicy.check !== check) payload.check = check
+        if (selectedPolicy.check !== check) payload.check = check
       }
 
       if (Object.keys(payload).length === 0) return onSelectCancel()

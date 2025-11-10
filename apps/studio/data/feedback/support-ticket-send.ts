@@ -1,10 +1,10 @@
-import { type UseMutationOptions, useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 // End of third-party imports
 
 import type { ExtendedSupportCategories } from 'components/interfaces/Support/Support.constants'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type sendSupportTicketVariables = {
   subject: string
@@ -77,23 +77,21 @@ export const useSendSupportTicketMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<sendSupportTicketData, ResponseError, sendSupportTicketVariables>,
+  UseCustomMutationOptions<sendSupportTicketData, ResponseError, sendSupportTicketVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<sendSupportTicketData, ResponseError, sendSupportTicketVariables>(
-    (vars) => sendSupportTicket(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit support ticket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<sendSupportTicketData, ResponseError, sendSupportTicketVariables>({
+    mutationFn: (vars) => sendSupportTicket(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to submit support ticket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

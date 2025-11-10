@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { render } from 'tests/helpers'
 import { addAPIMock } from 'tests/lib/msw'
 import { routerMock } from 'tests/lib/route-mock'
-import { VaultSecret } from 'types'
+import type { VaultSecret } from 'types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import EditSecretModal from '../EditSecretModal'
 

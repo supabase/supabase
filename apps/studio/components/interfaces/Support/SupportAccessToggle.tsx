@@ -35,6 +35,7 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
       render={({ field }) => {
         return (
           <FormItemLayout
+            hideMessage
             name="allowSupportAccess"
             className="px-6"
             layout="flex"
@@ -56,7 +57,6 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
                     }
                   >
                     <ChevronRight
-                      strokeWidth={2}
                       size={14}
                       className="transition-all group-data-[state=open]:rotate-90 text-foreground-muted -ml-1"
                     />

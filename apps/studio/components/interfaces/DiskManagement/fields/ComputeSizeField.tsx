@@ -2,7 +2,9 @@ import { CpuIcon, Lock, Microchip } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -11,7 +13,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { DOCS_URL, InstanceSpecs } from 'lib/constants'
-import Link from 'next/link'
 import {
   cn,
   FormField_Shadcn_,
@@ -302,8 +303,12 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]'
                     )}
                     label={
-                      <Link
-                        href={`/support/new?projectRef=${ref}&category=sales&subject=Enquiry%20about%20larger%20instance%20sizes`}
+                      <SupportLink
+                        queryParams={{
+                          projectRef: ref,
+                          category: SupportCategories.SALES_ENQUIRY,
+                          subject: 'Enquiry about larger instance sizes',
+                        }}
                       >
                         <div className="w-full flex flex-col gap-3 justify-between">
                           <div className="relative px-3 flex justify-between">
@@ -334,7 +339,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                             </div>
                           </div>
                         </div>
-                      </Link>
+                      </SupportLink>
                     }
                   />
                 </>

@@ -125,7 +125,7 @@ function SupportFormHeader() {
       <div className="flex items-center gap-x-3">
         <Button asChild type="default" icon={<Wrench />}>
           <Link
-            href={`${DOCS_URL}/guides/platform/troubleshooting`}
+            href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
             target="_blank"
             rel="noreferrer"
           >

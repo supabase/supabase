@@ -5,7 +5,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
+import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
@@ -192,14 +192,14 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
     // Construct custom headers
     const customHeaders: Record<string, string> = {}
-    headerFields.forEach(({ key, value }) => {
+    values.headers.forEach(({ key, value }) => {
       if (key && value) {
         customHeaders[key] = value
       }
     })
 
     // Construct query parameters
-    const queryString = queryParamFields
+    const queryString = values.queryParams
       .filter(({ key, value }) => key && value)
       .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join('&')

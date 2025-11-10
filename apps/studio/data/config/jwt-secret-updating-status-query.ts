@@ -1,6 +1,7 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
+import { UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdatingStatusVariables = {
@@ -49,30 +50,28 @@ export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusD
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData> = {}
+  }: UseCustomQueryOptions<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData> = {}
 ) => {
   const client = useQueryClient()
 
-  return useQuery<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData>(
-    configKeys.jwtSecretUpdatingStatus(projectRef),
-    ({ signal }) => getJwtSecretUpdatingStatus({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      refetchInterval(data) {
-        if (!data) {
-          return false
-        }
+  return useQuery<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData>({
+    queryKey: configKeys.jwtSecretUpdatingStatus(projectRef),
+    queryFn: ({ signal }) => getJwtSecretUpdatingStatus({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    refetchInterval(data) {
+      if (!data) {
+        return false
+      }
 
-        const { jwtSecretUpdateStatus } = data as unknown as JwtSecretUpdatingStatusResponse
+      const { jwtSecretUpdateStatus } = data as unknown as JwtSecretUpdatingStatusResponse
 
-        const interval = jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating ? 1000 : false
+      const interval = jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating ? 1000 : false
 
-        return interval
-      },
-      onSuccess() {
-        client.invalidateQueries(configKeys.postgrest(projectRef))
-      },
-      ...options,
-    }
-  )
+      return interval
+    },
+    onSuccess() {
+      client.invalidateQueries(configKeys.postgrest(projectRef))
+    },
+    ...options,
+  })
 }

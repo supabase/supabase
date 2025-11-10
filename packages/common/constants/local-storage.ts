@@ -17,7 +17,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
   UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
-  UI_PREVIEW_NEW_STORAGE_UI: 'new-storage-ui',
   UI_PREVIEW_SECURITY_NOTIFICATIONS: 'security-notifications',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
@@ -28,6 +27,7 @@ export const LOCAL_STORAGE_KEYS = {
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
 
   AUTH_USERS_FILTER: (ref: string) => `auth-users-filter-${ref}`,
+  AUTH_USERS_SORT_BY_VALUE: (ref: string) => `auth-users-sort-by-value-${ref}`,
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
@@ -75,9 +75,10 @@ export const LOCAL_STORAGE_KEYS = {
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
     `user-impersonation-selector-previous-searches-${ref}`,
 
-  HOTKEY_INLINE_EDITOR: 'supabase-dashboard-hotkey-inline-editor',
   HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
-  HOTKEY_AI_ASSISTANT: 'supabase-dashboard-hotkey-ai-assistant',
+
+  // Project sidebar hotkeys
+  HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
 
   /**
    * COMMON

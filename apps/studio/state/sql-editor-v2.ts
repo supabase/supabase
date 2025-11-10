@@ -1,4 +1,5 @@
 import { debounce, memoize } from 'lodash'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
@@ -10,8 +11,7 @@ import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { getQueryClient } from 'data/query-client'
-import { useMemo } from 'react'
-import { SqlSnippets } from 'types'
+import type { SqlSnippets } from 'types'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -299,9 +299,9 @@ async function upsertSnippet(
     if (shouldInvalidate) {
       const queryClient = getQueryClient()
       await Promise.all([
-        queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql')),
-        queryClient.invalidateQueries(contentKeys.sqlSnippets(projectRef)),
-        queryClient.invalidateQueries(contentKeys.folders(projectRef)),
+        queryClient.invalidateQueries({ queryKey: contentKeys.count(projectRef, 'sql') }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.sqlSnippets(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) }),
       ])
     }
 

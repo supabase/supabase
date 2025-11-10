@@ -312,7 +312,7 @@ export const LintCTA = ({
 
   return (
     <Button asChild type="default">
-      <Link href={link} target="_blank" rel="noreferrer" className="no-underline">
+      <Link href={link} rel="noreferrer" className="no-underline">
         {linkText}
       </Link>
     </Button>

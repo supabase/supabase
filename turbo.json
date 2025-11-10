@@ -89,6 +89,8 @@
         "PG_META_CRYPTO_KEY",
         "POSTGRES_PASSWORD",
         "POSTGRES_HOST",
+        "POSTGRES_USER_READ_WRITE",
+        "POSTGRES_USER_READ_ONLY",
         "POSTGRES_DB",
         "POSTGRES_PORT",
         "READ_ONLY_URL",
@@ -100,8 +102,10 @@
         "DEFAULT_ORGANIZATION_NAME",
         "OPENAI_API_KEY",
         "AUTH_JWT_SECRET",
-        "LOGFLARE_URL",
+        "LOGFLARE_API_KEY",
+        "LOGFLARE_PUBLIC_ACCESS_TOKEN",
         "LOGFLARE_PRIVATE_ACCESS_TOKEN",
+        "LOGFLARE_URL",
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
@@ -118,7 +122,7 @@
         "AI_PRO_MODEL",
         "AI_NORMAL_MODEL",
         "SUPPORT_SUPABASE_SECRET_KEY",
-        "NIMBUS_PROD_PROJECTS_URL"
+        "NEXT_PUBLIC_IS_NIMBUS"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]
