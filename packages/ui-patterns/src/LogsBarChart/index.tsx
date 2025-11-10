@@ -98,7 +98,7 @@ export const LogsBarChart = ({
             content={
               <ChartTooltipContent
                 className="text-foreground-light -mt-5"
-                labelFormatter={(v) => dayjs(v).format(DateTimeFormat)}
+                labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
               />
             }
           />
