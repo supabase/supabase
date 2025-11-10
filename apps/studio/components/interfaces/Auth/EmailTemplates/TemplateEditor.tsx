@@ -136,8 +136,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
           const spamRules = (res?.rules ?? []).filter((rule) => rule.score > 0)
           const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
-          console.log({ preventSaveFromSpamCheck, builtInSMTP, spamRules })
-
           if (preventSaveFromSpamCheck) {
             setIsSavingTemplate(false)
             // Set the last attempted save values so the button is disabled until a new change is made
