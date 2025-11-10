@@ -38,7 +38,7 @@ export const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProp
       <TextConfirmModal
         variant={'warning'}
         visible={visible}
-        onCancel={() => setVisible('')}
+        onCancel={() => setVisible(null)}
         onConfirm={handleDelete}
         title="Delete this function"
         loading={isLoading}
