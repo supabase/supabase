@@ -40,16 +40,12 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
-
-  // Add a ref to the code editor
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
 
   // [Joshen] Error state is handled in the parent
   const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
 
-  const { mutate: validateSpam } = useValidateSpamMutation({
-    onSuccess: (res) => setValidationResult(res),
-  })
+  const { mutate: validateSpam } = useValidateSpamMutation()
 
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -72,14 +68,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
-  const [lastAttemptedSaveValues, setLastAttemptedSaveValues] = useState<{
-    formValues: { [key: string]: string }
-    bodyValue: string
-  } | null>(null)
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 
-  // Create form values
   const INITIAL_VALUES = useMemo(() => {
     const result: { [x: string]: string } = {}
     Object.keys(properties).forEach((key) => {
@@ -88,38 +79,19 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     return result
   }, [authConfig, properties])
 
-  // Setup React Hook Form
-  const form = useForm({
-    defaultValues: INITIAL_VALUES,
-  })
-
-  // Update form values when authConfig changes
-  useEffect(() => {
-    if (authConfig) {
-      const values: { [key: string]: string } = {}
-      Object.keys(properties).forEach((key) => {
-        values[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
-      })
-      form.reset(values)
-      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
-      setLastAttemptedSaveValues(null) // Clear last attempted save values when authConfig changes
-    }
-  }, [authConfig, properties, messageSlug, form])
+  const form = useForm({ defaultValues: INITIAL_VALUES })
 
   const onSubmit = (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
 
     setIsSavingTemplate(true)
+
     const payload = { ...values }
 
     // Because the template content uses the code editor which is not a form component
     // its state is kept separately from the form state, hence why we manually inject it here
     delete payload[messageSlug]
     if (messageProperty) payload[messageSlug] = bodyValue
-
-    // Capture the current values for comparison if spam is detected
-    const currentFormValues = { ...values }
-    const currentBodyValue = bodyValue
 
     const [subjectKey] = Object.keys(properties)
 
@@ -133,16 +105,12 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
       },
       {
         onSuccess: (res) => {
+          setValidationResult(res)
           const spamRules = (res?.rules ?? []).filter((rule) => rule.score > 0)
           const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
           if (preventSaveFromSpamCheck) {
             setIsSavingTemplate(false)
-            // Set the last attempted save values so the button is disabled until a new change is made
-            setLastAttemptedSaveValues({
-              formValues: currentFormValues,
-              bodyValue: currentBodyValue,
-            })
             toast.error(
               'Please rectify all spam warnings before saving while using the built-in email service'
             )
@@ -153,7 +121,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                 onSuccess: () => {
                   setIsSavingTemplate(false)
                   setHasUnsavedChanges(false) // Reset the unsaved changes state
-                  setLastAttemptedSaveValues(null) // Clear the last attempted save values on successful save
                   toast.success('Successfully updated email template')
                 },
               }
@@ -164,6 +131,76 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
       }
     )
   }
+
+  // Single useMemo hook to parse and prepare message variables
+  const messageVariables = useMemo(() => {
+    if (!messageProperty?.description) return []
+
+    // Parse bullet point format: - `{{ .Variable }}` : Description
+    const lines = messageProperty.description.split('\n')
+    const variables: { variable: string; description: string }[] = []
+
+    for (const line of lines) {
+      // Match lines that start with a bullet point followed by a variable in the format {{ .Variable }}
+      // Handle variations in formatting (with or without backticks, different spacing)
+      const match = line.match(/-\s*`?({{\s*\.\w+\s*}})`?\s*(?::|-)?\s*(.+)/)
+      if (match && match[1] && match[2]) {
+        variables.push({
+          variable: match[1].replace(/`/g, '').trim(),
+          description: match[2].trim(),
+        })
+      }
+    }
+
+    return variables
+  }, [messageProperty?.description])
+
+  // Check if form values have changed
+  const formValues = form.watch()
+  const baselineValues = INITIAL_VALUES
+  const baselineBodyValue = (authConfig && authConfig[messageSlug]) ?? ''
+  const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
+  const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
+
+  // Function to insert text at cursor position
+  const insertTextAtCursor = (text: string) => {
+    if (!editorRef.current) return
+
+    const editor = editorRef.current
+    const selection = editor.getSelection()
+
+    if (selection) {
+      const range = {
+        startLineNumber: selection.startLineNumber,
+        startColumn: selection.startColumn,
+        endLineNumber: selection.endLineNumber,
+        endColumn: selection.endColumn,
+      }
+
+      editor.executeEdits('insert-variable', [
+        {
+          range,
+          text,
+          forceMoveMarkers: true,
+        },
+      ])
+
+      // Focus the editor after insertion
+      editor.focus()
+    }
+  }
+
+  // Update form values when authConfig changes
+  useEffect(() => {
+    if (authConfig) {
+      const values: { [key: string]: string } = {}
+      Object.keys(properties).forEach((key) => {
+        values[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
+      })
+      form.reset(values)
+      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+    }
+  }, [authConfig, properties, messageSlug, form])
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -195,64 +232,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  // Single useMemo hook to parse and prepare message variables
-  const messageVariables = useMemo(() => {
-    if (!messageProperty?.description) return []
-
-    // Parse bullet point format: - `{{ .Variable }}` : Description
-    const lines = messageProperty.description.split('\n')
-    const variables: { variable: string; description: string }[] = []
-
-    for (const line of lines) {
-      // Match lines that start with a bullet point followed by a variable in the format {{ .Variable }}
-      // Handle variations in formatting (with or without backticks, different spacing)
-      const match = line.match(/-\s*`?({{\s*\.\w+\s*}})`?\s*(?::|-)?\s*(.+)/)
-      if (match && match[1] && match[2]) {
-        variables.push({
-          variable: match[1].replace(/`/g, '').trim(),
-          description: match[2].trim(),
-        })
-      }
-    }
-
-    return variables
-  }, [messageProperty?.description])
-
-  // Check if form values have changed
-  const formValues = form.watch()
-  const baselineValues = lastAttemptedSaveValues?.formValues ?? INITIAL_VALUES
-  const baselineBodyValue =
-    lastAttemptedSaveValues?.bodyValue ?? (authConfig && authConfig[messageSlug]) ?? ''
-  const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
-  const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
-
-  // Function to insert text at cursor position
-  const insertTextAtCursor = (text: string) => {
-    if (!editorRef.current) return
-
-    const editor = editorRef.current
-    const selection = editor.getSelection()
-
-    if (selection) {
-      const range = {
-        startLineNumber: selection.startLineNumber,
-        startColumn: selection.startColumn,
-        endLineNumber: selection.endLineNumber,
-        endColumn: selection.endColumn,
-      }
-
-      editor.executeEdits('insert-variable', [
-        {
-          range,
-          text,
-          forceMoveMarkers: true,
-        },
-      ])
-
-      // Focus the editor after insertion
-      editor.focus()
-    }
-  }
+  useEffect(() => {
+    if (!hasChanges) setValidationResult(undefined)
+  }, [hasChanges])
 
   return (
     <Form_Shadcn_ {...form}>
@@ -367,11 +349,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               )}
             </CardContent>
 
-            {spamRules.length > 0 && (
-              <CardContent>
-                <SpamValidation validationResult={validationResult} />
-              </CardContent>
-            )}
+            <SpamValidation spamRules={spamRules} />
 
             <CardFooter className="flex flex-row justify-end gap-2">
               {hasChanges && (
@@ -381,7 +359,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     form.reset(INITIAL_VALUES)
                     setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
                     setHasUnsavedChanges(false)
-                    setLastAttemptedSaveValues(null) // Clear last attempted save values on cancel
                   }}
                 >
                   Cancel
