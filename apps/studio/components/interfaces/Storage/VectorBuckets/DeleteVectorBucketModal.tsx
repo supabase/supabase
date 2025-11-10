@@ -1,28 +1,10 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
 
 import { useParams } from 'common'
 import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
 import { deleteVectorBucketIndex } from 'data/storage/vector-bucket-index-delete-mutation'
 import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 export interface DeleteVectorBucketModalProps {
   visible: boolean
@@ -30,10 +12,6 @@ export interface DeleteVectorBucketModalProps {
   onCancel: () => void
   onSuccess: () => void
 }
-
-const formId = `delete-storage-vector-bucket-form`
-
-// [Joshen] Can refactor to use TextConfirmModal
 
 export const DeleteVectorBucketModal = ({
   visible,
@@ -43,29 +21,20 @@ export const DeleteVectorBucketModal = ({
 }: DeleteVectorBucketModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const schema = z.object({
-    confirm: z.literal(bucketName, {
-      errorMap: () => ({ message: `Please enter "${bucketName}" to confirm` }),
-    }),
-  })
-
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-  })
-
-  const { mutate: deleteBucket, isLoading } = useVectorBucketDeleteMutation({
+  const { mutate: deleteBucket, isLoading: isDeletingBucket } = useVectorBucketDeleteMutation({
     onSuccess: async () => {
       toast.success(`Bucket "${bucketName}" deleted successfully`)
       onSuccess()
     },
   })
 
-  const { data: { indexes = [] } = {} } = useVectorBucketsIndexesQuery({
-    projectRef,
-    vectorBucketName: bucketName,
-  })
+  const { data: { indexes = [] } = {}, isLoading: isDeletingIndexes } =
+    useVectorBucketsIndexesQuery({
+      projectRef,
+      vectorBucketName: bucketName,
+    })
 
-  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async () => {
+  const onConfirmDelete = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucketName) return console.error('No bucket is selected')
 
@@ -79,7 +48,6 @@ export const DeleteVectorBucketModal = ({
         })
       )
       await Promise.all(promises)
-
       deleteBucket({ projectRef, bucketName })
     } catch (error) {
       toast.error(
@@ -89,73 +57,26 @@ export const DeleteVectorBucketModal = ({
   }
 
   return (
-    <Dialog
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) onCancel()
+    <TextConfirmModal
+      visible={visible}
+      size="medium"
+      variant="destructive"
+      title={`Confirm deletion of ${bucketName}`}
+      loading={isDeletingBucket || isDeletingIndexes}
+      confirmPlaceholder="Type bucket name"
+      confirmString={bucketName ?? ''}
+      confirmLabel="Delete bucket"
+      onCancel={onCancel}
+      onConfirm={onConfirmDelete}
+      alert={{
+        title: 'You cannot recover this bucket once deleted',
+        description: 'This action cannot be undone',
       }}
     >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Confirm deletion of {bucketName}</DialogTitle>
-        </DialogHeader>
-
-        <DialogSectionSeparator />
-
-        <Admonition
-          type="destructive"
-          className="rounded-none border-x-0 border-t-0 mb-0"
-          title="You cannot recover this bucket once deleted."
-          description="All bucket data will be lost."
-        />
-
-        <DialogSection>
-          <p className="text-sm">
-            Your bucket <span className="font-bold text-foreground">{bucketName}</span> and all its
-            contents will be permanently deleted.
-          </p>
-        </DialogSection>
-        <DialogSectionSeparator />
-        <DialogSection>
-          <Form_Shadcn_ {...form}>
-            <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-              <FormField_Shadcn_
-                key="confirm"
-                name="confirm"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    name="confirm"
-                    label={
-                      <>
-                        Type <span className="font-bold text-foreground">{bucketName}</span> to
-                        confirm.
-                      </>
-                    }
-                  >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        id="confirm"
-                        autoComplete="off"
-                        {...field}
-                        placeholder="Type bucket name"
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </form>
-          </Form_Shadcn_>
-        </DialogSection>
-        <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button form={formId} htmlType="submit" type="danger" loading={isLoading}>
-            Delete bucket
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <p className="text-sm">
+        Your bucket <span className="font-bold text-foreground">{bucketName}</span> and all of its
+        contents will be permanently deleted.
+      </p>
+    </TextConfirmModal>
   )
 }
