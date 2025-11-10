@@ -1,5 +1,4 @@
 import { PageContainer } from 'ui-patterns/PageContainer'
-import { Button } from 'ui'
 
 export default function PageContainerDemo() {
   return (

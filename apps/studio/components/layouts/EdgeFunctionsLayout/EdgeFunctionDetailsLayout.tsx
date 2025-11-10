@@ -154,7 +154,7 @@ const EdgeFunctionDetailsLayout = ({
   useEffect(() => {
     let cancel = false
 
-    if (!!functionSlug && isError && error?.code === 404 && !cancel) {
+    if (!!functionSlug && isError && error.code === 404 && !cancel) {
       toast('Edge function cannot be found in your project')
       router.push(`/project/${ref}/functions`)
     }
@@ -162,7 +162,6 @@ const EdgeFunctionDetailsLayout = ({
     return () => {
       cancel = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError])
 
   if (!isLoading && !canReadFunctions) {
