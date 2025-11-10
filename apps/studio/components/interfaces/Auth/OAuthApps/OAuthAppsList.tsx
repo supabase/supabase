@@ -12,7 +12,6 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
-import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
 import {
   Badge,
   Button,
@@ -52,11 +51,14 @@ export const OAuthAppsList = () => {
   const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
   const isOAuthServerEnabled = !!authConfig?.OAUTH_SERVER_ENABLED
   const [newOAuthApp, setNewOAuthApp] = useState<OAuthClient | undefined>(undefined)
+
+  // State for OAuth apps
+  const [showCreateSheet, setShowCreateSheet] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [selectedApp, setSelectedApp] = useState<OAuthClient>()
   const [filteredAppTypes, setFilteredAppTypes] = useState<string[]>([])
   const [filteredAppScopes, setFilteredAppScopes] = useState<string[]>([])
-  const [filterString, setFilterString] = useState<string>('')
 
   const { data: supabaseClientData } = useSupabaseClientQuery({ projectRef })
 
@@ -68,26 +70,6 @@ export const OAuthAppsList = () => {
     { enabled: isOAuthServerEnabled }
   )
 
-  const oAuthApps = data?.clients || []
-
-  const {
-    booleans: { new: newQueryState },
-    delete: deleteQueryState,
-  } = useQueryStateRouting({
-    entities: oAuthApps,
-    isLoading,
-    idField: 'client_id',
-    booleanOperations: ['new'],
-    entityOperations: ['delete'],
-    entityName: 'OAuth App',
-  })
-
-  const showCreateSheet = newQueryState.show
-  const setShowCreateSheet = newQueryState.setShow
-  const setSelectedOAuthAppToDelete = deleteQueryState!.setSelectedId
-  const oAuthAppToDelete = deleteQueryState!.entity
-  const showoAuthAppToDelete = deleteQueryState!.show
-
   const { mutateAsync: regenerateSecret, isLoading: isRegenerating } =
     useOAuthServerAppRegenerateSecretMutation({
       onSuccess: (data) => {
@@ -97,9 +79,14 @@ export const OAuthAppsList = () => {
       },
     })
 
+  const oAuthApps = data?.clients || []
+
   const handleDeleteClick = (app: OAuthClient) => {
-    setSelectedOAuthAppToDelete(app.client_id)
+    setSelectedApp(app)
+    setShowDeleteModal(true)
   }
+
+  const [filterString, setFilterString] = useState<string>('')
 
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />
@@ -283,9 +270,9 @@ export const OAuthAppsList = () => {
       />
 
       <DeleteOAuthAppModal
-        visible={showoAuthAppToDelete}
-        onClose={() => setSelectedOAuthAppToDelete('')}
-        selectedApp={oAuthAppToDelete}
+        visible={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        selectedApp={selectedApp}
       />
 
       <ConfirmationModal

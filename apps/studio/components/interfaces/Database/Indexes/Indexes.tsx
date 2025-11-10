@@ -52,7 +52,7 @@ const Indexes = () => {
 
   const {
     booleans: { new: newQueryState },
-    edit,
+    edit: editQueryState,
     delete: deleteQueryState,
   } = useQueryStateRouting({
     entities: allIndexes,
@@ -63,13 +63,15 @@ const Indexes = () => {
     entityName: 'Database Index',
   })
 
-  const showCreateIndex = newQueryState.show
-  const setShowCreateIndex = newQueryState.setShow
-  const setSelectedIndexName = edit!.setSelectedId
-  const selectedIndex = edit!.entity
-  const setSelectedIndexNameToDelete = deleteQueryState!.setSelectedId
-  const selectedIndexToDelete = deleteQueryState!.entity
-  const showindexToDelete = deleteQueryState!.show
+  const { show: showCreateIndex, setShow: setShowCreateIndex } = newQueryState
+
+  const { setSelectedId: setSelectedIndexName, entity: selectedIndex } = editQueryState!
+
+  const {
+    setSelectedId: setSelectedIndexNameToDelete,
+    entity: selectedIndexToDelete,
+    show: showindexToDelete,
+  } = deleteQueryState!
 
   const {
     data: schemas,

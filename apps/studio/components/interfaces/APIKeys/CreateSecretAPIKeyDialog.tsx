@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert_Shadcn_,
@@ -25,7 +26,6 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
 import { Plus, ShieldCheck } from 'lucide-react'
 
 const NAME_SCHEMA = z
@@ -46,16 +46,8 @@ const SCHEMA = z.object({
 })
 
 const CreateSecretAPIKeyDialog = () => {
+  const [visible, setVisible] = useState(false)
   const { ref: projectRef } = useParams()
-
-  const {
-    booleans: { new: newQueryState },
-  } = useQueryStateRouting({
-    booleanOperations: ['new'],
-  })
-
-  const visible = newQueryState.show
-  const setVisible = newQueryState.setShow
 
   const onClose = (value: boolean) => {
     setVisible(value)

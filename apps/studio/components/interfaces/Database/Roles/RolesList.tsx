@@ -56,11 +56,13 @@ export const RolesList = () => {
     transformId: (id) => id.toString(),
   })
 
-  const isCreatingRole = newQueryState.show
-  const setIsCreatingRole = newQueryState.setShow
-  const setSelectedRoleToDelete = deleteQueryState!.setSelectedId
-  const roleToDelete = deleteQueryState!.entity
-  const showroleToDelete = deleteQueryState!.show
+  const { show: isCreatingRole, setShow: setIsCreatingRole } = newQueryState
+
+  const {
+    setSelectedId: setSelectedRoleIdToDelete,
+    entity: roleToDelete,
+    show: showRoleToDelete,
+  } = deleteQueryState!
 
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
 
@@ -202,7 +204,7 @@ export const RolesList = () => {
                   disabled
                   key={role.id}
                   role={role}
-                  onSelectDelete={setSelectedRoleToDelete}
+                  onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
         </div>
@@ -219,7 +221,7 @@ export const RolesList = () => {
                   key={role.id}
                   disabled={!canUpdateRoles}
                   role={role}
-                  onSelectDelete={setSelectedRoleToDelete}
+                  onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
         </div>
@@ -233,8 +235,8 @@ export const RolesList = () => {
 
       <DeleteRoleModal
         role={roleToDelete as unknown as PostgresRole}
-        visible={showroleToDelete}
-        onClose={() => setSelectedRoleToDelete('')}
+        visible={showRoleToDelete}
+        onClose={() => setSelectedRoleIdToDelete('')}
       />
     </>
   )
