@@ -42,6 +42,15 @@ import { CreateFunction } from 'components/interfaces/Database/Functions/CreateF
 import { DeleteFunction } from 'components/interfaces/Database/Functions/DeleteFunction'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 
+const createFunctionSnippet = `create function function_name()
+returns void
+language plpgsql
+as $$
+begin
+  -- Write your function logic here
+end;
+$$;`
+
 const FunctionsList = () => {
   const router = useRouter()
   const { search } = useParams()
@@ -60,14 +69,7 @@ const FunctionsList = () => {
     setSelectedFunctionIdToDuplicate(null)
     if (isInlineEditorEnabled) {
       setEditorPanelInitialPrompt('Create a new database function that...')
-      setEditorPanelValue(`create function function_name()
-returns void
-language plpgsql
-as $$
-begin
-  -- Write your function logic here
-end;
-$$;`)
+      setEditorPanelValue(createFunctionSnippet)
       setEditorPanelTemplates([])
       openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
     } else {
