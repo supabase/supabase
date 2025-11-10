@@ -29,7 +29,7 @@ After developing your project and deciding it's Production Ready, you should run
 - Ensure that you've [set the expiry](/dashboard/project/_/auth/providers) for one-time passwords (OTPs) to a reasonable value that you are comfortable with. We recommend setting this to 3600 seconds (1 hour) or lower.
 - Increase the length of the OTP if you need a higher level of entropy.
 - If your application requires a higher level of security, consider setting up [multi-factor authentication](/docs/guides/auth/auth-mfa) (MFA) for your users.
-- Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). Grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
+- Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). Grab SMTP credentials from any major email provider such as Forward Email, SendGrid, AWS SES, etc.
 - Think hard about how _you_ would abuse your service as an attacker, and mitigate.
 - Review these [common cybersecurity threats](https://auth0.com/docs/security/prevent-threats).
 - Check and review issues in your database using [Security Advisor](/dashboard/project/_/database/security-advisor).
@@ -49,7 +49,7 @@ After developing your project and deciding it's Production Ready, you should run
 ## Availability
 
 - Use your own SMTP credentials so that you have full control over the deliverability of your transactional auth emails (see Settings > Auth)
-  - you can grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc. You can refer to our [SMTP guide](/docs/guides/auth/auth-smtp) for more details.
+  - you can grab SMTP credentials from any major email provider such as Forward Email, SendGrid, AWS SES, etc. You can refer to our [SMTP guide](/docs/guides/auth/auth-smtp) for more details.
   - The default rate limit for auth emails when using a custom SMTP provider is 30 new users per hour, if doing a major public announcement you will likely require more than this.
 - Applications on the Free Plan that exhibit extremely low activity in a 7 day period may be paused by Supabase to save on server resources.
   - You can restore paused projects from the Supabase dashboard.
