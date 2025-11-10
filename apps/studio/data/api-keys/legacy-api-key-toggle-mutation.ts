@@ -1,7 +1,7 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { handleError, put } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { apiKeysKeys } from './keys'
 
 export type ToggleLegacyAPIKeysVariables = {
@@ -30,7 +30,7 @@ export const useToggleLegacyAPIKeysMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>,
+  UseCustomMutationOptions<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

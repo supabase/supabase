@@ -5,8 +5,10 @@ import { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from 'data/fetchers'
 import { detectOS } from 'lib/helpers'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import ResizableAIWidget from './ResizableAIWidget'
 
 interface AIEditorProps {
@@ -28,6 +30,7 @@ interface AIEditorProps {
   onChange?: (value: string) => void
   onClose?: () => void
   closeShortcutEnabled?: boolean
+  openAIAssistantShortcutEnabled?: boolean
   executeQuery?: () => void
 }
 
@@ -49,9 +52,11 @@ const AIEditor = ({
   onChange,
   onClose,
   closeShortcutEnabled = true,
+  openAIAssistantShortcutEnabled = true,
   executeQuery,
 }: AIEditorProps) => {
   const os = detectOS()
+  const { toggleSidebar } = useSidebarManagerSnapshot()
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<monacoEditor.IStandaloneDiffEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
@@ -220,6 +225,18 @@ const AIEditor = ({
     }
 
     refreshCloseAction()
+
+    // Add AI Assistant toggle keybinding (Cmd+I)
+    if (openAIAssistantShortcutEnabled) {
+      editor.addAction({
+        id: 'toggle-ai-assistant',
+        label: 'Toggle AI Assistant',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
+        run: () => {
+          toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+        },
+      })
+    }
 
     editor.addAction({
       id: 'generate-ai',

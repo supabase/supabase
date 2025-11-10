@@ -4413,7 +4413,7 @@
                 "summary": [
                   {
                     "kind": "text",
-                    "text": "Generates email links and OTPs to be sent via a custom email provider."
+                    "text": "Generates email links and OTPs. This will not send links or OTPs to the end user. This function is for custom admin functionality."
                   }
                 ]
               },

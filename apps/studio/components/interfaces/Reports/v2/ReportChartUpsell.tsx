@@ -44,7 +44,9 @@ export const ReportChartUpsell = ({ report, orgSlug }: ReportsChartUpsellProps) 
         <p className="text-sm text-foreground-light">
           This chart is available from{' '}
           <span className="capitalize">
-            {!!report.availableIn?.length ? report.availableIn[0] : 'Pro'}
+            {Array.isArray(report.availableIn) && report.availableIn.length > 0
+              ? report.availableIn[0]
+              : 'Pro'}
           </span>{' '}
           plan and above
         </p>
@@ -58,7 +60,9 @@ export const ReportChartUpsell = ({ report, orgSlug }: ReportsChartUpsellProps) 
           <Link href={`/org/${orgSlug || '_'}/billing?panel=subscriptionPlan&source=reports`}>
             Upgrade to{' '}
             <span className="capitalize">
-              {!!report.availableIn?.length ? report.availableIn[0] : 'Pro'}
+              {Array.isArray(report.availableIn) && report.availableIn.length > 0
+                ? report.availableIn[0]
+                : 'Pro'}
             </span>
           </Link>
         </Button>

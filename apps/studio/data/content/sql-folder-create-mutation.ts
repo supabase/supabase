@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { contentKeys } from './keys'
 
 export type CreateSQLSnippetFolderVariables = {
@@ -36,7 +36,11 @@ export const useSQLSnippetFolderCreateMutation = ({
   invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
-  UseMutationOptions<CreateSQLSnippetFolderData, ResponseError, CreateSQLSnippetFolderVariables>,
+  UseCustomMutationOptions<
+    CreateSQLSnippetFolderData,
+    ResponseError,
+    CreateSQLSnippetFolderVariables
+  >,
   'mutationFn'
 > & {
   invalidateQueriesOnSuccess?: boolean

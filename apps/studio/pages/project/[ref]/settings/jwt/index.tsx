@@ -36,9 +36,9 @@ const JWTKeysLegacyPage: NextPageWithLayout = () => {
     if (previousJwtSecretUpdateStatus.current === Updating) {
       switch (jwtSecretUpdateStatus) {
         case Updated:
-          client.invalidateQueries(configKeys.api(projectRef))
-          client.invalidateQueries(configKeys.settings(projectRef))
-          client.invalidateQueries(configKeys.postgrest(projectRef))
+          client.invalidateQueries({ queryKey: configKeys.api(projectRef) })
+          client.invalidateQueries({ queryKey: configKeys.settings(projectRef) })
+          client.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) })
           toast.success('Successfully updated JWT secret')
           break
         case Failed:

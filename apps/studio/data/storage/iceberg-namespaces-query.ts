@@ -1,7 +1,7 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
 
 type GetNamespacesVariables = {
@@ -55,7 +55,7 @@ export type IcebergNamespacesError = ResponseError
 
 export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
   params: GetNamespacesVariables,
-  { ...options }: UseQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
+  { ...options }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
   return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
     queryKey: storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),

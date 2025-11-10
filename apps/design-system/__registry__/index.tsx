@@ -2293,6 +2293,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "empty-state-missing-route": {
+      name: "empty-state-missing-route",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-missing-route")),
+      source: "",
+      files: ["registry/default/example/empty-state-missing-route.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "empty-state-zero-items-table": {
+      name: "empty-state-zero-items-table",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-zero-items-table")),
+      source: "",
+      files: ["registry/default/example/empty-state-zero-items-table.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "empty-state-initial-state": {
+      name: "empty-state-initial-state",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/empty-state-initial-state")),
+      source: "",
+      files: ["registry/default/example/empty-state-initial-state.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "chart-area-axes": {
       name: "chart-area-axes",
       type: "components:block",

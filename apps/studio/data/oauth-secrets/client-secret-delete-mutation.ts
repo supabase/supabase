@@ -1,7 +1,7 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { del, handleError } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { clientSecretKeys } from './keys'
 
 export type ClientSecretDeleteVariables = {
@@ -24,7 +24,7 @@ export const useClientSecretDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<boolean, ResponseError, ClientSecretDeleteVariables>,
+  UseCustomMutationOptions<boolean, ResponseError, ClientSecretDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
