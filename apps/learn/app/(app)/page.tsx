@@ -1,3 +1,4 @@
+import { WhatWillILearn } from '@/components/what-will-i-learn'
 import { Link } from '@/registry/default/components/ui/link'
 import { Activity, BookOpen, Database, Gauge, Wrench } from 'lucide-react'
 import { Badge, Button, Card, CardDescription, CardHeader } from 'ui'
@@ -77,12 +78,12 @@ export default function Home() {
                       help you get started no matter your skill level, teaching you how to build
                       production-ready apps.
                     </h2>
-
-                    <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"></div>
                   </div>
                 </div>
+
                 <div className="mb-8 mt-12">
                   <h3 className="text-2xl font-bold mb-6">Courses</h3>
+
                   <div className="space-y-4">
                     {courses.map((course) => {
                       const Icon = course.icon
@@ -121,6 +122,9 @@ export default function Home() {
                       )
                     })}
                   </div>
+                </div>
+                <div className="mt-16">
+                  <WhatWillILearn />
                 </div>
               </div>
             </div>
