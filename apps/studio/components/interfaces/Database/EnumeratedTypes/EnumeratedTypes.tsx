@@ -9,7 +9,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateRouting, useQueryStateWithValue } from 'hooks/misc/useQueryStateRouting'
+import { useQueryStateRouting, useQueryStateWithData } from 'hooks/misc/useQueryStateRouting'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -46,7 +46,7 @@ export const EnumeratedTypes = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const { val: typeToEditValue, setValue: setTypeToEditValue } = useQueryStateWithValue(
+  const { val: typeToEditValue, setValue: setTypeToEditValue } = useQueryStateWithData(
     'edit',
     data,
     'id'

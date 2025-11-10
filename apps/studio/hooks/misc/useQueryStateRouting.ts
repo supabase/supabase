@@ -128,7 +128,7 @@ export function useQueryStateRouting<T = any>({
   }
 }
 
-export function useQueryStateWithValue<T, K extends keyof T & string>(
+export function useQueryStateWithData<T, K extends keyof T & string>(
   urlKey: string,
   data: T[] = [],
   dataKey: K
