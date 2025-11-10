@@ -1,26 +1,26 @@
-import React from 'react'
+import { Database } from 'lucide-react'
 import Link from 'next/link'
+import React from 'react'
 import {
-  PageHeader,
-  PageHeaderBreadcrumb,
-  PageHeaderMeta,
-  PageHeaderIcon,
-  PageHeaderSummary,
-  PageHeaderTitle,
-  PageHeaderDescription,
-  PageHeaderAside,
-  PageHeaderFooter,
-} from 'ui-patterns/PageHeader'
-import {
-  Button,
-  NavMenu,
-  NavMenuItem,
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
   BreadcrumbList_Shadcn_ as BreadcrumbList,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  Button,
+  NavMenu,
+  NavMenuItem,
 } from 'ui'
-import { Database } from 'lucide-react'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderBreadcrumb,
+  PageHeaderDescription,
+  PageHeaderFooter,
+  PageHeaderIcon,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
 export default function PageHeaderDemo() {
   const breadcrumbItems = [
@@ -74,7 +74,7 @@ export default function PageHeaderDemo() {
         <PageHeaderFooter>
           <NavMenu>
             {navigationItems.map((item) => (
-              <NavMenuItem key={item.label}>
+              <NavMenuItem key={item.label} active={false}>
                 <Link href={item.href}>{item.label}</Link>
               </NavMenuItem>
             ))}

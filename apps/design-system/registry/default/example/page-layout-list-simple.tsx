@@ -7,10 +7,7 @@ import {
   PageHeaderDescription,
   PageHeaderAside,
 } from 'ui-patterns/PageHeader'
-import {
-  PageSection,
-  PageSectionContent,
-} from 'ui-patterns/PageSection'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import {
   Button,
   Card,

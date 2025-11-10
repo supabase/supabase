@@ -16,9 +16,9 @@ export default function PageSectionHorizontal() {
           <PageSectionSummary>
             <PageSectionTitle>Section Title</PageSectionTitle>
             <PageSectionDescription>
-              In horizontal orientation, the summary (title and description) appears on the left, with
-              content arranged on the right on larger screens. This is useful for detailed sections
-              where you want to maintain context while viewing content.
+              In horizontal orientation, the summary (title and description) appears on the left,
+              with content arranged on the right on larger screens. This is useful for detailed
+              sections where you want to maintain context while viewing content.
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>

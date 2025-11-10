@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react'
+import React from 'react'
 import {
   Button,
   Card,
@@ -25,7 +26,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-export default function PageLayoutList() {
+export default function PageLayoutList(): React.JSX.Element {
   const functions = [
     {
       id: 1,
