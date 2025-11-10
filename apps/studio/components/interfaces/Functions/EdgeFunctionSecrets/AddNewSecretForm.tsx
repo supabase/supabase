@@ -168,7 +168,7 @@ const AddNewSecretForm = () => {
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
-              <CardTitle>Add new secrets</CardTitle>
+              <CardTitle>Add or replace secrets</CardTitle>
             </CardHeader>
             <CardContent>
               {fields.map((fieldItem, index) => (
@@ -178,7 +178,7 @@ const AddNewSecretForm = () => {
                     name={`secrets.${index}.name`}
                     render={({ field }) => (
                       <FormItem_Shadcn_ className="w-full">
-                        <FormLabel_Shadcn_>Key</FormLabel_Shadcn_>
+                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input
                             {...field}
@@ -246,9 +246,13 @@ const AddNewSecretForm = () => {
                 Add another
               </Button>
             </CardContent>
-            <CardFooter className="justify-end space-x-2">
+            <CardFooter className="justify-between space-x-2">
+              <p className="text-sm text-foreground-lighter">
+                Insert or update multiple secrets at once by pasting key-value pairs
+              </p>
+
               <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
-                {isCreating ? 'Saving...' : 'Save'}
+                {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
               </Button>
             </CardFooter>
           </Card>

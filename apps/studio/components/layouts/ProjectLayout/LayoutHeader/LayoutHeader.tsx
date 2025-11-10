@@ -28,6 +28,7 @@ import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
+import { CommandMenuTriggerInput } from 'ui-patterns'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -208,7 +209,16 @@ export const LayoutHeader = ({
               <>
                 <FeedbackDropdown />
 
-                <div className="overflow-hidden flex items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <CommandMenuTriggerInput
+                    placeholder="Search..."
+                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
+                    [&_.command-shortcut>div]:border-none
+                    [&_.command-shortcut>div]:pr-2
+                    [&_.command-shortcut>div]:bg-transparent
+                    [&_.command-shortcut>div]:text-foreground-lighter
+                  "
+                  />
                   <HelpPopover />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
@@ -225,7 +235,16 @@ export const LayoutHeader = ({
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="overflow-hidden flex items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <CommandMenuTriggerInput
+                    placeholder="Search..."
+                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
+                        [&_.command-shortcut>div]:border-none
+                        [&_.command-shortcut>div]:pr-2
+                        [&_.command-shortcut>div]:bg-transparent
+                        [&_.command-shortcut>div]:text-foreground-lighter
+                      "
+                  />
                   <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
