@@ -16854,11 +16854,6 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
-  react-dom@19.2.0:
-    resolution: {integrity: sha512-UlbRu4cAiGaIewkPyiRGJk0imDN2T3JjieT6spoL2UeSf5od4n5LB/mQ4ejmxhCFT1tYe8IvaFulzynWovsEFQ==}
-    peerDependencies:
-      react: ^19.2.0
-
   react-draggable@4.4.6:
     resolution: {integrity: sha512-LtY5Xw1zTPqHkVmtM3X8MUOxNDOUhv/khTgBgrUvwaS064bwVvxT+q5El0uUFNx5IEPKXuRejr7UqLwBIg5pdw==}
     peerDependencies:
@@ -17117,10 +17112,6 @@ packages:
 
   react@18.3.1:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
-    engines: {node: '>=0.10.0'}
-
-  react@19.2.0:
-    resolution: {integrity: sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ==}
     engines: {node: '>=0.10.0'}
 
   reactflow@11.10.1:
@@ -17589,9 +17580,6 @@ packages:
 
   scheduler@0.25.0:
     resolution: {integrity: sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==}
-
-  scheduler@0.27.0:
-    resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
 
   schema-utils@3.3.0:
     resolution: {integrity: sha512-pN/yOAvcC+5rQ5nERGuwrjLlYvLTbCibnZ1I7B1LaiAz9BRBlE9GMgE/eqV30P7aJQUf7Ddimy/RsbYO/GrVGg==}
@@ -27191,12 +27179,12 @@ snapshots:
       handlebars: 4.7.8
       mobx: 6.11.0
       pluralize: 8.0.0
-      react: 19.2.0
-      react-dom: 19.2.0(react@19.2.0)
-      redoc: 2.4.0(core-js@3.35.0)(encoding@0.1.13)(mobx@6.11.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(styled-components@6.1.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(supports-color@8.1.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      redoc: 2.4.0(core-js@3.35.0)(encoding@0.1.13)(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(supports-color@8.1.1)
       semver: 7.7.1
       simple-websocket: 9.1.0(supports-color@8.1.1)
-      styled-components: 6.1.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      styled-components: 6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       yargs: 17.0.1
     transitivePeerDependencies:
       - ajv
@@ -36548,21 +36536,21 @@ snapshots:
     dependencies:
       obliterator: 2.0.4
 
-  mobx-react-lite@4.1.0(mobx@6.11.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  mobx-react-lite@4.1.0(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       mobx: 6.11.0
-      react: 19.2.0
-      use-sync-external-store: 1.5.0(react@19.2.0)
+      react: 18.3.1
+      use-sync-external-store: 1.5.0(react@18.3.1)
     optionalDependencies:
-      react-dom: 19.2.0(react@19.2.0)
+      react-dom: 18.3.1(react@18.3.1)
 
-  mobx-react@9.2.0(mobx@6.11.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  mobx-react@9.2.0(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       mobx: 6.11.0
-      mobx-react-lite: 4.1.0(mobx@6.11.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      react: 19.2.0
+      mobx-react-lite: 4.1.0(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
     optionalDependencies:
-      react-dom: 19.2.0(react@19.2.0)
+      react-dom: 18.3.1(react@18.3.1)
 
   mobx@6.11.0: {}
 
@@ -38658,11 +38646,6 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
-  react-dom@19.2.0(react@19.2.0):
-    dependencies:
-      react: 19.2.0
-      scheduler: 0.27.0
-
   react-draggable@4.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       clsx: 1.2.1
@@ -38936,11 +38919,11 @@ snapshots:
       react: 18.3.1
       refractor: 3.6.0
 
-  react-tabs@6.1.0(react@19.2.0):
+  react-tabs@6.1.0(react@18.3.1):
     dependencies:
       clsx: 2.1.1
       prop-types: 15.8.1
-      react: 19.2.0
+      react: 18.3.1
 
   react-tooltip@4.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -38989,8 +38972,6 @@ snapshots:
   react@18.3.1:
     dependencies:
       loose-envify: 1.4.0
-
-  react@19.2.0: {}
 
   reactflow@11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -39094,7 +39075,7 @@ snapshots:
     dependencies:
       redis-errors: 1.2.0
 
-  redoc@2.4.0(core-js@3.35.0)(encoding@0.1.13)(mobx@6.11.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(styled-components@6.1.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(supports-color@8.1.1):
+  redoc@2.4.0(core-js@3.35.0)(encoding@0.1.13)(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(supports-color@8.1.1):
     dependencies:
       '@redocly/openapi-core': 1.34.1(supports-color@8.1.1)
       classnames: 2.5.1
@@ -39107,19 +39088,19 @@ snapshots:
       mark.js: 8.11.1
       marked: 4.3.0
       mobx: 6.11.0
-      mobx-react: 9.2.0(mobx@6.11.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      mobx-react: 9.2.0(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       openapi-sampler: 1.6.1
       path-browserify: 1.0.1
       perfect-scrollbar: 1.5.5
       polished: 4.2.2
       prismjs: 1.30.0
       prop-types: 15.8.1
-      react: 19.2.0
-      react-dom: 19.2.0(react@19.2.0)
-      react-tabs: 6.1.0(react@19.2.0)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-tabs: 6.1.0(react@18.3.1)
       slugify: 1.4.7
       stickyfill: 1.1.1
-      styled-components: 6.1.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      styled-components: 6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       swagger2openapi: 7.0.8(encoding@0.1.13)
       url-template: 2.0.8
     transitivePeerDependencies:
@@ -39699,8 +39680,6 @@ snapshots:
       loose-envify: 1.4.0
 
   scheduler@0.25.0: {}
-
-  scheduler@0.27.0: {}
 
   schema-utils@3.3.0:
     dependencies:
@@ -40508,7 +40487,7 @@ snapshots:
       hey-listen: 1.0.8
       tslib: 2.8.1
 
-  styled-components@6.1.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  styled-components@6.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@emotion/is-prop-valid': 1.2.1
       '@emotion/unitless': 0.8.0
@@ -40516,8 +40495,8 @@ snapshots:
       css-to-react-native: 3.2.0
       csstype: 3.1.2
       postcss: 8.4.31
-      react: 19.2.0
-      react-dom: 19.2.0(react@19.2.0)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
       shallowequal: 1.1.0
       stylis: 4.3.1
       tslib: 2.5.0
@@ -41570,10 +41549,6 @@ snapshots:
   use-sync-external-store@1.5.0(react@18.3.1):
     dependencies:
       react: 18.3.1
-
-  use-sync-external-store@1.5.0(react@19.2.0):
-    dependencies:
-      react: 19.2.0
 
   utf8-byte-length@1.0.5: {}
 
