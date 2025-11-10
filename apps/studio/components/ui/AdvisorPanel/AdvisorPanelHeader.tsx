@@ -4,6 +4,7 @@ import { ChevronLeft, X } from 'lucide-react'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { AdvisorItemSource, AdvisorSeverity } from 'state/advisor-state'
 import { Badge } from 'ui'
+import { getAdvisorItemDisplayTitle } from './AdvisorDetail'
 
 export type AdvisorItem = {
   id: string
@@ -12,7 +13,7 @@ export type AdvisorItem = {
   createdAt?: number
   tab: 'security' | 'performance' | 'messages'
   source: AdvisorItemSource
-  original: any
+  original: Lint | Notification
 }
 
 export const severityBadgeVariants: Record<AdvisorSeverity, 'destructive' | 'warning' | 'default'> =
@@ -35,6 +36,8 @@ interface AdvisorPanelHeaderProps {
 }
 
 export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPanelHeaderProps) => {
+  const displayTitle = selectedItem ? getAdvisorItemDisplayTitle(selectedItem) : undefined
+
   return (
     <div className="border-b px-4 py-3 flex items-center gap-3">
       <ButtonTooltip
@@ -46,7 +49,7 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
       />
       <div className="flex items-center gap-2 overflow-hidden flex-1">
         <div className="flex-1 flex flex-col gap-0.5">
-          <span className="heading-default">{selectedItem?.title?.replace(/[`\\]/g, '')}</span>
+          <span className="heading-default">{displayTitle}</span>
           {selectedItem?.createdAt && (
             <span className="text-xs text-foreground-light capitalize-sentence">
               {(() => {

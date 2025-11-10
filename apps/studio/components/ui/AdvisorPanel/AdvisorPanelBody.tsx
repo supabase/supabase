@@ -1,10 +1,12 @@
-import dayjs from 'dayjs'
 import { AlertTriangle, ChevronRight, Gauge, Inbox, Shield } from 'lucide-react'
 
+import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import { Lint } from 'data/lint/lint-query'
 import { Notification } from 'data/notifications/notifications-v2-query'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { formatItemDate } from './AdvisorPanel.utils'
 import { AdvisorItem } from './AdvisorPanelHeader'
 import { EmptyAdvisor } from './EmptyAdvisor'
 
@@ -101,6 +103,22 @@ export const AdvisorPanelBody = ({
           const isNotification = item.source === 'notification'
           const notification = isNotification ? (item.original as Notification) : null
           const isUnread = notification?.status === 'new'
+          const lint = !isNotification ? (item.original as Lint) : null
+
+          // For lint items, get issue type title from lintInfoMap
+          const issueTypeTitle = lint && lintInfoMap.find((info) => info.name === lint.name)?.title
+
+          // Primary text: issue type for lint items, title for notifications
+          const primaryText = issueTypeTitle || item.title.replace(/[`\\]/g, '')
+
+          // Secondary text: entity for lint items when no date, date for notifications
+          const hasDate = !!item.createdAt
+          const entityString =
+            lint?.metadata &&
+            (lint.metadata.entity ||
+              (lint.metadata.schema &&
+                lint.metadata.name &&
+                `${lint.metadata.schema}.${lint.metadata.name}`))
 
           return (
             <div key={`${item.source}-${item.id}`} className="border-b">
@@ -120,17 +138,17 @@ export const AdvisorPanelBody = ({
                       className={cn('flex-shrink-0', severityClass)}
                     />
                     <div className="text-left flex flex-col gap-0.5 truncate flex-1 min-w-0">
-                      <div className="truncate">{item.title.replace(/[`\\]/g, '')}</div>
-                      {item.createdAt && (
+                      <div className="truncate">{primaryText}</div>
+                      {hasDate ? (
                         <span className="text-xs text-foreground-light capitalize-sentence">
-                          {(() => {
-                            const insertedAt = item.createdAt
-                            const daysFromNow = dayjs().diff(dayjs(insertedAt), 'day')
-                            const formattedTimeFromNow = dayjs(insertedAt).fromNow()
-                            const formattedInsertedAt = dayjs(insertedAt).format('MMM DD, YYYY')
-                            return daysFromNow > 1 ? formattedInsertedAt : formattedTimeFromNow
-                          })()}
+                          {formatItemDate(item.createdAt!)}
                         </span>
+                      ) : (
+                        entityString && (
+                          <div className="flex items-center gap-1 text-xs text-foreground-light">
+                            <span className="truncate">{entityString}</span>
+                          </div>
+                        )
                       )}
                     </div>
                   </div>
