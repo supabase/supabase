@@ -56,7 +56,7 @@ export interface TableEditorProps {
     payload: {
       name: string
       schema: string
-      comment?: string | undefined
+      comment?: string | null
     },
     columns: ColumnField[],
     foreignKeyRelations: ForeignKey[],

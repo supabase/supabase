@@ -1,3 +1,4 @@
+import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { getUsersCountSQL } from '@supabase/pg-meta/src/sql/studio/get-users-count'
 import { useQuery } from '@tanstack/react-query'
 
@@ -13,6 +14,9 @@ type UsersCountVariables = {
   filter?: Filter
   providers?: string[]
   forceExactCount?: boolean
+
+  /** If set, uses optimized prefix search for the specified column */
+  column?: OptimizedSearchColumns
 }
 
 export async function getUsersCount(
@@ -23,10 +27,11 @@ export async function getUsersCount(
     filter,
     providers,
     forceExactCount,
+    column,
   }: UsersCountVariables,
   signal?: AbortSignal
 ) {
-  const sql = getUsersCountSQL({ filter, keywords, providers, forceExactCount })
+  const sql = getUsersCountSQL({ filter, keywords, providers, forceExactCount, column })
 
   const { result } = await executeSql(
     {
@@ -63,6 +68,7 @@ export const useUsersCountQuery = <TData = UsersCountData>(
     filter,
     providers,
     forceExactCount,
+    column,
   }: UsersCountVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<UsersCountData, UsersCountError, TData> = {}
 ) =>
@@ -72,6 +78,7 @@ export const useUsersCountQuery = <TData = UsersCountData>(
       filter,
       providers,
       forceExactCount,
+      column,
     }),
     queryFn: ({ signal }) =>
       getUsersCount(
@@ -82,6 +89,7 @@ export const useUsersCountQuery = <TData = UsersCountData>(
           filter,
           providers,
           forceExactCount,
+          column,
         },
         signal
       ),

@@ -27,7 +27,6 @@ import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
-import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 import { CommandMenuTriggerInput } from 'ui-patterns'
 
@@ -221,11 +220,10 @@ export const LayoutHeader = ({
                   "
                   />
                   <HelpPopover />
-                  <NotificationsPopoverV2 />
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <AdvisorButton />
                         <InlineEditorButton />
                         <AssistantButton />
                       </>
@@ -238,6 +236,7 @@ export const LayoutHeader = ({
               <>
                 <LocalVersionPopover />
                 <div className="flex items-center gap-2">
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
@@ -250,7 +249,6 @@ export const LayoutHeader = ({
                             [&_.command-shortcut>div]:text-foreground-lighter
                           "
                         />
-                        <AdvisorButton />
                         <InlineEditorButton />
                         <AssistantButton />
                       </>

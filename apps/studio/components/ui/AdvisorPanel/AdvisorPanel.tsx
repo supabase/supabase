@@ -1,62 +1,28 @@
-import { AlertTriangle, ChevronLeft, ChevronRight, Gauge, Inbox, Shield, X } from 'lucide-react'
-import { useMemo } from 'react'
+import dayjs from 'dayjs'
+import { useMemo, useRef } from 'react'
 
-import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import {
+  Notification,
+  NotificationData,
+  useNotificationsV2Query,
+} from 'data/notifications/notifications-v2-query'
+import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advisor-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { Badge, Button, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_, cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import { EmptyAdvisor } from './EmptyAdvisor'
-
-type AdvisorItem = {
-  id: string
-  title: string
-  severity: AdvisorSeverity
-  createdAt?: number
-  tab: Exclude<AdvisorTab, 'all'>
-  source: 'lint'
-  original: Lint
-}
-
-const severityOptions = [
-  { label: 'Critical', value: 'critical' },
-  { label: 'Warning', value: 'warning' },
-  { label: 'Info', value: 'info' },
-]
+import { AdvisorDetail } from './AdvisorDetail'
+import { AdvisorFilters } from './AdvisorFilters'
+import { AdvisorPanelBody } from './AdvisorPanelBody'
+import { AdvisorItem, AdvisorPanelHeader } from './AdvisorPanelHeader'
 
 const severityOrder: Record<AdvisorSeverity, number> = {
   critical: 0,
   warning: 1,
   info: 2,
-}
-
-const severityLabels: Record<AdvisorSeverity, string> = {
-  critical: 'Critical',
-  warning: 'Warning',
-  info: 'Info',
-}
-
-const severityBadgeVariants: Record<AdvisorSeverity, 'destructive' | 'warning' | 'default'> = {
-  critical: 'destructive',
-  warning: 'warning',
-  info: 'default',
-}
-
-const severityColorClasses: Record<AdvisorSeverity, string> = {
-  critical: 'text-destructive',
-  warning: 'text-warning',
-  info: 'text-foreground-light',
-}
-
-const tabIconMap: Record<Exclude<AdvisorTab, 'all'>, React.ElementType> = {
-  security: Shield,
-  performance: Gauge,
-  messages: Inbox,
 }
 
 const lintLevelToSeverity = (level: Lint['level']): AdvisorSeverity => {
@@ -70,20 +36,39 @@ const lintLevelToSeverity = (level: Lint['level']): AdvisorSeverity => {
   }
 }
 
+const notificationPriorityToSeverity = (priority: string | null | undefined): AdvisorSeverity => {
+  switch (priority) {
+    case 'Critical':
+      return 'critical'
+    case 'Warning':
+      return 'warning'
+    default:
+      return 'info'
+  }
+}
+
 export const AdvisorPanel = () => {
   const {
     activeTab,
     severityFilters,
     selectedItemId,
+    selectedItemSource,
     setActiveTab,
     setSeverityFilters,
     clearSeverityFilters,
-    setSelectedItemId,
+    setSelectedItem,
+    notificationFilterStatuses,
+    notificationFilterPriorities,
+    setNotificationFilters,
+    resetNotificationFilters,
   } = useAdvisorStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
   const isSidebarOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
+  const markedRead = useRef<string[]>([])
+  const hasProjectRef = !!project?.ref
 
   const {
     data: lintData,
@@ -91,8 +76,57 @@ export const AdvisorPanel = () => {
     isError: isLintsError,
   } = useProjectLintsQuery(
     { projectRef: project?.ref },
-    { enabled: isSidebarOpen && !!project?.ref }
+    { enabled: isSidebarOpen && hasProjectRef && activeTab !== 'messages' }
   )
+
+  // Notifications should always load when sidebar is open (shown in both 'all' and 'messages' tabs)
+  const shouldLoadNotifications = isSidebarOpen && IS_PLATFORM
+
+  const notificationStatus = useMemo(() => {
+    if (notificationFilterStatuses.includes('archived')) {
+      return 'archived'
+    }
+    if (notificationFilterStatuses.includes('unread')) {
+      return 'new'
+    }
+    return undefined
+  }, [notificationFilterStatuses])
+
+  // Memoize filters to prevent query key changes on every render
+  // Use selected organization and project if they exist
+  const notificationFilters = useMemo(
+    () => ({
+      priority: notificationFilterPriorities,
+      organizations: selectedOrganization?.slug ? [selectedOrganization.slug] : [],
+      projects: project?.ref ? [project.ref] : [],
+    }),
+    [notificationFilterPriorities, selectedOrganization?.slug, project?.ref]
+  )
+
+  const {
+    data: notificationsData,
+    isLoading: isNotificationsLoading,
+    isError: isNotificationsError,
+  } = useNotificationsV2Query(
+    {
+      status: notificationStatus,
+      filters: notificationFilters,
+      limit: 20,
+    },
+    { enabled: shouldLoadNotifications }
+  )
+
+  const { mutate: updateNotifications } = useNotificationsV2UpdateMutation()
+
+  const notifications = useMemo(() => {
+    return notificationsData?.pages.flatMap((page) => page) ?? []
+  }, [notificationsData?.pages])
+
+  const markNotificationsRead = () => {
+    if (markedRead.current.length > 0) {
+      updateNotifications({ ids: markedRead.current, status: 'seen' })
+    }
+  }
 
   const lintItems = useMemo<AdvisorItem[]>(() => {
     if (!lintData) return []
@@ -121,8 +155,24 @@ export const AdvisorPanel = () => {
       .filter((item): item is AdvisorItem => item !== null)
   }, [lintData])
 
+  const notificationItems = useMemo<AdvisorItem[]>(() => {
+    if (!IS_PLATFORM) return []
+    return notifications?.map((notification): AdvisorItem => {
+      const data = notification.data as NotificationData
+      return {
+        id: notification.id,
+        title: data.title,
+        severity: notificationPriorityToSeverity(notification.priority),
+        createdAt: dayjs(notification.inserted_at).valueOf(),
+        tab: 'messages' as const,
+        source: 'notification' as const,
+        original: notification,
+      }
+    })
+  }, [notifications])
+
   const combinedItems = useMemo<AdvisorItem[]>(() => {
-    const all = [...lintItems]
+    const all = [...lintItems, ...notificationItems]
 
     return all.sort((a, b) => {
       const severityDiff = severityOrder[a.severity] - severityOrder[b.severity]
@@ -133,80 +183,107 @@ export const AdvisorPanel = () => {
 
       return a.title.localeCompare(b.title)
     })
-  }, [lintItems])
+  }, [lintItems, notificationItems])
 
   const filteredItems = useMemo<AdvisorItem[]>(() => {
     return combinedItems.filter((item) => {
+      // Filter by severity
       if (severityFilters.length > 0 && !severityFilters.includes(item.severity)) {
         return false
       }
 
-      if (activeTab === 'all') return true
+      // Filter by tab
+      if (activeTab === 'all') {
+        // When no projectRef, only show notifications in 'all' tab
+        if (!hasProjectRef && item.source !== 'notification') {
+          return false
+        }
+        return true
+      }
 
       return item.tab === activeTab
     })
-  }, [combinedItems, severityFilters, activeTab])
+  }, [combinedItems, severityFilters, activeTab, hasProjectRef])
 
   const itemsFilteredByTabOnly = useMemo<AdvisorItem[]>(() => {
     return combinedItems.filter((item) => {
-      if (activeTab === 'all') return true
+      if (activeTab === 'all') {
+        // When no projectRef, only show notifications in 'all' tab
+        if (!hasProjectRef && item.source !== 'notification') {
+          return false
+        }
+        return true
+      }
       return item.tab === activeTab
     })
-  }, [combinedItems, activeTab])
+  }, [combinedItems, activeTab, hasProjectRef])
 
   const hiddenItemsCount = itemsFilteredByTabOnly.length - filteredItems.length
 
-  const selectedItem = combinedItems.find((item) => item.id === selectedItemId)
+  const selectedItem = combinedItems.find(
+    (item) => item.id === selectedItemId && item.source === selectedItemSource
+  )
   const isDetailView = !!selectedItem
 
-  const isLoading = isLintsLoading
-  const isError = isLintsError
+  // Only show loading state if the query is actually enabled
+  const isLintsActuallyLoading =
+    isSidebarOpen && hasProjectRef && activeTab !== 'messages' && isLintsLoading
+  const isNotificationsActuallyLoading = shouldLoadNotifications && isNotificationsLoading
+  const isLoading = isLintsActuallyLoading || isNotificationsActuallyLoading
+  const isError = isLintsError || isNotificationsError
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as AdvisorTab)
+    setSelectedItem(undefined)
   }
 
   const handleBackToList = () => {
-    setSelectedItemId(undefined)
+    setSelectedItem(undefined)
+    markNotificationsRead()
   }
 
   const handleClose = () => {
+    markNotificationsRead()
     closeSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
   }
+
+  const handleItemClick = (item: AdvisorItem) => {
+    setSelectedItem(item.id, item.source)
+    if (item.source === 'notification') {
+      const notification = item.original as Notification
+      if (notification.status === 'new' && !markedRead.current.includes(notification.id)) {
+        markedRead.current.push(notification.id)
+      }
+    }
+  }
+
+  const handleUpdateNotificationStatus = (id: string, status: 'archived' | 'seen') => {
+    updateNotifications({ ids: [id], status })
+  }
+
+  const handleClearAllFilters = () => {
+    clearSeverityFilters()
+    resetNotificationFilters()
+  }
+
+  const hasAnyFilters = severityFilters.length > 0 || notificationFilterStatuses.length > 0
 
   return (
     <div className="flex h-full flex-col bg-background">
       {isDetailView ? (
         <>
-          <div className="border-b px-4 py-3 flex items-center gap-3">
-            <ButtonTooltip
-              type="text"
-              className="w-7 h-7 p-0 flex justify-center items-center"
-              icon={<ChevronLeft size={16} strokeWidth={1.5} aria-hidden={true} />}
-              onClick={handleBackToList}
-              tooltip={{ content: { side: 'bottom', text: 'Back to list' } }}
-            />
-            <div className="flex items-center gap-2 overflow-hidden flex-1">
-              <div className="flex-1">
-                <span className="heading-default">{selectedItem?.title}</span>
-              </div>
-              {selectedItem && (
-                <Badge variant={severityBadgeVariants[selectedItem.severity]}>
-                  {severityLabels[selectedItem.severity]}
-                </Badge>
-              )}
-            </div>
-            <ButtonTooltip
-              type="text"
-              className="w-7 h-7 p-0"
-              icon={<X strokeWidth={1.5} />}
-              onClick={handleClose}
-              tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
-            />
-          </div>
+          <AdvisorPanelHeader
+            selectedItem={selectedItem}
+            onBack={handleBackToList}
+            onClose={handleClose}
+          />
           <div className="flex-1 overflow-y-auto">
             {selectedItem ? (
-              <AdvisorDetail item={selectedItem} projectRef={project?.ref ?? ''} />
+              <AdvisorDetail
+                item={selectedItem}
+                projectRef={project?.ref ?? ''}
+                onUpdateNotificationStatus={handleUpdateNotificationStatus}
+              />
             ) : (
               <div className="px-6 py-8">
                 <p className="text-sm text-foreground-light">
@@ -218,118 +295,40 @@ export const AdvisorPanel = () => {
         </>
       ) : (
         <>
-          <div className="border-b">
-            <div className="flex items-center justify-between gap-3 px-4 h-[46px]">
-              <Tabs_Shadcn_ value={activeTab} onValueChange={handleTabChange} className="h-full">
-                <TabsList_Shadcn_ className="border-b-0 gap-4 h-full">
-                  <TabsTrigger_Shadcn_ value="all" className="h-full text-xs">
-                    All
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="security" className="h-full text-xs">
-                    Security
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="performance" className="h-full text-xs">
-                    Performance
-                  </TabsTrigger_Shadcn_>
-                </TabsList_Shadcn_>
-              </Tabs_Shadcn_>
-              <div className="flex items-center gap-2">
-                <FilterPopover
-                  name="Severity"
-                  options={severityOptions}
-                  activeOptions={[...severityFilters]}
-                  valueKey="value"
-                  labelKey="label"
-                  onSaveFilters={(values) => setSeverityFilters(values as AdvisorSeverity[])}
-                />
-                <ButtonTooltip
-                  type="text"
-                  className="w-7 h-7 p-0"
-                  icon={<X strokeWidth={1.5} />}
-                  onClick={handleClose}
-                  tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
-                />
-              </div>
-            </div>
-          </div>
+          <AdvisorFilters
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            severityFilters={[...severityFilters]}
+            onSeverityFiltersChange={setSeverityFilters}
+            statusFilters={[...notificationFilterStatuses]}
+            onStatusFiltersChange={(values) => {
+              notificationFilterStatuses
+                .filter((status) => !values.includes(status))
+                .forEach((status) => setNotificationFilters(status, 'status'))
+              values
+                .filter((status) => !notificationFilterStatuses.includes(status))
+                .forEach((status) => setNotificationFilters(status, 'status'))
+            }}
+            hasProjectRef={hasProjectRef}
+            onClose={handleClose}
+            isPlatform={IS_PLATFORM}
+          />
           <div className="flex-1 overflow-y-auto">
-            {isLoading ? (
-              <div>
-                <GenericSkeletonLoader className="w-full p-4" />
-              </div>
-            ) : isError ? (
-              <div className="my-8 mx-4 flex flex-col items-center gap-2">
-                <AlertTriangle className="text-destructive" />
-                <h2 className="text-base text-foreground-light">Error loading advisories</h2>
-                <p className="text-sm text-foreground-lighter">Please try again later.</p>
-              </div>
-            ) : filteredItems.length === 0 ? (
-              <EmptyAdvisor
-                activeTab={activeTab}
-                hasFilters={severityFilters.length > 0}
-                onClearFilters={clearSeverityFilters}
-              />
-            ) : (
-              <>
-                <div className="flex flex-col">
-                  {filteredItems.map((item) => {
-                    const SeverityIcon = tabIconMap[item.tab]
-                    const severityClass = severityColorClasses[item.severity]
-                    return (
-                      <div key={item.id} className="border-b">
-                        <Button
-                          type="text"
-                          className="justify-start w-full block rounded-none h-auto py-3 px-4 text-foreground-light hover:text-foreground"
-                          onClick={() => setSelectedItemId(item.id)}
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2 overflow-hidden">
-                              <SeverityIcon
-                                size={16}
-                                strokeWidth={1.5}
-                                className={cn('flex-shrink-0', severityClass)}
-                              />
-                              <span className="truncate">{item.title}</span>
-                            </div>
-                            <ChevronRight
-                              size={16}
-                              strokeWidth={1.5}
-                              className="flex-shrink-0 text-foreground-lighter"
-                            />
-                          </div>
-                        </Button>
-                      </div>
-                    )
-                  })}
-                </div>
-                {severityFilters.length > 0 && hiddenItemsCount > 0 && (
-                  <div className="px-4 py-3">
-                    <Button type="text" className="w-full" onClick={clearSeverityFilters}>
-                      Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? 's' : ''}
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
+            <AdvisorPanelBody
+              isLoading={isLoading}
+              isError={isError}
+              filteredItems={filteredItems}
+              activeTab={activeTab}
+              severityFilters={[...severityFilters]}
+              onItemClick={handleItemClick}
+              onClearFilters={handleClearAllFilters}
+              hiddenItemsCount={hiddenItemsCount}
+              hasAnyFilters={hasAnyFilters}
+              hasProjectRef={hasProjectRef}
+            />
           </div>
         </>
       )}
     </div>
   )
-}
-
-interface AdvisorDetailProps {
-  item: AdvisorItem
-  projectRef: string
-}
-
-const AdvisorDetail = ({ item, projectRef }: AdvisorDetailProps) => {
-  if (item.source === 'lint') {
-    const lint = item.original as Lint
-    return (
-      <div className="px-6 py-6">
-        <LintDetail lint={lint} projectRef={projectRef} />
-      </div>
-    )
-  }
 }

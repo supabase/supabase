@@ -1,8 +1,13 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
+import { useParams } from 'common'
 import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TEMPLATES_SCHEMAS } from 'components/interfaces/Auth/AuthTemplatesValidation'
 import { slugifyTitle } from 'components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
@@ -10,14 +15,30 @@ import { TemplateEditor } from 'components/interfaces/Auth/EmailTemplates/Templa
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import {
+  ScaffoldContainer,
+  ScaffoldSection,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DOCS_URL } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { Button, Card } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Switch,
+} from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
@@ -26,12 +47,29 @@ const TemplatePage: NextPageWithLayout = () => {
 const RedirectToTemplates = () => {
   const router = useRouter()
   const { templateId, ref } = router.query
+  const { ref: projectRef } = useParams()
   const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
 
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
   )
+
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
+
+  const { data: authConfig, isLoading: isLoadingConfig } = useAuthConfigQuery({ projectRef })
+
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to update settings: ${error?.message}`)
+    },
+    onSuccess: () => {
+      toast.success('Successfully updated settings')
+    },
+  })
 
   // Find template whose slug matches the URL slug
   const template =
@@ -43,11 +81,55 @@ const RedirectToTemplates = () => {
   const templateIdForDocs =
     typeof templateId === 'string' ? templateId.replace(/-/g, '').toLowerCase() : ''
 
+  // Determine if this is a security notification template
+  const isSecurityTemplate = template?.misc?.emailTemplateType === 'security'
+
+  // Get the enabled key for security templates
+  const templateEnabledKey = isSecurityTemplate
+    ? (`MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as string)
+    : null
+
+  const showConfigurationSection = isSecurityTemplate && templateEnabledKey
+
+  // Create form schema for security templates
+  const TemplateFormSchema = templateEnabledKey
+    ? z.object({
+        [templateEnabledKey]: z.boolean(),
+      })
+    : z.object({})
+
+  const defaultValues = templateEnabledKey
+    ? {
+        [templateEnabledKey]: authConfig
+          ? Boolean(authConfig[templateEnabledKey as keyof typeof authConfig])
+          : false,
+      }
+    : {}
+
+  const templateForm = useForm<z.infer<typeof TemplateFormSchema>>({
+    resolver: zodResolver(TemplateFormSchema),
+    defaultValues,
+  })
+
+  const onSubmit = (values: any) => {
+    if (!projectRef) return console.error('Project ref is required')
+    updateAuthConfig({ projectRef: projectRef, config: { ...values } })
+  }
+
   useEffect(() => {
     if (isPermissionsLoaded && !isSecurityNotificationsEnabled) {
       router.replace(`/project/${ref}/auth/templates/`)
     }
   }, [isPermissionsLoaded, isSecurityNotificationsEnabled, ref, router])
+
+  useEffect(() => {
+    if (authConfig && templateEnabledKey) {
+      templateForm.reset({
+        [templateEnabledKey]: Boolean(authConfig[templateEnabledKey as keyof typeof authConfig]),
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authConfig, templateEnabledKey])
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's email settings" />
@@ -88,21 +170,77 @@ const RedirectToTemplates = () => {
       secondaryActions={[
         <DocsButton
           key="docs"
-          href={`${DOCS_URL}/guides/local-development/customizing-email-templates#authemailtemplate${templateIdForDocs}`}
+          href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${isSecurityTemplate ? 'security' : 'auth'}emailtemplate${templateIdForDocs}`}
         />,
       ]}
     >
       <ScaffoldContainer bottomPadding>
-        {!isPermissionsLoaded ? (
+        {!isPermissionsLoaded || isLoadingConfig ? (
           <ScaffoldSection isFullWidth>
             <GenericSkeletonLoader />
           </ScaffoldSection>
         ) : (
-          <ScaffoldSection isFullWidth>
-            <Card>
-              <TemplateEditor template={template} />
-            </Card>
-          </ScaffoldSection>
+          <>
+            {showConfigurationSection && (
+              <ScaffoldSection isFullWidth>
+                <ScaffoldSectionTitle className="mb-4">Configuration</ScaffoldSectionTitle>
+                <Form_Shadcn_ {...templateForm}>
+                  <form onSubmit={templateForm.handleSubmit(onSubmit)} className="space-y-4">
+                    <Card>
+                      <CardContent>
+                        <FormField_Shadcn_
+                          control={templateForm.control}
+                          name={templateEnabledKey as keyof z.infer<typeof TemplateFormSchema>}
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Enable notification"
+                              description="Send this email to users when triggered"
+                            >
+                              <FormControl_Shadcn_>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  disabled={!canUpdateConfig}
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </CardContent>
+                      <CardFooter className="justify-end space-x-2">
+                        {templateForm.formState.isDirty && (
+                          <Button type="default" onClick={() => templateForm.reset()}>
+                            Cancel
+                          </Button>
+                        )}
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          disabled={
+                            !canUpdateConfig || isUpdatingConfig || !templateForm.formState.isDirty
+                          }
+                          loading={isUpdatingConfig}
+                        >
+                          Save changes
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </form>
+                </Form_Shadcn_>
+              </ScaffoldSection>
+            )}
+
+            <ScaffoldSection isFullWidth>
+              {/* Only show title if there is an another section above */}
+              {showConfigurationSection && (
+                <ScaffoldSectionTitle className="mb-4">Contents</ScaffoldSectionTitle>
+              )}
+              <Card>
+                <TemplateEditor template={template} />
+              </Card>
+            </ScaffoldSection>
+          </>
         )}
       </ScaffoldContainer>
     </PageLayout>
