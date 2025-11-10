@@ -324,6 +324,16 @@ const nextConfig = {
       },
       {
         permanent: true,
+        source: '/project/:ref/reports',
+        destination: '/project/:ref/observability',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/:path*',
+        destination: '/project/:ref/observability/:path*',
+      },
+      {
+        permanent: true,
         source: '/project/:ref/query-performance',
         destination: '/project/:ref/reports/query-performance',
       },
