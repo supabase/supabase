@@ -691,5 +691,37 @@
     "position": "Founder Advocate",
     "author_url": "https://www.linkedin.com/in/gregorykress",
     "author_image_url": "/images/blog/avatars/gregorykress.jpg"
+  },
+  {
+    "author_id": "harry_roper",
+    "author": "Harry Roper",
+    "position": "Founder and CEO",
+    "company": "Imaginary Space",
+    "author_url": "https://www.linkedin.com/in/harry-roper",
+    "author_image_url": "/images/avatars/harry-roper.png"
+  },
+  {
+    "author_id": "shahed_islam",
+    "author": "Shahed Islam",
+    "position": "Co-Founder and CEO",
+    "company": "SJ Innovation LLC",
+    "author_url": "https://www.linkedin.com/in/shahed-islam",
+    "author_image_url": "/images/avatars/shahed-islam.jpeg"
+  },
+  {
+    "author_id": "omar_moulani",
+    "author": "Omar Moulani",
+    "position": "Founder and Managing Director",
+    "company": "WeGetDesign",
+    "author_url": "https://www.linkedin.com/in/omar-moulani",
+    "author_image_url": "/images/avatars/omar-moulani.jpeg"
+  },
+  {
+    "author_id": "dave_wilson",
+    "author": "Dave Wilson",
+    "position": "Partnerships",
+    "company": "Supabase",
+    "author_url": "https://www.linkedin.com/in/david-wilson-285564140",
+    "author_image_url": "/images/avatars/dave-wilson.jpg"
   }
 ]

@@ -102,7 +102,7 @@ export const PublicationsTables = () => {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Schema</TableHead>
-                  <TableHead>Description</TableHead>
+                  <TableHead className="hidden lg:table-cell">Description</TableHead>
                   {/* 
                       We've disabled All tables toggle for publications. 
                       See https://github.com/supabase/supabase/pull/7233. 

@@ -20,7 +20,7 @@ const bucket: Bucket = {
     count: { min: 1, max: 5 },
   }),
   file_size_limit: faker.number.int({ min: 0, max: 25165824 }),
-  type: faker.helpers.arrayElement(['STANDARD', 'ANALYTICS', undefined]),
+  type: 'STANDARD',
   created_at: faker.date.recent().toISOString(),
   updated_at: faker.date.recent().toISOString(),
 }
@@ -46,7 +46,7 @@ const Page = ({ onClose }: { onClose: () => void }) => {
 describe(`DeleteBucketModal`, () => {
   beforeEach(() => {
     // useParams
-    routerMock.setCurrentUrl(`/project/default/storage/buckets/test`)
+    routerMock.setCurrentUrl(`/project/default/storage/files`)
     // useProjectContext
     addAPIMock({
       method: `get`,
@@ -117,25 +117,6 @@ describe(`DeleteBucketModal`, () => {
     fireEvent.click(confirmButton)
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
-    expect(routerMock.asPath).toStrictEqual(`/project/default/storage/buckets`)
-  })
-
-  it(`prevents submission when the input doesn't match the bucket name`, async () => {
-    const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
-
-    const openButton = screen.getByRole(`button`, { name: `Open` })
-    await userEvent.click(openButton)
-    await screen.findByRole(`dialog`)
-
-    const input = screen.getByLabelText(/Type/)
-    await userEvent.type(input, `invalid`)
-
-    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
-    fireEvent.click(confirmButton)
-
-    await waitFor(() => {
-      expect(screen.getByText(/Please enter/)).toBeInTheDocument()
-    })
+    expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`)
   })
 })

@@ -42,11 +42,11 @@ const ContainerVariants = cva('relative grid gap-10', {
       false: '',
     },
     layout: {
-      horizontal: 'flex flex-col gap-2 md:grid @lg:grid-cols-12',
+      horizontal: 'flex flex-col gap-2 md:grid md:grid-cols-12',
       vertical: 'flex flex-col gap-2',
       flex: 'flex flex-row gap-3',
       'flex-row-reverse':
-        'flex flex-col-reverse gap-2 @lg:gap-6 @lg:flex-row-reverse @lg:justify-between',
+        'flex flex-col-reverse gap-2 md:gap-6 md:flex-row-reverse md:justify-between',
     },
     flex: {
       true: '',
@@ -233,7 +233,7 @@ const FlexContainer = cva('', {
     },
     {
       layout: 'flex-row-reverse',
-      className: 'flex flex-col justify-center items-start @lg:items-end shrink-0',
+      className: 'flex flex-col justify-center items-start md:items-end shrink-0',
     },
   ],
 })
@@ -359,85 +359,83 @@ export const FormLayout = React.forwardRef<
     )
 
     return (
-      <div className="@container">
-        <div
-          ref={ref}
-          {...props}
-          className={cn(ContainerVariants({ size, flex, align, layout }), className)}
-        >
-          {flex && (
-            <div className={cn(FlexContainer({ flex, align, layout }))}>
-              {props.children}
-              {layout === 'flex-row-reverse' && renderError}
+      <div
+        ref={ref}
+        {...props}
+        className={cn(ContainerVariants({ size, flex, align, layout }), className)}
+      >
+        {flex && (
+          <div className={cn(FlexContainer({ flex, align, layout }))}>
+            {props.children}
+            {layout === 'flex-row-reverse' && renderError}
+          </div>
+        )}
+        {hasLabel || labelOptional || layout === 'horizontal' ? (
+          <>
+            <div
+              className={cn(LabelContainerVariants({ align, labelLayout, flex, layout }))}
+              data-formlayout-id={'labelContainer'}
+            >
+              {hasLabel && isReactForm ? (
+                <FormLabel_Shadcn_
+                  className="text-foreground flex gap-2 items-center break-all"
+                  data-formlayout-id="formLabel"
+                  htmlFor={props.name || id}
+                >
+                  <LabelContents />
+                </FormLabel_Shadcn_>
+              ) : (
+                <Label_Shadcn_
+                  className="text-foreground flex gap-2 items-center break-all leading-normal"
+                  data-formlayout-id="label"
+                  htmlFor={props.name || id}
+                >
+                  <LabelContents />
+                </Label_Shadcn_>
+              )}
+              {labelOptional && (
+                <span
+                  className={cn(LabelOptionalVariants({ size }))}
+                  id={id + '-optional'}
+                  data-formlayout-id={'labelOptional'}
+                >
+                  {labelOptional}
+                </span>
+              )}
+              {flex && (
+                <>
+                  {renderDescription}
+                  {layout !== 'flex-row-reverse' && renderError}
+                </>
+              )}
             </div>
-          )}
-          {hasLabel || labelOptional || layout === 'horizontal' ? (
+          </>
+        ) : null}
+        {!flex && (
+          <div
+            className={cn(DataContainerVariants({ align, layout }))}
+            style={style}
+            data-formlayout-id={'dataContainer'}
+          >
             <>
               <div
-                className={cn(LabelContainerVariants({ align, labelLayout, flex, layout }))}
-                data-formlayout-id={'labelContainer'}
+                className={cn(
+                  NonBoxInputContainer({
+                    nonBoxInput,
+                    // @ts-expect-error
+                    label,
+                    layout,
+                  })
+                )}
+                data-formlayout-id={'nonBoxInputContainer'}
               >
-                {hasLabel && isReactForm ? (
-                  <FormLabel_Shadcn_
-                    className="text-foreground flex gap-2 items-center break-all"
-                    data-formlayout-id="formLabel"
-                    htmlFor={props.name || id}
-                  >
-                    <LabelContents />
-                  </FormLabel_Shadcn_>
-                ) : (
-                  <Label_Shadcn_
-                    className="text-foreground flex gap-2 items-center break-all leading-normal"
-                    data-formlayout-id="label"
-                    htmlFor={props.name || id}
-                  >
-                    <LabelContents />
-                  </Label_Shadcn_>
-                )}
-                {labelOptional && (
-                  <span
-                    className={cn(LabelOptionalVariants({ size }))}
-                    id={id + '-optional'}
-                    data-formlayout-id={'labelOptional'}
-                  >
-                    {labelOptional}
-                  </span>
-                )}
-                {flex && (
-                  <>
-                    {renderDescription}
-                    {layout !== 'flex-row-reverse' && renderError}
-                  </>
-                )}
+                {props.children}
               </div>
+              {renderError}
+              {renderDescription}
             </>
-          ) : null}
-          {!flex && (
-            <div
-              className={cn(DataContainerVariants({ align, layout }))}
-              style={style}
-              data-formlayout-id={'dataContainer'}
-            >
-              <>
-                <div
-                  className={cn(
-                    NonBoxInputContainer({
-                      nonBoxInput,
-                      // @ts-expect-error
-                      label,
-                      layout,
-                    })
-                  )}
-                  data-formlayout-id={'nonBoxInputContainer'}
-                >
-                  {props.children}
-                </div>
-                {renderError}
-                {renderDescription}
-              </>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     )
   }

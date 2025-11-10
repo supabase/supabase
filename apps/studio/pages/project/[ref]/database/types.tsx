@@ -17,7 +17,7 @@ const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
           <FormHeader
             className="!mb-0"
             title="Database Enumerated Types"
-            description="Custom data types that you can use in your database tables or functions."
+            description="Custom data types that you can use in your database tables or functions"
           />
         </ScaffoldSectionContent>
         <div className="col-span-12 mt-3">

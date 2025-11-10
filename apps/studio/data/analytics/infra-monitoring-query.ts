@@ -1,9 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 import { get, handleError } from 'data/fetchers'
 import type { AnalyticsData, AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 export type InfraMonitoringAttribute =
   | 'max_cpu_usage'
@@ -76,7 +77,7 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
+  }: UseCustomQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
 ) =>
   useQuery<InfraMonitoringData, InfraMonitoringError, TData>({
     queryKey: analyticsKeys.infraMonitoring(projectRef, {

@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { secretsKeys } from './keys'
 
 export type SecretsVariables = {
@@ -28,7 +28,7 @@ export type SecretsError = ResponseError
 
 export const useSecretsQuery = <TData = SecretsData>(
   { projectRef }: SecretsVariables,
-  { enabled = true, ...options }: UseQueryOptions<SecretsData, SecretsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<SecretsData, SecretsError, TData> = {}
 ) =>
   useQuery<SecretsData, SecretsError, TData>({
     queryKey: secretsKeys.list(projectRef),

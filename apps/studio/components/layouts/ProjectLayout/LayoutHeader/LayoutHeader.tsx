@@ -27,8 +27,6 @@ import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
-import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
@@ -212,11 +210,10 @@ export const LayoutHeader = ({
 
                 <div className="overflow-hidden flex items-center gap-2">
                   <HelpPopover />
-                  <NotificationsPopoverV2 />
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <AdvisorButton />
                         <InlineEditorButton />
                         <AssistantButton />
                       </>
@@ -229,10 +226,10 @@ export const LayoutHeader = ({
               <>
                 <LocalVersionPopover />
                 <div className="overflow-hidden flex items-center gap-2">
+                  <AdvisorButton projectRef={projectRef} />
                   <AnimatePresence initial={false}>
                     {!!projectRef && (
                       <>
-                        <AdvisorButton />
                         <InlineEditorButton />
                         <AssistantButton />
                       </>

@@ -4,13 +4,11 @@ import { noop } from 'lodash'
 import { DatabaseZap, FunctionSquare, Plus, Search, Shield } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 
-import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -21,10 +19,7 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
-  Button,
   Card,
-  CardContent,
-  cn,
   Input,
   Table,
   TableBody,
@@ -33,8 +28,7 @@ import {
   TableRow,
 } from 'ui'
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
-import TriggerList from './TriggerList'
-import Link from 'next/link'
+import { TriggerList } from './TriggerList'
 
 interface TriggersListProps {
   createTrigger: () => void
@@ -43,7 +37,7 @@ interface TriggersListProps {
   deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
-const TriggersList = ({
+export const TriggersList = ({
   createTrigger = noop,
   editTrigger = noop,
   duplicateTrigger = noop,
@@ -248,5 +242,3 @@ const TriggersList = ({
     </div>
   )
 }
-
-export default TriggersList

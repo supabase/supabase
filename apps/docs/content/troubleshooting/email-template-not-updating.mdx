@@ -1,0 +1,31 @@
+---
+title = "Email template not updating"
+topics = [ "auth", "studio" ]
+keywords = [ "email", "template" ]
+
+[[errors]]
+code = "templatemailer_template_body_parse_error"
+---
+
+If your email templates are not updated, check [Auth Logs](/dashboard/project/_/logs/auth-logs) for any errors when the email is sent. When there are errors, we will use a fallback template with valid syntax so it will not show any of your customizations.
+
+Typical errors relate to invalid syntax involving variables. Refer to [the Email Templates docs](/docs/guides/auth/auth-email-templates#terminology) for the supported variables and syntax.
+
+**Example error message**
+
+```
+"event": "templatemailer_template_body_parse_error",
+"msg": "templatemailer: template type \"recovery\": template: https://api.supabase.com/platform/auth/PROJECT_ID/templates/recovery:2: function \"default\" not defined",
+```
+
+The error shows an issue with `default` which is used in the invalid syntax below.
+
+```
+{{ .Data.display_name | default: "test" }}
+```
+
+The final correct syntax after removing invalid syntax.
+
+```
+{{ .Data.display_name }}
+```
