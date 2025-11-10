@@ -3,13 +3,15 @@ import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
 import { Lint } from 'data/lint/lint-query'
 import { Notification } from 'data/notifications/notifications-v2-query'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
-import { Button, cn } from 'ui'
+import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   formatItemDate,
   getAdvisorItemDisplayTitle,
+  severityBadgeVariants,
   severityColorClasses,
+  severityLabels,
   tabIconMap,
 } from './AdvisorPanel.utils'
 import { EmptyAdvisor } from './EmptyAdvisor'
@@ -120,7 +122,7 @@ export const AdvisorPanelBody = ({
                 onClick={() => onItemClick(item)}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 overflow-hidden">
+                  <div className="flex items-center gap-3 overflow-hidden">
                     <SeverityIcon
                       size={16}
                       strokeWidth={1.5}
@@ -141,11 +143,18 @@ export const AdvisorPanelBody = ({
                       )}
                     </div>
                   </div>
-                  <ChevronRight
-                    size={16}
-                    strokeWidth={1.5}
-                    className="flex-shrink-0 text-foreground-lighter"
-                  />
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {item.severity === 'critical' && (
+                      <Badge variant={severityBadgeVariants[item.severity]}>
+                        {severityLabels[item.severity]}
+                      </Badge>
+                    )}
+                    <ChevronRight
+                      size={16}
+                      strokeWidth={1.5}
+                      className="flex-shrink-0 text-foreground-lighter"
+                    />
+                  </div>
                 </div>
               </Button>
             </div>
