@@ -19,7 +19,7 @@ const ObservabilityLayout = ({ title, children }: PropsWithChildren<Observabilit
     return (
       <ProjectLayout
         title={title}
-        product="Reports"
+        product="Observability"
         productMenu={<ObservabilityMenu />}
         isBlocking={false}
       >
