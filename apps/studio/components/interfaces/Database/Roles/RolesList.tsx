@@ -55,11 +55,10 @@ export const RolesList = () => {
     show: showRoleToDelete,
   } = useQueryStateRouting({
     key: 'delete',
-    entities: data,
+    lookup: (id) => (id ? data?.find((role) => role.id.toString() === id) : undefined),
+    lookupDeps: [data],
     isLoading,
-    idField: 'id',
     entityName: 'Database Role',
-    transformId: (id: number) => id.toString(),
   })
 
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())

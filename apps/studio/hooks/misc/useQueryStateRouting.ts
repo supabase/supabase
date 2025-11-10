@@ -1,92 +1,112 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 
-// Entity state configuration
-interface EntityStateConfig<T> {
+interface UseQueryStateRoutingConfig<T> {
+  /**
+   * The query parameter key (e.g., 'edit', 'delete', 'duplicate')
+   */
   key: string
-  entities: T[] | undefined
+  /**
+   * Function to lookup the entity based on the selected ID
+   * Return undefined when no ID is selected or entity not found
+   */
+  lookup: (selectedId: string | null) => T | undefined
+  /**
+   * Dependencies for the lookup function (e.g., [entities, entities?.length])
+   * Controls when the entity lookup should re-run
+   */
+  lookupDeps: React.DependencyList
+  /**
+   * Loading state before determining if to show the "not found" error
+   */
   isLoading?: boolean
-  idField: keyof T
+  /**
+   * Human-readable entity name for error messages (e.g., 'Database Function')
+   */
   entityName: string
-  transformId?: (id: any) => string
-  transformDuplicate?: (entity: T) => T
 }
 
-// Entity state return type
-interface EntityState<T> {
+interface UseQueryStateRoutingReturn<T> {
+  /**
+   * The selected entity ID from the URL (or null if none)
+   */
   selectedId: string | null
+  /**
+   * Function to set the selected entity ID (pass null to clear)
+   */
   setSelectedId: (value: string | null) => Promise<URLSearchParams>
+  /**
+   * The entity result from the lookup function
+   */
   entity: T | undefined
+  /**
+   * Whether to show the dialog (true when entity is found)
+   */
   show: boolean
+  /**
+   * Whether the entity was not found (selectedId exists but entity is null/undefined)
+   */
   notFound: boolean
 }
 
 /**
- * Hook for managing URL query parameters for entity-based operations.
+ * Hook for managing URL query parameters for entity-based operations with automatic error handling.
  *
- * This hook provides entity state management with automatic entity lookup,
- * error handling, and URL synchronization. Use this for edit/delete/duplicate
- * operations where you need to track which entity is selected.
- *
- * For simple boolean state (e.g., create dialogs), use `useQueryState` from nuqs directly:
- * ```
- * import { parseAsBoolean, useQueryState } from 'nuqs'
- * const [show, setShow] = useQueryState('new', parseAsBoolean.withDefault(false))
- * ```
+ * This hook handles:
+ * - URL query state management (via nuqs)
+ * - Entity lookup with your custom logic
+ * - Show/notFound state calculation
+ * - Automatic "not found" error toast
  *
  * @example
- * // Entity state (for edit/delete/duplicate)
- * const editState = useQueryStateRouting({
+ * // Basic usage with entity lookup
+ * const { selectedId, setSelectedId, show, entity } = useQueryStateRouting({
  *   key: 'edit',
- *   entities: users,
+ *   lookup: (id) => id ? functions?.find(f => f.id.toString() === id) : undefined,
+ *   lookupDeps: [functions],
  *   isLoading,
- *   idField: 'id',
- *   entityName: 'User',
- *   transformId: (id) => id.toString(),
+ *   entityName: 'Database Function',
  * })
- * <EditDialog open={editState.show} entity={editState.entity} />
+ *
+ * <EditDialog open={show} entity={entity} onClose={() => setSelectedId(null)} />
  *
  * @example
- * // Entity state with duplicate transformation
- * const duplicateState = useQueryStateRouting({
+ * // With transformation (e.g., duplicate)
+ * const { show, entity, setSelectedId } = useQueryStateRouting({
  *   key: 'duplicate',
- *   entities: functions,
+ *   lookup: (id) => {
+ *     if (!id) return undefined
+ *     const original = functions?.find(f => f.id.toString() === id)
+ *     return original ? { ...original, name: `${original.name}_duplicate` } : undefined
+ *   },
+ *   lookupDeps: [functions],
  *   isLoading,
- *   idField: 'id',
  *   entityName: 'Database Function',
- *   transformId: (id) => id.toString(),
- *   transformDuplicate: (fn) => ({
- *     ...fn,
- *     name: `${fn.name}_copy`,
- *   }),
+ * })
+ *
+ * @example
+ * // Optimize for large lists - only re-lookup when length changes
+ * const { entity } = useQueryStateRouting({
+ *   key: 'edit',
+ *   lookup: (id) => id ? largeList?.find(item => item.id === id) : undefined,
+ *   lookupDeps: [largeList?.length], // Only re-run when list length changes
+ *   entityName: 'Item',
  * })
  */
-export function useQueryStateRouting<T = any>(config: EntityStateConfig<T>): EntityState<T> {
-  const {
-    key,
-    entities,
-    isLoading = false,
-    idField,
-    entityName,
-    transformId = (id: unknown) => String(id),
-    transformDuplicate,
-  } = config
-
+export function useQueryStateRouting<T = any>({
+  key,
+  lookup,
+  lookupDeps,
+  isLoading = false,
+  entityName,
+}: UseQueryStateRoutingConfig<T>): UseQueryStateRoutingReturn<T> {
   const [selectedId, setSelectedId] = useQueryState(
     key,
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const originalEntity = selectedId
-    ? entities?.find((entity) => {
-        const id = idField as keyof T
-        return transformId(entity[id]) === selectedId
-      })
-    : undefined
-
-  const entity =
-    originalEntity && transformDuplicate ? transformDuplicate(originalEntity) : originalEntity
+  const entity = useMemo(() => lookup(selectedId), [selectedId, ...lookupDeps])
 
   const show = selectedId !== null && !!entity
   const notFound = selectedId !== null && !entity

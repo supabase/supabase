@@ -52,11 +52,10 @@ export const EnumeratedTypes = () => {
     show: showTypeToEdit,
   } = useQueryStateRouting({
     key: 'edit',
-    entities: data,
+    lookup: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
+    lookupDeps: [data],
     isLoading,
-    idField: 'id',
     entityName: 'Enumerated Type',
-    transformId: (id: number) => id.toString(),
   })
 
   const {
@@ -65,11 +64,10 @@ export const EnumeratedTypes = () => {
     show: showTypeToDelete,
   } = useQueryStateRouting({
     key: 'delete',
-    entities: data,
+    lookup: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
+    lookupDeps: [data],
     isLoading,
-    idField: 'id',
     entityName: 'Enumerated Type',
-    transformId: (id: number) => id.toString(),
   })
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)

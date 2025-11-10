@@ -58,9 +58,9 @@ const Indexes = () => {
 
   const { setSelectedId: setSelectedIndexName, entity: selectedIndex } = useQueryStateRouting({
     key: 'edit',
-    entities: allIndexes,
+    lookup: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
+    lookupDeps: [allIndexes],
     isLoading: isLoadingIndexes,
-    idField: 'name',
     entityName: 'Database Index',
   })
 
@@ -70,9 +70,9 @@ const Indexes = () => {
     show: showindexToDelete,
   } = useQueryStateRouting({
     key: 'delete',
-    entities: allIndexes,
+    lookup: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
+    lookupDeps: [allIndexes],
     isLoading: isLoadingIndexes,
-    idField: 'name',
     entityName: 'Database Index',
   })
 

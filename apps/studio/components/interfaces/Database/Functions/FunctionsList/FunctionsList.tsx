@@ -175,24 +175,10 @@ const FunctionsList = () => {
     show: showFunctionToEdit,
   } = useQueryStateRouting({
     key: 'edit',
-    entities: functions,
+    lookup: (id) => (id ? functions?.find((fn) => fn.id.toString() === id) : undefined),
+    lookupDeps: [functions],
     isLoading,
-    idField: 'id',
     entityName: 'Database Function',
-    transformId: (id: number) => id.toString(),
-  })
-
-  const {
-    setSelectedId: setSelectedFunctionToDelete,
-    entity: functionToDelete,
-    show: showFunctionToDelete,
-  } = useQueryStateRouting({
-    key: 'delete',
-    entities: functions,
-    isLoading,
-    idField: 'id',
-    entityName: 'Database Function',
-    transformId: (id: number) => id.toString(),
   })
 
   const {
@@ -201,15 +187,26 @@ const FunctionsList = () => {
     show: showFunctionToDuplicate,
   } = useQueryStateRouting({
     key: 'duplicate',
-    entities: functions,
+    lookup: (id) => {
+      if (!id) return undefined
+      const original = functions?.find((fn) => fn.id.toString() === id)
+      return original ? { ...original, name: `${original.name}_duplicate` } : undefined
+    },
+    lookupDeps: [functions],
     isLoading,
-    idField: 'id',
     entityName: 'Database Function',
-    transformId: (id: number) => id.toString(),
-    transformDuplicate: (fn: any) => ({
-      ...fn,
-      name: `${fn.name}_duplicate`,
-    }),
+  })
+
+  const {
+    setSelectedId: setSelectedFunctionToDelete,
+    entity: functionToDelete,
+    show: showFunctionToDelete,
+  } = useQueryStateRouting({
+    key: 'delete',
+    lookup: (id) => (id ? functions?.find((fn) => fn.id.toString() === id) : undefined),
+    lookupDeps: [functions],
+    isLoading,
+    entityName: 'Database Function',
   })
 
   if (isLoading) return <GenericSkeletonLoader />
