@@ -155,7 +155,7 @@ export const generateOtherRoutes = (
             key: 'observability',
             label: 'Observability',
             icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
           },
         ]
       : []),
