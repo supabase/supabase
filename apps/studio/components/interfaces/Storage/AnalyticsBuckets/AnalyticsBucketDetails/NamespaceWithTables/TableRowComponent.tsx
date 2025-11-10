@@ -263,22 +263,26 @@ export const TableRowComponent = ({
                     </Link>
                   </DropdownMenuItem>
 
-                  {isReplicating ? (
-                    <DropdownMenuItem
-                      className="flex items-center gap-x-2"
-                      onClick={() => setShowStopReplicationModal(true)}
-                    >
-                      <Pause size={12} className="text-foreground-lighter" />
-                      <p>Stop replication</p>
-                    </DropdownMenuItem>
-                  ) : (
-                    <DropdownMenuItem
-                      className="flex items-center gap-x-2"
-                      onClick={() => setShowStartReplicationModal(true)}
-                    >
-                      <Play size={12} className="text-foreground-lighter" />
-                      <p>Start replication</p>
-                    </DropdownMenuItem>
+                  {!!publication && (
+                    <>
+                      {isReplicating ? (
+                        <DropdownMenuItem
+                          className="flex items-center gap-x-2"
+                          onClick={() => setShowStopReplicationModal(true)}
+                        >
+                          <Pause size={12} className="text-foreground-lighter" />
+                          <p>Stop replication</p>
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem
+                          className="flex items-center gap-x-2"
+                          onClick={() => setShowStartReplicationModal(true)}
+                        >
+                          <Play size={12} className="text-foreground-lighter" />
+                          <p>Start replication</p>
+                        </DropdownMenuItem>
+                      )}
+                    </>
                   )}
 
                   <DropdownMenuSeparator />
