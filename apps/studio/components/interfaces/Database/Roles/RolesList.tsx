@@ -43,26 +43,22 @@ export const RolesList = () => {
     connectionString: project?.connectionString,
   })
 
-  const {
-    booleans: { new: newQueryState },
-    delete: deleteQueryState,
-  } = useQueryStateRouting({
-    entities: data,
-    isLoading,
-    idField: 'id',
-    booleanOperations: ['new'],
-    entityOperations: ['delete'],
-    entityName: 'Database Role',
-    transformId: (id) => id.toString(),
+  const { show: isCreatingRole, setShow: setIsCreatingRole } = useQueryStateRouting({
+    key: 'new',
   })
-
-  const { show: isCreatingRole, setShow: setIsCreatingRole } = newQueryState
 
   const {
     setSelectedId: setSelectedRoleIdToDelete,
     entity: roleToDelete,
     show: showRoleToDelete,
-  } = deleteQueryState!
+  } = useQueryStateRouting({
+    key: 'delete',
+    entities: data,
+    isLoading,
+    idField: 'id',
+    entityName: 'Database Role',
+    transformId: (id: number) => id.toString(),
+  })
 
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
 
@@ -236,7 +232,7 @@ export const RolesList = () => {
       <DeleteRoleModal
         role={roleToDelete as unknown as PostgresRole}
         visible={showRoleToDelete}
-        onClose={() => setSelectedRoleIdToDelete('')}
+        onClose={() => setSelectedRoleIdToDelete(null)}
       />
     </>
   )

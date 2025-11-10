@@ -50,28 +50,29 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const {
-    booleans: { new: newQueryState },
-    edit: editQueryState,
-    delete: deleteQueryState,
-  } = useQueryStateRouting({
+  const { show: showCreateIndex, setShow: setShowCreateIndex } = useQueryStateRouting({
+    key: 'new',
+  })
+
+  const { setSelectedId: setSelectedIndexName, entity: selectedIndex } = useQueryStateRouting({
+    key: 'edit',
     entities: allIndexes,
     isLoading: isLoadingIndexes,
     idField: 'name',
-    booleanOperations: ['new'],
-    entityOperations: ['edit', 'delete'],
     entityName: 'Database Index',
   })
-
-  const { show: showCreateIndex, setShow: setShowCreateIndex } = newQueryState
-
-  const { setSelectedId: setSelectedIndexName, entity: selectedIndex } = editQueryState!
 
   const {
     setSelectedId: setSelectedIndexNameToDelete,
     entity: selectedIndexToDelete,
     show: showindexToDelete,
-  } = deleteQueryState!
+  } = useQueryStateRouting({
+    key: 'delete',
+    entities: allIndexes,
+    isLoading: isLoadingIndexes,
+    idField: 'name',
+    entityName: 'Database Index',
+  })
 
   const {
     data: schemas,
@@ -85,7 +86,7 @@ const Indexes = () => {
 
   const { mutate: deleteIndex, isLoading: isExecuting } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      setSelectedIndexNameToDelete('')
+      setSelectedIndexNameToDelete(null)
       toast.success('Successfully deleted index')
     },
   })
@@ -253,7 +254,7 @@ const Indexes = () => {
             <code className="text-sm ml-2">{selectedIndex?.name}</code>
           </>
         }
-        onCancel={() => setSelectedIndexName('')}
+        onCancel={() => setSelectedIndexName(null)}
       >
         <div className="h-full">
           <div className="relative h-full">
@@ -284,7 +285,7 @@ const Indexes = () => {
         onConfirm={() =>
           selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
         }
-        onCancel={() => setSelectedIndexNameToDelete('')}
+        onCancel={() => setSelectedIndexNameToDelete(null)}
         alert={{
           title: 'This action cannot be undone',
           description:

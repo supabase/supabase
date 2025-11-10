@@ -57,7 +57,7 @@ const FunctionsList = () => {
   } = useEditorPanelStateSnapshot()
 
   const createFunction = () => {
-    setSelectedFunctionIdToDuplicate('')
+    setSelectedFunctionIdToDuplicate(null)
     if (isInlineEditorEnabled) {
       setEditorPanelInitialPrompt('Create a new database function that...')
       setEditorPanelValue(`create function function_name()
@@ -91,7 +91,7 @@ $$;`)
   }
 
   const editFunction = (fn: DatabaseFunction) => {
-    setSelectedFunctionIdToDuplicate('')
+    setSelectedFunctionIdToDuplicate(null)
     if (isInlineEditorEnabled) {
       setEditorPanelValue(fn.complete_statement)
       setEditorPanelTemplates([])
@@ -162,44 +162,54 @@ $$;`)
     ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
   ]
 
-  const {
-    booleans: { new: newQueryState },
-    edit: editQueryState,
-    delete: deleteQueryState,
-    duplicate: duplicateQueryState,
-  } = useQueryStateRouting({
-    entities: functions,
-    isLoading,
-    idField: 'id',
-    booleanOperations: ['new'], // can specify any and multiple boolean operations
-    entityOperations: ['edit', 'delete', 'duplicate'], // supports "edit", "delete", "duplicate" for entities
-    entityName: 'Database Function',
-    transformDuplicate: (fn) => ({
-      ...fn,
-      name: `${fn.name}_duplicate`,
-    }),
-    transformId: (id) => id.toString(),
-  })
-
-  const { show: showCreateFunctionForm, setShow: setShowCreateFunctionForm } = newQueryState
+  const { show: showCreateFunctionForm, setShow: setShowCreateFunctionForm } = useQueryStateRouting(
+    {
+      key: 'new',
+    }
+  )
 
   const {
     setSelectedId: setSelectedFunctionToEdit,
     entity: functionToEdit,
     show: showFunctionToEdit,
-  } = editQueryState!
+  } = useQueryStateRouting({
+    key: 'edit',
+    entities: functions,
+    isLoading,
+    idField: 'id',
+    entityName: 'Database Function',
+    transformId: (id: number) => id.toString(),
+  })
 
   const {
     setSelectedId: setSelectedFunctionToDelete,
     entity: functionToDelete,
     show: showFunctionToDelete,
-  } = deleteQueryState!
+  } = useQueryStateRouting({
+    key: 'delete',
+    entities: functions,
+    isLoading,
+    idField: 'id',
+    entityName: 'Database Function',
+    transformId: (id: number) => id.toString(),
+  })
 
   const {
     setSelectedId: setSelectedFunctionIdToDuplicate,
     entity: functionToDuplicate,
     show: showFunctionToDuplicate,
-  } = duplicateQueryState!
+  } = useQueryStateRouting({
+    key: 'duplicate',
+    entities: functions,
+    isLoading,
+    idField: 'id',
+    entityName: 'Database Function',
+    transformId: (id: number) => id.toString(),
+    transformDuplicate: (fn: any) => ({
+      ...fn,
+      name: `${fn.name}_duplicate`,
+    }),
+  })
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
@@ -360,8 +370,8 @@ $$;`)
         func={functionToEdit || functionToDuplicate}
         visible={showFunctionToEdit || showFunctionToDuplicate}
         onClose={() => {
-          setSelectedFunctionToEdit('')
-          setSelectedFunctionIdToDuplicate('')
+          setSelectedFunctionToEdit(null)
+          setSelectedFunctionIdToDuplicate(null)
         }}
         isDuplicating={showFunctionToDuplicate}
       />
