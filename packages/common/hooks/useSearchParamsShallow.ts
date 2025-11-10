@@ -14,11 +14,13 @@ import { useCallback, useEffect, useId, useMemo, useReducer, useRef } from 'reac
 const useSearchParamsShallow = () => {
   const EVENT_NAME = 'supabase.events.packages.common.useSearchParamsShallow'
   const id = useId()
-  const timeoutHandle = useRef<ReturnType<typeof setTimeout>>()
+  const timeoutHandle = useRef<ReturnType<typeof setTimeout>>(null)
 
   const reducer = useCallback(
     (_: URLSearchParams, action: { target: 'int' | 'ext'; newParams: URLSearchParams }) => {
-      clearTimeout(timeoutHandle.current)
+      if (timeoutHandle.current) {
+        clearTimeout(timeoutHandle.current)
+      }
       if (action.target === 'ext') {
         /**
          * Doing this in the next tick makes sure that the originating
@@ -34,7 +36,14 @@ const useSearchParamsShallow = () => {
     [id]
   )
 
-  useEffect(() => () => clearTimeout(timeoutHandle.current), [])
+  useEffect(
+    () => () => {
+      if (timeoutHandle.current) {
+        clearTimeout(timeoutHandle.current)
+      }
+    },
+    []
+  )
 
   const [localParams, setLocalParams] = useReducer(reducer, undefined, () => new URLSearchParams())
 

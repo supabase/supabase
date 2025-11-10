@@ -55,7 +55,7 @@
     "color": "^4.2.3",
     "date-fns": "^2.30.0",
     "formik": "^2.2.9",
-    "framer-motion": "^11.0.3",
+    "framer-motion": "^11.18.2",
     "highlightjs-curl": "^1.3.0",
     "input-otp": "^1.2.3",
     "lodash": "^4.17.21",

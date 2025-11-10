@@ -10,7 +10,7 @@ type ResultBox<T> = { v: T }
  * React hook for creating a value exactly once
  */
 export function useConstant<T>(fn: () => T): T {
-  const ref = useRef<ResultBox<T>>()
+  const ref = useRef<ResultBox<T>>({ v: fn() })
 
   if (!ref.current) {
     ref.current = { v: fn() }

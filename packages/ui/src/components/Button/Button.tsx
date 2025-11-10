@@ -273,8 +273,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 ) : _iconLeft ? (
                   <div className={cn(IconContainerVariants({ size, type }))}>{_iconLeft}</div>
                 ) : null),
-              children.props.children && (
-                <span className={'truncate'}>{children.props.children}</span>
+              (children.props as any).children && (
+                <span className={'truncate'}>{(children.props as any).children}</span>
               ),
               iconRight && !loading && (
                 <div className={cn(IconContainerVariants({ size, type }))}>{iconRight}</div>

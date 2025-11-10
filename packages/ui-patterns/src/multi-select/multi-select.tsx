@@ -438,7 +438,7 @@ const MultiSelectorList = React.forwardRef<
     ? Array.isArray(children)
       ? (children as React.ReactNode[])
       : typeof children === 'object' && 'props' in children
-        ? children.props.children
+        ? (children.props as any).children
         : []
     : []
   const availableOptions = options

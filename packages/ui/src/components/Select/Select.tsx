@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { RefObject, useEffect } from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
@@ -25,7 +25,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLSelectElement>
   descriptionText?: string
   error?: string
   icon?: any
-  inputRef?: string
+  inputRef?: RefObject<HTMLSelectElement>
   label?: string
   afterLabel?: string
   beforeLabel?: string

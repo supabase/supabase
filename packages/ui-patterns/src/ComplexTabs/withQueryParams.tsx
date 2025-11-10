@@ -29,7 +29,10 @@ const withQueryParams =
   }: Props & QueryParamsProps) => {
     const children = Children.toArray(childrenUnvalidated)
     const tabIdsTemp = children
-      .map((child) => !!child && typeof child === 'object' && 'props' in child && child.props.id)
+      .map(
+        (child) =>
+          !!child && typeof child === 'object' && 'props' in child && (child.props as any).id
+      )
       .filter(isString)
     // Store in ref to avoid stale data in later timeout
     const tabIdsRef = useRef(tabIdsTemp)

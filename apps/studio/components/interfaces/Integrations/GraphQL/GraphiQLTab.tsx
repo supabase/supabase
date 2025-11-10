@@ -1,4 +1,3 @@
-import '@graphiql/react/dist/style.css'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
