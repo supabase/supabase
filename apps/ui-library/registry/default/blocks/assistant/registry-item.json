@@ -1,0 +1,71 @@
+{
+  "name": "assistant",
+  "type": "registry:block",
+  "title": "AI Assistant with Database Query",
+  "description": "AI chatbot widget with database query capabilities through MCP (Model Context Protocol)",
+  "registryDependencies": [
+    "button",
+    "input",
+    "scroll-area",
+    "@ai-elements/conversation",
+    "@ai-elements/message",
+    "@ai-elements/prompt-input",
+    "@ai-elements/model-selector",
+    "@ai-elements/reasoning",
+    "@ai-elements/sources",
+    "@ai-elements/suggestion"
+  ],
+  "dependencies": [
+    "ai@latest",
+    "@ai-sdk/react@latest",
+    "@ai-sdk/openai@latest",
+    "@ai-sdk/mcp@latest",
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest",
+    "zod@latest",
+    "nanoid@latest",
+    "sonner@latest",
+    "lucide-react@latest"
+  ],
+  "files": [
+    {
+      "path": "registry/default/blocks/assistant/components/assistant-widget.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/assistant/app/api/chat/route.ts",
+      "type": "registry:page",
+      "target": "app/api/chat/route.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/lib/supabase/server.ts",
+      "type": "registry:file",
+      "target": "lib/supabase/server.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/lib/supabase/client.ts",
+      "type": "registry:file",
+      "target": "lib/supabase/client.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/lib/supabase/middleware.ts",
+      "type": "registry:file",
+      "target": "lib/supabase/middleware.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/index.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/index.ts"
+    },
+    {
+      "path": "registry/default/blocks/assistant/supabase/functions/mcp-server/deno.json",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/deno.json"
+    },
+    {
+      "path": "registry/default/blocks/assistant/README.md",
+      "type": "registry:file",
+      "target": "README.assistant.md"
+    }
+  ]
+}
