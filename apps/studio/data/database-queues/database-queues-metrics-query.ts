@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+
+import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { validateQueueName } from './database-queues-utils'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesMetricsVariables = {
@@ -17,7 +18,6 @@ export type PostgresQueueMetric = {
 }
 
 const preciseMetricsSqlQuery = (queueName: string) => {
-  validateQueueName(queueName)
   return `
   set local statement_timeout = '1s';
   SELECT
@@ -28,7 +28,6 @@ const preciseMetricsSqlQuery = (queueName: string) => {
 }
 
 const estimateMetricsSqlQuery = (queueName: string) => {
-  validateQueueName(queueName)
   return `
   select
   reltuples::bigint as estimated_rows
@@ -46,6 +45,11 @@ export async function getDatabaseQueuesMetrics({
   queueName,
 }: DatabaseQueuesMetricsVariables) {
   if (!projectRef) throw new Error('Project ref is required')
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
 
   try {
     const { result } = await executeSql({

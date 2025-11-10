@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { validateQueueName } from './database-queues-utils'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueMessageDeleteVariables = {
@@ -19,7 +19,11 @@ export async function deleteDatabaseQueueMessage({
   queueName,
   messageId,
 }: DatabaseQueueMessageDeleteVariables) {
-  validateQueueName(queueName)
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
 
   const { result } = await executeSql({
     projectRef,

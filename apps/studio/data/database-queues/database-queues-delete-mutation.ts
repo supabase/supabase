@@ -3,8 +3,8 @@ import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { validateQueueName } from './database-queues-utils'
 import { databaseQueuesKeys } from './keys'
+import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 
 export type DatabaseQueueDeleteVariables = {
   projectRef: string
@@ -17,7 +17,11 @@ export async function deleteDatabaseQueue({
   connectionString,
   queueName,
 }: DatabaseQueueDeleteVariables) {
-  validateQueueName(queueName)
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
 
   const { result } = await executeSql({
     projectRef,
