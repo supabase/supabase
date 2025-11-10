@@ -1,7 +1,7 @@
-import { ChevronRight, Code, Info, MoreVertical, Plus, Replace, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+import { ChevronRight, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import { useParams } from 'common'
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
@@ -14,10 +14,7 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  LoadingLine,
   Table,
   TableBody,
   TableCell,
@@ -26,9 +23,10 @@ import {
   TableRow,
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from 'ui'
+import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
+import { TableRowComponent } from './TableRowComponent'
 
 type NamespaceWithTablesProps = {
   bucketName?: string
@@ -40,108 +38,9 @@ type NamespaceWithTablesProps = {
   wrapperInstance: FDW
   wrapperValues: Record<string, string>
   wrapperMeta: WrapperMeta
-}
-
-// Component for individual table rows within a namespace
-const TableRowComponent = ({
-  index,
-  tableName,
-  isConnected,
-  isLoading,
-}: {
-  index: number
-  tableName: string
-  isConnected: boolean
-  isLoading?: boolean
-}) => {
-  const { data: project } = useSelectedProjectQuery()
-
-  const handleQueryTable = () => {
-    // TODO: Implement query table functionality
-    console.log('Query table:', tableName)
-  }
-
-  const handleDeleteTable = () => {
-    // TODO: Implement delete table functionality
-    console.log('Delete table:', tableName)
-  }
-
-  return (
-    <TableRow>
-      <TableCell className="min-w-[120px]">{tableName}</TableCell>
-      <TableCell colSpan={isConnected ? 1 : 2} className="min-w-[150px]">
-        <div className="flex flex-row items-center text-foregroung-lighter">
-          <div className="relative mr-2 align-middle w-3 h-3">
-            {/* Outer faded dot with pulsing background */}
-            <span
-              className={`absolute inset-0 rounded-full ${
-                isConnected
-                  ? isLoading
-                    ? 'bg-brand/20 animate-ping'
-                    : 'bg-brand/20 animate-ping'
-                  : isLoading
-                    ? 'bg-warning-500/20 animate-ping'
-                    : 'hidden'
-              }`}
-              style={{
-                // Stagger the animation delay for each table
-                animationDelay: `${1 + index * 0.15}s`,
-                // Slow the animation
-                animationDuration: '2s',
-              }}
-            />
-            {/* Inner colored dot */}
-            <span
-              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 inline-block w-2 h-2 rounded-full ${
-                isConnected ? 'bg-brand' : 'bg-warning-500'
-              }`}
-            />
-          </div>
-          <span className="text-foreground-lighter">
-            {isLoading && !isConnected
-              ? 'Connecting...'
-              : isConnected
-                ? 'Connected'
-                : 'Not connected'}
-          </span>
-        </div>
-      </TableCell>
-      {isConnected && (
-        <TableCell className="text-right flex flex-row items-center gap-x-2 justify-end">
-          <>
-            <Button asChild type="default" size="tiny">
-              <Link href={`/project/${project?.ref}/editor/${tableName}`}>
-                <p>View table</p>
-              </Link>
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" className="px-1" icon={<MoreVertical />} />
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent side="bottom" align="end" className="w-fit min-w-[180px]">
-                <DropdownMenuItem className="flex items-center gap-x-2" onClick={handleQueryTable}>
-                  <Code size={12} className="text-foreground-lighter" />
-                  <p>Query in SQL Editor</p>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="flex items-center gap-x-2">
-                  <Link href={`/project/${project?.ref}/database/etl/${tableName}`}>
-                    <Replace size={12} className="text-foreground-lighter" />
-                    <p>View replication status</p>
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem className="flex items-center gap-x-2" onClick={handleDeleteTable}>
-                  <Trash2 size={12} className="text-foreground-lighter" />
-                  <p>Delete table</p>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        </TableCell>
-      )}
-    </TableRow>
-  )
+  tablesToPoll: { schema: string; name: string }[]
+  pollIntervalNamespaceTables: number
+  setPollIntervalNamespaceTables: (value: number) => void
 }
 
 export const NamespaceWithTables = ({
@@ -154,9 +53,15 @@ export const NamespaceWithTables = ({
   wrapperInstance,
   wrapperValues,
   wrapperMeta,
+  tablesToPoll,
+  pollIntervalNamespaceTables,
+  setPollIntervalNamespaceTables,
 }: NamespaceWithTablesProps) => {
+  const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
+
+  const { publication } = useAnalyticsBucketAssociatedEntities({ projectRef, bucketId })
 
   const { data: tablesData, isLoading: isLoadingNamespaceTables } = useIcebergNamespaceTablesQuery(
     {
@@ -165,7 +70,23 @@ export const NamespaceWithTables = ({
       token: token,
       namespace: namespace,
     },
-    { enabled: !!token }
+    {
+      enabled: !!token,
+      refetchInterval: (data) => {
+        if (pollIntervalNamespaceTables === 0) return false
+        if (tablesToPoll.length > 0) {
+          const hasMissingTables =
+            (data ?? []).filter((t) => !tables.find((table) => table.table.split('.')[1] === t))
+              .length > 0
+
+          if (hasMissingTables) {
+            setPollIntervalNamespaceTables(0)
+            return false
+          }
+        }
+        return pollIntervalNamespaceTables
+      },
+    }
   )
 
   const { mutateAsync: importForeignSchema, isLoading: isImportingForeignSchema } =
@@ -187,21 +108,13 @@ export const NamespaceWithTables = ({
     )
   }, [tablesData, tables])
 
-  let scanTooltip = useMemo(() => {
-    if (isImportingForeignSchema) return 'Looking for new tables...'
-    if (isLoadingNamespaceTables) return 'Loading new tables...'
-    if (missingTables.length > 0)
-      return `${missingTables.length} new table${missingTables.length > 1 ? 's' : ''} found`
-    if (tables.length === 0) return 'No new tables found'
-    return 'All tables are up to date'
-  }, [isImportingForeignSchema, isLoadingNamespaceTables, missingTables.length, tables.length])
-
   // Get all tables (connected + missing) for display
   const allTables = useMemo(() => {
     const connectedTableNames = tables.map((table) => table.table.split('.')[1])
     const allTableNames = [...new Set([...connectedTableNames, ...missingTables])]
 
     return allTableNames.map((tableName) => ({
+      id: tables.find((t) => t.table_name === tableName)?.id ?? 0,
       name: tableName,
       isConnected: connectedTableNames.includes(tableName),
     }))
@@ -234,19 +147,17 @@ export const NamespaceWithTables = ({
     <Card>
       <CardHeader className="flex flex-row justify-between items-center px-4 py-5 space-y-0">
         <CardTitle className="text-sm font-normal font-sans normal-case leading-none flex flex-row items-center gap-x-1">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="flex flex-row items-center gap-x-1 text-foreground-lighter">
-                  {sourceType === 'direct' ? namespace : 'public'}
-                  <ChevronRight size={12} className="text-foreground-muted" />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{sourceType === 'direct' ? 'Analytics' : 'Postgres'} schema</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="flex flex-row items-center gap-x-1 text-foreground-lighter">
+                {sourceType === 'direct' ? namespace : 'public'}
+                <ChevronRight size={12} className="text-foreground-muted" />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>{sourceType === 'direct' ? 'Analytics' : 'Postgres'} schema</p>
+            </TooltipContent>
+          </Tooltip>
           {validSchema && (
             <Tooltip>
               <TooltipTrigger
@@ -264,7 +175,7 @@ export const NamespaceWithTables = ({
                   {tables.length === 0 && <Info size={12} />}
                 </span>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom">
                 <p>Postgres schema{tables.length === 0 && ' that will be created'}</p>
               </TooltipContent>
             </Tooltip>
@@ -272,29 +183,41 @@ export const NamespaceWithTables = ({
         </CardTitle>
 
         <div className="flex flex-row gap-x-2">
-          {/* [Joshen] Temporarily commented out, will be introduced once language and UI details are finalized */}
-          {/* {tables.length > 0 && <p className="text-sm text-foreground-muted">{scanTooltip}</p>} */}
-          {/* {scanTooltip && <p className="text-sm text-foreground-muted">{scanTooltip}</p>} */}
+          {tablesToPoll.length > 0 && (
+            <div className="flex items-center gap-x-2 ml-6 text-foreground-lighter">
+              <Loader2 size={14} className="animate-spin" />
+              <p className="text-sm">
+                Connecting {tablesToPoll.length} table{tablesToPoll.length > 1 ? 's' : ''}
+              </p>
+            </div>
+          )}
           {missingTables.length > 0 && (
             <Button
-              type={missingTables.length > 0 ? 'warning' : 'default'}
+              type={schema ? 'default' : 'warning'}
               size="tiny"
-              icon={<Plus size={14} />}
+              icon={schema ? <RefreshCw /> : <Plus size={14} />}
               onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
               loading={isImportingForeignSchema || isLoadingNamespaceTables}
             >
-              Connect to table{missingTables.length > 1 ? 's' : ''}
+              {schema ? 'Sync tables' : `Connect to table${missingTables.length > 1 ? 's' : ''}`}
             </Button>
           )}
         </div>
       </CardHeader>
+
+      {tablesToPoll.length > 0 && <LoadingLine loading />}
+
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead className={allTables.length === 0 ? 'text-foreground-muted' : undefined}>
               Table name
             </TableHead>
-            <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>Status</TableHead>
+            {!!publication && (
+              <TableHead className={allTables.length === 0 ? 'hidden' : undefined}>
+                Replication Status
+              </TableHead>
+            )}
             <TableHead />
           </TableRow>
         </TableHeader>
@@ -311,11 +234,11 @@ export const NamespaceWithTables = ({
               </TableCell>
             </TableRow>
           ) : (
-            allTables.map(({ name, isConnected }, index) => (
+            allTables.map((table, index) => (
               <TableRowComponent
-                key={name}
-                tableName={name}
-                isConnected={isConnected}
+                key={table.name}
+                table={table}
+                schema={displaySchema}
                 isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
                 index={index}
               />
