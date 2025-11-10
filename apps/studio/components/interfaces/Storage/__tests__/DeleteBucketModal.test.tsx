@@ -135,7 +135,7 @@ describe(`DeleteBucketModal`, () => {
     fireEvent.click(confirmButton)
 
     await waitFor(() => {
-      expect(screen.getByText(/Please enter/)).toBeInTheDocument()
+      expect(screen.getByText(/Value entered does not match/)).toBeInTheDocument()
     })
   })
 })
