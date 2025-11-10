@@ -6,7 +6,6 @@ import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -60,8 +59,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   })
 
   const { id, properties } = template
-
-  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
 
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as keyof typeof authConfig
   const messageProperty = properties[messageSlug]
@@ -138,6 +135,8 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
         onSuccess: (res) => {
           const spamRules = (res?.rules ?? []).filter((rule) => rule.score > 0)
           const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
+
+          console.log({ preventSaveFromSpamCheck, builtInSMTP, spamRules })
 
           if (preventSaveFromSpamCheck) {
             setIsSavingTemplate(false)
