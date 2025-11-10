@@ -18,7 +18,7 @@ export async function purgeDatabaseQueue({
   queueName,
 }: DatabaseQueuePurgeVariables) {
   validateQueueName(queueName)
-  
+
   const { result } = await executeSql({
     projectRef,
     connectionString,

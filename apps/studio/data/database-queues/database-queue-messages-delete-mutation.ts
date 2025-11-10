@@ -20,7 +20,7 @@ export async function deleteDatabaseQueueMessage({
   messageId,
 }: DatabaseQueueMessageDeleteVariables) {
   validateQueueName(queueName)
-  
+
   const { result } = await executeSql({
     projectRef,
     connectionString,

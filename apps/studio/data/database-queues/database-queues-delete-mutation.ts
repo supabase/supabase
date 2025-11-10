@@ -18,7 +18,7 @@ export async function deleteDatabaseQueue({
   queueName,
 }: DatabaseQueueDeleteVariables) {
   validateQueueName(queueName)
-  
+
   const { result } = await executeSql({
     projectRef,
     connectionString,

@@ -35,7 +35,7 @@ export async function getDatabaseQueue({
   status,
 }: DatabaseQueueVariables & { afterTimestamp: string }) {
   if (!projectRef) throw new Error('Project ref is required')
-  
+
   validateQueueName(queueName)
 
   if (status.length === 0) {
