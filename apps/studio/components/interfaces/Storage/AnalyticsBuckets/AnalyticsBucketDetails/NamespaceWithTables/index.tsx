@@ -238,6 +238,8 @@ export const NamespaceWithTables = ({
               <TableRowComponent
                 key={table.name}
                 table={table}
+                namespace={namespace}
+                token={token}
                 schema={displaySchema}
                 isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
                 index={index}
