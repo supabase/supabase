@@ -7,7 +7,7 @@ import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'component
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { Bucket as BucketIcon } from 'icons'
-import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Button, Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyBucketState } from '../EmptyBucketState'
@@ -119,22 +119,25 @@ export const AnalyticsBuckets = () => {
                   {analyticsBuckets.map((bucket) => (
                     <TableRow
                       key={bucket.id}
-                      role="button"
-                      tabIndex={0}
-                      className="cursor-pointer h-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong focus-visible:bg-surface-200"
-                      onClick={(event) => handleBucketNavigation(bucket.id, event)}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                          event.preventDefault()
-                          handleBucketNavigation(bucket.id, event)
-                        }
-                      }}
+                      className={cn(
+                        'relative cursor-pointer h-16',
+                        '[&:has(:focus-visible)]:bg-surface-200'
+                      )}
                     >
                       <TableCell className="w-2 pr-1">
                         <BucketIcon size={16} className="text-foreground-muted" />
                       </TableCell>
                       <TableCell>
                         <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
+                        <button
+                          className={cn(
+                            'absolute inset-0',
+                            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong'
+                          )}
+                          onClick={(event) => handleBucketNavigation(bucket.id, event)}
+                        >
+                          <span className="sr-only">Go to table details</span>
+                        </button>
                       </TableCell>
 
                       <TableCell>

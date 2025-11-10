@@ -8,7 +8,7 @@ import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'component
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { Bucket as BucketIcon } from 'icons'
-import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Button, Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -133,22 +133,25 @@ export const VectorsBuckets = () => {
                     return (
                       <TableRow
                         key={id}
-                        role="button"
-                        tabIndex={0}
-                        className="cursor-pointer h-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong focus-visible:bg-surface-200"
-                        onClick={(event) => handleBucketNavigation(name, event)}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter') {
-                            event.preventDefault()
-                            handleBucketNavigation(name, event)
-                          }
-                        }}
+                        className={cn(
+                          'relative cursor-pointer h-16',
+                          '[&:has(:focus-visible)]:bg-surface-200'
+                        )}
                       >
                         <TableCell className="w-2 pr-1">
                           <BucketIcon size={16} className="text-foreground-muted" />
                         </TableCell>
                         <TableCell>
                           <p className="whitespace-nowrap max-w-[512px] truncate">{name}</p>
+                          <button
+                            className={cn(
+                              'absolute inset-0',
+                              'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong'
+                            )}
+                            onClick={(event) => handleBucketNavigation(name, event)}
+                          >
+                            <span className="sr-only">Go to bucket details</span>
+                          </button>
                         </TableCell>
                         <TableCell>
                           <p className="text-foreground-light">
