@@ -1,6 +1,16 @@
 import React from 'react'
 import Link from 'next/link'
-import { PageHeader } from 'ui-patterns/PageHeader'
+import {
+  PageHeader,
+  PageHeaderBreadcrumb,
+  PageHeaderMeta,
+  PageHeaderIcon,
+  PageHeaderSummary,
+  PageHeaderTitle,
+  PageHeaderDescription,
+  PageHeaderAside,
+  PageHeaderFooter,
+} from 'ui-patterns/PageHeader'
 import {
   Button,
   NavMenu,
@@ -27,8 +37,8 @@ export default function PageHeaderDemo() {
 
   return (
     <div className="w-full">
-      <PageHeader.Root>
-        <PageHeader.Breadcrumb>
+      <PageHeader>
+        <PageHeaderBreadcrumb>
           <BreadcrumbList>
             {breadcrumbItems.map((item, index) => (
               <React.Fragment key={item.label}>
@@ -41,27 +51,27 @@ export default function PageHeaderDemo() {
               </React.Fragment>
             ))}
           </BreadcrumbList>
-        </PageHeader.Breadcrumb>
-        <PageHeader.Icon>
-          <Database className="w-5 h-5" />
-        </PageHeader.Icon>
-        <PageHeader.Summary>
-          <PageHeader.Title>Demo Function</PageHeader.Title>
-          <PageHeader.Description>
-            Serverless functions that run at the edge with low latency and automatic scaling.
-          </PageHeader.Description>
-        </PageHeader.Summary>
-
-        <PageHeader.Aside>
-          <Button type="default" size="small">
-            Secondary
-          </Button>
-          <Button type="primary" size="small">
-            Deploy Function
-          </Button>
-        </PageHeader.Aside>
-
-        <PageHeader.Footer>
+        </PageHeaderBreadcrumb>
+        <PageHeaderMeta>
+          <PageHeaderIcon>
+            <Database className="w-5 h-5" />
+          </PageHeaderIcon>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Demo Function</PageHeaderTitle>
+            <PageHeaderDescription>
+              Serverless functions that run at the edge with low latency and automatic scaling.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <Button type="default" size="small">
+              Secondary
+            </Button>
+            <Button type="primary" size="small">
+              Deploy Function
+            </Button>
+          </PageHeaderAside>
+        </PageHeaderMeta>
+        <PageHeaderFooter>
           <NavMenu>
             {navigationItems.map((item) => (
               <NavMenuItem key={item.label}>
@@ -69,8 +79,8 @@ export default function PageHeaderDemo() {
               </NavMenuItem>
             ))}
           </NavMenu>
-        </PageHeader.Footer>
-      </PageHeader.Root>
+        </PageHeaderFooter>
+      </PageHeader>
     </div>
   )
 }

@@ -1,22 +1,32 @@
-import { PageSection } from 'ui-patterns/PageSection'
+import {
+  PageSection,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+  PageSectionDescription,
+  PageSectionAside,
+  PageSectionContent,
+} from 'ui-patterns/PageSection'
 import { Button, Card, CardContent } from 'ui'
 
 export default function PageSectionDemo() {
   return (
     <div className="w-full">
-      <PageSection.Root>
-        <PageSection.Summary>
-          <PageSection.Title>Section Title</PageSection.Title>
-          <PageSection.Description>
-            This is a section with a title and description, plus optional actions.
-          </PageSection.Description>
-        </PageSection.Summary>
-        <PageSection.Aside>
-          <Button type="default" size="small">
-            Action
-          </Button>
-        </PageSection.Aside>
-        <PageSection.Content>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Section Title</PageSectionTitle>
+            <PageSectionDescription>
+              This is a section with a title and description, plus optional actions.
+            </PageSectionDescription>
+          </PageSectionSummary>
+          <PageSectionAside>
+            <Button type="default" size="small">
+              Action
+            </Button>
+          </PageSectionAside>
+        </PageSectionMeta>
+        <PageSectionContent>
           <Card>
             <CardContent className="p-6">
               <p className="text-sm text-foreground-light">
@@ -24,8 +34,8 @@ export default function PageSectionDemo() {
               </p>
             </CardContent>
           </Card>
-        </PageSection.Content>
-      </PageSection.Root>
+        </PageSectionContent>
+      </PageSection>
     </div>
   )
 }

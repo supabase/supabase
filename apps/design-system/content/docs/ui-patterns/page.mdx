@@ -32,8 +32,8 @@ List pages display collections of objects like tables, triggers, or functions. T
 
 **Table and List Actions:**
 
-- **With filters or search:** If the table has filters or search, place table actions aligned with the filters on the right side. Do not use `PageSection.Aside` or `PageHeader.Aside` for table actions when filters are present.
-- **Without filters:** For simple lists without filters or search, add primary list actions to `PageHeader.Aside` or `PageSection.Aside` as appropriate.
+- **With filters or search:** If the table has filters or search, place table actions aligned with the filters on the right side. Do not use `PageSectionAside` or `PageHeaderAside` for table actions when filters are present.
+- **Without filters:** For simple lists without filters or search, add primary list actions to `PageHeaderAside` or `PageSectionAside` as appropriate.
 
 <ComponentPreview
   name="page-layout-list"
@@ -44,7 +44,7 @@ List pages display collections of objects like tables, triggers, or functions. T
 
 <ComponentPreview
   name="page-layout-list-simple"
-  description="Simple list page layout without filters - actions in PageHeader.Aside"
+  description="Simple list page layout without filters - actions in PageHeaderAside"
   peekCode
   wide
 />

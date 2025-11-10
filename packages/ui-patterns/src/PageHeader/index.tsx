@@ -36,7 +36,7 @@ export type PageHeaderRootProps = React.ComponentProps<'div'> &
 
 /**
  * Root component for page header.
- * Enforces structure by rendering components in order.
+ * Renders children in order without searching for specific components.
  */
 const PageHeaderRoot = ({
   className,
@@ -44,46 +44,6 @@ const PageHeaderRoot = ({
   children,
   ...props
 }: PageHeaderRootProps) => {
-  // Convert children to an array for easier manipulation
-  const childrenArray = React.Children.toArray(children)
-
-  // Filter out specific components by their displayName
-  const breadcrumb = childrenArray.find(
-    (child: React.ReactNode) =>
-      React.isValidElement(child) &&
-      (child.type === PageHeaderBreadcrumb ||
-        (child.type as any)?.displayName === 'PageHeaderBreadcrumb')
-  )
-
-  const icon = childrenArray.find(
-    (child: React.ReactNode) =>
-      React.isValidElement(child) &&
-      (child.type === PageHeaderIcon || (child.type as any)?.displayName === 'PageHeaderIcon')
-  )
-
-  const summary = childrenArray.find(
-    (child: React.ReactNode) =>
-      React.isValidElement(child) &&
-      (child.type === PageHeaderSummary || (child.type as any)?.displayName === 'PageHeaderSummary')
-  )
-
-  const aside = childrenArray.find(
-    (child: React.ReactNode) =>
-      React.isValidElement(child) &&
-      (child.type === PageHeaderAside || (child.type as any)?.displayName === 'PageHeaderAside')
-  )
-
-  const footer = childrenArray.find(
-    (child: React.ReactNode) =>
-      React.isValidElement(child) &&
-      (child.type === PageHeaderFooter || (child.type as any)?.displayName === 'PageHeaderFooter')
-  )
-
-  const rest = childrenArray.filter(
-    (child: React.ReactNode) =>
-      React.isValidElement(child) && !breadcrumb && !icon && !summary && !aside && !footer
-  )
-
   return (
     <div
       data-slot="page-header"
@@ -91,31 +51,7 @@ const PageHeaderRoot = ({
       className={cn(pageHeaderVariants({ size }), className)}
       {...props}
     >
-      {/* Breadcrumb section - max-width based on size */}
-      {breadcrumb && <PageContainer size={size}>{breadcrumb}</PageContainer>}
-
-      {/* Main content section - Icon, Summary, Aside with max-width based on size */}
-      {(icon || summary || aside) && (
-        <PageContainer size={size}>
-          <div
-            className={cn('flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4')}
-          >
-            <div className="flex items-center gap-4">
-              {icon}
-              {summary}
-            </div>
-            {aside}
-          </div>
-          {rest}
-        </PageContainer>
-      )}
-
-      {/* Footer section - full width wrapper with border, but inner content has max-width unless size is full */}
-      {footer && (
-        <PageContainer size={size} className={cn(size === 'full' && 'border-b')}>
-          <div className={cn(size !== 'full' && 'border-b', 'w-full')}>{footer}</div>
-        </PageContainer>
-      )}
+      {children}
     </div>
   )
 }
@@ -124,21 +60,31 @@ const PageHeaderRoot = ({
 // Breadcrumb
 // ============================================================================
 
-export type PageHeaderBreadcrumbProps = React.ComponentProps<typeof Breadcrumb>
+export type PageHeaderBreadcrumbProps = React.ComponentProps<typeof Breadcrumb> & {
+  size?: 'default' | 'small' | 'large' | 'full'
+}
 
 /**
  * Breadcrumb component for page header.
  * A wrapper around Breadcrumb with page header styling.
+ * Should be placed as the first child of PageHeader.
  */
-const PageHeaderBreadcrumb = ({ className, children, ...props }: PageHeaderBreadcrumbProps) => {
+const PageHeaderBreadcrumb = ({
+  className,
+  size = 'default',
+  children,
+  ...props
+}: PageHeaderBreadcrumbProps) => {
   return (
-    <Breadcrumb
-      data-slot="page-header-breadcrumb"
-      className={cn('flex items-center gap-4 [&_li]:text-xs', className)}
-      {...props}
-    >
-      {children}
-    </Breadcrumb>
+    <PageContainer size={size}>
+      <Breadcrumb
+        data-slot="page-header-breadcrumb"
+        className={cn('flex items-center gap-4 [&_li]:text-xs', className)}
+        {...props}
+      >
+        {children}
+      </Breadcrumb>
+    </PageContainer>
   )
 }
 PageHeaderBreadcrumb.displayName = 'PageHeaderBreadcrumb'
@@ -157,7 +103,7 @@ const PageHeaderIcon = ({ className, ...props }: PageHeaderIconProps) => {
   return (
     <div
       data-slot="page-header-icon"
-      className={cn('text-foreground-light shrink-0', className)}
+      className={cn('text-foreground-light', className)}
       {...props}
     />
   )
@@ -173,6 +119,7 @@ export type PageHeaderSummaryProps = React.ComponentProps<'div'>
 /**
  * Summary component to contain title and description.
  * Provides layout structure for text content.
+ * Should be placed inside PageHeaderMeta.
  */
 const PageHeaderSummary = ({ className, children, ...props }: PageHeaderSummaryProps) => {
   return (
@@ -228,6 +175,45 @@ const PageHeaderDescription = ({ className, children, ...props }: PageHeaderDesc
 }
 
 // ============================================================================
+// Meta
+// ============================================================================
+
+export type PageHeaderMetaProps = React.ComponentProps<'div'> & {
+  size?: 'default' | 'small' | 'large' | 'full'
+}
+
+/**
+ * Meta wrapper for page header.
+ * Contains icon, summary, and aside components with proper layout.
+ * Should be placed after PageHeaderBreadcrumb (if present) and before PageHeaderFooter.
+ * Uses CSS to style children based on their data-slot attributes.
+ */
+const PageHeaderMeta = ({
+  className,
+  size = 'default',
+  children,
+  ...props
+}: PageHeaderMetaProps) => {
+  return (
+    <PageContainer size={size}>
+      <div
+        data-slot="page-header-meta"
+        className={cn(
+          'flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4',
+          '[&>[data-slot="page-header-icon"]]:shrink-0',
+          '[&>[data-slot="page-header-summary"]]:flex-1',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    </PageContainer>
+  )
+}
+PageHeaderMeta.displayName = 'PageHeaderMeta'
+
+// ============================================================================
 // Actions
 // ============================================================================
 
@@ -236,6 +222,7 @@ export type PageHeaderAsideProps = React.ComponentProps<'div'>
 /**
  * Actions component for page header.
  * Container for buttons and other action elements.
+ * Should be placed inside PageHeaderMeta.
  */
 const PageHeaderAside = ({ className, ...props }: PageHeaderAsideProps) => {
   return (
@@ -257,35 +244,43 @@ export type PageHeaderFooterProps = React.ComponentProps<'div'>
 /**
  * Navigation component for page header.
  * Container for tab navigation (NavMenu).
+ * Should be placed as the last child of PageHeader.
  */
-const PageHeaderFooter = ({ className, ...props }: PageHeaderFooterProps) => {
+const PageHeaderFooter = ({
+  className,
+  size = 'default',
+  ...props
+}: PageHeaderFooterProps & { size?: 'default' | 'small' | 'large' | 'full' }) => {
   return (
-    <div
-      data-slot="page-header-footer"
-      className={cn('w-full [&>nav]:border-b-0', className)}
-      {...props}
-    />
+    <PageContainer size={size} className={cn(size === 'full' && 'border-b')}>
+      <div
+        data-slot="page-header-footer"
+        className={cn('w-full [&>nav]:border-b-0', size !== 'full' && 'border-b', className)}
+        {...props}
+      />
+    </PageContainer>
   )
 }
 PageHeaderFooter.displayName = 'PageHeaderFooter'
 
 // ============================================================================
-// Compound Component
+// Exports
 // ============================================================================
 
 export type PageHeaderProps = PageHeaderRootProps
 
 /**
- * Compound component for page header.
- * Use PageHeader.Root, PageHeader.Breadcrumb, PageHeader.Summary, etc.
+ * Page header root component.
+ * Use PageHeader, PageHeaderBreadcrumb, PageHeaderMeta, PageHeaderIcon, etc.
  */
-export const PageHeader = Object.assign(PageHeaderRoot, {
-  Root: PageHeaderRoot,
-  Breadcrumb: PageHeaderBreadcrumb,
-  Icon: PageHeaderIcon,
-  Summary: PageHeaderSummary,
-  Title: PageHeaderTitle,
-  Description: PageHeaderDescription,
-  Aside: PageHeaderAside,
-  Footer: PageHeaderFooter,
-})
+export {
+  PageHeaderRoot as PageHeader,
+  PageHeaderAside,
+  PageHeaderBreadcrumb,
+  PageHeaderDescription,
+  PageHeaderFooter,
+  PageHeaderIcon,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+}

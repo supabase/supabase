@@ -1,9 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { PageContainer } from 'ui-patterns/PageContainer'
-import { PageHeader } from 'ui-patterns/PageHeader'
-import { PageSection } from 'ui-patterns/PageSection'
 import {
   Button,
   Card,
@@ -17,6 +13,23 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import * as z from 'zod'
 
 const RefreshTokenSchema = z.object({
   REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
@@ -59,24 +72,28 @@ export default function PageLayoutSettings() {
 
   return (
     <div className="w-full">
-      <PageHeader.Root size="default">
-        <PageHeader.Summary>
-          <PageHeader.Title>User Sessions</PageHeader.Title>
-          <PageHeader.Description>
-            Configure settings for user sessions and refresh tokens
-          </PageHeader.Description>
-        </PageHeader.Summary>
-      </PageHeader.Root>
+      <PageHeader size="default">
+        <PageHeaderMeta size="default">
+          <PageHeaderSummary>
+            <PageHeaderTitle>User Sessions</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure settings for user sessions and refresh tokens
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
 
       <PageContainer size="default">
-        <PageSection.Root>
-          <PageSection.Summary>
-            <PageSection.Title>Refresh Tokens</PageSection.Title>
-            <PageSection.Description>
-              Configure refresh token rotation and security settings.
-            </PageSection.Description>
-          </PageSection.Summary>
-          <PageSection.Content>
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Refresh Tokens</PageSectionTitle>
+              <PageSectionDescription>
+                Configure refresh token rotation and security settings.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
             <Form_Shadcn_ {...refreshTokenForm}>
               <form className="space-y-4">
                 <Card>
@@ -133,17 +150,19 @@ export default function PageLayoutSettings() {
                 </Card>
               </form>
             </Form_Shadcn_>
-          </PageSection.Content>
-        </PageSection.Root>
+          </PageSectionContent>
+        </PageSection>
 
-        <PageSection.Root>
-          <PageSection.Summary>
-            <PageSection.Title>User Sessions</PageSection.Title>
-            <PageSection.Description>
-              Configure session timeout and single session enforcement settings.
-            </PageSection.Description>
-          </PageSection.Summary>
-          <PageSection.Content>
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>User Sessions</PageSectionTitle>
+              <PageSectionDescription>
+                Configure session timeout and single session enforcement settings.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
             <Form_Shadcn_ {...userSessionsForm}>
               <form className="space-y-4">
                 <Card>
@@ -226,8 +245,8 @@ export default function PageLayoutSettings() {
                 </Card>
               </form>
             </Form_Shadcn_>
-          </PageSection.Content>
-        </PageSection.Root>
+          </PageSectionContent>
+        </PageSection>
       </PageContainer>
     </div>
   )

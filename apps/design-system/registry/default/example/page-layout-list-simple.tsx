@@ -1,6 +1,16 @@
 import { PageContainer } from 'ui-patterns/PageContainer'
-import { PageHeader } from 'ui-patterns/PageHeader'
-import { PageSection } from 'ui-patterns/PageSection'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+  PageHeaderDescription,
+  PageHeaderAside,
+} from 'ui-patterns/PageHeader'
+import {
+  PageSection,
+  PageSectionContent,
+} from 'ui-patterns/PageSection'
 import {
   Button,
   Card,
@@ -26,23 +36,25 @@ export default function PageLayoutListSimple() {
 
   return (
     <div className="w-full">
-      <PageHeader.Root size="large">
-        <PageHeader.Summary>
-          <PageHeader.Title>Projects</PageHeader.Title>
-          <PageHeader.Description>
-            Manage and view all your projects in one place.
-          </PageHeader.Description>
-        </PageHeader.Summary>
-        <PageHeader.Aside>
-          <Button type="primary" size="small">
-            Create Project
-          </Button>
-        </PageHeader.Aside>
-      </PageHeader.Root>
+      <PageHeader size="large">
+        <PageHeaderMeta size="large">
+          <PageHeaderSummary>
+            <PageHeaderTitle>Projects</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage and view all your projects in one place.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <Button type="primary" size="small">
+              Create Project
+            </Button>
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
 
       <PageContainer size="large">
-        <PageSection.Root>
-          <PageSection.Content>
+        <PageSection>
+          <PageSectionContent>
             <Card>
               <Table>
                 <TableHeader>
@@ -79,8 +91,8 @@ export default function PageLayoutListSimple() {
                 </TableBody>
               </Table>
             </Card>
-          </PageSection.Content>
-        </PageSection.Root>
+          </PageSectionContent>
+        </PageSection>
       </PageContainer>
     </div>
   )

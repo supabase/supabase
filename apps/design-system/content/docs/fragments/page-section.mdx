@@ -13,12 +13,13 @@ fragment: true
 
 ## Sub-components
 
-- `PageSection.Root` - Root container with orientation variants (`horizontal` or `vertical`)
-- `PageSection.Summary` - Container for section title and description
-- `PageSection.Title` - Section heading (h2)
-- `PageSection.Description` - Supporting text below section title
-- `PageSection.Aside` - Container for section-level actions
-- `PageSection.Content` - Container for the main section content
+- `PageSection` - Root container with orientation variants (`horizontal` or `vertical`)
+- `PageSectionMeta` - Meta wrapper for summary and aside (groups summary and aside together)
+- `PageSectionSummary` - Container for section title and description (should be inside PageSectionMeta, has `flex-1`)
+- `PageSectionTitle` - Section heading (h2)
+- `PageSectionDescription` - Supporting text below section title
+- `PageSectionAside` - Container for section-level actions (should be inside PageSectionMeta, has `shrink-0`)
+- `PageSectionContent` - Container for the main section content
 
 ## Orientation Variants
 

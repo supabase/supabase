@@ -37,9 +37,9 @@ export type PageContainerProps = HTMLAttributes<HTMLDivElement> &
  * @example
  * ```tsx
  * <PageContainer size="large">
- *   <PageHeader.Root>
- *     <PageHeader.Title>My Page</PageHeader.Title>
- *   </PageHeader.Root>
+ *   <PageHeader>
+ *     <PageHeaderTitle>My Page</PageHeaderTitle>
+ *   </PageHeader>
  *   {children}
  * </PageContainer>
  * ```

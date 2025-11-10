@@ -1,29 +1,46 @@
 import { PageContainer } from 'ui-patterns/PageContainer'
-import { PageHeader } from 'ui-patterns/PageHeader'
-import { PageSection } from 'ui-patterns/PageSection'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+  PageHeaderDescription,
+} from 'ui-patterns/PageHeader'
+import {
+  PageSection,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+  PageSectionDescription,
+  PageSectionContent,
+} from 'ui-patterns/PageSection'
 import { Button, Card, CardContent } from 'ui'
 
 export default function PageLayoutDetail() {
   return (
     <div className="w-full">
-      <PageHeader.Root size="large">
-        <PageHeader.Summary>
-          <PageHeader.Title>Billing</PageHeader.Title>
-          <PageHeader.Description>
-            Manage your organization's billing and subscription settings.
-          </PageHeader.Description>
-        </PageHeader.Summary>
-      </PageHeader.Root>
+      <PageHeader size="large">
+        <PageHeaderMeta size="large">
+          <PageHeaderSummary>
+            <PageHeaderTitle>Billing</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage your organization's billing and subscription settings.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
 
       <PageContainer size="large">
-        <PageSection.Root orientation="horizontal">
-          <PageSection.Summary>
-            <PageSection.Title>Subscription</PageSection.Title>
-            <PageSection.Description>
-              View and manage your current subscription plan and billing cycle.
-            </PageSection.Description>
-          </PageSection.Summary>
-          <PageSection.Content>
+        <PageSection orientation="horizontal">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Subscription</PageSectionTitle>
+              <PageSectionDescription>
+                View and manage your current subscription plan and billing cycle.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
             <Card>
               <CardContent className="p-6">
                 <div className="space-y-4">
@@ -47,17 +64,19 @@ export default function PageLayoutDetail() {
                 </div>
               </CardContent>
             </Card>
-          </PageSection.Content>
-        </PageSection.Root>
+          </PageSectionContent>
+        </PageSection>
 
-        <PageSection.Root orientation="horizontal">
-          <PageSection.Summary>
-            <PageSection.Title>Cost Control</PageSection.Title>
-            <PageSection.Description>
-              Set spending limits and alerts to manage your organization's costs.
-            </PageSection.Description>
-          </PageSection.Summary>
-          <PageSection.Content>
+        <PageSection orientation="horizontal">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Cost Control</PageSectionTitle>
+              <PageSectionDescription>
+                Set spending limits and alerts to manage your organization's costs.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
             <Card>
               <CardContent className="p-6">
                 <div className="space-y-4">
@@ -77,17 +96,19 @@ export default function PageLayoutDetail() {
                 </div>
               </CardContent>
             </Card>
-          </PageSection.Content>
-        </PageSection.Root>
+          </PageSectionContent>
+        </PageSection>
 
-        <PageSection.Root orientation="horizontal">
-          <PageSection.Summary>
-            <PageSection.Title>Payment Methods</PageSection.Title>
-            <PageSection.Description>
-              Manage payment methods and billing information for your organization.
-            </PageSection.Description>
-          </PageSection.Summary>
-          <PageSection.Content>
+        <PageSection orientation="horizontal">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Payment Methods</PageSectionTitle>
+              <PageSectionDescription>
+                Manage payment methods and billing information for your organization.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
             <Card>
               <CardContent className="p-6">
                 <div className="space-y-4">
@@ -107,8 +128,8 @@ export default function PageLayoutDetail() {
                 </div>
               </CardContent>
             </Card>
-          </PageSection.Content>
-        </PageSection.Root>
+          </PageSectionContent>
+        </PageSection>
       </PageContainer>
     </div>
   )

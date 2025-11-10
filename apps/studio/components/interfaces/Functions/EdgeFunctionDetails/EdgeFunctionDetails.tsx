@@ -28,8 +28,6 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  CardTitle,
   cn,
   CodeBlock,
   copyToClipboard,
@@ -48,11 +46,16 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { PageContainer } from 'ui-patterns/PageContainer'
-import { PageSection } from 'ui-patterns/PageSection'
 
 const FormSchema = z.object({
   name: z.string().min(0, 'Name is required'),
@@ -161,9 +164,9 @@ export const EdgeFunctionDetails = () => {
 
   return (
     <PageContainer size="full">
-      <PageSection.Root orientation="horizontal">
-        <PageSection.Summary className="gap-6">
-          <PageSection.Title>Details</PageSection.Title>
+      <PageSection orientation="horizontal">
+        <PageSectionSummary className="gap-6">
+          <PageSectionTitle>Details</PageSectionTitle>
           {isLoading && <GenericSkeletonLoader />}
           {isError && (
             <AlertError error={error} subject="Failed to retrieve edge function details" />
@@ -232,13 +235,13 @@ export const EdgeFunctionDetails = () => {
               </dd>
             </dl>
           )}
-        </PageSection.Summary>
-        <PageSection.Content>
-          <PageSection.Root className="pt-0">
-            <PageSection.Summary>
-              <PageSection.Title>Function Configuration</PageSection.Title>
-            </PageSection.Summary>
-            <PageSection.Content>
+        </PageSectionSummary>
+        <PageSectionContent>
+          <PageSection className="pt-0">
+            <PageSectionSummary>
+              <PageSectionTitle>Function Configuration</PageSectionTitle>
+            </PageSectionSummary>
+            <PageSectionContent>
               <Form_Shadcn_ {...form}>
                 <form onSubmit={form.handleSubmit(onUpdateFunction)}>
                   <Card>
@@ -313,14 +316,14 @@ export const EdgeFunctionDetails = () => {
                   </Card>
                 </form>
               </Form_Shadcn_>
-            </PageSection.Content>
-          </PageSection.Root>
+            </PageSectionContent>
+          </PageSection>
 
-          <PageSection.Root>
-            <PageSection.Summary>
-              <PageSection.Title>Invoke function</PageSection.Title>
-            </PageSection.Summary>
-            <PageSection.Content>
+          <PageSection>
+            <PageSectionSummary>
+              <PageSectionTitle>Invoke function</PageSectionTitle>
+            </PageSectionSummary>
+            <PageSectionContent>
               <Card>
                 <CardContent className="px-0">
                   <Tabs
@@ -378,14 +381,14 @@ export const EdgeFunctionDetails = () => {
                   </Tabs>
                 </CardContent>
               </Card>
-            </PageSection.Content>
-          </PageSection.Root>
+            </PageSectionContent>
+          </PageSection>
 
-          <PageSection.Root>
-            <PageSection.Summary>
-              <PageSection.Title>Develop locally</PageSection.Title>
-            </PageSection.Summary>
-            <PageSection.Content>
+          <PageSection>
+            <PageSectionSummary>
+              <PageSectionTitle>Develop locally</PageSectionTitle>
+            </PageSectionSummary>
+            <PageSectionContent>
               <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">
                 <div className="space-y-6">
                   <CommandRender
@@ -407,13 +410,13 @@ export const EdgeFunctionDetails = () => {
                   <CommandRender commands={[managementCommands[1]]} />
                 </div>
               </div>
-            </PageSection.Content>
-          </PageSection.Root>
-          <PageSection.Root>
-            <PageSection.Summary>
-              <PageSection.Title>Delete function</PageSection.Title>
-            </PageSection.Summary>
-            <PageSection.Content>
+            </PageSectionContent>
+          </PageSection>
+          <PageSection>
+            <PageSectionSummary>
+              <PageSectionTitle>Delete function</PageSectionTitle>
+            </PageSectionSummary>
+            <PageSectionContent>
               <Alert_Shadcn_ variant="destructive">
                 <CriticalIcon />
                 <AlertTitle_Shadcn_>
@@ -433,8 +436,8 @@ export const EdgeFunctionDetails = () => {
                   </Button>
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
-            </PageSection.Content>
-          </PageSection.Root>
+            </PageSectionContent>
+          </PageSection>
 
           <ConfirmationModal
             visible={showDeleteModal}
@@ -452,8 +455,8 @@ export const EdgeFunctionDetails = () => {
                 'Ensure that you have made a backup if you want to restore your edge function',
             }}
           />
-        </PageSection.Content>
-      </PageSection.Root>
+        </PageSectionContent>
+      </PageSection>
     </PageContainer>
   )
 }

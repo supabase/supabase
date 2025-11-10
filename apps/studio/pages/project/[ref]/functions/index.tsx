@@ -18,7 +18,14 @@ import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import { PageHeader } from 'ui-patterns/PageHeader'
+import {
+  PageHeader,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+  PageHeaderDescription,
+  PageHeaderAside,
+} from 'ui-patterns/PageHeader'
 import { PageSection } from 'ui-patterns/PageSection'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
@@ -96,18 +103,20 @@ EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
 
     return (
       <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader.Root size="large">
-          <PageHeader.Summary>
-            <PageHeader.Title>Edge Functions</PageHeader.Title>
-            <PageHeader.Description>
-              Deploy edge functions to handle complex business logic
-            </PageHeader.Description>
-          </PageHeader.Summary>
-          <PageHeader.Aside>
-            {secondaryActions.map((action) => action)}
-            {IS_PLATFORM && <DeployEdgeFunctionButton />}
-          </PageHeader.Aside>
-        </PageHeader.Root>
+        <PageHeader size="large">
+          <PageHeaderMeta size="large">
+            <PageHeaderSummary>
+              <PageHeaderTitle>Edge Functions</PageHeaderTitle>
+              <PageHeaderDescription>
+                Deploy edge functions to handle complex business logic
+              </PageHeaderDescription>
+            </PageHeaderSummary>
+            <PageHeaderAside>
+              {secondaryActions.map((action) => action)}
+              {IS_PLATFORM && <DeployEdgeFunctionButton />}
+            </PageHeaderAside>
+          </PageHeaderMeta>
+        </PageHeader>
 
         {page}
       </div>

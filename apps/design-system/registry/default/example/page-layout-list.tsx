@@ -1,6 +1,4 @@
-import { PageContainer } from 'ui-patterns/PageContainer'
-import { PageHeader } from 'ui-patterns/PageHeader'
-import { PageSection } from 'ui-patterns/PageSection'
+import { Search } from 'lucide-react'
 import {
   Button,
   Card,
@@ -17,7 +15,15 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Search } from 'lucide-react'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 export default function PageLayoutList() {
   const functions = [
@@ -46,16 +52,18 @@ export default function PageLayoutList() {
 
   return (
     <div className="w-full">
-      <PageHeader.Root size="large">
-        <PageHeader.Summary>
-          <PageHeader.Title>Database Functions</PageHeader.Title>
-          <PageHeader.Description>Manage your database functions</PageHeader.Description>
-        </PageHeader.Summary>
-      </PageHeader.Root>
+      <PageHeader size="large">
+        <PageHeaderMeta size="large">
+          <PageHeaderSummary>
+            <PageHeaderTitle>Database Functions</PageHeaderTitle>
+            <PageHeaderDescription>Manage your database functions</PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
 
       <PageContainer size="large">
-        <PageSection.Root>
-          <PageSection.Content>
+        <PageSection>
+          <PageSectionContent>
             <div className="w-full space-y-4">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-2">
@@ -110,8 +118,8 @@ export default function PageLayoutList() {
                 </Table>
               </Card>
             </div>
-          </PageSection.Content>
-        </PageSection.Root>
+          </PageSectionContent>
+        </PageSection>
       </PageContainer>
     </div>
   )

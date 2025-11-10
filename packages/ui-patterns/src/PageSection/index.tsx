@@ -33,6 +33,7 @@ export type PageSectionRootProps = React.ComponentProps<'div'> &
 /**
  * Root component for page section.
  * Provides layout structure for section content with orientation variants.
+ * Renders children in order without searching for specific components.
  */
 const PageSectionRoot = ({
   className,
@@ -40,33 +41,6 @@ const PageSectionRoot = ({
   children,
   ...props
 }: PageSectionRootProps) => {
-  // Convert children to an array for easier manipulation
-  const childrenArray = React.Children.toArray(children)
-
-  // Filter out specific components by their displayName
-  const summary = childrenArray.find(
-    (child: React.ReactNode) =>
-      React.isValidElement(child) &&
-      (child.type === PageSectionSummary ||
-        (child.type as any)?.displayName === 'PageSectionSummary')
-  )
-
-  const aside = childrenArray.find(
-    (child: React.ReactNode) =>
-      React.isValidElement(child) &&
-      (child.type === PageSectionAside || (child.type as any)?.displayName === 'PageSectionAside')
-  )
-
-  const content = childrenArray.find(
-    (child: React.ReactNode) =>
-      React.isValidElement(child) &&
-      (child.type === PageSectionContent ||
-        (child.type as any)?.displayName === 'PageSectionContent')
-  )
-  const rest = childrenArray.filter(
-    (child: React.ReactNode) => React.isValidElement(child) && !summary && !aside && !content
-  )
-
   return (
     <div
       data-slot="page-section"
@@ -74,24 +48,7 @@ const PageSectionRoot = ({
       className={cn(pageSectionRootVariants({ orientation }), className)}
       {...props}
     >
-      {/* Header wrapper: Summary + Aside */}
-      {(summary || aside) && (
-        <div className="@container">
-          <div
-            data-slot="page-section-summary"
-            className={cn('flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4')}
-          >
-            {summary}
-            {aside}
-          </div>
-        </div>
-      )}
-
-      {/* Content */}
-      <div>
-        {content}
-        {rest}
-      </div>
+      {children}
     </div>
   )
 }
@@ -107,6 +64,7 @@ export type PageSectionSummaryProps = React.ComponentProps<'div'>
 /**
  * Summary component to contain title and description.
  * Provides layout structure for text content.
+ * Should be placed inside PageSectionMeta.
  */
 const PageSectionSummary = ({ className, children, ...props }: PageSectionSummaryProps) => {
   return (
@@ -172,17 +130,50 @@ export type PageSectionAsideProps = React.ComponentProps<'div'>
 /**
  * Aside component for page section.
  * Container for buttons and other action elements.
+ * Should be placed inside PageSectionMeta.
  */
 const PageSectionAside = ({ className, ...props }: PageSectionAsideProps) => {
   return (
     <div
       data-slot="page-section-aside"
-      className={cn('flex items-center gap-2 shrink-0', className)}
+      className={cn('flex items-center gap-2', className)}
       {...props}
     />
   )
 }
 PageSectionAside.displayName = 'PageSectionAside'
+
+// ============================================================================
+// Meta
+// ============================================================================
+
+export type PageSectionMetaProps = React.ComponentProps<'div'>
+
+/**
+ * Meta wrapper for page section.
+ * Contains summary and aside components with proper layout.
+ * Should be placed as the first child of PageSectionRoot.
+ * Uses CSS to style children based on their data-slot attributes.
+ */
+const PageSectionMeta = ({ className, children, ...props }: PageSectionMetaProps) => {
+  return (
+    <div className="@container">
+      <div
+        data-slot="page-section-meta"
+        className={cn(
+          'flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4',
+          '[&>[data-slot="page-section-summary"]]:flex-1',
+          '[&>[data-slot="page-section-aside"]]:shrink-0',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+PageSectionMeta.displayName = 'PageSectionMeta'
 
 // ============================================================================
 // Content
@@ -200,20 +191,21 @@ const PageSectionContent = ({ className, ...props }: PageSectionContentProps) =>
 PageSectionContent.displayName = 'PageSectionContent'
 
 // ============================================================================
-// Compound Component
+// Exports
 // ============================================================================
 
 export type PageSectionProps = PageSectionRootProps
 
 /**
- * Compound component for page section.
- * Use PageSection.Root, PageSection.Title, PageSection.Description, etc.
+ * Page section root component.
+ * Use PageSection, PageSectionMeta, PageSectionSummary, etc.
  */
-export const PageSection = Object.assign(PageSectionRoot, {
-  Root: PageSectionRoot,
-  Summary: PageSectionSummary,
-  Title: PageSectionTitle,
-  Description: PageSectionDescription,
-  Aside: PageSectionAside,
-  Content: PageSectionContent,
-})
+export {
+  PageSectionRoot as PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+}

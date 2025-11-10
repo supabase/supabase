@@ -13,11 +13,12 @@ fragment: true
 
 ## Sub-components
 
-- `PageHeader.Root` - Root container with size variants (`default`, `small`, `large`, `full`)
-- `PageHeader.Breadcrumb` - Breadcrumb navigation wrapper
-- `PageHeader.Icon` - Icon container positioned left of title
-- `PageHeader.Summary` - Container for title and description
-- `PageHeader.Title` - Primary page heading (h1)
-- `PageHeader.Description` - Supporting text below title
-- `PageHeader.Aside` - Container for action buttons
-- `PageHeader.Footer` - Container for tab navigation (NavMenu)
+- `PageHeader` - Root container with size variants (`default`, `small`, `large`, `full`)
+- `PageHeaderBreadcrumb` - Breadcrumb navigation wrapper (should be first child)
+- `PageHeaderMeta` - Meta wrapper for icon, summary, and aside (groups icon and summary together, places aside on the right)
+- `PageHeaderIcon` - Icon container positioned left of title (should be inside PageHeaderMeta, has `shrink-0`)
+- `PageHeaderSummary` - Container for title and description (should be inside PageHeaderMeta, has `flex-1`)
+- `PageHeaderTitle` - Primary page heading (h1)
+- `PageHeaderDescription` - Supporting text below title
+- `PageHeaderAside` - Container for action buttons (should be inside PageHeaderMeta, has `shrink-0`)
+- `PageHeaderFooter` - Container for tab navigation (NavMenu, should be last child)

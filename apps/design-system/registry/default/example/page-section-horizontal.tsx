@@ -1,19 +1,28 @@
-import { PageSection } from 'ui-patterns/PageSection'
+import {
+  PageSection,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+  PageSectionDescription,
+  PageSectionContent,
+} from 'ui-patterns/PageSection'
 import { Card, CardContent } from 'ui'
 
 export default function PageSectionHorizontal() {
   return (
     <div className="w-full">
-      <PageSection.Root orientation="horizontal">
-        <PageSection.Summary>
-          <PageSection.Title>Section Title</PageSection.Title>
-          <PageSection.Description>
-            In horizontal orientation, the summary (title and description) appears on the left, with
-            content arranged on the right on larger screens. This is useful for detailed sections
-            where you want to maintain context while viewing content.
-          </PageSection.Description>
-        </PageSection.Summary>
-        <PageSection.Content>
+      <PageSection orientation="horizontal">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Section Title</PageSectionTitle>
+            <PageSectionDescription>
+              In horizontal orientation, the summary (title and description) appears on the left, with
+              content arranged on the right on larger screens. This is useful for detailed sections
+              where you want to maintain context while viewing content.
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
           <Card>
             <CardContent className="p-6">
               <p className="text-sm text-foreground-light">
@@ -22,8 +31,8 @@ export default function PageSectionHorizontal() {
               </p>
             </CardContent>
           </Card>
-        </PageSection.Content>
-      </PageSection.Root>
+        </PageSectionContent>
+      </PageSection>
     </div>
   )
 }
