@@ -58,6 +58,11 @@ const PIPELINE_STATE_MESSAGES = {
     message: 'Initializing replication. Table status will be available once running.',
     badge: 'Starting',
   },
+  stopping: {
+    title: 'Pipeline stopping',
+    message: 'Stopping replication. Table replication will be paused once stopped',
+    badge: 'Starting',
+  },
   running: {
     title: 'Pipeline running',
     message: 'Replication is active and processing data',
@@ -100,6 +105,8 @@ export const getPipelineStateMessages = (
       return PIPELINE_STATE_MESSAGES.stopped
     case 'started':
       return PIPELINE_STATE_MESSAGES.running
+    case 'stopping':
+      return PIPELINE_STATE_MESSAGES.stopping
     case 'unknown':
       return PIPELINE_STATE_MESSAGES.unknown
     default:
