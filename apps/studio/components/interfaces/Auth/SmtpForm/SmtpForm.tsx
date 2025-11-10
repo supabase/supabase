@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertTriangle, Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -10,14 +9,12 @@ import * as yup from 'yup'
 import { useParams } from 'common'
 import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -29,6 +26,7 @@ import {
   PrePostTab,
   Switch,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { urlRegex } from '../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
@@ -65,7 +63,8 @@ export const SmtpForm = () => {
   const smtpSchema = yup.object({
     SMTP_ADMIN_EMAIL: yup.string().when('ENABLE_SMTP', {
       is: true,
-      then: (schema) => schema.email('Must be a valid email').required('Sender email is required'),
+      then: (schema) =>
+        schema.email('Must be a valid email').required('Sender email address is required'),
       otherwise: (schema) => schema,
     }),
     SMTP_SENDER_NAME: yup.string().when('ENABLE_SMTP', {
@@ -205,17 +204,14 @@ export const SmtpForm = () => {
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex-row-reverse"
-                    label="Enable Custom SMTP"
+                    label="Enable custom SMTP"
                     description={
                       <p className="max-w-full prose text-sm text-foreground-lighter">
                         Emails will be sent using your custom SMTP provider. Email rate limits can
                         be adjusted{' '}
-                        <Link
-                          className="underline"
-                          href={`/project/${projectRef}/auth/rate-limits`}
-                        >
+                        <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
                           here
-                        </Link>
+                        </InlineLink>
                         .
                       </p>
                     }
@@ -232,15 +228,12 @@ export const SmtpForm = () => {
               />
 
               {enableSmtp && !isSmtpEnabled(form.getValues() as any) && (
-                <div className="mt-4">
-                  <Alert_Shadcn_ variant="warning">
-                    <AlertTriangle strokeWidth={2} />
-                    <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      The following fields must be filled before custom SMTP can be properly enabled
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                </div>
+                <Admonition
+                  type="warning"
+                  title="All fields must be filled"
+                  description="Each of the fields below must be filled before custom SMTP can be enabled."
+                  className="bg-warning-200 border-warning-400 mt-4"
+                />
               )}
             </CardContent>
 
@@ -250,7 +243,7 @@ export const SmtpForm = () => {
                   <div className="grid grid-cols-12 gap-6">
                     <div className="col-span-4">
                       <h3 className="text-sm mb-1">Sender details</h3>
-                      <p className="text-sm text-foreground-lighter">
+                      <p className="text-sm text-foreground-lighter text-balance">
                         Configure the sender information for your emails.
                       </p>
                     </div>
@@ -260,8 +253,8 @@ export const SmtpForm = () => {
                         name="SMTP_ADMIN_EMAIL"
                         render={({ field }) => (
                           <FormItemLayout
-                            label="Sender email"
-                            description="This is the email address the emails are sent from"
+                            label="Sender email address"
+                            description="The email address the emails are sent from."
                           >
                             <FormControl_Shadcn_>
                               <Input_Shadcn_
@@ -280,12 +273,12 @@ export const SmtpForm = () => {
                         render={({ field }) => (
                           <FormItemLayout
                             label="Sender name"
-                            description="Name displayed in the recipient's inbox"
+                            description="Name displayed in the recipient's inbox."
                           >
                             <FormControl_Shadcn_>
                               <Input_Shadcn_
                                 {...field}
-                                placeholder="The name shown on the email"
+                                placeholder="Your Name"
                                 disabled={!canUpdateConfig}
                               />
                             </FormControl_Shadcn_>
@@ -299,26 +292,12 @@ export const SmtpForm = () => {
                 <CardContent className="py-6">
                   <div className="grid grid-cols-12 gap-6">
                     <div className="col-span-4">
-                      <h3 className="text-sm mb-1">SMTP Provider Settings</h3>
-                      <p className="text-sm text-foreground-lighter">
-                        Your SMTP Credentials will always be encrypted in our database.
+                      <h3 className="text-sm mb-1">SMTP provider settings</h3>
+                      <p className="text-sm text-foreground-lighter text-balance">
+                        Your SMTP credentials will always be encrypted in our database.
                       </p>
                     </div>
                     <div className="col-span-8 space-y-4">
-                      {form.watch('SMTP_HOST')?.endsWith('.gmail.com') && (
-                        <Alert_Shadcn_ variant="warning" className="mb-4">
-                          <AlertTriangle strokeWidth={2} />
-                          <AlertTitle_Shadcn_>Check your SMTP provider</AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
-                            Not all SMTP providers are designed for the email sending required by
-                            Supabase Auth. It looks like the SMTP provider you entered is designed
-                            for sending personal email messages and not for sending transactional
-                            messages. Although you can ignore this warning, email deliverability may
-                            be impacted.
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      )}
-
                       <FormField_Shadcn_
                         control={form.control}
                         name="SMTP_HOST"
@@ -338,6 +317,17 @@ export const SmtpForm = () => {
                         )}
                       />
 
+                      {form.watch('SMTP_HOST')?.endsWith('.gmail.com') && (
+                        <Admonition
+                          type="warning"
+                          title="Check your SMTP provider"
+                          description="It looks like the SMTP provider you entered is designed
+                            for sending personal rather than transactional email messages. Email deliverability may
+                            be impacted."
+                          className="mb-4 bg-warning-200 border-warning-400"
+                        />
+                      )}
+
                       <FormField_Shadcn_
                         control={form.control}
                         name="SMTP_PORT"
@@ -347,13 +337,9 @@ export const SmtpForm = () => {
                             description={
                               <>
                                 <span className="block">
-                                  Port used by your SMTP server. Common ports include 25, 465, and
-                                  587.{' '}
-                                </span>
-                                <span className="mt-2 block">
-                                  Avoid using port 25 as modern SMTP email clients shouldn't use
-                                  this port, it is traditionally blocked by residential ISPs and
-                                  Cloud Hosting Providers, to curb the amount of spam.
+                                  Port used by your SMTP server. Common ports include 465 and 587.
+                                  Avoid using port 25 as it is often blocked by providers to curb
+                                  spam.
                                 </span>
                               </>
                             }
@@ -376,8 +362,8 @@ export const SmtpForm = () => {
                         name="SMTP_MAX_FREQUENCY"
                         render={({ field }) => (
                           <FormItemLayout
-                            label="Minimum interval between emails being sent to same user"
-                            description="How long between each email can a new email be sent via your SMTP server to the same user."
+                            label="Minimum interval per user"
+                            description="The minimum time in seconds between emails before another email can be sent to the same user."
                           >
                             <FormControl_Shadcn_>
                               <PrePostTab postTab="seconds">
@@ -399,7 +385,7 @@ export const SmtpForm = () => {
                         render={({ field }) => (
                           <FormItemLayout
                             label="Username"
-                            description="Username for your SMTP server"
+                            description="Username for your SMTP server."
                           >
                             <FormControl_Shadcn_>
                               <Input_Shadcn_
@@ -418,7 +404,7 @@ export const SmtpForm = () => {
                         render={({ field }) => (
                           <FormItemLayout
                             label="Password"
-                            description="For security reasons, the password is write-only. Once saved, it cannot be retrieved or displayed."
+                            description="Password for your SMTP server. For security reasons, this password cannot be viewed once saved."
                           >
                             <FormControl_Shadcn_>
                               <PrePostTab
