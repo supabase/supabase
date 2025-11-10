@@ -1,33 +1,14 @@
-import dayjs from 'dayjs'
 import { ChevronLeft, X } from 'lucide-react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { AdvisorItemSource, AdvisorSeverity } from 'state/advisor-state'
 import { Badge } from 'ui'
-import { getAdvisorItemDisplayTitle } from './AdvisorDetail'
-
-export type AdvisorItem = {
-  id: string
-  title: string
-  severity: AdvisorSeverity
-  createdAt?: number
-  tab: 'security' | 'performance' | 'messages'
-  source: AdvisorItemSource
-  original: Lint | Notification
-}
-
-export const severityBadgeVariants: Record<AdvisorSeverity, 'destructive' | 'warning' | 'default'> =
-  {
-    critical: 'destructive',
-    warning: 'warning',
-    info: 'default',
-  }
-
-export const severityLabels: Record<AdvisorSeverity, string> = {
-  critical: 'Critical',
-  warning: 'Warning',
-  info: 'Info',
-}
+import type { AdvisorItem } from './AdvisorPanel.types'
+import {
+  formatItemDate,
+  getAdvisorItemDisplayTitle,
+  severityBadgeVariants,
+  severityLabels,
+} from './AdvisorPanel.utils'
 
 interface AdvisorPanelHeaderProps {
   selectedItem: AdvisorItem | undefined
@@ -52,13 +33,7 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
           <span className="heading-default">{displayTitle}</span>
           {selectedItem?.createdAt && (
             <span className="text-xs text-foreground-light capitalize-sentence">
-              {(() => {
-                const insertedAt = selectedItem.createdAt
-                const daysFromNow = dayjs().diff(dayjs(insertedAt), 'day')
-                const formattedTimeFromNow = dayjs(insertedAt).fromNow()
-                const formattedInsertedAt = dayjs(insertedAt).format('MMM DD, YYYY')
-                return daysFromNow > 1 ? formattedInsertedAt : formattedTimeFromNow
-              })()}
+              {formatItemDate(selectedItem.createdAt)}
             </span>
           )}
         </div>

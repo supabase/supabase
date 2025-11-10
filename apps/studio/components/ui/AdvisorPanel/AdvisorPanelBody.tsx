@@ -1,13 +1,17 @@
-import { AlertTriangle, ChevronRight, Gauge, Inbox, Shield } from 'lucide-react'
+import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
 
-import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
 import { Notification } from 'data/notifications/notifications-v2-query'
 import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { formatItemDate } from './AdvisorPanel.utils'
-import { AdvisorItem } from './AdvisorPanelHeader'
+import type { AdvisorItem } from './AdvisorPanel.types'
+import {
+  formatItemDate,
+  getAdvisorItemDisplayTitle,
+  severityColorClasses,
+  tabIconMap,
+} from './AdvisorPanel.utils'
 import { EmptyAdvisor } from './EmptyAdvisor'
 
 const NoProjectNotice = () => {
@@ -22,18 +26,6 @@ const NoProjectNotice = () => {
       </div>
     </div>
   )
-}
-
-const tabIconMap: Record<Exclude<AdvisorTab, 'all'>, React.ElementType> = {
-  security: Shield,
-  performance: Gauge,
-  messages: Inbox,
-}
-
-const severityColorClasses: Record<AdvisorSeverity, string> = {
-  critical: 'text-destructive',
-  warning: 'text-warning',
-  info: 'text-foreground-light',
 }
 
 interface AdvisorPanelBodyProps {
@@ -98,18 +90,15 @@ export const AdvisorPanelBody = ({
     <>
       <div className="flex flex-col">
         {filteredItems.map((item) => {
-          const SeverityIcon = tabIconMap[item.tab]
+          const SeverityIcon = tabIconMap[item.tab as Exclude<AdvisorTab, 'all'>]
           const severityClass = severityColorClasses[item.severity]
           const isNotification = item.source === 'notification'
           const notification = isNotification ? (item.original as Notification) : null
           const isUnread = notification?.status === 'new'
           const lint = !isNotification ? (item.original as Lint) : null
 
-          // For lint items, get issue type title from lintInfoMap
-          const issueTypeTitle = lint && lintInfoMap.find((info) => info.name === lint.name)?.title
-
           // Primary text: issue type for lint items, title for notifications
-          const primaryText = issueTypeTitle || item.title.replace(/[`\\]/g, '')
+          const primaryText = getAdvisorItemDisplayTitle(item)
 
           // Secondary text: entity for lint items when no date, date for notifications
           const hasDate = !!item.createdAt

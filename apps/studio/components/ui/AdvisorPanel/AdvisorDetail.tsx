@@ -1,18 +1,9 @@
-import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import LintDetail from 'components/interfaces/Linter/LintDetail'
 import { Lint } from 'data/lint/lint-query'
 import { Notification } from 'data/notifications/notifications-v2-query'
 import { noop } from 'lodash'
-import { AdvisorItem } from './AdvisorPanelHeader'
+import type { AdvisorItem } from './AdvisorPanel.types'
 import { NotificationDetail } from './NotificationDetail'
-
-export const getAdvisorItemDisplayTitle = (item: AdvisorItem): string => {
-  if (item.source === 'lint') {
-    const lint = item.original as Lint
-    return lintInfoMap.find((info) => info.name === lint.name)?.title || item.title.replace(/[`\\]/g, '')
-  }
-  return item.title.replace(/[`\\]/g, '')
-}
 
 interface AdvisorDetailProps {
   item: AdvisorItem
