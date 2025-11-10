@@ -23,6 +23,8 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
   const { data: wrapperInstance } = useAnalyticsBucketWrapperInstance({ bucketId: bucketName })
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
 
+  if (!wrapperInstance) return null
+
   return (
     <ScaffoldSection isFullWidth>
       <ScaffoldHeader className="flex flex-row justify-between items-end gap-x-8">
