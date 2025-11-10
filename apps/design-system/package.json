@@ -66,9 +66,5 @@
     "tsx": "catalog:",
     "typescript": "catalog:",
     "unist-builder": "3.0.0"
-  },
-  "overrides": {
-  "react-is": "^19.0.0-rc-69d4b800-20241021",
-  "recharts": "catalog:"
-}
+  }
 }
