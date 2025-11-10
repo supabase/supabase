@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
 
 export type PgbouncerStatusVariables = {
@@ -30,7 +30,7 @@ export const usePgbouncerStatusQuery = <TData = PgbouncerStatusData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<PgbouncerStatusData, PgbouncerStatusError, TData> = {}
+  }: UseCustomQueryOptions<PgbouncerStatusData, PgbouncerStatusError, TData> = {}
 ) =>
   useQuery<PgbouncerStatusData, PgbouncerStatusError, TData>({
     queryKey: databaseKeys.pgbouncerStatus(projectRef),

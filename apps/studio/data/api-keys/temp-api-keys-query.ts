@@ -1,7 +1,7 @@
-import { type UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { apiKeysKeys } from './keys'
 
 interface getTemporaryAPIKeyVariables {
@@ -36,7 +36,10 @@ export type TemporaryAPIKeyData = Awaited<ReturnType<typeof getTemporaryAPIKey>>
 
 export const useTemporaryAPIKeyQuery = <TData = TemporaryAPIKeyData>(
   { projectRef, expiry = 300 }: getTemporaryAPIKeyVariables,
-  { enabled = true, ...options }: UseQueryOptions<TemporaryAPIKeyData, ResponseError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<TemporaryAPIKeyData, ResponseError, TData> = {}
 ) => {
   return useQuery<TemporaryAPIKeyData, ResponseError, TData>({
     queryKey: apiKeysKeys.temporary(projectRef),

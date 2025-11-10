@@ -58,13 +58,13 @@ The design system _references_ components rather than housing them. That’s an 
 With that out of the way, there are several parts of this design system that need to be manually updated after components have been added or removed (from documentation). These include:
 
 - `config/docs.ts`: list of components in the sidebar
-- `content/docs`: where the actual component documentation `.mdx` file lives
+- `content/docs`: the actual component documentation
 - `registry/examples.ts`: list of example components
-- `registry/default/example`: where the actual example component(s) live
-- `registry/charts.ts`: Chart components
-- `registry/fragments.ts`: Fragment components
+- `registry/default/example`: the actual example components
+- `registry/charts.ts`: chart components
+- `registry/fragments.ts`: fragment components
 
-You will need to rebuild the design system’s registry each time a new example component is added. In other words: whenever a new file enters `registry`, it needs to be rebuilt. You can do that via:
+You may need to rebuild the design system’s registry. You can do that via:
 
 ```bash
 cd apps/design-system

@@ -67,6 +67,10 @@ export const EditorPanel = () => {
     LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
     true
   )
+  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
+    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
+    true
+  )
 
   const currentValue = value || ''
 
@@ -294,6 +298,7 @@ export const EditorPanel = () => {
             executeQuery={onExecuteSql}
             onClose={handleClosePanel}
             closeShortcutEnabled={isInlineEditorHotkeyEnabled}
+            openAIAssistantShortcutEnabled={isAIAssistantHotkeyEnabled}
           />
         </div>
 

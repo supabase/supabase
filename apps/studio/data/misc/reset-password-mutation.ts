@@ -1,11 +1,9 @@
-import * as Sentry from '@sentry/nextjs'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
-
-const WHITELIST_ERRORS = ['email must be an email']
+import { captureCriticalError } from 'lib/error-reporting'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type ResetPasswordVariables = {
   email: string
@@ -30,7 +28,7 @@ export const useResetPasswordMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ResetPasswordData, ResponseError, ResetPasswordVariables>,
+  UseCustomMutationOptions<ResetPasswordData, ResponseError, ResetPasswordVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<ResetPasswordData, ResponseError, ResetPasswordVariables>({
@@ -44,9 +42,7 @@ export const useResetPasswordMutation = ({
       } else {
         onError(data, variables, context)
       }
-      if (!WHITELIST_ERRORS.some((error) => data.message.includes(error))) {
-        Sentry.captureMessage('[CRITICAL] Failed to send reset password email: ' + data.message)
-      }
+      captureCriticalError(data, 'send reset password email')
     },
     ...options,
   })

@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainReverifyVariables = {
@@ -25,7 +25,7 @@ export const useCustomDomainReverifyMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CustomDomainReverifyData, ResponseError, CustomDomainReverifyVariables>,
+  UseCustomMutationOptions<CustomDomainReverifyData, ResponseError, CustomDomainReverifyVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

@@ -1,4 +1,4 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 import { getUnifiedLogsQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import {
@@ -6,7 +6,7 @@ import {
   QuerySearchParamsType,
 } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { logsKeys } from './keys'
 
 const LOGS_PAGE_LIMIT = 50
@@ -159,7 +159,7 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<UnifiedLogsData, UnifiedLogsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<UnifiedLogsData, UnifiedLogsError, TData> = {}
 ) => {
   return useInfiniteQuery<UnifiedLogsData, UnifiedLogsError, TData>({
     queryKey: logsKeys.unifiedLogsInfinite(projectRef, search),
