@@ -1,4 +1,7 @@
-import { ReplicationPipelineStatusData } from 'data/etl/pipeline-status-query'
+import {
+  ReplicationPipelineStatus,
+  ReplicationPipelineStatusData,
+} from 'data/etl/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { PipelineStatusName } from './Replication.constants'
 
@@ -61,7 +64,7 @@ const PIPELINE_STATE_MESSAGES = {
   stopping: {
     title: 'Pipeline stopping',
     message: 'Stopping replication. Table replication will be paused once stopped',
-    badge: 'Starting',
+    badge: 'Stopping',
   },
   running: {
     title: 'Pipeline running',
@@ -81,8 +84,8 @@ const PIPELINE_STATE_MESSAGES = {
 } as const
 
 export const getPipelineStateMessages = (
-  requestStatus: PipelineStatusRequestStatus | undefined,
-  statusName: string | undefined
+  requestStatus?: PipelineStatusRequestStatus,
+  statusName?: ReplicationPipelineStatus
 ) => {
   // Reflect optimistic request intent immediately after click
   if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
