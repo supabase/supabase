@@ -7,10 +7,9 @@ import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import type { AdvisorItem } from './AdvisorPanel.types'
 
 export const formatItemDate = (timestamp: number): string => {
-  const insertedAt = timestamp
-  const daysFromNow = dayjs().diff(dayjs(insertedAt), 'day')
-  const formattedTimeFromNow = dayjs(insertedAt).fromNow()
-  const formattedInsertedAt = dayjs(insertedAt).format('MMM DD, YYYY')
+  const daysFromNow = dayjs().diff(dayjs(timestamp), 'day')
+  const formattedTimeFromNow = dayjs(timestamp).fromNow()
+  const formattedInsertedAt = dayjs(timestamp).format('MMM DD, YYYY')
   return daysFromNow > 1 ? formattedInsertedAt : formattedTimeFromNow
 }
 
