@@ -326,7 +326,7 @@ export const ForeignKeySelector = ({
                       </Alert_Shadcn_>
                     )}
                     {fk.columns.map((_, idx) => (
-                      <Fragment key={`${uuidv4()}`}>
+                      <Fragment key={`${fk.schema}-${fk.table}-${idx}`}>
                         <div className="col-span-4">
                           <Listbox
                             id="column"
