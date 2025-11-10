@@ -6,6 +6,7 @@ import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/Si
 import { executeSql } from 'data/sql/execute-sql-query'
 import { DATE_FORMAT } from 'lib/constants'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+import { validateQueueName } from './database-queues-utils'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueVariables = {
@@ -34,6 +35,8 @@ export async function getDatabaseQueue({
   status,
 }: DatabaseQueueVariables & { afterTimestamp: string }) {
   if (!projectRef) throw new Error('Project ref is required')
+  
+  validateQueueName(queueName)
 
   if (status.length === 0) {
     return []

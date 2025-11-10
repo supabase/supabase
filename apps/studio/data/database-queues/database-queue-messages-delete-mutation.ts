@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { validateQueueName } from './database-queues-utils'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueMessageDeleteVariables = {
@@ -18,6 +19,8 @@ export async function deleteDatabaseQueueMessage({
   queueName,
   messageId,
 }: DatabaseQueueMessageDeleteVariables) {
+  validateQueueName(queueName)
+  
   const { result } = await executeSql({
     projectRef,
     connectionString,

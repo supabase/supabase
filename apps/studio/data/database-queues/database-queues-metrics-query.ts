@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { validateQueueName } from './database-queues-utils'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesMetricsVariables = {
@@ -15,15 +16,20 @@ export type PostgresQueueMetric = {
   method: 'estimated' | 'precise'
 }
 
-const preciseMetricsSqlQuery = (queueName: string) => `
+const preciseMetricsSqlQuery = (queueName: string) => {
+  validateQueueName(queueName)
+  return `
   set local statement_timeout = '1s';
   SELECT
     COUNT(*) AS row_count
   FROM
     "pgmq"."q_${queueName}";
 `
+}
 
-const estimateMetricsSqlQuery = (queueName: string) => `
+const estimateMetricsSqlQuery = (queueName: string) => {
+  validateQueueName(queueName)
+  return `
   select
   reltuples::bigint as estimated_rows
     from
@@ -32,6 +38,7 @@ const estimateMetricsSqlQuery = (queueName: string) => `
   relname = 'q_${queueName}'
   and relnamespace = 'pgmq'::regnamespace;
 `
+}
 
 export async function getDatabaseQueuesMetrics({
   projectRef,
