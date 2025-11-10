@@ -9,6 +9,7 @@ import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   formatItemDate,
   getAdvisorItemDisplayTitle,
+  getLintEntityString,
   severityBadgeVariants,
   severityColorClasses,
   severityLabels,
@@ -104,12 +105,7 @@ export const AdvisorPanelBody = ({
 
           // Secondary text: entity for lint items when no date, date for notifications
           const hasDate = !!item.createdAt
-          const entityString =
-            lint?.metadata &&
-            (lint.metadata.entity ||
-              (lint.metadata.schema &&
-                lint.metadata.name &&
-                `${lint.metadata.schema}.${lint.metadata.name}`))
+          const entityString = getLintEntityString(lint)
 
           return (
             <div key={`${item.source}-${item.id}`} className="border-b">

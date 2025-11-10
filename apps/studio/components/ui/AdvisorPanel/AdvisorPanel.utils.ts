@@ -48,3 +48,19 @@ export const severityLabels: Record<AdvisorSeverity, string> = {
   warning: 'Warning',
   info: 'Info',
 }
+
+export const getLintEntityString = (lint: Lint | null): string | undefined => {
+  if (!lint?.metadata) {
+    return undefined
+  }
+
+  if (lint.metadata.entity) {
+    return lint.metadata.entity
+  }
+
+  if (lint.metadata.schema && lint.metadata.name) {
+    return `${lint.metadata.schema}.${lint.metadata.name}`
+  }
+
+  return undefined
+}
