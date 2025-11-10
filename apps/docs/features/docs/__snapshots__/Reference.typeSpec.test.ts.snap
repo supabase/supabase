@@ -2403,7 +2403,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -2961,7 +2978,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -3732,7 +3766,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -4286,7 +4337,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -4867,7 +4935,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -5723,7 +5808,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -6429,6 +6531,17 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "name": "string"
                   },
                   "isOptional": true
+                },
+                {
+                  "name": "throwOnError",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "If there is an error with the query, throwOnError will reject the promise by\\nthrowing the error instead of returning it as part of a successful response."
+                  }
                 },
                 {
                   "name": "url",
@@ -7166,7 +7279,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -8482,7 +8612,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -9087,7 +9234,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -9682,7 +9846,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -10267,7 +10448,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -11279,7 +11477,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -11763,7 +11978,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -12429,7 +12661,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -12913,7 +13162,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -13606,7 +13872,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -14241,7 +14524,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -14716,7 +15016,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -15401,8 +15718,220 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           {
                             "name": "claims",
                             "type": {
-                              "type": "nameOnly",
-                              "name": "JwtPayload"
+                              "type": "object",
+                              "name": "JwtPayload",
+                              "properties": [
+                                {
+                                  "name": "aal",
+                                  "type": {
+                                    "type": "union",
+                                    "name": "AuthenticatorAssuranceLevels",
+                                    "subTypes": [
+                                      {
+                                        "type": "literal",
+                                        "value": "aal1"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "aal2"
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "name": "amr",
+                                  "type": {
+                                    "type": "array",
+                                    "elemType": {
+                                      "type": "object",
+                                      "name": "AMREntry",
+                                      "properties": [
+                                        {
+                                          "name": "method",
+                                          "type": {
+                                            "type": "union",
+                                            "name": "AMRMethod",
+                                            "subTypes": [
+                                              {
+                                                "type": "nameOnly",
+                                                "name": "['number']"
+                                              },
+                                              null
+                                            ]
+                                          },
+                                          "comment": {
+                                            "shortText": "Authentication method name."
+                                          }
+                                        },
+                                        {
+                                          "name": "timestamp",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "number"
+                                          },
+                                          "comment": {
+                                            "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "app_metadata",
+                                  "type": {
+                                    "type": "object",
+                                    "name": "UserAppMetadata",
+                                    "properties": [
+                                      {
+                                        "name": "provider",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "aud",
+                                  "type": {
+                                    "type": "union",
+                                    "subTypes": [
+                                      {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      {
+                                        "type": "array",
+                                        "elemType": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "name": "email",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "exp",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  }
+                                },
+                                {
+                                  "name": "iat",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  }
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "iss",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "jti",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "nbf",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "phone",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "ref",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "role",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "session_id",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "sub",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "user_metadata",
+                                  "type": {
+                                    "type": "object",
+                                    "name": "UserMetadata",
+                                    "properties": []
+                                  },
+                                  "isOptional": true
+                                }
+                              ]
                             }
                           },
                           {
@@ -15651,7 +16180,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -16232,7 +16778,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -16891,6 +17454,19 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Initializes the client session either from the url or from storage.\\nThis method is automatically called when instantiating the client, but should also be called\\nmanually when checking for an error from an auth redirect (oauth, magiclink, password recovery, etc)."
+        }
+      },
+      "@supabase/supabase-js.GoTrueClient.isThrowOnErrorEnabled": {
+        "name": "@supabase/supabase-js.GoTrueClient.isThrowOnErrorEnabled",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          }
+        },
+        "comment": {
+          "shortText": "Returns whether error throwing mode is enabled for this client."
         }
       },
       "@supabase/supabase-js.GoTrueClient.linkIdentity": {
@@ -17563,7 +18139,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -18038,7 +18631,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -18710,7 +19320,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -19359,7 +19986,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                           "type": "intrinsic",
                                                           "name": "string"
                                                         },
-                                                        "isOptional": true
+                                                        "isOptional": true,
+                                                        "comment": {
+                                                          "shortText": "The first provider that the user used to sign up with."
+                                                        }
+                                                      },
+                                                      {
+                                                        "name": "providers",
+                                                        "type": {
+                                                          "type": "array",
+                                                          "elemType": {
+                                                            "type": "intrinsic",
+                                                            "name": "string"
+                                                          }
+                                                        },
+                                                        "isOptional": true,
+                                                        "comment": {
+                                                          "shortText": "A list of all providers that the user has linked to their account."
+                                                        }
                                                       }
                                                     ]
                                                   }
@@ -20033,7 +20677,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -20686,7 +21347,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                               "type": "intrinsic",
                                                               "name": "string"
                                                             },
-                                                            "isOptional": true
+                                                            "isOptional": true,
+                                                            "comment": {
+                                                              "shortText": "The first provider that the user used to sign up with."
+                                                            }
+                                                          },
+                                                          {
+                                                            "name": "providers",
+                                                            "type": {
+                                                              "type": "array",
+                                                              "elemType": {
+                                                                "type": "intrinsic",
+                                                                "name": "string"
+                                                              }
+                                                            },
+                                                            "isOptional": true,
+                                                            "comment": {
+                                                              "shortText": "A list of all providers that the user has linked to their account."
+                                                            }
                                                           }
                                                         ]
                                                       }
@@ -21333,7 +22011,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -21817,7 +22512,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -22483,7 +23195,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -22967,7 +23696,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -23962,7 +24708,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -24446,7 +25209,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -25134,7 +25914,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -25618,7 +26415,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -26355,7 +27169,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -26830,7 +27661,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -28179,7 +29027,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -28654,7 +29519,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -29888,7 +30770,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -30363,7 +31262,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -31080,7 +31996,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -31564,7 +32497,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -32358,7 +33308,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -33223,7 +34190,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -33707,7 +34691,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -36221,6 +37222,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "isOptional": true
                 },
                 {
+                  "name": "vsn",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true
+                },
+                {
                   "name": "worker",
                   "type": {
                     "type": "intrinsic",
@@ -36957,6 +37966,17 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         }
                       },
                       {
+                        "name": "throwOnError",
+                        "type": {
+                          "type": "nameOnly",
+                          "name": "SupabaseAuthClientOptions['throwOnError']"
+                        },
+                        "isOptional": true,
+                        "comment": {
+                          "shortText": "If there is an error with the query, throwOnError will reject the promise by\\nthrowing the error instead of returning it as part of a successful response."
+                        }
+                      },
+                      {
                         "name": "userStorage",
                         "type": {
                           "type": "nameOnly",
@@ -37199,6 +38219,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           "type": "object",
                           "name": "WebSocketLikeConstructor",
                           "properties": []
+                        },
+                        "isOptional": true
+                      },
+                      {
+                        "name": "vsn",
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "string"
                         },
                         "isOptional": true
                       },
@@ -40287,7 +41315,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -40844,7 +41889,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -41615,7 +42677,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -42109,7 +43188,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Generates email links and OTPs. This will not send links or OTPs to the end user. This function is for custom admin functionality."
+          "shortText": "Generates email links and OTPs to be sent via a custom email provider."
         }
       },
       "@supabase/auth-js.GoTrueAdminApi.getUserById": {
@@ -42169,7 +43248,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -42749,7 +43845,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -43604,7 +44717,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -44310,6 +45440,17 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "name": "string"
                   },
                   "isOptional": true
+                },
+                {
+                  "name": "throwOnError",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "If there is an error with the query, throwOnError will reject the promise by\\nthrowing the error instead of returning it as part of a successful response."
+                  }
                 },
                 {
                   "name": "url",
@@ -45047,7 +46188,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -46363,7 +47521,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -46968,7 +48143,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -47563,7 +48755,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -48148,7 +49357,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -49148,7 +50374,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -49623,7 +50866,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -50307,8 +51567,220 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           {
                             "name": "claims",
                             "type": {
-                              "type": "nameOnly",
-                              "name": "JwtPayload"
+                              "type": "object",
+                              "name": "JwtPayload",
+                              "properties": [
+                                {
+                                  "name": "aal",
+                                  "type": {
+                                    "type": "union",
+                                    "name": "AuthenticatorAssuranceLevels",
+                                    "subTypes": [
+                                      {
+                                        "type": "literal",
+                                        "value": "aal1"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "aal2"
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "name": "amr",
+                                  "type": {
+                                    "type": "array",
+                                    "elemType": {
+                                      "type": "object",
+                                      "name": "AMREntry",
+                                      "properties": [
+                                        {
+                                          "name": "method",
+                                          "type": {
+                                            "type": "union",
+                                            "name": "AMRMethod",
+                                            "subTypes": [
+                                              {
+                                                "type": "nameOnly",
+                                                "name": "['number']"
+                                              },
+                                              null
+                                            ]
+                                          },
+                                          "comment": {
+                                            "shortText": "Authentication method name."
+                                          }
+                                        },
+                                        {
+                                          "name": "timestamp",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "number"
+                                          },
+                                          "comment": {
+                                            "shortText": "Timestamp when the method was successfully used. Represents number of\\nseconds since 1st January 1970 (UNIX epoch) in UTC."
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "app_metadata",
+                                  "type": {
+                                    "type": "object",
+                                    "name": "UserAppMetadata",
+                                    "properties": [
+                                      {
+                                        "name": "provider",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "aud",
+                                  "type": {
+                                    "type": "union",
+                                    "subTypes": [
+                                      {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      {
+                                        "type": "array",
+                                        "elemType": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "name": "email",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "exp",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  }
+                                },
+                                {
+                                  "name": "iat",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  }
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "iss",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "jti",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "nbf",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "phone",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "ref",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "role",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "session_id",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "sub",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "user_metadata",
+                                  "type": {
+                                    "type": "object",
+                                    "name": "UserMetadata",
+                                    "properties": []
+                                  },
+                                  "isOptional": true
+                                }
+                              ]
                             }
                           },
                           {
@@ -50557,7 +52029,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -51138,7 +52627,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -51797,6 +53303,19 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Initializes the client session either from the url or from storage.\\nThis method is automatically called when instantiating the client, but should also be called\\nmanually when checking for an error from an auth redirect (oauth, magiclink, password recovery, etc)."
+        }
+      },
+      "@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled": {
+        "name": "@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          }
+        },
+        "comment": {
+          "shortText": "Returns whether error throwing mode is enabled for this client."
         }
       },
       "@supabase/auth-js.GoTrueClient.linkIdentity": {
@@ -52469,7 +53988,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -52944,7 +54480,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -53616,7 +55169,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -54265,7 +55835,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                           "type": "intrinsic",
                                                           "name": "string"
                                                         },
-                                                        "isOptional": true
+                                                        "isOptional": true,
+                                                        "comment": {
+                                                          "shortText": "The first provider that the user used to sign up with."
+                                                        }
+                                                      },
+                                                      {
+                                                        "name": "providers",
+                                                        "type": {
+                                                          "type": "array",
+                                                          "elemType": {
+                                                            "type": "intrinsic",
+                                                            "name": "string"
+                                                          }
+                                                        },
+                                                        "isOptional": true,
+                                                        "comment": {
+                                                          "shortText": "A list of all providers that the user has linked to their account."
+                                                        }
                                                       }
                                                     ]
                                                   }
@@ -54939,7 +56526,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -55592,7 +57196,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                               "type": "intrinsic",
                                                               "name": "string"
                                                             },
-                                                            "isOptional": true
+                                                            "isOptional": true,
+                                                            "comment": {
+                                                              "shortText": "The first provider that the user used to sign up with."
+                                                            }
+                                                          },
+                                                          {
+                                                            "name": "providers",
+                                                            "type": {
+                                                              "type": "array",
+                                                              "elemType": {
+                                                                "type": "intrinsic",
+                                                                "name": "string"
+                                                              }
+                                                            },
+                                                            "isOptional": true,
+                                                            "comment": {
+                                                              "shortText": "A list of all providers that the user has linked to their account."
+                                                            }
                                                           }
                                                         ]
                                                       }
@@ -56239,7 +57860,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -56723,7 +58361,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -57389,7 +59044,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -57873,7 +59545,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -58867,7 +60556,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -59351,7 +61057,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -60039,7 +61762,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -60523,7 +62263,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -61260,7 +63017,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -61735,7 +63509,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -63084,7 +64875,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -63559,7 +65367,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -64793,7 +66618,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": "intrinsic",
                                                 "name": "string"
                                               },
-                                              "isOptional": true
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "The first provider that the user used to sign up with."
+                                              }
+                                            },
+                                            {
+                                              "name": "providers",
+                                              "type": {
+                                                "type": "array",
+                                                "elemType": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              "isOptional": true,
+                                              "comment": {
+                                                "shortText": "A list of all providers that the user has linked to their account."
+                                              }
                                             }
                                           ]
                                         }
@@ -65268,7 +67110,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -65984,7 +67843,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -66468,7 +68344,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -67261,7 +69154,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         },
-                                        "isOptional": true
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "The first provider that the user used to sign up with."
+                                        }
+                                      },
+                                      {
+                                        "name": "providers",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        "isOptional": true,
+                                        "comment": {
+                                          "shortText": "A list of all providers that the user has linked to their account."
+                                        }
                                       }
                                     ]
                                   }
@@ -68126,7 +70036,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                     "type": "intrinsic",
                                                     "name": "string"
                                                   },
-                                                  "isOptional": true
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "The first provider that the user used to sign up with."
+                                                  }
+                                                },
+                                                {
+                                                  "name": "providers",
+                                                  "type": {
+                                                    "type": "array",
+                                                    "elemType": {
+                                                      "type": "intrinsic",
+                                                      "name": "string"
+                                                    }
+                                                  },
+                                                  "isOptional": true,
+                                                  "comment": {
+                                                    "shortText": "A list of all providers that the user has linked to their account."
+                                                  }
                                                 }
                                               ]
                                             }
@@ -68610,7 +70537,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             },
-                                            "isOptional": true
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "The first provider that the user used to sign up with."
+                                            }
+                                          },
+                                          {
+                                            "name": "providers",
+                                            "type": {
+                                              "type": "array",
+                                              "elemType": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              }
+                                            },
+                                            "isOptional": true,
+                                            "comment": {
+                                              "shortText": "A list of all providers that the user has linked to their account."
+                                            }
                                           }
                                         ]
                                       }
@@ -75342,11 +77286,11 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "subTypes": [
                       {
                         "type": "literal",
-                        "value": "presence"
+                        "value": "broadcast"
                       },
                       {
                         "type": "literal",
-                        "value": "broadcast"
+                        "value": "presence"
                       },
                       {
                         "type": "literal",
@@ -75813,6 +77757,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "type": "object",
                     "name": "WebSocketLikeConstructor",
                     "properties": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "vsn",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
                   },
                   "isOptional": true
                 },
@@ -86068,6 +88020,17 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "isOptional": true,
                   "comment": {
                     "shortText": "The AbortSignal to use for the request."
+                  }
+                },
+                {
+                  "name": "timeout",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "number"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The timeout for the request in milliseconds.\\nIf the function takes longer than this, the request will be aborted."
                   }
                 }
               ]
