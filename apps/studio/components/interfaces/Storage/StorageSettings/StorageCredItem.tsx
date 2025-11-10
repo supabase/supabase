@@ -53,7 +53,9 @@ export const StorageCredItem = ({
       <TableCell>
         <Input readOnly copy value={access_key} className="font-mono" />
       </TableCell>
-      <TableCell className="text-foreground-lighter">{daysSince(created_at)}</TableCell>
+      <TableCell className="text-foreground-lighter whitespace-nowrap">
+        {daysSince(created_at)}
+      </TableCell>
       <TableCell className="text-right">
         {canRemoveAccessKey && (
           <DropdownMenu>

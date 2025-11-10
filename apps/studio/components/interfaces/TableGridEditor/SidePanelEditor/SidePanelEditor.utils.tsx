@@ -374,7 +374,7 @@ export const updateColumn = async ({
 export const duplicateTable = async (
   projectRef: string,
   connectionString: string | undefined | null,
-  payload: { name: string; comment?: string },
+  payload: { name: string; comment?: string | null },
   metadata: {
     duplicateTable: RetrieveTableResult
     isRLSEnabled: boolean
@@ -470,7 +470,7 @@ export const createTable = async ({
   payload: {
     name: string
     schema: string
-    comment?: string | undefined
+    comment?: string | null
   }
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]

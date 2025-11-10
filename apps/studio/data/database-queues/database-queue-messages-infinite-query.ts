@@ -2,6 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { last } from 'lodash'
 
+import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { DATE_FORMAT } from 'lib/constants'
@@ -34,6 +35,11 @@ export async function getDatabaseQueue({
   status,
 }: DatabaseQueueVariables & { afterTimestamp: string }) {
   if (!projectRef) throw new Error('Project ref is required')
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
 
   if (status.length === 0) {
     return []

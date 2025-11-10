@@ -26,6 +26,7 @@ const rowKeyGetter = (row: SupaRow) => {
 interface IGrid extends GridProps {
   rows: any[]
   error: any
+  isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
   isError: boolean
@@ -45,6 +46,7 @@ export const Grid = memo(
         rowClass,
         rows,
         error,
+        isDisabled = false,
         isLoading,
         isSuccess,
         isError,
@@ -154,7 +156,7 @@ export const Grid = memo(
               onDragLeave={onDragOver}
               onDrop={onFileDrop}
             >
-              {isLoading && <GenericSkeletonLoader />}
+              {isLoading && !isDisabled && <GenericSkeletonLoader />}
 
               {isError && <GridError error={error} />}
 
