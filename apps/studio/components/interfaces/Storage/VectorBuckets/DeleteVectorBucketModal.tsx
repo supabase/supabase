@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
@@ -28,6 +28,8 @@ export const DeleteVectorBucketModal = ({
   onSuccess,
 }: DeleteVectorBucketModalProps) => {
   const { data: project } = useSelectedProjectQuery()
+  // Has to be a state because we're using a promise.all to delete the indexes
+  const [isDeletingIndexes, setIsDeletingIndexes] = useState(false)
 
   const { data } = useFDWsQuery(
     {
@@ -69,17 +71,19 @@ export const DeleteVectorBucketModal = ({
     },
   })
 
-  const { data: { indexes = [] } = {}, isLoading: isDeletingIndexes } =
-    useVectorBucketsIndexesQuery({
+  const { data: { indexes = [] } = {}, isLoading: isLoadingIndexes } = useVectorBucketsIndexesQuery(
+    {
       projectRef: project?.ref,
       vectorBucketName: bucketName,
-    })
+    }
+  )
 
   const onConfirmDelete = async () => {
     if (!project?.ref) return console.error('Project ref is required')
     if (!bucketName) return console.error('No bucket is selected')
 
     try {
+      setIsDeletingIndexes(true)
       // delete all indexes from the bucket first
       const promises = indexes.map((index) =>
         deleteVectorBucketIndex({
@@ -95,6 +99,8 @@ export const DeleteVectorBucketModal = ({
       toast.error(
         `Failed to delete bucket: ${error instanceof Error ? error.message : 'Unknown error'}`
       )
+    } finally {
+      setIsDeletingIndexes(false)
     }
   }
 
@@ -104,7 +110,7 @@ export const DeleteVectorBucketModal = ({
       size="medium"
       variant="destructive"
       title={`Confirm deletion of ${bucketName}`}
-      loading={isDeletingBucket || isDeletingIndexes}
+      loading={isDeletingBucket || isDeletingIndexes || isLoadingIndexes}
       confirmPlaceholder="Type bucket name"
       confirmString={bucketName ?? ''}
       confirmLabel="Delete bucket"
