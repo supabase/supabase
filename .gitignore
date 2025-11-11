@@ -150,3 +150,9 @@ gcloud.json
 **/.sentryclirc
 
 keys.json
+
+# Contentlayer
+.contentlayer
+
+# temporary files
+_tmp_*
