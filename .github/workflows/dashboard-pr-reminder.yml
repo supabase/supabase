@@ -116,79 +116,72 @@ jobs:
 
       - name: Send Slack notification
         if: fromJSON(steps.find-prs.outputs.count) > 0
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DASHBOARD_WEBHOOK_URL }}
-          STALE_PRS: ${{ steps.find-prs.outputs.count }}
-        run: |
-          # Parse the PR data
-          PR_DATA='${{ steps.find-prs.outputs.stale_prs }}'
+        with:
+          script: |
+            const stalePRs = JSON.parse('${{ steps.find-prs.outputs.stale_prs }}');
+            const count = ${{ steps.find-prs.outputs.count }};
 
-          # Build Slack message blocks
-          cat > slack-message.json << 'EOF'
-          {
-            "text": "Dashboard PRs needing attention",
-            "blocks": [
-              {
-                "type": "header",
-                "text": {
-                  "type": "plain_text",
-                  "text": "🔔 Dashboard PRs Older Than 24 Hours"
+            // Build PR blocks
+            const prBlocks = stalePRs.map(pr => {
+              // Format age display
+              const remainingHours = pr.hoursOld % 24;
+              const ageText = pr.daysOld > 0 
+                ? `${pr.daysOld}d ${remainingHours}h`
+                : `${pr.hoursOld}h`;
+              
+              return {
+                type: "section",
+                text: {
+                  type: "mrkdwn",
+                  text: `*<${pr.url}|#${pr.number}: ${pr.title}>*\n👤 @${pr.author} • ⏰ ${ageText} old • 📁 ${pr.fileCount} Dashboard files`
                 }
+              };
+            });
+
+            // Build complete Slack message
+            const slackMessage = {
+              text: "Dashboard PRs needing attention",
+              blocks: [
+                {
+                  type: "header",
+                  text: {
+                    type: "plain_text",
+                    text: "🔔 Dashboard PRs Older Than 24 Hours"
+                  }
+                },
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: `There are *${count}* open PRs affecting \`/apps/studio/\` that are older than 24 hours:`
+                  }
+                },
+                {
+                  type: "divider"
+                },
+                ...prBlocks
+              ]
+            };
+
+            // Send to Slack
+            const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+            const response = await fetch(webhookUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
               },
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "There are *${{ steps.find-prs.outputs.count }}* open PRs affecting `/apps/studio/` that are older than 24 hours:"
-                }
-              },
-              {
-                "type": "divider"
-              }
-          EOF
+              body: JSON.stringify(slackMessage)
+            });
 
-          # Add PR blocks
-          echo "$PR_DATA" | jq -c '.[]' | while read -r pr; do
-            NUMBER=$(echo "$pr" | jq -r '.number')
-            TITLE=$(echo "$pr" | jq -r '.title' | sed 's/"/\\"/g')
-            URL=$(echo "$pr" | jq -r '.url')
-            AUTHOR=$(echo "$pr" | jq -r '.author')
-            DAYS=$(echo "$pr" | jq -r '.daysOld')
-            HOURS=$(echo "$pr" | jq -r '.hoursOld')
-            FILES=$(echo "$pr" | jq -r '.fileCount')
-            
-            # Format age
-            if [ "$DAYS" -gt 0 ]; then
-              AGE="${DAYS}d ${HOURS}h"
-            else
-              AGE="${HOURS}h"
-            fi
-            
-            cat >> slack-message.json << PREOF
-          ,
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*<${URL}|#${NUMBER}: ${TITLE}>*\n👤 @${AUTHOR} • ⏰ ${AGE} old • 📁 ${FILES} Dashboard files"
-                }
-              }
-          PREOF
-          done
+            if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`Slack notification failed: ${response.status} ${response.statusText}\n${errorText}`);
+            }
 
-          # Close the JSON
-          cat >> slack-message.json << 'EOF'
-            ]
-          }
-          EOF
-
-          # Send to Slack
-          curl -X POST \
-            -H 'Content-Type: application/json' \
-            -d @slack-message.json \
-            "$SLACK_WEBHOOK_URL"
-
-          echo "Slack notification sent!"
+            console.log('✓ Slack notification sent successfully!');
 
       - name: No stale PRs found
         if: fromJSON(steps.find-prs.outputs.count) == 0
