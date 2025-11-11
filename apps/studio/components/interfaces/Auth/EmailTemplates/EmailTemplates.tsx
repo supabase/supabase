@@ -238,7 +238,7 @@ export const EmailTemplates = () => {
               </div>
             </div>
           ) : (
-            <Card>
+            <Card className="mt-12">
               <Tabs_Shadcn_ defaultValue={slugifyTitle(TEMPLATES_SCHEMAS[0].title)}>
                 <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
                   {TEMPLATES_SCHEMAS.filter(
