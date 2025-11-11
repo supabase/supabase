@@ -34,7 +34,6 @@ type NamespaceWithTablesProps = {
   sourceType: 'replication' | 'direct'
   schema: string
   tables: (FormattedWrapperTable & { id: number })[]
-  token: string
   wrapperInstance: FDW
   wrapperValues: Record<string, string>
   wrapperMeta: WrapperMeta
@@ -49,7 +48,6 @@ export const NamespaceWithTables = ({
   sourceType = 'direct',
   schema,
   tables,
-  token,
   wrapperInstance,
   wrapperValues,
   wrapperMeta,
@@ -238,7 +236,6 @@ export const NamespaceWithTables = ({
                 key={table.name}
                 table={table}
                 namespace={namespace}
-                token={token}
                 schema={displaySchema}
                 isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
                 index={index}

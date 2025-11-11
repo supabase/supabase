@@ -38,7 +38,6 @@ interface TableRowComponentProps {
   table: { id: number; name: string; isConnected: boolean }
   schema: string
   namespace: string
-  token: string
   isLoading?: boolean
 }
 
@@ -47,7 +46,6 @@ export const TableRowComponent = ({
   table,
   schema,
   namespace,
-  token,
   isLoading,
 }: TableRowComponentProps) => {
   const { ref: projectRef, bucketId } = useParams()
@@ -70,7 +68,9 @@ export const TableRowComponent = ({
   })
 
   const { mutateAsync: updateFDW } = useFDWUpdateMutation()
-  const { mutateAsync: deleteNamespaceTable } = useIcebergNamespaceTableDeleteMutation()
+  const { mutateAsync: deleteNamespaceTable } = useIcebergNamespaceTableDeleteMutation({
+    projectRef,
+  })
   const { mutateAsync: updatePublication } = useUpdatePublicationMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
@@ -184,7 +184,6 @@ export const TableRowComponent = ({
 
       const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
       await deleteNamespaceTable({
-        token,
         catalogUri: wrapperValues.catalog_uri,
         warehouse: wrapperValues.warehouse,
         namespace: namespace,

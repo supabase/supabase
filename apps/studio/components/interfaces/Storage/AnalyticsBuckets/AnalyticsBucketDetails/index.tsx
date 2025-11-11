@@ -264,7 +264,6 @@ export const AnalyticBucketDetails = () => {
                         sourceType="direct"
                         schema={schema}
                         tables={tables as any}
-                        token={token!}
                         wrapperInstance={wrapperInstance}
                         wrapperValues={wrapperValues}
                         wrapperMeta={wrapperMeta}
