@@ -36,19 +36,9 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Figma',
-          href: '/docs/figma',
           items: [],
-        },
-        {
-          title: 'Changelog',
-          href: '/docs/changelog',
-          items: [],
-        },
-        {
-          title: 'Accessibility',
           href: '/docs/ui-patterns/accessibility',
-          items: [],
+          title: 'Accessibility',
         },
       ],
     },

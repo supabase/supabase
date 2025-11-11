@@ -1,8 +1,8 @@
-import { Button } from 'ui'
-import { Plus } from 'lucide-react'
 import { BucketAdd } from 'icons'
+import { Plus } from 'lucide-react'
+import { Button } from 'ui'
 
-export default function EmptyStateInitialState() {
+export default function EmptyStateInitialStatePresentational() {
   return (
     <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-4 items-center text-center gap-1 text-balance">
       <div className="flex flex-col gap-3 items-center text-center">
