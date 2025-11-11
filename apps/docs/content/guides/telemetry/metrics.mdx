@@ -100,7 +100,7 @@ scrape_configs:
           group: "MyGroupLabel"
 ```
 
-**For Grafana Cloud users** instead of using the yaml file above, use a `Metrics Endpoint` instead:
+**For Grafana Cloud users** instead of manually configuring `prometheus.yaml`, use a `Metrics Endpoint` instead:
 
 - In the left-hand menu, select `Connections` and click `Add new connection`.
 - Search for `Metrics Endpoint` and select it.
@@ -129,11 +129,11 @@ Select `Prometheus` and enter the connection details for the Prometheus instance
 
 **Grafana Cloud users** refer to [Grafana Cloud Prometheus connection details](/docs/guides/telemetry/metrics#grafana-cloud-prometheus).
 
-Name the datasource `prometheus` (if you use a different name, you will need to modify the json file when adding the dashboard).
+Name the datasource `prometheus` (if you use a different name, you will need to modify the `dashboard.json` file when adding the dashboard).
 
 Under **Interval behavior**, set the **scraping interval** to 60s and test the data source. Once it has passed, save it.
 
-#### Grafana Cloud Prometheus connection details [#grafana-cloud-prometheus]
+#### Grafana cloud Prometheus connection details [#grafana-cloud-prometheus]
 
 - Log into your [Grafana Cloud Portal](https://grafana.com/auth/sign-in/).
 - Under `Grafana Cloud stack` click `Details`.
@@ -149,7 +149,7 @@ In the left-hand menu, select `Dashboards` and click `New`. From the drop-down, 
 Copy the raw file from our [supabase-grafana](https://raw.githubusercontent.com/supabase/supabase-grafana/refs/heads/main/grafana/dashboard.json) repository.
 
 - If your Prometheus data source is named `prometheus`, paste the contents of the file (or upload the file).
-- If your Prometheus data source is **not named `prometheus`**, find all occurences of `"uid": "prometheus"` and replace `prometheus` with your custom data source name.
+- If your Prometheus data source is **not named `prometheus`**, find all occurrences of `"uid": "prometheus"` and replace `prometheus` with your custom data source name.
 
 Click `Load` and the dashboard will load from the project specified in your Prometheus job.
 
