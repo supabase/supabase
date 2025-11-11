@@ -16,7 +16,7 @@ export async function deleteBranch({
   force,
 }: Pick<BranchDeleteVariables, 'branchRef'> & { force?: boolean }) {
   const { data, error } = await del('/v1/branches/{branch_id_or_ref}', {
-    params: { path: { branch_id_or_ref: branchRef }, query: { force: force ? 'true' : undefined } },
+    params: { path: { branch_id_or_ref: branchRef }, query: { force: force ? 'true' : 'false' } },
   })
 
   if (error) handleError(error)

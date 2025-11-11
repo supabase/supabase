@@ -99,7 +99,7 @@ const BranchesPage: NextPageWithLayout = () => {
     const [branchToDelete, force] = selectedBranchToDelete
     const { project_ref: branchRef, parent_project_ref: projectRef, persistent } = branchToDelete
     deleteBranch(
-      { branchRef, projectRef, force },
+      { branchRef, projectRef, force: force ?? false },
       {
         onSuccess: () => {
           if (branchRef === ref) {

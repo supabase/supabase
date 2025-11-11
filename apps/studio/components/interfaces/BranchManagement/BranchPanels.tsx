@@ -10,8 +10,6 @@ import Link from 'next/link'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { WorkflowLogs } from './WorkflowLogs'
 
-const BRANCH_DELETION_GRACE_PERIOD = 1 * 60 * 60 * 1000 // 1 hour
-
 interface BranchManagementSectionProps {
   header: string | ReactNode
   footer?: ReactNode
@@ -82,9 +80,7 @@ export const BranchRow = ({
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   // Deletion scheduled at is 1 hour from the deletion_scheduled_at time
-  const willBeDeletedIn = dayjs(branch.deletion_scheduled_at)
-    .add(BRANCH_DELETION_GRACE_PERIOD)
-    .diff(dayjs(), 'minutes')
+  const willBeDeletedIn = dayjs(branch.deletion_scheduled_at).diff(dayjs(), 'minutes')
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
   const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
