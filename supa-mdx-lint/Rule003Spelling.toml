@@ -181,6 +181,7 @@ allow_list = [
     "Erlang",
     "ESZip",
     "Ethereum",
+    "FastMCP",
     "Fiberplane",
     "Figma",
     "Firestore",
