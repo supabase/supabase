@@ -1,0 +1,193 @@
+name: Dashboard PR Reminder
+
+# Runs daily to check for PRs older than 24 hours that affect the Dashboard team
+# Sends notifications to #team-frontend Slack channel
+#
+# Required Secrets:
+# - SLACK_WEBHOOK_URL: Slack webhook URL for #team-frontend channel
+
+on:
+  schedule:
+    # Run daily at 9 AM UTC (adjust as needed)
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allow manual trigger for testing
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  check-dashboard-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find Dashboard PRs older than 24 hours
+        id: find-prs
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const TWENTY_FOUR_HOURS_AGO = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            const DASHBOARD_PATH = 'apps/studio/';
+
+            console.log(`Looking for PRs older than: ${TWENTY_FOUR_HOURS_AGO.toISOString()}`);
+
+            const stalePRs = [];
+            let page = 1;
+            let hasMore = true;
+
+            // Fetch PRs page by page, newest first
+            while (hasMore && page <= 10) { // Limit to 10 pages (1000 PRs) as safety measure
+              console.log(`Fetching page ${page}...`);
+              
+              const { data: prs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                sort: 'created',
+                direction: 'desc',
+                per_page: 100,
+                page: page
+              });
+              
+              if (prs.length === 0) {
+                hasMore = false;
+                break;
+              }
+              
+              // Check each PR
+              for (const pr of prs) {
+                const createdAt = new Date(pr.created_at);
+                
+                // If this PR is newer than 24 hours, skip it
+                if (createdAt > TWENTY_FOUR_HOURS_AGO) {
+                  console.log(`PR #${pr.number} is too new, skipping...`);
+                  continue;
+                }
+                
+                // If we've reached PRs older than what we're checking, we can stop
+                // But we still need to check if they touch Dashboard files
+                console.log(`Checking PR #${pr.number}: ${pr.title}`);
+                
+                // Fetch files changed in this PR
+                const { data: files } = await github.rest.pulls.listFiles({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  per_page: 100
+                });
+                
+                // Check if any file is under apps/studio/
+                const touchesDashboard = files.some(file => file.filename.startsWith(DASHBOARD_PATH));
+                
+                if (touchesDashboard) {
+                  const hoursOld = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60));
+                  const daysOld = Math.floor(hoursOld / 24);
+                  
+                  stalePRs.push({
+                    number: pr.number,
+                    title: pr.title,
+                    url: pr.html_url,
+                    author: pr.user.login,
+                    createdAt: pr.created_at,
+                    hoursOld: hoursOld,
+                    daysOld: daysOld,
+                    fileCount: files.filter(f => f.filename.startsWith(DASHBOARD_PATH)).length
+                  });
+                  
+                  console.log(`✓ Found stale Dashboard PR #${pr.number}`);
+                }
+              }
+              
+              page++;
+            }
+
+            console.log(`Found ${stalePRs.length} stale Dashboard PRs`);
+
+            // Sort by age (oldest first)
+            stalePRs.sort((a, b) => a.hoursOld - b.hoursOld);
+
+            // Store results for next step
+            core.setOutput('stale_prs', JSON.stringify(stalePRs));
+            core.setOutput('count', stalePRs.length);
+
+            return stalePRs;
+
+      - name: Send Slack notification
+        if: fromJSON(steps.find-prs.outputs.count) > 0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          STALE_PRS: ${{ steps.find-prs.outputs.count }}
+        run: |
+          # Parse the PR data
+          PR_DATA='${{ steps.find-prs.outputs.stale_prs }}'
+
+          # Build Slack message blocks
+          cat > slack-message.json << 'EOF'
+          {
+            "text": "Dashboard PRs needing attention",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "🔔 Dashboard PRs Older Than 24 Hours"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "There are *${{ steps.find-prs.outputs.count }}* open PRs affecting `/apps/studio/` that are older than 24 hours:"
+                }
+              },
+              {
+                "type": "divider"
+              }
+          EOF
+
+          # Add PR blocks
+          echo "$PR_DATA" | jq -c '.[]' | while read -r pr; do
+            NUMBER=$(echo "$pr" | jq -r '.number')
+            TITLE=$(echo "$pr" | jq -r '.title' | sed 's/"/\\"/g')
+            URL=$(echo "$pr" | jq -r '.url')
+            AUTHOR=$(echo "$pr" | jq -r '.author')
+            DAYS=$(echo "$pr" | jq -r '.daysOld')
+            HOURS=$(echo "$pr" | jq -r '.hoursOld')
+            FILES=$(echo "$pr" | jq -r '.fileCount')
+            
+            # Format age
+            if [ "$DAYS" -gt 0 ]; then
+              AGE="${DAYS}d ${HOURS}h"
+            else
+              AGE="${HOURS}h"
+            fi
+            
+            cat >> slack-message.json << PREOF
+          ,
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*<${URL}|#${NUMBER}: ${TITLE}>*\n👤 @${AUTHOR} • ⏰ ${AGE} old • 📁 ${FILES} Dashboard files"
+                }
+              }
+          PREOF
+          done
+
+          # Close the JSON
+          cat >> slack-message.json << 'EOF'
+            ]
+          }
+          EOF
+
+          # Send to Slack
+          curl -X POST \
+            -H 'Content-Type: application/json' \
+            -d @slack-message.json \
+            "$SLACK_WEBHOOK_URL"
+
+          echo "Slack notification sent!"
+
+      - name: No stale PRs found
+        if: fromJSON(steps.find-prs.outputs.count) == 0
+        run: |
+          echo "✓ No Dashboard PRs older than 24 hours found"
