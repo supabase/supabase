@@ -97,6 +97,13 @@ export const PipelineStatus = ({
             color: 'text-foreground-light',
             tooltip: stateMessages.message,
           }
+        case PipelineStatusName.STOPPING:
+          return {
+            label: 'Stopping',
+            dot: <Loader2 className="animate-spin w-3 h-3 text-warning" />,
+            color: 'text-warning',
+            tooltip: stateMessages.message,
+          }
         case PipelineStatusName.UNKNOWN:
           return {
             label: 'Unknown',
