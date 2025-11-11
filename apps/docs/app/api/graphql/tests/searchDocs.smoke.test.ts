@@ -204,4 +204,40 @@ describe('prod smoke test: graphql: searchDocs', () => {
     expect(guideNode).toHaveProperty('href')
     expect(guideNode).toHaveProperty('content')
   })
+
+  it('searchDocs query includes Management API references', async () => {
+    const query = `
+        query SearchDocsQuery($query: String!) {
+          searchDocs(query: $query) {
+            nodes {
+              ...on ManagementApiReference {
+                title
+                href
+                content
+              }
+            }
+          }
+        }
+      `
+    const result = await fetch(GRAPHQL_URL, {
+      method: 'POST',
+      body: JSON.stringify({ query, variables: { query: 'create SSO provider' } }),
+    })
+
+    expect(result.status).toBe(200)
+    const { data, errors } = await result.json()
+    expect(errors).toBeUndefined()
+
+    const {
+      searchDocs: { nodes },
+    } = data
+    expect(Array.isArray(nodes)).toBe(true)
+    expect(nodes.length).toBeGreaterThan(0)
+
+    const managementApiNode = nodes.find((node: any) => !!node.title)
+    expect(managementApiNode).toBeDefined()
+    expect(managementApiNode).toHaveProperty('title')
+    expect(managementApiNode).toHaveProperty('href')
+    expect(managementApiNode).toHaveProperty('content')
+  })
 })

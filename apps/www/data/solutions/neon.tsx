@@ -1,4 +1,5 @@
 import { cn, Image } from 'ui'
+import dynamic from 'next/dynamic'
 import { CubeIcon } from '@heroicons/react/outline'
 import {
   ArrowRight,
@@ -17,14 +18,16 @@ import {
   Check,
   InfoIcon,
 } from 'lucide-react'
-import AuthVisual from '~/components/Products/AuthVisual'
-import FunctionsVisual from '~/components/Products/FunctionsVisual'
-import RealtimeVisual from '~/components/Products/RealtimeVisual'
-import RealtimeLogs from '~/components/Products/Functions/RealtimeLogs'
-import DataAPIsVisual from '~/components/Products/DataAPIsVisual'
+import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
 
-import MainProducts from '~/data/MainProducts'
+import MainProducts from 'data/MainProducts'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { companyStats } from 'data/company-stats'
+import { DerivLogo } from '~/components/BrandLogo'
+
+const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
+const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
+const RealtimeVisual = dynamic(() => import('components/Products/RealtimeVisual'))
 
 const data = {
   metadata: {
@@ -81,24 +84,15 @@ const data = {
     avatar: (
       <Image
         draggable={false}
-        src="/images/customers/logos/deriv.png"
-        alt="Deriv logo"
-        className="dark:invert object-contain opacity-50 hover:!opacity-60 max-w-20 max-h-10 !w-10 !h-10"
-        width={28}
-        height={28}
+        src="/images/blog/avatars/raunak-kathuria.jpg"
+        alt="Raunak Kathuria"
+        className="object-cover"
+        width={32}
+        height={32}
       />
     ),
     link: '/customers/deriv',
-    logo: (
-      <Image
-        draggable={false}
-        src="/images/solutions/neon/raunak-kathuria.jpg"
-        alt="Raunak Kathuria"
-        className="w-10 h-10 rounded-full overflow-hidden"
-        width={28}
-        height={28}
-      />
-    ),
+    logo: <DerivLogo className="w-full" />,
   },
   why: {
     id: 'why-supabase',
@@ -546,12 +540,12 @@ const data = {
       "Supabase ensures optimal database performance at any scale, so you can focus on innovating and growing without worrying about infrastructure limitations — whether you're handling high-traffic applications, complex queries, or massive data volumes.",
     highlights: [
       {
-        heading: 'databases managed',
-        subheading: '1,000,000+',
+        heading: companyStats.databasesManaged.label,
+        subheading: companyStats.databasesManaged.text,
       },
       {
-        heading: 'databases launched daily',
-        subheading: '2,500+',
+        heading: companyStats.databasesLaunchedDaily.label,
+        subheading: companyStats.databasesLaunchedDaily.text,
       },
     ],
   },

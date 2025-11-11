@@ -38,6 +38,7 @@ export { Heading } from './src/components/CustomHTMLElements'
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
+export * from './src/components/AnimatedCounter'
 export * from './src/lib/utils'
 
 // DATA ENTRY
@@ -177,6 +178,8 @@ export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 
 export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
+export { ButtonGroup, ButtonGroupItem } from './src/components/shadcn/ui/button-group'
+
 export {
   Breadcrumb as Breadcrumb_Shadcn_,
   BreadcrumbItem as BreadcrumbItem_Shadcn_,
@@ -202,6 +205,7 @@ export * from './src/components/shadcn/ui/hover-card'
 export * from './src/components/shadcn/ui/aspect-ratio'
 
 export * from './src/components/shadcn/ui/table'
+export * from './src/components/ShadowScrollArea'
 
 export {
   Collapsible as Collapsible_Shadcn_,
@@ -221,6 +225,7 @@ export {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
+  TooltipPortal,
 } from './src/components/shadcn/ui/tooltip'
 
 export {
@@ -279,3 +284,5 @@ export * from './src/components/Icon/icons/IconYoutubeSolid'
 
 // Export hooks
 export * from './src/lib/Hooks'
+
+export * from './src/components/KeyboardShortcut/KeyboardShortcut'

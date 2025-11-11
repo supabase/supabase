@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "react-hooks/exhaustive-deps": 238,
+    "import/no-anonymous-default-export": 62,
+    "@tanstack/query/exhaustive-deps": 19,
+    "@tanstack/query/no-deprecated-options": 2
+  }
+}

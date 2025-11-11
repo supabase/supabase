@@ -1,4 +1,5 @@
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
+import { skillBasedSolutions, useCaseSolutions } from 'data/Solutions'
 
 const footerData = [
   {
@@ -40,19 +41,28 @@ const footerData = [
         text: 'Launch Week',
         url: '/launch-week',
       },
-      {
-        text: 'AI Builders',
-        url: '/solutions/ai-builders',
-      },
-      {
-        text: 'Switch from Neon',
-        url: '/solutions/switch-from-neon',
-      },
+    ],
+  },
+  {
+    title: 'Solutions',
+    links: [
+      ...skillBasedSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...useCaseSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
     ],
   },
   {
     title: 'Resources',
     links: [
+      {
+        text: 'Blog',
+        url: '/blog',
+      },
       {
         text: 'Support',
         url: '/support',
@@ -70,11 +80,11 @@ const footerData = [
         url: '/partners/integrations',
       },
       {
-        text: 'Brand Assets / Logos',
+        text: 'Brand Assets',
         url: '/brand-assets',
       },
       {
-        text: 'Security and Compliance',
+        text: 'Security & Compliance',
         url: '/security',
       },
       {
@@ -107,6 +117,10 @@ const footerData = [
         url: '/changelog',
       },
       {
+        text: 'Careers',
+        url: '/careers',
+      },
+      {
         text: 'Contributing',
         url: 'https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md',
       },
@@ -132,24 +146,8 @@ const footerData = [
     title: 'Company',
     links: [
       {
-        text: 'Blog',
-        url: '/blog',
-      },
-      {
-        text: 'Customer Stories',
-        url: '/customers',
-      },
-      {
-        text: 'Careers',
-        url: '/careers',
-      },
-      {
         text: 'Company',
         url: '/company',
-      },
-      {
-        text: 'Events & Webinars',
-        url: '/events',
       },
       {
         text: 'General Availability',

@@ -296,7 +296,7 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
                         </div>
                       </div>
                       <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
-                        <article className="prose prose-docs max-w-none">
+                        <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
                           <MDXRemote {...entry.source} components={mdxComponents('blog')} />
                         </article>
                       </div>

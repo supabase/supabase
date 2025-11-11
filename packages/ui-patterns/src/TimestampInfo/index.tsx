@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui/src/components/shadcn/ui/tooltip'
-import { cn } from 'ui/src/lib/utils'
+import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -54,12 +53,14 @@ export const TimestampInfo = ({
   displayAs = 'local',
   format = 'DD MMM  HH:mm:ss',
   labelFormat = 'DD MMM HH:mm:ss',
+  label,
 }: {
   className?: string
   utcTimestamp: string | number
   displayAs?: 'local' | 'utc'
   format?: string
   labelFormat?: string
+  label?: string
 }) => {
   const local = timestampLocalFormatter({ utcTimestamp, format })
   const utc = timestampUtcFormatter({ utcTimestamp, format })
@@ -103,12 +104,12 @@ export const TimestampInfo = ({
         onClick={(e) => {
           e.stopPropagation()
           e.preventDefault()
-          navigator.clipboard.writeText(value)
-          setCopied(true)
-
-          setTimeout(() => {
-            setCopied(false)
-          }, 1000)
+          copyToClipboard(value, () => {
+            setCopied(true)
+            setTimeout(() => {
+              setCopied(false)
+            }, 1000)
+          })
         }}
         className={cn(
           'relative cursor-pointer flex gap-y-2 gap-x-0.5 hover:bg-surface-100 px-2 py-1 group',
@@ -140,9 +141,11 @@ export const TimestampInfo = ({
         className={`text-xs ${className} border-b border-transparent hover:border-dashed hover:border-foreground-light`}
       >
         <span>
-          {displayAs === 'local'
-            ? timestampLocalFormatter({ utcTimestamp, format: labelFormat })
-            : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
+          {label
+            ? label
+            : displayAs === 'local'
+              ? timestampLocalFormatter({ utcTimestamp, format: labelFormat })
+              : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
         </span>
       </TooltipTrigger>
       <TooltipContent align={align} side="right" className="font-mono p-0 py-1 min-w-80">

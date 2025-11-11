@@ -24,7 +24,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "noErrorTruncation": true
   },
   "include": [
     "next-env.d.ts",

@@ -15,14 +15,6 @@ export const sidePanelsState = proxy({
   setVercelConnectionsIntegrationId: (id: string) => {
     sidePanelsState.vercelConnectionsIntegrationId = id
   },
-
-  /**
-   * GitHub connections
-   */
-  githubConnectionsOpen: false as boolean,
-  setGithubConnectionsOpen: (bool: boolean) => {
-    sidePanelsState.githubConnectionsOpen = bool
-  },
 })
 
 export const getSidePanelsState = () => snapshot(sidePanelsState)

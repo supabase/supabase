@@ -28,7 +28,7 @@ export default function TicketHome() {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: LW_URL,
+          url: `${LW_URL}/7`,
           images: [
             {
               url: OG_IMAGE,

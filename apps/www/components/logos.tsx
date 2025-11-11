@@ -1,5 +1,5 @@
 import { cn } from 'ui'
-import { range } from 'lodash'
+import { range } from 'lib/helpers'
 
 interface Props {
   showHeading?: boolean
@@ -117,6 +117,11 @@ const logos = [
     image: `/images/logos/publicity/betashares.svg`,
     alt: 'betashares',
     name: 'betashares',
+  },
+  {
+    image: `/images/logos/publicity/submagic.svg`,
+    alt: 'submagic',
+    name: 'submagic',
   },
 ]
 

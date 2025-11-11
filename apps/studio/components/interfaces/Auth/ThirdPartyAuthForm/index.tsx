@@ -17,7 +17,8 @@ import {
   ThirdPartyAuthIntegration,
   useThirdPartyAuthIntegrationsQuery,
 } from 'data/third-party-auth/integrations-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
@@ -25,6 +26,7 @@ import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
 import { CreateClerkAuthIntegrationDialog } from './CreateClerkAuthDialog'
 import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
+import { CreateWorkOSIntegrationDialog } from './CreateWorkOSDialog'
 import { IntegrationCard } from './IntegrationCard'
 import {
   getIntegrationType,
@@ -48,7 +50,10 @@ export const ThirdPartyAuthForm = () => {
     useState<ThirdPartyAuthIntegration>()
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
 
   if (isError) {
     return (
@@ -69,14 +74,16 @@ export const ThirdPartyAuthForm = () => {
             <br />
             Billing is based on the number of monthly active users (MAUs) requesting your API
             throughout the billing period. Refer to our{' '}
-            <InlineLink href="https://supabase.com/docs/guides/platform/manage-your-usage/monthly-active-users-third-party">
+            <InlineLink
+              href={`${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`}
+            >
               billing docs
             </InlineLink>{' '}
             for more information.
           </ScaffoldSectionDescription>
         </div>
         <div className="flex items-center gap-2 ">
-          <DocsButton href="https://supabase.com/docs/guides/auth/third-party/overview" />
+          <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
           {integrations.length !== 0 && (
             <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
           )}
@@ -145,6 +152,12 @@ export const ThirdPartyAuthForm = () => {
 
       <CreateClerkAuthIntegrationDialog
         visible={selectedIntegration === 'clerk'}
+        onDelete={() => {}}
+        onClose={() => setSelectedIntegration(undefined)}
+      />
+
+      <CreateWorkOSIntegrationDialog
+        visible={selectedIntegration === 'workos'}
         onDelete={() => {}}
         onClose={() => setSelectedIntegration(undefined)}
       />

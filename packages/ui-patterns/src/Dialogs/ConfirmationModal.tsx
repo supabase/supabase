@@ -66,7 +66,7 @@ const ConfirmationModal = forwardRef<
       e.preventDefault()
       e.stopPropagation()
       onConfirm()
-      if (loading === undefined) setLoading(true)
+      if (loading_ === undefined) setLoading(true)
     }
 
     useEffect(() => {

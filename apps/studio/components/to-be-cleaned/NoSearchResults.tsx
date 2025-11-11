@@ -1,8 +1,9 @@
-import SVG from 'react-inlinesvg'
 import { BASE_PATH } from 'lib/constants'
+import SVG from 'react-inlinesvg'
 
-// [Joshen] To be deprecated in favor of NoSearchResults in components/ui
-
+/**
+ * To be deprecated in favor of NoSearchResults in components/ui
+ */
 export const NoSearchResults = () => {
   return (
     <div className="flex h-64 flex-col items-center justify-center">

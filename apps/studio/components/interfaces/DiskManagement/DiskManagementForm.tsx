@@ -1,17 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
+import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
@@ -20,15 +18,21 @@ import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-upd
 import { useDiskAutoscaleCustomConfigQuery } from 'data/config/disk-autoscale-config-query'
 import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale-config-update-mutation'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { setProjectStatus } from 'data/projects/projects-query'
+import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { GB, PROJECT_STATUS } from 'lib/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsCloudProvider,
+  useIsAwsK8sCloudProvider,
+  useIsAwsNimbusCloudProvider,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
+import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
   Button,
@@ -53,45 +57,45 @@ import { IOPSField } from './fields/IOPSField'
 import { StorageTypeField } from './fields/StorageTypeField'
 import { ThroughputField } from './fields/ThroughputField'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
-import { DiskType, RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 } from './ui/DiskManagement.constants'
+import {
+  DISK_LIMITS,
+  DiskType,
+  RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
+} from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 export function DiskManagementForm() {
-  // isLoading is used to avoid a useCheckPermissions() race condition
-  const { project, isLoading: isProjectLoading } = useProjectContext()
-  const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
-  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { setProjectStatus } = useSetProjectStatus()
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === project?.ref
   )
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
-  const isFlyArchitecture = project?.cloud_provider === 'FLY'
+  const isAws = useIsAwsCloudProvider()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
+  const isAwsNimbus = useIsAwsNimbusCloudProvider()
 
-  /**
-   * Permissions
-   */
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
+      resource: {
+        project_id: project?.id,
+      },
+    })
 
-  /**
-   * Component States
-   */
+  const { hasAccess } = useCheckEntitlements('instances.compute_update')
+
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [message, setMessageState] = useState<DiskManagementMessage | null>(null)
   const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
 
-  /**
-   * Fetch form data
-   */
   const { data: databases, isSuccess: isReadReplicasSuccess } = useReadReplicasQuery({ projectRef })
   const { data, isSuccess: isDiskAttributesSuccess } = useDiskAttributesQuery(
     { projectRef },
@@ -118,31 +122,29 @@ export function DiskManagementForm() {
           setRefetchInterval(2000)
         }
       },
-      enabled: project != null && !isFlyArchitecture,
+      enabled: project != null && isAws,
     }
   )
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
   const { isWithinCooldownWindow, isSuccess: isCooldownSuccess } =
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
-      enabled: project != null && !isFlyArchitecture,
+      enabled: project != null && isAws,
     })
   const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery(
     {
       projectRef,
     },
-    { enabled: project != null && !isFlyArchitecture }
+    { enabled: project != null && isAws }
   )
 
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
-    useDiskAutoscaleCustomConfigQuery(
-      { projectRef },
-      { enabled: project != null && !isFlyArchitecture }
-    )
+    useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: project != null && isAws })
 
-  /**
-   * Handle default values
-   */
+  const computeSize = project?.infra_compute_size
+    ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+    : undefined
+
   // @ts-ignore
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0, iops: 0 }
   const { growth_percent, max_size_gb, min_increment_gb } = diskAutoscaleConfig ?? {}
@@ -151,9 +153,7 @@ export function DiskManagementForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
-    computeSize: project?.infra_compute_size
-      ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
-      : undefined,
+    computeSize,
     growthPercent: growth_percent,
     minIncrementGb: min_increment_gb,
     maxSizeGb: max_size_gb,
@@ -161,16 +161,29 @@ export function DiskManagementForm() {
 
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(
-      CreateDiskStorageSchema(defaultValues.totalSize, project?.cloud_provider as CloudProvider)
+      CreateDiskStorageSchema({
+        defaultTotalSize: defaultValues.totalSize,
+        cloudProvider: project?.cloud_provider as CloudProvider,
+      })
     ),
     defaultValues,
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })
 
-  /**
-   * State handling
-   */
+  const { computeSize: modifiedComputeSize } = form.watch()
+
+  // We only support disk configurations for >=Large instances
+  // If a customer downgrades back to <Large, we should reset the storage settings to avoid incurring unnecessary costs
+  useEffect(() => {
+    if (modifiedComputeSize && project?.infra_compute_size && isDialogOpen) {
+      if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)) {
+        form.setValue('storageType', DiskType.GP3)
+        form.setValue('throughput', DISK_LIMITS['gp3'].minThroughput)
+        form.setValue('provisionedIOPS', DISK_LIMITS['gp3'].minIops)
+      }
+    }
+  }, [modifiedComputeSize, isDialogOpen, project])
 
   const isSuccess =
     isAddonsSuccess &&
@@ -182,7 +195,7 @@ export function DiskManagementForm() {
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const isPlanUpgradeRequired = org?.plan.id === 'free'
+  const isPlanUpgradeRequired = !hasAccess
 
   const { formState } = form
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
@@ -190,8 +203,7 @@ export function DiskManagementForm() {
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
-    org?.plan.id !== 'free'
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) && !hasAccess
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -200,13 +212,13 @@ export function DiskManagementForm() {
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration ||
-    isFlyArchitecture
+    !isAws
 
   const disableComputeInputs = isPlanUpgradeRequired
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
-  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration && !isProjectLoading
+  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration
 
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({
@@ -220,7 +232,7 @@ export function DiskManagementForm() {
       onError: () => {},
       onSuccess: () => {
         //Manually set project status to RESIZING, Project status should be RESIZING on next project status request.
-        setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
+        if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
       },
     })
   const { mutateAsync: updateDiskAutoscaleConfig, isLoading: isUpdatingDiskAutoscaleConfig } =
@@ -236,12 +248,14 @@ export function DiskManagementForm() {
     let willUpdateDiskConfiguration = false
     setMessageState(null)
 
+    // [Joshen] Skip disk configuration related stuff for AWS Nimbus
     try {
       if (
-        payload.storageType !== form.formState.defaultValues?.storageType ||
-        payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
-        payload.throughput !== form.formState.defaultValues?.throughput ||
-        payload.totalSize !== form.formState.defaultValues?.totalSize
+        !isAwsNimbus &&
+        (payload.storageType !== form.formState.defaultValues?.storageType ||
+          payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
+          payload.throughput !== form.formState.defaultValues?.throughput ||
+          payload.totalSize !== form.formState.defaultValues?.totalSize)
       ) {
         willUpdateDiskConfiguration = true
 
@@ -255,9 +269,10 @@ export function DiskManagementForm() {
       }
 
       if (
-        payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
-        payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
-        payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb
+        !isAwsNimbus &&
+        (payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
+          payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
+          payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb)
       ) {
         await updateDiskAutoscaleConfig({
           projectRef,
@@ -303,17 +318,9 @@ export function DiskManagementForm() {
         <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
           <NoticeBar
             type="default"
-            visible={isPlanUpgradeRequired}
+            visible={!hasAccess}
             title="Compute and Disk configuration is not available on the Free Plan"
-            actions={
-              <Button type="default" asChild>
-                <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=diskManagementConfigure`}
-                >
-                  Upgrade plan
-                </Link>
-              </Button>
-            }
+            actions={<UpgradePlanButton source="diskManagementConfigure" plan="Pro" />}
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
           />
 
@@ -339,20 +346,26 @@ export function DiskManagementForm() {
             </div>
           ) : null}
           <Separator />
+
           <ComputeSizeField form={form} disabled={disableComputeInputs} />
-          <Separator />
+
+          {!(isAws || isAwsNimbus) && <Separator />}
+
           <SpendCapDisabledSection />
+
           <NoticeBar
             type="default"
-            visible={isFlyArchitecture}
-            title="Disk configuration is not available on Fly Postgres"
+            visible={!(isAws || isAwsNimbus)}
+            title="Disk configuration is only available for projects in the AWS cloud provider"
             description={
-              isBranch
-                ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
-                : 'The Fly Postgres offering is deprecated - please migrate your instance to Supabase to configure your disk.'
+              isAwsK8s
+                ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
+                : isBranch
+                  ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
+                  : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
             }
           />
-          {!isFlyArchitecture && (
+          {isAws && (
             <>
               <div className="flex flex-col gap-y-3">
                 <DiskCountdownRadial />
@@ -365,7 +378,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#read-only-mode`}
                     />
                   </Admonition>
                 )}
@@ -378,7 +391,7 @@ export function DiskManagementForm() {
                     <DocsButton
                       abbrev={false}
                       className="mt-2"
-                      href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                      href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                     />
                   </Admonition>
                 )}

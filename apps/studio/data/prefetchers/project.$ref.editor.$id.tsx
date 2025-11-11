@@ -9,9 +9,9 @@ import {
   parseSupaTable,
 } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { prefetchTableRows } from 'data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
@@ -64,7 +64,7 @@ export function prefetchEditorTablePage({
 export function usePrefetchEditorTablePage() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   return useCallback(

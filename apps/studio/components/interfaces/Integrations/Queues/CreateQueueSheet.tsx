@@ -4,10 +4,11 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseQueueCreateMutation } from 'data/database-queues/database-queues-create-mutation'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
 import {
   Badge,
   Button,
@@ -29,7 +30,7 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
-import { useRouter } from 'next/router'
+import { QueryNameSchema } from './Queues.utils'
 
 export interface CreateQueueSheetProps {
   isClosing: boolean
@@ -52,12 +53,7 @@ const unloggedQueueSchema = z.object({
 })
 
 const FormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, 'Please provide a name for your queue')
-    .max(47, "The name can't be longer than 47 characters")
-    .regex(/^[a-z_-]+$/, 'Name must contain only lowercase letters, hyphens, and underscores'),
+  name: QueryNameSchema,
   enableRls: z.boolean(),
   values: z.discriminatedUnion('type', [
     normalQueueSchema,
@@ -74,12 +70,12 @@ const FORM_ID = 'create-queue-sidepanel'
 export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQueueSheetProps) => {
   // This is for enabling pg_partman extension which will be used for partitioned queues (3rd kind of queue)
   // const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
-  // const canToggleExtensions = useCheckPermissions(
+  // const { can: canToggleExtensions } = useAsyncCheckPermissions(
   //   PermissionAction.TENANT_SQL_ADMIN_WRITE,
   //   'extensions'
   // )
   const router = useRouter()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,

@@ -348,7 +348,8 @@
     "link": "/guides/database/extensions/pgjwt",
     "github_url": "https://github.com/michelp/pgjwt",
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "pgroonga",

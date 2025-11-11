@@ -2,15 +2,17 @@ import { CpuIcon, Lock, Microchip } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { InstanceSpecs } from 'lib/constants'
-import Link from 'next/link'
+import { DOCS_URL, InstanceSpecs } from 'lib/constants'
 import {
   cn,
   FormField_Shadcn_,
@@ -52,10 +54,13 @@ type ComputeSizeFieldProps = {
 
 export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
-  const org = useSelectedOrganization()
-  const { control, formState, setValue, trigger } = form
+  const { data: org } = useSelectedOrganizationQuery()
+  const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
 
-  const { project, isLoading: isProjectLoading } = useProjectContext()
+  const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
+
+  const { computeSize, storageType } = form.watch()
+
   const {
     data: addons,
     isLoading: isAddonsLoading,
@@ -63,6 +68,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   } = useProjectAddonsQuery({ projectRef: ref })
 
   const isLoading = isProjectLoading || isAddonsLoading
+
+  const { control, formState, setValue, trigger } = form
 
   const availableAddons = useMemo(() => {
     return addons?.available_addons ?? []
@@ -110,7 +117,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
         >
           <FormItemLayout
             layout="horizontal"
-            label={'Compute size'}
+            label="Compute size"
             id={field.name}
             className="gap-5"
             labelOptional={
@@ -124,7 +131,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   }
                   beforePrice={Number(computeSizePrice.oldPrice)}
                   afterPrice={Number(computeSizePrice.newPrice)}
-                  free={showUpgradeBadge && form.watch('computeSize') === 'ci_micro' ? true : false}
+                  free={showUpgradeBadge && computeSize === 'ci_micro' ? true : false}
                 />
                 <p className="text-foreground-lighter">
                   Hardware resources allocated to your Postgres database
@@ -133,7 +140,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 <div className="mt-3">
                   <DocsButton
                     abbrev={false}
-                    href="https://supabase.com/docs/guides/platform/compute-and-disk"
+                    href={`${DOCS_URL}/guides/platform/compute-and-disk`}
                   />
                 </div>
 
@@ -218,21 +225,23 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                           <Lock size={14} />
                                         </div>
                                       ) : (
-                                        <>
-                                          <span
-                                            className="text-foreground text-sm font-semibold"
-                                            translate="no"
-                                          >
-                                            ${price}
-                                          </span>
-                                          <span className="text-foreground-light translate-y-[1px]">
-                                            {' '}
-                                            /{' '}
-                                            {compute.price_interval === 'monthly'
-                                              ? 'month'
-                                              : 'hour'}
-                                          </span>
-                                        </>
+                                        showComputePrice && (
+                                          <>
+                                            <span
+                                              className="text-foreground text-sm font-semibold"
+                                              translate="no"
+                                            >
+                                              ${price}
+                                            </span>
+                                            <span className="text-foreground-light translate-y-[1px]">
+                                              {' '}
+                                              /{' '}
+                                              {compute.price_interval === 'monthly'
+                                                ? 'month'
+                                                : 'hour'}
+                                            </span>
+                                          </>
+                                        )
                                       )}
                                     </div>
                                   </div>
@@ -294,8 +303,12 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]'
                     )}
                     label={
-                      <Link
-                        href={`/support/new?projectRef=${ref}&category=sales&subject=Enquiry%20about%20larger%20instance%20sizes`}
+                      <SupportLink
+                        queryParams={{
+                          projectRef: ref,
+                          category: SupportCategories.SALES_ENQUIRY,
+                          subject: 'Enquiry about larger instance sizes',
+                        }}
                       >
                         <div className="w-full flex flex-col gap-3 justify-between">
                           <div className="relative px-3 flex justify-between">
@@ -326,7 +339,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                             </div>
                           </div>
                         </div>
-                      </Link>
+                      </SupportLink>
                     }
                   />
                 </>

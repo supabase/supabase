@@ -1,9 +1,8 @@
 import { Link } from 'lucide-react'
 
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { copyToClipboard } from 'lib/helpers'
-import { Badge } from 'ui'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Badge, copyToClipboard } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
@@ -11,7 +10,7 @@ import { orderCommandSectionsByPriority } from './ordering'
 export function useApiUrlCommand() {
   const setIsOpen = useSetCommandMenuOpen()
 
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { data: settings } = useProjectSettingsV2Query(
     { projectRef: project?.ref },
     { enabled: !!project }

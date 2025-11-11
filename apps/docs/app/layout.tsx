@@ -4,19 +4,25 @@ import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
-import { type Metadata, type Viewport } from 'next'
+import { TelemetryTagManager } from 'common'
 
 import { genFaviconData } from 'common/MetaFavicons/app-router'
-
+import type { Metadata, Viewport } from 'next'
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+
+const { metadataApplicationName, metadataTitle } = getCustomContent([
+  'metadata:application_name',
+  'metadata:title',
+])
 
 const metadata: Metadata = {
-  applicationName: 'Supabase Docs',
-  title: 'Supabase Docs',
+  applicationName: metadataApplicationName,
+  title: metadataTitle,
   description:
-    'Supabase is an open source Firebase alternative providing all the backend features you need to build a product.',
+    'Supabase is the Postgres development platform providing all the backend features you need to build a product.',
   metadataBase: new URL('https://supabase.com'),
   icons: genFaviconData(BASE_PATH),
   robots: {
@@ -47,6 +53,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body>
+        <TelemetryTagManager />
         <GlobalProviders>
           <TopNavSkeleton>{children}</TopNavSkeleton>
         </GlobalProviders>

@@ -1,34 +1,33 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import {
-  CONSTRAINT_TYPE,
-  Constraint,
-  useTableConstraintsQuery,
-} from 'data/database/constraints-query'
-import {
-  ForeignKeyConstraint,
-  useForeignKeyConstraintsQuery,
-} from 'data/database/foreign-key-constraints-query'
+import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
+import { type PlainObject } from 'lib/type-helpers'
+import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
+import type { SaveTableParams } from '../SidePanelEditor'
 import type { ColumnField } from '../SidePanelEditor.types'
-import SpreadsheetImport from '../SpreadsheetImport/SpreadsheetImport'
+import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import HeaderTitle from './HeaderTitle'
@@ -41,67 +40,62 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+
+type SaveTableParamsFor<Action extends SaveTableParams['action']> = Extract<
+  SaveTableParams,
+  { action: Action }
+>
+
+type SaveTablePayloadFor<Action extends SaveTableParams['action']> =
+  SaveTableParamsFor<Action>['payload']
 
 export interface TableEditorProps {
   table?: PostgresTable
   isDuplicating: boolean
+  templateData?: Partial<TableField>
   visible: boolean
   closePanel: () => void
-  saveChanges: (
-    payload: {
-      name: string
-      schema: string
-      comment?: string | undefined
-    },
-    columns: ColumnField[],
-    foreignKeyRelations: ForeignKey[],
-    isNewRecord: boolean,
-    configuration: {
-      tableId?: number
-      importContent?: ImportContent
-      isRLSEnabled: boolean
-      isRealtimeEnabled: boolean
-      isDuplicateRows: boolean
-      existingForeignKeyRelations: ForeignKeyConstraint[]
-      primaryKey?: Constraint
-    },
-    resolve: any
-  ) => void
+  saveChanges: (params: SaveTableParams) => void
   updateEditorDirty: () => void
 }
 
-const TableEditor = ({
+export const TableEditor = ({
   table,
   isDuplicating,
+  templateData,
   visible = false,
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
 }: TableEditorProps) => {
+  const tableEditorApi = useContext(TableEditorStateContext)
   const snap = useTableEditorStateSnapshot()
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { selectedSchema } = useQuerySchemaState()
-  const isNewRecord = isUndefined(table)
-  const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const isNewRecord = isUndefined(table)
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
     if (params.create === 'table' && snap.ui.open === 'none') {
-      snap.onAddTable()
+      tableEditorApi.onAddTable()
       setParams({ ...params, create: undefined })
     }
-  }, [snap, params, setParams])
+  }, [tableEditorApi, setParams, snap.ui.open, params])
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
   const enumTypes = (types ?? []).filter(
-    (type) => !PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+    (type) => !protectedSchemas.find((s) => s.name === type.schema)
   )
 
   const { data: publications } = useDatabasePublicationsQuery({
@@ -114,9 +108,9 @@ const TableEditor = ({
   const realtimeEnabledTables = realtimePublication?.tables ?? []
   const isRealtimeEnabled = isNewRecord
     ? false
-    : realtimeEnabledTables.some((t: any) => t.id === table?.id)
+    : realtimeEnabledTables.some((t) => t.id === table?.id)
 
-  const [errors, setErrors] = useState<any>({})
+  const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
 
@@ -140,8 +134,12 @@ const TableEditor = ({
       connectionString: project?.connectionString,
       schema: table?.schema,
     })
-  const foreignKeys = (foreignKeyMeta ?? []).filter(
-    (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
+  const foreignKeys = useMemo(
+    () =>
+      (foreignKeyMeta ?? []).filter(
+        (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
+      ),
+    [foreignKeyMeta, table]
   )
 
   const onUpdateField = (changes: Partial<TableField>) => {
@@ -183,21 +181,22 @@ const TableEditor = ({
     setFkRelations(relations)
   }
 
-  const onSaveChanges = (resolve: any) => {
+  const onSaveChanges = (resolve: () => void) => {
     if (tableFields) {
-      const errors: any = validateFields(tableFields)
+      const errors = validateFields(tableFields)
+      if (errors.name) {
+        toast.error(errors.name)
+      }
       if (errors.columns) {
         toast.error(errors.columns)
       }
       setErrors(errors)
 
+      const isNameChanged = tableFields.name.trim() !== table?.name
+      const isCommentChanged = tableFields.comment !== table?.comment
+      const isRlsEnabledChanged = tableFields.isRLSEnabled !== (table?.rls_enabled ?? false)
+
       if (isEmpty(errors)) {
-        const payload = {
-          name: tableFields.name.trim(),
-          schema: selectedSchema,
-          comment: tableFields.comment?.trim(),
-          ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
-        }
         const configuration = {
           tableId: table?.id,
           importContent,
@@ -211,7 +210,48 @@ const TableEditor = ({
           return { ...column, name: column.name.trim() }
         })
 
-        saveChanges(payload, columns, fkRelations, isNewRecord, configuration, resolve)
+        if (isNewRecord) {
+          const payload: SaveTablePayloadFor<'create'> = {
+            name: tableFields.name.trim(),
+            schema: selectedSchema,
+            comment: tableFields.comment?.trim(),
+          }
+          saveChanges({
+            action: 'create',
+            payload,
+            configuration,
+            columns,
+            foreignKeyRelations: fkRelations,
+            resolve,
+          })
+        } else if (isDuplicating) {
+          const payload: SaveTablePayloadFor<'duplicate'> = {
+            name: tableFields.name.trim(),
+            comment: tableFields.comment?.trim(),
+          }
+          saveChanges({
+            action: 'duplicate',
+            payload,
+            configuration,
+            columns,
+            foreignKeyRelations: fkRelations,
+            resolve,
+          })
+        } else {
+          const payload: SaveTablePayloadFor<'update'> = {
+            ...(isNameChanged && { name: tableFields.name.trim() }),
+            ...(isCommentChanged && { comment: tableFields.comment?.trim() ?? '' }),
+            ...(isRlsEnabledChanged && { rls_enabled: tableFields.isRLSEnabled }),
+          }
+          saveChanges({
+            action: 'update',
+            payload,
+            configuration,
+            columns,
+            foreignKeyRelations: fkRelations,
+            resolve,
+          })
+        }
       } else {
         resolve()
       }
@@ -225,23 +265,27 @@ const TableEditor = ({
       setIsDuplicateRows(false)
       if (isNewRecord) {
         const tableFields = generateTableField()
-        setTableFields(tableFields)
+        if (templateData) {
+          setTableFields({ ...tableFields, ...templateData })
+        } else {
+          setTableFields(tableFields)
+        }
         setFkRelations([])
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
           table,
-          foreignKeyMeta || [],
+          foreignKeyMeta ?? [],
           isDuplicating,
           isRealtimeEnabled
         )
         setTableFields(tableFields)
       }
     }
-  }, [visible])
+  }, [visible, templateData])
 
   useEffect(() => {
     if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
-  }, [isSuccessForeignKeyMeta])
+  }, [isSuccessForeignKeyMeta, foreignKeys])
 
   useEffect(() => {
     if (importContent && !isEmpty(importContent)) {
@@ -276,7 +320,7 @@ const TableEditor = ({
           label="Name"
           layout="horizontal"
           type="text"
-          error={errors.name}
+          error={errors.name ? String(errors.name) : undefined}
           value={tableFields?.name}
           onChange={(event: any) => onUpdateField({ name: event.target.value })}
         />
@@ -311,6 +355,7 @@ const TableEditor = ({
           }}
           size="medium"
         />
+
         {tableFields.isRLSEnabled ? (
           <Admonition
             type="default"
@@ -328,7 +373,7 @@ const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         ) : (
@@ -346,10 +391,11 @@ const TableEditor = ({
             <DocsButton
               abbrev={false}
               className="mt-2"
-              href="https://supabase.com/docs/guides/auth/row-level-security"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         )}
+
         {realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
@@ -374,7 +420,9 @@ const TableEditor = ({
           />
         )}
       </SidePanel.Content>
+
       <SidePanel.Separator />
+
       <SidePanel.Content className="space-y-10 py-6">
         {!isDuplicating && (
           <ColumnManagement
@@ -449,5 +497,3 @@ const TableEditor = ({
     </SidePanel>
   )
 }
-
-export default TableEditor

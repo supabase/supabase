@@ -1,8 +1,8 @@
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteFunctionProps {
@@ -11,8 +11,8 @@ interface DeleteFunctionProps {
   setVisible: (value: boolean) => void
 }
 
-const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
-  const { project } = useProjectContext()
+export const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const { name, schema } = func ?? {}
 
   const { mutate: deleteDatabaseFunction, isLoading } = useDatabaseFunctionDeleteMutation({
@@ -57,5 +57,3 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
     </>
   )
 }
-
-export default DeleteFunction

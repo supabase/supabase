@@ -15,9 +15,10 @@ const MobileSheetNav: React.FC<{
   const router = useRouter()
   const { width } = useWindowSize()
 
+  const pathWithoutQuery = router?.asPath?.split('?')?.[0]
   useEffect(() => {
     onOpenChange(false)
-  }, [router?.asPath])
+  }, [pathWithoutQuery])
 
   useEffect(() => {
     onOpenChange(false)
@@ -30,10 +31,7 @@ const MobileSheetNav: React.FC<{
         showClose={false}
         size="full"
         side="bottom"
-        className={cn(
-          'rounded-t-lg overflow-hidden overflow-y-scroll',
-          'h-[85dvh] md:max-h-[500px] py-2'
-        )}
+        className={cn('rounded-t-lg overflow-hidden overflow-y-scroll h-[85dvh] md:max-h-[500px]')}
       >
         <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>{children}</ErrorBoundary>
       </SheetContent>

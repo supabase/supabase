@@ -4,7 +4,7 @@ import type { ColumnField } from '../SidePanelEditor.types'
 export interface TableField {
   id: number
   name: string
-  comment?: string
+  comment?: string | null
   columns: ColumnField[]
   isRLSEnabled: boolean
   isRealtimeEnabled: boolean

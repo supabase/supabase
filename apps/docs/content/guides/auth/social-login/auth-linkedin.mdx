@@ -11,7 +11,7 @@ To enable LinkedIn Auth for your project, you need to set up a LinkedIn OAuth ap
 Setting up LinkedIn logins for your application consists of 3 parts:
 
 - Create and configure a LinkedIn Project and App on the [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps).
-- Add your _LinkedIn (OIDC)_ `client_id` and `client_secret` to your [Supabase Project](https://supabase.com/dashboard).
+- Add your _LinkedIn (OIDC)_ `client_id` and `client_secret` to your [Supabase Project](/dashboard).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your LinkedIn Developer account
@@ -46,6 +46,24 @@ Ensure that the appropriate scopes have been added under OAuth 2.0 Scopes at the
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "LinkedIn (OIDC)" }} />
 
+You can also configure the LinkedIn (OIDC) auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure LinkedIn (OIDC) auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_linkedin_oidc_enabled": true,
+    "external_linkedin_oidc_client_id": "your-linkedin-client-id",
+    "external_linkedin_oidc_secret": "your-linkedin-client-secret"
+  }'
+```
+
 ## Add login code to your client app
 
 <Tabs
@@ -63,7 +81,7 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<your-anon-key>')
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
 
 // ---cut---
 async function signInWithLinkedIn() {
@@ -90,6 +108,7 @@ Future<void> signInWithLinkedIn() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `LinkedIn` as the `Provider`:
@@ -101,6 +120,7 @@ suspend fun signInWithKaLinkedIn() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -118,7 +138,7 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<your-anon-key>')
+const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
 
 // ---cut---
 async function signOut() {
@@ -138,6 +158,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -149,6 +170,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## LinkedIn Open ID Connect (OIDC)
@@ -170,4 +192,4 @@ Do reach out to support if you have any concerns around this change.
 
 - [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [LinkedIn Developer Dashboard](https://api.LinkedIn.com/apps)
+- [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps)
