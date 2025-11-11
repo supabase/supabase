@@ -7,9 +7,6 @@ import { getSortedPosts } from 'lib/posts'
 import authors from 'lib/authors.json'
 import { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
 
-// Re-export types and constants for backward compatibility
-export { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
-
 /**
  * Parse hosts from a comma-separated string of author IDs
  * Maps author IDs to EventHost objects using the authors.json file

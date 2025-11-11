@@ -24,7 +24,7 @@ export const SUPABASE_HOST: EventHost = {
   name: 'Supabase',
   first_name: 'Supabase',
   last_name: null,
-  avatar_url: 'https://supabase.com/images/supabase-logo-icon.svg',
+  avatar_url: 'https://github.com/supabase.png',
 }
 
 /**

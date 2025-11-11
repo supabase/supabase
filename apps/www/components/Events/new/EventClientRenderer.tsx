@@ -4,6 +4,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { getStaticEvents, SupabaseEvent } from '~/lib/events'
 import { EventBanner } from '~/components/Events/new/EventBanner'
 import { EventsProvider } from '~/app/events/context'
+import { EventGallery } from './EventGallery'
 
 export function EventClientRenderer({ staticEvents }: { staticEvents: SupabaseEvent[] }) {
   return (
@@ -18,6 +19,10 @@ export function EventClientRenderer({ staticEvents }: { staticEvents: SupabaseEv
 
         <SectionContainer className="border-x flex-1">
           <EventBanner />
+        </SectionContainer>
+
+        <SectionContainer className="border-x flex-1 !pt-0">
+          <EventGallery />
         </SectionContainer>
       </DefaultLayout>
     </EventsProvider>

@@ -10,17 +10,14 @@ import { formatHosts } from '~/lib/eventsUtils'
 export function EventBanner() {
   const { isLoading, allEvents, featuredEvent } = useEvents()
 
-  console.log('featuredEvent', featuredEvent)
-  console.log('desc', featuredEvent?.description)
-
   if (isLoading) {
-    return <section>Loading...</section>
+    return <EventBannerSkeleton />
   }
 
   if (!featuredEvent) return null
 
   return (
-    <section className={cn('grid grid-cols-[minmax(320px,30%),1fr] gap-12')}>
+    <section className={cn('grid grid-cols-[minmax(320px,40%),1fr] gap-12')}>
       <CoverImage url={featuredEvent.cover_url} />
 
       <article className="flex flex-col gap-6 py-2">
@@ -188,3 +185,55 @@ const Logo = () => (
     </defs>
   </svg>
 )
+
+const EventBannerSkeleton = () => {
+  return (
+    <section className={cn('grid grid-cols-[minmax(320px,40%),1fr] gap-12')}>
+      {/* Cover Image Skeleton */}
+      <div className="w-full bg-surface-100 aspect-square border rounded-lg animate-pulse" />
+
+      <article className="flex flex-col gap-6 py-2">
+        <div className="flex justify-between items-start">
+          <div className="flex flex-col gap-1.5 flex-1">
+            {/* Title Skeleton */}
+            <div className="h-8 bg-surface-200 rounded animate-pulse w-3/4" />
+            {/* Host Skeleton */}
+            <div className="h-6 bg-surface-200 rounded animate-pulse w-1/2 mt-1" />
+          </div>
+
+          {/* Button Skeleton */}
+          <div className="hidden lg:block mt-1 h-10 w-24 bg-surface-200 rounded animate-pulse" />
+        </div>
+
+        <div className="flex gap-x-12 items-center">
+          {/* Date Widget Skeleton */}
+          <div className="flex items-center gap-4">
+            <div className="bg-surface-200 p-1.5 border rounded-md">
+              <div className="size-7 bg-surface-200 rounded animate-pulse" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="h-5 w-40 bg-surface-200 rounded animate-pulse" />
+              <div className="h-4 w-24 bg-surface-200 rounded animate-pulse" />
+            </div>
+          </div>
+
+          {/* Location Widget Skeleton */}
+          <div className="flex items-center gap-4">
+            <div className="bg-surface-200 p-1.5 border rounded-md">
+              <div className="size-7 bg-surface-200 rounded animate-pulse" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="h-5 w-24 bg-surface-200 rounded animate-pulse" />
+              <div className="h-4 w-32 bg-surface-200 rounded animate-pulse" />
+            </div>
+          </div>
+        </div>
+
+        {/* Description Skeleton */}
+        <div className="mt-4 space-y-2">
+          <div className="h-32 bg-surface-200 rounded animate-pulse w-full" />
+        </div>
+      </article>
+    </section>
+  )
+}
