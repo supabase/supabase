@@ -16,8 +16,9 @@ import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advi
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AdvisorDetail } from './AdvisorDetail'
 import { AdvisorFilters } from './AdvisorFilters'
+import type { AdvisorItem } from './AdvisorPanel.types'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
-import { AdvisorItem, AdvisorPanelHeader } from './AdvisorPanelHeader'
+import { AdvisorPanelHeader } from './AdvisorPanelHeader'
 
 const severityOrder: Record<AdvisorSeverity, number> = {
   critical: 0,

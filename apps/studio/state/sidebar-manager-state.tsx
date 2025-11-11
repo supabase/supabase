@@ -1,6 +1,7 @@
 import { LOCAL_STORAGE_KEYS } from 'common/constants'
+import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useRef } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
 type SidebarHandlers = {
@@ -151,20 +152,16 @@ export const useRegisterSidebar = (
     true
   )
 
-  const { sidebars, registerSidebar, unregisterSidebar } = useSidebarManagerSnapshot()
+  const componentRef = useLatest(component)
+  const handlersRef = useLatest(handlers)
 
   useEffect(() => {
-    const isEnabled = enabled !== false
-    if (!sidebars[id] && isEnabled) {
-      registerSidebar(id, component, handlers)
-    } else if (sidebars[id] && !isEnabled) {
-      unregisterSidebar(id)
+    if (enabled) {
+      sidebarManagerState.registerSidebar(id, () => componentRef.current(), handlersRef.current)
     }
 
     return () => {
-      if (sidebars[id]) {
-        unregisterSidebar(id)
-      }
+      sidebarManagerState.unregisterSidebar(id)
     }
   }, [id, enabled])
 
