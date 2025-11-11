@@ -67,6 +67,7 @@ export const CreateVectorBucketDialog = () => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
+  const [isLoading, setIsLoading] = useState(false)
 
   const [visible, setVisible] = useState(false)
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -79,7 +80,7 @@ export const CreateVectorBucketDialog = () => {
   })
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutateAsync: createVectorBucket, isLoading: isCreating } = useVectorBucketCreateMutation({
+  const { mutateAsync: createVectorBucket } = useVectorBucketCreateMutation({
     onError: () => {},
   })
 
@@ -99,10 +100,12 @@ export const CreateVectorBucketDialog = () => {
     )
     if (hasExistingBucket) return toast.error('Bucket name already exists')
 
+    setIsLoading(true)
     try {
       await createVectorBucket({ projectRef: ref, bucketName: values.name })
     } catch (error: any) {
       toast.error(`Failed to create vector bucket: ${error.message}`)
+      setIsLoading(false)
       return
     }
 
@@ -119,6 +122,7 @@ export const CreateVectorBucketDialog = () => {
     } catch (error: any) {
       toast.error(`Failed to create vector bucket: ${error.message}`)
     }
+    setIsLoading(false)
 
     sendEvent({
       action: 'storage_bucket_created',
@@ -209,10 +213,10 @@ export const CreateVectorBucketDialog = () => {
         </Form_Shadcn_>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
+          <Button type="default" disabled={isLoading} onClick={() => setVisible(false)}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isCreating} disabled={isCreating}>
+          <Button form={formId} htmlType="submit" loading={isLoading}>
             Create
           </Button>
         </DialogFooter>
