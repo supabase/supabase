@@ -51,6 +51,11 @@ export const docsConfig: DocsConfig = {
       title: 'UI Patterns',
       items: [
         {
+          title: 'Accessibility',
+          href: '/docs/ui-patterns/accessibility',
+          items: [],
+        },
+        {
           title: 'Navigation',
           href: '/docs/ui-patterns/navigation',
           items: [],
