@@ -6,7 +6,9 @@ import { EventTimeline } from './EventTimeline'
 export function EventGallery() {
   return (
     <section className={cn('grid grid-cols-[minmax(320px,35%),16px,1fr] gap-12')}>
-      <EventGalleryFilters />
+      <div className="sticky top-24 self-start">
+        <EventGalleryFilters />
+      </div>
       <EventTimeline />
       <EventList />
     </section>

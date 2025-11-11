@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { NextRequest, NextResponse } from 'next/server'
+import { DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 
 export interface LumaGeoAddressJson {
   city: string
@@ -105,6 +106,7 @@ export async function GET(request: NextRequest) {
         url: event.url,
         timezone: event.timezone,
         cover_url: event.cover_url,
+        description: event.description,
       }))
       .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
 
