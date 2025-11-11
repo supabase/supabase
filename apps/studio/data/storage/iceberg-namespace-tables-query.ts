@@ -61,20 +61,26 @@ export const useIcebergNamespaceTablesQuery = <TData = IcebergNamespaceTablesDat
     ...options
   }: UseCustomQueryOptions<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData> = {}
 ) => {
-  const { projectRef } = params
+  const { projectRef, catalogUri, warehouse, namespace } = params
   const { data } = useTemporaryAPIKeyQuery({ projectRef })
   const tempApiKey = data?.api_key
 
   return useQuery<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData>({
     queryKey: storageKeys.icebergNamespaceTables({
       projectRef,
-      catalog: params.catalogUri,
-      warehouse: params.warehouse,
-      namespace: params.namespace,
+      warehouse,
+      namespace,
+      catalog: catalogUri,
       apikey: tempApiKey,
     }),
     queryFn: () => getNamespaceTables({ ...params, tempApiKey }),
-    enabled: enabled && typeof projectRef !== 'undefined' && typeof tempApiKey !== 'undefined',
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof tempApiKey !== 'undefined' &&
+      typeof warehouse !== 'undefined' &&
+      typeof namespace !== 'undefined' &&
+      typeof catalogUri !== 'undefined',
     ...options,
   })
 }
