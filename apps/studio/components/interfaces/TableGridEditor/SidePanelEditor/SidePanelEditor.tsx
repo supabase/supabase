@@ -173,7 +173,7 @@ export const SidePanelEditor = ({
     onComplete: (err?: any) => void
   ) => {
     if (!project || selectedTable === undefined) {
-      return console.error('no project or table selected')
+      return
     }
 
     let saveRowError: Error | undefined
@@ -292,7 +292,7 @@ export const SidePanelEditor = ({
     const { primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
 
     if (!project || selectedTable === undefined) {
-      return console.error('no project or table selected')
+      return
     }
 
     const response = isNewRecord
@@ -376,16 +376,8 @@ export const SidePanelEditor = ({
   }
 
   const updateTableRealtime = async (table: RetrieveTableResult, enabled: boolean) => {
-    if (!project) return console.error('Project is required')
+    if (!project) return
     const realtimePublication = publications?.find((pub) => pub.name === 'supabase_realtime')
-
-    const trackRealtimeStateChange = () => {
-      track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
-        method: 'ui',
-        schema_name: table.schema,
-        table_name: table.name,
-      })
-    }
 
     try {
       if (realtimePublication === undefined) {
@@ -399,10 +391,7 @@ export const SidePanelEditor = ({
           publish_delete: true,
           tables: realtimeTables,
         })
-        trackRealtimeStateChange()
-        return
-      }
-      if (realtimePublication.tables === null) {
+      } else if (realtimePublication.tables === null) {
         // UI doesn't have support for toggling realtime for ALL tables
         // Switch it to individual tables via an array of strings
         // Refer to PublicationStore for more information about this
@@ -428,30 +417,32 @@ export const SidePanelEditor = ({
           connectionString: project.connectionString,
           tables: realtimeTables,
         })
-        trackRealtimeStateChange()
-        return
-      }
-      const isAlreadyEnabled = realtimePublication.tables.some((x) => x.id == table.id)
-      const realtimeTables =
-        isAlreadyEnabled && !enabled
-          ? // Toggle realtime off
-            realtimePublication.tables
-              .filter((t) => t.id !== table.id)
-              .map((t) => `${t.schema}.${t.name}`)
-          : !isAlreadyEnabled && enabled
-            ? // Toggle realtime on
-              realtimePublication.tables
+      } else {
+        const isAlreadyEnabled = realtimePublication.tables.some((x) => x.id === table.id)
+        const realtimeTables =
+          isAlreadyEnabled && !enabled
+            ? realtimePublication.tables
+                .filter((t) => t.id !== table.id)
                 .map((t) => `${t.schema}.${t.name}`)
-                .concat([`${table.schema}.${table.name}`])
-            : null
-      if (realtimeTables === null) return
-      await updatePublication({
-        id: realtimePublication.id,
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        tables: realtimeTables,
+            : !isAlreadyEnabled && enabled
+              ? realtimePublication.tables
+                  .map((t) => `${t.schema}.${t.name}`)
+                  .concat([`${table.schema}.${table.name}`])
+              : null
+        if (realtimeTables === null) return
+        await updatePublication({
+          id: realtimePublication.id,
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          tables: realtimeTables,
+        })
+      }
+
+      track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
+        method: 'ui',
+        schema_name: table.schema,
+        table_name: table.name,
       })
-      trackRealtimeStateChange()
     } catch (error: any) {
       toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
     }
@@ -579,7 +570,7 @@ export const SidePanelEditor = ({
 
   const onImportData = async (importContent: ImportContent) => {
     if (!project || selectedTable === undefined) {
-      return console.error('no project or table selected')
+      return
     }
 
     const { file, rowCount, selectedHeaders, resolve } = importContent

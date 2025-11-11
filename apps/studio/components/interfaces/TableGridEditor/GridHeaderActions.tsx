@@ -198,9 +198,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
     hasTrackedExposure.current = true
 
-    const daysSinceCreation = Math.floor(
-      (Date.now() - new Date(project.inserted_at).getTime()) / (1000 * 60 * 60 * 24)
-    )
+    const daysSinceCreation = dayjs().diff(dayjs(project.inserted_at), 'day')
 
     track('realtime_experiment_exposed', {
       variant: realtimeButtonVariant,
@@ -210,8 +208,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   }, [isTable, isNewProject, realtimeButtonVariant, project, isRealtimeEnabled, track])
 
   const toggleRealtime = async () => {
-    if (!project) return console.error('Project is required')
-    if (!realtimePublication) return console.error('Unable to find realtime publication')
+    if (!project || !realtimePublication) return
 
     const exists = realtimeEnabledTables.some((x: any) => x.id === table.id)
     const tables = !exists
