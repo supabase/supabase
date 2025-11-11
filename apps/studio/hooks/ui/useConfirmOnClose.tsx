@@ -1,69 +1,56 @@
-import { useCallback, useState, type ReactNode } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import useLatest from '../misc/useLatest'
 
-export type ConfirmOnCloseModalProps = {
+export interface ConfirmOnCloseModalProps {
   visible: boolean
   onClose: () => void
   onCancel: () => void
 }
 
-type UseConfirmOnCloseBaseParams = {
+interface UseConfirmOnCloseProps {
   checkIsDirty: () => boolean
   onClose: () => void
 }
 
-type UseConfirmOnCloseParams<ExtraProps extends Record<string, unknown> | undefined = undefined> =
-  UseConfirmOnCloseBaseParams &
-    (ExtraProps extends undefined
-      ? {
-          ConfirmationModal: (props: ConfirmOnCloseModalProps) => ReactNode
-        }
-      : {
-          ConfirmationModal: (props: ConfirmOnCloseModalProps & ExtraProps) => ReactNode
-          extraProps: ExtraProps
-        })
-
-type ConfirmOnCloseReturn = {
-  confirmOnClose: () => void
-  modal: ReactNode
-}
-
-export const useConfirmOnClose = <
-  ExtraProps extends Record<string, unknown> | undefined = undefined,
->(
-  props: UseConfirmOnCloseParams<ExtraProps>
-): ConfirmOnCloseReturn => {
-  const { checkIsDirty, onClose, ConfirmationModal } = props
-
+export const useConfirmOnClose = ({ checkIsDirty, onClose }: UseConfirmOnCloseProps) => {
   const [visible, setVisible] = useState(false)
 
+  const checkIsDirtyRef = useLatest(checkIsDirty)
+  const onCloseRef = useLatest(onClose)
+
   const confirmOnClose = useCallback(() => {
-    if (checkIsDirty()) {
+    if (checkIsDirtyRef.current()) {
       setVisible(true)
     } else {
-      onClose()
+      onCloseRef.current()
     }
-  }, [checkIsDirty, onClose])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  const onConfirm = () => {
+  const onConfirm = useCallback(() => {
     setVisible(false)
-    onClose()
-  }
+    onCloseRef.current()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  const baseModalProps: ConfirmOnCloseModalProps = {
-    visible,
-    onClose: onConfirm,
-    onCancel: () => setVisible(false),
-  }
+  const onCancel = useCallback(() => {
+    setVisible(false)
+  }, [])
 
-  const modal =
-    'extraProps' in props ? (
-      <ConfirmationModal {...baseModalProps} {...props.extraProps} />
-    ) : (
-      <ConfirmationModal {...baseModalProps} />
-    )
+  const modalProps: ConfirmOnCloseModalProps = useMemo(
+    () => ({
+      visible,
+      onClose: onConfirm,
+      onCancel,
+    }),
+    [visible, onConfirm, onCancel]
+  )
 
-  return {
-    confirmOnClose,
-    modal,
-  }
+  return useMemo(
+    () => ({
+      confirmOnClose,
+      modalProps,
+    }),
+    [confirmOnClose, modalProps]
+  )
 }

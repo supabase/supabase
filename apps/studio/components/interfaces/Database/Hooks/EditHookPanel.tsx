@@ -4,12 +4,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
 import { Button, Form, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -259,13 +259,12 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
     }
   }, [visible])
 
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => isEdited,
     onClose: () => {
       setIsEdited(false)
       onClose()
     },
-    ConfirmationModal: CloseConfirmationModal,
   })
 
   return (
@@ -331,7 +330,7 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
           }}
         </Form>
       </SidePanel>
-      {closeConfirmationModal}
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>
   )
 }

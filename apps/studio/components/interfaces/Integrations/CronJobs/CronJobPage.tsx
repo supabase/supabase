@@ -52,13 +52,12 @@ export const CronJobPage = () => {
   const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
 
   const [isDirty, setIsDirty] = useState(false)
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       setIsDirty(false)
       setIsEditSheetOpen(false)
     },
-    ConfirmationModal: CloseConfirmationModal,
   })
 
   const breadcrumbItems = [
@@ -195,7 +194,7 @@ export const CronJobPage = () => {
           )}
         </SheetContent>
       </Sheet>
-      {closeConfirmationModal}
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>
   )
 }

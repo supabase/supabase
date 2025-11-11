@@ -80,13 +80,12 @@ export const SidePanelEditor = ({
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => isEdited,
     onClose: () => {
       setIsEdited(false)
       snap.closeSidePanel()
     },
-    ConfirmationModal: CloseConfirmationModal,
   })
 
   const enumArrayColumns = (selectedTable?.columns ?? [])
@@ -691,7 +690,7 @@ export const SidePanelEditor = ({
         closePanel={onClosePanel}
         updateEditorDirty={setIsEdited}
       />
-      {closeConfirmationModal}
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>
   )
 }

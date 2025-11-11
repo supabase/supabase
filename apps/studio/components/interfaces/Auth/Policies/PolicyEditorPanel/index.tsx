@@ -164,10 +164,9 @@ export const PolicyEditorPanel = memo(function ({
     return policyCreateUnsaved || policyUpdateUnsaved
   }, [command, name, roles, selectedPolicy])
 
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: hasUnsavedChanges,
     onClose: onSelectCancel,
-    ConfirmationModal: CloseConfirmationModal,
   })
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -573,7 +572,7 @@ export const PolicyEditorPanel = memo(function ({
         </form>
       </Form_Shadcn_>
 
-      {closeConfirmationModal}
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>
   )
 })

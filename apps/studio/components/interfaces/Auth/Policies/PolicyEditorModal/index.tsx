@@ -74,13 +74,12 @@ const PolicyEditorModal = ({
   const [policyStatementForReview, setPolicyStatementForReview] = useState<any>('')
   const [isDirty, setIsDirty] = useState(false)
 
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       onSelectCancel()
       setIsDirty(false)
     },
-    ConfirmationModal: CloseConfirmationModal,
   })
 
   const onViewIntro = useCallback(() => setView(POLICY_MODAL_VIEWS.SELECTION), [])
@@ -199,7 +198,7 @@ const PolicyEditorModal = ({
       onCancel={confirmOnClose}
     >
       <div>
-        {closeConfirmationModal}
+        <CloseConfirmationModal {...closeConfirmationModalProps} />
         {view === POLICY_MODAL_VIEWS.SELECTION ? (
           <PolicySelection
             description="Write rules with PostgreSQL's policies to fit your unique business needs."

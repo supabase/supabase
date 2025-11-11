@@ -12,8 +12,8 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import type { FormSchema } from 'types'
 import {
@@ -87,10 +87,9 @@ export const CreateFunction = ({
   })
   const language = form.watch('language')
 
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
-    ConfirmationModal: CloseConfirmationModal,
   })
 
   const { mutate: createDatabaseFunction, isLoading: isCreating } =
@@ -403,7 +402,7 @@ export const CreateFunction = ({
             </Button>
           </SheetFooter>
         </div>
-        {closeConfirmationModal}
+        <CloseConfirmationModal {...closeConfirmationModalProps} />
       </SheetContent>
     </Sheet>
   )

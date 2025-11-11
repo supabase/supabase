@@ -11,8 +11,8 @@ import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/databas
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -33,6 +33,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ChooseFunctionForm from './ChooseFunctionForm'
 import {
@@ -41,7 +42,6 @@ import {
   TRIGGER_ORIENTATIONS,
   TRIGGER_TYPES,
 } from './Triggers.constants'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const formId = 'create-trigger'
 
@@ -135,10 +135,9 @@ export const TriggerSheet = ({
   })
   const { function_name, function_schema } = form.watch()
 
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
-    ConfirmationModal: CloseConfirmationModal,
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
@@ -482,7 +481,7 @@ export const TriggerSheet = ({
             </Button>
           </SheetFooter>
 
-          {closeConfirmationModal}
+          <CloseConfirmationModal {...closeConfirmationModalProps} />
         </SheetContent>
       </Sheet>
 

@@ -106,10 +106,9 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
 
   const checkIsDirty = () => form.formState.isDirty
 
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty,
     onClose,
-    ConfirmationModal: CloseConfirmationModal,
   })
 
   const onSubmit: SubmitHandler<CreateQueueForm> = async ({ name, enableRls, values }) => {
@@ -334,7 +333,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
             </Button>
           </SheetFooter>
         </div>
-        {closeConfirmationModal}
+        <CloseConfirmationModal {...closeConfirmationModalProps} />
       </SheetContent>
     </Sheet>
   )

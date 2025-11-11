@@ -113,10 +113,9 @@ export const EditWrapperSheet = ({
 
   const checkIsDirty = useCallback(() => hasChangesRef.current, [])
 
-  const { confirmOnClose, modal: closeConfirmationModal } = useConfirmOnClose({
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
     checkIsDirty,
     onClose,
-    ConfirmationModal: CloseConfirmationModal,
   })
 
   useEffect(() => {
@@ -351,7 +350,7 @@ export const EditWrapperSheet = ({
         </Form>
       </div>
 
-      {closeConfirmationModal}
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
 
       <WrapperTableEditor
         visible={isEditingTable}
