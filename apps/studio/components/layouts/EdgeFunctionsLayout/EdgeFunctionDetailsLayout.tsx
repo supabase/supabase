@@ -1,14 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download, FileArchive, Send } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useState, type PropsWithChildren } from 'react'
+import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
@@ -19,14 +18,30 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
 import {
+  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
+  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
+  BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
+  NavMenu,
+  NavMenuItem,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Separator,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderBreadcrumb,
+  PageHeaderFooter,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 
@@ -81,6 +96,10 @@ const EdgeFunctionDetailsLayout = ({
     {
       label: 'Edge Functions',
       href: `/project/${ref}/functions`,
+    },
+    {
+      label: functionSlug,
+      href: `/project/${ref}/functions/${functionSlug}`,
     },
   ]
 
@@ -155,78 +174,119 @@ const EdgeFunctionDetailsLayout = ({
 
   return (
     <EdgeFunctionsLayout>
-      <PageLayout
-        isCompact
-        size="full"
-        title={functionSlug ? name : 'Edge Functions'}
-        breadcrumbs={breadcrumbItems}
-        navigationItems={navigationItems}
-        primaryActions={
-          <div className="flex items-center space-x-2">
-            {isNewAPIDocsEnabled && (
-              <APIDocsButton
-                section={
-                  functionSlug !== undefined ? ['edge-functions', functionSlug] : ['edge-functions']
-                }
-                source="edge-functions"
-              />
-            )}
-            <DocsButton href={`${DOCS_URL}/guides/functions`} />
-            <Popover_Shadcn_>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="default" icon={<Download />}>
-                  Download
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ align="end" className="p-0">
-                <div className="p-3 flex flex-col gap-y-2">
-                  <p className="text-xs text-foreground-light">Download via CLI</p>
-                  <Input
-                    copy
-                    showCopyOnHover
-                    readOnly
-                    containerClassName=""
-                    className="text-xs font-mono tracking-tighter"
-                    value={`supabase functions download ${functionSlug}`}
+      <div className="w-full min-h-full flex flex-col items-stretch">
+        <PageHeader size="full">
+          {breadcrumbItems.length > 0 && (
+            <PageHeaderBreadcrumb size="full">
+              <BreadcrumbList>
+                {breadcrumbItems.map((item, index) => (
+                  <React.Fragment key={item.label || `breadcrumb-${index}`}>
+                    <BreadcrumbItem>
+                      {item.href ? (
+                        <BreadcrumbLink asChild>
+                          <Link href={item.href}>{item.label}</Link>
+                        </BreadcrumbLink>
+                      ) : (
+                        <span>{item.label}</span>
+                      )}
+                    </BreadcrumbItem>
+                    {index < breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
+                  </React.Fragment>
+                ))}
+              </BreadcrumbList>
+            </PageHeaderBreadcrumb>
+          )}
+
+          <PageHeaderMeta size="full">
+            <PageHeaderSummary>
+              <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
+            </PageHeaderSummary>
+
+            <PageHeaderAside>
+              <div className="flex items-center space-x-2">
+                {isNewAPIDocsEnabled && (
+                  <APIDocsButton
+                    section={
+                      functionSlug !== undefined
+                        ? ['edge-functions', functionSlug]
+                        : ['edge-functions']
+                    }
+                    source="edge-functions"
                   />
-                </div>
-                <Separator className="!bg-border-overlay" />
-                <div className="py-2 px-1">
+                )}
+                <DocsButton href={`${DOCS_URL}/guides/functions`} />
+                <Popover_Shadcn_>
+                  <PopoverTrigger_Shadcn_ asChild>
+                    <Button type="default" icon={<Download />}>
+                      Download
+                    </Button>
+                  </PopoverTrigger_Shadcn_>
+                  <PopoverContent_Shadcn_ align="end" className="p-0">
+                    <div className="p-3 flex flex-col gap-y-2">
+                      <p className="text-xs text-foreground-light">Download via CLI</p>
+                      <Input
+                        copy
+                        showCopyOnHover
+                        readOnly
+                        containerClassName=""
+                        className="text-xs font-mono tracking-tighter"
+                        value={`supabase functions download ${functionSlug}`}
+                      />
+                    </div>
+                    <Separator className="!bg-border-overlay" />
+                    <div className="py-2 px-1">
+                      <Button
+                        type="text"
+                        className="w-min hover:bg-transparent"
+                        icon={<FileArchive />}
+                        onClick={downloadFunction}
+                      >
+                        Download as ZIP
+                      </Button>
+                    </div>
+                  </PopoverContent_Shadcn_>
+                </Popover_Shadcn_>
+                {!!functionSlug && (
                   <Button
-                    type="text"
-                    className="w-min hover:bg-transparent"
-                    icon={<FileArchive />}
-                    onClick={downloadFunction}
+                    type="default"
+                    icon={<Send />}
+                    onClick={() => {
+                      setIsOpen(true)
+                      sendEvent({
+                        action: 'edge_function_test_side_panel_opened',
+                        groups: {
+                          project: ref ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
+                      })
+                    }}
                   >
-                    Download as ZIP
+                    Test
                   </Button>
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
-            {!!functionSlug && (
-              <Button
-                type="default"
-                icon={<Send />}
-                onClick={() => {
-                  setIsOpen(true)
-                  sendEvent({
-                    action: 'edge_function_test_side_panel_opened',
-                    groups: {
-                      project: ref ?? 'Unknown',
-                      organization: org?.slug ?? 'Unknown',
-                    },
-                  })
-                }}
-              >
-                Test
-              </Button>
-            )}
-          </div>
-        }
-      >
+                )}
+              </div>
+            </PageHeaderAside>
+          </PageHeaderMeta>
+
+          {navigationItems.length > 0 && (
+            <PageHeaderFooter size="full">
+              <NavMenu>
+                {navigationItems.map((item) => {
+                  const isActive = router.asPath.split('?')[0] === item.href
+                  return (
+                    <NavMenuItem key={item.label} active={isActive}>
+                      <Link href={item.href}>{item.label}</Link>
+                    </NavMenuItem>
+                  )
+                })}
+              </NavMenu>
+            </PageHeaderFooter>
+          )}
+        </PageHeader>
+
         {children}
         <EdgeFunctionTesterSheet visible={isOpen} onClose={() => setIsOpen(false)} />
-      </PageLayout>
+      </div>
     </EdgeFunctionsLayout>
   )
 }

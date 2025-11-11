@@ -34,17 +34,21 @@
       "import": "./src/AuthenticatedDropdownMenu/index.tsx",
       "types": "./src/AuthenticatedDropdownMenu/index.tsx"
     },
+    "./Banners/AnnouncementBanner": {
+      "import": "./src/Banners/AnnouncementBanner.tsx",
+      "types": "./src/Banners/AnnouncementBanner.tsx"
+    },
     "./Banners/Countdown": {
       "import": "./src/Banners/Countdown.tsx",
       "types": "./src/Banners/Countdown.tsx"
     },
-    "./Banners/LW14Announcement": {
-      "import": "./src/Banners/LW14Announcement.tsx",
-      "types": "./src/Banners/LW14Announcement.tsx"
+    "./Banners/LW15Banner": {
+      "import": "./src/Banners/LW15Banner.tsx",
+      "types": "./src/Banners/LW15Banner.tsx"
     },
-    "./Banners/LW14Banner": {
-      "import": "./src/Banners/LW14Banner.tsx",
-      "types": "./src/Banners/LW14Banner.tsx"
+    "./Banners": {
+      "import": "./src/Banners/index.ts",
+      "types": "./src/Banners/index.ts"
     },
     "./CommandMenu/api/Badges": {
       "import": "./src/CommandMenu/api/Badges.tsx",
@@ -97,6 +101,14 @@
     "./CommandMenu/api/hooks/useCommandFilterState": {
       "import": "./src/CommandMenu/api/hooks/useCommandFilterState.ts",
       "types": "./src/CommandMenu/api/hooks/useCommandFilterState.ts"
+    },
+    "./CommandMenu/api/hooks/useCommandMenuTelemetry": {
+      "import": "./src/CommandMenu/api/hooks/useCommandMenuTelemetry.ts",
+      "types": "./src/CommandMenu/api/hooks/useCommandMenuTelemetry.ts"
+    },
+    "./CommandMenu/api/hooks/useCommandMenuTelemetryContext": {
+      "import": "./src/CommandMenu/api/hooks/useCommandMenuTelemetryContext.tsx",
+      "types": "./src/CommandMenu/api/hooks/useCommandMenuTelemetryContext.tsx"
     },
     "./CommandMenu/api/hooks/useCrossCompatRouter": {
       "import": "./src/CommandMenu/api/hooks/useCrossCompatRouter.tsx",
@@ -214,6 +226,10 @@
       "import": "./src/CommandMenu/prepackaged/ai/queryAi.ts",
       "types": "./src/CommandMenu/prepackaged/ai/queryAi.ts"
     },
+    "./CommandMenu/prepackaged/ai/useAiChat.test": {
+      "import": "./src/CommandMenu/prepackaged/ai/useAiChat.test.ts",
+      "types": "./src/CommandMenu/prepackaged/ai/useAiChat.test.ts"
+    },
     "./CommandMenu/prepackaged/ai/useAiChat": {
       "import": "./src/CommandMenu/prepackaged/ai/useAiChat.ts",
       "types": "./src/CommandMenu/prepackaged/ai/useAiChat.ts"
@@ -278,6 +294,14 @@
       "import": "./src/ExpandableVideo/index.tsx",
       "types": "./src/ExpandableVideo/index.tsx"
     },
+    "./FilterBar/DefaultCommandList": {
+      "import": "./src/FilterBar/DefaultCommandList.tsx",
+      "types": "./src/FilterBar/DefaultCommandList.tsx"
+    },
+    "./FilterBar/FilterBar.test": {
+      "import": "./src/FilterBar/FilterBar.test.tsx",
+      "types": "./src/FilterBar/FilterBar.test.tsx"
+    },
     "./FilterBar/FilterBar": {
       "import": "./src/FilterBar/FilterBar.tsx",
       "types": "./src/FilterBar/FilterBar.tsx"
@@ -290,13 +314,49 @@
       "import": "./src/FilterBar/FilterGroup.tsx",
       "types": "./src/FilterBar/FilterGroup.tsx"
     },
+    "./FilterBar/hooks.test": {
+      "import": "./src/FilterBar/hooks.test.ts",
+      "types": "./src/FilterBar/hooks.test.ts"
+    },
+    "./FilterBar/hooks": {
+      "import": "./src/FilterBar/hooks.ts",
+      "types": "./src/FilterBar/hooks.ts"
+    },
     "./FilterBar": {
       "import": "./src/FilterBar/index.ts",
       "types": "./src/FilterBar/index.ts"
     },
+    "./FilterBar/menuItems": {
+      "import": "./src/FilterBar/menuItems.ts",
+      "types": "./src/FilterBar/menuItems.ts"
+    },
     "./FilterBar/types": {
       "import": "./src/FilterBar/types.ts",
       "types": "./src/FilterBar/types.ts"
+    },
+    "./FilterBar/useAIFilter": {
+      "import": "./src/FilterBar/useAIFilter.ts",
+      "types": "./src/FilterBar/useAIFilter.ts"
+    },
+    "./FilterBar/useCommandHandling": {
+      "import": "./src/FilterBar/useCommandHandling.ts",
+      "types": "./src/FilterBar/useCommandHandling.ts"
+    },
+    "./FilterBar/useCommandMenu": {
+      "import": "./src/FilterBar/useCommandMenu.ts",
+      "types": "./src/FilterBar/useCommandMenu.ts"
+    },
+    "./FilterBar/useKeyboardNavigation": {
+      "import": "./src/FilterBar/useKeyboardNavigation.ts",
+      "types": "./src/FilterBar/useKeyboardNavigation.ts"
+    },
+    "./FilterBar/utils.test": {
+      "import": "./src/FilterBar/utils.test.ts",
+      "types": "./src/FilterBar/utils.test.ts"
+    },
+    "./FilterBar/utils": {
+      "import": "./src/FilterBar/utils.ts",
+      "types": "./src/FilterBar/utils.ts"
     },
     "./GlassPanel": {
       "import": "./src/GlassPanel/index.tsx",
@@ -314,9 +374,45 @@
       "import": "./src/LogsBarChart/index.tsx",
       "types": "./src/LogsBarChart/index.tsx"
     },
+    "./McpUrlBuilder/McpConfigPanel": {
+      "import": "./src/McpUrlBuilder/McpConfigPanel.tsx",
+      "types": "./src/McpUrlBuilder/McpConfigPanel.tsx"
+    },
+    "./McpUrlBuilder/components/ClientSelectDropdown": {
+      "import": "./src/McpUrlBuilder/components/ClientSelectDropdown.tsx",
+      "types": "./src/McpUrlBuilder/components/ClientSelectDropdown.tsx"
+    },
+    "./McpUrlBuilder/components/ConnectionIcon": {
+      "import": "./src/McpUrlBuilder/components/ConnectionIcon.tsx",
+      "types": "./src/McpUrlBuilder/components/ConnectionIcon.tsx"
+    },
+    "./McpUrlBuilder/components/McpConfigurationDisplay": {
+      "import": "./src/McpUrlBuilder/components/McpConfigurationDisplay.tsx",
+      "types": "./src/McpUrlBuilder/components/McpConfigurationDisplay.tsx"
+    },
+    "./McpUrlBuilder/components/McpConfigurationOptions": {
+      "import": "./src/McpUrlBuilder/components/McpConfigurationOptions.tsx",
+      "types": "./src/McpUrlBuilder/components/McpConfigurationOptions.tsx"
+    },
+    "./McpUrlBuilder/constants": {
+      "import": "./src/McpUrlBuilder/constants.tsx",
+      "types": "./src/McpUrlBuilder/constants.tsx"
+    },
     "./McpUrlBuilder": {
       "import": "./src/McpUrlBuilder/index.ts",
       "types": "./src/McpUrlBuilder/index.ts"
+    },
+    "./McpUrlBuilder/types": {
+      "import": "./src/McpUrlBuilder/types.ts",
+      "types": "./src/McpUrlBuilder/types.ts"
+    },
+    "./McpUrlBuilder/utils/getMcpButtonData": {
+      "import": "./src/McpUrlBuilder/utils/getMcpButtonData.ts",
+      "types": "./src/McpUrlBuilder/utils/getMcpButtonData.ts"
+    },
+    "./McpUrlBuilder/utils/getMcpUrl": {
+      "import": "./src/McpUrlBuilder/utils/getMcpUrl.ts",
+      "types": "./src/McpUrlBuilder/utils/getMcpUrl.ts"
     },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
@@ -338,6 +434,22 @@
       "import": "./src/MultiSelectDeprecated/index.tsx",
       "types": "./src/MultiSelectDeprecated/index.tsx"
     },
+    "./PageContainer": {
+      "import": "./src/PageContainer/index.tsx",
+      "types": "./src/PageContainer/index.tsx"
+    },
+    "./PageHeader": {
+      "import": "./src/PageHeader/index.tsx",
+      "types": "./src/PageHeader/index.tsx"
+    },
+    "./PageSection": {
+      "import": "./src/PageSection/index.tsx",
+      "types": "./src/PageSection/index.tsx"
+    },
+    "./PopupFrame": {
+      "import": "./src/PopupFrame/index.tsx",
+      "types": "./src/PopupFrame/index.tsx"
+    },
     "./PrivacySettings": {
       "import": "./src/PrivacySettings/index.tsx",
       "types": "./src/PrivacySettings/index.tsx"
@@ -353,6 +465,14 @@
     "./PromoToast": {
       "import": "./src/PromoToast/index.ts",
       "types": "./src/PromoToast/index.ts"
+    },
+    "./Row/Row.utils": {
+      "import": "./src/Row/Row.utils.ts",
+      "types": "./src/Row/Row.utils.ts"
+    },
+    "./Row": {
+      "import": "./src/Row/index.tsx",
+      "types": "./src/Row/index.tsx"
     },
     "./ShimmeringLoader": {
       "import": "./src/ShimmeringLoader/index.tsx",
