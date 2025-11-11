@@ -8,13 +8,52 @@ import authors from 'lib/authors.json'
 import { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
 
 /**
- * Parse hosts from a comma-separated string of author IDs
+ * Parse hosts from either a comma-separated string of author IDs or an array of host objects
  * Maps author IDs to EventHost objects using the authors.json file
  */
-function parseHostsFromAuthors(hostsString?: string): EventHost[] {
-  if (!hostsString) return [SUPABASE_HOST]
+function parseHostsFromAuthors(
+  hostsData?: string | Array<{ name: string; avatar_url?: string | null }>
+): EventHost[] {
+  if (!hostsData) return [SUPABASE_HOST]
 
-  const hostIds = hostsString.split(',').map((id) => id.trim())
+  // Handle array format (new format from MDX files)
+  if (Array.isArray(hostsData)) {
+    const hosts = hostsData
+      .map((host) => {
+        // Try to find author by name for additional data
+        const author = authors.find((a: any) => a.author === host.name || a.author_id === host.name)
+
+        if (author) {
+          return {
+            id: (author as any).author_id || host.name,
+            email: (author as any).author_url || '',
+            name: (author as any).author || host.name,
+            first_name: (author as any).author?.split(' ')[0] || host.name?.split(' ')[0] || null,
+            last_name:
+              (author as any).author?.split(' ').slice(1).join(' ') ||
+              host.name?.split(' ').slice(1).join(' ') ||
+              null,
+            avatar_url: host.avatar_url || (author as any).author_image_url || '',
+          }
+        }
+
+        // Return host as-is if no author match
+        return {
+          id: host.name,
+          email: '',
+          name: host.name,
+          first_name: host.name?.split(' ')[0] || null,
+          last_name: host.name?.split(' ').slice(1).join(' ') || null,
+          avatar_url: host.avatar_url || '',
+        }
+      })
+      .filter((host): host is EventHost => host !== null && host.name !== null)
+
+    return hosts.length > 0 ? hosts : [SUPABASE_HOST]
+  }
+
+  // Handle string format (legacy format)
+  const hostIds = hostsData.split(',').map((id) => id.trim())
   const hosts = hostIds
     .map((hostId) => {
       const author = authors.find((a: any) => a.author_id === hostId)
