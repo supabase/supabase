@@ -143,8 +143,6 @@ export const CreateWrapperSheet = ({
       }
     }
 
-    console.log(errors)
-
     setFormErrors(errors)
     if (!isEmpty(errors)) return
 
