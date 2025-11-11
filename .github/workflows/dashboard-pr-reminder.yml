@@ -7,9 +7,6 @@ on:
     # Run at 10am US Eastern Time (2pm UTC = 10am EDT / 9am EST)
     - cron: '0 14 * * *'
   workflow_dispatch: # Allow manual trigger for testing
-  push: # TODO Remove before merging to main
-    branches:
-      - 'aliwaseem/fe-2076-create-slackbot-to-ping-prs-that-are-over-the-24-sla' # Testing branch only (remove before merging to main)
 
 permissions:
   pull-requests: read
