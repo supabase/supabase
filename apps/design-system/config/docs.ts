@@ -45,16 +45,16 @@ export const docsConfig: DocsConfig = {
           href: '/docs/changelog',
           items: [],
         },
-      ],
-    },
-    {
-      title: 'UI Patterns',
-      items: [
         {
           title: 'Accessibility',
           href: '/docs/ui-patterns/accessibility',
           items: [],
         },
+      ],
+    },
+    {
+      title: 'UI Patterns',
+      items: [
         {
           title: 'Navigation',
           href: '/docs/ui-patterns/navigation',
