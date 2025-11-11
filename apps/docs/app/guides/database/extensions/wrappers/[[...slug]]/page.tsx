@@ -231,7 +231,7 @@ const pageMap = [
       title: 'AWS S3 Vectors',
       dashboardIntegrationPath: 's3_vectors_wrapper',
     },
-    remoteFile: 's3_vectors.md',
+    remoteFile: 's3vectors.md',
   },
   {
     slug: 'snowflake',
