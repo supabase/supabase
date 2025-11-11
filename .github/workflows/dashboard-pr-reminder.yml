@@ -58,6 +58,12 @@ jobs:
                   continue;
                 }
                 
+                // Skip dependabot PRs
+                if (pr.user.login === 'dependabot[bot]' || pr.user.login === 'dependabot') {
+                  console.log(`PR #${pr.number} is from dependabot, skipping...`);
+                  continue;
+                }
+                
                 const createdAt = new Date(pr.created_at);
                 
                 // If this PR is newer than 24 hours, skip it
@@ -156,6 +162,12 @@ jobs:
               };
             });
 
+            // Slack has a 50 block limit, we use 3 for header/intro/divider
+            // So we can show max 47 PRs
+            const MAX_PRS_TO_SHOW = 47;
+            const prBlocksToShow = prBlocks.slice(0, MAX_PRS_TO_SHOW);
+            const hasMorePRs = prBlocks.length > MAX_PRS_TO_SHOW;
+
             // Build complete Slack message
             const slackMessage = {
               text: "Dashboard PRs needing attention",
@@ -171,13 +183,13 @@ jobs:
                   type: "section",
                   text: {
                     type: "mrkdwn",
-                    text: `There are *${count}* open PRs affecting /apps/studio/ that are older than 24 hours:`
+                    text: `There are *${count}* open PRs affecting /apps/studio/ that are older than 24 hours:${hasMorePRs ? ` (showing first ${MAX_PRS_TO_SHOW})` : ''}`
                   }
                 },
                 {
                   type: "divider"
                 },
-                prBlocks[0],
+                ...prBlocksToShow
               ]
             };
 
