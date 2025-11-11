@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
   ScaffoldContainer,
   ScaffoldHeader,
@@ -12,11 +13,15 @@ import {
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
+import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
+import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
 import { useVectorBucketQuery } from 'data/storage/vector-bucket-query'
 import {
   useVectorBucketsIndexesQuery,
   VectorBucketIndex,
 } from 'data/storage/vector-buckets-indexes-query'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Card,
@@ -34,10 +39,13 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { Admonition } from 'ui-patterns/admonition'
 import { CreateVectorTableSheet } from './CreateVectorTableSheet'
 import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
 import { DeleteVectorTableModal } from './DeleteVectorTableModal'
 import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
+import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
+import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 
 export const VectorBucketDetails = () => {
   const router = useRouter()
@@ -66,6 +74,25 @@ export const VectorBucketDetails = () => {
       : allIndexes.filter((index) =>
           index.indexName.toLowerCase().includes(filterString.toLowerCase())
         )
+
+  const { extension: wrappersExtension, state: extensionState } = useS3VectorsWrapperExtension()
+  const {
+    data: wrapperInstance,
+    meta: wrapperMeta,
+    isLoading: isLoadingWrapper,
+  } = useS3VectorsWrapperInstance({
+    bucketId,
+  })
+
+  const isLoading = isLoadingIndexes || isLoadingWrapper
+
+  const state = isLoading
+    ? 'loading'
+    : extensionState === 'installed'
+      ? wrapperInstance
+        ? 'added'
+        : 'missing'
+      : extensionState
 
   return (
     <>
@@ -96,6 +123,24 @@ export const VectorBucketDetails = () => {
               <CreateVectorTableSheet bucketName={bucket?.vectorBucketName} />
             </div>
 
+            {state === 'not-installed' && (
+              <ExtensionNotInstalled
+                bucketName={bucket?.vectorBucketName}
+                projectRef={projectRef!}
+                wrapperMeta={wrapperMeta!}
+                wrappersExtension={wrappersExtension!}
+              />
+            )}
+            {state === 'needs-upgrade' && (
+              <ExtensionNeedsUpgrade
+                bucketName={bucket?.vectorBucketName}
+                projectRef={projectRef!}
+                wrapperMeta={wrapperMeta!}
+                wrappersExtension={wrappersExtension!}
+              />
+            )}
+
+            {state === 'missing' && <WrapperMissing bucketName={bucket?.vectorBucketName} />}
             {isLoadingIndexes ? (
               <GenericSkeletonLoader />
             ) : (
@@ -245,6 +290,125 @@ export const VectorBucketDetails = () => {
           router.push(`/project/${projectRef}/storage/vectors`)
         }}
       />
+    </>
+  )
+}
+
+const ExtensionNotInstalled = ({
+  bucketName,
+  projectRef,
+  wrapperMeta,
+  wrappersExtension,
+}: {
+  bucketName?: string
+  projectRef: string
+  wrapperMeta: WrapperMeta
+  wrappersExtension: DatabaseExtension
+}) => {
+  const databaseNeedsUpgrading =
+    (wrappersExtension?.default_version ?? '') < (wrapperMeta?.minimumExtensionVersion ?? '')
+
+  return (
+    <>
+      <ScaffoldSection isFullWidth>
+        <Admonition type="warning" title="Missing required extension" className="mb-0">
+          <p>
+            The Wrappers extension is required in order to query vector tables.{' '}
+            {databaseNeedsUpgrading &&
+              'Please first upgrade your database and then install the extension.'}{' '}
+            <InlineLink
+              href={`${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-foreground-lighter hover:text-foreground transition-colors"
+            >
+              Learn more
+            </InlineLink>
+          </p>
+          <Button type="default" asChild className="mt-2" onClick={() => {}}>
+            <Link
+              href={
+                databaseNeedsUpgrading
+                  ? `/project/${projectRef}/settings/infrastructure`
+                  : `/project/${projectRef}/database/extensions?filter=wrappers`
+              }
+            >
+              {databaseNeedsUpgrading ? 'Upgrade database' : 'Install extension'}
+            </Link>
+          </Button>
+        </Admonition>
+      </ScaffoldSection>
+    </>
+  )
+}
+
+const ExtensionNeedsUpgrade = ({
+  bucketName,
+  projectRef,
+  wrapperMeta,
+  wrappersExtension,
+}: {
+  bucketName?: string
+  projectRef: string
+  wrapperMeta: WrapperMeta
+  wrappersExtension: DatabaseExtension
+}) => {
+  // [Joshen] Default version is what's on the DB, so if the installed version is already the default version
+  // but still doesnt meet the minimum extension version, then DB upgrade is required
+  const databaseNeedsUpgrading =
+    wrappersExtension?.installed_version === wrappersExtension?.default_version
+
+  return (
+    <>
+      <ScaffoldSection isFullWidth>
+        <Admonition type="warning" title="Outdated extension version" className="mb-0">
+          <p>
+            The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
+            {wrapperMeta.minimumExtensionVersion}. You have version{' '}
+            {wrappersExtension?.installed_version} installed. Please{' '}
+            {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the extension
+            by disabling and enabling the Wrappers extension.
+          </p>
+          <p>
+            Before reinstalling the wrapper extension, you must first remove all existing wrappers.
+            Afterward, you can recreate the wrappers.
+          </p>
+          <Button asChild type="default">
+            <Link
+              href={
+                databaseNeedsUpgrading
+                  ? `/project/${projectRef}/settings/infrastructure`
+                  : `/project/${projectRef}/database/extensions?filter=wrappers`
+              }
+            >
+              {databaseNeedsUpgrading ? 'Upgrade database' : 'Extensions'}
+            </Link>
+          </Button>
+        </Admonition>
+      </ScaffoldSection>
+    </>
+  )
+}
+
+const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
+  const { mutateAsync: createS3VectorsWrapper, isLoading: isCreatingS3VectorsWrapper } =
+    useS3VectorsWrapperCreateMutation()
+
+  const onSetupWrapper = async () => {
+    if (!bucketName) return console.error('Bucket name is required')
+    await createS3VectorsWrapper({ bucketName })
+  }
+
+  return (
+    <>
+      <ScaffoldSection isFullWidth>
+        <Admonition type="warning" title="Missing integration" className="mb-0">
+          <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
+          <Button type="default" loading={isCreatingS3VectorsWrapper} onClick={onSetupWrapper}>
+            Install wrapper
+          </Button>
+        </Admonition>
+      </ScaffoldSection>
     </>
   )
 }

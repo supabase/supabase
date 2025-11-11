@@ -1,18 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
-import { wrapperMetaComparator } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useVectorBucketDeleteMutation } from 'data/storage/vector-bucket-delete-mutation'
 import { deleteVectorBucketIndex } from 'data/storage/vector-bucket-index-delete-mutation'
 import { useVectorBucketsIndexesQuery } from 'data/storage/vector-buckets-indexes-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { getVectorBucketFDWName } from './VectorBuckets.utils'
+import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 
 export interface DeleteVectorBucketModalProps {
   visible: boolean
@@ -31,28 +26,9 @@ export const DeleteVectorBucketModal = ({
   // Has to be a state because we're using a promise.all to delete the indexes
   const [isDeletingIndexes, setIsDeletingIndexes] = useState(false)
 
-  const { data } = useFDWsQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: !!bucketName }
-  )
-  const integration = INTEGRATIONS.find(
-    (i) => i.id === 's3_vectors_wrapper' && i.type === 'wrapper'
-  )
-  const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta
-
-  const vectorBucketWrapper = useMemo(() => {
-    return data
-      ?.filter((wrapper) =>
-        wrapperMetaComparator(
-          { handlerName: WRAPPER_HANDLERS.S3_VECTORS, server: { options: [] } },
-          wrapper
-        )
-      )
-      .find((w) => w.name === getVectorBucketFDWName(bucketName ?? ''))
-  }, [data, bucketName])
+  const { data: vectorBucketWrapper, meta: wrapperMeta } = useS3VectorsWrapperInstance({
+    bucketId: bucketName,
+  })
 
   const { mutate: deleteFDW } = useFDWDeleteMutation()
 
@@ -64,7 +40,7 @@ export const DeleteVectorBucketModal = ({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           wrapper: vectorBucketWrapper,
-          wrapperMeta: wrapperMeta,
+          wrapperMeta: wrapperMeta!,
         })
       }
       onSuccess()
