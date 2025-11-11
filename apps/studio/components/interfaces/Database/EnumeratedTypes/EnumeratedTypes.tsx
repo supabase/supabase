@@ -46,11 +46,12 @@ export const EnumeratedTypes = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const { val: typeToEditValue, setValue: setTypeToEditValue } = useQueryStateWithData(
-    'edit',
-    data,
-    'id'
-  )
+  const { val: typeToEditValue, setValue: setTypeToEditValue } = useQueryStateWithData({
+    urlKey: 'edit',
+    data: data ?? [],
+    dataKeySelector: 'id',
+    errorMessage: 'Enumerated type not found',
+  })
 
   const {
     setSelectedId: setSelectedTypeIdToDelete,
