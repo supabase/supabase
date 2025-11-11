@@ -35,6 +35,7 @@ import {
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 /**
  * to do: this could be a type from api-types
@@ -56,7 +57,9 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
-
+  
+  const { hasAccess: entitledUpdateCompute, getEntitlementSetValues: getEntitledAvailableSizes, isLoading: isEntitlementLoading } = useCheckEntitlements('instances.compute_update_available_sizes')
+  
   const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
 
   const { computeSize, storageType } = form.watch()
@@ -67,7 +70,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     error: addonsError,
   } = useProjectAddonsQuery({ projectRef: ref })
 
-  const isLoading = isProjectLoading || isAddonsLoading
+  const isLoading = isProjectLoading || isAddonsLoading || isEntitlementLoading
 
   const { control, formState, setValue, trigger } = form
 
@@ -83,6 +86,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
   }, [availableAddons, project?.cloud_provider])
 
+  console.log(availableAddons)
+
   const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
 
   const computeSizePrice = calculateComputeSizePrice({
@@ -92,10 +97,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     plan: org?.plan.id ?? 'free',
   })
 
-  const showUpgradeBadge = showMicroUpgrade(
-    org?.plan.id ?? 'free',
-    project?.infra_compute_size ?? 'nano'
-  )
+  const projectComputeSize = project?.infra_compute_size ?? 'nano'  
+  const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
 
   return (
     <FormField_Shadcn_
