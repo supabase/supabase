@@ -152,11 +152,12 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             <SectionContainer className="md:!pt-16 md:grid md:max-h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
               <div
                 className="
+                    hidden md:block
                     relative md:col-span-2 aspect-square
-                    w-[calc(100%+100px)] md:w-[calc(100%+450px)] xl:w-[calc(100%+200px)]
+                    w-[calc(100%+100px)] md:w-[calc(100%+450px)] xl:w-[calc(100%)]
                     -mb-[160px] md:mb-0
-                    -top-[160px] md:-top-[200px] xl:-top-[210px]
-                    -left-[100px] md:-left-[450px] xl:-left-[200px]
+                    -top-[160px] md:-top-[200px] xl:-top-[64px]
+                    -left-[100px] md:-left-[450px] xl:-left-[64px]
                   "
               >
                 <Globe />
