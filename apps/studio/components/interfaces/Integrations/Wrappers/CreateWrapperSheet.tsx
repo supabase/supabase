@@ -24,7 +24,6 @@ import {
   SheetTitle,
   WarningIcon,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
@@ -33,17 +32,17 @@ import WrapperTableEditor from './WrapperTableEditor'
 const FORM_ID = 'create-wrapper-form'
 
 export interface CreateWrapperSheetProps {
-  isClosing: boolean
   wrapperMeta: WrapperMeta
-  setIsClosing: (v: boolean) => void
+  onDirty: (isDirty: boolean) => void
   onClose: () => void
+  onCloseWithConfirmation: () => void
 }
 
 export const CreateWrapperSheet = ({
   wrapperMeta,
-  isClosing,
-  setIsClosing,
+  onDirty,
   onClose,
+  onCloseWithConfirmation,
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
 
@@ -53,7 +52,6 @@ export const CreateWrapperSheet = ({
 
   const [newTables, setNewTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
-  const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [selectedMode, setSelectedMode] = useState<'tables' | 'schema'>(
     wrapperMeta.tables.length > 0 ? 'tables' : 'schema'
@@ -197,21 +195,9 @@ export const CreateWrapperSheet = ({
           onSubmit={onSubmit}
           className="flex-grow flex flex-col h-full"
         >
-          {({ values, initialValues, setFieldValue }: any) => {
+          {({ values, initialValues }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-
-            const onClosePanel = () => {
-              if (hasChanges) {
-                setIsClosing(true)
-              } else {
-                onClose()
-              }
-            }
-
-            // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
-            if (!hasChanges && isClosing) {
-              onClose()
-            }
+            onDirty(hasChanges)
 
             return (
               <>
@@ -453,7 +439,7 @@ export const CreateWrapperSheet = ({
                     size="tiny"
                     type="default"
                     htmlType="button"
-                    onClick={onClosePanel}
+                    onClick={onCloseWithConfirmation}
                     disabled={isLoading}
                   >
                     Cancel
@@ -473,18 +459,6 @@ export const CreateWrapperSheet = ({
           }}
         </Form>
       </div>
-      <ConfirmationModal
-        visible={isClosing}
-        title="Discard changes"
-        confirmLabel="Discard"
-        onCancel={() => setIsClosing(false)}
-        onConfirm={() => onClose()}
-      >
-        <p className="text-sm text-foreground-light">
-          There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-          lost.
-        </p>
-      </ConfirmationModal>
 
       <WrapperTableEditor
         visible={isEditingTable}
