@@ -40,25 +40,25 @@ export function useReportsGotoCommands(options?: CommandOptions) {
           {
             id: 'nav-reports',
             name: 'Reports',
-            route: `/project/${ref}/reports`,
+            route: `/project/${ref}/observability`,
             defaultHidden: true,
           },
           {
             id: 'nav-reports-api',
             name: 'API Reports',
-            route: `/project/${ref}/reports/api-overview`,
+            route: `/project/${ref}/observability/api-overview`,
             defaultHidden: true,
           },
           {
             id: 'nav-reports-storage',
             name: 'Storage Reports',
-            route: `/project/${ref}/reports/storage`,
+            route: `/project/${ref}/observability/storage`,
             defaultHidden: true,
           },
           {
             id: 'nav-reports-database',
             name: 'Database Reports',
-            route: `/project/${ref}/reports/database`,
+            route: `/project/${ref}/observability/database`,
             defaultHidden: true,
           },
         ]
@@ -77,7 +77,7 @@ export function useReportsGotoCommands(options?: CommandOptions) {
           {
             id: QUERY_PERFORMANCE_COMMAND_ID,
             name: 'Query Performance Reports',
-            route: `/project/${ref}/reports/query-performance`,
+            route: `/project/${ref}/observability/query-performance`,
             defaultHidden: true,
           },
         ]
