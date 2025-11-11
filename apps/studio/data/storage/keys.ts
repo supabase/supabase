@@ -13,6 +13,18 @@ export const storageKeys = {
     ['catalog', catalog, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: (catalog: string, warehouse: string, namespace: string) =>
     ['catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace] as const,
-  icebergNamespaceTables: (catalog: string, warehouse: string, namespace: string) =>
-    ['catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace, 'tables'] as const,
+  icebergNamespaceTables: ({
+    catalog,
+    warehouse,
+    namespace,
+    apikey,
+  }: {
+    catalog: string
+    warehouse: string
+    namespace: string
+    apikey?: string
+  }) =>
+    ['catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace, 'tables', apikey].filter(
+      Boolean
+    ),
 }

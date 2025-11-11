@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { useTemporaryAPIKeyQuery } from 'data/api-keys/temp-api-keys-query'
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
@@ -7,30 +8,22 @@ import { storageKeys } from './keys'
 type GetNamespaceTablesVariables = {
   catalogUri: string
   warehouse: string
-  token: string
   namespace: string
+  projectRef?: string
 }
 
 async function getNamespaceTables({
   catalogUri,
   warehouse,
-  token,
   namespace,
-}: GetNamespaceTablesVariables) {
+  tempApiKey,
+}: GetNamespaceTablesVariables & { tempApiKey?: string }) {
   let headers = new Headers()
-  // handle both secret key and service role key
-  if (token.startsWith('sb_secret_')) {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      apikey: `${token}`,
-    })
-    headers.delete('Authorization')
-  } else {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    })
-  }
+  headers = await constructHeaders({
+    'Content-Type': 'application/json',
+    apikey: tempApiKey ?? '',
+  })
+  headers.delete('Authorization')
 
   const url = `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables`.replaceAll(
     /(?<!:)\/\//g,
@@ -67,13 +60,20 @@ export const useIcebergNamespaceTablesQuery = <TData = IcebergNamespaceTablesDat
     ...options
   }: UseCustomQueryOptions<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData> = {}
 ) => {
+  const { projectRef } = params
+  const { data } = useTemporaryAPIKeyQuery({ projectRef })
+  const tempApiKey = data?.api_key
+
   return useQuery<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData>({
-    queryKey: storageKeys.icebergNamespaceTables(
-      params.catalogUri,
-      params.warehouse,
-      params.namespace
-    ),
-    queryFn: () => getNamespaceTables(params),
+    queryKey: storageKeys.icebergNamespaceTables({
+      catalog: params.catalogUri,
+      warehouse: params.warehouse,
+      namespace: params.namespace,
+      apikey: tempApiKey,
+    }),
+    queryFn: () => getNamespaceTables({ ...params, tempApiKey }),
+    enabled:
+      options.enabled && typeof projectRef !== 'undefined' && typeof tempApiKey !== 'undefined',
     ...options,
   })
 }

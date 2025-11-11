@@ -67,11 +67,10 @@ export const NamespaceWithTables = ({
     {
       catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
-      token: token,
       namespace: namespace,
+      projectRef,
     },
     {
-      enabled: !!token,
       refetchInterval: (data) => {
         if (pollIntervalNamespaceTables === 0) return false
         if (tablesToPoll.length > 0) {
