@@ -64,6 +64,12 @@ jobs:
                   continue;
                 }
                 
+                // Skip draft PRs
+                if (pr.draft) {
+                  console.log(`PR #${pr.number} is a draft, skipping...`);
+                  continue;
+                }
+                
                 const createdAt = new Date(pr.created_at);
                 
                 // If this PR is newer than 24 hours, skip it
