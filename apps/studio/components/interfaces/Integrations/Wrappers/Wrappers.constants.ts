@@ -1461,15 +1461,6 @@ export const WRAPPERS: WrapperMeta[] = [
       ],
     },
     canTargetSchema: true,
-    sourceSchemaOption: {
-      name: 'source_schema',
-      label: 'Namespace',
-      description: 'It should match the namespace of the Iceberg catalog.',
-      required: true,
-      encrypted: false,
-      secureEntry: false,
-      defaultValue: '',
-    },
     tables: [],
   },
   {
