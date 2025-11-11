@@ -110,7 +110,7 @@ export const BucketTableRow = ({
           {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
         <button
-          className={cn('absolute inset-0', 'table-row-focus')}
+          className={cn('absolute inset-0', 'inset-focus')}
           onClick={(event) => handleBucketNavigation(bucket.id, event)}
         >
           <span className="sr-only">Go to bucket details</span>

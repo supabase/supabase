@@ -138,7 +138,7 @@ export const VectorsBuckets = () => {
                         <TableCell>
                           <p className="whitespace-nowrap max-w-[512px] truncate">{name}</p>
                           <button
-                            className={cn('absolute inset-0', 'table-row-focus')}
+                            className={cn('absolute inset-0', 'inset-focus')}
                             onClick={(event) => handleBucketNavigation(name, event)}
                           >
                             <span className="sr-only">Go to bucket details</span>

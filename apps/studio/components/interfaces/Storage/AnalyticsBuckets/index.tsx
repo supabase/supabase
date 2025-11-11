@@ -124,7 +124,7 @@ export const AnalyticsBuckets = () => {
                       <TableCell>
                         <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
                         <button
-                          className={cn('absolute inset-0', 'table-row-focus')}
+                          className={cn('absolute inset-0', 'inset-focus')}
                           onClick={(event) => handleBucketNavigation(bucket.id, event)}
                         >
                           <span className="sr-only">Go to table details</span>

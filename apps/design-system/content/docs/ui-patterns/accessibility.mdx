@@ -21,13 +21,13 @@ About to push some code? At a minimum, check your work against this list:
 
 ## Focus management
 
-All interactive page elements should be reachable by keyboard. They should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `table-row-focus` so users recognize this state instantly.
+All interactive page elements should be reachable by keyboard. They should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
 
 ```jsx
 <TableCell>
   <p>{name}</p>
   <button
-    className={cn('absolute inset-0', 'table-row-focus')}
+    className={cn('absolute inset-0', 'inset-focus')}
     onClick={(event) => handleBucketNavigation(name, event)}
   >
     <span className="sr-only">Go to bucket details</span>
