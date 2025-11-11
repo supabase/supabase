@@ -17,7 +17,6 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
@@ -54,7 +53,6 @@ const RealtimeUsage = () => {
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange,
-    isOrgPlanLoading,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
   const queryClient = useQueryClient()
   const {
@@ -74,11 +72,9 @@ const RealtimeUsage = () => {
     end: selectedDateRange?.period_end?.date,
   })
 
-  const state = useDatabaseSelectorStateSnapshot()
-  const { plan: orgPlan } = useCurrentOrgPlan()
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
-
   const chartSyncId = `realtime-${ref}`
+
+  const state = useDatabaseSelectorStateSnapshot()
 
   const reportConfig = useMemo(() => {
     return realtimeReports({
@@ -87,9 +83,8 @@ const RealtimeUsage = () => {
       endDate: selectedDateRange?.period_end?.date ?? '',
       interval: selectedDateRange?.interval ?? 'minute',
       databaseIdentifier: state.selectedDatabaseId,
-      isFreePlan,
     })
-  }, [ref, selectedDateRange, state.selectedDatabaseId, isFreePlan])
+  }, [ref, selectedDateRange, state.selectedDatabaseId])
 
   const onRefreshReport = async () => {
     if (!selectedDateRange) return
