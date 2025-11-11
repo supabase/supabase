@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { snakeCase, uniq } from 'lodash'
+import { uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -17,6 +17,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
 import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
 import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
+import { getAnalyticsBucketFDWServerName } from './AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import { getDecryptedParameters } from './ImportForeignSchemaDialog.utils'
 
 export interface ImportForeignSchemaDialogProps {
@@ -79,7 +80,7 @@ export const ImportForeignSchemaDialog = ({
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
-    const serverName = `${snakeCase(values.bucketName)}_fdw_server`
+    const serverName = getAnalyticsBucketFDWServerName(values.bucketName)
 
     if (!ref) return console.error('Project ref is required')
     setLoading(true)

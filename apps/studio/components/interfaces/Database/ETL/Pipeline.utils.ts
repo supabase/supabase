@@ -1,4 +1,7 @@
-import { ReplicationPipelineStatusData } from 'data/etl/pipeline-status-query'
+import {
+  ReplicationPipelineStatus,
+  ReplicationPipelineStatusData,
+} from 'data/etl/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { PipelineStatusName } from './Replication.constants'
 
@@ -58,6 +61,11 @@ const PIPELINE_STATE_MESSAGES = {
     message: 'Initializing replication. Table status will be available once running.',
     badge: 'Starting',
   },
+  stopping: {
+    title: 'Pipeline stopping',
+    message: 'Stopping replication. Table replication will be paused once stopped',
+    badge: 'Stopping',
+  },
   running: {
     title: 'Pipeline running',
     message: 'Replication is active and processing data',
@@ -76,8 +84,8 @@ const PIPELINE_STATE_MESSAGES = {
 } as const
 
 export const getPipelineStateMessages = (
-  requestStatus: PipelineStatusRequestStatus | undefined,
-  statusName: string | undefined
+  requestStatus?: PipelineStatusRequestStatus,
+  statusName?: ReplicationPipelineStatus
 ) => {
   // Reflect optimistic request intent immediately after click
   if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
@@ -100,6 +108,8 @@ export const getPipelineStateMessages = (
       return PIPELINE_STATE_MESSAGES.stopped
     case 'started':
       return PIPELINE_STATE_MESSAGES.running
+    case 'stopping':
+      return PIPELINE_STATE_MESSAGES.stopping
     case 'unknown':
       return PIPELINE_STATE_MESSAGES.unknown
     default:
