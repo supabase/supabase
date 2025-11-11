@@ -17,9 +17,9 @@ import {
 } from 'recharts'
 
 import { CategoricalChartState } from 'recharts/types/chart/types'
-import { Badge, cn } from 'ui'
+import { cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
-import { ChartHighlightActions, ChartHighlightAction } from './ChartHighlightActions'
+import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
   CHART_COLORS,
   DateTimeFormats,
@@ -305,6 +305,7 @@ export function ComposedChart({
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
+        hideTotalPlaceholder={highlightedValue === undefined}
         message={emptyStateMessage}
         description="It may take up to 24 hours for data to refresh"
         size={size}

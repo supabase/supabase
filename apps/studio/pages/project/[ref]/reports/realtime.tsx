@@ -1,33 +1,29 @@
-import { useEffect, useState, useMemo } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import {
-  DatePickerValue,
-  LogsDatePicker,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
 
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 
-import type { NextPageWithLayout } from 'types'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import { realtimeReports } from 'data/reports/v2/realtime.config'
-import { useChartHoverState } from 'components/ui/Charts/useChartHoverState'
+import type { NextPageWithLayout } from 'types'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -83,7 +79,6 @@ const RealtimeUsage = () => {
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   const chartSyncId = `realtime-${ref}`
-  useChartHoverState(chartSyncId)
 
   const reportConfig = useMemo(() => {
     return realtimeReports({
@@ -100,12 +95,16 @@ const RealtimeUsage = () => {
     if (!selectedDateRange) return
 
     setIsRefreshing(true)
-    queryClient.invalidateQueries(['report-v2'])
+    queryClient.invalidateQueries(['projects', ref, 'report-v2', { queryGroup: 'realtime' }])
     refetch()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
+  const urlStateHasSyncedRef = useRef(false)
   useEffect(() => {
+    if (urlStateHasSyncedRef.current) return
+    urlStateHasSyncedRef.current = true
+
     if (db !== undefined) {
       setTimeout(() => {
         // [Joshen] Adding a timeout here to support navigation from settings to reports
@@ -177,6 +176,7 @@ const RealtimeUsage = () => {
               .map((report) => (
                 <ReportChartV2
                   key={`${report.id}`}
+                  queryGroup="realtime"
                   report={report}
                   projectRef={ref!}
                   interval={selectedDateRange.interval}

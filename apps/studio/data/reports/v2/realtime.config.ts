@@ -1,5 +1,5 @@
+import type { AnalyticsData, AnalyticsInterval } from 'data/analytics/constants'
 import { getInfraMonitoring, InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
-import type { AnalyticsInterval, AnalyticsData } from 'data/analytics/constants'
 import { ReportConfig } from './reports.types'
 
 async function runInfraMonitoringQuery(
@@ -28,19 +28,17 @@ export const realtimeReports = ({
   endDate,
   interval,
   databaseIdentifier,
-  isFreePlan,
 }: {
   projectRef: string
   startDate: string
   endDate: string
   interval: AnalyticsInterval
   databaseIdentifier?: string
-  isFreePlan: boolean
 }): ReportConfig[] => [
   {
     id: 'client-to-realtime-connections',
-    label: 'Realtime connections',
-    valuePrecision: 2,
+    label: 'Connections',
+    valuePrecision: 0,
     hide: false,
     showTooltip: false,
     showLegend: false,
@@ -59,6 +57,14 @@ export const realtimeReports = ({
         databaseIdentifier
       )
 
+      const transformedData = (data?.data ?? []).map((p) => {
+        const valueAsNumber = Number(p.realtime_connections_connected)
+        return {
+          ...p,
+          realtime_connections_connected: Number.isNaN(valueAsNumber) ? 0 : valueAsNumber,
+        }
+      })
+
       const attributes = [
         {
           attribute: 'realtime_connections_connected',
@@ -66,16 +72,16 @@ export const realtimeReports = ({
         },
       ]
 
-      return { data: data?.data || [], attributes }
+      return { data: transformedData, attributes }
     },
   },
   {
     id: 'channel-events',
     label: 'Channel Events',
-    valuePrecision: 2,
+    valuePrecision: 0,
     hide: false,
     showTooltip: true,
-    showLegend: true,
+    showLegend: false,
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'line',
@@ -111,6 +117,7 @@ export const realtimeReports = ({
     label: 'Rate of Channel Joins',
     valuePrecision: 2,
     hide: false,
+    showSumAsDefaultHighlight: false,
     showTooltip: false,
     showLegend: false,
     showMaxValue: false,
@@ -140,10 +147,11 @@ export const realtimeReports = ({
   },
   {
     id: 'realtime_payload_size',
-    label: 'Realtime Broadcast Payload Size',
+    label: 'Broadcast Payload Size',
     valuePrecision: 2,
     showNewBadge: true,
     hide: false,
+    showSumAsDefaultHighlight: false,
     showTooltip: true,
     showLegend: false,
     showMaxValue: false,
@@ -178,7 +186,7 @@ export const realtimeReports = ({
   },
   {
     id: 'realtime_sum_connections_connected',
-    label: 'Realtime Connected Clients',
+    label: 'Connected Clients',
     valuePrecision: 0,
     hide: false,
     showNewBadge: true,
@@ -199,6 +207,14 @@ export const realtimeReports = ({
         databaseIdentifier
       )
 
+      const transformedData = (data?.data ?? []).map((p) => {
+        const valueAsNumber = Number(p.realtime_sum_connections_connected)
+        return {
+          ...p,
+          realtime_sum_connections_connected: Number.isNaN(valueAsNumber) ? 0 : valueAsNumber,
+        }
+      })
+
       const attributes = [
         {
           attribute: 'realtime_sum_connections_connected',
@@ -206,15 +222,16 @@ export const realtimeReports = ({
         },
       ]
 
-      return { data: data?.data || [], attributes }
+      return { data: transformedData, attributes }
     },
   },
   {
     id: 'realtime_replication_connection_lag',
-    label: 'Realtime Replication Connection Lag',
+    label: 'Replication Connection Lag',
     valuePrecision: 2,
     showNewBadge: true,
     hide: false,
+    showSumAsDefaultHighlight: false,
     showTooltip: true,
     showLegend: false,
     showMaxValue: false,
@@ -249,10 +266,11 @@ export const realtimeReports = ({
   },
   {
     id: 'realtime_authorization_rls_execution_time',
-    label: 'Realtime Authorization RLS Execution Time',
+    label: 'RLS Execution Time',
     valuePrecision: 2,
     showNewBadge: true,
     hide: false,
+    showSumAsDefaultHighlight: false,
     showTooltip: true,
     showLegend: false,
     showMaxValue: false,

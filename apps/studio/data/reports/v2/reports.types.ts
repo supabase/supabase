@@ -33,6 +33,7 @@ export interface ReportConfig<FiltersType = any> {
   valuePrecision: number
   hide: boolean
   hideHighlightedValue?: boolean
+  showSumAsDefaultHighlight?: boolean
   showTooltip: boolean
   showLegend: boolean
   showMaxValue: boolean
