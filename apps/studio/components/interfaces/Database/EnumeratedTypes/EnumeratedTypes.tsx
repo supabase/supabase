@@ -1,6 +1,7 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -9,7 +10,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -46,28 +47,18 @@ export const EnumeratedTypes = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const {
-    setSelectedId: setSelectedTypeIdToEdit,
-    entity: typeToEdit,
-    show: showTypeToEdit,
-  } = useQueryStateRouting({
-    key: 'edit',
-    lookup: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
-    lookupDeps: [data],
-    isLoading,
-    entityName: 'Enumerated Type',
+  const { value: typeToEdit, setValue: setSelectedTypeIdToEdit } = useQueryStateWithSelect({
+    urlKey: 'edit',
+    select: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
+    enabled: !!data,
+    onError: () => toast.error(`Enumerated Tybe not found`),
   })
 
-  const {
-    setSelectedId: setSelectedTypeIdToDelete,
-    entity: typeToDelete,
-    show: showTypeToDelete,
-  } = useQueryStateRouting({
-    key: 'delete',
-    lookup: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
-    lookupDeps: [data],
-    isLoading,
-    entityName: 'Enumerated Type',
+  const { value: typeToDelete, setValue: setSelectedTypeIdToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
+    enabled: !!data,
+    onError: () => toast.error(`Enumerated Tybe not found`),
   })
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
@@ -208,13 +199,13 @@ export const EnumeratedTypes = () => {
       />
 
       <EditEnumeratedTypeSidePanel
-        visible={showTypeToEdit}
+        visible={!!typeToEdit}
         selectedEnumeratedType={typeToEdit}
         onClose={() => setSelectedTypeIdToEdit(null)}
       />
 
       <DeleteEnumeratedTypeModal
-        visible={showTypeToDelete}
+        visible={!!typeToDelete}
         selectedEnumeratedType={typeToDelete}
         onClose={() => setSelectedTypeIdToDelete(null)}
       />

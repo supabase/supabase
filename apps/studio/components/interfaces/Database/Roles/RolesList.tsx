@@ -3,6 +3,7 @@ import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -11,7 +12,7 @@ import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CreateRolePanel } from './CreateRolePanel'
 import { DeleteRoleModal } from './DeleteRoleModal'
@@ -49,16 +50,11 @@ export const RolesList = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const {
-    setSelectedId: setSelectedRoleIdToDelete,
-    entity: roleToDelete,
-    show: showRoleToDelete,
-  } = useQueryStateRouting({
-    key: 'delete',
-    lookup: (id) => (id ? data?.find((role) => role.id.toString() === id) : undefined),
-    lookupDeps: [data],
-    isLoading,
-    entityName: 'Database Role',
+  const { setValue: setSelectedRoleIdToDelete, value: roleToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id: string) => (id ? data?.find((role) => role.id.toString() === id) : undefined),
+    enabled: !!data,
+    onError: () => toast.error(`Database Role not found`),
   })
 
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
@@ -232,7 +228,7 @@ export const RolesList = () => {
 
       <DeleteRoleModal
         role={roleToDelete as unknown as PostgresRole}
-        visible={showRoleToDelete}
+        visible={!!roleToDelete}
         onClose={() => setSelectedRoleIdToDelete(null)}
       />
     </>

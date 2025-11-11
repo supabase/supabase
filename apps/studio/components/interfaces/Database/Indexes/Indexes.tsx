@@ -14,7 +14,7 @@ import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/index
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -56,25 +56,20 @@ const Indexes = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const { setSelectedId: setSelectedIndexName, entity: selectedIndex } = useQueryStateRouting({
-    key: 'edit',
-    lookup: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-    lookupDeps: [allIndexes],
-    isLoading: isLoadingIndexes,
-    entityName: 'Database Index',
+  const { setValue: setSelectedIndexName, value: selectedIndex } = useQueryStateWithSelect({
+    urlKey: 'edit',
+    select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
+    enabled: !!allIndexes,
+    onError: () => toast.error(`Index not found`),
   })
 
-  const {
-    setSelectedId: setSelectedIndexNameToDelete,
-    entity: selectedIndexToDelete,
-    show: showindexToDelete,
-  } = useQueryStateRouting({
-    key: 'delete',
-    lookup: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-    lookupDeps: [allIndexes],
-    isLoading: isLoadingIndexes,
-    entityName: 'Database Index',
-  })
+  const { setValue: setSelectedIndexNameToDelete, value: selectedIndexToDelete } =
+    useQueryStateWithSelect({
+      urlKey: 'delete',
+      select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
+      enabled: !!allIndexes,
+      onError: () => toast.error(`Index not found`),
+    })
 
   const {
     data: schemas,
@@ -276,7 +271,7 @@ const Indexes = () => {
         variant="warning"
         size="medium"
         loading={isExecuting}
-        visible={showindexToDelete}
+        visible={!!selectedIndexToDelete}
         title={
           <>
             Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>

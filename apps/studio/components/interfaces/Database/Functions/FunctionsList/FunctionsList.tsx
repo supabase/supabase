@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsJson, useQueryState } from 'nuqs'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -15,7 +16,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateRouting } from 'hooks/misc/useQueryStateRouting'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -169,45 +170,32 @@ const FunctionsList = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const {
-    setSelectedId: setSelectedFunctionToEdit,
-    entity: functionToEdit,
-    show: showFunctionToEdit,
-  } = useQueryStateRouting({
-    key: 'edit',
-    lookup: (id) => (id ? functions?.find((fn) => fn.id.toString() === id) : undefined),
-    lookupDeps: [functions],
-    isLoading,
-    entityName: 'Database Function',
+  const { setValue: setSelectedFunctionToEdit, value: functionToEdit } = useQueryStateWithSelect({
+    urlKey: 'edit',
+    select: (id: string) => (id ? functions?.find((fn) => fn.id.toString() === id) : undefined),
+    enabled: !!functions,
+    onError: () => toast.error(`Function not found`),
   })
 
-  const {
-    setSelectedId: setSelectedFunctionIdToDuplicate,
-    entity: functionToDuplicate,
-    show: showFunctionToDuplicate,
-  } = useQueryStateRouting({
-    key: 'duplicate',
-    lookup: (id) => {
-      if (!id) return undefined
-      const original = functions?.find((fn) => fn.id.toString() === id)
-      return original ? { ...original, name: `${original.name}_duplicate` } : undefined
-    },
-    lookupDeps: [functions],
-    isLoading,
-    entityName: 'Database Function',
-  })
+  const { setValue: setSelectedFunctionIdToDuplicate, value: functionToDuplicate } =
+    useQueryStateWithSelect({
+      urlKey: 'duplicate',
+      select: (id: string) => {
+        if (!id) return undefined
+        const original = functions?.find((fn) => fn.id.toString() === id)
+        return original ? { ...original, name: `${original.name}_duplicate` } : undefined
+      },
+      enabled: !!functions,
+      onError: () => toast.error(`Function not found`),
+    })
 
-  const {
-    setSelectedId: setSelectedFunctionToDelete,
-    entity: functionToDelete,
-    show: showFunctionToDelete,
-  } = useQueryStateRouting({
-    key: 'delete',
-    lookup: (id) => (id ? functions?.find((fn) => fn.id.toString() === id) : undefined),
-    lookupDeps: [functions],
-    isLoading,
-    entityName: 'Database Function',
-  })
+  const { setValue: setSelectedFunctionToDelete, value: functionToDelete } =
+    useQueryStateWithSelect({
+      urlKey: 'delete',
+      select: (id: string) => (id ? functions?.find((fn) => fn.id.toString() === id) : undefined),
+      enabled: !!functions,
+      onError: () => toast.error(`Function not found`),
+    })
 
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database functions" />
@@ -366,17 +354,17 @@ const FunctionsList = () => {
       {/* Edit or Duplicate Function */}
       <CreateFunction
         func={functionToEdit || functionToDuplicate}
-        visible={showFunctionToEdit || showFunctionToDuplicate}
+        visible={!!functionToEdit || !!functionToDuplicate}
         onClose={() => {
           setSelectedFunctionToEdit(null)
           setSelectedFunctionIdToDuplicate(null)
         }}
-        isDuplicating={showFunctionToDuplicate}
+        isDuplicating={!!functionToDuplicate}
       />
 
       <DeleteFunction
         func={functionToDelete}
-        visible={showFunctionToDelete}
+        visible={!!functionToDelete}
         setVisible={setSelectedFunctionToDelete}
       />
     </>
