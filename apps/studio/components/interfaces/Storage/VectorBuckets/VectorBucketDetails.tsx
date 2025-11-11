@@ -206,18 +206,20 @@ export const VectorBucketDetails = () => {
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-row justify-end gap-2">
-                                <Button
-                                  asChild
-                                  icon={<Eye size={14} className="text-foreground-lighter" />}
-                                  type="default"
-                                >
-                                  {/* TODO: Proper URL for table editor */}
-                                  <Link
-                                    href={`/project/${projectRef}/editor/${encodeURIComponent(name)}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
+                                {wrapperInstance ? (
+                                  <Button
+                                    asChild
+                                    icon={<Eye size={14} className="text-foreground-lighter" />}
+                                    type="default"
                                   >
-                                    Table Editor
-                                  </Link>
-                                </Button>
+                                    {/* TODO: Proper URL for table editor */}
+                                    <Link
+                                      href={`/project/${projectRef}/editor/${encodeURIComponent(name)}?schema=${getVectorBucketFDWSchemaName(bucketId!)}`}
+                                    >
+                                      Table Editor
+                                    </Link>
+                                  </Button>
+                                ) : null}
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -321,7 +323,6 @@ const ExtensionNotInstalled = ({
           <InlineLink
             href={`${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`}
             target="_blank"
-            className="text-foreground-lighter hover:text-foreground transition-colors"
           >
             Learn more
           </InlineLink>
