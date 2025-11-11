@@ -120,11 +120,11 @@ export function ComponentPreview({
     )
   }, [Preview, align])
 
-  const wideClasses = wide ? '2xl:-ml-12 2xl:-mr-12' : ''
+  const wideClasses = wide ? '2xl:-ml-20 2xl:-mr-20' : ''
 
   if (peekCode) {
     return (
-      <div className={cn('mt-4 mb-12', wideClasses)}>
+      <div className={cn('@container mt-4 mb-12', wideClasses)}>
         <div
           className={cn(
             'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'

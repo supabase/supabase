@@ -46,6 +46,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
+          items: [],
+        },
+        {
           title: 'Empty States',
           href: '/docs/ui-patterns/empty-states',
           items: [],
@@ -73,6 +78,21 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Modal',
           href: '/docs/fragments/modal',
+          items: [],
+        },
+        {
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
+          items: [],
+        },
+        {
+          title: 'Page Header',
+          href: '/docs/fragments/page-header',
+          items: [],
+        },
+        {
+          title: 'Page Section',
+          href: '/docs/fragments/page-section',
           items: [],
         },
         {

@@ -38,6 +38,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "PageContainer": {
+      name: "PageContainer",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/PageContainer")),
+      source: "",
+      files: ["registry/default//PageContainer/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "PageHeader": {
+      name: "PageHeader",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/PageHeader")),
+      source: "",
+      files: ["registry/default//PageHeader/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "PageSection": {
+      name: "PageSection",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/PageSection")),
+      source: "",
+      files: ["registry/default//PageSection/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "accordion-demo": {
       name: "accordion-demo",
       type: "components:example",
@@ -1882,6 +1915,105 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/info-tooltip-demo")),
       source: "",
       files: ["registry/default/example/info-tooltip-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-container-demo": {
+      name: "page-container-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-container-demo")),
+      source: "",
+      files: ["registry/default/example/page-container-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-detail": {
+      name: "page-layout-detail",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-layout-detail")),
+      source: "",
+      files: ["registry/default/example/page-layout-detail.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-list": {
+      name: "page-layout-list",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-layout-list")),
+      source: "",
+      files: ["registry/default/example/page-layout-list.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-list-simple": {
+      name: "page-layout-list-simple",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-layout-list-simple")),
+      source: "",
+      files: ["registry/default/example/page-layout-list-simple.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-settings": {
+      name: "page-layout-settings",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-layout-settings")),
+      source: "",
+      files: ["registry/default/example/page-layout-settings.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-header-demo": {
+      name: "page-header-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-header-demo")),
+      source: "",
+      files: ["registry/default/example/page-header-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-section-demo": {
+      name: "page-section-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-section-demo")),
+      source: "",
+      files: ["registry/default/example/page-section-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-section-horizontal": {
+      name: "page-section-horizontal",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-section-horizontal")),
+      source: "",
+      files: ["registry/default/example/page-section-horizontal.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-section-with-aside": {
+      name: "page-section-with-aside",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-section-with-aside")),
+      source: "",
+      files: ["registry/default/example/page-section-with-aside.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

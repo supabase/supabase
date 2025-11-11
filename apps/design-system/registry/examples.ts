@@ -1079,6 +1079,51 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'page-container-demo',
+    type: 'components:example',
+    files: ['example/page-container-demo.tsx'],
+  },
+  {
+    name: 'page-layout-detail',
+    type: 'components:example',
+    files: ['example/page-layout-detail.tsx'],
+  },
+  {
+    name: 'page-layout-list',
+    type: 'components:example',
+    files: ['example/page-layout-list.tsx'],
+  },
+  {
+    name: 'page-layout-list-simple',
+    type: 'components:example',
+    files: ['example/page-layout-list-simple.tsx'],
+  },
+  {
+    name: 'page-layout-settings',
+    type: 'components:example',
+    files: ['example/page-layout-settings.tsx'],
+  },
+  {
+    name: 'page-header-demo',
+    type: 'components:example',
+    files: ['example/page-header-demo.tsx'],
+  },
+  {
+    name: 'page-section-demo',
+    type: 'components:example',
+    files: ['example/page-section-demo.tsx'],
+  },
+  {
+    name: 'page-section-horizontal',
+    type: 'components:example',
+    files: ['example/page-section-horizontal.tsx'],
+  },
+  {
+    name: 'page-section-with-aside',
+    type: 'components:example',
+    files: ['example/page-section-with-aside.tsx'],
+  },
+  {
     name: 'inner-side-menu-demo',
     type: 'components:example',
     files: ['example/inner-side-menu-demo.tsx'],

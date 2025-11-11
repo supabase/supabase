@@ -1,4 +1,5 @@
 import { ExternalLink } from 'lucide-react'
+import React from 'react'
 
 import { useParams } from 'common'
 import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
@@ -9,8 +10,6 @@ import {
 } from 'components/interfaces/Functions/FunctionsEmptyState'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -18,6 +17,16 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -31,29 +40,10 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
 
   const hasFunctions = (functions ?? []).length > 0
 
-  const secondaryActions = [
-    <DocsButton key="docs" href={`${DOCS_URL}/guides/functions`} />,
-    <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
-      <a
-        target="_blank"
-        rel="noreferrer"
-        href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-      >
-        Examples
-      </a>
-    </Button>,
-  ]
-
   return (
-    <PageLayout
-      size="large"
-      title="Edge Functions"
-      subtitle="Deploy edge functions to handle complex business logic"
-      primaryActions={IS_PLATFORM ? <DeployEdgeFunctionButton /> : undefined}
-      secondaryActions={secondaryActions}
-    >
-      <ScaffoldContainer size="large">
-        <ScaffoldSection isFullWidth>
+    <PageContainer size="large">
+      <PageSection>
+        <PageSectionContent>
           {IS_PLATFORM ? (
             <>
               {isLoading && <GenericSkeletonLoader />}
@@ -92,16 +82,54 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
           ) : (
             <FunctionsEmptyStateLocal />
           )}
-        </ScaffoldSection>
-      </ScaffoldContainer>
-    </PageLayout>
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   )
 }
 
-EdgeFunctionsPage.getLayout = (page) => {
+EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
+  const EdgeFunctionsPageLayout = () => {
+    const secondaryActions = [
+      <DocsButton key="docs" href={`${DOCS_URL}/guides/functions`} />,
+      <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+        >
+          Examples
+        </a>
+      </Button>,
+    ]
+
+    return (
+      <div className="w-full min-h-full flex flex-col items-stretch">
+        <PageHeader size="large">
+          <PageHeaderMeta size="large">
+            <PageHeaderSummary>
+              <PageHeaderTitle>Edge Functions</PageHeaderTitle>
+              <PageHeaderDescription>
+                Deploy edge functions to handle complex business logic
+              </PageHeaderDescription>
+            </PageHeaderSummary>
+            <PageHeaderAside>
+              {secondaryActions.map((action) => action)}
+              {IS_PLATFORM && <DeployEdgeFunctionButton />}
+            </PageHeaderAside>
+          </PageHeaderMeta>
+        </PageHeader>
+
+        {page}
+      </div>
+    )
+  }
+
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
+      <EdgeFunctionsLayout>
+        <EdgeFunctionsPageLayout />
+      </EdgeFunctionsLayout>
     </DefaultLayout>
   )
 }
