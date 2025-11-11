@@ -11,6 +11,7 @@ import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { type GuideFrontmatter } from '~/lib/docs'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { UiLibraryCta } from '~/components/UiLibraryCta'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -62,7 +63,6 @@ type GuideTemplateProps =
 
 const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
-
   return (
     <TocAnchorsProvider>
       <div className={'grid grid-cols-12 relative gap-4'}>
@@ -90,11 +90,12 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             )}
             <hr className="not-prose border-t-0 border-b my-8" />
 
+            {meta?.uiLibraryCta && <UiLibraryCta />}
+
             {content && (
               <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />
             )}
             {children}
-
             <footer className="mt-16 not-prose">
               <a
                 href={
