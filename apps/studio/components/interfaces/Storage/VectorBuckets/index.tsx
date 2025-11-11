@@ -131,23 +131,14 @@ export const VectorsBuckets = () => {
                     const created = +bucket.creationTime * 1000
 
                     return (
-                      <TableRow
-                        key={id}
-                        className={cn(
-                          'relative cursor-pointer h-16',
-                          '[&:has(:focus-visible)]:bg-surface-200'
-                        )}
-                      >
+                      <TableRow key={id} className="relative cursor-pointer h-16">
                         <TableCell className="w-2 pr-1">
                           <BucketIcon size={16} className="text-foreground-muted" />
                         </TableCell>
                         <TableCell>
                           <p className="whitespace-nowrap max-w-[512px] truncate">{name}</p>
                           <button
-                            className={cn(
-                              'absolute inset-0',
-                              'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong'
-                            )}
+                            className={cn('absolute inset-0', 'table-row-focus')}
                             onClick={(event) => handleBucketNavigation(name, event)}
                           >
                             <span className="sr-only">Go to bucket details</span>

@@ -100,10 +100,7 @@ export const BucketTableRow = ({
   }
 
   return (
-    <BucketTableRow
-      key={bucket.id}
-      className={cn('relative cursor-pointer h-16', '[&:has(:focus-visible)]:bg-surface-200')}
-    >
+    <BucketTableRow key={bucket.id} className="relative cursor-pointer h-16">
       <BucketTableCell className="w-2 pr-1">
         <BucketIcon size={16} className="text-foreground-muted" />
       </BucketTableCell>
@@ -113,10 +110,7 @@ export const BucketTableRow = ({
           {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
         <button
-          className={cn(
-            'absolute inset-0',
-            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong'
-          )}
+          className={cn('absolute inset-0', 'table-row-focus')}
           onClick={(event) => handleBucketNavigation(bucket.id, event)}
         >
           <span className="sr-only">Go to bucket details</span>

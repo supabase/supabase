@@ -117,23 +117,14 @@ export const AnalyticsBuckets = () => {
                     </TableRow>
                   )}
                   {analyticsBuckets.map((bucket) => (
-                    <TableRow
-                      key={bucket.id}
-                      className={cn(
-                        'relative cursor-pointer h-16',
-                        '[&:has(:focus-visible)]:bg-surface-200'
-                      )}
-                    >
+                    <TableRow key={bucket.id} className="relative cursor-pointer h-16">
                       <TableCell className="w-2 pr-1">
                         <BucketIcon size={16} className="text-foreground-muted" />
                       </TableCell>
                       <TableCell>
                         <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
                         <button
-                          className={cn(
-                            'absolute inset-0',
-                            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-strong'
-                          )}
+                          className={cn('absolute inset-0', 'table-row-focus')}
                           onClick={(event) => handleBucketNavigation(bucket.id, event)}
                         >
                           <span className="sr-only">Go to table details</span>
