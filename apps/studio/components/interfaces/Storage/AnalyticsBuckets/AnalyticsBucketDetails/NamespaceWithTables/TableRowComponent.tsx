@@ -1,5 +1,5 @@
 import { snakeCase, uniq } from 'lodash'
-import { MoreVertical, Pause, Play, Trash } from 'lucide-react'
+import { Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -10,7 +10,10 @@ import {
   formatWrapperTables,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { getDecryptedParameters } from 'components/interfaces/Storage/ImportForeignSchemaDialog.utils'
+import { DotPing } from 'components/ui/DotPing'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
 import { useUpdatePublicationMutation } from 'data/etl/publication-update-mutation'
 import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import { useReplicationTablesQuery } from 'data/etl/tables-query'
@@ -27,14 +30,17 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { getAnalyticsBucketFDWServerName } from '../AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
+import { inferPostgresTableFromNamespaceTable } from './NamespaceWithTables.utils'
 
 interface TableRowComponentProps {
-  index: number
   table: { id: number; name: string; isConnected: boolean }
   schema: string
   namespace: string
@@ -43,7 +49,6 @@ interface TableRowComponentProps {
 }
 
 export const TableRowComponent = ({
-  index,
   table,
   schema,
   namespace,
@@ -63,6 +68,8 @@ export const TableRowComponent = ({
     projectRef,
     bucketId,
   })
+  const { data } = useReplicationPipelineStatusQuery({ projectRef, pipelineId: pipeline?.id })
+  const pipelineStatus = data?.status.name
 
   const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId })
   const { data: wrapperInstance, meta: wrapperMeta } = useAnalyticsBucketWrapperInstance({
@@ -74,9 +81,27 @@ export const TableRowComponent = ({
   const { mutateAsync: updatePublication } = useUpdatePublicationMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
-  const isReplicating = !!publication?.tables.find(
-    (x) => table.name === snakeCase(`${x.schema}.${x.name}_changelog`)
-  )
+  const inferredPostgresTable = inferPostgresTableFromNamespaceTable({
+    publication,
+    tableName: table.name,
+  })
+  const isTableUnderReplicationPublication = !!inferredPostgresTable
+  const hasReplication = !!pipeline && !!publication
+  const isPipelineRunning = pipelineStatus === 'started'
+  const isReplicating = isTableUnderReplicationPublication && isPipelineRunning
+
+  const getStatusLabel = () => {
+    if (isLoading) return 'Checking'
+    if (hasReplication && isTableUnderReplicationPublication) {
+      if (isPipelineRunning) {
+        return 'Replicating'
+      } else {
+        return `Replication ${pipelineStatus ?? 'unknown'}`
+      }
+    } else {
+      return 'Not replicating'
+    }
+  }
 
   const onConfirmStopReplication = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -204,38 +229,38 @@ export const TableRowComponent = ({
     <>
       <TableRow>
         <TableCell className="min-w-[120px]">{table.name}</TableCell>
-        {!!publication && (
+        {!!hasReplication && (
           <TableCell colSpan={table.isConnected ? 1 : 2} className="min-w-[150px]">
-            <div className="flex flex-row items-center text-foregroung-lighter">
-              <div className="relative mr-2 align-middle w-3 h-3">
-                <span
-                  className={`absolute inset-0 rounded-full ${
-                    isReplicating
-                      ? isLoading
-                        ? 'bg-brand/20 animate-ping'
-                        : 'bg-brand/20 animate-ping'
-                      : isLoading
-                        ? 'bg-selection/20 animate-ping'
-                        : 'hidden'
-                  }`}
-                  style={{
-                    animationDelay: `${1 + index * 0.15}s`,
-                    animationDuration: '2s',
-                  }}
-                />
-                <span
-                  className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 inline-block w-2 h-2 rounded-full ${
-                    isReplicating ? 'bg-brand' : 'bg-selection'
-                  }`}
-                />
-              </div>
-              <span className="text-foreground-lighter">
-                {isLoading && !isReplicating
-                  ? '-'
-                  : isReplicating
-                    ? 'Replicating'
-                    : 'Not replicating'}
-              </span>
+            <div className="flex items-center">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-x-2">
+                    {isLoading ? (
+                      <Loader2 size={12} className="animate-spin text-foreground-lighter" />
+                    ) : (
+                      <DotPing
+                        animate={isReplicating}
+                        variant={isReplicating ? 'primary' : 'default'}
+                      />
+                    )}
+                    <span className="text-foreground-lighter">{getStatusLabel()}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  {isReplicating ? (
+                    `Table data is currently replicating${!!inferredPostgresTable ? ` from ${inferredPostgresTable.schema}.${inferredPostgresTable.name}` : ''}`
+                  ) : !isTableUnderReplicationPublication ? (
+                    'Replication is stopped for this table'
+                  ) : (
+                    <>
+                      View replication for more details{' '}
+                      <InlineLink href={`/project/${projectRef}/database/etl/${pipeline?.id}`}>
+                        here
+                      </InlineLink>
+                    </>
+                  )}
+                </TooltipContent>
+              </Tooltip>
             </div>
           </TableCell>
         )}
@@ -265,7 +290,7 @@ export const TableRowComponent = ({
 
                   {!!publication && (
                     <>
-                      {isReplicating ? (
+                      {isTableUnderReplicationPublication ? (
                         <DropdownMenuItem
                           className="flex items-center gap-x-2"
                           onClick={() => setShowStopReplicationModal(true)}
