@@ -177,7 +177,7 @@ jobs:
                 {
                   type: "divider"
                 },
-                ...prBlocks
+                prBlocks[0],
               ]
             };
 
