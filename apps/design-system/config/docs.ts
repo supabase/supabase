@@ -56,8 +56,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Page',
-          href: '/docs/ui-patterns/page',
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
           items: [],
         },
         {

@@ -1,15 +1,15 @@
 ---
-title: Page
-description: Page components provide consistent structure and layout for page-level content.
+title: Layout
+description: Guidelines to create consistent layouts across Studio pages using a set of page components.
 ---
 
 The Page pattern consists of three main components that work together to create consistent page layouts: [PageContainer](../fragments/page-container), [PageHeader](../fragments/page-header), and [PageSection](../fragments/page-section). These components provide a structured approach to building pages with consistent spacing, max-widths, and content organization.
 
-## Layouts
+## Layout Types
 
 ### Settings
 
-Settings pages are used for configuration and preference management. They follow a single-column layout with default widths to keep content focused and readable.
+Settings pages are used for configuration and preference management. They follow a single-column layout with default widths to keep content focused and readable. Examples include project settings or auth sessions.
 
 - Use `PageHeader` with `size="default"`
 - Use `PageContainer` with `size="default"`
@@ -24,7 +24,7 @@ Settings pages are used for configuration and preference management. They follow
 
 ### List
 
-List pages display collections of objects like tables, triggers, or functions. These pages use larger widths to accommodate wide content like data tables.
+List pages display collections of objects like tables, triggers, or functions. These pages use larger widths to accommodate wide content like data tables. Examples include database triggers, database functions or org team members.
 
 - Use `PageHeader` with `size="large"`
 - Use `PageContainer` with `size="large"`
@@ -51,7 +51,7 @@ List pages display collections of objects like tables, triggers, or functions. T
 
 ### Data and Full Page Experiences
 
-Full-page experiences like editors require maximum screen real estate. These pages use full-width containers to maximize available space.
+Full-page experiences like the table editor, cron jobs, and edge functions require maximum screen real-estate and so make use of "full" size containers.
 
 - Use `PageHeader` with `size="full"`
 - Use `PageContainer` with `size="full"`
@@ -59,7 +59,7 @@ Full-page experiences like editors require maximum screen real estate. These pag
 
 ### Detail Pages
 
-Detail pages display dense or lengthy content split into multiple sections. The horizontal orientation allows for better information hierarchy and context.
+Detail pages display dense or lengthy content split into multiple sections. The horizontal orientation allows for better information hierarchy and context. Examples include organisation billing or project infrastructure.
 
 - Use `PageHeader` with `size="large"`
 - Use `PageContainer` with `size="large"`
