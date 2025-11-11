@@ -5,7 +5,7 @@ import { EventTimeline } from './EventTimeline'
 
 export function EventGallery() {
   return (
-    <section className={cn('grid grid-cols-[minmax(320px,40%),16px,1fr] gap-12')}>
+    <section className={cn('grid grid-cols-[minmax(320px,35%),16px,1fr] gap-12')}>
       <EventGalleryFilters />
       <EventTimeline />
       <EventList />

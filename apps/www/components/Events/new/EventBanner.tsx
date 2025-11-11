@@ -17,7 +17,7 @@ export function EventBanner() {
   if (!featuredEvent) return null
 
   return (
-    <section className={cn('grid grid-cols-[minmax(320px,40%),1fr] gap-12')}>
+    <section className={cn('grid grid-cols-[minmax(320px,35%),1fr] gap-12')}>
       <CoverImage url={featuredEvent.cover_url} />
 
       <article className="flex flex-col gap-6 py-2">
@@ -188,9 +188,9 @@ const Logo = () => (
 
 const EventBannerSkeleton = () => {
   return (
-    <section className={cn('grid grid-cols-[minmax(320px,40%),1fr] gap-12')}>
+    <section className={cn('grid grid-cols-[minmax(320px,35%),1fr] gap-12')}>
       {/* Cover Image Skeleton */}
-      <div className="w-full bg-surface-100 aspect-square border rounded-lg animate-pulse" />
+      <div className="w-full bg-surface-200 aspect-square border rounded-lg animate-pulse" />
 
       <article className="flex flex-col gap-6 py-2">
         <div className="flex justify-between items-start">
