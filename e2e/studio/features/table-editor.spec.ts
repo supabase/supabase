@@ -231,7 +231,7 @@ test.describe.serial('table editor', () => {
       page,
       'pg-meta',
       ref,
-      'tables?include_columns=true&included_schemas=public'
+      'tables?include_columns=false&included_schemas=public'
     ) // wait for table creation
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
     await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()

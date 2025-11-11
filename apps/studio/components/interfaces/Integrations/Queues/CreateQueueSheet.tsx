@@ -30,6 +30,7 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
+import { QueryNameSchema } from './Queues.utils'
 
 export interface CreateQueueSheetProps {
   isClosing: boolean
@@ -52,12 +53,7 @@ const unloggedQueueSchema = z.object({
 })
 
 const FormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, 'Please provide a name for your queue')
-    .max(47, "The name can't be longer than 47 characters")
-    .regex(/^[a-z_-]+$/, 'Name must contain only lowercase letters, hyphens, and underscores'),
+  name: QueryNameSchema,
   enableRls: z.boolean(),
   values: z.discriminatedUnion('type', [
     normalQueueSchema,

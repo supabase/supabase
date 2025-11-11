@@ -1,6 +1,6 @@
-import { Admonition } from 'ui-patterns/admonition'
 import Link from 'next/link'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 const bucketId = 'user_avatars'
 
@@ -14,7 +14,14 @@ export default function EmptyStateMissingRoute() {
         description={`${bucketId ? `The bucket “${bucketId}”` : 'This bucket'} doesn’t seem to exist.`}
       >
         <Button asChild type="default" className="mt-2">
-          <Link href="/">Head back</Link>
+          <Link
+            href="/"
+            onClick={(e) => {
+              e.preventDefault()
+            }}
+          >
+            Head back
+          </Link>
         </Button>
       </Admonition>
     </div>

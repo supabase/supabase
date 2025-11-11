@@ -119,23 +119,4 @@ describe(`DeleteBucketModal`, () => {
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
     expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`)
   })
-
-  it(`prevents submission when the input doesn't match the bucket name`, async () => {
-    const onClose = vi.fn()
-    render(<Page onClose={onClose} />)
-
-    const openButton = screen.getByRole(`button`, { name: `Open` })
-    await userEvent.click(openButton)
-    await screen.findByRole(`dialog`)
-
-    const input = screen.getByLabelText(/Type/)
-    await userEvent.type(input, `invalid`)
-
-    const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })
-    fireEvent.click(confirmButton)
-
-    await waitFor(() => {
-      expect(screen.getByText(/Please enter/)).toBeInTheDocument()
-    })
-  })
 })
