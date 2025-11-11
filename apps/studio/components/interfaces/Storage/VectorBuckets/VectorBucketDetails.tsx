@@ -306,7 +306,7 @@ const ExtensionNotInstalled = ({
   wrappersExtension: DatabaseExtension
 }) => {
   const databaseNeedsUpgrading =
-    (wrappersExtension?.default_version ?? '') < (wrapperMeta?.minimumExtensionVersion ?? '')
+    (wrappersExtension?.default_version ?? '') < (wrapperMeta.minimumExtensionVersion ?? '')
 
   return (
     <>

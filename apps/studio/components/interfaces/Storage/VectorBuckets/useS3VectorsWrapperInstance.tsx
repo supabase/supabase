@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 
-import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
-  getWrapperMetaForWrapper,
-  wrapperMetaComparator,
-} from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+  WRAPPER_HANDLERS,
+  WRAPPERS,
+} from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { wrapperMetaComparator } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { type FDW, useFDWsQuery } from 'data/fdw/fdws-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getVectorBucketFDWName } from './VectorBuckets.utils'
@@ -39,11 +39,11 @@ export const useS3VectorsWrapperInstance = (
       .find((w) => w.name === getVectorBucketFDWName(bucketId ?? ''))
   }, [data, bucketId])
 
-  const s3VectorsWrapperMeta = getWrapperMetaForWrapper(s3VectorsWrapper)
+  const s3VectorsWrapperMeta = WRAPPERS.find((w) => w.handlerName === WRAPPER_HANDLERS.S3_VECTORS)
 
   return {
     data: s3VectorsWrapper,
-    meta: s3VectorsWrapperMeta,
+    meta: s3VectorsWrapperMeta!,
     isLoading: isLoadingProject || isLoadingFDWs,
   }
 }
