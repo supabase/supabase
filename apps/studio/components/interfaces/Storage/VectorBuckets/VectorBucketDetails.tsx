@@ -2,6 +2,7 @@ import { Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
@@ -311,36 +312,33 @@ const ExtensionNotInstalled = ({
     (wrappersExtension?.default_version ?? '') < (wrapperMeta.minimumExtensionVersion ?? '')
 
   return (
-    <>
-      <ScaffoldSection isFullWidth>
-        <Admonition type="warning" title="Missing required extension" className="mb-0">
-          <p>
-            The Wrappers extension is required in order to query vector tables.{' '}
-            {databaseNeedsUpgrading &&
-              'Please first upgrade your database and then install the extension.'}{' '}
-            <InlineLink
-              href={`${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-foreground-lighter hover:text-foreground transition-colors"
-            >
-              Learn more
-            </InlineLink>
-          </p>
-          <Button type="default" asChild className="mt-2" onClick={() => {}}>
-            <Link
-              href={
-                databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
-                  : `/project/${projectRef}/database/extensions?filter=wrappers`
-              }
-            >
-              {databaseNeedsUpgrading ? 'Upgrade database' : 'Install extension'}
-            </Link>
-          </Button>
-        </Admonition>
-      </ScaffoldSection>
-    </>
+    <ScaffoldSection isFullWidth>
+      <Admonition type="warning" title="Missing required extension" className="mb-0">
+        <p>
+          The Wrappers extension is required in order to query vector tables.{' '}
+          {databaseNeedsUpgrading &&
+            'Please first upgrade your database and then install the extension.'}{' '}
+          <InlineLink
+            href={`${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`}
+            target="_blank"
+            className="text-foreground-lighter hover:text-foreground transition-colors"
+          >
+            Learn more
+          </InlineLink>
+        </p>
+        <Button type="default" asChild className="mt-2">
+          <Link
+            href={
+              databaseNeedsUpgrading
+                ? `/project/${projectRef}/settings/infrastructure`
+                : `/project/${projectRef}/database/extensions?filter=wrappers`
+            }
+          >
+            {databaseNeedsUpgrading ? 'Upgrade database' : 'Install extension'}
+          </Link>
+        </Button>
+      </Admonition>
+    </ScaffoldSection>
   )
 }
 
@@ -361,34 +359,32 @@ const ExtensionNeedsUpgrade = ({
     wrappersExtension?.installed_version === wrappersExtension?.default_version
 
   return (
-    <>
-      <ScaffoldSection isFullWidth>
-        <Admonition type="warning" title="Outdated extension version" className="mb-0">
-          <p>
-            The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
-            {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-            {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the extension
-            by disabling and enabling the Wrappers extension.
-          </p>
-          <p>
-            Before reinstalling the wrapper extension, you must first remove all existing wrappers.
-            Afterward, you can recreate the wrappers.
-          </p>
-          <Button asChild type="default">
-            <Link
-              href={
-                databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
-                  : `/project/${projectRef}/database/extensions?filter=wrappers`
-              }
-            >
-              {databaseNeedsUpgrading ? 'Upgrade database' : 'Extensions'}
-            </Link>
-          </Button>
-        </Admonition>
-      </ScaffoldSection>
-    </>
+    <ScaffoldSection isFullWidth>
+      <Admonition type="warning" title="Outdated extension version" className="mb-0">
+        <p>
+          The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
+          {wrapperMeta.minimumExtensionVersion}. You have version{' '}
+          {wrappersExtension?.installed_version} installed. Please{' '}
+          {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the extension
+          by disabling and enabling the Wrappers extension.
+        </p>
+        <p>
+          Before reinstalling the wrapper extension, you must first remove all existing wrappers.
+          Afterward, you can recreate the wrappers.
+        </p>
+        <Button asChild type="default">
+          <Link
+            href={
+              databaseNeedsUpgrading
+                ? `/project/${projectRef}/settings/infrastructure`
+                : `/project/${projectRef}/database/extensions?filter=wrappers`
+            }
+          >
+            {databaseNeedsUpgrading ? 'Upgrade database' : 'Extensions'}
+          </Link>
+        </Button>
+      </Admonition>
+    </ScaffoldSection>
   )
 }
 
@@ -400,26 +396,30 @@ const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
 
   const onSetupWrapper = async () => {
     if (!bucketName) return console.error('Bucket name is required')
-    await createS3VectorsWrapper({ bucketName })
-    await createSchema({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      name: getVectorBucketFDWSchemaName(bucketName),
-    })
+    try {
+      await createS3VectorsWrapper({ bucketName })
+      await createSchema({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        name: getVectorBucketFDWSchemaName(bucketName),
+      })
+    } catch (error) {
+      toast.error(
+        `Failed to install wrapper: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
+    }
   }
 
   const isLoading = isCreatingS3VectorsWrapper || isCreatingSchema
 
   return (
-    <>
-      <ScaffoldSection isFullWidth>
-        <Admonition type="warning" title="Missing integration" className="mb-0">
-          <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
-          <Button type="default" loading={isLoading} onClick={onSetupWrapper}>
-            Install wrapper
-          </Button>
-        </Admonition>
-      </ScaffoldSection>
-    </>
+    <ScaffoldSection isFullWidth>
+      <Admonition type="warning" title="Missing integration" className="mb-0">
+        <p>The S3 Vectors Wrapper integration is required in order to query vector tables.</p>
+        <Button type="default" loading={isLoading} onClick={onSetupWrapper}>
+          Install wrapper
+        </Button>
+      </Admonition>
+    </ScaffoldSection>
   )
 }
