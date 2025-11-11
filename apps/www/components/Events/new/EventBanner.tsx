@@ -99,7 +99,7 @@ const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
 
       <div className="flex flex-col gap-0">
         <p>{formattedDateWithYear}</p>
-        <p className="text-foreground-muted text-sm">{timeDisplay}</p>
+        <p className="text-foreground-light text-sm">{timeDisplay}</p>
       </div>
     </div>
   )
@@ -117,7 +117,7 @@ const LocationWidget = ({ location }: { location?: string }) => {
 
       <div className="flex flex-col gap-0">
         <p>Hosted at</p>
-        <p className="text-foreground-muted text-sm">{locationText}</p>
+        <p className="text-foreground-light text-sm">{locationText}</p>
       </div>
     </div>
   )

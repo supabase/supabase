@@ -27,6 +27,7 @@ export interface LumaPayloadEvent {
   cover_url: string
   visibility: string
   geo_address_json: LumaGeoAddressJson
+  hosts: LumaHost[]
 }
 export interface LumaEvent {
   id: string
@@ -40,6 +41,15 @@ export interface LumaEvent {
   country: string
   url: string
   visibility: string
+}
+
+export interface LumaHost {
+  id: string
+  name: string
+  email: string
+  first_name: string
+  last_name: string
+  avatar_url: string
 }
 
 interface LumaResponse {
@@ -107,6 +117,7 @@ export async function GET(request: NextRequest) {
         timezone: event.timezone,
         cover_url: event.cover_url,
         description: event.description,
+        hosts: event.hosts || [],
       }))
       .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
 
