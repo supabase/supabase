@@ -64,7 +64,7 @@ With that out of the way, there are several parts of this design system that nee
 - `registry/charts.ts`: chart components
 - `registry/fragments.ts`: fragment components
 
-You may need to rebuild the design system’s registry. You can do that via:
+You will probably need to rebuild the design system’s registry after making new additions. You can do that via:
 
 ```bash
 cd apps/design-system

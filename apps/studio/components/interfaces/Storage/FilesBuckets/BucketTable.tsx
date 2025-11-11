@@ -1,6 +1,3 @@
-import { Edit, FolderOpen, MoreVertical, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-
 import {
   VirtualizedTableCell,
   VirtualizedTableHead,
@@ -8,29 +5,21 @@ import {
   VirtualizedTableRow,
 } from 'components/ui/VirtualizedTable'
 import { Bucket } from 'data/storage/buckets-query'
+import { Bucket as BucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
-import {
-  Badge,
-  Button,
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { ChevronRight } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import type React from 'react'
+import { Badge, cn, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
 type BucketTableHeaderProps = {
   mode: BucketTableMode
+  hasBuckets?: boolean
 }
 
-export const BucketTableHeader = ({ mode }: BucketTableHeaderProps) => {
+export const BucketTableHeader = ({ mode, hasBuckets = true }: BucketTableHeaderProps) => {
   const BucketTableHeader = mode === 'standard' ? TableHeader : VirtualizedTableHeader
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableHead = mode === 'standard' ? TableHead : VirtualizedTableHead
@@ -40,7 +29,12 @@ export const BucketTableHeader = ({ mode }: BucketTableHeaderProps) => {
   return (
     <BucketTableHeader>
       <BucketTableRow>
-        <BucketTableHead className={cn('w-[280px]', stickyClasses)}>Name</BucketTableHead>
+        {hasBuckets && (
+          <BucketTableHead className={`${stickyClasses} w-2 pr-1`}>
+            <span className="sr-only">Icon</span>
+          </BucketTableHead>
+        )}
+        <BucketTableHead className={stickyClasses}>Name</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Policies</BucketTableHead>
         <BucketTableHead className={stickyClasses}>File size limit</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Allowed MIME types</BucketTableHead>
@@ -65,8 +59,8 @@ export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptySt
     <BucketTableRow className="[&>td]:hover:bg-inherit">
       <BucketTableCell colSpan={5}>
         <p className="text-sm text-foreground">No results found</p>
-        <p className="text-sm text-foreground-light">
-          Your search for "{filterString}" did not return any results
+        <p className="text-sm text-foreground-lighter">
+          Your search for “{filterString}” did not return any results
         </p>
       </BucketTableCell>
     </BucketTableRow>
@@ -79,8 +73,6 @@ type BucketTableRowProps = {
   projectRef: string
   formattedGlobalUploadLimit: string
   getPolicyCount: (bucketName: string) => number
-  setSelectedBucket: (bucket: Bucket) => void
-  setModal: (modal: 'edit' | 'empty' | 'delete' | null) => void
 }
 
 export const BucketTableRow = ({
@@ -89,25 +81,40 @@ export const BucketTableRow = ({
   projectRef,
   formattedGlobalUploadLimit,
   getPolicyCount,
-  setSelectedBucket,
-  setModal,
 }: BucketTableRowProps) => {
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
 
+  const router = useRouter()
+
+  const handleBucketNavigation = (
+    bucketId: string,
+    event: React.MouseEvent | React.KeyboardEvent
+  ) => {
+    const url = `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId)}`
+    if (event.metaKey || event.ctrlKey) {
+      window.open(url, '_blank')
+    } else {
+      router.push(url)
+    }
+  }
+
   return (
-    <BucketTableRow key={bucket.id}>
-      <BucketTableCell>
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
-            title={bucket.id}
-            className="text-link-table-cell"
-          >
-            {bucket.id}
-          </Link>
+    <BucketTableRow key={bucket.id} className="relative cursor-pointer h-16">
+      <BucketTableCell className="w-2 pr-1">
+        <BucketIcon size={16} className="text-foreground-muted" />
+      </BucketTableCell>
+      <BucketTableCell className="flex-1">
+        <div className="flex items-center gap-2.5">
+          <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
           {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
+        <button
+          className={cn('absolute inset-0', 'inset-focus')}
+          onClick={(event) => handleBucketNavigation(bucket.id, event)}
+        >
+          <span className="sr-only">Go to bucket details</span>
+        </button>
       </BucketTableCell>
 
       <BucketTableCell>
@@ -115,7 +122,9 @@ export const BucketTableRow = ({
       </BucketTableCell>
 
       <BucketTableCell>
-        <p className={bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'}>
+        <p
+          className={`whitespace-nowrap ${bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'}`}
+        >
           {bucket.file_size_limit
             ? formatBytes(bucket.file_size_limit)
             : `Unset (${formattedGlobalUploadLimit})`}
@@ -131,71 +140,10 @@ export const BucketTableRow = ({
       </BucketTableCell>
 
       <BucketTableCell>
-        <div className="flex justify-end gap-2">
-          <Button asChild type="default">
-            <Link
-              href={`/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`}
-            >
-              View files
-            </Link>
-          </Button>
-          <BucketDropdownMenu
-            bucket={bucket}
-            setSelectedBucket={setSelectedBucket}
-            setModal={setModal}
-          />
+        <div className="flex justify-end items-center h-full">
+          <ChevronRight size={14} className="text-foreground-muted/60" />
         </div>
       </BucketTableCell>
     </BucketTableRow>
-  )
-}
-
-type BucketDropdownMenuProps = {
-  bucket: Bucket
-  setSelectedBucket: (bucket: Bucket) => void
-  setModal: (modal: 'edit' | 'empty' | 'delete' | null) => void
-}
-
-const BucketDropdownMenu = ({ bucket, setSelectedBucket, setModal }: BucketDropdownMenuProps) => {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="default" className="px-1" icon={<MoreVertical />} />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-40">
-        <DropdownMenuItem
-          className="flex items-center space-x-2"
-          onClick={() => {
-            setModal('edit')
-            setSelectedBucket(bucket)
-          }}
-        >
-          <Edit size={12} />
-          <p>Edit bucket</p>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="flex items-center space-x-2"
-          onClick={() => {
-            setModal('empty')
-            setSelectedBucket(bucket)
-          }}
-        >
-          <FolderOpen size={12} />
-          <p>Empty bucket</p>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          className="flex items-center space-x-2"
-          onClick={() => {
-            setModal('delete')
-            setSelectedBucket(bucket)
-          }}
-        >
-          <Trash2 size={12} />
-          <p>Delete bucket</p>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   )
 }

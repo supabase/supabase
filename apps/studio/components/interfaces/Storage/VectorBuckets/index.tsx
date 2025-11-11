@@ -1,31 +1,19 @@
-import { ExternalLink, MoreVertical, Search, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+import { ChevronRight, ExternalLink, Search } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import type React from 'react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
-import {
-  Button,
-  Card,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { Bucket as BucketIcon } from 'icons'
+import { Button, Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
-import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
 
 /**
  * [Joshen] Low-priority refactor: We should use a virtualized table here as per how we do it
@@ -34,12 +22,9 @@ import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
 
 export const VectorsBuckets = () => {
   const { ref: projectRef } = useParams()
+  const router = useRouter()
 
   const [filterString, setFilterString] = useState('')
-  const [bucketForDeletion, setBucketForDeletion] = useState<{
-    vectorBucketName: string
-    creationTime: string
-  } | null>(null)
 
   const { data, isLoading: isLoadingBuckets } = useVectorBucketsQuery({ projectRef })
   const bucketsList = data?.vectorBuckets ?? []
@@ -51,13 +36,25 @@ export const VectorsBuckets = () => {
           bucket.vectorBucketName.toLowerCase().includes(filterString.toLowerCase())
         )
 
+  const handleBucketNavigation = (
+    bucketName: string,
+    event: React.MouseEvent | React.KeyboardEvent
+  ) => {
+    const url = `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(bucketName)}`
+    if (event.metaKey || event.ctrlKey) {
+      window.open(url, '_blank')
+    } else {
+      router.push(url)
+    }
+  }
+
   return (
     <ScaffoldSection isFullWidth>
       <Admonition
-        type="warning"
+        type="note"
         layout="horizontal"
-        className="mb-12 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
-        title="Vector buckets are in alpha"
+        className="-mt-4 mb-8 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
+        title="Private alpha"
         actions={
           <Button asChild type="default" icon={<ExternalLink />}>
             <a
@@ -66,15 +63,16 @@ export const VectorsBuckets = () => {
               // [Joshen] To update with Vector specific GH discussion
               href="https://github.com/orgs/supabase/discussions/40116"
             >
-              Leave feedback
+              Share feedback
             </a>
           </Button>
         }
       >
-        <p className="!leading-normal !mb-0">
-          Expect rapid changes, limited features, and possible breaking updates as we expand access.
+        <p className="!leading-normal !mb-0 text-balance">
+          Vector buckets are now in private alpha. Expect rapid changes, limited features, and
+          possible breaking updates. Please share feedback as we refine the experience and expand
+          access.
         </p>
-        <p className="!leading-normal !mb-0">Please share feedback as we refine the experience!</p>
       </Admonition>
 
       {!isLoadingBuckets && bucketsList.length === 0 ? (
@@ -103,14 +101,21 @@ export const VectorsBuckets = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    {filteredBuckets.length > 0 && (
+                      <TableHead className="w-2 pr-1">
+                        <span className="sr-only">Icon</span>
+                      </TableHead>
+                    )}
                     <TableHead>Name</TableHead>
                     <TableHead>Created at</TableHead>
-                    <TableHead />
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredBuckets.length === 0 && filterString.length > 0 && (
-                    <TableRow>
+                    <TableRow className="[&>td]:hover:bg-inherit">
                       <TableCell colSpan={3}>
                         <p className="text-sm text-foreground">No results found</p>
                         <p className="text-sm text-foreground-lighter">
@@ -126,15 +131,18 @@ export const VectorsBuckets = () => {
                     const created = +bucket.creationTime * 1000
 
                     return (
-                      <TableRow key={id}>
+                      <TableRow key={id} className="relative cursor-pointer h-16">
+                        <TableCell className="w-2 pr-1">
+                          <BucketIcon size={16} className="text-foreground-muted" />
+                        </TableCell>
                         <TableCell>
-                          <Link
-                            href={`/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`}
-                            title={name}
-                            className="text-link-table-cell"
+                          <p className="whitespace-nowrap max-w-[512px] truncate">{name}</p>
+                          <button
+                            className={cn('absolute inset-0', 'inset-focus')}
+                            onClick={(event) => handleBucketNavigation(name, event)}
                           >
-                            {name}
-                          </Link>
+                            <span className="sr-only">Go to bucket details</span>
+                          </button>
                         </TableCell>
                         <TableCell>
                           <p className="text-foreground-light">
@@ -145,30 +153,8 @@ export const VectorsBuckets = () => {
                           </p>
                         </TableCell>
                         <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <Button asChild type="default">
-                              <Link
-                                href={`/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`}
-                              >
-                                View contents
-                              </Link>
-                            </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent side="bottom" align="end" className="w-40">
-                                <DropdownMenuItem
-                                  className="flex items-center space-x-2"
-                                  onClick={() => {
-                                    setBucketForDeletion(bucket)
-                                  }}
-                                >
-                                  <Trash2 size={12} />
-                                  <p>Delete bucket</p>
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                          <div className="flex justify-end items-center h-full">
+                            <ChevronRight size={14} className="text-foreground-muted/60" />
                           </div>
                         </TableCell>
                       </TableRow>
@@ -180,13 +166,6 @@ export const VectorsBuckets = () => {
           )}
         </div>
       )}
-
-      <DeleteVectorBucketModal
-        visible={!!bucketForDeletion}
-        bucketName={bucketForDeletion?.vectorBucketName!}
-        onCancel={() => setBucketForDeletion(null)}
-        onSuccess={() => setBucketForDeletion(null)}
-      />
     </ScaffoldSection>
   )
 }
