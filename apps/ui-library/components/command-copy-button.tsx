@@ -20,10 +20,11 @@ export function CommandCopyButton({ command }: { command: string }) {
   const parseCommandForTelemetry = (cmd: string) => {
     // Extracts title and framework e.g. "title: password-based-auth, framework: nextjs"
     const match = cmd.match(
-      /(?:\/ui\/r\/|@supabase\/)(.+)-(nextjs|react-router|react|tanstack)(?:@[^@\s]+|\.json)?$/
+      /(?:\/ui\/r\/|@supabase\/)(.+)-(nextjs|react-router|react|tanstack|vue|nuxtjs)(?:@[^@\s]+|\.json)?$/
     )
 
-    const framework = (match?.[2] as 'nextjs' | 'react-router' | 'tanstack' | 'react') ?? 'react'
+    const framework =
+      (match?.[2] as 'nextjs' | 'react-router' | 'tanstack' | 'react' | 'vue' | 'nuxtjs') ?? 'react'
     const title = match?.[1] ?? ''
 
     // Extract package manager from command prefix (npx, pnpm, yarn, bun)
