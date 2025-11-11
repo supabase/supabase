@@ -1,14 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
 import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { usePHFlag } from 'hooks/ui/useFlag'
 import { RealtimeButtonVariant } from 'types'
-import { NEW_PROJECT_THRESHOLD_DAYS } from 'lib/constants'
 import { RefreshButton } from 'components/grid/components/header/RefreshButton'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { APIDocsButton } from 'components/ui/APIDocsButton'
@@ -28,6 +25,7 @@ import {
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTrack } from 'lib/telemetry/track'
@@ -48,6 +46,15 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
+
+/**
+ * Minimal type for realtime-enabled tables from database publications
+ */
+interface RealtimeEnabledTable {
+  id: number
+  schema: string
+  name: string
+}
 
 export interface GridHeaderActionsProps {
   table: Entity
@@ -72,25 +79,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isView = isTableLikeView(table)
   const isMaterializedView = isTableLikeMaterializedView(table)
 
-  const realtimeButtonVariant = usePHFlag<RealtimeButtonVariant | false | undefined>(
-    'realtimeButtonVariant'
-  )
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
-
-  const isNewProject = useMemo(() => {
-    if (!project?.inserted_at) return false
-    return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
-  }, [project?.inserted_at])
-
-  const activeRealtimeVariant = useMemo(() => {
-    if (!isTable || !isNewProject) return null
-    if (!realtimeButtonVariant || realtimeButtonVariant === RealtimeButtonVariant.CONTROL)
-      return null
-    return realtimeButtonVariant
-  }, [isTable, isNewProject, realtimeButtonVariant])
-
-  const hasTrackedExposure = useRef(false)
 
   const { mutate: updateTable } = useTableUpdateMutation({
     onError: (error) => {
@@ -124,8 +114,14 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const realtimePublication = (publications ?? []).find(
     (publication) => publication.name === 'supabase_realtime'
   )
-  const realtimeEnabledTables = realtimePublication?.tables ?? []
-  const isRealtimeEnabled = realtimeEnabledTables.some((t: any) => t.id === table?.id)
+  const realtimeEnabledTables = (realtimePublication?.tables ?? []) as RealtimeEnabledTable[]
+  const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === table?.id)
+
+  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
+    projectInsertedAt: project?.inserted_at,
+    isTable,
+    isRealtimeEnabled,
+  })
 
   const { mutate: updatePublications, isLoading: isTogglingRealtime } =
     useDatabasePublicationUpdateMutation({
@@ -192,32 +188,17 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
   const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
 
-  useEffect(() => {
-    if (!isTable || !isNewProject || !project || hasTrackedExposure.current) return
-    if (realtimeButtonVariant === false || realtimeButtonVariant === undefined) return
-
-    hasTrackedExposure.current = true
-
-    const daysSinceCreation = dayjs().diff(dayjs(project.inserted_at), 'day')
-
-    track('realtime_experiment_exposed', {
-      variant: realtimeButtonVariant,
-      table_has_realtime_enabled: isRealtimeEnabled,
-      days_since_project_creation: daysSinceCreation,
-    })
-  }, [isTable, isNewProject, realtimeButtonVariant, project, isRealtimeEnabled, track])
-
   const toggleRealtime = async () => {
     if (!project || !realtimePublication) return
 
-    const exists = realtimeEnabledTables.some((x: any) => x.id === table.id)
+    const exists = realtimeEnabledTables.some((x) => x.id === table.id)
     const tables = !exists
       ? [`${table.schema}.${table.name}`].concat(
-          realtimeEnabledTables.map((t: any) => `${t.schema}.${t.name}`)
+          realtimeEnabledTables.map((t) => `${t.schema}.${t.name}`)
         )
       : realtimeEnabledTables
-          .filter((x: any) => x.id !== table.id)
-          .map((x: any) => `${x.schema}.${x.name}`)
+          .filter((x) => x.id !== table.id)
+          .map((x) => `${x.schema}.${x.name}`)
 
     track('realtime_toggle_table_clicked', {
       newState: exists ? 'disabled' : 'enabled',

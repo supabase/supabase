@@ -1,5 +1,4 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import dayjs from 'dayjs'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -10,12 +9,11 @@ import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constra
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useTrack } from 'lib/telemetry/track'
-import { NEW_PROJECT_THRESHOLD_DAYS } from 'lib/constants'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { usePHFlag } from 'hooks/ui/useFlag'
 import { RealtimeButtonVariant } from 'types'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
@@ -77,9 +75,6 @@ export const TableEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
-  const realtimeButtonVariant = usePHFlag<RealtimeButtonVariant | false | undefined>(
-    'realtimeButtonVariant'
-  )
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const track = useTrack()
 
@@ -114,17 +109,11 @@ export const TableEditor = ({
     ? false
     : realtimeEnabledTables.some((t) => t.id === table?.id)
 
-  const isNewProject = useMemo(() => {
-    if (!project?.inserted_at) return false
-    return dayjs().diff(dayjs(project.inserted_at), 'day') < NEW_PROJECT_THRESHOLD_DAYS
-  }, [project?.inserted_at])
-
-  const activeRealtimeVariant = useMemo(() => {
-    if (!isNewProject) return null
-    if (!realtimeButtonVariant || realtimeButtonVariant === RealtimeButtonVariant.CONTROL)
-      return null
-    return realtimeButtonVariant
-  }, [isNewProject, realtimeButtonVariant])
+  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
+    projectInsertedAt: project?.inserted_at,
+    isTable: !isNewRecord,
+    isRealtimeEnabled,
+  })
 
   const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
