@@ -6,14 +6,14 @@ import { useEvents } from '~/app/events/context'
 import { formatHosts } from '~/lib/eventsUtils'
 
 export function EventList() {
-  const { isLoading, allEvents } = useEvents()
+  const { isLoading, filteredEvents } = useEvents()
 
   if (isLoading) {
     return <EventListSkeleton />
   }
 
   // Group events by date
-  const eventsByDate = allEvents.reduce(
+  const eventsByDate = filteredEvents.reduce(
     (acc, event) => {
       const eventDate = new Date(event.date).toLocaleDateString('en-US', {
         weekday: 'long',
@@ -28,7 +28,7 @@ export function EventList() {
       acc[eventDate].push(event)
       return acc
     },
-    {} as Record<string, typeof allEvents>
+    {} as Record<string, typeof filteredEvents>
   )
 
   return (

@@ -18,8 +18,8 @@ interface EventsContextValue {
   // Search & Filter
   searchQuery: string
   setSearchQuery: (query: string) => void
-  selectedCategory: string
-  setSelectedCategory: (category: string) => void
+  selectedCategories: string[]
+  toggleCategory: (category: string) => void
 
   // Categories
   categories: { [key: string]: number }
@@ -36,7 +36,7 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
   const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(['all'])
 
   useEffect(() => {
     const fetchLumaEvents = async () => {
@@ -111,13 +111,37 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
     return categoryCounts
   }, [allEvents])
 
+  // Toggle category selection
+  const toggleCategory = (category: string) => {
+    if (category === 'all') {
+      setSelectedCategories(['all'])
+      return
+    }
+
+    setSelectedCategories((prev) => {
+      // Remove 'all' if selecting a specific category
+      const withoutAll = prev.filter((c) => c !== 'all')
+
+      // Toggle the category
+      if (withoutAll.includes(category)) {
+        const updated = withoutAll.filter((c) => c !== category)
+        // If no categories selected, default to 'all'
+        return updated.length === 0 ? ['all'] : updated
+      } else {
+        return [...withoutAll, category]
+      }
+    })
+  }
+
   // Filter events by search query and category
   const filteredEvents = useMemo(() => {
     let filtered = allEvents
 
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter((event) => event.categories?.includes(selectedCategory))
+    // Filter by categories (multiple selection)
+    if (!selectedCategories.includes('all')) {
+      filtered = filtered.filter((event) =>
+        event.categories?.some((cat) => selectedCategories.includes(cat))
+      )
     }
 
     // Filter by search query
@@ -139,7 +163,7 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
       const dateB = new Date(b.date).getTime()
       return dateA - dateB
     })
-  }, [allEvents, selectedCategory, searchQuery])
+  }, [allEvents, selectedCategories, searchQuery])
 
   // Featured event: nearest upcoming event, or if none, the most recent past event
   const featuredEvent = useMemo(() => {
@@ -187,8 +211,8 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
     isLoading,
     searchQuery,
     setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
+    selectedCategories,
+    toggleCategory,
     categories,
     featuredEvent,
   }
