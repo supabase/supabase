@@ -125,7 +125,7 @@ jobs:
             const stalePRs = JSON.parse(process.env.STALE_PRS_JSON);
             const count = stalePRs.length;
 
-            // Build PR blocks
+            // Build PR blocks with proper escaping for Slack mrkdwn
             const prBlocks = stalePRs.map(pr => {
               // Format age display
               const remainingHours = pr.hoursOld % 24;
@@ -133,11 +133,25 @@ jobs:
                 ? `${pr.daysOld}d ${remainingHours}h`
                 : `${pr.hoursOld}h`;
               
+              // Escape special characters for Slack mrkdwn (escape &, <, >)
+              const escapeSlack = (text) => {
+                return text
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;');
+              };
+              
+              // Truncate title if too long (max 3000 chars for entire text field)
+              const maxTitleLength = 200;
+              const safeTitle = pr.title.length > maxTitleLength 
+                ? escapeSlack(pr.title.substring(0, maxTitleLength) + '...')
+                : escapeSlack(pr.title);
+              
               return {
                 type: "section",
                 text: {
                   type: "mrkdwn",
-                  text: `*<${pr.url}|#${pr.number}: ${pr.title}>*\n👤 @${pr.author} • ⏰ ${ageText} old • 📁 ${pr.fileCount} Dashboard files`
+                  text: `*<${pr.url}|#${pr.number}: ${safeTitle}>*\n:bust_in_silhouette: @${pr.author} • :clock3: ${ageText} old • :file_folder: ${pr.fileCount} Dashboard files`
                 }
               };
             });
@@ -150,14 +164,14 @@ jobs:
                   type: "header",
                   text: {
                     type: "plain_text",
-                    text: "🔔 Dashboard PRs Older Than 24 Hours"
+                    text: "Dashboard PRs Older Than 24 Hours"
                   }
                 },
                 {
                   type: "section",
                   text: {
                     type: "mrkdwn",
-                    text: `There are *${count}* open PRs affecting \`/apps/studio/\` that are older than 24 hours:`
+                    text: `There are *${count}* open PRs affecting /apps/studio/ that are older than 24 hours:`
                   }
                 },
                 {
