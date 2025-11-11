@@ -259,6 +259,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 18.3.1
+      react-data-grid:
+        specifier: 7.0.0-beta.41
+        version: 7.0.0-beta.41(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-day-picker:
         specifier: ^9.11.1
         version: 9.11.1(react@18.3.1)

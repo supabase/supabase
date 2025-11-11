@@ -35,16 +35,6 @@ export const docsConfig: DocsConfig = {
           href: '/docs/icons',
           items: [],
         },
-        {
-          title: 'Figma',
-          href: '/docs/figma',
-          items: [],
-        },
-        {
-          title: 'Changelog',
-          href: '/docs/changelog',
-          items: [],
-        },
       ],
     },
     {
