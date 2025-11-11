@@ -119,10 +119,11 @@ jobs:
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DASHBOARD_WEBHOOK_URL }}
+          STALE_PRS_JSON: ${{ steps.find-prs.outputs.stale_prs }}
         with:
           script: |
-            const stalePRs = JSON.parse('${{ steps.find-prs.outputs.stale_prs }}');
-            const count = ${{ steps.find-prs.outputs.count }};
+            const stalePRs = JSON.parse(process.env.STALE_PRS_JSON);
+            const count = stalePRs.length;
 
             // Build PR blocks
             const prBlocks = stalePRs.map(pr => {
