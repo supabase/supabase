@@ -12,7 +12,6 @@ import {
 import { getDecryptedParameters } from 'components/interfaces/Storage/ImportForeignSchemaDialog.utils'
 import { DotPing } from 'components/ui/DotPing'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
 import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
 import { useUpdatePublicationMutation } from 'data/etl/publication-update-mutation'
 import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
@@ -94,12 +93,12 @@ export const TableRowComponent = ({
     if (isLoading) return 'Checking'
     if (hasReplication && isTableUnderReplicationPublication) {
       if (isPipelineRunning) {
-        return 'Replicating'
+        return 'Running'
       } else {
-        return `Replication ${pipelineStatus ?? 'unknown'}`
+        return pipelineStatus ?? 'unknown'
       }
     } else {
-      return 'Not replicating'
+      return 'Stopped'
     }
   }
 
@@ -243,22 +242,15 @@ export const TableRowComponent = ({
                         variant={isReplicating ? 'primary' : 'default'}
                       />
                     )}
-                    <span className="text-foreground-lighter">{getStatusLabel()}</span>
+                    <span className="text-foreground-lighter capitalize">{getStatusLabel()}</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  {isReplicating ? (
-                    `Table data is currently replicating${!!inferredPostgresTable ? ` from ${inferredPostgresTable.schema}.${inferredPostgresTable.name}` : ''}`
-                  ) : !isTableUnderReplicationPublication ? (
-                    'Replication is stopped for this table'
-                  ) : (
-                    <>
-                      View replication for more details{' '}
-                      <InlineLink href={`/project/${projectRef}/database/etl/${pipeline?.id}`}>
-                        here
-                      </InlineLink>
-                    </>
-                  )}
+                  {isReplicating
+                    ? `Table data is currently replicating${!!inferredPostgresTable ? ` from ${inferredPostgresTable.schema}.${inferredPostgresTable.name}` : ''}`
+                    : !isTableUnderReplicationPublication
+                      ? 'Replication is disabled for this table'
+                      : `Replication on the bucket is ${pipelineStatus}`}
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -296,7 +288,7 @@ export const TableRowComponent = ({
                           onClick={() => setShowStopReplicationModal(true)}
                         >
                           <Pause size={12} className="text-foreground-lighter" />
-                          <p>Stop replication</p>
+                          <p>Disable replication</p>
                         </DropdownMenuItem>
                       ) : (
                         <DropdownMenuItem
@@ -304,7 +296,7 @@ export const TableRowComponent = ({
                           onClick={() => setShowStartReplicationModal(true)}
                         >
                           <Play size={12} className="text-foreground-lighter" />
-                          <p>Start replication</p>
+                          <p>Enable replication</p>
                         </DropdownMenuItem>
                       )}
                     </>
@@ -337,14 +329,14 @@ export const TableRowComponent = ({
         variant="warning"
         visible={showStopReplicationModal}
         loading={isUpdatingReplication}
-        title="Confirm to stop replication for table"
-        confirmLabel="Stop replication"
+        title="Confirm to disable replication for table"
+        confirmLabel="Disable replication"
         onCancel={() => setShowStopReplicationModal(false)}
         onConfirm={() => onConfirmStopReplication()}
       >
         <p className="text-sm text-foreground-light">
           Data within the "{table.name}" table will stop replicating. However do note that,
-          restarting replication on the table will clear and re-sync all data in it. Are you sure?
+          re-enabling replication on this table will clear and re-sync all data in it. Are you sure?
         </p>
       </ConfirmationModal>
 
@@ -353,13 +345,13 @@ export const TableRowComponent = ({
         variant="warning"
         visible={showStartReplicationModal}
         loading={isUpdatingReplication}
-        title="Confirm to start replication for table"
-        confirmLabel="Start replication"
+        title="Confirm to enable replication for table"
+        confirmLabel="Enable replication"
         onCancel={() => setShowStartReplicationModal(false)}
         onConfirm={() => onConfirmStartReplication()}
       >
         <p className="text-sm text-foreground-light">
-          Restarting replication on the "{table.name}" table will clear and re-sync all data in it.
+          Re-enabling replication on the "{table.name}" table will clear and re-sync all data in it.
           Are you sure?
         </p>
       </ConfirmationModal>

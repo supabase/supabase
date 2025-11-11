@@ -25,13 +25,14 @@ import {
   DatabaseExtension,
   useDatabaseExtensionsQuery,
 } from 'data/database-extensions/database-extensions-query'
+import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
 import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { Button, Card, CardContent } from 'ui'
+import { Button, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
@@ -72,6 +73,9 @@ export const AnalyticBucketDetails = () => {
     projectRef,
     bucketId: bucket?.id,
   })
+  const { data } = useReplicationPipelineStatusQuery({ projectRef, pipelineId: pipeline?.id })
+  const pipelineStatus = data?.status.name
+  const isPipelineRunning = ['starting', 'started'].includes(pipelineStatus ?? '')
 
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
@@ -193,6 +197,16 @@ export const AnalyticBucketDetails = () => {
                     </ScaffoldSectionDescription>
                   </div>
                   <div className="flex items-center gap-x-2">
+                    {!isPipelineRunning && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <WarningIcon />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          Replication on the bucket is {pipelineStatus}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                     {!!pipeline && (
                       <Button asChild type="default">
                         <Link
