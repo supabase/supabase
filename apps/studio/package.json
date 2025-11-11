@@ -127,7 +127,7 @@
     "react-simple-maps": "4.0.0-beta.6",
     "react-use": "^17.5.0",
     "reactflow": "^11.10.1",
-    "recharts": "^2.8.0",
+    "recharts": "catalog:",
     "remark-gfm": "^3.0.1",
     "shared-data": "workspace:*",
     "sonner": "^1.5.0",
