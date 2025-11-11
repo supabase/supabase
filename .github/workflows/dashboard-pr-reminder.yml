@@ -97,6 +97,20 @@ jobs:
                   const hoursOld = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60));
                   const daysOld = Math.floor(hoursOld / 24);
                   
+                  // Fetch detailed PR info to get merge status
+                  const { data: detailedPR } = await github.rest.pulls.get({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pr.number
+                  });
+                  
+                  // Skip PRs with merge conflicts
+                  const hasConflicts = detailedPR.mergeable === false || detailedPR.mergeable_state === 'dirty';
+                  if (hasConflicts) {
+                    console.log(`PR #${pr.number} has merge conflicts, skipping...`);
+                    continue;
+                  }
+                  
                   stalePRs.push({
                     number: pr.number,
                     title: pr.title,
