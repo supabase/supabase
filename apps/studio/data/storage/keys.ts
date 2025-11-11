@@ -9,8 +9,15 @@ export const storageKeys = {
   vectorBucketsIndexes: (projectRef: string | undefined, vectorBucketName: string | undefined) =>
     ['projects', projectRef, 'vector-buckets', vectorBucketName, 'indexes'] as const,
   archive: (projectRef: string | undefined) => ['projects', projectRef, 'archive'] as const,
-  icebergNamespaces: (catalog: string, warehouse: string) =>
-    ['catalog', catalog, 'warehouse', warehouse, 'namespaces'] as const,
+  icebergNamespaces: ({
+    catalog,
+    warehouse,
+    apikey,
+  }: {
+    catalog: string
+    warehouse: string
+    apikey?: string
+  }) => ['catalog', catalog, 'warehouse', warehouse, 'namespaces', apikey].filter(Boolean),
   icebergNamespace: (catalog: string, warehouse: string, namespace: string) =>
     ['catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace] as const,
   icebergNamespaceTables: ({

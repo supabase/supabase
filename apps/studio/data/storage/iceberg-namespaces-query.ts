@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { useTemporaryAPIKeyQuery } from 'data/api-keys/temp-api-keys-query'
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { storageKeys } from './keys'
@@ -7,25 +8,21 @@ import { storageKeys } from './keys'
 type GetNamespacesVariables = {
   catalogUri: string
   warehouse: string
-  token: string
+  projectRef?: string
 }
 
 // [Joshen] Investigate if we can use the temp API keys here
-async function getNamespaces({ catalogUri, warehouse, token }: GetNamespacesVariables) {
+async function getNamespaces({
+  catalogUri,
+  warehouse,
+  tempApiKey,
+}: GetNamespacesVariables & { tempApiKey?: string }) {
   let headers = new Headers()
-  // handle both secret key and service role key
-  if (token.startsWith('sb_secret_')) {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      apikey: `${token}`,
-    })
-    headers.delete('Authorization')
-  } else {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    })
-  }
+  headers = await constructHeaders({
+    'Content-Type': 'application/json',
+    apikey: tempApiKey ?? '',
+  })
+  headers.delete('Authorization')
 
   const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
 
@@ -57,9 +54,19 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
   params: GetNamespacesVariables,
   { ...options }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
+  const { projectRef } = params
+  const { data } = useTemporaryAPIKeyQuery({ projectRef })
+  const tempApiKey = data?.api_key
+
   return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
-    queryKey: storageKeys.icebergNamespaces(params.catalogUri, params.warehouse),
+    queryKey: storageKeys.icebergNamespaces({
+      catalog: params.catalogUri,
+      warehouse: params.warehouse,
+      apikey: tempApiKey,
+    }),
     queryFn: () => getNamespaces(params),
+    enabled:
+      options.enabled && typeof projectRef !== 'undefined' && typeof tempApiKey !== 'undefined',
     ...options,
   })
 }

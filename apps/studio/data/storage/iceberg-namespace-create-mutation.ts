@@ -12,7 +12,6 @@ type CreateIcebergNamespaceVariables = {
   namespace: string
 }
 
-// [Joshen] Investigate if we can use the temp API keys here
 async function createIcebergNamespace({
   catalogUri,
   warehouse,
@@ -85,7 +84,10 @@ export const useIcebergNamespaceCreateMutation = ({
         ),
       })
       await queryClient.invalidateQueries({
-        queryKey: storageKeys.icebergNamespaces(variables.catalogUri, variables.warehouse),
+        queryKey: storageKeys.icebergNamespaces({
+          catalog: variables.catalogUri,
+          warehouse: variables.warehouse,
+        }),
       })
       await onSuccess?.(data, variables, context)
     },
