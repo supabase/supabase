@@ -2,8 +2,10 @@ name: Dashboard PR Reminder
 
 on:
   schedule:
-    # Run daily at 9 AM UTC (adjust as needed)
-    - cron: '0 9 * * *'
+    # Run at 10am Singapore Time (2am UTC)
+    - cron: '0 2 * * *'
+    # Run at 10am US Eastern Time (2pm UTC = 10am EDT / 9am EST)
+    - cron: '0 14 * * *'
   workflow_dispatch: # Allow manual trigger for testing
   push: # TODO Remove before merging to main
     branches:
