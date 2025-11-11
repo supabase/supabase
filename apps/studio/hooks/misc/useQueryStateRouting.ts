@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
 
 interface UseQueryStateRoutingConfig<T> {
   /**
@@ -125,5 +126,55 @@ export function useQueryStateRouting<T = any>({
     entity,
     show,
     notFound,
+  }
+}
+
+interface UseQueryStateWithDataConfig<T, K extends keyof T & string> {
+  urlKey: string
+  data: T[]
+  dataKeySelector: K
+  errorMessage: string | undefined
+}
+
+export function useQueryStateWithData<T, K extends keyof T & string>({
+  urlKey,
+  data = [],
+  dataKeySelector,
+  errorMessage,
+}: UseQueryStateWithDataConfig<T, K>) {
+  const [selectedId, setSelectedId] = useQueryState(
+    urlKey,
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [val, setVal] = useState<T | undefined>(undefined)
+
+  const setValue = (value: T | undefined) => {
+    if (value == null) {
+      setSelectedId(null)
+      setVal(undefined)
+      return
+    }
+
+    const keyValue = String(value[dataKeySelector])
+    setSelectedId(keyValue)
+    setVal(value)
+  }
+
+  useEffect(() => {
+    // Set the value if the selected ID is not null and we have data
+    if (selectedId != null && data.length > 0) {
+      // since we store strings in the URL, we need to convert the data key lookup value to a string
+      const initialValue = data.find((item) => String(item[dataKeySelector]) === selectedId)
+      if (initialValue == null) {
+        errorMessage && toast.error(errorMessage)
+        setSelectedId(null)
+      }
+      setVal(initialValue)
+    }
+  }, [selectedId, data, dataKeySelector])
+
+  return {
+    val,
+    setValue,
   }
 }
