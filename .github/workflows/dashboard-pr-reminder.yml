@@ -117,7 +117,7 @@ jobs:
       - name: Send Slack notification
         if: fromJSON(steps.find-prs.outputs.count) > 0
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DASHBOARD_WEBHOOK_URL }}
           STALE_PRS: ${{ steps.find-prs.outputs.count }}
         run: |
           # Parse the PR data
