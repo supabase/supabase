@@ -712,12 +712,6 @@ export const auth: NavMenuConstant = {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
-            { name: 'Overview', url: '/guides/auth/server-side' },
-            { name: 'Next.js guide', url: '/guides/auth/server-side/nextjs' },
-            {
-              name: 'SvelteKit guide',
-              url: '/guides/auth/server-side/sveltekit' as `/${string}`,
-            },
             { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
             {
               name: 'Migrating from Auth Helpers',
