@@ -1333,4 +1333,9 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/empty-state-zero-items-data-grid.tsx'],
   },
+  {
+    name: 'metrics-block',
+    type: 'components:example',
+    files: ['example/metrics-block.tsx'],
+  },
 ]
