@@ -189,7 +189,7 @@ const BranchesPage: NextPageWithLayout = () => {
         text={
           <>
             {selectedBranchWillBeDeletedImmediately
-              ? 'This will delete your database preview branc '
+              ? 'This will delete your database preview branch '
               : 'This will pause your branch for one hour then permanently delete it '}
             <span className="text-bold text-foreground">{selectedBranchToDelete?.[0].name}</span>.
           </>
