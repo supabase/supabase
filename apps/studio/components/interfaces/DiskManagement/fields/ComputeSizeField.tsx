@@ -57,9 +57,12 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project, isLoading: isProjectLoading } = useSelectedProjectQuery()
-  
-  const { hasAccess: entitledUpdateCompute, getEntitlementSetValues: getEntitledAvailableSizes, isLoading: isEntitlementLoading } = useCheckEntitlements('instances.compute_update_available_sizes')
-  
+
+  const {
+    hasAccess: entitledUpdateCompute,
+    isLoading: isEntitlementLoading,
+  } = useCheckEntitlements('instances.compute_update_available_sizes')
+
   const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
 
   const { computeSize, storageType } = form.watch()
@@ -97,7 +100,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     plan: org?.plan.id ?? 'free',
   })
 
-  const projectComputeSize = project?.infra_compute_size ?? 'nano'  
+  const projectComputeSize = project?.infra_compute_size ?? 'nano'
   const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
 
   return (

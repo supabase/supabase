@@ -89,7 +89,9 @@ export function DiskManagementForm() {
       },
     })
 
-  const { hasAccess, isSuccess: isEntitlementsLoaded } = useCheckEntitlements('instances.compute_update_available_sizes')
+  const { hasAccess, isSuccess: isEntitlementsLoaded } = useCheckEntitlements(
+    'instances.compute_update_available_sizes'
+  )
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
