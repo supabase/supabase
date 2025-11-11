@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -84,10 +83,7 @@ export const CreateVectorBucketDialog = () => {
     onError: () => {},
   })
 
-  const { extension, state: wrappersExtensionState } = useS3VectorsWrapperExtension()
-  // [Joshen] Default version is what's on the DB, so if the installed version is already the default version
-  // but still doesnt meet the minimum extension version, then DB upgrade is required
-  const databaseNeedsUpgrading = extension?.installed_version === extension?.default_version
+  const { state: wrappersExtensionState } = useS3VectorsWrapperExtension()
 
   const { mutateAsync: createS3VectorsWrapper } = useS3VectorsWrapperCreateMutation()
 
@@ -197,43 +193,17 @@ export const CreateVectorBucketDialog = () => {
                   </FormItemLayout>
                 )}
               />
-              {wrappersExtensionState === 'needs-upgrade' ? (
-                <Admonition type="warning" title="Outdated extension version" className="mb-0">
-                  <p>
-                    The S3 Vectors Wrapper requires a minimum extension version of 0.5.6. You have
-                    version {extension?.installed_version} installed. Please{' '}
-                    {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the
-                    extension by disabling and enabling the Wrappers extension.
-                  </p>
-                  <p>
-                    Before reinstalling the wrapper extension, you must first remove all existing
-                    wrappers. Afterward, you can recreate the wrappers.
-                  </p>
-                  <Button asChild type="default">
-                    <Link
-                      href={
-                        databaseNeedsUpgrading
-                          ? `/project/${ref}/settings/infrastructure`
-                          : `/project/${ref}/database/extensions?filter=wrappers`
-                      }
-                    >
-                      {databaseNeedsUpgrading ? 'Upgrade database' : 'Extensions'}
-                    </Link>
-                  </Button>
-                </Admonition>
-              ) : (
-                <Admonition type="default">
-                  <p>
-                    Supabase will install the{' '}
-                    {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
-                    S3 Vectors Wrapper integration on your behalf.{' '}
-                    <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/s3-vectors`}>
-                      Learn more
-                    </InlineLink>
-                    .
-                  </p>
-                </Admonition>
-              )}
+              <Admonition type="default">
+                <p>
+                  Supabase will install the{' '}
+                  {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
+                  S3 Vectors Wrapper integration on your behalf.{' '}
+                  <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/s3-vectors`}>
+                    Learn more
+                  </InlineLink>
+                  .
+                </p>
+              </Admonition>
             </DialogSection>
           </form>
         </Form_Shadcn_>
