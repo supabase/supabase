@@ -415,7 +415,7 @@ CREATE POLICY "users_can_receive_broadcasts" ON realtime.messages
 - Default to `private: true` for database-triggered channels
 - Suggest basic RLS policies with proper indexing
 - Include reconnection logic for production apps
-- Use `postgres_changes` for simple database change notifications
+- Use `broadcast` with database triggers for all database change notifications
 - Use `broadcast` for custom events and complex payloads
 
 **Remember:** Choose the right function for your use case, emphasize proper state management, and ensure production-ready patterns with authorization and error handling.
