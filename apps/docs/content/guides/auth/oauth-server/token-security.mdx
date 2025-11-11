@@ -23,7 +23,7 @@ Every OAuth access token includes:
   "email": "user@example.com",
   "client_id": "9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d",
   "aal": "aal1",
-  "amr": [{"method": "password", "timestamp": 1735815600}],
+  "amr": [{ "method": "password", "timestamp": 1735815600 }],
   "session_id": "session-uuid",
   "iss": "https://<project-ref>.supabase.co/auth/v1",
   "iat": 1735815600,
@@ -33,8 +33,8 @@ Every OAuth access token includes:
 
 The key OAuth-specific claim is:
 
-| Claim | Description |
-|-------|-------------|
+| Claim       | Description                                                    |
+| ----------- | -------------------------------------------------------------- |
 | `client_id` | Unique identifier of the OAuth client that obtained this token |
 
 You can use this claim in RLS policies to grant different permissions to different clients.
@@ -203,14 +203,14 @@ serve(async (req) => {
   }
 
   // Default audience for non-OAuth flows
-  return new Response(
-    JSON.stringify({ claims: {} }),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
+  return new Response(JSON.stringify({ claims: {} }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
 })
 ```
 
 The `audience` claim is especially important for:
+
 - **JWT validation by third parties**: Services can verify tokens were issued for their specific API
 - **Multi-tenant applications**: Different audiences for different client applications
 - **Compliance**: Meeting security requirements that mandate audience validation
@@ -226,10 +226,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 serve(async (req) => {
   const { user, claims, client_id } = await req.json()
 
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SECRET_KEY')!
-  )
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SECRET_KEY')!)
 
   // Add custom claims based on OAuth client
   let customClaims = {}
@@ -256,10 +253,9 @@ serve(async (req) => {
     customClaims.max_retention = agent?.max_data_retention_days
   }
 
-  return new Response(
-    JSON.stringify({ claims: customClaims }),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
+  return new Response(JSON.stringify({ claims: customClaims }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
 })
 ```
 
@@ -346,7 +342,6 @@ WHERE s.created_at > NOW() - INTERVAL '30 days'
 GROUP BY oc.client_id, oc.name, oc.created_at;
 ```
 
-
 ## Testing your policies
 
 Always test your RLS policies before deploying to production:
@@ -375,6 +370,7 @@ Or use the Supabase Dashboard's [RLS policy tester](/dashboard/project/_/auth/po
 **Problem**: OAuth client can't access data despite having a valid token.
 
 **Check**:
+
 1. Verify the policy includes the client's `client_id`
 2. Ensure RLS is enabled on the table
 3. Check for conflicting restrictive policies

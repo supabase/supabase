@@ -9,6 +9,7 @@ The Model Context Protocol (MCP) is an open standard for connecting AI agents an
 ## What is Model Context Protocol?
 
 Model Context Protocol (MCP) provides a standardized way for AI applications to:
+
 - Access external data sources and APIs
 - Authenticate users securely via OAuth 2.1
 - Maintain user context across interactions
@@ -77,11 +78,7 @@ This endpoint returns metadata about your OAuth server:
   "response_types_supported": ["code"],
   "grant_types_supported": ["authorization_code", "refresh_token"],
   "code_challenge_methods_supported": ["S256", "plain"],
-  "token_endpoint_auth_methods_supported": [
-    "client_secret_basic",
-    "client_secret_post",
-    "none"
-  ]
+  "token_endpoint_auth_methods_supported": ["client_secret_basic", "client_secret_post", "none"]
 }
 ```
 
@@ -101,6 +98,7 @@ Dynamic client registration is disabled by default for security. Enable it in yo
 <Admonition type="caution">
 
 Dynamic registration allows any MCP client to register with your project. Consider:
+
 - Requiring user approval for all clients
 - Monitoring registered clients regularly
 - Validating redirect URIs are from trusted domains
@@ -148,6 +146,7 @@ Always require explicit user approval for MCP clients:
 **Problem**: Client shows "OAuth discovery failed" or similar error.
 
 **Solutions**:
+
 - Verify OAuth 2.1 is enabled in your project
 - Check that `/.well-known/oauth-authorization-server` returns valid JSON
 - Ensure your project URL is accessible
@@ -157,6 +156,7 @@ Always require explicit user approval for MCP clients:
 **Problem**: Client receives 403 or 404 on registration endpoint.
 
 **Solutions**:
+
 - Enable dynamic client registration in project settings
 - Verify redirect URIs are valid, complete URLs (protocol, domain, path, and port)
 - Check for rate limiting on registration endpoint
@@ -166,6 +166,7 @@ Always require explicit user approval for MCP clients:
 **Problem**: Client receives "invalid_grant" error.
 
 **Solutions**:
+
 - Verify authorization code hasn't expired (10 minutes)
 - Ensure code verifier matches code challenge
 - Check that redirect URI exactly matches registration
@@ -176,6 +177,7 @@ Always require explicit user approval for MCP clients:
 **Problem**: MCP client can't access data despite valid token.
 
 **Solutions**:
+
 - Check RLS policies include the MCP client's `client_id`
 - Verify user has necessary permissions
 - Test with service role key to isolate RLS issues

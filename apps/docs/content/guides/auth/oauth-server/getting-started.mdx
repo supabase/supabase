@@ -67,6 +67,7 @@ The authorization path is combined with your Site URL (configured in **Authentic
 </Admonition>
 
 Your authorization UI will be at the combined Site URL + Authorization Path. For example:
+
 - Site URL: `https://example.com` (from **Authentication** > **URL Configuration**)
 - Authorization Path: `/oauth/consent` (from **OAuth Server** settings)
 - Your authorization UI: `https://example.com/oauth/consent`
@@ -133,16 +134,16 @@ export default async function ConsentPage({
         getAll: async () => (await cookies()).getAll(),
         setAll: async (cookiesToSet) => {
           const cookieStore = await cookies()
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         },
       },
     }
   )
 
   // Check if user is authenticated
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     // Redirect to login, preserving authorization_id
@@ -150,7 +151,8 @@ export default async function ConsentPage({
   }
 
   // Get authorization details using the authorization_id
-  const { data: authDetails, error } = await supabase.auth.oauth.getAuthorizationDetails(authorizationId)
+  const { data: authDetails, error } =
+    await supabase.auth.oauth.getAuthorizationDetails(authorizationId)
 
   if (error || !authDetails) {
     return <div>Error: {error?.message || 'Invalid authorization request'}</div>
@@ -162,14 +164,22 @@ export default async function ConsentPage({
       <p>This application wants to access your account.</p>
 
       <div>
-        <p><strong>Client:</strong> {authDetails.client.name}</p>
-        <p><strong>Redirect URI:</strong> {authDetails.redirect_uri}</p>
+        <p>
+          <strong>Client:</strong> {authDetails.client.name}
+        </p>
+        <p>
+          <strong>Redirect URI:</strong> {authDetails.redirect_uri}
+        </p>
       </div>
 
       <form action="/api/oauth/decision" method="POST">
         <input type="hidden" name="authorization_id" value={authorizationId} />
-        <button type="submit" name="decision" value="approve">Approve</button>
-        <button type="submit" name="decision" value="deny">Deny</button>
+        <button type="submit" name="decision" value="approve">
+          Approve
+        </button>
+        <button type="submit" name="decision" value="deny">
+          Deny
+        </button>
       </form>
     </div>
   )
@@ -199,9 +209,7 @@ export async function POST(request: Request) {
         getAll: async () => (await cookies()).getAll(),
         setAll: async (cookiesToSet) => {
           const cookieStore = await cookies()
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         },
       },
     }
@@ -256,7 +264,9 @@ export function OAuthConsent() {
       }
 
       // Check if user is authenticated
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
       if (!user) {
         navigate(`/login?redirect=/oauth/consent?authorization_id=${authorizationId}`)
@@ -314,8 +324,12 @@ export function OAuthConsent() {
       <p>This application wants to access your account.</p>
 
       <div>
-        <p><strong>Client:</strong> {authDetails.client.name}</p>
-        <p><strong>Redirect URI:</strong> {authDetails.redirect_uri}</p>
+        <p>
+          <strong>Client:</strong> {authDetails.client.name}
+        </p>
+        <p>
+          <strong>Redirect URI:</strong> {authDetails.redirect_uri}
+        </p>
       </div>
 
       <div>
@@ -360,6 +374,7 @@ Before third-party applications can use your project as an identity provider, yo
 4. Click **Create**
 
 You'll receive:
+
 - **Client ID**: A unique identifier for the client
 - **Client Secret** (for confidential clients): A secret key for authenticating the client
 
@@ -394,10 +409,7 @@ Response:
   "client_id": "9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d",
   "client_secret": "secret_1234567890abcdef...",
   "name": "My Third-Party App",
-  "redirect_uris": [
-    "https://my-app.com/auth/callback",
-    "https://my-app.com/auth/silent-callback"
-  ],
+  "redirect_uris": ["https://my-app.com/auth/callback", "https://my-app.com/auth/silent-callback"],
   "client_type": "confidential",
   "created_at": "2025-01-15T10:30:00.000Z"
 }
