@@ -28,9 +28,7 @@ const pageHeaderVariants = cva(['flex flex-col gap-4 w-full'], {
 // ============================================================================
 
 export type PageHeaderRootProps = React.ComponentProps<'div'> &
-  VariantProps<typeof pageHeaderVariants> & {
-    size?: 'default' | 'small' | 'large' | 'full'
-  }
+  VariantProps<typeof pageHeaderVariants>
 
 /**
  * Root component for page header.

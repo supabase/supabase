@@ -174,10 +174,10 @@ export const EdgeFunctionDetails = () => {
           {isSuccess && (
             <dl className="grid grid-cols-1 @xl:grid-cols-[auto_1fr] gap-y-2 [&>dd]:mb-3 @xl:[&>dd]:mb-0 @xl:gap-y-4 gap-x-10">
               <dt className="text-sm text-foreground-light">Slug</dt>
-              <dd className="text-sm lg:text-left">{selectedFunction?.slug}</dd>
+              <dd className="text-sm @lg:text-left">{selectedFunction?.slug}</dd>
 
               <dt className="text-sm text-foreground-light">Endpoint URL</dt>
-              <dd className="text-sm lg:text-left">
+              <dd className="text-sm @lg:text-left">
                 <Input
                   className="font-mono input-mono"
                   disabled
@@ -188,23 +188,23 @@ export const EdgeFunctionDetails = () => {
               </dd>
 
               <dt className="text-sm text-foreground-light">Region</dt>
-              <dd className="text-sm lg:text-left">All functions are deployed globally</dd>
+              <dd className="text-sm @lg:text-left">All functions are deployed globally</dd>
 
               <dt className="text-sm text-foreground-light">Created at</dt>
-              <dd className="text-sm lg:text-left">
+              <dd className="text-sm @lg:text-left">
                 {dayjs(selectedFunction?.created_at ?? 0).format('dddd, MMMM D, YYYY h:mm A')}
               </dd>
 
               <dt className="text-sm text-foreground-light">Last updated at</dt>
-              <dd className="text-sm lg:text-left">
+              <dd className="text-sm @lg:text-left">
                 {dayjs(selectedFunction?.updated_at ?? 0).format('dddd, MMMM D, YYYY h:mm A')}
               </dd>
 
               <dt className="text-sm text-foreground-light">Deployments</dt>
-              <dd className="text-sm lg:text-left">{selectedFunction?.version ?? 0}</dd>
+              <dd className="text-sm @lg:text-left">{selectedFunction?.version ?? 0}</dd>
 
               <dt className="text-sm text-foreground-light">Import Maps</dt>
-              <dd className="text-sm lg:text-left">
+              <dd className="text-sm @lg:text-left">
                 <p>
                   Import maps are{' '}
                   <span className={cn(hasImportMap ? 'text-brand' : 'text-amber-900')}>

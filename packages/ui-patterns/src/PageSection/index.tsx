@@ -24,9 +24,7 @@ const pageSectionRootVariants = cva(['pt-12 last:pb-12 gap-6'], {
 // ============================================================================
 
 export type PageSectionRootProps = React.ComponentProps<'div'> &
-  VariantProps<typeof pageSectionRootVariants> & {
-    orientation?: 'horizontal' | 'vertical'
-  }
+  VariantProps<typeof pageSectionRootVariants>
 
 /**
  * Root component for page section.
