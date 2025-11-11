@@ -1219,7 +1219,7 @@ export interface SupabaseUiCommandCopyButtonClickedEvent {
   properties: {
     templateTitle: string
     command: string
-    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react'
+    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react' | 'vue' | 'nuxtjs'
     packageManager: 'npm' | 'pnpm' | 'yarn' | 'bun'
   }
 }

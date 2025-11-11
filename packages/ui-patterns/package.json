@@ -434,6 +434,18 @@
       "import": "./src/MultiSelectDeprecated/index.tsx",
       "types": "./src/MultiSelectDeprecated/index.tsx"
     },
+    "./PageContainer": {
+      "import": "./src/PageContainer/index.tsx",
+      "types": "./src/PageContainer/index.tsx"
+    },
+    "./PageHeader": {
+      "import": "./src/PageHeader/index.tsx",
+      "types": "./src/PageHeader/index.tsx"
+    },
+    "./PageSection": {
+      "import": "./src/PageSection/index.tsx",
+      "types": "./src/PageSection/index.tsx"
+    },
     "./PopupFrame": {
       "import": "./src/PopupFrame/index.tsx",
       "types": "./src/PopupFrame/index.tsx"

@@ -229,7 +229,7 @@ export const CreateBucketModal = ({
 
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Create a storage bucket</DialogTitle>
+          <DialogTitle>Create file bucket</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />

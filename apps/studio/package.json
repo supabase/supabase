@@ -8,6 +8,7 @@
     "build": "next build && ./../../scripts/upload-static-assets.sh",
     "start": "next start",
     "lint": "eslint .",
+    "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rule react-hooks/exhaustive-deps --rule import/no-anonymous-default-export --rule @tanstack/query/exhaustive-deps --rule @tanstack/query/no-deprecated-options",
     "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
     "test": "vitest --run --coverage",
     "test:watch": "vitest watch",
