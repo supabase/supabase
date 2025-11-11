@@ -110,7 +110,7 @@ export const CreateVectorBucketDialog = () => {
     }
 
     try {
-      if (wrappersExtensionState === 'not-installed' || wrappersExtensionState === 'installed') {
+      if (wrappersExtensionState === 'installed') {
         await createS3VectorsWrapper({ bucketName: values.name })
 
         await createSchema({

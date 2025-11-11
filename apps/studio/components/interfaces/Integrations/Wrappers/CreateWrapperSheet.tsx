@@ -53,7 +53,6 @@ export const CreateWrapperSheet = ({
 
   const [newTables, setNewTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
-  const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [selectedMode, setSelectedMode] = useState<'tables' | 'schema'>(
     wrapperMeta.tables.length > 0 ? 'tables' : 'schema'
