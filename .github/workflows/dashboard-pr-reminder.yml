@@ -1,11 +1,5 @@
 name: Dashboard PR Reminder
 
-# Runs daily to check for PRs older than 24 hours that affect the Dashboard team
-# Sends notifications to #team-frontend Slack channel
-#
-# Required Secrets:
-# - SLACK_WEBHOOK_URL: Slack webhook URL for #team-frontend channel
-
 on:
   schedule:
     # Run daily at 9 AM UTC (adjust as needed)
