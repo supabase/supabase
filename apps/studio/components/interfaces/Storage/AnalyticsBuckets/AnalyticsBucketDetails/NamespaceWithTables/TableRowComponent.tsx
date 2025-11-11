@@ -147,40 +147,45 @@ export const TableRowComponent = ({
     try {
       setIsRemovingTable(true)
 
-      const serverName = getAnalyticsBucketFDWServerName(bucketId)
-      const serverOptions = await getDecryptedParameters({
-        ref: project?.ref,
-        connectionString: project?.connectionString ?? undefined,
-        wrapper: wrapperInstance,
-      })
-      const formValues: Record<string, string> = {
-        wrapper_name: wrapperInstance.name,
-        server_name: wrapperInstance.server_name,
-        ...serverOptions,
-      }
-      const targetSchemas = (formValues['supabase_target_schema'] || '')
-        .split(',')
-        .map((s) => s.trim())
-      const wrapperTables = formatWrapperTables(wrapperInstance, wrapperMeta).filter(
-        (x) => x.table_name !== table.name
-      )
+      // [Joshen] Update FDW instance only if table is in FDW instance's tables
+      // e.g for a namespace table that was added outside of the dashboard, it wouldn't be
+      const isTableInWrapperInstance = wrapperInstance.tables.some((x) => x.name === table.name)
+      if (isTableInWrapperInstance) {
+        const serverName = getAnalyticsBucketFDWServerName(bucketId)
+        const serverOptions = await getDecryptedParameters({
+          ref: project?.ref,
+          connectionString: project?.connectionString ?? undefined,
+          wrapper: wrapperInstance,
+        })
+        const formValues: Record<string, string> = {
+          wrapper_name: wrapperInstance.name,
+          server_name: wrapperInstance.server_name,
+          ...serverOptions,
+        }
+        const targetSchemas = (formValues['supabase_target_schema'] || '')
+          .split(',')
+          .map((s) => s.trim())
+        const wrapperTables = formatWrapperTables(wrapperInstance, wrapperMeta).filter(
+          (x) => x.table_name !== table.name
+        )
 
-      // [Joshen] Once Ivan's PR goes through, swap these out to just use useFDWDropForeignTableMutation
-      // https://github.com/supabase/supabase/pull/40206
-      await updateFDW({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        wrapper: wrapperInstance,
-        wrapperMeta,
-        formState: {
-          ...formValues,
-          server_name: serverName,
-          supabase_target_schema: uniq([...targetSchemas])
-            .filter(Boolean)
-            .join(','),
-        },
-        tables: wrapperTables,
-      })
+        // [Joshen] Once Ivan's PR goes through, swap these out to just use useFDWDropForeignTableMutation
+        // https://github.com/supabase/supabase/pull/40206
+        await updateFDW({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          wrapper: wrapperInstance,
+          wrapperMeta,
+          formState: {
+            ...formValues,
+            server_name: serverName,
+            supabase_target_schema: uniq([...targetSchemas])
+              .filter(Boolean)
+              .join(','),
+          },
+          tables: wrapperTables,
+        })
+      }
 
       const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
       await deleteNamespaceTable({
