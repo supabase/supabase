@@ -17,6 +17,8 @@ async function getNamespaces({
   warehouse,
   tempApiKey,
 }: GetNamespacesVariables & { tempApiKey?: string }) {
+  console.log('getNamespaces', { catalogUri, warehouse, tempApiKey })
+
   let headers = new Headers()
   headers = await constructHeaders({
     'Content-Type': 'application/json',
@@ -52,21 +54,29 @@ export type IcebergNamespacesError = ResponseError
 
 export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
   params: GetNamespacesVariables,
-  { ...options }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<IcebergNamespacesData, IcebergNamespacesError, TData> = {}
 ) => {
-  const { projectRef } = params
+  const { projectRef, catalogUri, warehouse } = params
   const { data } = useTemporaryAPIKeyQuery({ projectRef })
   const tempApiKey = data?.api_key
 
   return useQuery<IcebergNamespacesData, IcebergNamespacesError, TData>({
     queryKey: storageKeys.icebergNamespaces({
-      catalog: params.catalogUri,
-      warehouse: params.warehouse,
+      projectRef,
+      warehouse,
+      catalog: catalogUri,
       apikey: tempApiKey,
     }),
-    queryFn: () => getNamespaces(params),
+    queryFn: () => getNamespaces({ ...params, tempApiKey }),
     enabled:
-      options.enabled && typeof projectRef !== 'undefined' && typeof tempApiKey !== 'undefined',
+      options &&
+      typeof projectRef !== 'undefined' &&
+      typeof tempApiKey !== 'undefined' &&
+      typeof catalogUri !== 'undefined' &&
+      typeof warehouse !== 'undefined',
     ...options,
   })
 }

@@ -10,28 +10,41 @@ export const storageKeys = {
     ['projects', projectRef, 'vector-buckets', vectorBucketName, 'indexes'] as const,
   archive: (projectRef: string | undefined) => ['projects', projectRef, 'archive'] as const,
   icebergNamespaces: ({
+    projectRef,
     catalog,
     warehouse,
     apikey,
   }: {
+    projectRef?: string
     catalog: string
     warehouse: string
     apikey?: string
-  }) => ['catalog', catalog, 'warehouse', warehouse, 'namespaces', apikey].filter(Boolean),
+  }) =>
+    [projectRef, 'catalog', catalog, 'warehouse', warehouse, 'namespaces', apikey].filter(Boolean),
   icebergNamespace: (catalog: string, warehouse: string, namespace: string) =>
     ['catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace] as const,
   icebergNamespaceTables: ({
+    projectRef,
     catalog,
     warehouse,
     namespace,
     apikey,
   }: {
+    projectRef?: string
     catalog: string
     warehouse: string
     namespace: string
     apikey?: string
   }) =>
-    ['catalog', catalog, 'warehouse', warehouse, 'namespaces', namespace, 'tables', apikey].filter(
-      Boolean
-    ),
+    [
+      projectRef,
+      'catalog',
+      catalog,
+      'warehouse',
+      warehouse,
+      'namespaces',
+      namespace,
+      'tables',
+      apikey,
+    ].filter(Boolean),
 }

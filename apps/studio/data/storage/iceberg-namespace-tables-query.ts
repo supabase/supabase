@@ -57,6 +57,7 @@ export type IcebergNamespaceTablesError = ResponseError
 export const useIcebergNamespaceTablesQuery = <TData = IcebergNamespaceTablesData>(
   params: GetNamespaceTablesVariables,
   {
+    enabled = true,
     ...options
   }: UseCustomQueryOptions<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData> = {}
 ) => {
@@ -66,14 +67,14 @@ export const useIcebergNamespaceTablesQuery = <TData = IcebergNamespaceTablesDat
 
   return useQuery<IcebergNamespaceTablesData, IcebergNamespaceTablesError, TData>({
     queryKey: storageKeys.icebergNamespaceTables({
+      projectRef,
       catalog: params.catalogUri,
       warehouse: params.warehouse,
       namespace: params.namespace,
       apikey: tempApiKey,
     }),
     queryFn: () => getNamespaceTables({ ...params, tempApiKey }),
-    enabled:
-      options.enabled && typeof projectRef !== 'undefined' && typeof tempApiKey !== 'undefined',
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof tempApiKey !== 'undefined',
     ...options,
   })
 }

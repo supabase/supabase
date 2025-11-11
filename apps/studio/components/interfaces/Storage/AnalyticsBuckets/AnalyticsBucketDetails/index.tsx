@@ -96,6 +96,7 @@ export const AnalyticBucketDetails = () => {
 
   const { data: namespacesData, isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
     {
+      projectRef,
       catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
     },

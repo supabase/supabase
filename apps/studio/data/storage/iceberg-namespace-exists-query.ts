@@ -53,12 +53,14 @@ export type IcebergNamespaceExistsError = ResponseError
 export const useIcebergNamespaceExistsQuery = <TData = IcebergNamespaceExistsData>(
   params: ExistsNamespaceVariables,
   {
+    enabled = true,
     ...options
   }: UseCustomQueryOptions<IcebergNamespaceExistsData, IcebergNamespaceExistsError, TData> = {}
 ) => {
   return useQuery<IcebergNamespaceExistsData, IcebergNamespaceExistsError, TData>({
     queryKey: storageKeys.icebergNamespace(params.catalogUri, params.warehouse, params.namespace),
     queryFn: () => checkNamespaceExists(params),
+    enabled,
     ...options,
   })
 }
