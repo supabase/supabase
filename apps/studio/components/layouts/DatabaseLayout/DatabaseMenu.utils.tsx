@@ -78,10 +78,9 @@ export const generateDatabaseMenu = (
         ...(showPgReplicate
           ? [
               {
-                name: 'Replication',
-                key: 'replication',
-                url: `/project/${ref}/database/replication`,
-                label: !enablePgReplicate ? 'Coming soon' : undefined,
+                name: 'ETL Replication',
+                key: 'etl',
+                url: `/project/${ref}/database/etl`,
                 items: [],
               },
             ]
@@ -101,7 +100,6 @@ export const generateDatabaseMenu = (
                 key: 'column-privileges',
                 url: `/project/${ref}/database/column-privileges`,
                 items: [],
-                label: 'ALPHA',
               },
             ]
           : []),
@@ -180,7 +178,7 @@ export const generateDatabaseMenu = (
         {
           name: 'Query Performance',
           key: 'query-performance',
-          url: `/project/${ref}/advisors/query-performance`,
+          url: `/project/${ref}/reports/query-performance`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },

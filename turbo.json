@@ -67,8 +67,12 @@
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
         "NEXT_PUBLIC_GOOGLE_MAPS_KEY",
         "NEXT_RUNTIME",
+        "NIMBUS_PROD_PROJECTS_URL",
+        "NIMBUS_PROD_PROJECTS_URL_WS",
         "NODE_ENV",
         "SUPABASE_URL",
+        "VERCEL",
+        "VERCEL_ENV",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
@@ -85,6 +89,8 @@
         "PG_META_CRYPTO_KEY",
         "POSTGRES_PASSWORD",
         "POSTGRES_HOST",
+        "POSTGRES_USER_READ_WRITE",
+        "POSTGRES_USER_READ_ONLY",
         "POSTGRES_DB",
         "POSTGRES_PORT",
         "READ_ONLY_URL",
@@ -96,8 +102,10 @@
         "DEFAULT_ORGANIZATION_NAME",
         "OPENAI_API_KEY",
         "AUTH_JWT_SECRET",
-        "LOGFLARE_URL",
+        "LOGFLARE_API_KEY",
+        "LOGFLARE_PUBLIC_ACCESS_TOKEN",
         "LOGFLARE_PRIVATE_ACCESS_TOKEN",
+        "LOGFLARE_URL",
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
@@ -112,7 +120,9 @@
         "VERCEL_URL",
         "IS_THROTTLED",
         "AI_PRO_MODEL",
-        "AI_NORMAL_MODEL"
+        "AI_NORMAL_MODEL",
+        "SUPPORT_SUPABASE_SECRET_KEY",
+        "NEXT_PUBLIC_IS_NIMBUS"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION", "VERCEL_GIT_COMMIT_SHA"],
       "outputs": [".next/**", "!.next/cache/**"]
@@ -121,6 +131,7 @@
       "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
+        "CI",
         "CF_ACCESS_CLIENT_ID",
         "CF_ACCESS_CLIENT_SECRET",
         "CMS_API_KEY",
@@ -143,6 +154,9 @@
         "NEXT_PUBLIC_SENTRY_DSN",
         "NEXT_PUBLIC_SURVEY_SUPABASE_URL",
         "NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY",
+        "VERCEL",
+        "VERCEL_ENV",
+        "VERCEL_GIT_COMMIT_SHA",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",

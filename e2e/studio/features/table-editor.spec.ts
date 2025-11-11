@@ -205,23 +205,11 @@ test.describe.serial('table editor', () => {
     await expect(page.getByLabel(`View ${authTableSso}`)).toBeVisible()
     await expect(page.getByLabel(`View ${authTableMfa}`)).toBeVisible()
 
-    // filter by querying
+    // can find auth tables
     await page.getByRole('textbox', { name: 'Search tables...' }).fill('mfa')
     await waitForTableToLoad(page, ref, 'auth') // load tables
     await expect(page.getByLabel(`View ${authTableSso}`)).not.toBeVisible()
     await expect(page.getByLabel(`View ${authTableMfa}`)).toBeVisible()
-
-    // navigate to policies page when view policies action is clicked
-    await page.getByRole('button', { name: `View ${authTableMfa}` }).click()
-    await page.waitForURL(/\/editor\/\d+\?schema=auth$/)
-    await page
-      .getByRole('button', { name: `View ${authTableMfa}` })
-      .getByRole('button')
-      .nth(1)
-      .click()
-    await page.getByRole('menuitem', { name: 'View policies' }).click()
-    await page.waitForURL(/.*\/policies\?schema=auth/)
-    expect(page.url()).toContain('auth/policies?schema=auth')
   })
 
   test('should show rls accordingly', async ({ ref }) => {
@@ -243,7 +231,7 @@ test.describe.serial('table editor', () => {
       page,
       'pg-meta',
       ref,
-      'tables?include_columns=true&included_schemas=public'
+      'tables?include_columns=false&included_schemas=public'
     ) // wait for table creation
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
     await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()

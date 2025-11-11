@@ -2,18 +2,22 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { makeRandomString } from './helpers'
 
 const GITHUB_INTEGRATION_APP_NAME =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? `supabase`
-    : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? `supabase-staging`
-      : `supabase-local-testing`
+  process.env.NEXT_PUBLIC_IS_NIMBUS !== undefined
+    ? 'supabase-snap'
+    : process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+      ? `supabase`
+      : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+        ? `supabase-staging`
+        : `supabase-local-testing`
 
 const GITHUB_INTEGRATION_CLIENT_ID =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? `Iv1.b91a6d8eaa272168`
-    : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? `Iv1.2681ab9a0360d8ad`
-      : `Iv1.5022a3b44d150fbf`
+  process.env.NEXT_PUBLIC_IS_NIMBUS !== undefined
+    ? 'Iv23li2pAiqDGgaSrP8q'
+    : process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+      ? `Iv1.b91a6d8eaa272168`
+      : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+        ? `Iv1.2681ab9a0360d8ad`
+        : `Iv1.5022a3b44d150fbf`
 
 const GITHUB_INTEGRATION_AUTHORIZATION_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_INTEGRATION_CLIENT_ID}`
 export const GITHUB_INTEGRATION_INSTALLATION_URL = `https://github.com/apps/${GITHUB_INTEGRATION_APP_NAME}/installations/new`
@@ -46,7 +50,7 @@ export function openInstallGitHubIntegrationWindow(
   } else {
     const state = makeRandomString(32)
     localStorage.setItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE, state)
-    windowUrl = `${GITHUB_INTEGRATION_AUTHORIZATION_URL}&state=${state}`
+    windowUrl = `${GITHUB_INTEGRATION_AUTHORIZATION_URL}&state=${state}&prompt=select_account`
   }
 
   const systemZoom = width / window.screen.availWidth

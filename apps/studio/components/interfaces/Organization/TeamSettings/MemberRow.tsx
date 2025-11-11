@@ -1,11 +1,13 @@
 import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
 import Link from 'next/link'
 
+import { useParams } from 'common'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
@@ -32,8 +34,10 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 } as const
 
 export const MemberRow = ({ member }: MemberRowProps) => {
+  const { slug } = useParams()
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
@@ -41,7 +45,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
   // [Joshen] We only need this data if the org has project scoped roles
-  const { data } = useProjectsQuery({ enabled: hasProjectScopedRoles })
+  const { data } = useProjectsQuery({ enabled: isOptedIntoProjectLevelPermissions })
   const projects = data?.projects ?? []
 
   const orgProjects = projects?.filter((p) => p.organization_id === selectedOrganization?.id)

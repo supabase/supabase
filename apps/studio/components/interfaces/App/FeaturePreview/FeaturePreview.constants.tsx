@@ -2,11 +2,11 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
   {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NEW_STORAGE_UI,
-    name: 'New Storage interface',
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS,
+    name: 'Security notification templates',
     discussionsUrl: undefined,
     isNew: true,
-    isPlatformOnly: false,
+    isPlatformOnly: true,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
@@ -28,13 +28,6 @@ export const FEATURE_PREVIEWS = [
     discussionsUrl: undefined,
     isNew: true,
     isPlatformOnly: true,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    name: 'Directly edit database entities',
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
-    isNew: false,
-    isPlatformOnly: false,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,

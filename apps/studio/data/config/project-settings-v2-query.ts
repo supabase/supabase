@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectSettingsVariables = { projectRef?: string }
@@ -40,7 +40,7 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectSettingsData, ProjectSettingsError, TData> = {}
+  }: UseCustomQueryOptions<ProjectSettingsData, ProjectSettingsError, TData> = {}
 ) => {
   // [Joshen] Sync with API perms checking here - shouldReturnApiKeys
   // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/settings.controller.ts#L92
@@ -49,19 +49,17 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
     '*'
   )
 
-  return useQuery<ProjectSettingsData, ProjectSettingsError, TData>(
-    configKeys.settingsV2(projectRef),
-    ({ signal }) => getProjectSettings({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      refetchInterval(_data) {
-        const data = _data as ProjectSettings | undefined
-        const apiKeys = data?.service_api_keys ?? []
-        const interval =
-          canReadAPIKeys && data?.status !== 'INACTIVE' && apiKeys.length === 0 ? 2000 : 0
-        return interval
-      },
-      ...options,
-    }
-  )
+  return useQuery<ProjectSettingsData, ProjectSettingsError, TData>({
+    queryKey: configKeys.settingsV2(projectRef),
+    queryFn: ({ signal }) => getProjectSettings({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    refetchInterval(_data) {
+      const data = _data as ProjectSettings | undefined
+      const apiKeys = data?.service_api_keys ?? []
+      const interval =
+        canReadAPIKeys && data?.status !== 'INACTIVE' && apiKeys.length === 0 ? 2000 : 0
+      return interval
+    },
+    ...options,
+  })
 }

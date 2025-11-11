@@ -5,8 +5,10 @@ import { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from 'data/fetchers'
 import { detectOS } from 'lib/helpers'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import ResizableAIWidget from './ResizableAIWidget'
 
 interface AIEditorProps {
@@ -27,6 +29,8 @@ interface AIEditorProps {
   options?: monacoEditor.IStandaloneEditorConstructionOptions
   onChange?: (value: string) => void
   onClose?: () => void
+  closeShortcutEnabled?: boolean
+  openAIAssistantShortcutEnabled?: boolean
   executeQuery?: () => void
 }
 
@@ -47,11 +51,16 @@ const AIEditor = ({
   options = {},
   onChange,
   onClose,
+  closeShortcutEnabled = true,
+  openAIAssistantShortcutEnabled = true,
   executeQuery,
 }: AIEditorProps) => {
   const os = detectOS()
+  const { toggleSidebar } = useSidebarManagerSnapshot()
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<monacoEditor.IStandaloneDiffEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
+  const closeActionDisposableRef = useRef<{ dispose: () => void } | null>(null)
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
@@ -142,11 +151,33 @@ const AIEditor = ({
     handleReset()
   }
 
+  const refreshCloseAction = useCallback(() => {
+    closeActionDisposableRef.current?.dispose()
+    closeActionDisposableRef.current = null
+
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+
+    if (!editor || !monaco || !onClose || !closeShortcutEnabled) return
+
+    const action = editor.addAction({
+      id: 'close-editor',
+      label: 'Close editor',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyE],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: onClose,
+    })
+
+    closeActionDisposableRef.current = action ?? null
+  }, [closeShortcutEnabled, onClose])
+
   const handleEditorOnMount: OnMount = (
     editor: monacoEditor.IStandaloneCodeEditor,
     monaco: Monaco
   ) => {
     editorRef.current = editor
+    monacoRef.current = monaco
     // Set prompt state to open if promptInput exists
     if (promptInput) {
       const model = editor.getModel()
@@ -193,14 +224,17 @@ const AIEditor = ({
       })
     }
 
-    if (!!onClose) {
+    refreshCloseAction()
+
+    // Add AI Assistant toggle keybinding (Cmd+I)
+    if (openAIAssistantShortcutEnabled) {
       editor.addAction({
-        id: 'close-editor',
-        label: 'Close editor',
-        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyE],
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 0,
-        run: () => onClose(),
+        id: 'toggle-ai-assistant',
+        label: 'Toggle AI Assistant',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
+        run: () => {
+          toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+        },
       })
     }
 

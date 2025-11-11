@@ -8,8 +8,10 @@ Alaister Young
 Alan De Los Santos
 Aleksi Immonen
 Alexander Korotkov
+Ali Waseem
 Amy Q
 Andrew Valleteau
+Andrey A
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
@@ -26,6 +28,7 @@ Cameron Blackwood
 Cemal Kılıç
 Chandana Anumula
 Charis Lam
+Chase Cresgy
 Chase Granberry
 Chris Caruso
 Chris Chandler
@@ -50,6 +53,7 @@ Dustin Keib
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
+Eliot Whalan
 Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
@@ -70,11 +74,15 @@ Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
+Jason Farber
+Jean-Paul Argudo
 Jeff Smick
 Jenny Kibiri
 Jess Shears
 Jim Chanco Jr
+Joakim Ahrlin
 John Pena
+John Schaeffer
 Jon M
 Jonny Summers-Muir
 Jordi Enric
@@ -114,7 +122,9 @@ Paul Cioanca
 Paul Copplestone
 Pavel Borisov
 Paweł Gulbinowicz
+Pedro Rodrigues
 Peter Lyn
+Peter Soderberg
 Qiao Han
 Rafael Chacón
 Raminder Singh
@@ -128,6 +138,7 @@ Sam Meech-Ward
 Sam Rome
 Sam Rose
 Sean Oliver
+Sean Thompson
 Sergio Cioban Filho
 Sreyas Udayavarman
 Stanislav M

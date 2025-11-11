@@ -1,15 +1,15 @@
-import { useIsLoggedIn, useParams } from 'common'
-import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import CopyButton from 'components/ui/CopyButton'
-import { Loading } from 'components/ui/Loading'
-import { createCliLoginSession } from 'data/cli/login'
-import { withAuth } from 'hooks/misc/withAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { NextPageWithLayout } from 'types'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from 'ui'
+
+import { useIsLoggedIn, useParams } from 'common'
+import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
+import CopyButton from 'components/ui/CopyButton'
+import { createCliLoginSession } from 'data/cli/login'
+import { withAuth } from 'hooks/misc/withAuth'
+import type { NextPageWithLayout } from 'types'
+import { InputOTP, InputOTPGroup, InputOTPSlot, LogoLoader } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const CliLoginPage: NextPageWithLayout = () => {
@@ -77,7 +77,7 @@ const CliLoginPage: NextPageWithLayout = () => {
             />
           </>
         ) : (
-          <Loading />
+          <LogoLoader />
         )}
       </div>
     </APIAuthorizationLayout>

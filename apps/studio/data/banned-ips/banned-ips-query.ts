@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { BannedIPKeys } from './keys'
 
 export type BannedIPVariables = {
@@ -28,13 +28,11 @@ export type IPError = ResponseError
 
 export const useBannedIPsQuery = <TData = IPData>(
   { projectRef }: BannedIPVariables,
-  { enabled = true, ...options }: UseQueryOptions<IPData, IPError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<IPData, IPError, TData> = {}
 ) =>
-  useQuery<IPData, IPError, TData>(
-    BannedIPKeys.list(projectRef),
-    ({ signal }) => getBannedIPs({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<IPData, IPError, TData>({
+    queryKey: BannedIPKeys.list(projectRef),
+    queryFn: ({ signal }) => getBannedIPs({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

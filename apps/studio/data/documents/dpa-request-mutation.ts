@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { post, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type DpaRequestVariables = {
   recipient_email: string
@@ -25,23 +25,21 @@ export const useDpaRequestMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DpaRequestData, ResponseError, DpaRequestVariables>,
+  UseCustomMutationOptions<DpaRequestData, ResponseError, DpaRequestVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DpaRequestData, ResponseError, DpaRequestVariables>(
-    (vars) => requestDpa(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to request DPA: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DpaRequestData, ResponseError, DpaRequestVariables>({
+    mutationFn: (vars) => requestDpa(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to request DPA: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

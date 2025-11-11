@@ -1,18 +1,13 @@
-import { ExternalLink } from 'lucide-react'
-
-import { EnumeratedTypes } from 'components/interfaces/Database'
+import { EnumeratedTypes } from 'components/interfaces/Database/EnumeratedTypes/EnumeratedTypes'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
-  ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
-import { DocsButton } from 'components/ui/DocsButton'
 
 const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
   return (
@@ -22,7 +17,7 @@ const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
           <FormHeader
             className="!mb-0"
             title="Database Enumerated Types"
-            description="Custom data types that you can use in your database tables or functions."
+            description="Custom data types that you can use in your database tables or functions"
           />
         </ScaffoldSectionContent>
         <div className="col-span-12 mt-3">

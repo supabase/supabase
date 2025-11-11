@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { Markdown } from 'components/interfaces/Markdown'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
 import { constructHeaders } from 'data/fetchers'
@@ -21,13 +22,15 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useHotKey } from 'hooks/ui/useHotKey'
 import { prepareMessagesForAPI } from 'lib/ai/message-utils'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import uuidv4 from 'lib/uuid'
+import { uuidv4 } from 'lib/helpers'
+import type { AssistantModel } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { ErrorBoundary } from '../ErrorBoundary'
+import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import type { SqlSnippet } from './AIAssistant.types'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
@@ -58,6 +61,20 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
+  const { closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
+
+  const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
+
+  const selectedModel = useMemo<AssistantModel>(() => {
+    const defaultModel: AssistantModel = isPaidPlan ? 'gpt-5' : 'gpt-5-mini'
+    const model = snap.model ?? defaultModel
+
+    if (!isPaidPlan && model === 'gpt-5') {
+      return 'gpt-5-mini'
+    }
+
+    return model
+  }, [isPaidPlan, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -201,6 +218,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             table: currentTable?.name,
             chatName: currentChat,
             orgSlug: selectedOrganizationRef.current?.slug,
+            model: selectedModel,
           },
           headers: { Authorization: authorizationHeader ?? '' },
         }
@@ -417,11 +435,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [snap.initialInput])
 
   useEffect(() => {
-    if (snap.open && isInSQLEditor && !!snippetContent) {
+    const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
+    if (isOpen && isInSQLEditor && !!snippetContent) {
       snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snap.open, isInSQLEditor, snippetContent])
+  }, [activeSidebar?.id, isInSQLEditor, snippetContent])
 
   return (
     <ErrorBoundary
@@ -442,11 +461,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       ]}
     >
-      <div className={cn('flex flex-col h-full', className)}>
+      <div className={cn('flex flex-col h-full w-full md:h-full max-h-[100dvh]', className)}>
         <AIAssistantHeader
           isChatLoading={isChatLoading}
           onNewChat={snap.newChat}
-          onCloseAssistant={snap.closeAssistant}
+          onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
           showMetadataWarning={showMetadataWarning}
           updatedOptInSinceMCP={updatedOptInSinceMCP}
           isHipaaProjectDisallowed={isHipaaProjectDisallowed as boolean}
@@ -640,6 +659,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               snap.setSqlSnippets(newSnippets)
             }}
             includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
+            selectedModel={selectedModel}
+            onSelectModel={(model) => snap.setModel(model)}
           />
         </div>
       </div>

@@ -55,7 +55,7 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{`Confirm to delete all contents from ${bucket?.name}`}</DialogTitle>
+          <DialogTitle>{`Empty bucket “${bucket?.name}”`}</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <Admonition
@@ -65,7 +65,9 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
           description="The contents of your bucket cannot be recovered once deleted."
         />
         <DialogSection>
-          <p className="text-sm">Are you sure you want to empty the bucket "{bucket?.name}"?</p>
+          <p className="text-sm">
+            Are you sure you want to remove all contents from the bucket “{bucket?.name}”?
+          </p>
         </DialogSection>
         <DialogFooter>
           <Button type="default" disabled={isLoading} onClick={onClose}>

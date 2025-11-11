@@ -26,6 +26,32 @@ export interface ReportChartV2Props {
   highlightActions?: ChartHighlightAction[]
 }
 
+// Compute total across entire period over unique attribute keys.
+// Excludes attributes that are disabled, reference lines, max values, or marked omitFromTotal.
+export function computePeriodTotal(chartData: any[], dynamicAttributes: any[]): number {
+  const attributeKeys = Array.from(
+    new Set(
+      (dynamicAttributes as any[])
+        .filter(
+          (a) =>
+            a?.enabled !== false &&
+            a?.provider !== 'reference-line' &&
+            !a?.isMaxValue &&
+            !a?.omitFromTotal
+        )
+        .map((a: any) => a.attribute)
+    )
+  )
+
+  return chartData.reduce((sum: number, row: any) => {
+    const rowTotal = attributeKeys.reduce((acc: number, key: string) => {
+      const value = row?.[key]
+      return acc + (typeof value === 'number' ? value : 0)
+    }, 0)
+    return sum + rowTotal
+  }, 0)
+}
+
 export const ReportChartV2 = ({
   report,
   projectRef,
@@ -42,8 +68,7 @@ export const ReportChartV2 = ({
   const { plan: orgPlan } = useCurrentOrgPlan()
   const orgPlanId = orgPlan?.id
 
-  const isAvailable =
-    report.availableIn === undefined || (orgPlanId && report.availableIn.includes(orgPlanId))
+  const isAvailable = !report?.availableIn || (orgPlanId && report.availableIn?.includes(orgPlanId))
 
   const canFetch = orgPlanId !== undefined && isAvailable
 
@@ -52,25 +77,25 @@ export const ReportChartV2 = ({
     isLoading: isLoadingChart,
     error,
     isFetching,
-  } = useQuery(
-    [
+  } = useQuery({
+    queryKey: [
       'projects',
       projectRef,
       'report-v2',
       { reportId: report.id, startDate, endDate, interval, filters },
     ],
-    async () => {
+    queryFn: async () => {
       return await report.dataProvider(projectRef, startDate, endDate, interval, filters)
     },
-    {
-      enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
-      refetchOnWindowFocus: false,
-      staleTime: 0,
-    }
-  )
+    enabled: Boolean(projectRef && canFetch && isAvailable && !report.hide),
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  })
 
   const chartData = queryResult?.data || []
   const dynamicAttributes = queryResult?.attributes || []
+
+  const headerTotal = computePeriodTotal(chartData, dynamicAttributes)
 
   /**
    * Depending on the source the timestamp key could be 'timestamp' or 'period_start'
@@ -124,7 +149,7 @@ export const ReportChartV2 = ({
               xAxisKey={report.xAxisKey ?? 'timestamp'}
               yAxisKey={report.yAxisKey ?? dynamicAttributes[0]?.attribute}
               hideHighlightedValue={report.hideHighlightedValue}
-              highlightedValue={0}
+              highlightedValue={headerTotal}
               title={report.label}
               customDateFormat={undefined}
               chartStyle={chartStyle}

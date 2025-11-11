@@ -2,10 +2,12 @@ import { ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
+import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
 import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
 import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
-import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { DisplayApiSettings } from 'components/ui/ProjectSettings/DisplayApiSettings'
+import { DisplayConfigSettings } from 'components/ui/ProjectSettings/DisplayConfigSettings'
 import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
@@ -112,7 +114,7 @@ const BuildingState = () => {
                           support ticket.
                         </p>
                         <Button asChild type="default">
-                          <Link href="/support/new">Contact support team</Link>
+                          <SupportLink>Contact support team</SupportLink>
                         </Button>
                       </>
                     }

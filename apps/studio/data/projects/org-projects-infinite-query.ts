@@ -1,9 +1,9 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useProfile } from 'lib/profile'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { INFINITE_PROJECTS_KEY_PREFIX, projectKeys } from './keys'
 
 // [Joshen] Try to keep this value a multiple of 6 (common denominator of 2 and 3) to fit the cards view
@@ -65,27 +65,25 @@ export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData> = {}
 ) => {
   const { profile } = useProfile()
-  return useInfiniteQuery<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData>(
-    projectKeys.infiniteListByOrg(slug, { limit, sort, search, statuses }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery<OrgProjectsInfiniteData, OrgProjectsInfiniteError, TData>({
+    queryKey: projectKeys.infiniteListByOrg(slug, { limit, sort, search, statuses }),
+    queryFn: ({ signal, pageParam }) =>
       getOrganizationProjects({ slug, limit, page: pageParam, sort, search, statuses }, signal),
-    {
-      enabled: enabled && profile !== undefined && typeof slug !== 'undefined',
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        const currentTotalCount = page * limit
-        const totalCount = lastPage.pagination.count
+    enabled: enabled && profile !== undefined && typeof slug !== 'undefined',
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    getNextPageParam(lastPage, pages) {
+      const page = pages.length
+      const currentTotalCount = page * limit
+      const totalCount = lastPage.pagination.count
 
-        if (currentTotalCount >= totalCount) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
+      if (currentTotalCount >= totalCount) return undefined
+      return page
+    },
+    ...options,
+  })
 }
 
 export const getComputeSize = (project: OrgProject) => {
@@ -98,8 +96,8 @@ export const useInvalidateProjectsInfiniteQuery = () => {
   const invalidateProjectsQuery = () => {
     // [Joshen] Temporarily for completeness while we still have UIs depending on the old endpoint (Org teams)
     // Can be removed once we completely deprecate projects-query (Old unpaginated endpoint)
-    queryClient.invalidateQueries(projectKeys.list())
-    return queryClient.invalidateQueries([INFINITE_PROJECTS_KEY_PREFIX])
+    queryClient.invalidateQueries({ queryKey: projectKeys.list() })
+    return queryClient.invalidateQueries({ queryKey: [INFINITE_PROJECTS_KEY_PREFIX] })
   }
   return { invalidateProjectsQuery }
 }

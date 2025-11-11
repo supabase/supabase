@@ -16,6 +16,7 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
@@ -47,7 +48,6 @@ import {
 } from './StorageListV2MigrationCallout'
 import {
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED,
-  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN,
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
   StorageSizeUnits,
 } from './StorageSettings.constants'
@@ -87,6 +87,8 @@ export const StorageSettings = () => {
     !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'canary'
 
   const { data: organization } = useSelectedOrganizationQuery()
+  const { getEntitlementNumericValue, isEntitlementUnlimited } =
+    useCheckEntitlements('storage.max_file_size')
   const isFreeTier = organization?.plan.id === 'free'
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
@@ -109,14 +111,12 @@ export const StorageSettings = () => {
   })
 
   const maxBytes = useMemo(() => {
-    if (organization?.plan.id === 'free') {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN
-    } else if (organization?.usage_billing_enabled) {
+    if (organization?.usage_billing_enabled || isEntitlementUnlimited()) {
       return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
     } else {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
+      return getEntitlementNumericValue() ?? STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
     }
-  }, [organization])
+  }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
 
   const FormSchema = z
     .object({
@@ -249,7 +249,7 @@ export const StorageSettings = () => {
                       render={({ field }) => (
                         <FormItemLayout
                           layout="flex-row-reverse"
-                          label="Enable Image Transformation"
+                          label="Enable image transformation"
                           description={
                             <>
                               Optimize and resize images on the fly.{' '}

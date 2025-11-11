@@ -14,7 +14,7 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -114,8 +114,8 @@ const OrganizationsPage: NextPageWithLayout = () => {
 
 OrganizationsPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Organizations">
-      <PageLayout title="Your Organizations" className="max-w-[1200px] px-6 mx-auto">
+    <DefaultLayout hideMobileMenu headerTitle="Organizations">
+      <PageLayout title="Your Organizations" className="max-w-[1200px] lg:px-6 mx-auto">
         {page}
       </PageLayout>
     </DefaultLayout>

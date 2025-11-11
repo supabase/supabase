@@ -13,7 +13,7 @@ import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithA
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -313,20 +313,6 @@ const MergePage: NextPageWithLayout = () => {
     })
   }
 
-  const handleReadyForReview = () => {
-    if (!ref || !parentProjectRef) return
-    updateBranch(
-      {
-        branchRef: ref,
-        projectRef: parentProjectRef,
-        requestReview: true,
-      },
-      {
-        onSuccess: () => toast.success('Successfully marked as ready for review'),
-      }
-    )
-  }
-
   const breadcrumbs = useMemo(
     () => [
       {
@@ -334,7 +320,7 @@ const MergePage: NextPageWithLayout = () => {
         href: `/project/${project?.ref}/branches/merge-requests`,
       },
     ],
-    [parentProjectRef]
+    [project?.ref]
   )
 
   const currentTab = (router.query.tab as string) || 'database'

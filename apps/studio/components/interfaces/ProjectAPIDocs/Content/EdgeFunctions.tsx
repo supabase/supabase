@@ -2,7 +2,7 @@ import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 
-const EdgeFunctions = ({ language }: ContentProps) => {
+export const EdgeFunctions = ({ language }: ContentProps) => {
   return (
     <>
       <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.edgeFunctions} />
@@ -12,5 +12,3 @@ const EdgeFunctions = ({ language }: ContentProps) => {
     </>
   )
 }
-
-export default EdgeFunctions

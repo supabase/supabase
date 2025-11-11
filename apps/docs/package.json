@@ -22,7 +22,7 @@
     "embeddings:nimbus:refresh": "ENABLED_FEATURES_OVERRIDE_DISABLE_ALL=true pnpm run embeddings:refresh",
     "last-changed": "tsx scripts/last-changed.ts",
     "last-changed:reset": "pnpm run last-changed -- --reset",
-    "lint": "next lint",
+    "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "postbuild": "pnpm run build:sitemap && pnpm run build:llms && ./../../scripts/upload-static-assets.sh",
     "prebuild": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
@@ -119,7 +119,7 @@
     "unist-util-visit": "^4.1.2",
     "uuid": "^9.0.1",
     "valtio": "catalog:",
-    "yaml": "^2.4.5",
+    "yaml": "^2.8.1",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -153,18 +153,19 @@
     "graphiql": "^4.0.2",
     "openapi-types": "^12.1.3",
     "postcss": "^8.5.3",
+    "tailwindcss": "catalog:",
     "shiki": "^3.2.1",
     "shx": "^0.4.0",
     "simple-git": "^3.24.0",
     "slugify": "^1.6.6",
     "smol-toml": "^1.3.1",
     "tsconfig": "workspace:*",
-    "tsx": "^4.19.3",
+    "tsx": "catalog:",
     "twoslash": "^0.3.1",
     "typescript": "catalog:",
     "unist-util-visit-parents": "5.1.3",
     "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^3.0.5"
+    "vitest": "catalog:"
   }
 }
