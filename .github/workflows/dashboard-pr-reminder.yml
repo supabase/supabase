@@ -52,6 +52,12 @@ jobs:
               
               // Check each PR
               for (const pr of prs) {
+                // Skip PRs from forks - only check internal PRs
+                if (pr.head.repo && pr.head.repo.full_name !== context.repo.owner + '/' + context.repo.repo) {
+                  console.log(`PR #${pr.number} is from a fork, skipping...`);
+                  continue;
+                }
+                
                 const createdAt = new Date(pr.created_at);
                 
                 // If this PR is newer than 24 hours, skip it
