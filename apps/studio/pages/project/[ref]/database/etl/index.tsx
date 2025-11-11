@@ -21,7 +21,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {false ? (
+      {enablePgReplicate ? (
         <PipelineRequestStatusProvider>
           <ScaffoldContainer>
             <ScaffoldSection>
