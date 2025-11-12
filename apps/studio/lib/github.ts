@@ -1,7 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { makeRandomString } from './helpers'
 
-console.log('process.env', process.env)
 const GITHUB_INTEGRATION_APP_NAME =
   process.env.NEXT_PUBLIC_GITHUB_INTEGRATION_APP_NAME ||
   (process.env.NEXT_PUBLIC_IS_NIMBUS !== undefined
