@@ -3,11 +3,13 @@
 import {
   MetricsBlock,
   MetricsBlockHeader,
-  MetricsBlockIcon,
+  // MetricsBlockIcon,
   MetricsBlockLabel,
   MetricsBlockContent,
+  MetricsBlockValue,
+  MetricsBlockDifferential,
 } from 'ui-patterns/MetricsBlock'
-import { ChartBar } from 'lucide-react'
+// import { ChartBar } from 'lucide-react'
 
 export default function MetricsBlockDemo() {
   return (
@@ -22,7 +24,8 @@ export default function MetricsBlockDemo() {
           </MetricsBlockLabel>
         </MetricsBlockHeader>
         <MetricsBlockContent>
-          <p>This is the content of the metrics block</p>
+          <MetricsBlockValue>5,201</MetricsBlockValue>
+          <MetricsBlockDifferential>+0.7%</MetricsBlockDifferential>
         </MetricsBlockContent>
       </MetricsBlock>
     </div>

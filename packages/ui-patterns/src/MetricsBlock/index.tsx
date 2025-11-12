@@ -79,6 +79,25 @@ const MetricsBlockHeader = React.forwardRef<HTMLDivElement, MetricsBlockHeaderPr
 )
 MetricsBlockHeader.displayName = 'MetricsBlockHeader'
 
+interface MetricsBlockContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  orientation?: 'horizontal' | 'vertical'
+}
+
+const MetricsBlockContent = React.forwardRef<HTMLDivElement, MetricsBlockContentProps>(
+  ({ className, orientation = 'vertical', ...props }, ref) => (
+    <CardContent
+      ref={ref}
+      className={cn(
+        'pb-4 px-6 pt-0 flex-1 flex h-full items-start gap-1 overflow-hidden',
+        orientation === 'horizontal' ? 'flex-row' : 'flex-col ',
+        className
+      )}
+      {...props}
+    />
+  )
+)
+MetricsBlockContent.displayName = 'MetricsBlockContent'
+
 const MetricsBlockIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('text-foreground-light', className)} {...props} />
@@ -115,27 +134,32 @@ const MetricsBlockLabel = React.forwardRef<HTMLDivElement, MetricsBlockLabelProp
 )
 MetricsBlockLabel.displayName = 'MetricsBlockLabel'
 
-const MetricsBlockContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const MetricsBlockValue = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <CardContent
-      ref={ref}
-      className={cn('pb-4 px-6 pt-0 flex-1 h-full overflow-hidden', className)}
-      {...props}
-    />
+    <span ref={ref} className={cn('font-normal text-xl tabular-nums', className)} {...props} />
   )
 )
-MetricsBlockContent.displayName = 'MetricsBlockContent'
+MetricsBlockValue.displayName = 'MetricsBlockValue'
 
-/* TO DO: 
-===========================
-- MetricsBlockValue 
-- MetricsBlockContent
-- MetricsBlockDifferential
-- MetricsBlockSparkline 
-- CSS for all of this
-- Functionality too.
-===========================
-*/
+const MetricsBlockDifferential = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <span
+    ref={ref}
+    className={cn('text-foreground-light tabular-nums text-sm', className)}
+    {...props}
+  />
+))
+MetricsBlockDifferential.displayName = 'MetricsBlockDifferential'
+
+const MetricsBlockSparkline = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn('text-foreground-light', className)} {...props} />
+))
+MetricsBlockSparkline.displayName = 'MetricsBlockSparkline'
 
 export {
   MetricsBlock,
@@ -143,5 +167,8 @@ export {
   MetricsBlockIcon,
   MetricsBlockLabel,
   MetricsBlockContent,
+  MetricsBlockValue,
+  MetricsBlockDifferential,
+  MetricsBlockSparkline,
   useMetricsBlock,
 }
