@@ -4,7 +4,7 @@ import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEqual } from 'lodash'
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -17,6 +17,7 @@ import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -94,7 +95,6 @@ export const PolicyEditorPanel = memo(function ({
   const [selectedDiff, setSelectedDiff] = useState<string>()
 
   const [showTools, setShowTools] = useState<boolean>(false)
-  const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState<boolean>(false)
 
   const formId = 'rls-editor'
   const FormSchema = z.object({
@@ -139,7 +139,7 @@ export const PolicyEditorPanel = memo(function ({
     },
   })
 
-  const onClosingPanel = () => {
+  const hasUnsavedChanges = useCallback(() => {
     const editorOneValue = editorOneRef.current?.getValue().trim() ?? null
     const editorOneFormattedValue = !editorOneValue ? null : editorOneValue
     const editorTwoValue = editorTwoRef.current?.getValue().trim() ?? null
@@ -147,7 +147,10 @@ export const PolicyEditorPanel = memo(function ({
 
     const policyCreateUnsaved =
       selectedPolicy === undefined &&
-      (name.length > 0 || roles.length > 0 || editorOneFormattedValue || editorTwoFormattedValue)
+      (name.length > 0 ||
+        roles.length > 0 ||
+        !!editorOneFormattedValue ||
+        !!editorTwoFormattedValue)
     const policyUpdateUnsaved =
       selectedPolicy !== undefined
         ? checkIfPolicyHasChanged(selectedPolicy, {
@@ -158,12 +161,13 @@ export const PolicyEditorPanel = memo(function ({
           })
         : false
 
-    if (policyCreateUnsaved || policyUpdateUnsaved) {
-      setIsClosingPolicyEditorPanel(true)
-    } else {
-      onSelectCancel()
-    }
-  }
+    return policyCreateUnsaved || policyUpdateUnsaved
+  }, [command, name, roles, selectedPolicy])
+
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: hasUnsavedChanges,
+    onClose: onSelectCancel,
+  })
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const { name, table, behavior, command, roles } = data
@@ -242,7 +246,6 @@ export const PolicyEditorPanel = memo(function ({
       editorOneRef.current?.setValue('')
       editorTwoRef.current?.setValue('')
       setShowTools(false)
-      setIsClosingPolicyEditorPanel(false)
       setError(undefined)
       setShowDetails(false)
       setSelectedDiff(undefined)
@@ -288,7 +291,7 @@ export const PolicyEditorPanel = memo(function ({
     <>
       <Form_Shadcn_ {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-          <Sheet open={visible} onOpenChange={() => onClosingPanel()}>
+          <Sheet open={visible} onOpenChange={confirmOnClose}>
             <SheetContent
               showClose={false}
               size={showTools ? 'lg' : 'default'}
@@ -481,7 +484,7 @@ export const PolicyEditorPanel = memo(function ({
                       <Button
                         type="default"
                         disabled={isExecuting || isUpdating}
-                        onClick={() => onClosingPanel()}
+                        onClick={confirmOnClose}
                       >
                         Cancel
                       </Button>
@@ -569,23 +572,24 @@ export const PolicyEditorPanel = memo(function ({
         </form>
       </Form_Shadcn_>
 
-      <ConfirmationModal
-        visible={isClosingPolicyEditorPanel}
-        title="Discard changes"
-        confirmLabel="Discard"
-        onCancel={() => setIsClosingPolicyEditorPanel(false)}
-        onConfirm={() => {
-          onSelectCancel()
-          setIsClosingPolicyEditorPanel(false)
-        }}
-      >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to close the editor? Any unsaved changes on your policy and
-          conversations with the Assistant will be lost.
-        </p>
-      </ConfirmationModal>
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>
   )
 })
 
 PolicyEditorPanel.displayName = 'PolicyEditorPanel'
+
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      Are you sure you want to close the editor? Any unsaved changes on your policy and
+      conversations with the Assistant will be lost.
+    </p>
+  </ConfirmationModal>
+)
