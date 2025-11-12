@@ -18,7 +18,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -199,13 +199,8 @@ const FunctionsList = () => {
       urlKey: 'delete',
       select: (id: string) => (id ? functions?.find((fn) => fn.id.toString() === id) : undefined),
       enabled: !!functions,
-      onError: (_error, selectedId) => {
-        if (selectedId !== deletingFunctionIdRef.current) {
-          toast.error(`Function not found`)
-        } else {
-          deletingFunctionIdRef.current = null
-        }
-      },
+      onError: (_error, selectedId) =>
+        handleErrorOnDelete(deletingFunctionIdRef, selectedId, `Function not found`),
     })
 
   const { mutate: deleteDatabaseFunction, isLoading: isDeletingFunction } =

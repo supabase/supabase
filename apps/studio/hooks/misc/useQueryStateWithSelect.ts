@@ -1,5 +1,6 @@
-import { useEffect, useMemo } from 'react'
+import { MutableRefObject, useEffect, useMemo } from 'react'
 import { parseAsString, useQueryState } from 'nuqs'
+import { toast } from 'sonner'
 
 /**
  * Hook for managing URL query parameters with a custom select function and error handling.
@@ -41,5 +42,17 @@ export function useQueryStateWithSelect<T>({
   return {
     value,
     setValue: setSelectedId as (value: string | null) => void,
+  }
+}
+
+export const handleErrorOnDelete = (
+  deletingIdRef: MutableRefObject<string | null>,
+  selectedId: string,
+  errorMessage: string
+) => {
+  if (selectedId !== deletingIdRef.current) {
+    toast.error(errorMessage)
+  } else {
+    deletingIdRef.current = null
   }
 }

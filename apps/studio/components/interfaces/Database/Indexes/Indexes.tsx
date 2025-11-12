@@ -14,7 +14,7 @@ import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/index
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -69,13 +69,8 @@ const Indexes = () => {
       urlKey: 'delete',
       select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
       enabled: !!allIndexes,
-      onError: (_error, selectedId) => {
-        if (selectedId !== deletingIndexNameRef.current) {
-          toast.error(`Index not found`)
-        } else {
-          deletingIndexNameRef.current = null
-        }
-      },
+      onError: (_error, selectedId) =>
+        handleErrorOnDelete(deletingIndexNameRef, selectedId, `Index not found`),
     })
 
   const {

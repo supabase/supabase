@@ -3,7 +3,6 @@ import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
-import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -12,7 +11,7 @@ import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CreateRolePanel } from './CreateRolePanel'
 import { DeleteRoleModal } from './DeleteRoleModal'
@@ -55,13 +54,8 @@ export const RolesList = () => {
     urlKey: 'delete',
     select: (id: string) => (id ? data?.find((role) => role.id.toString() === id) : undefined),
     enabled: !!data,
-    onError: (_error, selectedId) => {
-      if (selectedId !== deletingRoleIdRef.current) {
-        toast.error(`Database Role not found`)
-      } else {
-        deletingRoleIdRef.current = null
-      }
-    },
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingRoleIdRef, selectedId, `Database Role not found`),
   })
 
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())

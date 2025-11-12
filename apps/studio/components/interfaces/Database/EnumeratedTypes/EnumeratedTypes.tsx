@@ -10,7 +10,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
@@ -59,13 +59,8 @@ export const EnumeratedTypes = () => {
     urlKey: 'delete',
     select: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
     enabled: !!data,
-    onError: (_error, selectedId) => {
-      if (selectedId !== deletingTypeIdRef.current) {
-        toast.error(`Enumerated Type not found`)
-      } else {
-        deletingTypeIdRef.current = null
-      }
-    },
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingTypeIdRef, selectedId, `Enumerated Type not found`),
   })
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
