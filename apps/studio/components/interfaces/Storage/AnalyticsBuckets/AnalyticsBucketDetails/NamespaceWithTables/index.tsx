@@ -79,7 +79,7 @@ export const NamespaceWithTables = ({
       refetchInterval: (data = []) => {
         if (pollIntervalNamespaceTables === 0) return false
 
-        const publicationTables = publication?.tables.map((x) => `${x.schema}.${x.name}`) ?? []
+        const publicationTables = publication?.tables ?? []
         const isSynced = !publicationTables.some(
           (x) => !data.includes(getNamespaceTableNameFromPostgresTableName(x))
         )
@@ -93,7 +93,7 @@ export const NamespaceWithTables = ({
     }
   )
 
-  const publicationTables = publication?.tables.map((x) => `${x.schema}.${x.name}`) ?? []
+  const publicationTables = publication?.tables ?? []
   const publicationTablesNotSyncedToNamespaceTables = publicationTables.filter(
     (x) => !tablesData.includes(getNamespaceTableNameFromPostgresTableName(x))
   )
@@ -215,9 +215,10 @@ export const NamespaceWithTables = ({
               <TooltipContent side="bottom" align="end">
                 <p className="mb-1">Waiting for namespace table to be created for:</p>
                 <ul className="list-disc pl-6">
-                  {publicationTablesNotSyncedToNamespaceTables.map((x) => (
-                    <li key={x}>{x}</li>
-                  ))}
+                  {publicationTablesNotSyncedToNamespaceTables.map((x) => {
+                    const value = `${x.schema}.${x.name}`
+                    return <li key={value}>{value}</li>
+                  })}
                 </ul>
               </TooltipContent>
             </Tooltip>

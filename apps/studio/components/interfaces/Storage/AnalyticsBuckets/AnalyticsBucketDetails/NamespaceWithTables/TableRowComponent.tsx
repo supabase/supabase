@@ -1,4 +1,4 @@
-import { snakeCase, uniq } from 'lodash'
+import { uniq } from 'lodash'
 import { MoreVertical, Pause, Play, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -29,7 +29,10 @@ import {
   TableRow,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { getAnalyticsBucketFDWServerName } from '../AnalyticsBucketDetails.utils'
+import {
+  getAnalyticsBucketFDWServerName,
+  getNamespaceTableNameFromPostgresTableName,
+} from '../AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
 
@@ -75,7 +78,7 @@ export const TableRowComponent = ({
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
   const isReplicating = !!publication?.tables.find(
-    (x) => table.name === snakeCase(`${x.schema}.${x.name}_changelog`)
+    (x) => table.name === getNamespaceTableNameFromPostgresTableName(x)
   )
 
   const onConfirmStopReplication = async () => {
@@ -90,7 +93,7 @@ export const TableRowComponent = ({
       // [Joshen ALPHA] Assumption here is that all the namespace tables have _changelog as suffix
       // May need to update if that assumption falls short (e.g for those dealing with iceberg APIs directly)
       const updatedTables = publication.tables.filter(
-        (x) => table.name !== snakeCase(`${x.schema}.${x.name}_changelog`)
+        (x) => table.name !== getNamespaceTableNameFromPostgresTableName(x)
       )
       await updatePublication({
         projectRef,
@@ -116,7 +119,9 @@ export const TableRowComponent = ({
     if (!pipeline) return toast.error('Unable to find existing pipeline')
 
     // [Joshen ALPHA] This has potential to be flaky - we should see how we can get the table name and schema better
-    const pgTable = tables?.find((t) => snakeCase(`${t.schema}.${t.name}_changelog`) === table.name)
+    const pgTable = tables?.find(
+      (t) => getNamespaceTableNameFromPostgresTableName(t) === table.name
+    )
     if (!pgTable) return toast.error('Unable to find corresponding Postgres table')
 
     try {
