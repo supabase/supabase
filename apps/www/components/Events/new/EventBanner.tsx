@@ -200,7 +200,7 @@ const Logo = () => (
 
 const EventBannerSkeleton = () => {
   return (
-    <section className={cn('grid grid-cols-[minmax(320px,35%),1fr] gap-12')}>
+    <section className={cn('grid md:grid-cols-[minmax(320px,35%),1fr] gap-12')}>
       {/* Cover Image Skeleton */}
       <div className="w-full bg-surface-200 aspect-square border rounded-lg animate-pulse" />
 
@@ -214,10 +214,10 @@ const EventBannerSkeleton = () => {
           </div>
 
           {/* Button Skeleton */}
-          <div className="hidden lg:block mt-1 h-10 w-24 bg-surface-200 rounded animate-pulse" />
+          <div className="hidden md:block mt-1 h-10 w-24 bg-surface-200 rounded animate-pulse" />
         </div>
 
-        <div className="flex gap-x-12 items-center">
+        <div className="flex flex-wrap gap-y-4 gap-x-12 items-center">
           {/* Date Widget Skeleton */}
           <div className="flex items-center gap-4">
             <div className="bg-surface-200 p-1.5 border rounded-md">
@@ -245,6 +245,9 @@ const EventBannerSkeleton = () => {
         <div className="mt-4 space-y-2">
           <div className="h-32 bg-surface-200 rounded animate-pulse w-full" />
         </div>
+
+        {/* Mobile Button Skeleton */}
+        <div className="block md:hidden mt-1 h-10 w-full bg-surface-200 rounded animate-pulse" />
       </article>
     </section>
   )
