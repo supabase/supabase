@@ -223,10 +223,7 @@ export const EmailTemplates = () => {
                         icon={<ExternalLink strokeWidth={1.5} />}
                         className="mt-2"
                       >
-                        <Link
-                          href={`${DOCS_URL}/guides/auth/security-notifications`}
-                          target="_blank"
-                        >
+                        <Link href={`${DOCS_URL}/guides/auth/auth-email-templates`} target="_blank">
                           Docs
                         </Link>
                       </Button>
