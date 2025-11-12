@@ -374,7 +374,7 @@ export const updateColumn = async ({
 export const duplicateTable = async (
   projectRef: string,
   connectionString: string | undefined | null,
-  payload: { name: string; comment?: string },
+  payload: { name: string; comment?: string | null },
   metadata: {
     duplicateTable: RetrieveTableResult
     isRLSEnabled: boolean
@@ -394,7 +394,7 @@ export const duplicateTable = async (
     connectionString,
     sql: [
       `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`,
-      payload.comment !== undefined
+      payload.comment != undefined
         ? `comment on table "${sourceTableSchema}"."${duplicatedTableName}" is '${payload.comment}';`
         : '',
     ].join('\n'),
@@ -470,7 +470,7 @@ export const createTable = async ({
   payload: {
     name: string
     schema: string
-    comment?: string | undefined
+    comment?: string | null
   }
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
@@ -724,7 +724,6 @@ export const updateTable = async ({
   const primaryKeyColumns = columns
     .filter((column) => column.isPrimaryKey)
     .map((column) => column.name)
-
   const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
   const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
@@ -738,15 +737,16 @@ export const updateTable = async ({
     }
   }
 
-  // Update the table
-  await updateTableMutation({
-    projectRef,
-    connectionString,
-    id: table.id,
-    name: table.name,
-    schema: table.schema,
-    payload,
-  })
+  if (Object.keys(payload).length > 0) {
+    await updateTableMutation({
+      projectRef,
+      connectionString,
+      id: table.id,
+      name: table.name,
+      schema: table.schema,
+      payload,
+    })
+  }
 
   // Track RLS enablement if it's being turned on
   if (payload.rls_enabled === true) {

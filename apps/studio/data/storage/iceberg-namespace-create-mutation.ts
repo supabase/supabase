@@ -1,8 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
 
 type CreateIcebergNamespaceVariables = {
@@ -65,7 +65,11 @@ export const useIcebergNamespaceCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>,
+  UseCustomMutationOptions<
+    IcebergNamespaceCreateData,
+    ResponseError,
+    CreateIcebergNamespaceVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -86,7 +90,7 @@ export const useIcebergNamespaceCreateMutation = ({
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
-      if ((data.message = 'Request failed with status code 409')) {
+      if (data.message === 'Request failed with status code 409') {
         toast.error(`A namespace named ${variables.namespace} already exists in the catalog.`)
         return
       }

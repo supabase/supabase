@@ -11,7 +11,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
-      const { data, error } = await getLints({ headers: constructHeaders(req.headers) })
+      /**
+       * [Joshen] JFYI technically the exposed schemas is being set here via docker-compose.yml
+       * https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml#L183
+       * https://github.com/supabase/supabase/blob/474a78721e510301d15ca9dbd41f05ce10fa29e5/docker/.env.example#L55
+       *
+       * But i noticed that the local API route on config/postgrest.ts has currently hardcoded db_schema to `public, storage`
+       * As such, this is only just a temporary patch here that we're hardcoding the exposed schemas but we will need to figure
+       * out how to get the dashboard to retrieve the values from docker-compose
+       */
+      const { data, error } = await getLints({
+        headers: constructHeaders(req.headers),
+        exposedSchemas: 'public, storage',
+      })
 
       if (error) {
         return res.status(400).json(error)

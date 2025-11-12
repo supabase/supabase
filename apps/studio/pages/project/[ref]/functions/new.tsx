@@ -7,11 +7,13 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { FileExplorerAndEditor } from 'components/ui/FileExplorerAndEditor'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -19,6 +21,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -42,8 +45,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -108,9 +109,7 @@ const NewFunctionPage = () => {
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const [files, setFiles] = useState<
-    { id: number; name: string; content: string; selected?: boolean }[]
-  >([
+  const [files, setFiles] = useState<EdgeFunctionFile[]>([
     {
       id: 1,
       name: 'index.ts',
@@ -154,13 +153,10 @@ const NewFunctionPage = () => {
     deployFunction({
       projectRef: ref,
       slug: values.functionName,
-      metadata: {
-        entrypoint_path: 'index.ts',
-        name: values.functionName,
-        verify_jwt: true,
-      },
+      metadata: { name: values.functionName, verify_jwt: true },
       files: files.map(({ name, content }) => ({ name, content })),
     })
+
     sendEvent({
       action: 'edge_function_deploy_button_clicked',
       properties: { origin: 'functions_editor' },

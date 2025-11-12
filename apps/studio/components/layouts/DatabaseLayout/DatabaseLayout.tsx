@@ -9,7 +9,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { ProjectLayout } from '../ProjectLayout/ProjectLayout'
+import { ProjectLayout } from '../ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
 export interface DatabaseLayoutProps {

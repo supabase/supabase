@@ -13,6 +13,7 @@ import { useDatabaseFunctionCreateMutation } from 'data/database-functions/datab
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import type { FormSchema } from 'types'
 import {
@@ -69,9 +70,13 @@ const FormSchema = z.object({
     .optional(),
 })
 
-const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: CreateFunctionProps) => {
+export const CreateFunction = ({
+  func,
+  visible,
+  isDuplicating = false,
+  onClose,
+}: CreateFunctionProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
@@ -82,14 +87,15 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
   })
   const language = form.watch('language')
 
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: () => form.formState.isDirty,
+    onClose,
+  })
+
   const { mutate: createDatabaseFunction, isLoading: isCreating } =
     useDatabaseFunctionCreateMutation()
   const { mutate: updateDatabaseFunction, isLoading: isUpdating } =
     useDatabaseFunctionUpdateMutation()
-
-  function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
-  }
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!project) return console.error('Project is required')
@@ -151,7 +157,7 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
   const { data: protectedSchemas } = useProtectedSchemas()
 
   return (
-    <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
+    <Sheet open={visible} onOpenChange={confirmOnClose}>
       <SheetContent
         showClose={false}
         size={'default'}
@@ -383,7 +389,7 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
             </form>
           </Form_Shadcn_>
           <SheetFooter>
-            <Button disabled={isCreating || isUpdating} type="default" onClick={isClosingSidePanel}>
+            <Button disabled={isCreating || isUpdating} type="default" onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button
@@ -396,27 +402,26 @@ const CreateFunction = ({ func, visible, isDuplicating = false, onClose }: Creat
             </Button>
           </SheetFooter>
         </div>
-        <ConfirmationModal
-          visible={isClosingPanel}
-          title="Discard changes"
-          confirmLabel="Discard"
-          onCancel={() => setIsClosingPanel(false)}
-          onConfirm={() => {
-            setIsClosingPanel(false)
-            onClose()
-          }}
-        >
-          <p className="text-sm text-foreground-light">
-            There are unsaved changes. Are you sure you want to close the panel? Your changes will
-            be lost.
-          </p>
-        </ConfirmationModal>
+        <CloseConfirmationModal {...closeConfirmationModalProps} />
       </SheetContent>
     </Sheet>
   )
 }
 
-export default CreateFunction
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+      lost.
+    </p>
+  </ConfirmationModal>
+)
 
 interface FormFieldConfigParamsProps {
   readonly?: boolean

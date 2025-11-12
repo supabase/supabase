@@ -44,15 +44,19 @@ export const PolicyTableRowHeader = ({
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
-      <div className="flex gap-x-4 text-left">
+      <div className="flex gap-x-4 text-left flex-wrap">
         <EditorTablePageLink
           projectRef={ref}
           id={String(table.id)}
-          className="flex items-center gap-x-3"
+          className="flex items-center gap-3 flex-wrap"
         >
           <Table strokeWidth={1.5} size={16} className="text-foreground-muted" />
           <CardTitle className="m-0 normal-case">{table.name}</CardTitle>
-          {!table.rls_enabled && <Badge variant="warning">RLS Disabled</Badge>}
+          {!table.rls_enabled && (
+            <Badge variant="warning" className="shrink-0">
+              RLS Disabled
+            </Badge>
+          )}
         </EditorTablePageLink>
         {isTableLocked && (
           <Badge>

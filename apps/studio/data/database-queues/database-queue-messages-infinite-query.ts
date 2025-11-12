@@ -1,10 +1,12 @@
-import { UseInfiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { last } from 'lodash'
+
+import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
-import dayjs from 'dayjs'
 import { DATE_FORMAT } from 'lib/constants'
-import { last } from 'lodash'
-import { ResponseError } from 'types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueVariables = {
@@ -33,6 +35,11 @@ export async function getDatabaseQueue({
   status,
 }: DatabaseQueueVariables & { afterTimestamp: string }) {
   if (!projectRef) throw new Error('Project ref is required')
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
 
   if (status.length === 0) {
     return []
@@ -79,7 +86,7 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
 ) =>
   useInfiniteQuery<DatabaseQueueData, DatabaseQueueError, TData>({
     queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName, { status }),

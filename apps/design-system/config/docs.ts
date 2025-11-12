@@ -6,28 +6,6 @@ interface DocsConfig {
 }
 
 export const docsConfig: DocsConfig = {
-  // mainNav: [
-  //   {
-  //     title: 'Documentation',
-  //     href: '/docs',
-  //   },
-  //   {
-  //     title: 'Components',
-  //     href: '/docs/components/accordion',
-  //   },
-  //   {
-  //     title: 'Themes',
-  //     href: '/themes',
-  //   },
-  //   {
-  //     title: 'Examples',
-  //     href: '/examples',
-  //   },
-  //   {
-  //     title: 'Blocks',
-  //     href: '/blocks',
-  //   },
-  // ],
   sidebarNav: [
     {
       title: 'Getting Started',
@@ -58,14 +36,9 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Figma',
-          href: '/docs/figma',
           items: [],
-        },
-        {
-          title: 'Changelog',
-          href: '/docs/changelog',
-          items: [],
+          href: '/docs/ui-patterns/accessibility',
+          title: 'Accessibility',
         },
       ],
     },
@@ -75,6 +48,16 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Navigation',
           href: '/docs/ui-patterns/navigation',
+          items: [],
+        },
+        {
+          title: 'Layout',
+          href: '/docs/ui-patterns/layout',
+          items: [],
+        },
+        {
+          title: 'Empty States',
+          href: '/docs/ui-patterns/empty-states',
           items: [],
         },
       ],
@@ -100,6 +83,21 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Modal',
           href: '/docs/fragments/modal',
+          items: [],
+        },
+        {
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
+          items: [],
+        },
+        {
+          title: 'Page Header',
+          href: '/docs/fragments/page-header',
+          items: [],
+        },
+        {
+          title: 'Page Section',
+          href: '/docs/fragments/page-section',
           items: [],
         },
         {

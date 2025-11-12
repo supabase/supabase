@@ -697,6 +697,7 @@ export const auth: NavMenuConstant = {
           name: 'Sessions',
           url: '/guides/auth/sessions',
           items: [
+            { name: 'User sessions', url: '/guides/auth/sessions' },
             { name: 'Implicit flow', url: '/guides/auth/sessions/implicit-flow' },
             { name: 'PKCE flow', url: '/guides/auth/sessions/pkce-flow' },
           ],
@@ -711,11 +712,6 @@ export const auth: NavMenuConstant = {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
-            { name: 'Next.js guide', url: '/guides/auth/server-side/nextjs' },
-            {
-              name: 'SvelteKit guide',
-              url: '/guides/auth/server-side/sveltekit' as `/${string}`,
-            },
             { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
             {
               name: 'Migrating from Auth Helpers',
@@ -746,7 +742,7 @@ export const auth: NavMenuConstant = {
         {
           name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
-          items: [...SocialLoginItems],
+          items: [{ name: 'Overview', url: '/guides/auth/social-login' }, ...SocialLoginItems],
           enabled: allAuthProvidersEnabled,
         },
 
@@ -755,6 +751,7 @@ export const auth: NavMenuConstant = {
           url: '/guides/auth/enterprise-sso',
           enabled: allAuthProvidersEnabled,
           items: [
+            { name: 'Overview', url: '/guides/auth/enterprise-sso' },
             {
               name: 'SAML 2.0',
               url: '/guides/auth/enterprise-sso/auth-sso-saml' as `/${string}`,
@@ -781,6 +778,7 @@ export const auth: NavMenuConstant = {
           name: 'Multi-Factor Authentication',
           url: '/guides/auth/auth-mfa',
           items: [
+            { name: 'Overview', url: '/guides/auth/auth-mfa' },
             { name: 'App Authenticator (TOTP)', url: '/guides/auth/auth-mfa/totp' },
             { name: 'Phone', url: '/guides/auth/auth-mfa/phone' },
           ],
@@ -831,6 +829,7 @@ export const auth: NavMenuConstant = {
           name: 'Auth Hooks',
           url: '/guides/auth/auth-hooks',
           items: [
+            { name: 'Overview', url: '/guides/auth/auth-hooks' },
             {
               name: 'Custom access token hook',
               url: '/guides/auth/auth-hooks/custom-access-token-hook' as `/${string}`,
@@ -880,7 +879,10 @@ export const auth: NavMenuConstant = {
           name: 'JSON Web Tokens (JWT)',
           url: '/guides/auth/jwts',
           enabled: authFullSecurityEnabled,
-          items: [{ name: 'Claims Reference', url: '/guides/auth/jwt-fields' }],
+          items: [
+            { name: 'Overview', url: '/guides/auth/jwts' },
+            { name: 'Claims Reference', url: '/guides/auth/jwt-fields' },
+          ],
         },
         {
           name: 'JWT Signing Keys',
@@ -921,6 +923,7 @@ const ormQuickstarts: NavMenuSection = {
       name: 'Prisma',
       url: '/guides/database/prisma',
       items: [
+        { name: 'Connecting with Prisma', url: '/guides/database/prisma' as `/${string}` },
         {
           name: 'Prisma troubleshooting',
           url: '/guides/database/prisma/prisma-troubleshooting' as `/${string}`,
@@ -1035,6 +1038,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Managing connections',
           url: '/guides/database/connection-management' as `/${string}`,
+        },
+        {
+          name: 'Managing event triggers',
+          url: '/guides/database/postgres/event-triggers' as `/${string}`,
         },
       ],
     },
@@ -1285,6 +1292,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to AWS S3',
           url: '/guides/database/extensions/wrappers/s3' as `/${string}`,
+        },
+        {
+          name: 'Connecting to AWS S3 Vectors',
+          url: '/guides/database/extensions/wrappers/s3_vectors' as `/${string}`,
         },
         {
           name: 'Connecting to BigQuery',
@@ -1640,6 +1651,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/examples/auth-send-email-hook-react-email-resend' as `/${string}`,
         },
         {
+          name: 'Building an MCP Server with mcp-lite',
+          url: '/guides/functions/examples/mcp-server-mcp-lite' as `/${string}`,
+        },
+        {
           name: 'CORS support for invoking from the browser',
           url: '/guides/functions/cors' as `/${string}`,
         },
@@ -1702,6 +1717,10 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
+        {
+          name: 'mcp-lite (Model Context Protocol)',
+          url: '/guides/functions/examples/mcp-server-mcp-lite' as `/${string}`,
+        },
         {
           name: 'Browserless.io',
           url: '/guides/functions/examples/screenshots' as `/${string}`,
@@ -2000,7 +2019,13 @@ export const ai: NavMenuConstant = {
         {
           name: 'Vector indexes',
           url: '/guides/ai/vector-indexes',
-          items: vectorIndexItems,
+          items: [
+            {
+              name: 'Overview',
+              url: '/guides/ai/vector-indexes',
+            },
+            ...vectorIndexItems,
+          ],
         },
         {
           name: 'Automatic embeddings',
@@ -2348,6 +2373,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/migrating-within-supabase',
           items: [
             {
+              name: 'Overview',
+              url: '/guides/platform/migrating-within-supabase' as `/${string}`,
+            },
+            {
               name: 'Restore Dashboard backup',
               url: '/guides/platform/migrating-within-supabase/dashboard-restore' as `/${string}`,
             },
@@ -2360,7 +2389,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Migrating to Supabase',
           url: '/guides/platform/migrating-to-supabase',
-          items: MIGRATION_PAGES,
+          items: [
+            { name: 'Overview', url: '/guides/platform/migrating-to-supabase' as `/${string}` },
+            ...MIGRATION_PAGES,
+          ],
         },
       ],
     },
@@ -2377,6 +2409,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/multi-factor-authentication',
           enabled: fullPlatformEnabled,
           items: [
+            {
+              name: 'Overview',
+              url: '/guides/platform/multi-factor-authentication' as `/${string}`,
+            },
             {
               name: 'Enforce MFA on organization',
               url: '/guides/platform/mfa/org-mfa-enforcement' as `/${string}`,
@@ -2397,6 +2433,7 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/sso',
           enabled: fullPlatformEnabled,
           items: [
+            { name: 'Overview', url: '/guides/platform/sso' as `/${string}` },
             { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
             {
               name: 'SSO with Google Workspace',
@@ -2455,8 +2492,12 @@ export const platform: NavMenuConstant = {
         },
         {
           name: 'Manage your usage',
-          url: '/guides/platform/manage-your-usage' as `/${string}`,
+          url: '/guides/platform/manage-your-usage',
           items: [
+            {
+              name: 'Overview',
+              url: '/guides/platform/manage-your-usage' as `/${string}`,
+            },
             {
               name: 'Compute',
               url: '/guides/platform/manage-your-usage/compute' as `/${string}`,
@@ -2556,6 +2597,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/aws-marketplace',
           items: [
             {
+              name: 'Overview',
+              url: '/guides/platform/aws-marketplace' as `/${string}`,
+            },
+            {
               name: 'Getting Started',
               url: '/guides/platform/aws-marketplace/getting-started',
             },
@@ -2639,6 +2684,10 @@ export const self_hosting: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker' },
+    {
+      name: 'Configuration',
+      items: [{ name: 'Enabling MCP server', url: '/guides/self-hosting/enable-mcp' }],
+    },
     {
       name: 'Auth Server',
       items: [
@@ -2792,6 +2841,10 @@ export const integrations: NavMenuConstant = {
           name: 'Build a Supabase integration',
           url: '/guides/integrations/build-a-supabase-integration',
           items: [
+            {
+              name: 'Overview',
+              url: '/guides/integrations/build-a-supabase-integration' as `/${string}`,
+            },
             {
               name: 'OAuth scopes',
               url: '/guides/integrations/build-a-supabase-integration/oauth-scopes' as `/${string}`,

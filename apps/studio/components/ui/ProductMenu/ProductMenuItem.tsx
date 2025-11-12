@@ -34,11 +34,11 @@ const ProductMenuItem = ({
       <div className="flex w-full items-center justify-between gap-1">
         <div
           title={hoverText ? hoverText : typeof name === 'string' ? name : ''}
-          className={'flex items-center gap-2 truncate w-full ' + textClassName}
+          className={'flex space-between items-center gap-2 truncate w-full ' + textClassName}
         >
-          <span className="truncate">{name} </span>
+          <span className="truncate flex-1">{name}</span>
           {label !== undefined && (
-            <Badge variant="warning" className="py-0 px-1.5 capitalize">
+            <Badge variant="warning" className="py-0 px-1.5 uppercase">
               {label}
             </Badge>
           )}

@@ -17,6 +17,8 @@ import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
 import { posthogClient } from './posthog-client'
 
+export { posthogClient }
+
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
 // Reexports GoogleTagManager with the right API key set
@@ -170,6 +172,9 @@ export const PageTelemetry = ({
   // Handle initial page telemetry event
   const hasSentInitialPageTelemetryRef = useRef(false)
 
+  // Track previous pathname for App Router to detect actual changes
+  const previousAppPathnameRef = useRef<string | null>(null)
+
   // Initialize PostHog client when consent is accepted
   useEffect(() => {
     if (hasAcceptedConsent && IS_PLATFORM) {
@@ -237,10 +242,17 @@ export const PageTelemetry = ({
     // For app router
     if (router !== null) return
 
-    // Wait until we've sent the initial page telemetry event
-    if (appPathname && !hasSentInitialPageTelemetryRef.current) {
+    // Only track if pathname actually changed (not initial mount)
+    if (
+      appPathname &&
+      previousAppPathnameRef.current !== null &&
+      previousAppPathnameRef.current !== appPathname
+    ) {
       sendPageTelemetry()
     }
+
+    // Update previous pathname
+    previousAppPathnameRef.current = appPathname
   }, [appPathname, router, sendPageTelemetry])
 
   useEffect(() => {

@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type BackupRestoreVariables = {
   ref: string
@@ -38,7 +38,7 @@ export const useBackupRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BackupRestoreData, ResponseError, BackupRestoreVariables>,
+  UseCustomMutationOptions<BackupRestoreData, ResponseError, BackupRestoreVariables>,
   'mutationFn'
 > = {}) => {
   return useMutation<BackupRestoreData, ResponseError, BackupRestoreVariables>({

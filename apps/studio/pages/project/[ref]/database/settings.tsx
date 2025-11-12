@@ -1,6 +1,6 @@
 import { DiskManagementPanelForm } from 'components/interfaces/DiskManagement/DiskManagementPanelForm'
-import { ConnectionPooling } from 'components/interfaces/Settings/Database'
 import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
+import { ConnectionPooling } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import ResetDbPassword from 'components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'

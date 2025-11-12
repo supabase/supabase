@@ -120,7 +120,7 @@ interface SortableProps<TData extends { id: UniqueIdentifier }> extends DndConte
   overlay?: React.ReactNode | null
 }
 
-function Sortable<TData extends { id: UniqueIdentifier }>({
+export function Sortable<TData extends { id: UniqueIdentifier }>({
   value,
   onValueChange,
   onDragStart,
@@ -202,7 +202,7 @@ interface SortableOverlayProps extends React.ComponentPropsWithRef<typeof DragOv
   activeId?: UniqueIdentifier | null
 }
 
-const SortableOverlay = forwardRef<HTMLDivElement, SortableOverlayProps>(
+export const SortableOverlay = forwardRef<HTMLDivElement, SortableOverlayProps>(
   ({ activeId, dropAnimation = dropAnimationOpts, children, ...props }, ref) => {
     return (
       <DragOverlay dropAnimation={dropAnimation} {...props}>
@@ -262,7 +262,7 @@ interface SortableItemProps extends SlotProps {
   asChild?: boolean
 }
 
-const SortableItem = forwardRef<HTMLDivElement, SortableItemProps>(
+export const SortableItem = forwardRef<HTMLDivElement, SortableItemProps>(
   ({ value, asTrigger, asChild, className, ...props }, ref) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
       id: value,
@@ -309,7 +309,7 @@ interface SortableDragHandleProps extends ButtonProps {
   withHandle?: boolean
 }
 
-const SortableDragHandle = forwardRef<HTMLButtonElement, SortableDragHandleProps>(
+export const SortableDragHandle = forwardRef<HTMLButtonElement, SortableDragHandleProps>(
   ({ className, ...props }, ref) => {
     const { attributes, listeners, isDragging } = useSortableItem()
 
@@ -326,5 +326,3 @@ const SortableDragHandle = forwardRef<HTMLButtonElement, SortableDragHandleProps
   }
 )
 SortableDragHandle.displayName = 'SortableDragHandle'
-
-export { Sortable, SortableDragHandle, SortableItem, SortableOverlay }

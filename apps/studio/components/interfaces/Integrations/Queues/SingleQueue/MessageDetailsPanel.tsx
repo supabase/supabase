@@ -146,7 +146,7 @@ export const MessageDetailsPanel = ({
                       readMessage({
                         projectRef: project!.ref,
                         connectionString: project?.connectionString,
-                        queryName: queueName!,
+                        queueName: queueName!,
                         messageId: selectedMessage.msg_id,
                         duration: 60,
                       })
@@ -173,7 +173,7 @@ export const MessageDetailsPanel = ({
                       archiveMessage({
                         projectRef: project!.ref,
                         connectionString: project?.connectionString,
-                        queryName: queueName!,
+                        queueName: queueName!,
                         messageId: selectedMessage.msg_id,
                       })
                     },

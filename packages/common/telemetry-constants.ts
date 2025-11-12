@@ -1219,7 +1219,7 @@ export interface SupabaseUiCommandCopyButtonClickedEvent {
   properties: {
     templateTitle: string
     command: string
-    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react'
+    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react' | 'vue' | 'nuxtjs'
     packageManager: 'npm' | 'pnpm' | 'yarn' | 'bun'
   }
 }
@@ -2011,6 +2011,231 @@ export interface CommandMenuCommandClickedEvent {
 }
 
 /**
+ * User opened a sidebar panel.
+ *
+ * @group Events
+ * @source studio
+ * @page Various pages with sidebar buttons
+ */
+export interface SidebarOpenedEvent {
+  action: 'sidebar_opened'
+  properties: {
+    /**
+     * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
+     */
+    sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the table quickstart experiment.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (NewTab)
+ */
+export interface TableQuickstartOpenedEvent {
+  action: 'table_quickstart_opened'
+  properties: {
+    /**
+     * Which variation the user was shown: ai, templates, assistant, or control
+     */
+    variant: 'ai' | 'templates' | 'assistant' | 'control'
+  }
+  groups: TelemetryGroups
+}
+/**
+ * User submitted a prompt in the AI quickstart variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartAIPromptSubmittedEvent {
+  action: 'table_quickstart_ai_prompt_submitted'
+  properties: {
+    /**
+     * Length of the AI prompt
+     */
+    promptLength: number
+    /**
+     * Whether this was triggered by a quick idea button
+     */
+    wasQuickIdea: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * AI table generation completed (success or failure).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartAIGenerationCompletedEvent {
+  action: 'table_quickstart_ai_generation_completed'
+  properties: {
+    /**
+     * Whether generation succeeded
+     */
+    success: boolean
+    /**
+     * Number of tables generated (0 if failed)
+     */
+    tablesGenerated: number
+    /**
+     * Length of the prompt used
+     */
+    promptLength: number
+    /**
+     * Error message if failed
+     */
+    errorMessage?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a quick idea button in the AI variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget)
+ */
+export interface TableQuickstartQuickIdeaClickedEvent {
+  action: 'table_quickstart_quick_idea_clicked'
+  properties: {
+    /**
+     * Text of the quick idea clicked
+     */
+    ideaText: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a category in the templates variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartTemplatesWidget)
+ */
+export interface TableQuickstartCategoryClickedEvent {
+  action: 'table_quickstart_category_clicked'
+  properties: {
+    /**
+     * Name of the category clicked
+     */
+    categoryName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User selected a table template from either AI-generated suggestions or pre-made templates.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (QuickstartAIWidget, QuickstartTemplatesWidget)
+ */
+export interface TableQuickstartTemplateClickedEvent {
+  action: 'table_quickstart_template_clicked'
+  properties: {
+    /**
+     * Name of the table clicked
+     */
+    tableName: string
+    /**
+     * Number of columns in the template
+     */
+    columnCount: number
+    /**
+     * Source of the template clicked
+     */
+    source: 'ai' | 'templates'
+    /**
+     * Category the template belongs to (only present for templates source)
+     */
+    categoryName?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the assistant button in the assistant variation.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor (NewTab)
+ */
+export interface TableQuickstartAssistantOpenedEvent {
+  action: 'table_quickstart_assistant_opened'
+  properties: {
+    /**
+     * Whether the assistant chat was successfully created
+     */
+    chatCreated: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User toggled the inline editor setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface InlineEditorSettingClickedEvent {
+  action: 'inline_editor_setting_clicked'
+  properties: {
+    /**
+     * Whether the inline editor was enabled or disabled
+     */
+    enabled: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the save destination button in add log drains sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/log-drains (LogDrainDestinationSheetForm)
+ */
+export interface LogDrainSaveButtonClickedEvent {
+  action: 'log_drain_save_button_clicked'
+  properties: {
+    /**
+     * Type of the destination saved
+     */
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User confirmed addition of log drain destination.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/settings/log-drains (LogDrains)
+ */
+export interface LogDrainConfirmButtonSubmittedEvent {
+  action: 'log_drain_confirm_button_submitted'
+  properties: {
+    /**
+     * Type of the destination confirmed
+     */
+    destination: 'webhook' | 'datadog' | 'loki' | 'sentry'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2122,7 +2347,18 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRLSEnabledEvent
+  | TableQuickstartOpenedEvent
+  | TableQuickstartAIPromptSubmittedEvent
+  | TableQuickstartAIGenerationCompletedEvent
+  | TableQuickstartQuickIdeaClickedEvent
+  | TableQuickstartCategoryClickedEvent
+  | TableQuickstartTemplateClickedEvent
+  | TableQuickstartAssistantOpenedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
+  | InlineEditorSettingClickedEvent
+  | SidebarOpenedEvent
+  | LogDrainSaveButtonClickedEvent
+  | LogDrainConfirmButtonSubmittedEvent
