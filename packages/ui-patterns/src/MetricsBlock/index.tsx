@@ -1,8 +1,20 @@
 'use client'
 
 import * as React from 'react'
-import { cn } from 'ui'
 import { useContext } from 'react'
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  Card,
+  CardTitle,
+  cn,
+  InfoIcon,
+  CardContent,
+} from 'ui'
+import { ExternalLink, HelpCircle } from 'lucide-react'
+import Link from 'next/link'
 
 interface MetricsBlockContextValue {
   isLoading?: boolean
@@ -26,18 +38,26 @@ interface MetricsBlockProps extends React.HTMLAttributes<HTMLDivElement> {
 const MetricsBlock = React.forwardRef<HTMLDivElement, MetricsBlockProps>(
   ({ isLoading = false, isDisabled = false, className, children, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn(className)} {...props}>
+      <Card ref={ref} className={cn(className)} {...props}>
         <MetricsBlockContext.Provider value={{ isLoading, isDisabled }}>
           {children}
         </MetricsBlockContext.Provider>
-      </div>
+      </Card>
     )
   }
 )
 MetricsBlock.displayName = 'MetricsBlock'
 
-const MetricsBlockHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+interface MetricsBlockHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  isLoading?: boolean
+  isDisabled?: boolean
+  hasLink?: boolean
+  href?: string
+  children: React.ReactNode
+}
+
+const MetricsBlockHeader = React.forwardRef<HTMLDivElement, MetricsBlockHeaderProps>(
+  ({ className, isLoading, isDisabled, hasLink = false, href, children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
@@ -45,7 +65,16 @@ const MetricsBlockHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes
         className
       )}
       {...props}
-    />
+    >
+      <div className="flex flex-row items-center gap-2">{children}</div>
+      {hasLink && (
+        <Button type="text" size="tiny" className="px-1 text-foreground-lighter" asChild>
+          <Link href={href || ''}>
+            <ExternalLink size={14} strokeWidth={1.5} />
+          </Link>
+        </Button>
+      )}
+    </div>
   )
 )
 MetricsBlockHeader.displayName = 'MetricsBlockHeader'
@@ -57,12 +86,45 @@ const MetricsBlockIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<H
 )
 MetricsBlockIcon.displayName = 'MetricsBlockIcon'
 
-const MetricsBlockLabel = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('text-foreground-light', className)} {...props} />
+interface MetricsBlockLabelProps extends React.HTMLAttributes<HTMLDivElement> {
+  isLoading?: boolean
+  isDisabled?: boolean
+  hasTooltip?: boolean
+  tooltip?: string
+  children: React.ReactNode
+}
+
+const MetricsBlockLabel = React.forwardRef<HTMLDivElement, MetricsBlockLabelProps>(
+  ({ className, isLoading, isDisabled, hasTooltip = false, tooltip, children, ...props }, ref) => (
+    <CardTitle
+      ref={ref}
+      className={cn('flex items-center gap-2 text-foreground-light', className)}
+      {...props}
+    >
+      <span>{children}</span>
+      {hasTooltip && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <HelpCircle size={14} strokeWidth={1.5} />
+          </TooltipTrigger>
+          <TooltipContent>{tooltip}</TooltipContent>
+        </Tooltip>
+      )}
+    </CardTitle>
   )
 )
 MetricsBlockLabel.displayName = 'MetricsBlockLabel'
+
+const MetricsBlockContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <CardContent
+      ref={ref}
+      className={cn('pb-4 px-6 pt-0 flex-1 h-full overflow-hidden', className)}
+      {...props}
+    />
+  )
+)
+MetricsBlockContent.displayName = 'MetricsBlockContent'
 
 /* TO DO: 
 ===========================
@@ -75,4 +137,11 @@ MetricsBlockLabel.displayName = 'MetricsBlockLabel'
 ===========================
 */
 
-export { MetricsBlock, MetricsBlockHeader, MetricsBlockIcon, MetricsBlockLabel, useMetricsBlock }
+export {
+  MetricsBlock,
+  MetricsBlockHeader,
+  MetricsBlockIcon,
+  MetricsBlockLabel,
+  MetricsBlockContent,
+  useMetricsBlock,
+}
