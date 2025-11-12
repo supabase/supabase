@@ -64,10 +64,8 @@ export function useRealtimeExperiment({
   const isNewProject = useMemo(() => {
     if (!projectInsertedAt) return false
 
-    // Validate date format
     const insertedDate = dayjs.utc(projectInsertedAt)
     if (!insertedDate.isValid()) {
-      console.warn('[useRealtimeExperiment] Invalid project inserted_at date:', projectInsertedAt)
       return false
     }
 
@@ -102,8 +100,7 @@ export function useRealtimeExperiment({
         table_has_realtime_enabled: isRealtimeEnabled,
         days_since_project_creation: daysSinceCreation,
       })
-    } catch (error) {
-      console.error('[useRealtimeExperiment] Failed to track exposure:', error)
+    } catch {
       hasTrackedExposure.current = false
     }
   }, [isTable, isNewProject, realtimeButtonVariant, projectInsertedAt, isRealtimeEnabled, track])

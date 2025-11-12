@@ -24,11 +24,11 @@ import {
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useRealtimeExperiment, RealtimeButtonVariant } from 'hooks/misc/useRealtimeExperiment'
+import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { useTrack } from 'lib/telemetry/track'
 import { DOCS_URL } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
@@ -105,7 +105,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     (publication) => publication.name === 'supabase_realtime'
   )
   const realtimeEnabledTables = realtimePublication?.tables ?? []
-  const isRealtimeEnabled = realtimeEnabledTables.some((t: any) => t.id === table?.id)
+  const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === table?.id)
 
   const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
     projectInsertedAt: project?.inserted_at,
