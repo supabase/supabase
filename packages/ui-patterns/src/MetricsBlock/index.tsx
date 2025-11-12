@@ -11,6 +11,7 @@ import {
   CardTitle,
   cn,
   CardContent,
+  Skeleton,
 } from 'ui'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -49,33 +50,33 @@ const MetricsBlock = React.forwardRef<HTMLDivElement, MetricsBlockProps>(
 MetricsBlock.displayName = 'MetricsBlock'
 
 interface MetricsBlockHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  isLoading?: boolean
-  isDisabled?: boolean
   hasLink?: boolean
   href?: string
   children: React.ReactNode
 }
 
 const MetricsBlockHeader = React.forwardRef<HTMLDivElement, MetricsBlockHeaderProps>(
-  ({ className, isLoading, isDisabled, hasLink = false, href, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        'py-4 px-6 flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
-        className
-      )}
-      {...props}
-    >
-      <div className="flex flex-row items-center gap-2">{children}</div>
-      {hasLink && (
-        <Button type="text" size="tiny" className="px-1 text-foreground-lighter" asChild>
-          <Link href={href || ''}>
-            <ExternalLink size={14} strokeWidth={1.5} />
-          </Link>
-        </Button>
-      )}
-    </div>
-  )
+  ({ className, hasLink = false, href, children, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'py-4 px-6 flex flex-row items-center justify-between gap-2 space-y-0 pb-0 border-b-0 relative',
+          className
+        )}
+        {...props}
+      >
+        <div className="flex flex-row items-center gap-2">{children}</div>
+        {hasLink && (
+          <Button type="text" size="tiny" className="px-1 text-foreground-lighter" asChild>
+            <Link href={href || ''}>
+              <ExternalLink size={14} strokeWidth={1.5} />
+            </Link>
+          </Button>
+        )}
+      </div>
+    )
+  }
 )
 MetricsBlockHeader.displayName = 'MetricsBlockHeader'
 
@@ -106,39 +107,48 @@ const MetricsBlockIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<H
 MetricsBlockIcon.displayName = 'MetricsBlockIcon'
 
 interface MetricsBlockLabelProps extends React.HTMLAttributes<HTMLDivElement> {
-  isLoading?: boolean
-  isDisabled?: boolean
   hasTooltip?: boolean
   tooltip?: string
   children: React.ReactNode
 }
 
 const MetricsBlockLabel = React.forwardRef<HTMLDivElement, MetricsBlockLabelProps>(
-  ({ className, isLoading, isDisabled, hasTooltip = false, tooltip, children, ...props }, ref) => (
-    <CardTitle
-      ref={ref}
-      className={cn('flex items-center gap-2 text-foreground-light', className)}
-      {...props}
-    >
-      <span>{children}</span>
-      {hasTooltip && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <HelpCircle size={14} strokeWidth={1.5} />
-          </TooltipTrigger>
-          <TooltipContent>{tooltip}</TooltipContent>
-        </Tooltip>
-      )}
-    </CardTitle>
-  )
+  ({ className, hasTooltip = false, tooltip, children, ...props }, ref) => {
+    return (
+      <CardTitle
+        ref={ref}
+        className={cn('flex items-center gap-2 text-foreground-light', className)}
+        {...props}
+      >
+        <span>{children}</span>
+        {hasTooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle size={14} strokeWidth={1.5} />
+            </TooltipTrigger>
+            <TooltipContent>{tooltip}</TooltipContent>
+          </Tooltip>
+        )}
+      </CardTitle>
+    )
+  }
 )
 MetricsBlockLabel.displayName = 'MetricsBlockLabel'
 
 const MetricsBlockValue = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <span ref={ref} className={cn('font-normal text-xl tabular-nums', className)} {...props} />
-  )
+  ({ className, ...props }, ref) => {
+    const { isLoading } = useMetricsBlock()
+
+    if (isLoading) {
+      return <Skeleton className="w-32 h-7" />
+    }
+
+    return (
+      <span ref={ref} className={cn('font-normal text-xl tabular-nums', className)} {...props} />
+    )
+  }
 )
+
 MetricsBlockValue.displayName = 'MetricsBlockValue'
 
 interface MetricsBlockDifferentialProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -146,22 +156,31 @@ interface MetricsBlockDifferentialProps extends React.HTMLAttributes<HTMLDivElem
 }
 
 const MetricsBlockDifferential = React.forwardRef<HTMLDivElement, MetricsBlockDifferentialProps>(
-  ({ className, variant = 'default', ...props }, ref) => (
-    <span
-      ref={ref}
-      className={cn(
-        variant === 'positive'
-          ? 'text-brand'
-          : variant === 'negative'
-            ? 'text-destructive'
-            : 'text-foreground-light',
-        'tabular-nums text-sm',
-        className
-      )}
-      {...props}
-    />
-  )
+  ({ className, variant = 'default', ...props }, ref) => {
+    const { isLoading } = useMetricsBlock()
+
+    if (isLoading) {
+      return <Skeleton className="w-16 h-5" />
+    }
+
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          variant === 'positive'
+            ? 'text-brand'
+            : variant === 'negative'
+              ? 'text-destructive'
+              : 'text-foreground-light',
+          'tabular-nums text-sm',
+          className
+        )}
+        {...props}
+      />
+    )
+  }
 )
+
 MetricsBlockDifferential.displayName = 'MetricsBlockDifferential'
 
 interface MetricsBlockSparklineProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -172,17 +191,21 @@ interface MetricsBlockSparklineProps extends React.HTMLAttributes<HTMLDivElement
 
 const MetricsBlockSparkline = React.forwardRef<HTMLDivElement, MetricsBlockSparklineProps>(
   ({ className, data, dataKey, ...props }, ref) => {
-    const customDateFormat = 'MMM D, YYYY'
+    const { isLoading } = useMetricsBlock()
+    if (isLoading) {
+      return <Skeleton className="w-full h-[56px] rounded-none" />
+    }
+
     if (!data || data.length === 0) {
       return null
     }
 
     return (
-      <div ref={ref} className={cn('w-full h-20', className)} {...props}>
-        <ResponsiveContainer width="100%" height="100%">
+      <div ref={ref} className={cn('w-full h-16 relative', className)} {...props}>
+        <ResponsiveContainer width="100%" height="100%" className="relative">
           <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <defs>
-              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="hsl(var(--brand-default))" stopOpacity={0.8} />
                 <stop offset="95%" stopColor="hsl(var(--brand-default))" stopOpacity={0} />
               </linearGradient>
@@ -190,7 +213,7 @@ const MetricsBlockSparkline = React.forwardRef<HTMLDivElement, MetricsBlockSpark
             <Area
               type="step"
               dataKey={dataKey || 'value'}
-              fill="url(#colorUv)"
+              fill="url(#sparklineGradient)"
               fillOpacity={0.1}
               stroke="hsl(var(--brand-default))"
               strokeWidth={1.5}
