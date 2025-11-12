@@ -125,6 +125,7 @@ const RealtimeUsage = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 200)
     }
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [])
 
   const handleDatePickerChange = (values: DatePickerValue) => {
