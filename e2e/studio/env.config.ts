@@ -18,4 +18,4 @@ export const env = {
     process.env.VERCEL_AUTOMATION_BYPASS_SELFHOSTED_STUDIO || 'false',
 }
 
-export const STORAGE_STATE_PATH = path.join(__dirname, './playwright/.auth/user.json')
+export const STORAGE_STATE_PATH = path.join(import.meta.dirname, './playwright/.auth/user.json')

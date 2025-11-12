@@ -110,7 +110,7 @@ describe(`DeleteBucketModal`, () => {
     await userEvent.click(openButton)
     await screen.findByRole(`dialog`)
 
-    const input = screen.getByLabelText(/Type/)
+    const input = screen.getByPlaceholderText(/Type/)
     await userEvent.type(input, `test`)
 
     const confirmButton = screen.getByRole(`button`, { name: `Delete bucket` })

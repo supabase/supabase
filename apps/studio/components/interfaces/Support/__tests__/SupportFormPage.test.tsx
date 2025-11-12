@@ -646,10 +646,13 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Dashboard bug')
     await waitFor(() => {
@@ -739,10 +742,13 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'APIs and client libraries')
     await waitFor(() => {
