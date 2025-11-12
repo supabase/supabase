@@ -192,7 +192,7 @@ export const CreateAnalyticsBucketModal = ({
           type={buttonType}
           className={buttonClassName}
           icon={<Plus size={14} />}
-          disabled={!canCreateBuckets || !icebergCatalogEnabled || disabled}
+          disabled={!canCreateBuckets || !icebergCatalogEnabled || buckets.length >= 2 || disabled}
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
           tooltip={{
@@ -203,7 +203,9 @@ export const CreateAnalyticsBucketModal = ({
                 ? 'Analytics buckets are not enabled for your project. Please contact support to enable it.'
                 : !canCreateBuckets
                   ? 'You need additional permissions to create buckets'
-                  : tooltip?.content?.text,
+                  : buckets.length >= 2
+                    ? 'Bucket limit reached'
+                    : tooltip?.content?.text,
             },
           }}
         >

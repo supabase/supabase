@@ -100,8 +100,14 @@ export const AnalyticsBuckets = () => {
         <EmptyBucketState bucketType="analytics" />
       ) : (
         <div className="flex flex-col gap-y-4">
-          <ScaffoldHeader className="py-0">
+          <ScaffoldHeader className="py-0 flex flex-row items-baseline gap-x-2">
             <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
+            {analyticsBuckets.length > 0 && (
+              <span className="bg-surface-200 rounded-full px-1.5 py-1 leading-none text-xs text-foreground-lighter tracking-widest">
+                {analyticsBuckets.length}
+                /2
+              </span>
+            )}
           </ScaffoldHeader>
           <div className="flex flex-grow justify-between gap-x-2 items-center">
             <Input
