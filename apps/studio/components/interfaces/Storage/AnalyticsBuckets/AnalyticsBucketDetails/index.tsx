@@ -14,9 +14,7 @@ import {
 import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import {
   ScaffoldContainer,
-  ScaffoldHeader,
   ScaffoldSection,
-  ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -33,8 +31,9 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
+import { BucketHeader } from './BucketHeader'
 import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
@@ -60,15 +59,15 @@ export const AnalyticBucketDetails = () => {
   // updating connected tables until namespaces are updated
   // Namespace would just be the schema (Which is currently limited to public)
   // Wrapper table would be {schema}_{table}_changelog
-  const [tablesToPoll, setTablesToPoll] = useState<{ schema: string; name: string }[]>([])
   const [pollIntervalNamespaces, setPollIntervalNamespaces] = useState(0)
   const [pollIntervalNamespaceTables, setPollIntervalNamespaceTables] = useState(0)
 
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
-  const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance({
-    bucketId: bucket?.id,
-  })
-  const { pipeline } = useAnalyticsBucketAssociatedEntities({
+  const { data: wrapperInstance, isLoading: isLoadingWrapperInstance } =
+    useAnalyticsBucketWrapperInstance({
+      bucketId: bucket?.id,
+    })
+  const { publication } = useAnalyticsBucketAssociatedEntities({
     projectRef,
     bucketId: bucket?.id,
   })
@@ -76,7 +75,7 @@ export const AnalyticBucketDetails = () => {
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
   const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta
-  const state = isLoading
+  const state = isLoadingWrapperInstance
     ? 'loading'
     : extensionState === 'installed'
       ? wrapperInstance
@@ -104,7 +103,13 @@ export const AnalyticBucketDetails = () => {
     { enabled: wrapperValues.vault_token !== undefined }
   )
 
-  const { data: namespacesData, isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
+  const {
+    data: namespacesData = [],
+    error: namespacesError,
+    isSuccess: isSuccessNamespaces,
+    isLoading: isLoadingNamespaces,
+    isError: isErrorNamespaces,
+  } = useIcebergNamespacesQuery(
     {
       catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
@@ -112,21 +117,26 @@ export const AnalyticBucketDetails = () => {
     },
     {
       enabled: isSuccessToken,
-      refetchInterval: (data) => {
+      refetchInterval: (data = []) => {
         if (pollIntervalNamespaces === 0) return false
-        if (tablesToPoll.length > 0) {
-          const schemas = [...new Set(tablesToPoll.map((x) => x.schema))]
-          const hasSchemaMissingFromNamespace = !schemas.some((x) => (data ?? []).includes(x))
 
-          if (!hasSchemaMissingFromNamespace) {
-            setPollIntervalNamespaces(0)
-            return false
-          }
+        const publicationTableSchemas = publication?.tables.map((x) => x.schema) ?? []
+        const isSynced = !publicationTableSchemas.some((x) => !data.includes(x))
+        if (isSynced) {
+          setPollIntervalNamespaces(0)
+          return false
         }
+
         return pollIntervalNamespaces
       },
     }
   )
+
+  const publicationTableSchemas = (publication?.tables ?? []).map((x) => x.schema)
+  const isSyncedPublicationTableSchemasAndNamespaces = !publicationTableSchemas.some(
+    (x) => !namespacesData.includes(x)
+  )
+  const isPollingForData = pollIntervalNamespaces > 0 || pollIntervalNamespaceTables > 0
 
   const namespaces = useMemo(() => {
     const fdwNamespaces = wrapperTables.map((t) => t.table.split('.')[0]) as string[]
@@ -145,10 +155,10 @@ export const AnalyticBucketDetails = () => {
   }, [wrapperTables, namespacesData])
 
   useEffect(() => {
-    if (pollIntervalNamespaces === 0 && pollIntervalNamespaceTables === 0) {
-      setTablesToPoll([])
+    if (isSuccessNamespaces && !isSyncedPublicationTableSchemasAndNamespaces) {
+      setPollIntervalNamespaces(4000)
     }
-  }, [pollIntervalNamespaces, pollIntervalNamespaceTables])
+  }, [isSuccessNamespaces, isSyncedPublicationTableSchemasAndNamespaces])
 
   return (
     <>
@@ -160,65 +170,45 @@ export const AnalyticBucketDetails = () => {
         </ScaffoldContainer>
       ) : (
         <ScaffoldContainer bottomPadding>
-          {state === 'loading' && (
+          {state === 'loading' ? (
             <ScaffoldSection isFullWidth>
-              <GenericSkeletonLoader />
+              <BucketHeader showActions={false} />
+              <GenericTableLoader headers={['Name']} />
             </ScaffoldSection>
-          )}
-          {state === 'not-installed' && (
+          ) : state === 'not-installed' ? (
             <ExtensionNotInstalled
               bucketName={bucket?.id}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
             />
-          )}
-          {state === 'needs-upgrade' && (
+          ) : state === 'needs-upgrade' ? (
             <ExtensionNeedsUpgrade
               bucketName={bucket?.id}
               projectRef={project?.ref!}
               wrapperMeta={wrapperMeta}
               wrappersExtension={wrappersExtension!}
             />
-          )}
-
-          {state === 'added' && wrapperInstance && (
+          ) : state === 'missing' ? (
+            <WrapperMissing bucketName={bucket?.id} />
+          ) : state === 'added' && wrapperInstance ? (
             <>
               <ScaffoldSection isFullWidth>
-                <ScaffoldHeader className="pt-0 flex flex-row justify-between items-end gap-x-8">
-                  <div>
-                    <ScaffoldSectionTitle>Tables</ScaffoldSectionTitle>
-                    <ScaffoldSectionDescription>
-                      Analytics tables stored in this bucket
-                    </ScaffoldSectionDescription>
-                  </div>
-                  <div className="flex items-center gap-x-2">
-                    {!!pipeline && (
-                      <Button asChild type="default">
-                        <Link
-                          href={`/project/${projectRef}/database/etl/${pipeline.replicator_id}`}
-                        >
-                          View replication
-                        </Link>
-                      </Button>
-                    )}
-                    {namespaces.length > 0 && (
-                      <ConnectTablesDialog
-                        onSuccessConnectTables={(tables) => {
-                          setTablesToPoll(tables)
-                          setPollIntervalNamespaces(4000)
-                          setPollIntervalNamespaceTables(4000)
-                        }}
-                      />
-                    )}
-                  </div>
-                </ScaffoldHeader>
+                <BucketHeader
+                  namespaces={namespaces}
+                  onSuccessConnectTables={() => {
+                    setPollIntervalNamespaces(4000)
+                    setPollIntervalNamespaceTables(4000)
+                  }}
+                />
 
-                {isLoadingNamespaces || isLoading ? (
-                  <GenericSkeletonLoader />
+                {isLoadingNamespaces || isLoadingWrapperInstance ? (
+                  <GenericTableLoader headers={['Name']} />
+                ) : isErrorNamespaces ? (
+                  <AlertError subject="Failed to retrieve namespaces" error={namespacesError} />
                 ) : namespaces.length === 0 ? (
                   <>
-                    {tablesToPoll.length > 0 ? (
+                    {isPollingForData ? (
                       <aside className="border border-dashed w-full bg-surface-100 rounded-lg px-4 py-10 flex flex-col gap-y-3 items-center text-center gap-1 text-balance">
                         <Loader2
                           size={24}
@@ -226,10 +216,7 @@ export const AnalyticBucketDetails = () => {
                           className="animate-spin text-foreground-muted"
                         />
                         <div className="flex flex-col items-center text-center">
-                          <h3>
-                            Connecting {tablesToPoll.length} table
-                            {tablesToPoll.length > 1 ? 's' : ''} to bucket
-                          </h3>
+                          <h3>Connecting table(s) to bucket</h3>
                           <p className="text-foreground-light text-sm">
                             Tables will be shown here once the connection is complete
                           </p>
@@ -245,8 +232,7 @@ export const AnalyticBucketDetails = () => {
                           </p>
                         </div>
                         <ConnectTablesDialog
-                          onSuccessConnectTables={(tables) => {
-                            setTablesToPoll(tables)
+                          onSuccessConnectTables={() => {
                             setPollIntervalNamespaces(4000)
                             setPollIntervalNamespaceTables(4000)
                           }}
@@ -268,7 +254,6 @@ export const AnalyticBucketDetails = () => {
                         wrapperInstance={wrapperInstance}
                         wrapperValues={wrapperValues}
                         wrapperMeta={wrapperMeta}
-                        tablesToPoll={tablesToPoll}
                         pollIntervalNamespaceTables={pollIntervalNamespaceTables}
                         setPollIntervalNamespaceTables={setPollIntervalNamespaceTables}
                       />
@@ -279,8 +264,7 @@ export const AnalyticBucketDetails = () => {
 
               <SimpleConfigurationDetails bucketName={bucket?.id} />
             </>
-          )}
-          {state === 'missing' && <WrapperMissing bucketName={bucket?.id} />}
+          ) : null}
 
           <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
             <header>
