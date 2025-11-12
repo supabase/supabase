@@ -120,7 +120,9 @@ export const CreateVectorBucketDialog = () => {
         })
       }
     } catch (error: any) {
-      toast.error(`Failed to create vector bucket: ${error.message}`)
+      toast.warning(
+        `Failed to create vector bucket integration: ${error.message}. The bucket will be created but you will need to manually install the integration.`
+      )
     }
     setIsLoading(false)
 

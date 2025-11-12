@@ -5,7 +5,7 @@ export const getVectorBucketS3KeyName = (bucketId: string) => {
 }
 
 export const getVectorBucketFDWSchemaName = (bucketId: string) => {
-  return `fdw_vector_${bucketId}`
+  return `fdw_vector_${snakeCase(bucketId)}`
 }
 
 export const getVectorBucketFDWName = (bucketId: string) => {

@@ -34,7 +34,8 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
-import { getVectorBucketFDWName, getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
+import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
+import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 
 const isStagingLocal = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
@@ -108,6 +109,8 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
   const [visible, setVisible] = useState(false)
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
+  const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId: bucketName })
+
   // [Joshen] Can remove this once this restriction is removed
   const showIndexCreationNotice = isStagingLocal && !!project && project?.region !== 'us-east-1'
 
@@ -157,14 +160,16 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     }
 
     try {
-      await importForeignSchema({
-        projectRef: project.ref,
-        connectionString: project?.connectionString,
-        serverName: `${getVectorBucketFDWName(values.bucketName)}_server`,
-        sourceSchema: getVectorBucketFDWSchemaName(values.bucketName),
-        targetSchema: getVectorBucketFDWSchemaName(values.bucketName),
-        schemaOptions: [`bucket_name '${values.bucketName}'`],
-      })
+      if (wrapperInstance) {
+        await importForeignSchema({
+          projectRef: project.ref,
+          connectionString: project?.connectionString,
+          serverName: wrapperInstance.server_name,
+          sourceSchema: getVectorBucketFDWSchemaName(values.bucketName),
+          targetSchema: getVectorBucketFDWSchemaName(values.bucketName),
+          schemaOptions: [`bucket_name '${values.bucketName}'`],
+        })
+      }
     } catch (error: any) {
       toast.warning(`Failed to connect vector table to the database: ${error.message}`)
     }
