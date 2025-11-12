@@ -9,6 +9,14 @@ dotenv.config({
 
 const IS_CI = !!process.env.CI
 
+const webServerConfig = IS_CI
+  ? undefined
+  : {
+      command: 'pnpm -w run e2e:setup',
+      port: 8082,
+      timeout: 5 * 60 * 1000,
+    }
+
 export default defineConfig({
   timeout: 90 * 1000,
   testDir: './features',
@@ -53,10 +61,5 @@ export default defineConfig({
     ['html', { open: 'never' }],
     ['json', { outputFile: 'test-results/test-results.json' }],
   ],
-  webServer: {
-    command: 'pnpm -w run e2e:setup',
-    port: 8082,
-    timeout: 5 * 60 * 1000, // Wait up to five minutes for server to boot
-    reuseExistingServer: !IS_CI,
-  },
+  webServer: webServerConfig,
 })
