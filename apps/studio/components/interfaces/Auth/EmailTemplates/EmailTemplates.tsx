@@ -1,21 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { FEATURE_PREVIEWS } from 'components/interfaces/App/FeaturePreview/FeaturePreview.constants'
 import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { DOCS_URL } from 'lib/constants'
 import {
+  Badge,
   Button,
   Card,
   CardContent,
@@ -28,9 +33,13 @@ import {
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
-import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
+import { EmailRateLimitsAlert } from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
 import { TemplateEditor } from './TemplateEditor'
 
@@ -50,12 +59,21 @@ const NotificationsFormSchema = z.object({
   ),
 })
 
+const SECURITY_NOTIFICATIONS_DISCUSSIONS_URL = FEATURE_PREVIEWS.find(
+  (f) => f.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS
+)?.discussionsUrl
+
 export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
   const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
+  )
+
+  const [acknowledged, setAcknowledged] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SECURITY_NOTIFICATIONS_ACKNOWLEDGED(projectRef ?? ''),
+    false
   )
 
   const {
@@ -161,6 +179,60 @@ export const EmailTemplates = () => {
 
               <div>
                 <ScaffoldSectionTitle className="mb-4">Security</ScaffoldSectionTitle>
+                {!acknowledged && (
+                  <Admonition showIcon={false} type="tip" className="relative mb-6">
+                    <Tooltip>
+                      <TooltipTrigger
+                        onClick={() => setAcknowledged(true)}
+                        className="absolute top-3 right-3 opacity-30 hover:opacity-100 transition-opacity"
+                      >
+                        <X size={14} className="text-foreground-light" />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Dismiss</TooltipContent>
+                    </Tooltip>
+                    <div className="flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
+                      <div className="flex flex-col gap-y-0.5">
+                        <div className="flex flex-col gap-y-2 items-start">
+                          <Badge variant="success" className="-ml-0.5">
+                            NEW
+                          </Badge>
+                          <p className="text-sm">
+                            Notify users about security-sensitive actions on their accounts
+                          </p>
+                        </div>
+                        <p className="text-sm text-foreground-lighter text-balance">
+                          We’ve expanded our email templates to handle security-sensitive actions.
+                          The list of templates will continue to grow as our feature-set changes
+                          {SECURITY_NOTIFICATIONS_DISCUSSIONS_URL && (
+                            <>
+                              {' '}
+                              and as we{' '}
+                              <InlineLink
+                                href={SECURITY_NOTIFICATIONS_DISCUSSIONS_URL}
+                                target="_blank"
+                              >
+                                gather feedback
+                              </InlineLink>{' '}
+                              from our community
+                            </>
+                          )}
+                          .
+                        </p>
+                      </div>
+                      <Button
+                        asChild
+                        type="default"
+                        icon={<ExternalLink strokeWidth={1.5} />}
+                        className="mt-2"
+                      >
+                        <Link href={`${DOCS_URL}/guides/auth/auth-email-templates`} target="_blank">
+                          Docs
+                        </Link>
+                      </Button>
+                    </div>
+                  </Admonition>
+                )}
+
                 <Form_Shadcn_ {...notificationsForm}>
                   <form onSubmit={notificationsForm.handleSubmit(onSubmit)} className="space-y-4">
                     <Card>
