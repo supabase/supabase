@@ -1,6 +1,6 @@
 /**
  * Finds stale Dashboard PRs (older than 24 hours) and fetches their status
- * including CI checks, review status, and mergeable state.
+ * including review status and mergeable state.
  *
  * @param {Object} github - GitHub API client from actions/github-script
  * @param {Object} context - GitHub Actions context
@@ -81,43 +81,6 @@ module.exports = async ({ github, context, core }) => {
       if (touchesDashboard) {
         const hoursOld = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60))
         const daysOld = Math.floor(hoursOld / 24)
-
-        // Fetch CI status from check runs
-        let ciStatus = 'unknown'
-        let ciEmoji = ':grey_question:'
-        try {
-          const { data: checkRuns } = await github.rest.checks.listForRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: pr.head.sha,
-            per_page: 100,
-          })
-
-          if (checkRuns.total_count === 0) {
-            ciStatus = 'no-checks'
-            ciEmoji = ':white_circle:'
-          } else {
-            const hasFailure = checkRuns.check_runs.some((run) => run.conclusion === 'failure')
-            const hasPending = checkRuns.check_runs.some((run) => run.status !== 'completed')
-            const allSuccess = checkRuns.check_runs.every((run) => run.conclusion === 'success')
-
-            if (hasFailure) {
-              ciStatus = 'failed'
-              ciEmoji = ':x:'
-            } else if (hasPending) {
-              ciStatus = 'pending'
-              ciEmoji = ':hourglass_flowing_sand:'
-            } else if (allSuccess) {
-              ciStatus = 'passed'
-              ciEmoji = ':white_check_mark:'
-            } else {
-              ciStatus = 'mixed'
-              ciEmoji = ':warning:'
-            }
-          }
-        } catch (error) {
-          console.log(`Warning: Could not fetch CI status for PR #${pr.number}: ${error.message}`)
-        }
 
         // Fetch review status
         let reviewStatus = 'no-reviews'
@@ -223,8 +186,6 @@ module.exports = async ({ github, context, core }) => {
           hoursOld: hoursOld,
           daysOld: daysOld,
           fileCount: files.filter((f) => f.filename.startsWith(DASHBOARD_PATH)).length,
-          ciStatus: ciStatus,
-          ciEmoji: ciEmoji,
           reviewStatus: reviewStatus,
           reviewEmoji: reviewEmoji,
           mergeableStatus: mergeableStatus,
@@ -232,7 +193,7 @@ module.exports = async ({ github, context, core }) => {
         })
 
         console.log(
-          `✓ Found stale Dashboard PR #${pr.number} (CI: ${ciStatus}, Review: ${reviewStatus}, Mergeable: ${mergeableStatus})`
+          `✓ Found stale Dashboard PR #${pr.number} (Review: ${reviewStatus}, Mergeable: ${mergeableStatus})`
         )
       }
     }

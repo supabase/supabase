@@ -26,17 +26,6 @@ module.exports = async (stalePRs, webhookUrl) => {
         : escapeSlack(pr.title)
 
     // Format status text
-    const ciStatusText =
-      pr.ciStatus === 'passed'
-        ? 'CI Passing'
-        : pr.ciStatus === 'failed'
-          ? 'CI Failed'
-          : pr.ciStatus === 'pending'
-            ? 'CI Pending'
-            : pr.ciStatus === 'no-checks'
-              ? 'No CI'
-              : 'CI Unknown'
-
     const reviewStatusText =
       pr.reviewStatus === 'approved'
         ? 'Approved'
@@ -65,7 +54,7 @@ module.exports = async (stalePRs, webhookUrl) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*<${pr.url}|#${pr.number}: ${safeTitle}>*\n:bust_in_silhouette: @${pr.author} • :clock3: ${ageText} old • :file_folder: ${pr.fileCount} Dashboard files\n${pr.ciEmoji} ${ciStatusText} • ${pr.reviewEmoji} ${reviewStatusText} • ${pr.mergeableEmoji} ${mergeableStatusText}`,
+        text: `*<${pr.url}|#${pr.number}: ${safeTitle}>*\n:bust_in_silhouette: @${pr.author} • :clock3: ${ageText} old • :file_folder: ${pr.fileCount} Dashboard files\n${pr.reviewEmoji} ${reviewStatusText} • ${pr.mergeableEmoji} ${mergeableStatusText}`,
       },
     }
   })
