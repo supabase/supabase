@@ -151,20 +151,52 @@ const NewFunctionPage = () => {
   const onSubmit = (values: FormValues) => {
     if (isDeploying || !ref) return
 
+    const fallbackEntrypointPath = () => {
+      // when there's no matching entrypoint path is set,
+      // we use few heuristics to find an entrypoint file
+      // 1. If the function has only a single TS / JS file, if so set it as entrypoint
+      const jsFiles = files.filter(({ name }) => name.endsWith('.js') || name.endsWith('.ts'))
+      if (jsFiles.length === 1) {
+        return jsFiles[0].name
+      } else if (jsFiles.length) {
+        // 2. If function has a `index` or `main` file use it as the entrypoint
+        const regex = /^.*?(index|main).*$/i
+        const matchingFile = jsFiles.find(({ name }) => regex.test(name))
+        // 3. if no valid index / main file found, we set the entrypoint expliclty to first JS file
+        return matchingFile ? matchingFile.name : jsFiles[0].name
+      } else {
+        // no potential entrypoint files found, this will most likely result in an error on deploy
+        return 'index.ts'
+      }
+    }
+
+    const fallbackImportMapPath = () => {
+      // try to find a deno.json or import_map.json file
+      const regex = /^.*?(deno|import_map).json*$/i
+      return files.find(({ name }) => regex.test(name))?.name
+    }
+
     deployFunction({
       projectRef: ref,
       slug: values.functionName,
       metadata: {
-        entrypoint_path: 'index.ts',
         name: values.functionName,
         verify_jwt: true,
+        entrypoint_path: fallbackEntrypointPath(),
+        import_map_path: fallbackImportMapPath(),
+        static_patterns: files
+          .filter(({ name }) => !name.match(/\.(js|ts|jsx|tsx|json|wasm)$/i))
+          .map(({ name }) => name),
       },
       files: files.map(({ name, content }) => ({ name, content })),
     })
     sendEvent({
       action: 'edge_function_deploy_button_clicked',
       properties: { origin: 'functions_editor' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
   }
 
