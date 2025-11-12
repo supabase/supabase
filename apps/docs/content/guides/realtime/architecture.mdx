@@ -9,13 +9,21 @@ Realtime is a globally distributed Elixir cluster. Clients can connect to any no
 
 Realtime is written in [Elixir](https://elixir-lang.org/), which compiles to [Erlang](https://www.erlang.org/), and utilizes many tools the [Phoenix Framework](https://www.phoenixframework.org/) provides out of the box.
 
-![Global Architecture](/docs/img/guides/realtime/realtime-arch.png)
+<Image
+  alt="Architecture"
+  src={{
+    light: '/docs/img/guides/platform/realtime/architecture--light.png',
+    dark: '/docs/img/guides/platform/realtime/architecture--dark.png',
+  }}
+/>
 
 ## Elixir & Phoenix
 
 Phoenix is fast and able to handle millions of concurrent connections.
 
 Phoenix can handle many concurrent connections because Elixir provides lightweight processes (not OS processes) to work with.
+
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
 Client-facing WebSocket servers need to handle many concurrent connections. Elixir & Phoenix let the Supabase Realtime cluster do this easily.
 
@@ -31,7 +39,7 @@ Presence is an in-memory key-value store backed by a CRDT. When a user is connec
 
 Broadcast lets you send a message from any connected client to a Channel. Any other client connected to that same Channel will receive that message.
 
-This works globally. A client connected to a Realtime node in the United States can send a message to another client connected to a node in Singapore. Simply connect two clients to the same Realtime Channel and they'll all receive the same messages.
+This works globally. A client connected to a Realtime node in the United States can send a message to another client connected to a node in Singapore. Connect two clients to the same Realtime Channel and they'll all receive the same messages.
 
 Broadcast is useful for getting messages to users in the same location very quickly. If a group of clients are connected to a node in Singapore, the message only needs to go to that Realtime node in Singapore and back down. If users are close to a Realtime node they'll get Broadcast messages in the time it takes to ping the cluster.
 
@@ -46,6 +54,14 @@ Realtime allows you to listen to changes from your Postgres database. When a new
 Realtime knows the region your database is in, and connects to it from the closest region possible.
 
 Every Realtime region has at least two nodes so if one node goes offline the other node should reconnect and start streaming changes again.
+
+## Broadcast from Postgres
+
+Realtime Broadcast sends messages when changes happen in your database. Behind the scenes, Realtime creates a publication on the `realtime.messages` table. It then reads the Write-Ahead Log (WAL) file for this table, and sends a message whenever an insert happens. Messages are sent as JSON packages over WebSockets.
+
+The `realtime.messages` table is partitioned by day. This allows old messages to be deleted performantly, by dropping old partitions. Partitions are retained for 3 days before being deleted.
+
+Broadcast uses [Realtime Authorization](/docs/guides/realtime/authorization) by default to protect your data.
 
 ## Streaming the Write-Ahead Log
 

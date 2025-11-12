@@ -1,251 +1,462 @@
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Plus } from 'lucide-react'
+import { useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
 
 import { useParams } from 'common'
-import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormMessage_Shadcn_,
+  Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Switch,
+} from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
+import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
-export interface CreateBucketModalProps {
-  visible: boolean
-  onClose: () => void
+const FormSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, 'Please provide a name for your bucket')
+      .max(100, 'Bucket name should be below 100 characters')
+      .refine(
+        (value) => !value.endsWith(' '),
+        'The name of the bucket cannot end with a whitespace'
+      )
+      .refine(
+        (value) => value !== 'public',
+        '"public" is a reserved name. Please choose another name'
+      ),
+    public: z.boolean().default(false),
+    has_file_size_limit: z.boolean().default(false),
+    formatted_size_limit: z.coerce
+      .number()
+      .min(0, 'File size upload limit has to be at least 0')
+      .optional(),
+    allowed_mime_types: z.string().trim().default(''),
+  })
+  .superRefine((data, ctx) => {
+    if (!validBucketNameRegex.test(data.name)) {
+      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
+      ctx.addIssue({
+        path: ['name'],
+        code: z.ZodIssueCode.custom,
+        message: !!match
+          ? `Bucket name cannot contain the "${match}" character`
+          : 'Bucket name contains an invalid special character',
+      })
+    }
+  })
+
+const formId = 'create-storage-bucket-form'
+
+export type CreateBucketForm = z.infer<typeof FormSchema>
+
+interface CreateBucketModalProps {
+  buttonSize?: 'tiny' | 'small'
+  buttonType?: 'default' | 'primary'
+  buttonClassName?: string
+  label?: string
 }
 
-const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
+export const CreateBucketModal = ({
+  buttonSize = 'tiny',
+  buttonType = 'default',
+  buttonClassName,
+  label = 'New bucket',
+}: CreateBucketModalProps) => {
   const { ref } = useParams()
-  const router = useRouter()
+  const { data: org } = useSelectedOrganizationQuery()
 
-  const { mutate: createBucket, isLoading: isCreating } = useBucketCreateMutation({
-    onSuccess: (res) => {
-      toast.success(`Successfully created bucket ${res.name}`)
-      router.push(`/project/${ref}/storage/buckets/${res.name}`)
-      onClose()
-    },
-  })
+  const [visible, setVisible] = useState(false)
+  const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
+  const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
+
+  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
-  const [selectedUnit, setSelectedUnit] = useState<StorageSizeUnits>(StorageSizeUnits.BYTES)
-  const [showConfiguration, setShowConfiguration] = useState(false)
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { mutateAsync: createBucket, isLoading: isCreatingBucket } = useBucketCreateMutation({
+    // [Joshen] Silencing the error here as it's being handled in onSubmit
+    onError: () => {},
+  })
 
-  const initialValues = {
-    name: '',
-    public: false,
-    file_size_limit: 0,
-    allowed_mime_types: '',
-    has_file_size_limit: false,
-    formatted_size_limit: 0,
-  }
+  const form = useForm<CreateBucketForm>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: '',
+      public: false,
+      has_file_size_limit: false,
+      formatted_size_limit: undefined,
+      allowed_mime_types: '',
+    },
+  })
+  const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
+  const isPublicBucket = form.watch('public')
+  const hasFileSizeLimit = form.watch('has_file_size_limit')
 
-  const validate = (values: any) => {
-    const errors = {} as any
-    if (!values.name) {
-      errors.name = 'Please provide a name for your bucket'
-    }
-    if (values.name && values.name.endsWith(' ')) {
-      errors.name = 'The name of the bucket cannot end with a whitespace'
-    }
-
-    if (values.has_file_size_limit && values.formatted_size_limit < 0) {
-      errors.formatted_size_limit = 'File size upload limit has to be at least 0'
-    }
-    if (values.name === 'public') {
-      errors.name = '"public" is a reserved name. Please choose another name'
-    }
-    return errors
-  }
-
-  const onSubmit = async (values: any) => {
+  const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
 
-    createBucket({
-      projectRef: ref,
-      id: values.name,
-      isPublic: values.public,
-      file_size_limit: values.has_file_size_limit
-        ? convertToBytes(values.formatted_size_limit, selectedUnit)
-        : null,
-      allowed_mime_types:
-        values.allowed_mime_types.length > 0
-          ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
-          : null,
-    })
+    // [Joshen] Should shift this into superRefine in the form schema
+    try {
+      const fileSizeLimit =
+        values.has_file_size_limit && values.formatted_size_limit !== undefined
+          ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
+          : undefined
+
+      const allowedMimeTypes =
+        hasAllowedMimeTypes && values.allowed_mime_types.length > 0
+          ? values.allowed_mime_types.split(',').map((x) => x.trim())
+          : undefined
+
+      if (!!fileSizeLimit && !!data?.fileSizeLimit && fileSizeLimit > data.fileSizeLimit) {
+        return form.setError('formatted_size_limit', {
+          type: 'manual',
+          message: 'exceed_global_limit',
+        })
+      }
+
+      await createBucket({
+        projectRef: ref,
+        id: values.name,
+        type: 'STANDARD',
+        isPublic: values.public,
+        file_size_limit: fileSizeLimit,
+        allowed_mime_types: allowedMimeTypes,
+      })
+      sendEvent({
+        action: 'storage_bucket_created',
+        properties: { bucketType: 'STANDARD' },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
+
+      toast.success(`Successfully created bucket ${values.name}`)
+      form.reset()
+      setSelectedUnit(StorageSizeUnits.MB)
+      setVisible(false)
+    } catch (error: any) {
+      // Handle specific error cases for inline display
+      const errorMessage = error.message?.toLowerCase() || ''
+
+      if (
+        errorMessage.includes('mime type') &&
+        (errorMessage.includes('is not supported') || errorMessage.includes('not supported'))
+      ) {
+        // Set form error for the MIME types field
+        form.setError('allowed_mime_types', {
+          type: 'manual',
+          message: 'Invalid MIME type format. Please check your input.',
+        })
+      } else {
+        // For other errors, show a toast as fallback
+        toast.error(`Failed to create bucket: ${error.message}`)
+      }
+    }
   }
 
-  useEffect(() => {
-    if (visible) {
-      setSelectedUnit(StorageSizeUnits.BYTES)
-      setShowConfiguration(false)
-    }
-  }, [visible])
+  const handleClose = () => {
+    form.reset()
+    setSelectedUnit(StorageSizeUnits.MB)
+    setVisible(false)
+  }
 
   return (
-    <Modal
-      hideFooter
-      visible={visible}
-      size="medium"
-      header="Create storage bucket"
-      onCancel={() => onClose()}
+    <Dialog
+      open={visible}
+      onOpenChange={(open) => {
+        if (!open) {
+          handleClose()
+        }
+      }}
     >
-      <Form
-        validateOnBlur={false}
-        initialValues={initialValues}
-        validate={validate}
-        onSubmit={onSubmit}
-      >
-        {({ values }: { values: any }) => {
-          return (
-            <>
-              <Modal.Content>
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  className="w-full"
-                  layout="vertical"
-                  label="Name of bucket"
-                  labelOptional="Buckets cannot be renamed once created."
-                  descriptionText="Only lowercase letters, numbers, dots, and hyphens"
-                />
-                <div className="space-y-2 mt-6">
-                  <Toggle
-                    id="public"
-                    name="public"
-                    layout="flex"
-                    label="Public bucket"
-                    descriptionText="Anyone can read any object without any authorization"
-                  />
-                  {values.public && (
-                    <Alert title="Public buckets are not protected" variant="warning" withIcon>
-                      <p className="mb-2">
-                        Users can read objects in public buckets without any authorization.
-                      </p>
-                      <p>
-                        Row level security (RLS) policies are still required for other operations
-                        such as object uploads and deletes.
-                      </p>
-                    </Alert>
-                  )}
-                </div>
-              </Modal.Content>
-              <Collapsible
-                open={showConfiguration}
-                onOpenChange={() => setShowConfiguration(!showConfiguration)}
-              >
-                <Collapsible.Trigger asChild>
-                  <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
-                    <p className="text-sm">Additional configuration</p>
-                    <ChevronDown
-                      size={18}
-                      strokeWidth={2}
-                      className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
-                    />
-                  </div>
-                </Collapsible.Trigger>
-                <Collapsible.Content className="py-4">
-                  <div className="w-full space-y-5 px-5">
-                    <div className="space-y-5">
-                      <Toggle
-                        id="has_file_size_limit"
-                        name="has_file_size_limit"
-                        layout="flex"
-                        label="Restrict file upload size for bucket"
-                        descriptionText="Prevent uploading of file sizes greater than a specified limit"
+      <DialogTrigger asChild>
+        <ButtonTooltip
+          block
+          size={buttonSize}
+          type={buttonType}
+          className={buttonClassName}
+          icon={<Plus size={14} />}
+          disabled={!canCreateBuckets}
+          style={{ justifyContent: 'start' }}
+          onClick={() => setVisible(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canCreateBuckets
+                ? 'You need additional permissions to create buckets'
+                : undefined,
+            },
+          }}
+        >
+          {label}
+        </ButtonTooltip>
+      </DialogTrigger>
+
+      <DialogContent aria-describedby={undefined}>
+        <DialogHeader>
+          <DialogTitle>Create file bucket</DialogTitle>
+        </DialogHeader>
+
+        <DialogSectionSeparator />
+
+        <Form_Shadcn_ {...form}>
+          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-y-2">
+              <FormField_Shadcn_
+                key="name"
+                name="name"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    name="name"
+                    label="Bucket name"
+                    labelOptional="Cannot be changed after creation"
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        id="name"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                        {...field}
+                        placeholder="Enter bucket name"
                       />
-                      {values.has_file_size_limit && (
-                        <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+
+            <DialogSectionSeparator />
+
+            <DialogSection className="space-y-3">
+              <FormField_Shadcn_
+                key="public"
+                name="public"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    hideMessage
+                    name="public"
+                    label="Public bucket"
+                    description="Allow anyone to read objects without authorization"
+                    layout="flex"
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        id="public"
+                        size="large"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+              {isPublicBucket && (
+                <Admonition
+                  type="warning"
+                  title="Public buckets are not protected"
+                  description="Users can read objects in public buckets without any authorization. Row level security (RLS) policies are still required for other operations such as object uploads and deletes."
+                />
+              )}
+            </DialogSection>
+
+            <DialogSectionSeparator />
+
+            <DialogSection className="space-y-2">
+              <FormField_Shadcn_
+                key="has_file_size_limit"
+                name="has_file_size_limit"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    name="has_file_size_limit"
+                    label="Restrict file size"
+                    description="Prevent uploading of files larger than a specified limit"
+                    layout="flex"
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        id="has_file_size_limit"
+                        size="large"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+
+              {hasFileSizeLimit && (
+                <div>
+                  <FormField_Shadcn_
+                    key="formatted_size_limit"
+                    name="formatted_size_limit"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        hideMessage
+                        name="formatted_size_limit"
+                        label="File size limit"
+                      >
+                        <div className="grid grid-cols-12 gap-x-2">
                           <div className="col-span-8">
-                            <Input
-                              type="number"
-                              step={1}
-                              id="formatted_size_limit"
-                              name="formatted_size_limit"
-                              disabled={false}
-                              onKeyPress={(event) => {
-                                if (event.charCode < 48 || event.charCode > 57) {
-                                  event.preventDefault()
-                                }
-                              }}
-                              descriptionText={`Equivalent to ${convertToBytes(
-                                values.formatted_size_limit,
-                                selectedUnit
-                              ).toLocaleString()} bytes.`}
-                            />
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                id="formatted_size_limit"
+                                aria-label="File size limit"
+                                type="number"
+                                min={0}
+                                placeholder="0"
+                                {...field}
+                              />
+                            </FormControl_Shadcn_>
                           </div>
                           <div className="col-span-4">
-                            <Listbox
-                              id="size_limit_units"
-                              disabled={false}
-                              value={selectedUnit}
-                              onChange={setSelectedUnit}
-                            >
-                              {Object.values(StorageSizeUnits).map((unit: string) => (
-                                <Listbox.Option key={unit} label={unit} value={unit}>
-                                  <div>{unit}</div>
-                                </Listbox.Option>
-                              ))}
-                            </Listbox>
+                            <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
+                              <SelectTrigger_Shadcn_ aria-label="File size limit unit" size="small">
+                                <SelectValue_Shadcn_>{selectedUnit}</SelectValue_Shadcn_>
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                {Object.values(StorageSizeUnits).map((unit: string) => (
+                                  <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
+                                    {unit}
+                                  </SelectItem_Shadcn_>
+                                ))}
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
                           </div>
-                          {IS_PLATFORM && (
-                            <div className="col-span-12">
-                              <p className="text-foreground-light text-sm">
-                                Note: Individual bucket uploads will still be capped at the{' '}
-                                <Link
-                                  href={`/project/${ref}/settings/storage`}
-                                  className="font-bold underline"
-                                >
-                                  global upload limit
-                                </Link>{' '}
-                                of {formattedGlobalUploadLimit}
-                              </p>
-                            </div>
-                          )}
                         </div>
-                      )}
-                    </div>
-                    <Input
-                      id="allowed_mime_types"
+                      </FormItemLayout>
+                    )}
+                  />
+                  {formattedSizeLimitError?.message === 'exceed_global_limit' && (
+                    <FormMessage_Shadcn_ className="mt-2">
+                      Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
+                      <InlineLink
+                        className="text-destructive decoration-destructive-500 hover:decoration-destructive"
+                        href={`/project/${ref}/storage/settings`}
+                        onClick={() => setVisible(false)}
+                      >
+                        Storage Settings
+                      </InlineLink>{' '}
+                      first.
+                    </FormMessage_Shadcn_>
+                  )}
+
+                  {IS_PLATFORM && (
+                    <p className="text-sm text-foreground-lighter mt-2">
+                      This project has a{' '}
+                      <InlineLink
+                        className="text-foreground-light hover:text-foreground"
+                        href={`/project/${ref}/storage/settings`}
+                        onClick={() => setVisible(false)}
+                      >
+                        global file size limit
+                      </InlineLink>{' '}
+                      of {formattedGlobalUploadLimit}.
+                    </p>
+                  )}
+                </div>
+              )}
+            </DialogSection>
+
+            <DialogSectionSeparator />
+
+            <DialogSection className="space-y-2">
+              <FormItemLayout
+                name="has_allowed_mime_types"
+                label="Restrict MIME types"
+                description="Allow only certain types of files to be uploaded"
+                layout="flex"
+              >
+                <FormControl_Shadcn_>
+                  <Switch
+                    id="has_allowed_mime_types"
+                    size="large"
+                    checked={hasAllowedMimeTypes}
+                    onCheckedChange={setHasAllowedMimeTypes}
+                  />
+                </FormControl_Shadcn_>
+              </FormItemLayout>
+              {hasAllowedMimeTypes && (
+                <FormField_Shadcn_
+                  key="allowed_mime_types"
+                  name="allowed_mime_types"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
                       name="allowed_mime_types"
-                      layout="vertical"
                       label="Allowed MIME types"
-                      placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                       labelOptional="Comma separated values"
-                      descriptionText="Wildcards are allowed, e.g. image/*. Leave blank to allow any MIME type."
-                    />
-                  </div>
-                </Collapsible.Content>
-              </Collapsible>
-              <Modal.Separator />
-              <Modal.Content className="flex items-center space-x-2 justify-end">
-                <Button
-                  type="default"
-                  htmlType="button"
-                  disabled={isCreating}
-                  onClick={() => onClose()}
-                >
-                  Cancel
-                </Button>
-                <Button type="primary" htmlType="submit" loading={isCreating} disabled={isCreating}>
-                  Save
-                </Button>
-              </Modal.Content>
-            </>
-          )
-        }}
-      </Form>
-    </Modal>
+                      description="Wildcards are allowed, e.g. image/*."
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_
+                          id="allowed_mime_types"
+                          {...field}
+                          placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
+            </DialogSection>
+          </form>
+        </Form_Shadcn_>
+
+        <DialogFooter>
+          <Button type="default" disabled={isCreatingBucket} onClick={() => setVisible(false)}>
+            Cancel
+          </Button>
+          <Button
+            form={formId}
+            htmlType="submit"
+            loading={isCreatingBucket}
+            disabled={isCreatingBucket}
+          >
+            Create
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default CreateBucketModal

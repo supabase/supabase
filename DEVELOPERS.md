@@ -12,7 +12,7 @@
       - [Shared components](#shared-components)
       - [Installing packages](#installing-packages)
   - [Running Docker for Supabase Studio](#running-docker-for-supabase-studio)
-    - [Prerequsites](#prerequsites)
+    - [Prerequisites](#prerequisites)
     - [Get Started](#get-started)
   - [Create a pull request](#create-a-pull-request)
   - [Issue assignment](#issue-assignment)
@@ -22,8 +22,6 @@
   - [Community channels](#community-channels)
   - [Contributors](#contributors)
 
-- [Common tasks](#common-tasks)
-  - [Add a redirect](#add-a-redirect)
 - [Community channels](#community-channels)
 
 ## Getting started
@@ -36,8 +34,8 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
-- [Git](http://git-scm.com/)
-- [Node.js v20.x (LTS)](http://nodejs.org)
+- [Git](https://git-scm.com/)
+- [Node.js v22.x or higher](https://nodejs.org)
 - [pnpm](https://pnpm.io/) version 9.x.x or higher
 - [make](https://www.gnu.org/software/make/) or the equivalent to `build-essentials` for your OS
 - [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
@@ -67,7 +65,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 ### Install dependencies
 
-1. Install the dependencies in the root of the repo.
+1. Install the dependencies in the root of the repo:
 
    ```sh
    pnpm install # install dependencies
@@ -79,7 +77,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
    cp apps/www/.env.local.example apps/www/.env.local
    ```
 
-3. After that you can run the apps simultaneously with the following.
+3. After that you can run the apps simultaneously with the following:
    ```sh
    pnpm dev # start all the applications
    ```
@@ -119,8 +117,8 @@ Installing a package in a specific workspace requires you to move to the workspa
 
 For example:
 
-1. `cd apps/studio`: move to the `studio` workspace
-2. `pnpm add react`: installs `react` into `studio` workspace
+1. `cd apps/studio`: move to the `studio` workspace.
+2. `pnpm add react`: installs `react` into `studio` workspace.
 
 
 ---
@@ -129,7 +127,7 @@ For example:
 
 To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
 
-#### Prerequsites
+#### Prerequisites
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 
@@ -147,7 +145,7 @@ First, make sure you have the Docker installed on your device. You can download 
    cp .env.example .env
    ```
 
-3. Run docker
+3. Run docker:
 
    ```sh
    docker compose up
@@ -188,9 +186,9 @@ Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/
 We support "federating" docs, meaning doc content can come directly from external repos other than [`supabase/supabase`](https://github.com/supabase/supabase).
 
 - It's great for things like client libs who have their own set of docs that we don't want to duplicate on the official Supabase docs (eg. [`supabase/vecs`](https://github.com/supabase/vecs)).
-- No duplication or manual steps required - fetches and generates automatically as part of the docs build pipeline
-- It's flexible - you can "embed" external docs nearly anywhere at any level in Supabase docs, but they will feel native
-- If you are maintaining a repo containing docs that you think could also live in Supabase docs, feel free to create an issue and we can work together to integrate
+- No duplication or manual steps required - fetches and generates automatically as part of the docs build pipeline.
+- It's flexible - you can "embed" external docs nearly anywhere at any level in Supabase docs, but they will feel native.
+- If you are maintaining a repo containing docs that you think could also live in Supabase docs, feel free to create an issue and we can work together to integrate.
 
 Federated docs work using Next.js's build pipeline. We use `getStaticProps()` to fetch remote documentation (ie. markdown) at build time which is processed and passed to the respective page within the docs.
 
@@ -205,7 +203,7 @@ Some things to consider:
 
 ## Community channels
 
-If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [GitHub Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
 
 ## Contributors
 

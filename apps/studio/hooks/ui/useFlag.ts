@@ -2,29 +2,10 @@ import * as Sentry from '@sentry/nextjs'
 
 import { useFeatureFlags } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { trackFeatureFlag } from 'lib/posthog'
 
 const isObjectEmpty = (obj: Object) => {
   return Object.keys(obj).length === 0
-}
-
-export function useFlag<T = boolean>(name: string) {
-  const project = useSelectedProject()
-  const flagStore = useFeatureFlags()
-
-  const store = flagStore.configcat
-
-  // Temporary override as Fly projects are cant seem to upgrade their compute with the new disk UI
-  if (name === 'diskAndComputeForm' && project?.cloud_provider === 'FLY') {
-    return false
-  }
-
-  if (!isObjectEmpty(store) && store[name] === undefined) {
-    console.error(`Flag key "${name}" does not exist in ConfigCat flag store`)
-    return false
-  }
-  return store[name] as T
 }
 
 // TODO(Alaister): move this to packages/common/feature-flags.tsx and rename to useFlag

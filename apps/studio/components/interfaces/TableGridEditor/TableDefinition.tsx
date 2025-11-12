@@ -2,11 +2,9 @@ import Editor from '@monaco-editor/react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef } from 'react'
-import { format } from 'sql-formatter'
 
 import { useParams } from 'common'
-import Footer from 'components/grid/components/footer/Footer'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Footer } from 'components/grid/components/footer/Footer'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
@@ -17,6 +15,8 @@ import {
   isView,
   isViewLike,
 } from 'data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
 import { Button } from 'ui'
 
@@ -24,12 +24,12 @@ export interface TableDefinitionProps {
   entity?: Entity
 }
 
-const TableDefinition = ({ entity }: TableDefinitionProps) => {
+export const TableDefinition = ({ entity }: TableDefinitionProps) => {
   const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
   const { resolvedTheme } = useTheme()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
 
   const viewResult = useViewDefinitionQuery(
     {
@@ -61,19 +61,8 @@ const TableDefinition = ({ entity }: TableDefinitionProps) => {
       ? `create materialized view ${entity.schema}.${entity.name} as\n`
       : ''
 
-  const formatDefinition = (value: string) => {
-    try {
-      return format(value, {
-        language: 'postgresql',
-        keywordCase: 'lower',
-      })
-    } catch (err) {
-      return value
-    }
-  }
-
   const formattedDefinition = useMemo(
-    () => (definition ? formatDefinition(prepend + definition) : undefined),
+    () => (definition ? formatSql(prepend + definition) : undefined),
     [definition]
   )
 
@@ -143,5 +132,3 @@ const TableDefinition = ({ entity }: TableDefinitionProps) => {
     </>
   )
 }
-
-export default TableDefinition

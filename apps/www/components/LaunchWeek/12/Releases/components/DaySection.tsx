@@ -7,7 +7,6 @@ import { Edit } from 'lucide-react'
 import { useBreakpoint } from 'common'
 
 import { WeekDayProps } from '../data'
-// import CountdownComponent from '../../Countdown'
 import { DayLink } from '.'
 
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {

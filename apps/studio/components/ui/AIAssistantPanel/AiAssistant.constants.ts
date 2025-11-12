@@ -31,4 +31,6 @@ export const SAFE_FUNCTIONS = [
   'date_trunc(',
   'string_agg(',
   'in (',
+  'now(',
+  'left(',
 ]

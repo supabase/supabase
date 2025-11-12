@@ -2,8 +2,8 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { Dictionary } from 'types'
 import { SidePanel } from 'ui'
 import ActionBar from '../ActionBar'
@@ -14,6 +14,7 @@ import InputField from './InputField'
 import { JsonEditor } from './JsonEditor'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
+  convertByteaToHex,
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
@@ -25,6 +26,7 @@ export interface RowEditorProps {
   row?: Dictionary<any>
   selectedTable: PostgresTable
   visible: boolean
+  editable?: boolean
   closePanel: () => void
   saveChanges: (payload: any, isNewRecord: boolean, configuration: any, resolve: () => void) => void
   updateEditorDirty: () => void
@@ -34,6 +36,7 @@ const RowEditor = ({
   row,
   selectedTable,
   visible = false,
+  editable = true,
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
@@ -58,7 +61,7 @@ const RowEditor = ({
     (rowField: any) => !rowField.isNullable
   )
 
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -130,7 +133,10 @@ const RowEditor = ({
       if (!isNewRecord) {
         const primaryKeyColumns = rowFields.filter((field) => field.isPrimaryKey)
         const identifiers = {} as Dictionary<any>
-        primaryKeyColumns.forEach((column) => (identifiers[column.name] = row![column.name]))
+        primaryKeyColumns.forEach((column) => {
+          identifiers[column.name] =
+            column.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
+        })
         configuration.identifiers = identifiers
         configuration.rowIdx = row!.idx
       }
@@ -164,26 +170,29 @@ const RowEditor = ({
       <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
           <div className="flex flex-grow flex-col">
-            <SidePanel.Content>
-              <div className="space-y-10 py-6">
-                {requiredFields.map((field: RowField) => {
-                  return (
-                    <InputField
-                      key={field.id}
-                      field={field}
-                      errors={errors}
-                      onUpdateField={onUpdateField}
-                      onEditJson={setSelectedValueForJsonEdit}
-                      onEditText={setSelectedValueForTextEdit}
-                      onSelectForeignKey={() => onOpenForeignRowSelector(field)}
-                    />
-                  )
-                })}
-              </div>
-            </SidePanel.Content>
+            {requiredFields.length > 0 && (
+              <SidePanel.Content>
+                <div className="space-y-10 py-6">
+                  {requiredFields.map((field: RowField) => {
+                    return (
+                      <InputField
+                        key={field.id}
+                        field={field}
+                        errors={errors}
+                        onUpdateField={onUpdateField}
+                        onEditJson={setSelectedValueForJsonEdit}
+                        onEditText={setSelectedValueForTextEdit}
+                        onSelectForeignKey={() => onOpenForeignRowSelector(field)}
+                        isEditable={editable}
+                      />
+                    )
+                  })}
+                </div>
+              </SidePanel.Content>
+            )}
             {optionalFields.length > 0 && (
               <>
-                <SidePanel.Separator />
+                {requiredFields.length > 0 && <SidePanel.Separator />}
                 <SidePanel.Content>
                   <div className="space-y-10 py-6">
                     <div>
@@ -202,6 +211,7 @@ const RowEditor = ({
                           onEditText={setSelectedValueForTextEdit}
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
+                          isEditable={editable}
                         />
                       )
                     })}
@@ -219,6 +229,7 @@ const RowEditor = ({
                 onUpdateField({ [selectedValueForTextEdit?.column ?? '']: value })
                 setSelectedValueForTextEdit(undefined)
               }}
+              readOnly={!editable}
             />
             <JsonEditor
               visible={isEditingJson}
@@ -229,6 +240,7 @@ const RowEditor = ({
                 onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })
                 setSelectedValueForJsonEdit(undefined)
               }}
+              readOnly={!editable}
             />
           </div>
           <div className="flex-shrink">
@@ -237,6 +249,7 @@ const RowEditor = ({
               backButtonLabel="Cancel"
               applyButtonLabel="Save"
               closePanel={closePanel}
+              hideApply={!editable}
             />
           </div>
         </div>

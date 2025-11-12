@@ -69,11 +69,13 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
       if (sqlStatements.length === 0) {
         setNodes([])
         setEdges([])
-        executedStatements.current.clear()
-        // Reset database
-        db.current = new PGlite()
-        // Re-run initial auth schema setup
-        db.current.exec(AUTH_SCHEMA_SQL)
+        if (executedStatements.current.size) {
+          executedStatements.current.clear()
+          // Reset database
+          db.current = new PGlite()
+          // Re-run initial auth schema setup
+          db.current.exec(AUTH_SCHEMA_SQL)
+        }
         return
       }
 

@@ -1,6 +1,6 @@
 ---
-title: 'Use Supabase with NuxtJS'
-subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a NuxtJS app.'
+title: 'Use Supabase with Nuxt'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Nuxt app.'
 breadcrumb: 'Framework Quickstarts'
 hideToc: true
 ---
@@ -8,22 +8,22 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
-    <QuickstartDbSetup />
+
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
 
-    <StepHikeCompact.Details title="Create a NuxtJS app">
+    <StepHikeCompact.Details title="Create a Nuxt app">
 
-    Create a Nuxt.js app using the `npx nuxi` command.
+    Create a Nuxt app using the `npx nuxi` command.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npx nuxi@latest init my-app
       ```
 
@@ -34,15 +34,15 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
 
-      The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a NuxtJS app.
+      The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a Nuxt app.
 
-      Navigate to the NuxtJS app and install `supabase-js`.
+      Navigate to the Nuxt app and install `supabase-js`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app && npm install @supabase/supabase-js
       ```
 
@@ -50,39 +50,72 @@ hideToc: true
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Query data from the app">
+    <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    In `app.vue`, create a Supabase client using your project URL and public API (anon) key:
+    Create a `.env` file and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
-
-    Replace the existing content in your `app.vue` file with the following code.
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```vue app.vue
+      <$CodeTabs>
+
+        ```text name=.env.local
+        SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+        ```
+
+        ```ts name=nuxt.config.tsx
+        export default defineNuxtConfig({
+          runtimeConfig: {
+            public: {
+              supabaseUrl: process.env.SUPABASE_URL,
+              supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY,
+            },
+          },
+        });
+        ```
+
+      </$CodeTabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Query data from the app">
+
+    In `app.vue`, create a Supabase client using your config values and replace the existing content with the following code.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```vue name=app.vue
       <script setup>
       import { createClient } from '@supabase/supabase-js'
-      const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
-      const countries = ref([])
+      const config = useRuntimeConfig()
+      const supabase = createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
+      const instruments = ref([])
 
-      async function getCountries() {
-        const { data } = await supabase.from('countries').select()
-        countries.value = data
+      async function getInstruments() {
+        const { data } = await supabase.from('instruments').select()
+        instruments.value = data
       }
 
       onMounted(() => {
-        getCountries()
+        getInstruments()
       })
       </script>
 
       <template>
         <ul>
-          <li v-for="country in countries" :key="country.id">{{ country.name }}</li>
+          <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
         </ul>
       </template>
       ```
@@ -91,16 +124,16 @@ hideToc: true
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app, navigate to http://localhost:3000 in the browser, open the browser console, and you should see the list of countries.
+    Start the app, navigate to http://localhost:3000 in the browser, open the browser console, and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 

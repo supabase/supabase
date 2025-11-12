@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import Link from 'next/link'
 import { Button } from 'ui'
 
 interface ProductEmptyStateProps {
@@ -14,6 +15,7 @@ interface ProductEmptyStateProps {
   loading?: boolean
   disabled?: boolean
   disabledMessage?: string
+  ctaUrl?: string
 }
 
 const ProductEmptyState = ({
@@ -27,6 +29,7 @@ const ProductEmptyState = ({
   loading = false,
   disabled = false,
   disabledMessage = '',
+  ctaUrl,
 }: PropsWithChildren<ProductEmptyStateProps>) => {
   const hasAction = (ctaButtonLabel && onClickCta) || (infoButtonUrl && infoButtonLabel)
 
@@ -40,7 +43,11 @@ const ProductEmptyState = ({
             <div className="flex flex-col space-y-2 text-foreground-light">{children}</div>
             {hasAction && (
               <div className="flex items-center space-x-2">
-                {ctaButtonLabel && onClickCta && (
+                {ctaButtonLabel && !!ctaUrl ? (
+                  <Button asChild type="primary">
+                    <Link href={ctaUrl}>{ctaButtonLabel}</Link>
+                  </Button>
+                ) : ctaButtonLabel && !!onClickCta ? (
                   <ButtonTooltip
                     type="primary"
                     onClick={onClickCta}
@@ -55,7 +62,7 @@ const ProductEmptyState = ({
                   >
                     {ctaButtonLabel}
                   </ButtonTooltip>
-                )}
+                ) : null}
                 {infoButtonUrl && infoButtonLabel ? (
                   <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <a target="_blank" rel="noreferrer" href={infoButtonUrl}>

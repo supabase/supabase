@@ -1,27 +1,44 @@
-import { useTheme } from 'next-themes'
+'use client'
+
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
-import { useIsLoggedIn } from 'common'
+import { useIsLoggedIn, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from 'ui/src/components/shadcn/ui/navigation-menu'
+import { AuthenticatedDropdownMenu } from 'ui-patterns'
 
-import ScrollProgress from '~/components/ScrollProgress'
-import { getMenu } from '~/data/nav'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
-import MenuItem from './MenuItem'
-import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
+import useDropdownMenu from './useDropdownMenu'
+
+import { getMenu } from 'data/nav'
+import { usePathname } from 'next/navigation'
+
+const MenuItem = dynamic(() => import('./MenuItem'))
+const MobileMenu = dynamic(() => import('./MobileMenu'))
+const NavigationMenu = dynamic(() =>
+  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenu)
+)
+const NavigationMenuContent = dynamic(() =>
+  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuContent)
+)
+const NavigationMenuItem = dynamic(() =>
+  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuItem)
+)
+const NavigationMenuLink = dynamic(() =>
+  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuLink)
+)
+const NavigationMenuList = dynamic(() =>
+  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuList)
+)
+const NavigationMenuTrigger = dynamic(() =>
+  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuTrigger)
+)
+const ScrollProgress = dynamic(() => import('components/ScrollProgress'))
 
 interface Props {
   hideNavbar: boolean
@@ -29,19 +46,27 @@ interface Props {
 }
 
 const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
-  const { resolvedTheme } = useTheme()
-  const router = useRouter()
+  const pathname = usePathname()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const menu = getMenu()
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  const user = useUser()
+  const userMenu = useDropdownMenu(user)
 
-  const isHomePage = router.pathname === '/'
-  const isLaunchWeekPage = router.pathname.includes('/launch-week')
-  const isLaunchWeekXPage = router.pathname === '/launch-week/x'
-  const isGAWeekSection = router.pathname.startsWith('/ga-week')
-  const disableStickyNav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage || !stickyNavbar
-  const showLaunchWeekNavMode = (isLaunchWeekPage || isGAWeekSection) && !open
+  const isLaunchWeekXPage = pathname === '/launch-week/x'
+  const isLaunchWeek12Page = pathname === '/launch-week/12'
+  const isLaunchWeek13Page = pathname === '/launch-week/13'
+  const isGAWeekSection = pathname?.startsWith('/ga-week')
+  const disableStickyNav =
+    isLaunchWeekXPage ||
+    isGAWeekSection ||
+    isLaunchWeekXPage ||
+    isLaunchWeek12Page ||
+    isLaunchWeek13Page ||
+    !stickyNavbar
+  const showLaunchWeekNavMode = (isGAWeekSection || isLaunchWeekXPage) && !open
 
   React.useEffect(() => {
     if (open) {
@@ -61,8 +86,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
     return null
   }
 
-  const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
-
   return (
     <>
       <div
@@ -73,14 +96,14 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
-            showLaunchWeekNavMode && '!bg-transparent transition-all',
+            showLaunchWeekNavMode && '!bg-transparent dark:!bg-black transition-all',
             isGAWeekSection && 'dark:!bg-alternative'
           )}
         />
         <nav
           className={cn(
             `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && 'border-muted border-b bg-alternative/50'
+            showLaunchWeekNavMode && 'border-muted border-b bg-transparent'
           )}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
@@ -128,16 +151,39 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 <GitHubButton />
 
                 {isLoggedIn ? (
-                  <Button className="hidden lg:block" asChild>
-                    <Link href="/dashboard/projects">Dashboard</Link>
-                  </Button>
+                  <>
+                    <Button className="hidden lg:block" asChild>
+                      <Link href="/dashboard/projects">Dashboard</Link>
+                    </Button>
+                    <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
+                  </>
                 ) : (
                   <>
                     <Button type="default" className="hidden lg:block" asChild>
-                      <Link href="https://supabase.com/dashboard">Sign in</Link>
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        onClick={() =>
+                          sendTelemetryEvent({
+                            action: 'sign_in_button_clicked',
+                            properties: { buttonLocation: 'Header Nav' },
+                          })
+                        }
+                      >
+                        Sign in
+                      </Link>
                     </Button>
                     <Button className="hidden lg:block" asChild>
-                      <Link href="https://supabase.com/dashboard">Start your project</Link>
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        onClick={() =>
+                          sendTelemetryEvent({
+                            action: 'start_project_button_clicked',
+                            properties: { buttonLocation: 'Header Nav' },
+                          })
+                        }
+                      >
+                        Start your project
+                      </Link>
                     </Button>
                   </>
                 )}

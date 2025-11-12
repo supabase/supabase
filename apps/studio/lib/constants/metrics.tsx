@@ -28,17 +28,17 @@ export const METRIC_CATEGORIES = {
     key: 'api_database',
   },
   API_AUTH: {
-    label: 'Auth API',
+    label: 'Authentication',
     icon: (className?: string) => <Auth size={16} className={className} />,
     key: 'api_auth',
   },
   API_STORAGE: {
-    label: 'Storage API',
+    label: 'Storage',
     icon: (className?: string) => <Storage size={16} className={className} />,
     key: 'api_storage',
   },
   API_REALTIME: {
-    label: 'Realtime API',
+    label: 'Realtime',
     icon: (className?: string) => <Realtime size={16} className={className} />,
     key: 'api_realtime',
   },
@@ -54,6 +54,7 @@ export const METRIC_CATEGORIES = {
   },
 }
 
+// [Joshen] Eventually we can remove some charts here from DEPRECATED_REPORTS from Reports.constants.ts
 export const METRICS: Metric[] = [
   {
     key: 'avg_cpu_usage',
@@ -286,6 +287,14 @@ export const METRICS: Metric[] = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
+
+  {
+    key: 'total_cached_egress',
+    label: 'All Cached Egress',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_STORAGE,
+  },
+
   {
     key: 'total_storage_patch_requests',
     label: 'Storage PATCH Requests',
@@ -333,7 +342,7 @@ export const METRICS: Metric[] = [
   /** Supavisor */
   {
     key: 'total_supavisor_egress_bytes',
-    label: 'Supavisor Egress',
+    label: 'Shared Pooler Egress',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.SUPAVISOR,
   },
@@ -371,6 +380,14 @@ export const TIME_PERIODS_REPORTS = [
 ]
 
 export const TIME_PERIODS_INFRA = [
+  {
+    key: '10m',
+    label: 'Last 10 minutes',
+  },
+  {
+    key: '30m',
+    label: 'Last 30 minutes',
+  },
   {
     key: '1h',
     label: 'Last hour',

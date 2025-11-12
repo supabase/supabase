@@ -23,7 +23,7 @@ Heads up - postgres.new is renaming to database.build. [Why?](/blog/database-bui
 
 </Admonition>
 
-Introducing [postgres.new](https://postgres.new), the in-browser Postgres sandbox with AI assistance. With postgres.new, you can instantly spin up an unlimited number of Postgres databases that run directly in your browser (and soon, deploy them to S3).
+Introducing [database.build](https://database.build) (formerly postgres.new), the in-browser Postgres sandbox with AI assistance. With database.build, you can instantly spin up an unlimited number of Postgres databases that run directly in your browser (and soon, deploy them to S3).
 
 Each database is paired with a large language model (LLM) which opens the door to some interesting use cases:
 
@@ -38,7 +38,7 @@ All while staying completely local to your browser. It's a bit like having Postg
   <iframe
     className="w-full"
     src="https://www.youtube-nocookie.com/embed/ooWaPVvljlU"
-    title="I gave AI full control over my database (postgres.new)"
+    title="I gave AI full control over my database"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
     allowfullscreen
   />
@@ -52,13 +52,13 @@ In this demo we cover several interesting use-cases:
 
 ## How it works
 
-All queries in postgres.new run directly in your browser. There's no remote Postgres container or WebSocket proxy.
+All queries in database.build run directly in your browser. There's no remote Postgres container or WebSocket proxy.
 
 How is this possible? The star of the show is [PGlite](https://pglite.dev/), a WASM version of Postgres that can run directly in your browser. Our friends at [ElectricSQL](https://electric-sql.com/) released PGlite a few months ago after discovering a way to compile the real Postgres source to Web Assembly (more on this later).
 
 ## Motivation
 
-There are a few things we wanted to achieve with postgres.new:
+There are a few things we wanted to achieve with database.build:
 
 1. **AI-driven development:** We wanted to re-imagine the interaction between Postgres and AI. This gives a lot of leniency for making mistakes, which AI sometimes make (and let's face it: developers too).
 2. **Postgres sandboxing:** we're big fans of sandboxes and notebooks. Since PGlite runs in the browser, it feels fast and disposable. You can spin up “a million little elephants” for doing data analysis using the same Postgres interface that we're familiar with in our daily development.
@@ -66,7 +66,7 @@ There are a few things we wanted to achieve with postgres.new:
 
 ## Features and how they work
 
-So what exactly can you do with postgres.new? How do these work under the hood?
+So what exactly can you do with database.build? How do these work under the hood?
 
 ### AI assistant
 
@@ -144,7 +144,7 @@ In the future, we would also like to support a “seeds” section that outputs 
 
 ElectricSQL has been working hard to support real Postgres extensions in PGlite (compiled to WASM). One extension that was high on the priority list was [pgvector](https://github.com/pgvector/pgvector) which enables in-browser vector search.
 
-pgvector is enabled by default in postgres.new, meaning you can create and query vector columns on any table immediately. Of course, this is only useful if you have real embeddings to work with - so we gave AI access to [Transformers.js](https://github.com/xenova/transformers.js) which allows you to generate text embeddings directly in the browser, then store/query them in PGlite.
+pgvector is enabled by default in database.build, meaning you can create and query vector columns on any table immediately. Of course, this is only useful if you have real embeddings to work with - so we gave AI access to [Transformers.js](https://github.com/xenova/transformers.js) which allows you to generate text embeddings directly in the browser, then store/query them in PGlite.
 
 <div>
   <Img
@@ -162,7 +162,7 @@ We're excited to see what people do with this tool. We've found it has provided 
 
 ### Deployments
 
-With postgres.new we expect to have read-only deployments by the end of the week. This is important for one main reason: it's incredibly cheap to host a PGLite database in S3. While running a full Postgres database isn't _that_ expensive, there are use-cases where developers would love **most** of the features of Postgres but without the cost of running a full database. PGLite, served via S3, will open the floodgates to many use-cases: a replicated database per user; read-only [materialized](https://github.com/supabase/pg_replicate) databases for faster reads; search features hosted on the edge; maybe even a trimmed-down version of Supabase.
+With database.build we expect to have read-only deployments by the end of the week. This is important for one main reason: it's incredibly cheap to host a PGLite database in S3. While running a full Postgres database isn't _that_ expensive, there are use-cases where developers would love **most** of the features of Postgres but without the cost of running a full database. PGLite, served via S3, will open the floodgates to many use-cases: a replicated database per user; read-only [materialized](https://github.com/supabase/pg_replicate) databases for faster reads; search features hosted on the edge; maybe even a trimmed-down version of Supabase.
 
 By itself PGlite is an embedded database which means you can't connect to it like a normal Postgres database via TCP connection. To support PGlite-backed deployments, we needed a way to recreate the TCP server component of Postgres and also parse real wire protocol messages so that people could connect to their database via any regular Postgres client.
 
@@ -251,5 +251,5 @@ As always, the work that we've done is open source and permissively licensed (as
 
 - [PGlite](https://github.com/electric-sql/pglite) (Apache 2.0): A WASM build of Postgres.
 - [pg-gateway](https://github.com/supabase-community/pg-gateway) (MIT): Postgres wire protocol for the server-side.
-- [postgres-new](https://github.com/supabase-community/postgres-new) (Apache 2.0): The frontend for [postgres.new](https://postgres.new).
+- [database-build](https://github.com/supabase-community/database-build) (Apache 2.0): The frontend for [database.build](https://database.build).
 - [transformers.js](https://github.com/xenova/transformers.js): Run Transformers directly in your browser

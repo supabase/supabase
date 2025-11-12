@@ -5,9 +5,261 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Fri, 20 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 20 Aug 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/lw15-hackathon-winners</guid>
+  <title>Supabase Launch Week 15 Hackathon Winner Announcement</title>
+  <link>https://supabase.com/blog/lw15-hackathon-winners</link>
+  <description>Announcing the winners of the Supabase Launch Week 15 Hackathon.</description>
+  <pubDate>Wed, 20 Aug 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-auth-build-vs-buy</guid>
+  <title>Supabase Auth: Build vs. Buy</title>
+  <link>https://supabase.com/blog/supabase-auth-build-vs-buy</link>
+  <description>The reasons why (and why not) to use Supabase Auth instead of building your own.</description>
+  <pubDate>Tue, 12 Aug 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-15-top-10</guid>
+  <title>Top 10 Launches of Launch Week 15</title>
+  <link>https://supabase.com/blog/launch-week-15-top-10</link>
+  <description>Highlights from Launch Week 15</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/lw15-hackathon</guid>
+  <title>Supabase Launch Week 15 Hackathon</title>
+  <link>https://supabase.com/blog/lw15-hackathon</link>
+  <description>Build an Open Source Project over 10 days. 5 prize categories.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/storage-500gb-uploads-cheaper-egress-pricing</guid>
+  <title>Storage: 10x Larger Uploads, 3x Cheaper Cached Egress, and 2x Egress Quota</title>
+  <link>https://supabase.com/blog/storage-500gb-uploads-cheaper-egress-pricing</link>
+  <description>Upload files up to 500 GB with significant egress cost reductions.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/persistent-storage-for-faster-edge-functions</guid>
+  <title>Persistent Storage and 97% Faster Cold Starts for Edge Functions</title>
+  <link>https://supabase.com/blog/persistent-storage-for-faster-edge-functions</link>
+  <description>Mount S3-compatible buckets as persistent file storage in Edge Functions with up to 97% faster cold start times.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/algolia-connector-for-supabase</guid>
+  <title>Algolia Connector for Supabase</title>
+  <link>https://supabase.com/blog/algolia-connector-for-supabase</link>
+  <description>Bring lightning-fast search to your Supabase apps, with no code required.</description>
+  <pubDate>Thu, 17 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/new-observability-features-in-supabase</guid>
+  <title>New Observability Features in Supabase</title>
+  <link>https://supabase.com/blog/new-observability-features-in-supabase</link>
+  <description>New unified logging, advanced reports, and AI debugging capabilities.</description>
+  <pubDate>Thu, 17 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/improved-security-controls</guid>
+  <title>Improved Security Controls and A New Home for Security</title>
+  <link>https://supabase.com/blog/improved-security-controls</link>
+  <description>Access to a new central security page and launch of additional controls.</description>
+  <pubDate>Wed, 16 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/branching-2-0</guid>
+  <title>Introducing Branching 2.0</title>
+  <link>https://supabase.com/blog/branching-2-0</link>
+  <description>Create, review and merge Supabase branches all within the dashboard.</description>
+  <pubDate>Wed, 16 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/stripe-engine-as-sync-library</guid>
+  <title>Stripe-To-Postgres Sync Engine as standalone Library</title>
+  <link>https://supabase.com/blog/stripe-engine-as-sync-library</link>
+  <description>Sync Stripe webhook data directly to Postgres using standalone TypeScript library.</description>
+  <pubDate>Tue, 15 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/analytics-buckets</guid>
+  <title>Supabase Analytics Buckets with Iceberg Support</title>
+  <link>https://supabase.com/blog/analytics-buckets</link>
+  <description>Analytics buckets optimized for large-scale data analysis with Apache Iceberg support.</description>
+  <pubDate>Tue, 15 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/figma-make-support-for-supabase</guid>
+  <title>Create a Supabase backend using Figma Make</title>
+  <link>https://supabase.com/blog/figma-make-support-for-supabase</link>
+  <description>Build functional web apps with Supabase backend directly in Figma Make, with no backend expertise required.</description>
+  <pubDate>Tue, 15 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/jwt-signing-keys</guid>
+  <title>Introducing JWT Signing Keys</title>
+  <link>https://supabase.com/blog/jwt-signing-keys</link>
+  <description>A new JWT signing keys system based on public key cryptography to improve your project&apos;s security and performance.</description>
+  <pubDate>Mon, 14 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-ui-platform-kit</guid>
+  <title>Supabase UI: Platform Kit</title>
+  <link>https://supabase.com/blog/supabase-ui-platform-kit</link>
+  <description>We are launching new components in the Supabase UI Library that makes it incredibly easy to build platforms on top of Supabase.</description>
+  <pubDate>Mon, 14 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/natural-db</guid>
+  <title>Build a Personalized AI Assistant with Postgres</title>
+  <link>https://supabase.com/blog/natural-db</link>
+  <description>Learn how to build a Supabase powered AI assistant that combines PostgreSQL with scheduling and external tools for long-term memory, structured data management and autonomous actions.</description>
+  <pubDate>Wed, 25 Jun 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/multigres-vitess-for-postgres</guid>
+  <title>Announcing Multigres: Vitess for Postgres</title>
+  <link>https://supabase.com/blog/multigres-vitess-for-postgres</link>
+  <description>Today we are welcoming Sugu, the co-creator of Vitess, to the Supabase team. He is joining Supabase to build Multigres: Vitess for Postgres.</description>
+  <pubDate>Tue, 10 Jun 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/building-on-open-table-formats</guid>
+  <title>Building on open table formats</title>
+  <link>https://supabase.com/blog/building-on-open-table-formats</link>
+  <description>Open table formats like Apache Iceberg, Delta Lake, and Apache Hudi are transforming how developers manage large-scale data on object storage systems.</description>
+  <pubDate>Thu, 29 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/open-data-standards-postgres-otel-iceberg</guid>
+  <title>Open Data Standards: Postgres, OTel, and Iceberg</title>
+  <link>https://supabase.com/blog/open-data-standards-postgres-otel-iceberg</link>
+  <description>Replace custom CRUD endpoints, reduce infrastructure complexity, and accelerate product delivery.</description>
+  <pubDate>Mon, 26 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/simplify-backend-with-data-api</guid>
+  <title>Simplifying back-end complexity with Supabase Data APIs</title>
+  <link>https://supabase.com/blog/simplify-backend-with-data-api</link>
+  <description>Replace custom CRUD endpoints, reduce infrastructure complexity, and accelerate product delivery.</description>
+  <pubDate>Sat, 17 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/event-triggers-wo-superuser</guid>
+  <title>PostgreSQL Event Triggers without superuser access</title>
+  <link>https://supabase.com/blog/event-triggers-wo-superuser</link>
+  <description>Using Postgres Hooks to allow regular users to create event triggers</description>
+  <pubDate>Thu, 08 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-14-top-10</guid>
+  <title>Top 10 Launches of Launch Week 14</title>
+  <link>https://supabase.com/blog/launch-week-14-top-10</link>
+  <description>Highlights from Launch Week 14</description>
+  <pubDate>Fri, 04 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/mcp-server</guid>
+  <title>Supabase MCP Server</title>
+  <link>https://supabase.com/blog/mcp-server</link>
+  <description>Connect your AI tools to Supabase using MCP</description>
+  <pubDate>Fri, 04 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/data-api-nearest-read-replica</guid>
+  <title>Data API Routes to Nearest Read Replica</title>
+  <link>https://supabase.com/blog/data-api-nearest-read-replica</link>
+  <description>Route your Data API (PostgREST) requests to the nearest Read Replica</description>
+  <pubDate>Fri, 04 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/declarative-schemas</guid>
+  <title>Declarative Schemas for Simpler Database Management</title>
+  <link>https://supabase.com/blog/declarative-schemas</link>
+  <description>Simplify managing and maintaining complex database schemas</description>
+  <pubDate>Thu, 03 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/realtime-broadcast-from-database</guid>
+  <title>Realtime: Broadcast from Database</title>
+  <link>https://supabase.com/blog/realtime-broadcast-from-database</link>
+  <description>Use Realtime Broadcast to scale sending database changes to clients</description>
+  <pubDate>Wed, 02 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/tabs-dashboard-updates</guid>
+  <title>Keeping Tabs on What&apos;s New in Supabase Studio</title>
+  <link>https://supabase.com/blog/tabs-dashboard-updates</link>
+  <description>Tabs in the Editors! And upgrades to AI Assistant, SQL, and Logs</description>
+  <pubDate>Wed, 02 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-edge-functions-deploy-dashboard-deno-2-1</guid>
+  <title>Edge Functions: Deploy from the Dashboard + Deno 2.1</title>
+  <link>https://supabase.com/blog/supabase-edge-functions-deploy-dashboard-deno-2-1</link>
+  <description>You can create, test, and deploy Edge Functions directly from the Supabase Dashboard.</description>
+  <pubDate>Tue, 01 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/automatic-embeddings</guid>
+  <title>Automatic Embeddings in Postgres</title>
+  <link>https://supabase.com/blog/automatic-embeddings</link>
+  <description>Automatic embeddings move the vector generation step into Postgres</description>
+  <pubDate>Tue, 01 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-ui-library</guid>
+  <title>Introducing the Supabase UI Library</title>
+  <link>https://supabase.com/blog/supabase-ui-library</link>
+  <description>Drop complex components into your projects in seconds.</description>
+  <pubDate>Mon, 31 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/clerk-tpa-pricing</guid>
+  <title>Supabase Auth: Bring Your Own Clerk</title>
+  <link>https://supabase.com/blog/clerk-tpa-pricing</link>
+  <description>Use Clerk with Supabase via official third-party auth support</description>
+  <pubDate>Mon, 31 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-language-server</guid>
+  <title>Postgres Language Server: Initial Release</title>
+  <link>https://supabase.com/blog/postgres-language-server</link>
+  <description>Language Server Protocol and collection of language tools for Postgres</description>
+  <pubDate>Sat, 29 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/migrating-from-fauna-to-supabase</guid>
+  <title>Migrating from Fauna to Supabase</title>
+  <link>https://supabase.com/blog/migrating-from-fauna-to-supabase</link>
+  <description>A guide to migrating from Fauna to Supabase.</description>
+  <pubDate>Fri, 21 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/migrating-mongodb-data-api-with-supabase</guid>
+  <title>Migrating from the MongoDB Data API to Supabase</title>
+  <link>https://supabase.com/blog/migrating-mongodb-data-api-with-supabase</link>
+  <description>A guide to migrating from the MongoDB Data API to Supabase.</description>
+  <pubDate>Thu, 20 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/dedicated-poolers</guid>
+  <title>Dedicated Poolers</title>
+  <link>https://supabase.com/blog/dedicated-poolers</link>
+  <description>A dedicated pgbouncer instance that&apos;s co-located with your database for maximum performance and reliability.</description>
+  <pubDate>Fri, 07 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pgrouting-postgres-graph-database</guid>
+  <title>Postgres as a Graph Database: (Ab)using pgRouting</title>
+  <link>https://supabase.com/blog/pgrouting-postgres-graph-database</link>
+  <description>Learn how to use pgRouting as a lightweight graph database solution in Postgres.</description>
+  <pubDate>Tue, 25 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/ai-hackathon-at-y-combinator</guid>
   <title>AI Hackathon at Y Combinator</title>
   <link>https://supabase.com/blog/ai-hackathon-at-y-combinator</link>
@@ -43,20 +295,6 @@
   <pubDate>Tue, 10 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/hack-the-base</guid>
-  <title>Hack the Base! with Supabase</title>
-  <link>https://supabase.com/blog/hack-the-base</link>
-  <description>Play cool games, win cool prizes.</description>
-  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/launch-week-13-top-10</guid>
-  <title>Top 10 Launches of Launch Week 13</title>
-  <link>https://supabase.com/blog/launch-week-13-top-10</link>
-  <description>Highlights from Launch Week 13</description>
-  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/blog/database-build-v2</guid>
   <title>database.build v2: Bring-your-own-LLM</title>
   <link>https://supabase.com/blog/database-build-v2</link>
@@ -68,6 +306,20 @@
   <title>Restore to a New Project</title>
   <link>https://supabase.com/blog/restore-to-a-new-project</link>
   <description>Effortlessly Clone Data into a New Supabase Project</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hack-the-base</guid>
+  <title>Hack the Base! with Supabase</title>
+  <link>https://supabase.com/blog/hack-the-base</link>
+  <description>Play cool games, win cool prizes.</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-13-top-10</guid>
+  <title>Top 10 Launches of Launch Week 13</title>
+  <link>https://supabase.com/blog/launch-week-13-top-10</link>
+  <description>Highlights from Launch Week 13</description>
   <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
@@ -739,7 +991,7 @@
   <guid>https://supabase.com/blog/oauth2-login-python-flask-apps</guid>
   <title>GitHub OAuth in your Python Flask app</title>
   <link>https://supabase.com/blog/oauth2-login-python-flask-apps</link>
-  <description>A step-by-step guide on building Login with Github into your Python apps.</description>
+  <description>A step-by-step guide on building Login with GitHub into your Python apps.</description>
   <pubDate>Tue, 21 Nov 2023 00:00:00 -0700</pubDate>
 </item>
 <item>

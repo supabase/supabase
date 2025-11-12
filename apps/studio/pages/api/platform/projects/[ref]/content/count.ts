@@ -20,5 +20,5 @@ type ResponseData =
   paths['/platform/projects/{ref}/content/count']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
-  return res.status(200).json({ shared: 1, favorites: 1, private: 1 })
+  return res.status(200).json({ shared: 0, favorites: 0, private: 1 })
 }

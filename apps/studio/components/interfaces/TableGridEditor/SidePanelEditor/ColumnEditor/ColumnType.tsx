@@ -66,6 +66,7 @@ const ColumnType = ({
   description,
   showRecommendation = false,
   onOptionSelect = noop,
+  error,
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
   const availableTypes = POSTGRES_DATA_TYPES.concat(
@@ -73,6 +74,8 @@ const ColumnType = ({
   )
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
+
+  const unsupportedDataTypeText = `This column's data type cannot be changed via the Table Editor as it is not supported yet. You can do so through the SQL Editor instead.`
 
   const getOptionByName = (name: string) => {
     // handle built in types
@@ -124,17 +127,12 @@ const ColumnType = ({
             size="small"
             icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
             value={value}
-            descriptionText={
-              showLabel
-                ? 'Custom non-native psql data types currently cannot be changed to a different data type via Supabase Studio'
-                : ''
-            }
+            descriptionText={showLabel ? unsupportedDataTypeText : undefined}
           />
         </TooltipTrigger>
         {!showLabel && (
           <TooltipContent side="bottom" className="w-80">
-            Custom non-native psql data types currently cannot be changed to a different data type
-            via Supabase Studio
+            {unsupportedDataTypeText}
           </TooltipContent>
         )}
       </Tooltip>
@@ -170,7 +168,7 @@ const ColumnType = ({
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
-            type="default"
+            type={error ? 'danger' : 'default'}
             role="combobox"
             size={'small'}
             aria-expanded={open}
@@ -190,7 +188,12 @@ const ColumnType = ({
         <PopoverContent_Shadcn_ className="w-[460px] p-0" side="bottom" align="center">
           <ScrollArea className="h-[335px]">
             <Command_Shadcn_>
-              <CommandInput_Shadcn_ placeholder="Search types..." />
+              <CommandInput_Shadcn_
+                placeholder="Search types..."
+                // [Joshen] Addresses style issues when this component is being used in the old Form component
+                // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
+                className="!bg-transparent focus:!shadow-none focus:!ring-0"
+              />
               <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
 
               <CommandList_Shadcn_>

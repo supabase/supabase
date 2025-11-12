@@ -1,8 +1,10 @@
 import { useParams } from 'common'
 
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 import { Markdown } from '../Markdown'
 import { PropsWithChildren } from 'react'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 interface ContentSnippetProps {
   apikey?: string
@@ -26,10 +28,27 @@ const ContentSnippet = ({
   children,
 }: PropsWithChildren<ContentSnippetProps>) => {
   const { ref: projectRef } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const codeSnippet = snippet[selectedLanguage]?.(apikey, endpoint).replaceAll(
     '[ref]',
     projectRef ?? ''
   )
+
+  const handleCopy = () => {
+    sendEvent({
+      action: 'api_docs_code_copy_button_clicked',
+      properties: {
+        title: snippet.title,
+        selectedLanguage,
+      },
+      groups: {
+        project: projectRef ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+  }
 
   return (
     <div id={snippet.key} className="space-y-4 py-6 pb-2 last:pb-6">
@@ -50,7 +69,9 @@ const ContentSnippet = ({
       {codeSnippet !== undefined && (
         <div className="px-4 codeblock-container">
           <div className="bg rounded p-2">
-            <SimpleCodeBlock className={selectedLanguage}>{codeSnippet}</SimpleCodeBlock>
+            <SimpleCodeBlock className={selectedLanguage} onCopy={handleCopy}>
+              {codeSnippet}
+            </SimpleCodeBlock>
           </div>
         </div>
       )}

@@ -1,7 +1,5 @@
 export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
-  indexes: (projectRef: string | undefined, schema?: string) =>
-    ['projects', projectRef, 'indexes', schema].filter(Boolean),
   keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
   migrations: (projectRef: string | undefined) => ['projects', projectRef, 'migrations'] as const,
   tableColumns: (
@@ -35,4 +33,12 @@ export const databaseKeys = {
     ['projects', projectRef, 'database-size'] as const,
   maxConnections: (projectRef: string | undefined) =>
     ['projects', projectRef, 'max-connections'] as const,
+  pgbouncerStatus: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'pgbouncer', 'status'] as const,
+  pgbouncerConfig: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'pgbouncer', 'config'] as const,
+  checkPrimaryKeysExists: (
+    projectRef: string | undefined,
+    tables: { name: string; schema: string }[]
+  ) => ['projects', projectRef, 'check-primary-keys', tables] as const,
 }

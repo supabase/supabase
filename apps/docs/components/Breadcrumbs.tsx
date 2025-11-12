@@ -107,17 +107,17 @@ const BreadcrumbsInternal = ({
                   <DrawerTrigger aria-label="Toggle Menu">
                     <BreadcrumbEllipsis className="h-4 w-4" />
                   </DrawerTrigger>
-                  <DrawerContent showHandle={false}>
+                  <DrawerContent>
                     <div className="grid gap-1 px-4">
-                      {breadcrumbs
-                        .slice(1, -2)
-                        .map((crumb) =>
-                          crumb.url ? (
-                            <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
-                          ) : (
-                            crumb.title || crumb.name
-                          )
-                        )}
+                      {breadcrumbs.slice(1, -2).map((crumb, index) =>
+                        crumb.url ? (
+                          <Link key={index} href={crumb.url}>
+                            {crumb.title || crumb.name}
+                          </Link>
+                        ) : (
+                          crumb.title || crumb.name
+                        )
+                      )}
                     </div>
                     <DrawerFooter className="pt-4">
                       <DrawerClose asChild>
@@ -131,12 +131,12 @@ const BreadcrumbsInternal = ({
             <BreadcrumbSeparator />
           </>
         )}
-        {appendedBreadcrumbs?.map((crumb, i) => (
-          <Fragment key={crumb.url}>
+        {appendedBreadcrumbs?.map((crumb, index) => (
+          <Fragment key={index}>
             <BreadcrumbItem
               className={cn(
                 'flex items-center overflow-hidden',
-                i === appendedBreadcrumbs.length - 1 && 'md:text-foreground-light'
+                index === appendedBreadcrumbs.length - 1 && 'md:text-foreground-light'
               )}
             >
               {crumb.url ? (
@@ -148,7 +148,7 @@ const BreadcrumbsInternal = ({
               )}
             </BreadcrumbItem>
             <BreadcrumbSeparator
-              className={cn(i === appendedBreadcrumbs.length - 1 && 'md:hidden')}
+              className={cn(index === appendedBreadcrumbs.length - 1 && 'md:hidden')}
             />
           </Fragment>
         ))}
@@ -170,7 +170,8 @@ function useBreadcrumbs() {
   if (isAiPromptsPage) {
     const breadcrumbs = [
       { name: 'Getting started', url: '/guides/getting-started' },
-      { name: 'AI Prompts', url: '/guides/getting-started/ai-prompts' },
+      { name: 'AI Tools' },
+      { name: 'Prompts', url: '/guides/getting-started/ai-prompts' },
     ]
     return breadcrumbs
   }
@@ -180,7 +181,7 @@ function useBreadcrumbs() {
   return findMenuItemByUrl(menu, pathname, [])
 }
 
-function findMenuItemByUrl(menu, targetUrl, parents = []) {
+function findMenuItemByUrl(menu: any, targetUrl: string, parents: any[] = []) {
   // If the menu has items, recursively search through them
   if (menu.items) {
     for (let item of menu.items) {

@@ -12,18 +12,18 @@ cli = [ "supabase-inspect-db" ]
 
 # Optimizing your database
 
-This is an intermediate and actionable guide for PostgreSQL optimization within the Supabase ecosystem.
+This is an intermediate and actionable guide for Postgres optimization within the Supabase ecosystem.
 
-> Consider checking out [Index_advisor](https://supabase.com/docs/guides/database/extensions/index_advisor) and the [performance advisor](https://supabase.com/dashboard/project/_/database/performance-advisor) now available in the Dashboard!
+> Consider checking out [Index_advisor](/docs/guides/database/extensions/index_advisor) and the [performance advisor](/dashboard/project/_/database/performance-advisor) now available in the Dashboard!
 
 ## Installing Supabase Grafana
 
-Supabase has an [open-source Grafana Repo](https://github.com/supabase/supabase-grafana) that displays real-time metrics of your database. Although the [Reports Dashboard ](https://supabase.com/dashboard/project/_/reports) provides similar metrics, it averages the data by the hour or day. Having visibility over how your database responds to changes helps to ensure that the database is not stressed by the index-building process.
+Supabase has an [open-source Grafana Repo](https://github.com/supabase/supabase-grafana) that displays real-time metrics of your database. Although the [Reports Dashboard ](/dashboard/project/_/reports) provides similar metrics, it averages the data by the hour or day. Having visibility over how your database responds to changes helps to ensure that the database is not stressed by the index-building process.
 
 _Visual of Grafana Dashboard_
 ![image](/docs/img/troubleshooting/18ed2c88-332e-4e66-b9b4-c37e99a39104.png)
 
-It can be run locally within Docker or can be deployed for free to fly.io. Installation instructions can be found in [Supabase's metrics docs](https://supabase.com/docs/guides/platform/metrics#deploying-supabase-grafana)
+It can be run locally within Docker or can be deployed for free to fly.io. Installation instructions can be found in [Supabase's metrics docs](/docs/guides/platform/metrics#deploying-supabase-grafana)
 
 ## Query optimization through indexes
 
@@ -59,7 +59,7 @@ where seq_scan + idx_scan > 0
 order by n_live_tup desc;
 ```
 
-A lot of the [queries for inspecting performance](https://supabase.com/docs/reference/cli/supabase-inspect-db) are actually pre-bundled as part of the [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started). For instance, there is a command for testing which indexes of yours are unnecessary and are needlessly taking up space:
+A lot of the [queries for inspecting performance](/docs/reference/cli/supabase-inspect-db) are actually pre-bundled as part of the [Supabase CLI](/docs/guides/cli/getting-started). For instance, there is a command for testing which indexes of yours are unnecessary and are needlessly taking up space:
 
 ```bash
 npx supabase login
@@ -69,7 +69,7 @@ npx supabase link
 npx supabase inspect db unused-indexes
 ```
 
-There is an extension called [index_advisor](https://supabase.com/docs/guides/database/extensions/index_advisor) that creates virtual indexes on your queries and then checks which ones increase performance the best. Unlike normal index creation, virtual indexes can be made rapidly, which makes uncovering the most performant solutions fast. The [Query Performance Advisor](https://supabase.com/dashboard/project/_/database/query-performance) in the Dashboard is configured to use index_advisor to make optimization suggestions and you should check it out to see where you can improve.
+There is an extension called [index_advisor](/docs/guides/database/extensions/index_advisor) that creates virtual indexes on your queries and then checks which ones increase performance the best. Unlike normal index creation, virtual indexes can be made rapidly, which makes uncovering the most performant solutions fast. The [Query Performance Advisor](/dashboard/project/_/database/query-performance) in the Dashboard is configured to use index_advisor to make optimization suggestions and you should check it out to see where you can improve.
 
 Index_advisor won't test indexes added through extensions nor will it test GIN/GIST indexes. For JSON or ARRAY columns, consider exploring GIN/GIST indexes separately from index_advisor. If you're using pg_vector, it's crucial to use an [HSNW index](https://github.com/orgs/supabase/discussions/21379).
 

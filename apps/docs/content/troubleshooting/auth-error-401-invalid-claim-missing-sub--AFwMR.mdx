@@ -12,9 +12,13 @@ sdk = [ "auth-getuser" ]
 [[errors]]
 http_status_code = 401
 message = "invalid claim: missing sub"
+
+[[errors]]
+http_status_code = 403
+message = "invalid claim: missing sub"
 ---
 
-The missing sub claim error is returned when supabase.auth.getUser() is called with an invalid JWT in the session or when the user attempts to register/sign in but hasn't completed the sign in when the getUser call is made.
+The missing sub claim error is returned when `supabase.auth.getUser()` is called with an invalid JWT in the session or when the user attempts to register/sign in but hasn't completed the sign in when the `getUser` call is made.
 
 A common pitfall, is inadvertently using a Supabase API key (such as the anon or service_role keys) instead of the Supabase Auth access token.
 
@@ -24,8 +28,8 @@ A common pitfall, is inadvertently using a Supabase API key (such as the anon or
 
 **How to Avoid This Issue:**
 
-- Ensure that the token being passed to supabase.auth.getUser() is, indeed, an Auth access token and not one of the API keys.
+- Ensure that the token being passed to `supabase.auth.getUser()` is, indeed, an Auth access token and not one of the API keys.
 
-- Are you creating the client on a per-request basis or are you creating a global client to be shared? If you're creating the client on a per-request basis, then you need to pass the session with the user's JWT from the client to the server somehow. This can be done by sending the user's JWT in a header like an `Authorization: Bearer <user_jwt>` . You can then get this header and call supabase.auth.getUser(user_jwt) with the user's JWT.
+- Are you creating the client on a per-request basis or are you creating a global client to be shared? If you're creating the client on a per-request basis, then you need to pass the session with the user's JWT from the client to the server somehow. This can be done by sending the user's JWT in a header like an `Authorization: Bearer <user_jwt>` . You can then get this header and call `supabase.auth.getUser(user_jwt)` with the user's JWT.
 
 - Examine how the Supabase client is being initialized, especially in server-side scenarios.

@@ -1,33 +1,25 @@
-import { QueryClient, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
+import {
+  COUNT_ESTIMATE_SQL,
+  THRESHOLD_COUNT,
+} from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
+import { UseCustomQueryOptions } from 'types'
 
 type GetTableRowsCountArgs = {
   table?: SupaTable
   filters?: Filter[]
   enforceExactCount?: boolean
 }
-
-export const THRESHOLD_COUNT = 50000
-const COUNT_ESTIMATE_SQL = /* SQL */ `
-CREATE OR REPLACE FUNCTION pg_temp.count_estimate(
-    query text
-) RETURNS integer LANGUAGE plpgsql AS $$
-DECLARE
-    plan jsonb;
-BEGIN
-    EXECUTE 'EXPLAIN (FORMAT JSON)' || query INTO plan;
-    RETURN plan->0->'Plan'->'Plan Rows';
-END;
-$$;
-`.trim()
 
 export const getTableRowsCountSql = ({
   table,
@@ -90,16 +82,16 @@ from approximation;
 }
 
 export type TableRowsCount = {
-  count: number
+  count?: number
   is_estimate?: boolean
 }
 
 export type TableRowsCountVariables = Omit<GetTableRowsCountArgs, 'table'> & {
   queryClient: QueryClient
   tableId?: number
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type TableRowsCountData = TableRowsCount
@@ -112,7 +104,7 @@ export async function getTableRowsCount(
     connectionString,
     tableId,
     filters,
-    impersonatedRole,
+    roleImpersonationState,
     enforceExactCount,
   }: TableRowsCountVariables,
   signal?: AbortSignal
@@ -130,10 +122,7 @@ export async function getTableRowsCount(
 
   const sql = wrapWithRoleImpersonation(
     getTableRowsCountSql({ table, filters, enforceExactCount }),
-    {
-      projectRef: projectRef ?? 'ref',
-      role: impersonatedRole,
-    }
+    roleImpersonationState
   )
   const { result } = await executeSql(
     {
@@ -141,14 +130,14 @@ export async function getTableRowsCount(
       connectionString,
       sql,
       queryKey: ['table-rows-count', table.id],
-      isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     },
     signal
   )
 
   return {
-    count: result[0].count,
-    is_estimate: result[0].is_estimate ?? false,
+    count: result?.[0]?.count,
+    is_estimate: result?.[0]?.is_estimate ?? false,
   } as TableRowsCount
 }
 
@@ -157,16 +146,14 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
+  }: UseCustomQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  return useQuery<TableRowsCountData, TableRowsCountError, TData>(
-    tableRowKeys.tableRowsCount(projectRef, { table: { id: tableId }, ...args }),
-    ({ signal }) =>
+  return useQuery<TableRowsCountData, TableRowsCountError, TData>({
+    queryKey: tableRowKeys.tableRowsCount(projectRef, { table: { id: tableId }, ...args }),
+    queryFn: ({ signal }) =>
       getTableRowsCount({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
+    ...options,
+  })
 }

@@ -75,10 +75,14 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 1.  Get your Auth 0 user export and password hash export lists.
 1.  Filter for users who use password login.
     - Under the `identities` field in the user object, these users will have `auth0` as a provider. In the same identity object, you can find their Auth0 `user_id`.
-    - Check that the user has a corresponding password hash by comapring their Auth0 `user_id` to the `oid` field in the password hash export.
+    - Check that the user has a corresponding password hash by comparing their Auth0 `user_id` to the `oid` field in the password hash export.
 1.  Use Supabase Auth's [admin create user](/docs/reference/javascript/auth-admin-createuser) method to recreate the user in Supabase Auth. If the user has a confirmed email address or phone number, set `email_confirm` or `phone_confirm` to `true`.
 
     ```ts
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
     const { data, error } = await supabase.auth.admin.createUser({
       email: 'valid.email@supabase.io',
       password_hash: '$2y$10$a9pghn27d7m0ltXvlX8LiOowy7XfFw0hW0G80OjKYQ1jaoejaA7NC',
@@ -88,13 +92,17 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 
     <Admonition type="note" label="Supported password hashing algorithms">
 
-    Supabase supports BCrypt and Argon2 password hashes.
+    Supabase supports bcrypt and Argon2 password hashes.
 
     </Admonition>
 
     If you have a plaintext password instead of a hash, you can provide that instead. Supabase Auth will handle hashing the password for you. (Passwords are **always** stored hashed.)
 
     ```ts
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
     const { data, error } = await supabase.auth.admin.createUser({
       email: 'valid.email@supabase.io',
       password: 'supersecurepassword123!',
@@ -114,6 +122,10 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 For passwordless signin via email or phone, check for users with verified email addresses or phone numbers. Create these users in Supabase Auth with `email_confirm` or `phone_confirm` set to `true`:
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const { data, error } = await supabase.auth.admin.createUser({
   email: 'valid.email@supabase.io',
   email_confirm: true,
@@ -128,7 +140,7 @@ Once you have imported your users, you can sign them in using the [`signInWithOt
 
 Configure your OAuth providers in Supabase by following the [Social login guides](/docs/guides/auth/social-login).
 
-For both new and existing users, sign in the user using the [`signInWithOAuth`](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) method. This works without pre-migrating existing users, since the user always needs to sign in through the OAuth provider before being redirected to your service.
+For both new and existing users, sign in the user using the [`signInWithOAuth`](/docs/reference/javascript/auth-signinwithoauth) method. This works without pre-migrating existing users, since the user always needs to sign in through the OAuth provider before being redirected to your service.
 
 After the user has completed the OAuth flow successfully, you can check if the user is a new or existing user in Auth0 by mapping their social provider id to Auth0. Auth0 stores the social provider ID in the user ID, which has the format `provider_name|provider_id` (for example, `github|123456`). See the [Auth0 identity docs](https://auth0.com/docs/manage-users/user-accounts/identify-users) to learn more.
 
@@ -150,6 +162,10 @@ Supabase Auth provides 2 fields which you can use to map user-specific metadata 
 Both columns are accessible from the admin user methods. To create a user with custom metadata, you can use the following method:
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const { data, error } = await supabase.auth.admin.createUser({
   email: 'valid.email@supabase.io',
   user_metadata: {
@@ -161,7 +177,7 @@ const { data, error } = await supabase.auth.admin.createUser({
 })
 ```
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 These fields will be exposed in the user's access token JWT so it is recommended not to store excessive metadata in these fields.
 
@@ -218,7 +234,7 @@ header={<span className="text-foreground">How can I allow my users to retain the
 id="existing-password"
 >
 
-Supabase Auth never stores passwords as plaintext. Since Supabase Auth supports reading BCrypt and argon2 password hashes, you can import your users passwords if they use the same hashing algorithm. New users in Supabase Auth who use password-based sign-in methods will always use a BCrypt hash. Passwords are stored in the `auth.users.encrypted_password` column.
+Supabase Auth never stores passwords as plaintext. Since Supabase Auth supports reading bcrypt and argon2 password hashes, you can import your users passwords if they use the same hashing algorithm. New users in Supabase Auth who use password-based sign-in methods will always use a bcrypt hash. Passwords are stored in the `auth.users.encrypted_password` column.
 
 </AccordionItem>
 
@@ -236,7 +252,7 @@ header={<span className="text-foreground">How do I migrate existing SAML Single 
 id="saml"
 >
 
-Customers may need to link their identity provider with Supabase Auth separately, but their users should still be able to sign-in as per-normal after authenticating with their identity provider. For more information about SSO with SAML 2.0, you can check out [this guide](/docs/guides/auth/enterprise-sso/auth-sso-saml). If you want to migrate your existing SAML SSO connections from Auth0 to Supabase Auth, please reach out to us via support.
+Customers may need to link their identity provider with Supabase Auth separately, but their users should still be able to sign-in as per-normal after authenticating with their identity provider. For more information about SSO with SAML 2.0, you can check out [this guide](/docs/guides/auth/enterprise-sso/auth-sso-saml). If you want to migrate your existing SAML SSO connections from Auth0 to Supabase Auth, reach out to us via support.
 
 </AccordionItem>
 

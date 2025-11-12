@@ -1182,20 +1182,16 @@ export default {
           rounded: `rounded-md`,
         },
         pills: {
-          base: `
-            px-3 py-1
-          `,
+          base: `px-3 py-1`,
           normal: `
             font-normal
             border-default
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
-            bg-surface-200
+            bg-sidebar-accent
             text-foreground-lighter
-            z-10
-
-            rounded-md
+            z-10 rounded-md
           `,
         },
       },
@@ -1417,8 +1413,9 @@ export default {
     },
     spinner: `
       absolute
-      text-brand animate-spin
+      text-foreground-lighter animate-spin
       inset-0
+      size-5
       m-auto
     `,
   },

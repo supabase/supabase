@@ -10,33 +10,44 @@ Every project on the Supabase Platform comes with its own dedicated Postgres ins
 
 The following table describes the base instances, Nano (free plan) and Micro (paid plans), with additional compute instance sizes available if you need extra performance when scaling up.
 
-<Admonition type="note" label="Nano instances in Pro organizations">
+<Admonition type="note" label="Nano instances in paid plan organizations">
 
-In Pro organizations, Nano Compute are billed at the same price as Micro Compute. It is recommended to upgrade your Project from Nano Compute to Micro Compute when it's convenient for you. Compute sizes are not auto-upgraded because of the downtime incurred. See [Supabase Pricing](https://supabase.com/pricing) for more information.
+In paid organizations, Nano Compute are billed at the same price as Micro Compute. It is recommended to upgrade your Project from Nano Compute to Micro Compute when it's convenient for you. Compute sizes are not auto-upgraded because of the downtime incurred. See [Supabase Pricing](/pricing) for more information. You cannot launch Nano instances on paid plans, only Micro and above - but you might have Nano instances after upgrading from Free Plan.
 
 </Admonition>
 
-| Compute Size | Hourly Price USD | Monthly Price USD | CPU                     | Memory       | Max DB Size (Recommended)[^2] |
-| ------------ | ---------------- | ----------------- | ----------------------- | ------------ | ----------------------------- |
-| Nano[^3]     | $0               | $0                | Shared                  | Up to 0.5 GB | 500 MB                        |
-| Micro        | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB         | 10 GB                         |
-| Small        | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB         | 50 GB                         |
-| Medium       | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB         | 100 GB                        |
-| Large        | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB         | 200 GB                        |
-| XL           | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB        | 500 GB                        |
-| 2XL          | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB        | 1 TB                          |
-| 4XL          | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB        | 2 TB                          |
-| 8XL          | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB       | 4 TB                          |
-| 12XL         | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB       | 6 TB                          |
-| 16XL         | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB       | 10 TB                         |
+| Compute Size | Hourly Price USD          | Monthly Price USD                                                                                       | CPU                     | Memory       | Max DB Size (Recommended)[^2] |
+| ------------ | ------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------- | ------------ | ----------------------------- |
+| Nano[^3]     | <Price price="0" />       | <Price price="0" />                                                                                     | Shared                  | Up to 0.5 GB | 500 MB                        |
+| Micro        | <Price price="0.01344" /> | ~<Price price="10" />                                                                                   | 2-core ARM (shared)     | 1 GB         | 10 GB                         |
+| Small        | <Price price="0.0206" />  | ~<Price price="15" />                                                                                   | 2-core ARM (shared)     | 2 GB         | 50 GB                         |
+| Medium       | <Price price="0.0822" />  | ~<Price price="60" />                                                                                   | 2-core ARM (shared)     | 4 GB         | 100 GB                        |
+| Large        | <Price price="0.1517" />  | ~<Price price="110" />                                                                                  | 2-core ARM (dedicated)  | 8 GB         | 200 GB                        |
+| XL           | <Price price="0.2877" />  | ~<Price price="210" />                                                                                  | 4-core ARM (dedicated)  | 16 GB        | 500 GB                        |
+| 2XL          | <Price price="0.562" />   | ~<Price price="410" />                                                                                  | 8-core ARM (dedicated)  | 32 GB        | 1 TB                          |
+| 4XL          | <Price price="1.32" />    | ~<Price price="960" />                                                                                  | 16-core ARM (dedicated) | 64 GB        | 2 TB                          |
+| 8XL          | <Price price="2.562" />   | ~<Price price="1" />,870                                                                                | 32-core ARM (dedicated) | 128 GB       | 4 TB                          |
+| 12XL         | <Price price="3.836" />   | ~<Price price="2" />,800                                                                                | 48-core ARM (dedicated) | 192 GB       | 6 TB                          |
+| 16XL         | <Price price="5.12" />    | ~<Price price="3" />,730                                                                                | 64-core ARM (dedicated) | 256 GB       | 10 TB                         |
+| >16XL        | -                         | [Contact Us](/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes) | Custom                  | Custom       | Custom                        |
 
 [^1]: Database max connections are recommended values and can be customized depending on your use case.
-[^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](https://supabase.com/docs/guides/platform/shared-responsibility-model) for more information.
+[^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/platform/shared-responsibility-model) for more information.
 [^3]: Compute resources on the Free plan are subject to change.
 
-Compute sizes can be changed by first selecting your project in the dashboard [here](https://supabase.com/dashboard/project/_/settings/compute-and-disk) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrade-downtime).
+Compute sizes can be changed by first selecting your project in the dashboard [here](/dashboard/project/_/settings/compute-and-disk) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrades).
 
-We charge hourly for additional compute based on your usage. Read more about [usage-based billing for compute](/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours).
+<Image
+  alt="Compute Size Selection"
+  src={{
+    light: '/docs/img/guides/platform/compute-size-selection--light.png',
+    dark: '/docs/img/guides/platform/compute-size-selection--dark.png',
+  }}
+  zoomable
+  className="max-w-[500px]"
+/>
+
+We charge hourly for additional compute based on your usage. Read more about [usage-based billing for compute](/docs/guides/platform/manage-your-usage/compute).
 
 ### Dedicated vs shared CPU
 
@@ -50,7 +61,7 @@ Compute instance changes are usually applied with less than 2 minutes of downtim
 
 </Admonition>
 
-When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](https://supabase.com/dashboard/project/_/reports) in the Dashboard to monitor your CPU utilization, and upgrade as needed.
+When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](/dashboard/project/_/reports) in the Dashboard to monitor your CPU utilization, and upgrade as needed.
 
 ## Disk
 
@@ -72,31 +83,33 @@ The following sections explain how these attributes affect disk performance.
 
 ### Compute size
 
-The compute size of your project sets the upper limit for disk throughput and IOPS. The table below shows the limits for each instance size. For instance, an 8XL compute instance has a maximum throughput of 9,500 MiB/s and a maximum IOPS of 40,000.
+The compute size of your project sets the upper limit for disk throughput and IOPS. The table below shows the limits for each instance size. For instance, an 8XL compute instance has a maximum throughput of 9,500 Mbps and a maximum IOPS of 40,000.
 
 | Compute Instance | Disk Throughput | IOPS        |
 | ---------------- | --------------- | ----------- |
-| Nano (free)      | 43 MiB/s        | 250 IOPS    |
-| Micro            | 87 MiB/s        | 500 IOPS    |
-| Small            | 174 MiB/s       | 1,000 IOPS  |
-| Medium           | 347 MiB/s       | 2,000 IOPS  |
-| Large            | 630 MiB/s       | 3,600 IOPS  |
-| XL               | 1,188 MiB/s     | 6,000 IOPS  |
-| 2XL              | 2,375 MiB/s     | 12,000 IOPS |
-| 4XL              | 4,750 MiB/s     | 20,000 IOPS |
-| 8XL              | 9,500 MiB/s     | 40,000 IOPS |
-| 12XL             | 14,250 MiB/s    | 50,000 IOPS |
-| 16XL             | 19,000 MiB/s    | 80,000 IOPS |
+| Nano (free)      | 43 Mbps         | 250 IOPS    |
+| Micro            | 87 Mbps         | 500 IOPS    |
+| Small            | 174 Mbps        | 1,000 IOPS  |
+| Medium           | 347 Mbps        | 2,000 IOPS  |
+| Large            | 630 Mbps        | 3,600 IOPS  |
+| XL               | 1,188 Mbps      | 6,000 IOPS  |
+| 2XL              | 2,375 Mbps      | 12,000 IOPS |
+| 4XL              | 4,750 Mbps      | 20,000 IOPS |
+| 8XL              | 9,500 Mbps      | 40,000 IOPS |
+| 12XL             | 14,250 Mbps     | 50,000 IOPS |
+| 16XL             | 19,000 Mbps     | 80,000 IOPS |
 
-Smaller compute instances like Nano, Micro, and Small have baseline performance levels that can occasionally be exceeded. Larger compute-instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits. If you hit your IOPS or throughput limit, throttling will occur.
+Smaller compute instances like Nano, Micro, Small, and Medium have baseline performance levels that can occasionally be exceeded for short periods of time. If it does exceed the baseline, you should consider upgrading your instance size for a more reliable performance.
+
+Larger compute instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits which you can [configure](/docs/guides/platform/manage-your-usage/disk-throughput). If you hit your IOPS or throughput limit, throttling will occur.
 
 ### Choosing the right compute instance for consistent disk performance
 
-If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has exceeded the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget. Projects that use any disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
+If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has exceeded the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget. Projects that use any disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
 
 ### Provisioned disk throughput and IOPS
 
-The default disk type is gp3, which comes with a baseline throughput of 125 MiB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](/dashboard/project/_/settings/database) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size.
+The default disk type is gp3, which comes with a baseline throughput of 125 MB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](/dashboard/project/_/settings/compute-and-disk) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
 
 <Admonition type="caution">
 
@@ -108,18 +121,18 @@ Be aware that increasing IOPS or throughput incurs additional charges.
 
 When selecting your disk, it's essential to focus on the performance needs of your workload. Here's a comparison of our available disk types:
 
-|                   | General Purpose SSD (gp3)                                                                                                                     | High Performance SSD (io2)                                                                           |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Use Case**      | General workloads, development environments, small to medium databases                                                                        | High-performance needs, large-scale databases, mission-critical applications                         |
-| **Max Disk Size** | 16 TB                                                                                                                                         | 60 TB                                                                                                |
-| **Max IOPS**      | 16,000 IOPS (at 32 GB disk size)                                                                                                              | 80,000 IOPS (at 80 GB disk size)                                                                     |
-| **Throughput**    | 125 MiB/s (default) to 1,000 MiB/s (maximum)                                                                                                  | Automatically scales with IOPS                                                                       |
-| **Best For**      | Great value for most use cases                                                                                                                | Low latency and very high IOPS requirements                                                          |
-| **Pricing**       | Disk: 8 GB included, then $0.125 per GB<br/>IOPS: 3,000 included, then $0.024 per IOPS<br/>Throughput: 125 Mbps included, then $0.95 per Mbps | Disk: $0.195 per GB<br/>IOPS: $0.119 per IOPS<br/>Throughput: Scales with IOPS at no additional cost |
+|                   | General Purpose SSD (gp3)                                                                                                                                                                        | High Performance SSD (io2)                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Use Case**      | General workloads, development environments, small to medium databases                                                                                                                           | High-performance needs, large-scale databases, mission-critical applications                                                           |
+| **Max Disk Size** | 16 TB                                                                                                                                                                                            | 60 TB                                                                                                                                  |
+| **Max IOPS**      | 16,000 IOPS (at 32 GB disk size)                                                                                                                                                                 | 80,000 IOPS (at 80 GB disk size)                                                                                                       |
+| **Throughput**    | 125 MB/s (default) to 1,000 MB/s (maximum)                                                                                                                                                       | Automatically scales with IOPS                                                                                                         |
+| **Best For**      | Great value for most use cases                                                                                                                                                                   | Low latency and very high IOPS requirements                                                                                            |
+| **Pricing**       | Disk: 8 GB included, then <Price price="0.125" /> per GB<br/>IOPS: 3,000 included, then <Price price="0.024" /> per IOPS<br/>Throughput: 125 MB/s included, then <Price price="0.95" /> per MB/s | Disk: <Price price="0.195" /> per GB<br/>IOPS: <Price price="0.119" /> per IOPS<br/>Throughput: Scales with IOPS at no additional cost |
 
 For general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
 
-<Admonition type="information">
+<Admonition type="note">
 
 Compute instance size changes will not change your selected disk type or disk size, but your IO limits may change according to what your selected compute instance size supports.
 
@@ -127,7 +140,7 @@ Compute instance size changes will not change your selected disk type or disk si
 
 ### Disk size
 
-- General Purpose (gp3) disks come with a baseline of 3,000 IOPS and 125 MiB/s. You can provision additional 500 IOPS for every GB of disk size and additional 0.25 MiB/s throughput per provisioned IOPS.
+- General Purpose (gp3) disks come with a baseline of 3,000 IOPS and 125 MB/s. You can provision additional 500 IOPS for every GB of disk size and additional 0.25 MB/s throughput per provisioned IOPS.
 - High Performance (io2) disks can be provisioned with 1,000 IOPS per GB of disk size.
 
 ## Limits and constraints

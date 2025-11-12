@@ -1,12 +1,16 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { IS_PLATFORM } from 'lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { subscriptionKeys } from './keys'
 
 export type ProjectAddonsVariables = {
   projectRef?: string
 }
+
+// [Joshen] For any customer facing text - let's use "Add-on" hyphenated
+// Will need to address consistency across the dashboard
 
 export async function getProjectAddons(
   { projectRef }: ProjectAddonsVariables,
@@ -28,13 +32,15 @@ export type ProjectAddonsError = ResponseError
 
 export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
   { projectRef }: ProjectAddonsVariables,
-  { enabled = true, ...options }: UseQueryOptions<ProjectAddonsData, ProjectAddonsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ProjectAddonsData, ProjectAddonsError, TData> = {}
 ) =>
-  useQuery<ProjectAddonsData, ProjectAddonsError, TData>(
-    subscriptionKeys.addons(projectRef),
-    ({ signal }) => getProjectAddons({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectAddonsData, ProjectAddonsError, TData>({
+    queryKey: subscriptionKeys.addons(projectRef),
+    queryFn: ({ signal }) => getProjectAddons({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    staleTime: 60 * 60 * 1000,
+    ...options,
+  })

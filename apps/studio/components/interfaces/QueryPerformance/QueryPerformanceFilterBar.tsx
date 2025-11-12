@@ -1,155 +1,166 @@
-import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useDebounce } from '@uidotdev/usehooks'
+import { Search, X } from 'lucide-react'
+import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
+import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from 'ui'
-import { QueryPerformanceSort } from '../Reports/Reports.queries'
-import { TextSearchPopover } from './TextSearchPopover'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 export const QueryPerformanceFilterBar = ({
-  queryPerformanceQuery,
-  onResetReportClick,
+  actions,
+  showRolesFilter = false,
 }: {
-  queryPerformanceQuery: DbQueryHook<any>
-  onResetReportClick?: () => void
+  actions?: ReactNode
+  showRolesFilter?: boolean
 }) => {
-  const router = useRouter()
-  const { project } = useProjectContext()
-  const [showBottomSection] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
-    true
-  )
-  const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
-  const defaultFilterRoles = router.query.roles ? (router.query.roles as string[]) : []
-  const defaultSortByValue = router.query.sort
-    ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
-    : undefined
+  const { data: project } = useSelectedProjectQuery()
+  const { sort, clearSort } = useQueryPerformanceSort()
 
-  const [searchInputVal, setSearchInputVal] = useState(defaultSearchQueryValue)
-  const [filters, setFilters] = useState<{ roles: string[]; query: string }>({
-    roles: typeof defaultFilterRoles === 'string' ? [defaultFilterRoles] : defaultFilterRoles,
-    query: '',
-  })
-  // [Joshen] This is for the old UI, can deprecated after
-  const [sortByValue, setSortByValue] = useState<QueryPerformanceSort>(
-    defaultSortByValue ?? { column: 'prop_total_time', order: 'desc' }
-  )
-
-  const { isLoading, isRefetching } = queryPerformanceQuery
+  const [{ search: searchQuery, roles: defaultFilterRoles, minCalls }, setSearchParams] =
+    useQueryStates({
+      search: parseAsString.withDefault(''),
+      roles: parseAsArrayOf(parseAsString).withDefault([]),
+      minCalls: parseAsInteger,
+    })
   const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
 
-  const onSearchQueryChange = (value: string) => {
-    setSearchInputVal(value)
+  const [filters, setFilters] = useState<{ roles: string[] }>({
+    roles: defaultFilterRoles,
+  })
+  const [inputValue, setInputValue] = useState(searchQuery)
+  const [minCallsInput, setMinCallsInput] = useState(
+    typeof minCalls === 'number' && Number.isFinite(minCalls) && minCalls >= 0
+      ? String(minCalls)
+      : ''
+  )
+  const debouncedInputValue = useDebounce(inputValue, 500)
+  const debouncedMinCalls = useDebounce(minCallsInput, 300)
+  const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
 
-    if (!value || typeof value !== 'string') {
-      // if user has deleted the search query, remove it from the url
-      const { search, ...rest } = router.query
-      router.push({ ...router, query: { ...rest } })
-    } else {
-      router.push({ ...router, query: { ...router.query, search: value } })
-    }
+  const onSearchQueryChange = (value: string) => {
+    const sanitizedMinCalls =
+      typeof minCalls === 'number' && Number.isFinite(minCalls) && minCalls >= 0
+        ? Math.floor(minCalls)
+        : undefined
+    setSearchParams({ search: value || '', minCalls: sanitizedMinCalls })
   }
 
   const onFilterRolesChange = (roles: string[]) => {
     setFilters({ ...filters, roles })
-    router.push({ ...router, query: { ...router.query, roles } })
+    const sanitizedMinCalls =
+      typeof minCalls === 'number' && Number.isFinite(minCalls) && minCalls >= 0
+        ? Math.floor(minCalls)
+        : undefined
+    setSearchParams({ roles, minCalls: sanitizedMinCalls })
   }
 
-  function getSortButtonLabel() {
-    if (sortByValue?.order === 'desc') {
-      return 'Sorted by latency - high to low'
-    } else {
-      return 'Sorted by latency - low to high'
+  useEffect(() => {
+    onSearchQueryChange(searchValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue])
+
+  useEffect(() => {
+    const value = debouncedMinCalls.trim()
+    if (value === '') {
+      setSearchParams({ minCalls: undefined })
+      return
     }
-  }
-
-  const onSortChange = (order: 'asc' | 'desc') => {
-    setSortByValue({ column: 'prop_total_time', order })
-    router.push({ ...router, query: { ...router.query, sort: 'prop_total_time', order } })
-  }
+    const parsed = Number(value)
+    if (Number.isFinite(parsed) && parsed >= 0) {
+      setSearchParams({ minCalls: Math.floor(parsed) })
+    } else {
+      setSearchParams({ minCalls: undefined })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedMinCalls])
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
-          <p className="text-xs prose">Filter by</p>
-          <FilterPopover
-            name="Roles"
-            options={roles}
-            labelKey="name"
-            valueKey="name"
-            activeOptions={isLoadingRoles ? [] : filters.roles}
-            onSaveFilters={onFilterRolesChange}
+          <Input
+            size="tiny"
+            autoComplete="off"
+            icon={<Search size={12} />}
+            value={inputValue}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
+            name="keyword"
+            id="keyword"
+            placeholder="Filter by query"
+            className="w-56"
+            actions={[
+              inputValue && (
+                <Button
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
+                  onClick={() => setInputValue('')}
+                  className="p-0 h-5 w-5"
+                />
+              ),
+            ]}
           />
-          <TextSearchPopover name="Query" value={searchInputVal} onSaveText={onSearchQueryChange} />
 
-          <div className="border-r border-strong h-6" />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button icon={sortByValue?.order === 'desc' ? <ArrowDown /> : <ArrowUp />}>
-                {getSortButtonLabel()}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuRadioGroup
-                value={sortByValue?.order}
-                onValueChange={(value: any) => onSortChange(value)}
-              >
-                <DropdownMenuRadioItem value="desc" defaultChecked={sortByValue?.order === 'desc'}>
-                  Sort by latency - high to low
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="asc" defaultChecked={sortByValue?.order === 'asc'}>
-                  Sort by latency - low to high
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Input
+            size="tiny"
+            type="number"
+            autoComplete="off"
+            value={minCallsInput}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setMinCallsInput(e.target.value)}
+            name="minCalls"
+            id="minCalls"
+            min={0}
+            placeholder="Min. calls (e.g. 100)"
+            className="w-32"
+            actions={[
+              minCallsInput && (
+                <Button
+                  size="tiny"
+                  type="text"
+                  icon={<X />}
+                  onClick={() => setMinCallsInput('')}
+                  className="p-0 h-5 w-5"
+                />
+              ),
+            ]}
+          />
+
+          {showRolesFilter && (
+            <FilterPopover
+              name="Roles"
+              options={roles}
+              labelKey="name"
+              valueKey="name"
+              activeOptions={isLoadingRoles ? [] : filters.roles}
+              onSaveFilters={onFilterRolesChange}
+              className="w-56"
+            />
+          )}
+
+          {sort && (
+            <div className="text-xs border rounded-md px-1.5 md:px-2.5 py-1 h-[26px] flex items-center gap-x-2">
+              <p className="md:inline-flex gap-x-1 hidden truncate">
+                Sort: {sort.column} <span className="text-foreground-lighter">{sort.order}</span>
+              </p>
+              <Tooltip>
+                <TooltipTrigger onClick={clearSort}>
+                  <X size={14} className="text-foreground-light hover:text-foreground" />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Clear sort</TooltipContent>
+              </Tooltip>
+            </div>
+          )}
         </div>
       </div>
-
-      <div className="flex gap-2 items-center">
-        {!showBottomSection && onResetReportClick && (
-          <Button
-            onClick={() => {
-              onResetReportClick()
-            }}
-            type="default"
-          >
-            Reset report
-          </Button>
-        )}
-        <Button
-          type="default"
-          size="tiny"
-          onClick={() => queryPerformanceQuery.runQuery()}
-          disabled={isLoading || isRefetching}
-          icon={
-            <RefreshCw
-              size={12}
-              className={`text-foreground-light ${isLoading || isRefetching ? 'animate-spin' : ''}`}
-            />
-          }
-        >
-          Refresh
-        </Button>
-      </div>
+      <div className="flex gap-2 items-center pl-2">{actions}</div>
     </div>
   )
 }

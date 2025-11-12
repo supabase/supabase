@@ -11,7 +11,7 @@ Seeding is the process of populating a database with initial data, typically use
 
 ## Using seed files
 
-Seed files are executed every time you run `supabase start` or `supabase db reset`. Seeding occurs _after_ all database migrations have been completed. As a best practice, only include data insertions in your seed files, and avoid adding schema statements.
+Seed files are executed the first time you run `supabase start` and every time you run `supabase db reset`. Seeding occurs _after_ all database migrations have been completed. As a best practice, only include data insertions in your seed files, and avoid adding schema statements.
 
 By default, if no specific configuration is provided, the system will look for a seed file matching the pattern `supabase/seed.sql`. This maintains backward compatibility with earlier versions, where the seed file was placed in the `supabase` folder.
 
@@ -26,7 +26,7 @@ values
   ('Mexico', 'MX');
 ```
 
-If you want to manage multiple seed files or organize them across different folders, you can configure additional paths or glob patterns in your `config.toml` (see the [next section](#splitting-up-your-seed-data) for details).
+If you want to manage multiple seed files or organize them across different folders, you can configure additional paths or glob patterns in your `config.toml` (see the [next section](#splitting-up-your-seed-file) for details).
 
 ### Splitting up your seed file
 

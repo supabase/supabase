@@ -2,14 +2,15 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
@@ -19,8 +20,13 @@ import { extractMethod, getRevokePermissionStatements, isValidHook } from './hoo
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const { data: project } = useSelectedProjectQuery()
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading,
+  } = useAuthConfigQuery({ projectRef })
 
   const [selectedHook, setSelectedHook] = useState<HOOK_DEFINITION_TITLE | null>(null)
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
@@ -60,20 +66,29 @@ export const HooksListing = () => {
 
   if (isError) {
     return (
-      <AlertError
-        error={authConfigError}
-        subject="Failed to retrieve auth configuration for hooks"
-      />
+      <ScaffoldSection isFullWidth>
+        <AlertError
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration for hooks"
+        />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
     )
   }
 
   return (
-    <div className="pb-4">
-      <FormHeader
-        title="Auth Hooks"
-        description="Use Postgres functions or HTTP endpoints to customize the behavior of Supabase Auth to meet your needs."
-        actions={<AddHookDropdown onSelectHook={setSelectedHook} />}
-      />
+    <ScaffoldSection isFullWidth>
+      <div className="flex justify-between items-center mb-4">
+        <ScaffoldSectionTitle>All hooks</ScaffoldSectionTitle>
+        <AddHookDropdown onSelectHook={setSelectedHook} />
+      </div>
 
       {hooks.filter((h) => isValidHook(h)).length === 0 && (
         <div
@@ -83,7 +98,11 @@ export const HooksListing = () => {
           ].join(' ')}
         >
           <p className="text-sm text-foreground-light">No hooks configured yet</p>
-          <AddHookDropdown buttonText="Add a new hook" onSelectHook={setSelectedHook} />
+          <AddHookDropdown
+            align="center"
+            buttonText="Add a new hook"
+            onSelectHook={setSelectedHook}
+          />
         </div>
       )}
 
@@ -159,6 +178,6 @@ export const HooksListing = () => {
           )}
         </div>
       </ConfirmationModal>
-    </div>
+    </ScaffoldSection>
   )
 }

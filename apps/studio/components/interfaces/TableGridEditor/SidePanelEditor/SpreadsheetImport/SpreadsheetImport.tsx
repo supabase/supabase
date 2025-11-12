@@ -1,26 +1,27 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { debounce, includes, noop } from 'lodash'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
+import { debounce, noop } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { Button, SidePanel, Tabs } from 'ui'
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
+import { SpreadsheetImportPreview } from './SpreadsheetImportPreview'
 import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
-import { EMPTY_SPREADSHEET_DATA, UPLOAD_FILE_TYPES } from './SpreadsheetImport.constants'
+import { EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import {
-  acceptedFileExtension,
+  flagInvalidFileImport,
   parseSpreadsheet,
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
-import SpreadsheetImportPreview from './SpreadsheetImportPreview'
-
-const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
+import { useChanged } from 'hooks/misc/useChanged'
 
 interface SpreadsheetImportProps {
   debounceDuration?: number
@@ -33,7 +34,10 @@ interface SpreadsheetImportProps {
   updateEditorDirty?: (value: boolean) => void
 }
 
-const SpreadsheetImport = ({
+const csvParseErrorMessage =
+  'Some issues have been detected. More details below the content preview.'
+
+export const SpreadsheetImport = ({
   visible = false,
   debounceDuration = 250,
   headers = [],
@@ -43,12 +47,14 @@ const SpreadsheetImport = ({
   closePanel,
   updateEditorDirty = noop,
 }: SpreadsheetImportProps) => {
-  useEffect(() => {
-    if (visible && headers.length === 0) {
-      resetSpreadsheetImport()
-    }
-  }, [visible])
+  const { ref: projectRef } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+  const tableEditorSnap = useTableEditorStateSnapshot()
 
+  const fileFromState =
+    tableEditorSnap.sidePanel?.type === 'csv-import' ? tableEditorSnap.sidePanel.file : undefined
+
+  const visiblityChanged = useChanged(visible)
   const [tab, setTab] = useState<'fileUpload' | 'pasteText'>('fileUpload')
   const [input, setInput] = useState<string>('')
   const [uploadedFile, setUploadedFile] = useState<File>()
@@ -62,6 +68,8 @@ const SpreadsheetImport = ({
   const [errors, setErrors] = useState<any>([])
   const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
   const incompatibleHeaders = selectedHeaders.filter(
     (header) => !selectedTableColumns.includes(header)
@@ -72,66 +80,55 @@ const SpreadsheetImport = ({
     setParseProgress(progress)
   }
 
-  const onFileUpload = async (event: any) => {
-    setParseProgress(0)
-    event.persist()
-    const [file] = event.target.files || event.dataTransfer.files
-
-    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
-      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
-    } else if (file.size > MAX_CSV_SIZE) {
-      event.target.value = ''
-      return toast(
-        <div className="space-y-1">
-          <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
-          <p>For bulk data loading, we recommend doing so directly through the database.</p>
-          <Button asChild type="default" icon={<ExternalLink />} className="!mt-2">
-            <Link
-              href="https://supabase.com/docs/guides/database/tables#bulk-data-loading"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Learn more
-            </Link>
-          </Button>
-        </div>,
-        { duration: Infinity }
-      )
-    } else {
+  // Process a file into table rows and columns (used for both upload and drop)
+  const processFile = useCallback(
+    async (file: File) => {
       updateEditorDirty(true)
       setUploadedFile(file)
+      setParseProgress(0)
+
       const { headers, rowCount, columnTypeMap, errors, previewRows } = await parseSpreadsheet(
         file,
         onProgressUpdate
       )
+
       if (errors.length > 0) {
-        toast.error(
-          `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
-        )
+        toast.error(csvParseErrorMessage)
       }
 
       setErrors(errors)
       setSelectedHeaders(headers)
       setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
-    }
-    event.target.value = ''
-  }
+    },
+    [updateEditorDirty]
+  )
 
-  const resetSpreadsheetImport = () => {
+  // Handle file upload events from file input
+  const onFileUpload = useCallback(
+    async (event: any) => {
+      event.persist()
+      const [file] = event.target.files || event.dataTransfer.files
+      if (file && !flagInvalidFileImport(file)) {
+        await processFile(file)
+      }
+      event.target.value = ''
+    },
+    [processFile]
+  )
+
+  const resetSpreadsheetImport = useCallback(() => {
     setInput('')
     setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
     setUploadedFile(undefined)
     setErrors([])
     updateEditorDirty(false)
-  }
+  }, [updateEditorDirty])
 
   const readSpreadsheetText = async (text: string) => {
     if (text.length > 0) {
       const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(text)
       if (errors.length > 0) {
-        toast.error(
-          `Some issues have been detected on ${errors.length} rows. More details below the content preview.`
-        )
+        toast.error(csvParseErrorMessage)
       }
       setErrors(errors)
       setSelectedHeaders(headers)
@@ -141,6 +138,7 @@ const SpreadsheetImport = ({
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handler = useCallback(debounce(readSpreadsheetText, debounceDuration), [])
   const onInputChange = (event: any) => {
     setInput(event.target.value)
@@ -168,8 +166,26 @@ const SpreadsheetImport = ({
       resolve()
     } else {
       saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
+      sendEvent({
+        action: 'import_data_added',
+        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     }
   }
+
+  useEffect(() => {
+    if (visiblityChanged && visible) {
+      if (fileFromState) processFile(fileFromState)
+      else if (headers.length === 0) resetSpreadsheetImport()
+    }
+  }, [
+    visiblityChanged,
+    visible,
+    fileFromState,
+    processFile,
+    headers.length,
+    resetSpreadsheetImport,
+  ])
 
   return (
     <SidePanel
@@ -239,5 +255,3 @@ const SpreadsheetImport = ({
     </SidePanel>
   )
 }
-
-export default SpreadsheetImport

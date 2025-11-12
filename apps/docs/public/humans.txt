@@ -2,94 +2,169 @@ TEAM
 
 Supabase is 100% remote.
 
+Aaron Byrne
+Adam Mokan
 Alaister Young
+Alan De Los Santos
 Aleksi Immonen
 Alexander Korotkov
+Ali Waseem
 Amy Q
 Andrew Valleteau
+Andrey A
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
 Artur Zakirov
+Artyom Borissov
+Barco Fourie
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
+Brendan Stephens
+Brent Newson
 Carel de Waal
+Cameron Blackwood
+Cemal Kılıç
 Chandana Anumula
 Charis Lam
+Chase Cresgy
 Chase Granberry
 Chris Caruso
 Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Martin
 Chris Stockton
+Chris Ward
 Craig Cannon
+Cuong Do
+Danny White
+Darren Cunningham
 Dave Wilson
+David A. Ventimiglia
+David Weitzman
+Deepthi Sigireddi
 Deji I
 Div Arora
 Divit D
+Douglas Hunley
+Dustin Keib
+Eduardo Gurgel
 Egor Romanov
+Eleftheria Trivyzaki
+Eliot Whalan
+Emmett Folger
+Eric Kharitonashvili
 Etienne Stalmans
 Fabrizio Fenoglio
+Fady A
+Felipe Stival
 Francesco Sansalvadore
+Greg Kress
 Greg P
 Greg Richardson
+Gregor Vand
 Guilherme Souza
+Hannah Bowers
+Hardik Maheshwari
 Haydn Maley
 Hieu Pham
+Ignacio Dobronich
+Illia Basalaiev
 Inian P
 Ivan Vasilov
+Jason Farber
+Jean-Paul Argudo
+Jeff Smick
 Jenny Kibiri
 Jess Shears
+Jim Chanco Jr
+Joakim Ahrlin
 John Pena
+John Schaeffer
 Jon M
 Jonny Summers-Muir
 Jordi Enric
+José Luis Ledesma
 Joshen Lim
 Julien Goux
+Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
 Karan S
 Karlo Ison
+Katerina Skroumpelou
+Kemal Y
 Kevin Brolly
 Kevin Grüneberg
 Lakshan Perera
 Laura C
 Laurence Isla
+Lenny Urbanowski
+Leonardo Santiago
 Long Hoang
+Luca Forstner
 Łukasz Niemier
+Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
-Monica El Khoury
+Matt Johnston
+Matt Rossman
+Monica Khoury
+Mykhailo Mischa Lieibenson
+Nick Littman
+Nyannyacha
 Oli R
 Pamela Chia
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
 Pavel Borisov
+Paweł Gulbinowicz
+Pedro Rodrigues
 Peter Lyn
+Peter Soderberg
 Qiao Han
+Rafael Chacón
 Raminder Singh
+Raúl Barroso
+Riccardo Busetti
 Rodrigo Mansueli
+Ronan Lehane
 Rory Wilding
+Ryan Goulet
+Sam Meech-Ward
+Sam Rome
 Sam Rose
+Sean Oliver
+Sean Thompson
+Sergio Cioban Filho
 Sreyas Udayavarman
 Stanislav M
 Stephen Morgan
 Steve Chavez
+Steven Eubank
 Stojan Dimitrovski
+Sugu Sougoumarane
 Supun Sudaraka Kalidasa
+Taryn King
 Terry Sutton
 Thomas E
 Thor Schaeff
+Timothy Lim
 Tom Ashley
 Tom G
+Tomás Pozo
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
+Yorvi Arias
+Yuliya Marinova
 Yuri Santana
+Zsolt Pazmandy
 ____________
 
 JOBS

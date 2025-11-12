@@ -1,0 +1,175 @@
+---
+title: 'Supabase Auth: Build vs. Buy'
+description: 'The reasons why (and why not) to use Supabase Auth instead of building your own.'
+categories:
+  - auth
+tags:
+  - auth
+date: '2025-08-12:10:00'
+toc_depth: 2
+author: prashant
+image: supabase-auth-build-vs-buy/supabase-auth-build-vs-buy-og.png
+thumb: supabase-auth-build-vs-buy/supabase-auth-build-vs-buy-og.png
+---
+
+Authentication appears in nearly every application but is rarely the core value proposition. Yet development teams often spend weeks or months building, testing, and maintaining auth systems. Let's explore the real costs of building authentication from scratch versus using a solution like Supabase Auth.
+
+## How Supabase Auth works under the hood
+
+Before diving into the cost analysis, it's important to understand what Supabase Auth is:
+
+1. **Postgres-native authentication**: Supabase Auth stores users directly in your Postgres database in the `auth.users` table, not in a separate service
+2. **JWT-based**: Authorization give you total control over security
+3. **Row Level Security integration**: Seamlessly connects authentication with Postgres's RLS policies
+4. **Hybrid token architecture**: Supabase Auth issues stateless JWTs for access control, while maintaining refresh tokens and session data in your Postgres database for secure, persistent login
+
+## The hidden costs of building your own auth
+
+When teams decide to build authentication, they're often thinking about the initial implementation only. But auth requires ongoing maintenance that can drain resources from your core product development. You need to consider:
+
+- The time investment required to build auth from scratch
+- The ongoing maintenance required to keep auth functioning properly
+- The security risks associated with running auth systems yourself
+- The considerable time and skills involved in adding new authentication protocols
+
+Even if you were to begin your auth investments using open-source projects, it’s typical for these open-source projects to be abandoned. This requires significant investments in upkeep and maintenance on your part.
+
+### Time investment
+
+Building basic authentication functionality typically requires:
+
+- **2-4 weeks** for a senior developer to implement email/password login, session management, and password reset functionality
+- **1-2 weeks** for implementing each additional auth provider (Google, GitHub, etc.)
+- **1-2 weeks** for security reviews and penetration testing
+- **1-3 weeks** for implementing MFA and other security features
+- **8+ weeks** for implementing SAML (which, itself, requires significant maintenance investment)
+
+This assumes you already have expertise in security best practices, JWT handling, and session management.
+
+### Ongoing maintenance
+
+Authentication isn't a "build once and forget" component:
+
+- Security vulnerabilities require immediate attention
+- Auth providers regularly update their APIs and requirements
+- Password storage standards evolve
+- Compliance requirements change over time
+- User management features grow more complex as you scale
+- New features, such as supporting one-time access codes, become more important
+
+Borrowing engineering time to maintain auth systems is a sub-optimal use of resources.
+
+### Security risks
+
+Authentication is security-critical infrastructure where mistakes can be catastrophic:
+
+- Token management vulnerabilities, such as session tokens
+- Password storage failures, such as weak hashing
+- Session handling issues
+- CSRF/XSS vulnerabilities
+
+These issues often aren't apparent until a breach occurs, with potentially devastating consequences. For most businesses, the time spent hardening and re-hardening auth systems, to say nothing of the time required and reputational hit caused by having to fix compromised auth systems, is simply not worth it when weighed against other priorities.
+
+## The Supabase Auth approach
+
+Supabase takes a different approach by providing authentication that's:
+
+1. **Integrated with your database**: Supabase Auth is deeply integrated with your Postgres instance via the `auth` schema. It stores user data in the `auth.users` table, manages tokens with Postgres functions and triggers, and integrates seamlessly with Row Level Security (RLS) for fine-grained access control, all without requiring you to manage auth logic in your own code.
+2. **Open source**: No vendor lock-in, with the ability to self-host if needed.
+3. **Developer-focused**: Simple APIs with client libraries for major frameworks.
+4. **Secure**: Supabase maintains security best practices for token issuance, password hashing (using `bcrypt`), and provider updates so you don’t have to monitor every standards update. However, developers are still responsible for securely handling user data and managing secure client environments.
+5. **Extensible**: Edge Functions enable custom auth logic to implement post-signup profile creation, role assignment based on domains, and third-party webhooks for things like sending Discord invites or syncing with your CRM.
+
+### Time to market
+
+Using Supabase Auth typically means:
+
+- **30 minutes to 2 hours**: Basic implementation time for email/password auth
+- **15-30 minutes**: Adding each additional provider (Google, GitHub, etc.)
+- **1-2 days**: Implementing row-level security policies
+- Security updates handled by Supabase
+
+This represents a 90-95% reduction in time-to-production compared to building from scratch.
+
+### Cost comparison
+
+Beyond the direct engineering time, there's the opportunity cost of resources diverted from your core product:
+
+| Activity                  | Build (hours)      | Supabase Auth (hours) |
+| ------------------------- | ------------------ | --------------------- |
+| Initial implementation    | 160-320            | 4-16                  |
+| Adding social providers   | 40-80 per provider | 0.5-1 per provider    |
+| Security updates (yearly) | 40-120             | 0                     |
+| User management features  | 80-160             | 0-8                   |
+| Total first year (est.)   | 320-680            | 4-24                  |
+
+At an average engineering cost of $150/hour, that's $47,400-$98,700 saved in the first year alone. For most companies, the 320-680 hours invested in building their own auth system could be channeled towards, at minimum, one category-defining feature.
+
+### Flexibility
+
+Supabase Auth supports:
+
+- Email/password authentication
+- Magic link (passwordless) login
+- Phone auth via Twilio integration
+- OAuth providers (Google, GitHub, Azure, Apple, etc.)
+- Custom claims and user metadata
+- JWT and session-based auth
+- Row-level security integration
+- Passkey support (coming soon)
+
+All without writing the underlying authentication code yourself.
+
+## Choosing between Supabase Auth and Auth0
+
+Many teams evaluate Supabase Auth against Auth0, another popular authentication service. Here's how they compare:
+
+| Feature                  | Supabase Auth                                  | Auth0                                     |
+| ------------------------ | ---------------------------------------------- | ----------------------------------------- |
+| **Architecture**         | Postgres-native, self-hostable                 | Cloud-only SaaS, proprietary              |
+| **Pricing Model**        | Based on compute and storage                   | Per monthly active user (MAU)             |
+| **Database Integration** | Direct Postgres RLS                            | Separate system from your database        |
+| **Enterprise Features**  | Self-hosting for compliance                    | Built-in SAML, LDAP, compliance tools     |
+| **Developer Experience** | Code-first, flexible APIs, Supabase UI Library | Dashboard-driven, extensive UI components |
+| Open Source              | Fully open source                              | Closed source                             |
+| **Customization**        | Full source code access                        | Rules, Actions, and Hooks                 |
+
+**Choose Supabase Auth when:**
+
+- You're already using Postgres and want direct database integration
+- You need cost predictability at scale (no per-user pricing)
+- You value open source and potential self-hosting
+- You prefer a code-first, API-driven approach
+
+**Choose Auth0 when:**
+
+- You need enterprise features like SAML and LDAP out of the box
+- You have complex multi-tenant B2B requirements
+- You need extensive compliance certifications immediately
+
+Both are excellent choices, but Supabase Auth typically offers significant cost advantages at scale while providing deeper database integration.
+
+## When should you build your own auth?
+
+Despite the advantages of Supabase Auth, there are legitimate reasons to build your own:
+
+1. **Specialized compliance requirements**: If you have unique regulatory needs that off-the-shelf solutions don't address
+2. **Deep integration with legacy systems**: When you need authentication tightly coupled with existing proprietary systems
+3. **Extremely unique authentication flows**: For highly specialized authentication requirements not supported by existing providers
+
+## Making the decision
+
+When considering whether to build or buy authentication, ask yourself:
+
+1. Is authentication a core differentiator for our product?
+2. Do we have security expertise on our team?
+3. Are we prepared to maintain this critical infrastructure indefinitely?
+4. Could the engineering time be better spent on our core value proposition?
+
+For most applications, authentication is essential infrastructure but not a competitive advantage. Using Supabase Auth lets you focus on what makes your application unique while leveraging battle-tested security.
+
+## Getting started
+
+- [Read the documentation](/docs/guides/auth). Implementing Supabase Auth takes just a few lines of code.
+- Try our [quickstart guide](/docs/guides/getting-started/quickstarts/nextjs). Supabase offers framework-specific packages that handle auth state, protected routes, and server-side rendering.
+- [Contact us](/contact/sales) if you want a more detailed analysis of Supabase Auth for your business, including pricing estimates and comparisons.

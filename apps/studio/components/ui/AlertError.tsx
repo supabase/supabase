@@ -1,6 +1,7 @@
-import Link from 'next/link'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { PropsWithChildren } from 'react'
 
-import type { ResponseError } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -15,24 +16,20 @@ export interface AlertErrorProps {
   error?: { message: string } | null
   className?: string
   showIcon?: boolean
+  additionalActions?: React.ReactNode
 }
 
 // [Joshen] To standardize the language for all error UIs
 
-const AlertError = ({
+export const AlertError = ({
   projectRef,
   subject,
   error,
   className,
   showIcon = true,
-}: AlertErrorProps) => {
-  const subjectString = subject?.replace(/ /g, '%20')
-  let href = `/support/new?category=dashboard_bug`
-
-  if (projectRef) href += `&ref=${projectRef}`
-  if (subjectString) href += `&subject=${subjectString}`
-  if (error) href += `&error=${error.message}`
-
+  children,
+  additionalActions,
+}: PropsWithChildren<AlertErrorProps>) => {
   const formattedErrorMessage = error?.message?.includes('503')
     ? '503 Service Temporarily Unavailable'
     : error?.message
@@ -45,13 +42,24 @@ const AlertError = ({
         <div>
           {error?.message && <p className="text-left">Error: {formattedErrorMessage}</p>}
           <p className="text-left">
-            Try refreshing your browser, but if the issue persists, please reach out to us via
-            support.
+            Try refreshing your browser, but if the issue persists for more than a few minutes,
+            please reach out to us via support.
           </p>
         </div>
-        <div>
-          <Button asChild type="warning">
-            <Link href={href}>Contact support</Link>
+        {children}
+        <div className="flex gap-2">
+          {additionalActions}
+          <Button asChild type="warning" className="w-min">
+            <SupportLink
+              queryParams={{
+                category: SupportCategories.DASHBOARD_BUG,
+                projectRef,
+                subject,
+                error: error?.message,
+              }}
+            >
+              Contact support
+            </SupportLink>
           </Button>
         </div>
       </AlertDescription_Shadcn_>

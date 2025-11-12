@@ -1,14 +1,33 @@
+import { Check, ChevronsUpDown, Database, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { Form, Input, Listbox, Modal, SidePanel } from 'ui'
+import {
+  Button,
+  cn,
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Form,
+  Input,
+  Label_Shadcn_,
+  Listbox,
+  Modal,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  ScrollArea,
+  SidePanel,
+} from 'ui'
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
-import { Plus, Database } from 'lucide-react'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 export type WrapperTableEditorProps = {
   visible: boolean
@@ -28,6 +47,7 @@ const WrapperTableEditor = ({
   tables,
   initialData,
 }: WrapperTableEditorProps) => {
+  const [open, setOpen] = useState(false)
   const [selectedTableIndex, setSelectedTableIndex] = useState<string>('')
 
   useEffect(() => {
@@ -71,33 +91,64 @@ const WrapperTableEditor = ({
       }
     >
       <SidePanel.Content>
-        <div className="my-4 space-y-6">
-          <Listbox
-            size="small"
-            label="Select a target the table will point to"
-            value={selectedTableIndex}
-            onChange={(value) => setSelectedTableIndex(value)}
-          >
-            <Listbox.Option key="empty" value="" label="---">
-              ---
-            </Listbox.Option>
-
-            {tables.map((table, i) => {
-              return (
-                <Listbox.Option
-                  className="group"
-                  key={String(i)}
-                  value={String(i)}
-                  label={table.label}
+        <div className="my-4 flex flex-col gap-y-6">
+          <div className="flex flex-col gap-y-2">
+            <Label_Shadcn_ className="text-foreground-light">
+              Select a target the table will point to
+            </Label_Shadcn_>
+            <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  type="default"
+                  role="combobox"
+                  className={cn(
+                    'w-full justify-between',
+                    !selectedTableIndex && 'text-muted-foreground'
+                  )}
+                  size="small"
+                  iconRight={
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />
+                  }
                 >
-                  <div className="space-y-1">
-                    <p>{table.label}</p>
-                    <p className="text-foreground-lighter">{table.description}</p>
-                  </div>
-                </Listbox.Option>
-              )
-            })}
-          </Listbox>
+                  {!!selectedTableIndex ? tables[Number(selectedTableIndex)].label : '---'}
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Find a table..." />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No targets found</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
+                        {(tables ?? []).map((table, i) => (
+                          <CommandItem_Shadcn_
+                            key={table.label}
+                            className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                            onSelect={() => {
+                              setSelectedTableIndex(String(i))
+                              setOpen(false)
+                            }}
+                            onClick={() => {
+                              setSelectedTableIndex(String(i))
+                              setOpen(false)
+                            }}
+                          >
+                            <div className="space-y-1">
+                              <p>{table.label}</p>
+                              <p className="text-foreground-lighter">{table.description}</p>
+                            </div>
+                            {String(i) === selectedTableIndex && (
+                              <Check className={cn('mr-2 h-4 w-4')} />
+                            )}
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          </div>
 
           {selectedTable && (
             <TableForm table={selectedTable} onSubmit={onSubmit} initialData={initialData} />
@@ -165,7 +216,7 @@ const TableForm = ({
   onSubmit: OnSubmitFn
   initialData: any
 }) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const {
     data: schemas,
     isLoading,

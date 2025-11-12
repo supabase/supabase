@@ -29,7 +29,7 @@ Add a prepared false flag to the client:
 export const client = postgres(connectionString, { prepare: false })
 ```
 
-# Node postgres
+# Node Postgres
 
 [Just omit the "name" value in a query definition](https://node-postgres.com/features/queries#prepared-statements):
 
@@ -51,6 +51,6 @@ Follow the recommendation in the [asyncpg docs](https://magicstack.github.io/asy
 
 > disable automatic use of prepared statements by passing `statement_cache_size=0` to [asyncpg.connect()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.connect) and [asyncpg.create_pool()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.pool.create_pool) (and, obviously, avoid the use of [Connection.prepare()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.Connection.prepare));
 
-# Rust's Deadpool or tokio-postgres:
+# Rust's Deadpool or `tokio-postgres`:
 
-- Check [Github Discussion](https://github.com/bikeshedder/deadpool/issues/340#event-13642472475)
+- Check [GitHub Discussion](https://github.com/bikeshedder/deadpool/issues/340#event-13642472475)

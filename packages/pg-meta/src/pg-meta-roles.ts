@@ -20,6 +20,8 @@ const pgRoleZod = z.object({
 const pgRoleArrayZod = z.array(pgRoleZod)
 const pgRoleOptionalZod = z.optional(pgRoleZod)
 
+export type PGRole = z.infer<typeof pgRoleZod>
+
 function list({
   includeDefaultRoles: includeDefaultRoles = false,
   limit,
@@ -65,24 +67,25 @@ where
   }
 }
 
-function retrieve({ id }: { id: number }): { sql: string; zod: typeof pgRoleOptionalZod }
-function retrieve({ name }: { name: string }): { sql: string; zod: typeof pgRoleOptionalZod }
-function retrieve({ id, name }: { id?: number; name?: string }): {
+type RoleIdentifier = Pick<PGRole, 'id'> | Pick<PGRole, 'name'>
+
+function getIdentifierWhereClause(identifier: RoleIdentifier) {
+  if ('id' in identifier && identifier.id) {
+    return `${ident('id')} = ${literal(identifier.id)}`
+  } else if ('name' in identifier && identifier.name) {
+    return `${ident('name')} = ${literal(identifier.name)}`
+  }
+  throw new Error('Must provide either id or name')
+}
+
+function retrieve(identifier: RoleIdentifier): {
   sql: string
   zod: typeof pgRoleOptionalZod
 } {
-  if (id) {
-    const sql = `${ROLES_SQL} where r.oid = ${literal(id)};`
-    return {
-      sql,
-      zod: pgRoleOptionalZod,
-    }
-  } else {
-    const sql = `${ROLES_SQL} where rolname = ${literal(name)};`
-    return {
-      sql,
-      zod: pgRoleOptionalZod,
-    }
+  const sql = `with roles as (${ROLES_SQL}) select * from roles where ${getIdentifierWhereClause(identifier)};`
+  return {
+    sql,
+    zod: pgRoleOptionalZod,
   }
 }
 
@@ -156,17 +159,8 @@ type RoleUpdateParams = {
   password?: string
   validUntil?: string
 }
-function update({ id }: { id: number }, params: RoleUpdateParams): { sql: string }
-function update({ name }: { name: string }, params: RoleUpdateParams): { sql: string }
-function update(
-  {
-    id,
-    name,
-  }: {
-    id?: number
-    name?: string
-  },
-  {
+function update(identifier: RoleIdentifier, params: RoleUpdateParams): { sql: string } {
+  const {
     name: newName,
     isSuperuser,
     canCreateDb,
@@ -178,15 +172,14 @@ function update(
     connectionLimit,
     password,
     validUntil,
-  }: RoleUpdateParams
-): { sql: string } {
+  } = params
   const sql = `
 do $$
 declare
-  id oid := ${id === undefined ? `${literal(name)}::regrole` : literal(id)};
   old record;
 begin
-  select * into old from pg_roles where oid = id;
+  with roles as (${ROLES_SQL})
+  select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
     raise exception 'Cannot find role with id %', id;
   end if;
@@ -199,18 +192,18 @@ begin
     ${canLogin === undefined ? '' : canLogin ? 'login' : 'nologin'}
     ${isReplicationRole === undefined ? '' : isReplicationRole ? 'replication' : 'noreplication'}
     ${canBypassRls === undefined ? '' : canBypassRls ? 'bypassrls' : 'nobypassrls'}
-    ${connectionLimit === undefined ? '' : `connection limit ${literal(connectionLimit)}`}
+    ${connectionLimit === undefined ? '' : `connection limit ${connectionLimit}`}
     ${password === undefined ? '' : `password ${literal(password)}`}
-    ${validUntil === undefined ? '' : `valid until ${literal(validUntil)}`}
-  ', old.rolname));
+    ${validUntil === undefined ? '' : `valid until %L`}
+  ', old.name${validUntil === undefined ? '' : `, ${literal(validUntil)}`}));
 
   ${
     newName === undefined
       ? ''
       : `
   -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
-  if new_name != old.nspname then
-    execute(format('alter role %I rename to ${ident(newName)};', old.nspname));
+  if ${literal(newName)} != old.name then
+    execute(format('alter role %I rename to %I;', old.name, ${literal(newName)}));
   end if;
   `
   }
@@ -223,30 +216,22 @@ $$;
 type RoleRemoveParams = {
   ifExists?: boolean
 }
-function remove({ id }: { id: number }, params?: RoleRemoveParams): { sql: string }
-function remove({ name }: { name: string }, params?: RoleRemoveParams): { sql: string }
 function remove(
-  {
-    id,
-    name,
-  }: {
-    id?: number
-    name?: string
-  },
+  identifier: RoleIdentifier,
   { ifExists = false }: RoleRemoveParams = {}
 ): { sql: string } {
   const sql = `
 do $$
 declare
-  id oid := ${id === undefined ? `${literal(name)}::regrole` : literal(id)};
   old record;
 begin
-  select * into old from pg_roles where oid = id;
+  with roles as (${ROLES_SQL})
+  select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
     raise exception 'Cannot find role with id %', id;
   end if;
 
-  execute(format('drop role ${ifExists ? 'if exists' : ''} %I;', old.rolname));
+  execute(format('drop role ${ifExists ? 'if exists' : ''} %I;', old.name));
 end
 $$;
 `

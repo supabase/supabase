@@ -377,6 +377,14 @@
             "type": "function"
           },
           {
+            "id": "overrideTypes",
+            "title": "Partially override or replace type of successful response",
+            "slug": "db-overrideTypes",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
+          },
+          {
             "id": "explain",
             "title": "Using explain",
             "slug": "explain",
@@ -442,7 +450,7 @@
       },
       {
         "id": "sign-in-with-id-token",
-        "title": "Sign in with ID Token",
+        "title": "Sign in with ID token (native sign-in)",
         "slug": "auth-signinwithidtoken",
         "product": "auth",
         "type": "function"
@@ -479,6 +487,20 @@
         "id": "sign-in-with-sso",
         "title": "Sign in a user through SSO",
         "slug": "auth-signinwithsso",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "sign-in-with-web3",
+        "title": "Sign in a user through Web3 (Solana, Ethereum)",
+        "slug": "auth-signinwithweb3",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "get-claims",
+        "title": "Get user claims from verified JWT",
+        "slug": "auth-getclaims",
         "product": "auth",
         "type": "function"
       },
@@ -784,6 +806,12 @@
     "title": "Realtime",
     "items": [
       {
+        "id": "realtime-api",
+        "title": "Overview",
+        "slug": "realtime-api",
+        "type": "function"
+      },
+      {
         "id": "stream",
         "title": "Listen to database changes",
         "slug": "stream",
@@ -987,6 +1015,7 @@
       "reference_dart_v1",
       "reference_dart_v2",
       "reference_javascript_v1",
+      "reference_javascript_v2",
       "reference_kotlin_v1",
       "reference_kotlin_v2",
       "reference_python_v2",

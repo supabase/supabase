@@ -18,7 +18,7 @@ A 500 error in Auth typically indicates an issue with an external dependency, su
 
 #### Open the log explorer
 
-Ensure you have access to the [Dashboard's Log Explorer](https://supabase.com/dashboard/project/_/logs/explorer) and set the time range appropriately:
+Ensure you have access to the [Dashboard's Log Explorer](/dashboard/project/_/logs/explorer) and set the time range appropriately:
 
 ![image](/docs/img/troubleshooting/152d65ad-f0ed-47cf-8dcb-1e31c6221e71.png)
 
@@ -96,13 +96,13 @@ If you see an error like must be owner of..., the supabase_auth_admin role may h
 
 #### Solution
 
-Check ownership with this [GitHub Gist](https://gist.github.com/TheOtherBrian1/6aaaa78632b1e371f3b1c790305f0acd). If any objects are owned by the `supabase_admin` role, contact [Support](https://supabase.com/dashboard/support/new). If they're owned by roles other than `supabase_auth_admin` you can change ownership back manually one-by-one:
+Check ownership with this [GitHub Gist](https://gist.github.com/TheOtherBrian1/6aaaa78632b1e371f3b1c790305f0acd). If any objects are owned by the `supabase_admin` role, contact [Support](/dashboard/support/new). If they're owned by roles other than `supabase_auth_admin` you can change ownership back manually one-by-one:
 
 ```sql
 ALTER <object type (table, function, etc.)> <auth.object_name> OWNER TO supabase_auth_admin;
 ```
 
-Alternatively, you can run the SQL script in this [Github Gist](https://gist.github.com/TheOtherBrian1/4714a333432b80660ff71b136b298fb8) to change all
+Alternatively, you can run the SQL script in this [GitHub Gist](https://gist.github.com/TheOtherBrian1/4714a333432b80660ff71b136b298fb8) to change all
 
 ### Trigger related:
 
@@ -128,7 +128,7 @@ where proname = '<FUNCTION NAME>';
 
 ##### Trigger has insufficient privileges ( sql_state_code = 42501)
 
-If the error is related to insufficient privileges, your trigger function is missing a security definer tag, which allows it to access schemas outside of auth. You must `REPLACE` the function with the appropriate security definer settings ([example](https://supabase.com/docs/guides/database/functions?queryGroups=language&language=js#security-definer-vs-invoker))
+If the error is related to insufficient privileges, your trigger function is missing a security definer tag, which allows it to access schemas outside of auth. You must `REPLACE` the function with the appropriate security definer settings ([example](/docs/guides/database/functions?queryGroups=language&language=js#security-definer-vs-invoker))
 
 ##### Trigger references a table or column that does not exist (sql_state_code = 42P01)
 
@@ -169,11 +169,11 @@ order by timestamp
 
 ### Database migration errors
 
-> "running db migrations: Migrator: problem creating schema migrations"
+> `running db migrations: Migrator: problem creating schema migrations`
 
 This is a continuation of the "Corrupted Schema" error from the Postgres Section. If you modified structures in the auth schema, such as columns or tables, or added restrictions, such as RLS, Auth will not be able to complete it's migrations. It's necessary to remove those modifications.
 
-If you are running older versions of auth, you may experience a migration bug. If so, checkout this [guide](https://github.com/orgs/supabase/discussions/20722) for a resolution. If it doesn't work, please contact Support.
+If you are running older versions of auth, you may experience a migration bug. If so, checkout this [guide](https://github.com/orgs/supabase/discussions/20722) for a resolution. If it doesn't work, contact Support.
 
 ### SMTP errors
 
@@ -190,4 +190,4 @@ The log will be able to provide some context for what is occurring, but it is im
 
 Incomplete or incorrect email templates can also cause 500 errors. If your templates have unclosed variable tags or HTML elements, or use forbidden characters, this might be the issue.
 
-Test a simplified email template in the [Auth Dashboard](https://supabase.com/dashboard/project/_/auth/templates). If the new template works, revise your original template to avoid forbidden characters and ensure all elements/variables are properly closed.
+Test a simplified email template in the [Auth Dashboard](/dashboard/project/_/auth/templates). If the new template works, revise your original template to avoid forbidden characters and ensure all elements/variables are properly closed.

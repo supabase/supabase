@@ -14,9 +14,16 @@ export function getTableEditorSql(id?: number) {
             c.relforcerowsecurity as rls_forced,
             c.relreplident,
             c.relowner,
-            obj_description(c.oid) as comment
+            obj_description(c.oid) as comment,
+            fs.srvname as foreign_server_name,
+            fdw.fdwname as foreign_data_wrapper_name,
+            fdw_handler.proname as foreign_data_wrapper_handler
         from pg_class c
         join pg_namespace nc on nc.oid = c.relnamespace
+        left join pg_foreign_table ft on ft.ftrelid = c.oid
+        left join pg_foreign_server fs on fs.oid = ft.ftserver
+        left join pg_foreign_data_wrapper fdw on fdw.oid = fs.srvfdw
+        left join pg_proc fdw_handler on fdw.fdwhandler = fdw_handler.oid
         where c.oid = ${id}
             and not pg_is_other_temp_schema(nc.oid)
             and (
@@ -162,6 +169,7 @@ export function getTableEditorSql(id?: number) {
                 conkey[1] as ordinal_position
             from pg_catalog.pg_constraint
             where contype = 'u' and cardinality(conkey) = 1
+            group by conrelid, conkey[1]
         ) as uniques on uniques.table_id = a.attrelid and uniques.ordinal_position = a.attnum
         left join (
             select distinct on (conrelid, conkey[1])
@@ -251,6 +259,9 @@ export function getTableEditorSql(id?: number) {
                 'schema', b.schema,
                 'name', b.name,
                 'comment', b.comment,
+                'foreign_server_name', b.foreign_server_name,
+                'foreign_data_wrapper_name', b.foreign_data_wrapper_name,
+                'foreign_data_wrapper_handler', b.foreign_data_wrapper_handler,
                 'columns', coalesce(c.columns, '[]'::jsonb)
             )
         end as entity

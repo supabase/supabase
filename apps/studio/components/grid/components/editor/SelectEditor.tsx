@@ -1,8 +1,6 @@
 import type { RenderEditCellProps } from 'react-data-grid'
 import { Select } from 'ui'
 
-import { useTrackedState } from 'components/grid/store/Store'
-
 interface SelectEditorProps<TRow, TSummaryRow = unknown>
   extends RenderEditCellProps<TRow, TSummaryRow> {
   isNullable?: boolean
@@ -17,9 +15,6 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
   options,
   isNullable,
 }: SelectEditorProps<TRow, TSummaryRow>) {
-  const state = useTrackedState()
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
-
   const value = row[column.key as keyof TRow] as unknown as string
 
   function onChange(event: any) {
@@ -42,7 +37,7 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
       size="small"
       defaultValue={value ?? ''}
       className="sb-grid-select-editor !gap-2"
-      style={{ width: `${gridColumn?.width || column.width}px` }}
+      style={{ width: `${column.width}px` }}
       // @ts-ignore
       onChange={onChange}
       onBlur={onBlur}

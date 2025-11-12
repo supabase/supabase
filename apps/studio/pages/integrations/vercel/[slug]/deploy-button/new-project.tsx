@@ -1,10 +1,9 @@
 import { useParams } from 'common'
-import { debounce } from 'lodash'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
+import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -15,10 +14,10 @@ import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PROVIDERS } from 'lib/constants'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import passwordStrength from 'lib/password-strength'
+import { passwordStrength } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
@@ -30,7 +29,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="mx-auto w-full max-w-md">
           <header>
-            <h1 className="text-xl text-foreground">New project</h1>
+            <h2>New project</h2>
             <Markdown
               className="text-foreground-light"
               content={`Choose the Supabase organization you wish to install in`}
@@ -53,8 +52,7 @@ VercelIntegration.getLayout = (page) => (
 )
 
 const CreateProject = () => {
-  const router = useRouter()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
@@ -64,9 +62,11 @@ const CreateProject = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value: string) => checkPasswordStrength(value), 300)
-  ).current
+  async function checkPasswordStrength(value: string) {
+    const { message, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthMessage(message)
+  }
 
   const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
@@ -106,19 +106,13 @@ const CreateProject = () => {
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
-  }
-
-  async function checkPasswordStrength(value: string) {
-    const { message, strength } = await passwordStrength(value)
-    setPasswordStrengthScore(strength)
-    setPasswordStrengthMessage(message)
+    } else checkPasswordStrength(value)
   }
 
   function generatePassword() {
     const password = generateStrongPassword()
     setDbPass(password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
@@ -136,8 +130,8 @@ const CreateProject = () => {
   async function onCreateProject() {
     if (!organizationIntegration) return console.error('No organization installation details found')
     if (!organizationIntegration?.id) return console.error('No organization installation ID found')
-    if (!foreignProjectId) return console.error('No foreignProjectId ID set')
-    if (!organization) return console.error('No organization ID set')
+    if (!foreignProjectId) return console.error('No foreignProjectId set')
+    if (!organization) return console.error('No organization set')
 
     snapshot.setLoading(true)
 
@@ -149,7 +143,7 @@ const CreateProject = () => {
     }
 
     createProject({
-      organizationId: organization.id,
+      organizationSlug: organization.slug,
       name: projectName,
       dbPass,
       dbRegion,
@@ -200,7 +194,7 @@ const CreateProject = () => {
 
         snapshot.setLoading(false)
 
-        if (next) {
+        if (next && isVercelUrl(next)) {
           window.location.href = next
         }
       },
@@ -225,7 +219,7 @@ const CreateProject = () => {
       <div className="py-2">
         <Input
           id="dbPass"
-          label="Database Password"
+          label="Database password"
           type="password"
           placeholder="Type in a strong password"
           value={dbPass}
@@ -257,11 +251,11 @@ const CreateProject = () => {
                   key={option}
                   label={label}
                   value={label}
-                  addOnBefore={({ active, selected }: any) => (
+                  addOnBefore={() => (
                     <img
                       alt="region icon"
                       className="w-5 rounded-sm"
-                      src={`${router.basePath}/img/regions/${Object.keys(AWS_REGIONS)[i]}.svg`}
+                      src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
                     />
                   )}
                 >

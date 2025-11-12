@@ -1,11 +1,11 @@
+import { Github } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from 'ui'
-
 import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
-import Link from 'next/link'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
 
 export default async function TroubleshootingPage({ entry }: { entry: ITroubleshootingEntry }) {
@@ -29,7 +29,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
           )}
           <hr className="my-7" aria-hidden />
           <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr,250px]">
-            <div>
+            <div className="min-w-0">
               <MDXRemoteBase source={entry.content} />
             </div>
             <aside aria-labelledby="heading--metadata" className="not-prose mt-5">
@@ -58,7 +58,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.errors?.length > 0 && (
+              {entry.data.errors?.length && entry.data.errors.length > 0 && (
                 <>
                   <h3 className="text-sm text-foreground-lighter mb-3">Related error codes</h3>
                   <div className="flex flex-wrap gap-0.5">
@@ -76,9 +76,9 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.keywords?.length > 0 && (
+              {entry.data.keywords?.length && entry.data.keywords.length > 0 && (
                 <>
-                  <h3 className="text-sm text-foreground-lighter mb-3">Tags</h3>
+                  <h3 className="text-sm text-foreground-lighter mb-3">Keywords</h3>
                   <div className="flex flex-wrap gap-0.5">
                     {entry.data.keywords.map((keyword) => (
                       <Link
@@ -94,7 +94,20 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              <Feedback className="px-0" />
+              <Feedback className="px-0 mb-6 lg:mb-8" />
+              {entry.data.github_url && (
+                <>
+                  <hr className="my-6" aria-hidden />
+                  <Link
+                    target="_blank"
+                    href={entry.data.github_url}
+                    className="flex items-center gap-2 text-sm text-foreground-lighter"
+                  >
+                    <Github size={14} />
+                    View discussion on GitHub
+                  </Link>
+                </>
+              )}
             </aside>
           </div>
         </article>

@@ -5,6 +5,7 @@ import type {
   PostgresTable,
   PostgresView,
 } from '@supabase/postgres-meta'
+import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
 interface TableRelationship extends PostgresRelationship {
@@ -40,10 +41,15 @@ export interface ForeignTable {
   schema: string
   name: string
   comment: string | null
+  foreign_server_name: string
+  foreign_data_wrapper_name: string
+  foreign_data_wrapper_handler: string
   columns: PostgresColumn[]
 }
 
 export type Entity = Table | PartitionedTable | View | MaterializedView | ForeignTable
+
+export type TableLike = Table | PartitionedTable
 
 export function isTable(entity?: Entity): entity is Table {
   return entity?.entity_type === ENTITY_TYPE.TABLE
@@ -57,12 +63,16 @@ export function isPartitionedTable(entity?: Entity): entity is PartitionedTable 
  * Returns true if the entity is a Table or a PartitionedTable.
  * Foreign tables are not considered table-like.
  */
-export function isTableLike(entity?: Entity): entity is Table | PartitionedTable {
+export function isTableLike(entity?: Entity): entity is TableLike {
   return isTable(entity) || isPartitionedTable(entity)
 }
 
 export function isForeignTable(entity?: Entity): entity is ForeignTable {
   return entity?.entity_type === ENTITY_TYPE.FOREIGN_TABLE
+}
+
+export function isMsSqlForeignTable(entity?: Entity): entity is ForeignTable {
+  return isForeignTable(entity) && entity.foreign_data_wrapper_handler === WRAPPER_HANDLERS.MSSQL
 }
 
 export function isView(entity?: Entity): entity is View {
@@ -78,4 +88,37 @@ export function isMaterializedView(entity?: Entity): entity is MaterializedView 
  */
 export function isViewLike(entity?: Entity): entity is View | MaterializedView {
   return isView(entity) || isMaterializedView(entity)
+}
+
+export function postgresTableToEntity(table: PostgresTable): Entity | undefined {
+  if (table.columns === undefined || table.relationships === undefined) {
+    console.error(
+      'Unable to convert PostgresTable to Entity type: columns and relationships must not be undefined.'
+    )
+    return undefined
+  }
+
+  const tableRelationships: TableRelationship[] = table.relationships.map((rel) => ({
+    deletion_action: 'a',
+    update_action: 'a',
+    ...rel,
+  }))
+
+  return {
+    id: table.id,
+    schema: table.schema,
+    name: table.name,
+    comment: table.comment,
+    rls_enabled: table.rls_enabled,
+    rls_forced: table.rls_forced,
+    replica_identity: table.replica_identity,
+    bytes: table.bytes,
+    size: table.size,
+    live_rows_estimate: table.live_rows_estimate,
+    dead_rows_estimate: table.dead_rows_estimate,
+    columns: table.columns,
+    relationships: tableRelationships,
+    primary_keys: table.primary_keys,
+    entity_type: ENTITY_TYPE.TABLE,
+  }
 }

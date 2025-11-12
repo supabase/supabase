@@ -1,43 +1,67 @@
-/// <reference types="@testing-library/jest-dom" />
-
 import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
-import { setupServer } from 'msw/node'
+import { cleanup, configure } from '@testing-library/react'
 import { createDynamicRouteParser } from 'next-router-mock/dist/dynamic-routes'
 import { afterAll, afterEach, beforeAll, vi } from 'vitest'
-import { APIMock } from './mocks/api'
-import { routerMock } from './mocks/router'
+import { routerMock } from './lib/route-mock'
+import { mswServer } from './lib/msw'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
-export const mswServer = setupServer(...APIMock)
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(relativeTime)
 
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-})
+// Uncomment this if HTML in errors are being annoying.
+//
+// configure({
+//   getElementError: (message, container) => {
+//     const error = new Error(message ?? 'Element not found')
+//     error.name = 'ElementNotFoundError'
+//     return error
+//   },
+// })
 
 beforeAll(() => {
-  console.log('🤖 Starting MSW Server')
-
-  mswServer.listen({ onUnhandledRequest: 'error' })
+  mswServer.listen({ onUnhandledRequest: `error` })
   vi.mock('next/router', () => require('next-router-mock'))
+  vi.mock('next/navigation', async () => {
+    const actual = await vi.importActual('next/navigation')
+    return {
+      ...actual,
+      useRouter: () => {
+        return {
+          push: vi.fn(),
+          replace: vi.fn(),
+        }
+      },
+      usePathname: () => vi.fn(),
+      useSearchParams: () => ({
+        get: vi.fn(),
+      }),
+    }
+  })
+
   vi.mock('next/compat/router', () => require('next-router-mock'))
+
+  // Mock the useParams hook from common module globally
+  vi.mock('common', async (importOriginal: any) => {
+    const actual = await importOriginal()
+    return {
+      ...(typeof actual === 'object' ? actual : {}),
+      useParams: () => ({ ref: 'default' }),
+    }
+  })
 
   routerMock.useParser(createDynamicRouteParser(['/projects/[ref]']))
 })
 
-afterAll(() => mswServer.close())
-
-afterEach(() => mswServer.resetHandlers())
-
 afterEach(() => {
+  mswServer.resetHandlers()
   cleanup()
+})
+
+afterAll(() => {
+  mswServer.close()
 })

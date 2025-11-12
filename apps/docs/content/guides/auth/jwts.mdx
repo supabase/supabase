@@ -1,177 +1,268 @@
 ---
 id: 'auth-jwts'
-title: 'JWTs'
-subtitle: 'JSON Web Tokens'
-tocVideo: 'v3Exg5YpJvE'
+title: 'JSON Web Token (JWT)'
+subtitle: 'Information on how best to use JSON Web Tokens with Supabase'
 ---
 
 A [JSON Web Token](https://jwt.io/introduction) is a type of data structure, represented as a string, that usually contains identity and authorization information about a user. It encodes information about its lifetime and is signed with a cryptographic key to make it tamper-resistant.
 
-Supabase Access Tokens are JWTs. The JWT is sent along with every request to Supabase services. By verifying the token and inspecting the included claims, you can allow or deny access to resources. [Row Level Security](/docs/guides/database/postgres/row-level-security) policies are based on the information present in JWTs.
+Supabase Auth continuously issues a new JWT for each user session, for as long as the user remains signed in. Check the comprehensive guide on [Sessions](/docs/guides/auth/sessions) to find out how you can tailor this process for your needs.
 
-## Encoding and signing JWTs
+JWTs provide the foundation for [Row Level Security](/docs/guides/database/row-level-security). Each Supabase product is able to securely decode and verify the validity of a JWT it receives before using Postgres policies and roles to authorize access to the project's data.
 
-JWTs are encoded and signed as follows.
+Supabase provides a comprehensive system of managing [JWT Signing Keys](/docs/guides/auth/signing-keys) used to create and verify JSON Web Tokens.
 
-The JSON object starts out looking something like this:
+## Introduction
 
-```js
+JWTs are strings that have the following structure:
+
+```
+<header>.<payload>.<signature>
+```
+
+Each part is a string of [Base64-URL](https://en.wikipedia.org/wiki/Base64#Variants_summary_table) encoded JSON, or bytes for the signature.
+
+**Header**
+
+```json
 {
-  "sub": "0001",
-  "name": "Sam Vimes",
-  "iat": 1516239022,
-  "exp": 1518239022
+  "typ": "JWT",
+  "alg": "<HS256 | ES256 | RS256>",
+  "kid": "<unique key identifier>"
 }
 ```
 
-`sub` is the "subject", which is usually the UUID of the user. `name` is self-explanatory, and `iat` is the Unix timestamp at which the token was created. Many JWTs will also have an `exp`, which is the date at which the token is set to expire and can no longer be used. These are some of the standard fields you may find in a JWT, but you can pretty much store whatever you want in there, for example:
+Gives some basic identifying information about the string, indicating its type `typ`, the cryptographic algorithm `alg` that can be used to verify the data, and optionally the unique key identifier that should be used when verifying it.
 
-```js
+**Payload**
+
+```json
 {
-  "sub": "0002",
-  "name": "Věra Hrabánková",
-  "iat": 1516239022,
-  "exp": 1518239022,
-  "theme": {
-      "primary" : "#D80C14",
-      "secondary" : "#FFFFFF"
+  "iss": "https://project_id.supabase.co/auth/v1",
+  "exp": 12345678,
+  "sub": "<user ID>",
+  "role": "authenticated",
+  "email": "someone@example.com",
+  "phone": "+15552368"
+  // ...
+}
+```
+
+Provides identifying information (called "claims") about the user (or other entity) that is represented by the token. Usually a JWT conveys information about what the user can access (then called Access Token) or who the user is (then called ID Token). You can use a [Custom Access Token Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook) to add, remove or change claims present in the token. A few claims are important:
+
+| Claim                                              | Description                                                                                                                                                                |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `iss`                                              | Identifies the server which issued the token. If you append `/.well-known/jwks.json` to this URL you'll get access to the public keys with which you can verify the token. |
+| `exp`                                              | Sets a time limit after which the token should not be trusted and is considered expired, even if it is properly signed.                                                    |
+| `sub`                                              | Means _subject_, is the unique ID of the user represented by the token.                                                                                                    |
+| <span className="whitespace-nowrap!">`role`</span> | The Postgres role to use when applying Row Level Security policies.                                                                                                        |
+| ...                                                | All other claims are useful for quick access to profile information without having to query the database or send a request to the Auth server.                             |
+
+**Signature**
+
+A [digital signature](https://en.wikipedia.org/wiki/Digital_signature) using a [shared secret](https://en.wikipedia.org/wiki/HMAC) or [public-key cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography). The purpose of the signature is to verify the authenticity of the `<header>.<payload>` string without relying on database access, liveness or performance of the Auth server. To verify the signature avoid implementing the algorithms yourself and instead rely on `supabase.auth.getClaims()`, or other high-quality JWT verification libraries for your language.
+
+## Supabase and JWTs
+
+Supabase creates JWTs in these cases for you:
+
+1. When using Supabase Auth, an access token (JWT) is created for each user while they remain signed in. These are short lived, so they are continuously issued as your user interacts with Supabase APIs.
+2. As the legacy JWT-based [API keys](/docs/guides/api/api-keys) `anon` and `service_role`. These have a 10 year expiry and are signed with a shared secret, making them hard to rotate or expire. These JWTs express public access via the `anon` key, or elevated access via the `service_role` key. We strongly recommend switching to publishable and secret API keys.
+3. On-the-fly when using publishable or secret API keys. Each API key is transformed into a short-lived JWT that is then used to authorize access to your data. Accessing these short-lived tokens is generally not possible.
+
+In addition to creating JWTs, Supabase can also accept JWTs from other Auth servers via the [Third-Party Auth](/docs/guides/auth/third-party/overview) feature or ones you've made yourself using the legacy JWT secret or if you've imported in [JWT Signing Key](/docs/guides/auth/signing-keys).
+
+## Using custom or third-party JWTs
+
+<Admonition type="note">
+
+The `supabase.auth.getClaims()` method is meant to be used only with JWTs issued by Supabase Auth. If you make your own JWTs using the legacy JWT secret or a key you've imported, the verification may fail. We strongly recommend using a JWT verification library for your language to verify this type of JWT based on the claims you're adding in them.
+
+</Admonition>
+
+Your Supabase project accepts a JWT in the `Authorization: Bearer <jwt>` header. If you're using the Supabase client library, it does this for you.
+
+If you are already using Supabase Auth, when a user is signed in, their access token JWT is automatically managed and sent for you with every API call.
+
+If you wish to send a JWT from a Third-Party Auth provider, or one you made yourself by using the legacy JWT secret or a JWT signing key you imported, you can pass it to the client library using the `accessToken` option.
+
+<Tabs type="underlined" queryGroup="language">
+
+<TabPanel id="ts" label="TypeScript">
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      return '<your JWT here>'
+    },
   }
-}
-```
-
-Just note that the more data you store in your token, the longer the encoded string will be.
-
-When we want to send the JWT to the user, we first encode the data using an algorithm such as `HS256`. There are many libraries (and several different algorithms) that can be used to do this encoding/decoding, such as [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken). The signing is as simple as:
-
-```js
-// from https://replit.com/@awalias/jsonwebtokens#index.js
-let token = jwt.sign({ name: 'Sam Vimes' }, 'some-secret')
-```
-
-And the resulting string will look like this:
-
-```js
-eyJhbGciOiJIUzI1NiJ9
-  .eyJzdWIiOiIwMDAxIiwibmFtZSI6IlNhbSBWaW1lcyIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNTE4MjM5MDIyfQ
-  .zMcHjKlkGhuVsiPIkyAkB2rjXzyzJsMMgpvEGvGtjvA
-```
-
-You will notice that the string is actually made up of three components:
-
-The first segment `eyJhbGciOiJIUzI1NiJ9` is known as the "header", and when decoded just tells us which algorithm was used to do the encoding:
-
-```js
-{
-  "alg": "HS256"
-}
-```
-
-The second segment <code className="break-all">eyJzdWIiOiIwMDAxIiwibmFtZSI6IlNhbSBWaW1lcyIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNTE4MjM5MDIyfQ</code> contains our original payload:
-
-```js
-{
-  "sub": "0001",
-  "name": "Sam Vimes",
-  "iat": 1516239022,
-  "exp": 1518239022
-}
-```
-
-The last segment `zMcHjKlkGhuVsiPIkyAkB2rjXzyzJsMMgpvEGvGtjvA` is the signature itself, which is the part used by the website or service provider to verify that a token sent by some user is legitimate. It is produced in the first instance by running the cryptographic function HS256 on the following input:
-
-```js
-HMACSHA256(
-  base64UrlEncode(header) + "." +
-  base64UrlEncode(payload)
-  <jwt_secret>
 )
 ```
 
-You can test out minting your own tokens on [https://jwt.io](https://jwt.io).
+</TabPanel>
 
-It is important to note that anyone who possesses the `jwt_secret` here can create new tokens, and also verify existing ones. More advanced JWT algorithms use two secrets: one for the creation of tokens, and a separate one to verify the validity of signed tokens.
+<$Show if="sdk:dart">
 
-You might wonder why JWTs are so popular all of a sudden. The answer is that with the mass adoption of microservice architecture, we were in a situation where several distinct microservices (APIs, websites, servers, etc.) want to easily validate that a user is who they say they are, or are in other words a "logged-in" user. Traditional session tokens are no use here, since they would require each microservice to either maintain a record of currently valid session tokens or to query a central database each time a user wants to access a resource in order to check the validity of the session token – very inefficient indeed. JWT-based auth in this sense is decentralized, since anyone with the `jwt_secret` can verify a token without needing access to a centralized database.
+<TabPanel id="dart" label="Flutter">
 
-Note: One downside of JWTs is that they are not easily voidable, like session tokens. If a JWT is leaked to a malicious actor, they will be able to redeem it anywhere until the expiry date is reached – unless of course the system owner updates the `jwt_secret` (which will of course invalidate _everyone's_ existing tokens).
-
-## JWTs in Supabase
-
-In Supabase we issue JWTs for three different purposes:
-
-1. `anon key`: This key is used to bypass the Supabase API gateway and can be used in your client-side code.
-2. `service role key`: This key has super admin rights and can bypass your Row Level Security. Do not put it in your client-side code. Keep it private.
-3. `user specific jwts`: These are tokens we issue to users who log into your project/service/website. It's the modern equivalent of a session token, and can be used by a user to access content or permissions specific to them.
-
-The first token here, the `anon key` token, is for developers to send along with their API requests whenever they want to interact with their Supabase database.
-
-Let's say you want to read the names of all the rows in a table `colors`. We would make a request like:
-
-```bash
-curl 'https://xscduanzzfseqszwzhcy.supabase.co/rest/v1/colors?select=name' \
--H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNDIwNTE3NCwiZXhwIjoxOTI5NzgxMTc0fQ.-NBR1WnZyQGpRLdXJfgfpszoZ0EeE6KHatJsDPLIX8c"
-```
-
-If we put this token into https://jwt.io, we see it decodes to:
-
-```js
-{
-  "role": "anon",
-  "iss": "supabase",
-  "iat": 1614205174,
-  "exp": 1929781174
-}
-```
-
-This JWT is signed by a `jwt_secret` specific to the developer's Supabase token (you can find this secret alongside this encoded "anon key" on your Dashboard under Settings > API page) and is required to get past the Supabase API gateway and access the developer's project.
-
-The idea with this particular key is that it's safe to put into your client, meaning it's okay if your end users see this key – but _only_ if you first enable Row Level Security.
-
-The second key, `service role key`, should only ever be used on one of your own servers or environments, and should never be shared with end users. You might use this token to do things like make batch inserts of data.
-
-The `user access token` is the JWT issued when you call for example:
-
-```js
-supabase.auth.signIn({
-  email: 'valid.email@supabase.io',
-  password: 'They_Live_1988!',
-})
-```
-
-This token should be passed in addition to the `apikey` header as an `Authorization Bearer` header like:
-
-```bash
-curl 'https://xscduanzzfseqszwzhcy.supabase.co/rest/v1/colors?select=name' \
--H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNDIwNTE3NCwiZXhwIjoxOTI5NzgxMTc0fQ.-NBR1WnZyQGpRLdXJfgfpszoZ0EeE6KHatJsDPLIX8c" \
--H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjE1ODI0Mzg4LCJzdWIiOiIwMzM0NzQ0YS1mMmEyLTRhYmEtOGM4YS02ZTc0OGY2MmExNzIiLCJlbWFpbCI6InNvbWVvbmVAZW1haWwuY29tIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwifSwidXNlcl9tZXRhZGF0YSI6bnVsbCwicm9sZSI6ImF1dGhlbnRpY2F0ZWQifQ.I-_oSsJamtinGxniPETBf-ezAUwDW2sY9bJIThvdX9s"
-```
-
-You'll notice that this token is quite a bit longer, since it contains information specific to the user such as:
-
-```js
-{
-  "aud": "authenticated",
-  "exp": 1615824388,
-  "sub": "0334744a-f2a2-4aba-8c8a-6e748f62a172",
-  "email": "valid.email@supabase.io",
-  "app_metadata": {
-    "provider": "email"
+```dart
+await Supabase.initialize(
+  url: supabaseUrl,
+  anonKey: supabaseKey,
+  debug: false,
+  accessToken: () async {
+    return "<your JWT here>";
   },
-  "user_metadata": null,
-  "role": "authenticated"
+);
+```
+
+</TabPanel>
+</$Show>
+
+<$Show if="sdk:swift">
+
+<TabPanel id="swift" label="Swift (iOS)">
+
+```swift
+import Supabase
+
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
+  supabaseKey: "SUPABASE_PUBLISHABLE_KEY",
+  options: SupabaseClientOptions(
+    auth: SupabaseClientOptions.AuthOptions(
+      accessToken: {
+        return "<your JWT here>"
+      }
+    )
+  )
+)
+```
+
+</TabPanel>
+</$Show>
+
+<$Show if="sdk:kotlin">
+
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val supabase = createSupabaseClient(
+    "https://<supabase-project>.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY"
+) {
+    accessToken = {
+        "<your JWT here>"
+    }
 }
 ```
 
-If using the service role key, you'll need to pass it into both the `apikey` and `authorization` headers (again, only do this from a secure environment such as your own server):
+</TabPanel>
+</$Show>
+
+<TabPanel id="bash" label="cURL">
 
 ```bash
-curl "$YOUR_PROJECT_URL/rest/v1/colors?select=name" \
- -H "apikey: $YOUR_SERVICE_ROLE_KEY" \
- -H "authorization: Bearer $YOUR_SERVICE_ROLE_KEY"
+curl 'https://<supabase-project>.supabase.co/rest/v1/my_table?select=id' \
+  -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+  -H "Authorization: Bearer <your JWT here>"
 ```
 
-Now that you understand what JWTs are and where they're used in Supabase, you can explore how to use them in combination with Row Level Security to start restricting access to certain tables, rows, and columns in your Postgres database.
+</TabPanel>
+
+</Tabs>
+
+In the past there was a recommendation to set custom headers on the Supabase client with the `Authorization` header including your custom JWT. This is no longer recommended as it's less flexible and causes confusion when combined with a user session from Supabase Auth.
+
+## Verifying a JWT from Supabase
+
+If you're not able to use the Supabase client libraries, the following can be used to help you securely verify JWTs issued by Supabase.
+
+Supabase Auth exposes a [JSON Web Key](https://datatracker.ietf.org/doc/html/rfc7517) Set URL for each Supabase project:
+
+```http
+GET https://project-id.supabase.co/auth/v1/.well-known/jwks.json
+```
+
+Which responds with JWKS object containing one or more asymmetric [JWT signing keys](/docs/guides/auth/signing-keys) (only their public keys). Be aware that this endpoint does not return any keys if you are not using asymmetric JWT signing keys.
+
+```json
+{
+  "keys": [
+    {
+      "kid": "<match with kid from JWT header>",
+      "alg": "<match with alg from JWT header>",
+      "kty": "<RSA|EC|OKP>",
+      "key_ops": ["verify"]
+      // public key fields
+    }
+  ]
+}
+```
+
+This endpoint is served directly from the Auth server, but is also additionally cached by the Supabase Edge for 10 minutes, significantly speeding up access to this data regardless of where you're performing the verification. It's important to be aware of the cache expiry time to prevent unintentionally rejecting valid user access tokens. We recommend waiting at least 20 minutes when creating a standby signing key, or revoking a previously used key.
+
+Make sure that you do not cache this data for longer in your application, as it might make revocation difficult. If you do, make sure to provide a way to purge this cache when rotating signing keys to avoid unintentionally rejecting valid user access tokens.
+
+Below is an example of how to use the [jose TypeScript JWT verification library](https://github.com/panva/jose) with Supabase JWTs:
+
+```typescript
+import { jwtVerify, createRemoteJWKSet } from 'jose'
+
+const PROJECT_JWKS = createRemoteJWKSet(
+  new URL('https://project-id.supabase.co/auth/v1/.well-known/jwks.json')
+)
+
+/**
+ * Verifies the provided JWT against the project's JSON Web Key Set.
+ */
+async function verifyProjectJWT(jwt: string) {
+  return jwtVerify(jwt, PROJECT_JWKS)
+}
+```
+
+### Verifying with the legacy JWT secret or a shared secret signing key
+
+If your project is still using the legacy JWT secret, or you're using a shared secret (HS256) signing key, we recommend always verifying a user access token directly with the Auth server by sending a request like so:
+
+```http
+GET https://project-id.supabase.co/auth/v1/user
+apikey: publishable or anon legacy API key
+Authorization: Bearer <JWT>
+```
+
+If the server responds with HTTP 200 OK, the JWT is valid, otherwise it is not.
+
+Because the Auth server runs only in your project's specified region and is not globally distributed, doing this check can be quite slow depending on where you're performing the check. Avoid doing checks like this from servers or functions running on the edge, and prefer routing to a server within the same geographical region as your project.
+
+If you are using the legacy JWT secret, or you've imported your own shared secret (HS256) signing key, you may wish to verify using the shared secret. **We strongly recommend against this approach.**
+
+<Admonition type="caution">
+
+There is almost no benefit from using a JWT signed with a shared secret. Although it's computationally more efficient and verification is simpler to code by hand, using this approach can expose your project's data to significant security vulnerabilities or weaknesses.
+
+Consider the following:
+
+- Using a shared secret can make it more difficult to keep aligned with security compliance frameworks such as SOC2, PCI-DSS, ISO27000, HIPAA, etc.
+- A shared secret that is in the hands of a malicious actor can be used to impersonate your users, give them access to privileged actions or data.
+- It is difficult to detect or identify when or how a shared secret has been given to a malicious actor.
+- Consider who might have even accidental access to the shared secret: systems, staff, devices (and their disk encryption and vulnerability patch status).
+- A malicious actor can use a shared secret **far into the future**, so lacking current evidence of compromise does not mean your data is secure.
+- It can be very easy to accidentally leak the shared secret in publicly available source code such as in your website or frontend, mobile app package or other executable. This is especially true if you accidentally add the secret in environment variables prefixed with `NEXT_PUBLIC_`, `VITE_`, `PUBLIC_` or other conventions by web frameworks.
+- Rotating shared secrets might require careful coordination to avoid downtime of your app.
+
+</Admonition>
+
+Check the JWT verification libraries for your language on how to securely verify JWTs signed with the legacy JWT secret or a shared secret (HS256) signing key. We strongly recommend relying on the Auth server as described above, or switching to a different signing key based on public key cryptography (RSA, Elliptic Curves) instead.
 
 ## Resources
 
 - JWT debugger: https://jwt.io/
+- [JWT Signing Keys](/docs/guides/auth/signing-keys)
+- [JWT Claims Reference](/docs/guides/auth/jwt-fields) - Complete reference for all JWT claims used by Supabase Auth
+- [API keys](/docs/guides/api/api-keys)

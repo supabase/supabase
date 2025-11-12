@@ -1,6 +1,5 @@
 import fs from 'fs'
 
-import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -8,7 +7,7 @@ import remarkGfm from 'remark-gfm'
 import type { ICommonMarkdown } from '~/components/reference/Reference.types'
 
 async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
-  let markdownContent = []
+  let markdownContent: any[] = []
   /**
    * Read all the markdown files that might have
    *  - custom text
@@ -34,14 +33,6 @@ async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
       const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
       const { data, content } = matter(fileContents)
 
-      const codeHikeOptions: CodeHikeConfig = {
-        theme: codeHikeTheme,
-        lineNumbers: true,
-        showCopyButton: true,
-        skipLanguages: [],
-        autoImport: false,
-      }
-
       markdownContent.push({
         id: section.id,
         title: section.title,
@@ -53,7 +44,7 @@ async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
               // https://mdxjs.com/packages/mdx/#compilefile-options
               mdxOptions: {
                 useDynamicImport: true,
-                remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+                remarkPlugins: [remarkGfm],
               },
               // Indicates whether or not to parse the frontmatter from the mdx source
             })

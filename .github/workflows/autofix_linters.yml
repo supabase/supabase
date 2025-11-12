@@ -5,50 +5,50 @@ on:
     types:
       - labeled
 
-permissions:
-  contents: write
-
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   autofix:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    permissions:
+      contents: write
     if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix') }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Calculate number of commits
+        run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
+
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
-          sparse-checkout: apps
           ref: ${{ github.head_ref }}
+          token: ${{ secrets.PAT_AUTOFIX }}
+          fetch-depth: ${{ env.PR_FETCH_DEPTH }}
+          sparse-checkout: |
+            packages
+            apps
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         name: Install pnpm
-        with:
-          version: 9.10.0
-          run_install: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
+          cache: pnpm
 
       - name: Install required dependencies
-        run: pnpm i
+        run: pnpm install --frozen-lockfile
 
       - name: Run Prettier in fix mode
         run: pnpm run format
 
       - name: Commit changes and push to existing branch
-        run: |
-          git config --global user.name 'github-tidy-bot'
-          git config --global user.email 'github-tidy-bot@supabase.com'
-          if [[ `git status --porcelain` ]]; then
-            echo "[bot] Changes detected, committing."
-
-            echo "[bot] Running in non-squash mode."
-            git commit -am "ci: Autofix updates from GitHub workflow"
-            git push
-          else
-            echo "[bot] No changes detected, nothing to commit."
-          fi
+        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
+        with:
+          commit_message: 'ci: Autofix updates from GitHub workflow'
+          commit_user_name: 'kevcodez'
+          commit_user_email: 'k.grueneberg1994@gmail.com'

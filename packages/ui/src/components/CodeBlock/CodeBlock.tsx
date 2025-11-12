@@ -4,9 +4,9 @@ import { noop } from 'lodash'
 import { Check, Copy } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Children, ReactNode, useState } from 'react'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
 
+import { copyToClipboard } from '../../lib/utils'
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button/Button'
 import { monokaiCustomTheme } from './CodeBlock.utils'
@@ -20,6 +20,7 @@ import http from 'react-syntax-highlighter/dist/cjs/languages/hljs/http'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
+import pgsql from 'react-syntax-highlighter/dist/cjs/languages/hljs/pgsql'
 import php from 'react-syntax-highlighter/dist/cjs/languages/hljs/php'
 import {
   default as py,
@@ -44,6 +45,7 @@ export type CodeBlockLang =
   | 'php'
   | 'python'
   | 'go'
+  | 'pgsql'
 export interface CodeBlockProps {
   title?: ReactNode
   language?: CodeBlockLang
@@ -61,10 +63,11 @@ export interface CodeBlockProps {
   value?: string
   theme?: any
   children?: string
-  renderer?: SyntaxHighlighterProps['renderer']
-  focusable?: boolean
-  onCopyCallback?: () => void
   wrapLines?: boolean
+  focusable?: boolean
+  renderer?: SyntaxHighlighterProps['renderer']
+  handleCopy?: (value?: string) => void
+  onCopyCallback?: () => void
 }
 
 /**
@@ -83,6 +86,7 @@ export interface CodeBlockProps {
  * @param {boolean} [props.hideLineNumbers=false] - Whether to hide line numbers.
  * @param {SyntaxHighlighterProps['renderer']} [props.renderer] - Custom renderer for syntax highlighting.
  * @param {boolean} [props.focusable=true] - Whether the code block is focusable. When true, users can focus the code block to select text or use ⌘A (Cmd+A) to select all. This is so we don't need to load Monaco Editor.
+ * @param {function} [props.handleCopy] - Optional override behaviour for copying value. For e.g if the code block contains obfuscated values, but the copy behaviour should reveal those values instead.
  */
 export const CodeBlock = ({
   title,
@@ -101,6 +105,7 @@ export const CodeBlock = ({
   renderer,
   focusable = true,
   onCopyCallback = noop,
+  handleCopy,
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
@@ -108,12 +113,17 @@ export const CodeBlock = ({
 
   const [copied, setCopied] = useState(false)
 
-  const handleCopy = () => {
+  const onSelectCopy = (value?: string) => {
+    if (value) {
+      if (!!handleCopy) {
+        handleCopy(value)
+      } else {
+        copyToClipboard(value)
+      }
+    }
     setCopied(true)
     onCopyCallback()
-    setTimeout(() => {
-      setCopied(false)
-    }, 1000)
+    setTimeout(() => setCopied(false), 1000)
   }
 
   // Extract string when `children` has a single string node
@@ -146,6 +156,7 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('php', php)
   SyntaxHighlighter.registerLanguage('python', python)
   SyntaxHighlighter.registerLanguage('go', go)
+  SyntaxHighlighter.registerLanguage('pgsql', pgsql)
 
   const large = false
   // don't show line numbers if bash == lang
@@ -168,9 +179,9 @@ export const CodeBlock = ({
         >
           {/* @ts-ignore */}
           <SyntaxHighlighter
+            suppressContentEditableWarning
             language={lang}
             wrapLines={wrapLines}
-            // @ts-ignore
             style={monokaiTheme}
             className={cn(
               'code-block border border-surface p-4 w-full !my-0 !bg-surface-100 outline-none focus:border-foreground-lighter/50',
@@ -220,7 +231,12 @@ export const CodeBlock = ({
               e.preventDefault()
               return false
             }}
-            suppressContentEditableWarning={true}
+            onKeyDown={(e: any) => {
+              if (e.code === 'Backspace') {
+                e.preventDefault()
+                return false
+              }
+            }}
           >
             {codeValue}
           </SyntaxHighlighter>
@@ -232,18 +248,14 @@ export const CodeBlock = ({
                 `${isDarkTheme ? 'dark' : ''}`,
               ].join(' ')}
             >
-              {/* //
-              @ts-ignore */}
-              <CopyToClipboard text={value || children}>
-                <Button
-                  type="default"
-                  className="px-1.5"
-                  icon={copied ? <Check /> : <Copy />}
-                  onClick={() => handleCopy()}
-                >
-                  {copied ? 'Copied' : ''}
-                </Button>
-              </CopyToClipboard>
+              <Button
+                type="default"
+                className="px-1.5"
+                icon={copied ? <Check /> : <Copy />}
+                onClick={() => onSelectCopy(value || children)}
+              >
+                {copied ? 'Copied' : ''}
+              </Button>
             </div>
           ) : null}
         </div>

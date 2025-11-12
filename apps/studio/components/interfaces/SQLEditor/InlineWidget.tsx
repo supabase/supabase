@@ -1,5 +1,5 @@
 import { editor } from 'monaco-editor'
-import { PropsWithChildren, useEffect, useMemo } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 export interface InlineWidgetProps {
@@ -45,62 +45,83 @@ const InlineWidget = ({
 }: PropsWithChildren<InlineWidgetProps>) => {
   const lineNumber = beforeLineNumber ?? afterLineNumber
   const key = `${id}-${lineNumber.toString()}`
-
   const containerElement = useMemo(() => document.createElement('div'), [])
+  const zoneIdRef = useRef<string>()
+  const viewZoneRef = useRef<{
+    top: number
+    height: number
+    heightInLines: number
+  }>({ top: 0, height: 0, heightInLines: heightInLines })
 
   // Get the appropriate editor instance for diff editor
   const targetEditor = 'getModifiedEditor' in editor ? editor.getModifiedEditor() : editor
 
-  useEffect(() => {
-    let zoneId: string
-    let viewZoneTop = 0
-    let viewZoneHeight = 0
+  const recalculateLayout = () => {
+    const layoutInfo = targetEditor.getLayoutInfo()
 
+    if (!layoutInfo) {
+      return
+    }
+
+    containerElement.style.left = `${layoutInfo.contentLeft}px`
+    containerElement.style.top = `${viewZoneRef.current.top}px`
+    containerElement.style.width = `${layoutInfo.width - layoutInfo.contentLeft - 20}px`
+    containerElement.style.height = `${viewZoneRef.current.height}px`
+  }
+
+  const createViewZone = () => {
+    targetEditor.changeViewZones((accessor) => {
+      // Remove existing zone if it exists
+      if (zoneIdRef.current) {
+        accessor.removeZone(zoneIdRef.current)
+      }
+
+      // Create new zone with current height
+      zoneIdRef.current = accessor.addZone({
+        afterLineNumber: beforeLineNumber ?? afterLineNumber,
+        heightInLines: viewZoneRef.current.heightInLines,
+        domNode: document.createElement('div'),
+        onDomNodeTop: (top) => {
+          viewZoneRef.current.top = top
+          recalculateLayout()
+        },
+        onComputedHeight: (height) => {
+          viewZoneRef.current.height = height
+          recalculateLayout()
+        },
+      })
+    })
+  }
+
+  // Initial setup of view zone and overlay widget
+  useEffect(() => {
     const overlayWidget: editor.IOverlayWidget = {
       getId: () => id,
       getDomNode: () => containerElement,
       getPosition: () => null,
     }
 
-    const recalculateLayout = () => {
-      const layoutInfo = targetEditor.getLayoutInfo()
-
-      if (!layoutInfo) {
-        return
-      }
-
-      containerElement.style.left = `${layoutInfo.contentLeft}px`
-      containerElement.style.top = `${viewZoneTop}px`
-      containerElement.style.width = `${layoutInfo.width - layoutInfo.contentLeft}px`
-      containerElement.style.height = `${viewZoneHeight}px`
-    }
-
-    targetEditor.changeViewZones((accessor) => {
-      zoneId = accessor.addZone({
-        afterLineNumber: beforeLineNumber ?? afterLineNumber,
-        heightInLines,
-        domNode: document.createElement('div'),
-        onDomNodeTop: (top) => {
-          viewZoneTop = top
-          recalculateLayout()
-        },
-        onComputedHeight: (height) => {
-          viewZoneHeight = height
-          recalculateLayout()
-        },
-      })
-
-      targetEditor.addOverlayWidget(overlayWidget)
-    })
+    createViewZone()
+    targetEditor.addOverlayWidget(overlayWidget)
 
     // Remove the view zone & overlay widget on unmount
     return () => {
       targetEditor.changeViewZones((accessor) => {
-        accessor.removeZone(zoneId)
+        if (zoneIdRef.current) {
+          accessor.removeZone(zoneIdRef.current)
+        }
         targetEditor.removeOverlayWidget(overlayWidget)
       })
     }
-  }, [targetEditor, id, beforeLineNumber, afterLineNumber, heightInLines, containerElement])
+  }, [targetEditor, id, beforeLineNumber, afterLineNumber]) // Note: heightInLines removed from deps
+
+  // Update view zone height when heightInLines changes
+  useEffect(() => {
+    if (heightInLines !== viewZoneRef.current.heightInLines) {
+      viewZoneRef.current.heightInLines = heightInLines
+      createViewZone()
+    }
+  }, [heightInLines])
 
   return createPortal(children, containerElement, key)
 }

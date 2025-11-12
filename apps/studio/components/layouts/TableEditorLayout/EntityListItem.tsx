@@ -1,31 +1,22 @@
 import saveAs from 'file-saver'
-import {
-  Clipboard,
-  Copy,
-  Download,
-  Edit,
-  Eye,
-  Lock,
-  MoreHorizontal,
-  Table2,
-  Trash,
-  Unlock,
-} from 'lucide-react'
+import { Copy, Download, Edit, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import {
   MAX_EXPORT_ROW_COUNT,
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
-import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { LOAD_TAB_FROM_CACHE_PARAM, parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
+import { InlineLink } from 'components/ui/InlineLink'
+import { getTableDefinition } from 'data/database/table-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
@@ -34,10 +25,16 @@ import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { copyToClipboard } from 'lib/helpers'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { formatSql } from 'lib/formatSql'
+import type { CSSProperties } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
+  Badge,
+  Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -49,25 +46,42 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  TreeViewItemVariant,
 } from 'ui'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
 export interface EntityListItemProps {
-  id: number
+  id: number | string
   projectRef: string
+  item: Entity
   isLocked: boolean
+  isActive?: boolean
+  style?: CSSProperties
+  onExportCLI: () => void
 }
 
-const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
+// [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
+function isTableLikeEntityListItem(entity: { type?: string }) {
+  return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
+}
+
+const EntityListItem = ({
   id,
   projectRef,
   item: entity,
   isLocked,
-}) => {
-  const { project } = useProjectContext()
+  isActive: _isActive,
+  style,
+  onExportCLI,
+}: EntityListItemProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
+  const tabId = createTabId(entity.type, { id: entity.id })
+  const tabs = useTabsStateSnapshot()
+  const isPreview = tabs.previewTabId === tabId
+
+  const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
@@ -94,6 +108,14 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const materializedViewHasLints: boolean = getEntityLintDetails(
     entity.name,
     'materialized_view_in_api',
+    ['ERROR', 'WARN'],
+    lints,
+    selectedSchema
+  ).hasLint
+
+  const foreignTableHasLints: boolean = getEntityLintDetails(
+    entity.name,
+    'foreign_table_in_api',
     ['ERROR', 'WARN'],
     lints,
     selectedSchema
@@ -191,11 +213,13 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         connectionString: project?.connectionString,
         table: supaTable,
       })
+
       const formattedRows = rows.map((row) => {
-        const formattedRow = row
-        Object.keys(row).map((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null)
-            formattedRow[column] = JSON.stringify(formattedRow[column])
+        const formattedRow = { ...row }
+        Object.keys(row).forEach((column) => {
+          if (typeof row[column] === 'object' && row[column] !== null) {
+            formattedRow[column] = JSON.stringify(row[column])
+          }
         })
         return formattedRow
       })
@@ -212,133 +236,73 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     }
   }
 
-  const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
-    let tooltipContent = null
-
-    switch (entity.type) {
-      case ENTITY_TYPE.TABLE:
-        if (tableHasLints) {
-          tooltipContent = 'RLS disabled'
-        }
-        break
-      case ENTITY_TYPE.VIEW:
-        if (viewHasLints) {
-          tooltipContent = 'Security definer view'
-        }
-        break
-      case ENTITY_TYPE.MATERIALIZED_VIEW:
-        if (materializedViewHasLints) {
-          tooltipContent = 'Security definer view'
-        }
-        break
-      case ENTITY_TYPE.FOREIGN_TABLE:
-        tooltipContent = 'RLS is not enforced on foreign tables'
-        break
-      default:
-        break
-    }
-
-    if (tooltipContent) {
-      return (
-        <Tooltip disableHoverableContent={true}>
-          <TooltipTrigger className="min-w-4" asChild>
-            <Unlock
-              size={14}
-              strokeWidth={2}
-              className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
-            />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">{tooltipContent}</TooltipContent>
-        </Tooltip>
-      )
-    }
-
-    return null
-  }
-
   return (
-    <div className="px-2">
-      <EditorTablePageLink
-        title={entity.name}
-        id={String(entity.id)}
-        href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
-        role="button"
-        aria-label={`View ${entity.name}`}
-        className={cn(
-          'w-full',
-          'flex items-center gap-2',
-          'py-1 px-2',
-          'text-light',
-          'rounded-md',
-          isActive ? 'bg-selection' : 'hover:bg-surface-200 focus:bg-surface-200',
-          'group',
-          'transition'
-        )}
-      >
+    <EditorTablePageLink
+      title={entity.name}
+      style={style}
+      id={String(entity.id)}
+      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}&${LOAD_TAB_FROM_CACHE_PARAM}=true`}
+      role="button"
+      aria-label={`View ${entity.name}`}
+      className={cn(
+        TreeViewItemVariant({
+          isSelected: isActive && !isPreview,
+          isOpened: isOpened && !isPreview,
+          isPreview,
+        }),
+        'pl-4 pr-1'
+      )}
+      onDoubleClick={(e) => {
+        e.preventDefault()
+        const tabId = createTabId(entity.type, { id: entity.id })
+        tabs.makeTabPermanent(tabId)
+      }}
+    >
+      <>
+        {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         <Tooltip disableHoverableContent={true}>
-          <TooltipTrigger className="min-w-4" asChild>
-            {entity.type === ENTITY_TYPE.TABLE ? (
-              <Table2
-                size={15}
-                strokeWidth={1.5}
-                className={cn(
-                  'text-foreground-muted group-hover:text-foreground-lighter',
-                  isActive && 'text-foreground-lighter',
-                  'transition-colors'
-                )}
-              />
-            ) : entity.type === ENTITY_TYPE.VIEW ? (
-              <Eye
-                size={15}
-                strokeWidth={1.5}
-                className={cn(
-                  'text-foreground-muted group-hover:text-foreground-lighter',
-                  isActive && 'text-foreground-lighter',
-                  'transition-colors'
-                )}
-              />
-            ) : (
-              <div
-                className={cn(
-                  'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                  entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-                  entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-                  entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                    'text-foreground-light bg-border-stronger'
-                )}
-              >
-                {Object.entries(ENTITY_TYPE)
-                  .find(([, value]) => value === entity.type)?.[0]?.[0]
-                  ?.toUpperCase()}
-              </div>
-            )}
+          <TooltipTrigger className="min-w-4">
+            <EntityTypeIcon type={entity.type} isActive={isActive} />
           </TooltipTrigger>
           <TooltipContent side="bottom">{formatTooltipText(entity.type)}</TooltipContent>
         </Tooltip>
         <div
           className={cn(
-            'truncate',
-            'overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
+            'truncate overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
             isActive && 'text-foreground'
           )}
         >
           <span
             className={cn(
               isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground',
-              'text-sm',
-              'transition',
-              'truncate'
+              'text-sm transition truncate'
             )}
           >
             {entity.name}
           </span>
-          <EntityTooltipTrigger entity={entity} />
+          <div>
+            <EntityTooltipTrigger
+              entity={entity}
+              tableHasLints={tableHasLints}
+              viewHasLints={viewHasLints}
+              materializedViewHasLints={materializedViewHasLints}
+              foreignTableHasLints={foreignTableHasLints}
+            />
+          </div>
         </div>
 
         {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
-              <MoreHorizontal size={14} strokeWidth={2} />
+            <DropdownMenuTrigger
+              asChild
+              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground"
+            >
+              <Button
+                type="text"
+                className="w-6 h-6"
+                icon={<MoreVertical size={14} strokeWidth={2} />}
+                onClick={(e) => e.preventDefault()}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start" className="w-44">
               <DropdownMenuItem
@@ -349,9 +313,42 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                   copyToClipboard(entity.name)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} />
                 <span>Copy name</span>
               </DropdownMenuItem>
+
+              {isTableLikeEntityListItem(entity) && (
+                <DropdownMenuItem
+                  key="copy-schema"
+                  className="space-x-2"
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    const toastId = toast.loading('Getting table schema...')
+
+                    const tableDefinition = await getTableDefinition({
+                      id: entity.id,
+                      projectRef: project?.ref,
+                      connectionString: project?.connectionString,
+                    })
+                    if (!tableDefinition) {
+                      return toast.error('Failed to get table schema', { id: toastId })
+                    }
+
+                    try {
+                      const formatted = formatSql(tableDefinition)
+                      await copyToClipboard(formatted)
+                      toast.success('Table schema copied to clipboard', { id: toastId })
+                    } catch (err: any) {
+                      toast.error('Failed to copy schema: ' + (err.message || err), {
+                        id: toastId,
+                      })
+                    }
+                  }}
+                >
+                  <Copy size={12} />
+                  <span>Copy table schema</span>
+                </DropdownMenuItem>
+              )}
 
               {entity.type === ENTITY_TYPE.TABLE && (
                 <>
@@ -415,6 +412,16 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                       >
                         <span>Export table as SQL</span>
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="download-table-cli"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onExportCLI()
+                        }}
+                      >
+                        <span>Export table via CLI</span>
+                      </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
 
@@ -435,9 +442,91 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </EditorTablePageLink>
-    </div>
+      </>
+    </EditorTablePageLink>
   )
+}
+
+const EntityTooltipTrigger = ({
+  entity,
+  tableHasLints,
+  viewHasLints,
+  materializedViewHasLints,
+  foreignTableHasLints,
+}: {
+  entity: Entity
+  tableHasLints: boolean
+  viewHasLints: boolean
+  materializedViewHasLints: boolean
+  foreignTableHasLints: boolean
+}) => {
+  const { ref } = useParams()
+
+  let tooltipContent = null
+  const accessWarning = 'Data is publicly accessible via API'
+  const learnMoreCTA = (
+    <InlineLink
+      href={`/project/${ref}/editor/${entity.id}?schema=${entity.schema}&showWarning=true`}
+    >
+      Learn more
+    </InlineLink>
+  )
+
+  switch (entity.type) {
+    case ENTITY_TYPE.TABLE:
+      if (tableHasLints) {
+        tooltipContent = (
+          <>
+            {accessWarning} as RLS is disabled. {learnMoreCTA}.
+          </>
+        )
+      }
+      break
+    case ENTITY_TYPE.VIEW:
+      if (viewHasLints) {
+        tooltipContent = (
+          <>
+            {accessWarning} as this is a Security definer view. {learnMoreCTA}.
+          </>
+        )
+      }
+      break
+    case ENTITY_TYPE.MATERIALIZED_VIEW:
+      if (materializedViewHasLints) {
+        tooltipContent = (
+          <>
+            {accessWarning} as this is a Security definer view {learnMoreCTA}.
+          </>
+        )
+      }
+      break
+    case ENTITY_TYPE.FOREIGN_TABLE:
+      if (foreignTableHasLints) {
+        tooltipContent = (
+          <>
+            {accessWarning} as RLS is not enforced on foreign tables. {learnMoreCTA}.
+          </>
+        )
+      }
+      break
+    default:
+      break
+  }
+
+  if (tooltipContent) {
+    return (
+      <Tooltip>
+        <TooltipTrigger className="min-w-4">
+          <Badge variant="destructive">Unrestricted</Badge>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-52 text-center">
+          {tooltipContent}
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return null
 }
 
 export default EntityListItem

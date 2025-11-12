@@ -1,11 +1,12 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Image } from 'ui'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { Admonition } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
+import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
@@ -13,82 +14,60 @@ import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderC
 import ButtonCard from '~/components/ButtonCard'
 import { Extensions } from '~/components/Extensions'
 import { JwtGenerator } from '~/components/JwtGenerator'
-import {
-  AuthErrorCodesTable,
-  AuthRateLimits,
-  CreateClientSnippet,
-  DatabaseSetup,
-  GetSessionWarning,
-  HuggingFaceDeployment,
-  KotlinProjectSetup,
-  MigrationWarnings,
-  OAuthPkceFlow,
-  ProjectSetup,
-  QuickstartDbSetup,
-  QuickstartIntro,
-  SocialProviderSettingsSupabase,
-  SocialProviderSetup,
-  PostgresInstallation,
-} from '~/components/MDX/partials'
 import { NavData } from '~/components/NavData'
+import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
-import { RegionsList } from '~/components/RegionsList'
+import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
+import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
-import * as CH from '~/features/ui/CodeHike'
+import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
+import InfoTooltip from '~/features/ui/InfoTooltip'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import { ErrorCodes } from '../ui/ErrorCodes'
+import { McpConfigPanel } from '../ui/McpConfigPanel'
 
 const components = {
   Accordion,
   AccordionItem,
   Admonition,
-  AuthErrorCodesTable,
-  AuthRateLimits,
+  AiPromptsIndex,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
   Button,
   ButtonCard,
-  CH,
   CodeSampleDummy,
   CodeSampleWrapper,
   CostWarning,
-  CreateClientSnippet,
-  DatabaseSetup,
+  ErrorCodes,
   Extensions,
-  GetSessionWarning,
   GlassPanel,
-  HuggingFaceDeployment,
   IconArrowDown: ArrowDown,
   IconCheck: Check,
   IconPanel,
   IconX: X,
-  Image: (props: any) => <Image fill className="object-contain" {...props} />,
+  Image: (props: any) => <Image fill alt="" className="object-contain" {...props} />,
   JwtGenerator,
-  KotlinProjectSetup,
   Link,
-  MigrationWarnings,
+  McpConfigPanel,
+  NamedCodeBlock,
   NavData,
-  OAuthPkceFlow,
   ProjectConfigVariables,
-  ProjectSetup,
-  QuickstartDbSetup,
-  QuickstartIntro,
   RealtimeLimitsEstimator,
   RegionsList,
+  SmartRegionsList,
   SharedData,
   ShowUntil,
-  SocialProviderSettingsSupabase,
-  SocialProviderSetup,
-  PostgresInstallation,
   SqlToRest,
   StepHikeCompact,
   Tabs,
   TabPanel,
+  InfoTooltip,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}
@@ -104,6 +83,8 @@ const components = {
       {props.children}
     </Heading>
   ),
+  pre: CodeBlock,
+  Price,
 }
 
 export { components }

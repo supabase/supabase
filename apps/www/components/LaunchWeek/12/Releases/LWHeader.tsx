@@ -17,7 +17,7 @@ const LWHeader = ({ className }: { className?: string }) => {
           Launch Week <span className="font-mono">12</span>
         </h1>
         <p className="text-foreground-lighter md:text-xl max-w-xs md:max-w-md">
-          Join us for a week of new features and find new ways to level up your development
+          Join us for a week of announcements
         </p>
       </SectionContainer>
     </div>

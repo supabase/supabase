@@ -1,16 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  ColumnPrivilegesGrant,
-  grantColumnPrivileges,
-} from 'data/privileges/column-privileges-grant-mutation'
+import { grantColumnPrivileges } from 'data/privileges/column-privileges-grant-mutation'
 import type { ColumnPrivilege } from 'data/privileges/column-privileges-query'
 import {
   ColumnPrivilegesRevoke,
   revokeColumnPrivileges,
 } from 'data/privileges/column-privileges-revoke-mutation'
+import { privilegeKeys } from 'data/privileges/keys'
 import {
   TablePrivilegesGrant,
   grantTablePrivileges,
@@ -20,12 +17,12 @@ import {
   TablePrivilegesRevoke,
   revokeTablePrivileges,
 } from 'data/privileges/table-privileges-revoke-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   ALL_PRIVILEGE_TYPES,
   COLUMN_PRIVILEGE_TYPES,
   ColumnPrivilegeType,
 } from './Privileges.constants'
-import { privilegeKeys } from 'data/privileges/keys'
 
 export interface PrivilegeOperation {
   object: 'table' | 'column'
@@ -269,7 +266,7 @@ export function usePrivilegesState({
 }
 
 export function useApplyPrivilegeOperations(callback?: () => void) {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
 
   const [isLoading, setIsLoading] = useState(false)
@@ -303,7 +300,7 @@ export function useApplyPrivilegeOperations(callback?: () => void) {
         .map((op) => ({
           column_id: String(op.id),
           grantee: op.grantee,
-          privilege_type: op.privilege_type as ColumnPrivilegesGrant['privilege_type'],
+          privilege_type: op.privilege_type as ColumnPrivilegesRevoke['privilege_type'],
         }))
       const revokeColumnOperations = columnOperations
         .filter((op) => op.type === 'revoke')
@@ -346,8 +343,10 @@ export function useApplyPrivilegeOperations(callback?: () => void) {
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(privilegeKeys.tablePrivilegesList(project.ref)),
-        queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(project.ref)),
+        queryClient.invalidateQueries({ queryKey: privilegeKeys.tablePrivilegesList(project.ref) }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.columnPrivilegesList(project.ref),
+        }),
       ])
 
       setIsLoading(false)

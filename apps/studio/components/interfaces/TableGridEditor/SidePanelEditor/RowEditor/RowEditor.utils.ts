@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { compact, isEqual, isNull, isString, omitBy } from 'lodash'
 import type { Dictionary } from 'types'
 
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
+import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { minifyJSON, tryParseJson } from 'lib/helpers'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import {
@@ -46,7 +46,7 @@ export const generateRowFields = (
   table: PostgresTable,
   foreignKeys: ForeignKey[]
 ): RowField[] => {
-  const { primary_keys } = table
+  const { primary_keys = [] } = table
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return (table.columns ?? []).map((column) => {
@@ -121,6 +121,8 @@ export const parseValue = (originalValue: any, format: string) => {
       return originalValue
     } else if (typeof originalValue === 'number' || !format) {
       return originalValue
+    } else if (format === 'bytea') {
+      return convertByteaToHex(originalValue)
     } else if (typeof originalValue === 'object') {
       return JSON.stringify(originalValue)
     } else if (typeof originalValue === 'boolean') {
@@ -260,5 +262,32 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
  * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
  */
 export const isValueTruncated = (value: string | null | undefined) => {
-  return value?.endsWith('...') && (value ?? '').length > MAX_CHARACTERS
+  return (
+    (typeof value === 'string' && value.endsWith('...') && value.length > MAX_CHARACTERS) ||
+    // if the value is an array which total representation is > MAX_CHARACTERS
+    // we'll select the first MAX_ARRAY_SIZE elements and add a "..." last element at the end of it
+    (typeof value === 'string' &&
+      // If the string represent an array finishing with "..." element
+      value.startsWith('["') &&
+      value.endsWith(',"..."]') &&
+      // If the array have MAX_ARRAY_SIZE elements in it
+      // its a large truncated array
+      (value.match(/","/g) || []).length === MAX_ARRAY_SIZE) ||
+    // if the string represent a multi-dimentional array we always consider it as possibly truncated
+    // so user load the whole value before edition
+    (typeof value === 'string' && value.startsWith('[["')) ||
+    // [Joshen] For json arrays, refer to getTableRowsSql from table-row-query
+    // for array types, we're adding {"truncated": true} as the last item of the JSON to
+    // maintain the JSON array structure
+    (typeof value === 'string' && value.endsWith(',{"truncated":true}]'))
+  )
+}
+
+export const convertByteaToHex = (value: { type: 'Buffer'; data: number[] }) => {
+  // [Alaister] this is just a safeguard to catch sneaky null values
+  try {
+    return `\\x${Buffer.from(value.data).toString('hex')}`
+  } catch {
+    return value
+  }
 }

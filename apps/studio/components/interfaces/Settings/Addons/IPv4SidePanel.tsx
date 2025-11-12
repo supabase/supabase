@@ -1,35 +1,40 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Button, Radio, SidePanel, cn } from 'ui'
-import { ExternalLink } from 'lucide-react'
 import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
+  const isAws = useIsAwsCloudProvider()
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 
-  const canUpdateIPv4 = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const { can: canUpdateIPv4 } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'ipv4'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled IPv4`)
@@ -56,9 +61,10 @@ const IPv4SidePanel = () => {
   const availableOptions =
     (addons?.available_addons ?? []).find((addon) => addon.type === 'ipv4')?.variants ?? []
 
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
+  const isPgBouncerEnabled = !isFreePlan
 
   useEffect(() => {
     if (visible) {
@@ -86,7 +92,7 @@ const IPv4SidePanel = () => {
       onCancel={closePanel}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4 || !isAws}
       tooltip={
         isFreePlan
           ? 'Unable to enable IPv4 on a Free Plan'
@@ -99,7 +105,7 @@ const IPv4SidePanel = () => {
           <h4>Dedicated IPv4 address</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/ipv4-address"
+              href={`${DOCS_URL}/guides/platform/ipv4-address`}
               target="_blank"
               rel="noreferrer"
             >
@@ -117,14 +123,29 @@ const IPv4SidePanel = () => {
             database via a IPv4 address.
           </p>
 
-          <p className="text-sm">
-            If you are connecting via our connection pooler, you do not need this add-on as our
-            pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
-            <Link href={`/project/${projectRef}/settings/database`} className="text-brand">
-              project database settings
-            </Link>
-            .
-          </p>
+          {!isAws && (
+            <Admonition
+              type="default"
+              title="Dedicated IPv4 address is only available for AWS projects"
+            />
+          )}
+
+          {isPgBouncerEnabled ? (
+            <Admonition
+              type="default"
+              title="The Dedicated Pooler does not support IPv4 addresses"
+              description="If you are connecting to your database via the Dedicated Pooler, you may need this add-on if your network does not support communicating via IPv6. Alternatively, you may consider using our Shared Pooler."
+            />
+          ) : (
+            <p className="text-sm">
+              If you are connecting via the Shared connection pooler, you do not need this add-on as
+              our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
+              <InlineLink href={`/project/${projectRef}/database/settings#connection-pooler`}>
+                project database settings
+              </InlineLink>
+              .
+            </p>
+          )}
 
           <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
             <Radio.Group
@@ -160,7 +181,7 @@ const IPv4SidePanel = () => {
                   className="col-span-4 !p-0"
                   name="ipv4"
                   key={option.identifier}
-                  disabled={isFreePlan}
+                  disabled={isFreePlan || !isAws}
                   checked={selectedOption === option.identifier}
                   label={option.name}
                   value={option.identifier}
@@ -174,7 +195,9 @@ const IPv4SidePanel = () => {
                         Allow direct database connections via IPv4 address
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                        <p className="text-foreground text-sm" translate="no">
+                          {formatCurrency(option.price)}
+                        </p>
                         <p className="text-foreground-light translate-y-[1px]">
                           / month / database
                         </p>
@@ -209,12 +232,10 @@ const IPv4SidePanel = () => {
                   charge.
                 </p>
               )}
-              {!subscription?.billing_via_partner && (
-                <p className="text-sm text-foreground-light">
-                  There are no immediate charges. The addon is billed at the end of your billing
-                  cycle based on your usage and prorated to the hour.
-                </p>
-              )}
+              <p className="text-sm text-foreground-light">
+                There are no immediate charges. The addon is billed at the end of your billing cycle
+                based on your usage and prorated to the hour.
+              </p>
             </>
           )}
 
@@ -222,7 +243,9 @@ const IPv4SidePanel = () => {
             <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
               <p>Upgrade your plan to enable a IPv4 address for your project</p>
               <Button asChild type="default">
-                <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                <Link
+                  href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=ipv4SidePanel`}
+                >
                   View available plans
                 </Link>
               </Button>

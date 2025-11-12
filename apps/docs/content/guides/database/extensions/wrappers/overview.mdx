@@ -7,7 +7,7 @@ subtitle: 'Connecting to external systems using Postgres Foreign Data Wrappers.'
 
 Foreign Data Wrappers (FDW) are a core feature of Postgres that allow you to access and query data stored in external data sources as if they were native Postgres tables.
 
-Postgres includes several built-in foreign data wrappers, such as [`postgres_fdw`](https://www.postgresql.org/docs/current/postgres-fdw.html) for accessing other PostgreSQL databases, and [`file_fdw`](https://www.postgresql.org/docs/current/file-fdw.html) for reading data from files. Supabase extends this feature to query other databases or any other external systems. We do this with our open source [Wrappers](https://github.com/supabase/wrappers) framework. In these guides we'll refer to them as "Wrappers", Foreign Data Wrappers, or FDWs. They are conceptually the same thing.
+Postgres includes several built-in foreign data wrappers, such as [`postgres_fdw`](https://www.postgresql.org/docs/current/postgres-fdw.html) for accessing other Postgres databases, and [`file_fdw`](https://www.postgresql.org/docs/current/file-fdw.html) for reading data from files. Supabase extends this feature to query other databases or any other external systems. We do this with our open source [Wrappers](https://github.com/supabase/wrappers) framework. In these guides we'll refer to them as "Wrappers", Foreign Data Wrappers, or FDWs. They are conceptually the same thing.
 
 ## Concepts
 
@@ -92,7 +92,7 @@ This approach has several benefits:
 1. **On-demand:** analytical data is immediately available within your application with no additional infrastructure.
 1. **Always in sync:** since the data is queried directly from the remote server, it's always up-to-date.
 1. **Integrated:** large datasets are available within your application, and can be joined with your operational/transactional data.
-1. **Save on bandwidth:** only extract/load what you need.
+1. **Save on egress:** only extract/load what you need.
 
 ### Batch ETL with Wrappers
 
@@ -133,9 +133,9 @@ To learn more about Wasm FDW, visit [Wrappers official documentation](https://su
 
 Foreign Data Wrappers do not provide Row Level Security, thus it is not advised to expose them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, you should create a `stripe` schema to store all of your foreign tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
 
-If you want to expose any of the foreign table columns to your public API, you can create a [Database Function with security definer](https://supabase.com/docs/guides/database/functions#security-definer-vs-invoker) in the `public` schema, and then you can interact with your foreign table through API. For better access control, the function should have appropriate filters on the foreign table to apply security rules based on your business needs.
+If you want to expose any of the foreign table columns to your public API, you can create a [Database Function with security definer](/docs/guides/database/functions#security-definer-vs-invoker) in the `public` schema, and then you can interact with your foreign table through API. For better access control, the function should have appropriate filters on the foreign table to apply security rules based on your business needs.
 
-As an example, go to [SQL Editor](https://supabase.com/dashboard/project/_/sql/new) and then follow below steps,
+As an example, go to [SQL Editor](/dashboard/project/_/sql/new) and then follow below steps,
 
 1. Create a Stripe Products foreign table:
 
@@ -191,9 +191,11 @@ As an example, go to [SQL Editor](https://supabase.com/dashboard/project/_/sql/n
 3. Restrict the function execution to a specific role only, for example, the authenticated users:
 
    <Admonition type="danger">
-     By default, the function created can be executed by any roles like `anon`, that means the
-     foreign table is public accessible. Always limit the function execution permission to
-     appropriate roles.
+
+   By default, the function created can be executed by any roles like `anon`, that means the
+   foreign table is public accessible. Always limit the function execution permission to
+   appropriate roles.
+
    </Admonition>
 
    ```sql

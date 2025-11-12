@@ -8,7 +8,8 @@ import { useCreateAndExposeAPISchemaMutation } from 'data/api-settings/create-an
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -33,7 +34,7 @@ interface HardenAPIModalProps {
 }
 
 export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -122,7 +123,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
           <DocsButton
             abbrev={false}
             className="w-min mt-4"
-            href="https://supabase.com/docs/guides/database/hardening-data-api"
+            href={`${DOCS_URL}/guides/database/hardening-data-api`}
           />
         </DialogSection>
 

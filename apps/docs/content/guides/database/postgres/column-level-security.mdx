@@ -7,9 +7,15 @@ description: 'Secure your data using Postgres Column Level Security.'
 PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) gives you granular control over who can access rows of data. However, it doesn't give you control over which columns they can access within rows. Sometimes you want to restrict access to specific columns in your database. Column Level Privileges allows you to do just that.
 
 <Admonition type="caution">
-  This is an advanced feature. We do not recommend using column-level privileges for most users.
-  Instead, we recommend using RLS policies in combination with a dedicated table for handling user
-  roles.
+
+This is an advanced feature. We do not recommend using column-level privileges for most users. Instead, we recommend using RLS policies in combination with a dedicated table for handling user roles.
+
+</Admonition>
+
+<Admonition type="caution">
+
+Restricted roles cannot use the wildcard operator (`*`) on the affected table. Instead of using `SELECT * FROM <restricted_table>;` or its API equivalent, you must specify the column names explicitly.
+
 </Admonition>
 
 ## Policies at the row level
@@ -39,7 +45,7 @@ However, this gives the post owner full access to update the row, including all 
 
 To restrict access to columns, you can use [Privileges](https://www.postgresql.org/docs/current/ddl-priv.html).
 
-There are two types of privileges in PostgreSQL:
+There are two types of privileges in Postgres:
 
 1. **table-level**: Grants the privilege on all columns in the table.
 2. **column-level** Grants the privilege on a specific column in the table.
@@ -76,20 +82,26 @@ This time, we are revoking the column-level `UPDATE` privilege of the `title` co
 
 ## Manage column privileges in the Dashboard
 
-You can view and edit the privileges in the [Supabase Studio](https://supabase.com/dashboard/project/_/database/column-privileges).
+<Admonition type="caution">
+
+Column-level privileges are a powerful tool, but they're also quite advanced and in many cases, not the best fit for common access control needs. For that reason, we've intentionally moved the UI for this feature under the Feature Preview section in the dashboard.
+
+</Admonition>
+
+You can view and edit the privileges in the [Supabase Studio](/dashboard/project/_/database/column-privileges).
 
 ![Column level privileges](/docs/img/guides/privileges/column-level-privileges-2.png)
 
 ## Manage column privileges in migrations
 
-While you can manage privileges directly from the Dashboard, as your project grows you may want to manage them in your migrations. Read about database migrations in the [Local Development](https://supabase.com/docs/guides/deployment/database-migrations) guide.
+While you can manage privileges directly from the Dashboard, as your project grows you may want to manage them in your migrations. Read about database migrations in the [Local Development](/docs/guides/deployment/database-migrations) guide.
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create a migration file">
 
-      To get started, generate a [new migration](https://supabase.com/docs/reference/cli/supabase-migration-new) to store the SQL needed to create your table along with row and column-level privileges.
+      To get started, generate a [new migration](/docs/reference/cli/supabase-migration-new) to store the SQL needed to create your table along with row and column-level privileges.
 
     </StepHikeCompact.Details>
 

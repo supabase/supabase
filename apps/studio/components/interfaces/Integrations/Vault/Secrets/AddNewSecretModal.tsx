@@ -1,14 +1,10 @@
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import InformationBox from 'components/ui/InformationBox'
-import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
-import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form, Input, Modal } from 'ui'
-import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
-import { EyeOff, Eye, HelpCircle } from 'lucide-react'
 
 interface AddNewSecretModalProps {
   visible: boolean
@@ -16,31 +12,21 @@ interface AddNewSecretModalProps {
 }
 
 const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
+  const { data: project } = useSelectedProjectQuery()
   const [showSecretValue, setShowSecretValue] = useState(false)
-  const [selectedKeyId, setSelectedKeyId] = useState<string>()
-  const { project } = useProjectContext()
 
-  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
   const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 
-  const { data: keys } = usePgSodiumKeysQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
   useEffect(() => {
-    if (visible && keys) {
+    if (visible) {
       setShowSecretValue(false)
-      setSelectedKeyId(keys[0]?.id ?? 'create-new')
     }
-  }, [visible, keys])
+  }, [visible])
 
   const validate = (values: any) => {
     const errors: any = {}
     if (values.name.length === 0) errors.name = 'Please provide a name for your secret'
     if (values.secret.length === 0) errors.secret = 'Please enter your secret value'
-    if (selectedKeyId === 'create-new' && values.keyName.length === 0)
-      errors.keyName = 'Please provide a name for your new key'
     return errors
   }
 
@@ -48,18 +34,9 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
     if (!project) return console.error('Project is required')
 
     setSubmitting(true)
-    let encryptionKeyId = selectedKeyId
 
     try {
       setSubmitting(true)
-      if (selectedKeyId === 'create-new') {
-        const addKeyRes = await addKeyMutation({
-          projectRef: project?.ref!,
-          connectionString: project?.connectionString,
-          name: values.keyName || undefined,
-        })
-        encryptionKeyId = addKeyRes[0].id
-      }
 
       await addSecret({
         projectRef: project.ref,
@@ -67,7 +44,6 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
         name: values.name,
         description: values.description,
         secret: values.secret,
-        key_id: encryptionKeyId,
       })
       toast.success(`Successfully added new secret ${values.name}`)
       onClose()
@@ -79,17 +55,10 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   }
 
   return (
-    <Modal
-      closable
-      hideFooter
-      size="medium"
-      visible={visible}
-      onCancel={onClose}
-      header="Add new secret"
-    >
+    <Modal hideFooter size="medium" visible={visible} onCancel={onClose} header="Add new secret">
       <Form
         id="add-new-secret-form"
-        initialValues={{ name: '', description: '', secret: '', keyId: '', keyName: '' }}
+        initialValues={{ name: '', description: '', secret: '' }}
         validate={validate}
         validateOnBlur={false}
         onSubmit={onAddNewSecret}
@@ -111,35 +80,6 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
                         icon={showSecretValue ? <EyeOff /> : <Eye />}
                         onClick={() => setShowSecretValue(!showSecretValue)}
                       />
-                    </div>
-                  }
-                />
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="space-y-4">
-                <EncryptionKeySelector
-                  id="keyId"
-                  nameId="keyName"
-                  label="Select a key to encrypt your secret with"
-                  labelOptional="Optional"
-                  selectedKeyId={selectedKeyId}
-                  onSelectKey={setSelectedKeyId}
-                />
-                <InformationBox
-                  icon={<HelpCircle size={18} strokeWidth={2} />}
-                  url="https://github.com/supabase/vault"
-                  urlLabel="Vault documentation"
-                  title="What is a key?"
-                  description={
-                    <div className="space-y-2">
-                      <p>
-                        Keys are used to encrypt data inside your database, and every secret in the
-                        Vault is encrypted with a key.
-                      </p>
-                      <p>
-                        You may create different keys for different purposes, such as one for
-                        encrypting user data, and another for application data.
-                      </p>
                     </div>
                   }
                 />

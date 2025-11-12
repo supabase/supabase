@@ -7,11 +7,11 @@ keywords = [ "logging", "disk", "i/o", "lockups" ]
 database_id = "10186830-8cce-4f10-8cb9-7cbf39310763"
 ---
 
-Since each Supabase project uses PostgreSQL as its underlying database engine, it’s common to adjust logging settings for various reasons—whether for debugging issues, monitoring database performance, or auditing actions. However, modifying logging levels improperly can lead to an excessive amount of log data being generated, which can quickly fill up your disk space and cause significant performance degradation or even system failure.
+Since each Supabase project uses Postgres as its underlying database engine, it’s common to adjust logging settings for various reasons—whether for debugging issues, monitoring database performance, or auditing actions. However, modifying logging levels improperly can lead to an excessive amount of log data being generated, which can quickly fill up your disk space and cause significant performance degradation or even system failure.
 
-### 1. Overview of PostgreSQL logging levels
+### 1. Overview of Postgres logging levels
 
-PostgreSQL provides multiple logging levels that allow you to control how much information gets logged. These include:
+Postgres provides multiple logging levels that allow you to control how much information gets logged. These include:
 
 | Log Level | Description                                                                                                           |
 | --------- | --------------------------------------------------------------------------------------------------------------------- |
@@ -59,10 +59,10 @@ Here are a few common scenarios where excessive logging can become a problem:
 
 - Frequent Write Operations: If your database processes a lot of write operations (such as inserts, updates, or deletes), even low-level logs (like NOTICE or INFO) can lead to significant log accumulation.
 
-### 4. How to manage PostgreSQL log levels effectively
+### 4. How to manage Postgres log levels effectively
 
 **a. Choose the Right Log Level**
-For most users, setting PostgreSQL logs to WARNING or ERROR is sufficient for regular operations. Here’s a general guideline:
+For most users, setting Postgres logs to WARNING or ERROR is sufficient for regular operations. Here’s a general guideline:
 
 - WARNING: Use this level for general logging during normal operations. It captures issues that may not be critical but are worth paying attention to.
 
@@ -71,7 +71,7 @@ For most users, setting PostgreSQL logs to WARNING or ERROR is sufficient for re
 - DEBUG, INFO, or NOTICE: Use these levels sparingly and only for short-term debugging or diagnostics. Always remember to revert the setting once you've collected the necessary information.
 
 **b. How to Adjust Log Levels**
-You can adjust log levels using SQL commands in the SQL Editor or any connected PostgreSQL client:
+You can adjust log levels using SQL commands in the SQL Editor or any connected Postgres client:
 
 - To check the current log level:
 
@@ -99,7 +99,7 @@ ALTER ROLE postgres RESET log_min_messages;
 
 ### 5. Conclusion
 
-PostgreSQL logs provide a powerful way to gain valuable insights into your database activity and performance when properly configured, but the key lies in finding the right balance. When set up properly, they can be incredibly useful.
+Postgres logs provide a powerful way to gain valuable insights into your database activity and performance when properly configured, but the key lies in finding the right balance. When set up properly, they can be incredibly useful.
 
 ### 6. Other resources
 
@@ -112,9 +112,9 @@ For a detailed explanation of the types of events logged in your database (such 
 
 We support PGAudit extension, which extends PostgreSQL’s built-in logging capabilities to track database activities for auditing purposes.
 
-[How to Enable the PGAudit Extension](https://supabase.com/docs/guides/database/extensions/pgaudit?queryGroups=database-method&database-method=dashboard#enable-the-extension)
+[How to Enable the PGAudit Extension](/docs/guides/database/extensions/pgaudit?queryGroups=database-method&database-method=dashboard#enable-the-extension)
 
-For detailed configuration instructions and logging options, refer to the complete documentation: [PGAudit Configuration Guide](https://supabase.com/docs/guides/database/extensions/pgaudit?queryGroups=database-method&database-method=dashboard#configure-the-extension)
+For detailed configuration instructions and logging options, refer to the complete documentation: [PGAudit Configuration Guide](/docs/guides/database/extensions/pgaudit?queryGroups=database-method&database-method=dashboard#configure-the-extension)
 
 **c. Debugging Functions**
-For more information on how to debug functions in Supabase, refer to the official guide: [Debugging Functions](https://supabase.com/docs/guides/database/functions?queryGroups=language&language=js#debugging-functions).
+For more information on how to debug functions in Supabase, refer to the official guide: [Debugging Functions](/docs/guides/database/functions?queryGroups=language&language=js#debugging-functions).

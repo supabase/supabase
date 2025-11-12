@@ -17,7 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
-  const responseObj: components['schemas']['PostgrestConfigResponse'] = {
+  const responseObj: components['schemas']['GetPostgrestConfigResponse'] = {
     db_anon_role: 'anon',
     db_extra_search_path: 'public',
     db_schema: 'public, storage',

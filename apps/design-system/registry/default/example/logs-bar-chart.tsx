@@ -1,3 +1,5 @@
+'use client'
+
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 export default function LogsBarChartDemo() {
@@ -9,11 +11,12 @@ export default function LogsBarChartDemo() {
       timestamp: date.toISOString(),
       ok_count: Math.floor(Math.random() * 100), // Random value 0-99
       error_count: Math.floor(Math.random() * 50), // Random value 0-50
+      warning_count: Math.floor(Math.random() * 50), // Random value 0-50
     }
   }).reverse()
 
   return (
-    <div className="w-full">
+    <div className="w-full h-64">
       <LogsBarChart data={data} />
     </div>
   )

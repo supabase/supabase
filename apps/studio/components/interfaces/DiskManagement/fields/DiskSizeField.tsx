@@ -2,11 +2,13 @@ import { UseFormReturn } from 'react-hook-form'
 
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { GB } from 'lib/constants'
+import dayjs from 'dayjs'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL, GB } from 'lib/constants'
 import { Button, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
@@ -14,14 +16,11 @@ import { calculateDiskSizePrice } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { DiskType, PLAN_DETAILS } from '../ui/DiskManagement.constants'
 import { DiskManagementDiskSizeReadReplicas } from '../ui/DiskManagementReadReplicas'
-import DiskSpaceBar from '../ui/DiskSpaceBar'
+import { DiskSpaceBar } from '../ui/DiskSpaceBar'
 import { DiskTypeRecommendationSection } from '../ui/DiskTypeRecommendationSection'
 import FormMessage from '../ui/FormMessage'
 import { InputPostTab } from '../ui/InputPostTab'
 import { InputResetButton } from '../ui/InputResetButton'
-import { Admonition } from 'ui-patterns'
-import Markdown from 'markdown-to-jsx'
-import { DocsButton } from 'components/ui/DocsButton'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -36,38 +35,42 @@ export function DiskSizeField({
 }: DiskSizeFieldProps) {
   const { ref: projectRef } = useParams()
   const { control, formState, setValue, trigger, getValues, resetField, watch } = form
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
 
   const {
     isLoading: isLoadingDiskAttributes,
     error: diskAttributesError,
     isError: isDiskAttributesError,
-  } = useDiskAttributesQuery({ projectRef })
-  const {
-    data: subscription,
-    isLoading: isSubscriptionLoading,
-    error: subscriptionError,
-    isError: isSubscriptionError,
-  } = useOrgSubscriptionQuery({
-    orgSlug: org?.slug,
-  })
+  } = useDiskAttributesQuery(
+    { projectRef },
+    { enabled: project && project.cloud_provider !== 'FLY' }
+  )
+
   const {
     data: diskUtil,
-    isLoading: isDiskUtilizationLoading,
     error: diskUtilError,
     isError: isDiskUtilizationError,
-  } = useDiskUtilizationQuery({
-    projectRef: projectRef,
-  })
+  } = useDiskUtilizationQuery(
+    {
+      projectRef: projectRef,
+    },
+    { enabled: project && project.cloud_provider !== 'FLY' }
+  )
 
-  const isLoading = isSubscriptionLoading || isDiskUtilizationLoading || isLoadingDiskAttributes
-  const error = subscriptionError || diskUtilError || diskAttributesError
-  const isError = isSubscriptionError || isDiskUtilizationError || isDiskAttributesError
+  const error = diskUtilError || diskAttributesError
+  const isError = isDiskUtilizationError || isDiskAttributesError
+
+  // coming up typically takes 5 minutes, and the request is cached for 5 mins
+  // so doing less than 10 mins to account for both
+  const isProjectNew =
+    dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < 10 ||
+    project?.status === 'COMING_UP'
 
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
 
-  const planId = subscription?.plan.id ?? 'free'
+  const planId = org?.plan.id ?? 'free'
 
   const { includedDiskGB: includedDiskGBMeta } =
     PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
@@ -85,7 +88,7 @@ export function DiskSizeField({
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
   return (
-    <div className="grid grid-cols-12 gap-5">
+    <div id="disk-size" className="grid @xl:grid-cols-12 gap-5">
       <div className="col-span-4">
         <FormField_Shadcn_
           name="totalSize"
@@ -94,7 +97,7 @@ export function DiskSizeField({
             <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
               <div className="relative flex gap-2 items-center">
                 <InputPostTab label="GB">
-                  {isLoading ? (
+                  {isLoadingDiskAttributes ? (
                     <div
                       className={cn(
                         InputVariants({ size: 'small' }),
@@ -149,14 +152,11 @@ export function DiskSizeField({
           />
           <span className="text-foreground-lighter text-sm">
             {includedDiskGB > 0 &&
-              subscription?.plan.id &&
+              org?.plan.id &&
               `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
 
             <div className="mt-3">
-              <DocsButton
-                abbrev={false}
-                href="https://supabase.com/docs/guides/platform/database-size"
-              />
+              <DocsButton abbrev={false} href={`${DOCS_URL}/guides/platform/database-size`} />
             </div>
           </span>
           <DiskTypeRecommendationSection
@@ -179,11 +179,20 @@ export function DiskSizeField({
       </div>
       <div className="col-span-8">
         <DiskSpaceBar form={form} />
-        {error && (
-          <FormMessage message="Failed to load disk size data" type="error">
-            {error?.message}
-          </FormMessage>
+
+        {isProjectNew ? (
+          <FormMessage
+            message="Disk size data is not available for ~10 minutes after project creation"
+            type="error"
+          />
+        ) : (
+          error && (
+            <FormMessage message="Failed to load disk size data" type="error">
+              {error?.message}
+            </FormMessage>
+          )
         )}
+
         <DiskManagementDiskSizeReadReplicas
           isDirty={formState.dirtyFields.totalSize !== undefined}
           totalSize={(formState.defaultValues?.totalSize || 0) * 1.25}

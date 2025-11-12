@@ -2,19 +2,10 @@
 id: 'custom-domains'
 title: 'Custom Domains'
 description: 'Use a custom domain instead of the default Supabase domain for your project.'
-video: 'https://www.youtube.com/v/6rcGnW_Mh-0'
+tocVideo: '6rcGnW_Mh-0'
 ---
 
-Custom domains allow you to present a branded experience to your users. These are available as an [add-on for projects on a paid plan](/dashboard/project/_/settings/addons?panel=customDomain).
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/6rcGnW_Mh-0"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+Custom domains allow you to present a branded experience to your users. These are available as a [paid add-on for projects on a paid plan](/dashboard/project/_/settings/addons?panel=customDomain).
 
 There are two types of domains supported by Supabase:
 
@@ -33,9 +24,15 @@ Custom domains change the way your project's URLs appear to your users. This is 
 
 Custom domains help you keep your APIs portable for the long term. By using a custom domain you can migrate from one Supabase project to another, or make it easier to version APIs in the future.
 
+### Limitations
+
+- Custom domains are not intended to enable hosting of frontend applications through [Edge Functions](/docs/guides/functions).
+- You can only attach a single custom domain to any given Supabase project. It is not possible to break out your project's resources into multiple custom domains.
+- Custom domains can only be powered by CNAME records.
+
 ### Configure a custom domain using the Supabase dashboard
 
-Follow the **Custom Domains** steps in the [General Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard to set up a custom domain for your project.
+Follow the **Custom Domains** steps in the [General Settings](/dashboard/project/_/settings/general) page in the Dashboard to set up a custom domain for your project.
 
 ### Configure a custom domain using the Supabase CLI
 
@@ -78,7 +75,7 @@ Required outstanding validation records:
 
 Add the record to your domains' DNS settings. Make sure to trim surrounding whitespace. Use a low TTL value so you can quickly change the records if you make a mistake.
 
-Some DNS registrars automatically append your domain name to the DNS entries being created. As such, creating a DNS record for `api.example.com` might instead create a record for `api.example.com.example.com`. In such cases, please remove the domain name from the records you're creating; as an example, you would create a TXT record for `api`, instead of `api.example.com`.
+Some DNS registrars automatically append your domain name to the DNS entries being created. As such, creating a DNS record for `api.example.com` might instead create a record for `api.example.com.example.com`. In such cases, remove the domain name from the records you're creating; as an example, you would create a TXT record for `api`, instead of `api.example.com`.
 
 ### Verify your domain
 
@@ -103,7 +100,7 @@ Before you activate your domain, prepare your applications and integrations for 
   - You do not need to change the Supabase URL in your applications immediately.
   - You can use it interchangeably with the custom domain.
 - Supabase Auth will use the custom domain immediately once activated.
-  - OAuth flows will advertize the custom domain as a callback URL.
+  - OAuth flows will advertise the custom domain as a callback URL.
   - SAML will use the custom domain instead. This means that the `EntityID` of your project has changed, and this may cause SAML with existing identity providers to stop working.
 
 To prevent issues for your users, follow these steps:
@@ -133,8 +130,10 @@ If you wish to use the new domain in client code, change the URL used in your Su
 import { createClient } from '@supabase/supabase-js'
 
 // Use a custom domain as the supabase URL
-const supabase = createClient('https://api.example.com', 'public-anon-key')
+const supabase = createClient('https://api.example.com', 'publishable-or-anon-key')
 ```
+
+Similarly, your Edge Functions will now be available at `https://api.example.com/functions/v1/your_function_name`, and your Storage objects at `https://api.example.com/storage/v1/object/public/your_file_path.ext`.
 
 ### Remove a custom domain
 
@@ -155,7 +154,7 @@ To get started:
 1. [Install](/docs/guides/resources/supabase-cli) the latest version of the Supabase CLI.
 1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
 1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project you'd like to set up a vanity subdomain for.
-1. Ensure that your organization is on a paid plan (Pro/Team/Enterprise Plan) in the [Billing page of the Dashboard](https://supabase.com/dashboard/org/_/billing).
+1. Ensure that your organization is on a paid plan (Pro/Team/Enterprise Plan) in the [Billing page of the Dashboard](/dashboard/org/_/billing).
 
 ### Configure a vanity subdomain
 
@@ -179,7 +178,7 @@ Before you activate your vanity subdomain, prepare your applications and integra
   - You do not need to change the Supabase URL in your applications immediately or at once.
   - You can use it interchangeably with the custom domain.
 - Supabase Auth will use the subdomain immediately once activated.
-  - OAuth flows will advertize the subdomain as a callback URL.
+  - OAuth flows will advertise the subdomain as a callback URL.
   - SAML will use the subdomain instead. This means that the `EntityID` of your project has changed, and this may cause SAML with existing identity providers to stop working.
 
 To prevent issues for your users, make sure you have gone through these steps:
@@ -200,7 +199,7 @@ Once you've chosen an available subdomain and have done all the necessary prepar
 Use the [`vanity-subdomains activate`](/docs/reference/cli/supabase-vanity-subdomains-activate) command to activate and claim your subdomain:
 
 ```bash
-supabase vanity-subdomains --project-ref abcdefghijklmnopqrst activate --desired-subdomain my-example-brand
+supabase vanity-subdomains --project-ref abcdefghijklmnopqrst activate --desired-subdomain my-example-brand --experimental
 ```
 
 If you wish to use the new domain in client code, you can set it up like so:
@@ -209,7 +208,7 @@ If you wish to use the new domain in client code, you can set it up like so:
 import { createClient } from '@supabase/supabase-js'
 
 // Use a custom domain as the supabase URL
-const supabase = createClient('https://my-example-brand.supabase.co', 'public-anon-key')
+const supabase = createClient('https://my-example-brand.supabase.co', 'publishable-or-anon-key')
 ```
 
 When using [Sign in with Twitter](/docs/guides/auth/social-login/auth-twitter) make sure your frontend code is using the subdomain only.
@@ -223,3 +222,7 @@ Use the [`vanity-subdomains delete`](/docs/reference/cli/supabase-vanity-subdoma
 ```bash
 supabase vanity-subdomains delete --project-ref abcdefghijklmnopqrst --experimental
 ```
+
+<$Show if="billing:all">
+<$Partial path="billing/pricing/pricing_custom_domains.mdx" />
+</$Show>

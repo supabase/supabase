@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import { cn } from '../../lib/utils/cn'
-import _announcement from './data/Announcement.json'
 import { X } from 'lucide-react'
 
 export interface AnnouncementProps {
@@ -16,12 +15,11 @@ export interface AnnouncementProps {
   badge?: string
 }
 
-const announcement = _announcement as AnnouncementProps
-
 interface AnnouncementComponentProps {
   show?: boolean
   dismissable?: boolean
   className?: string
+  announcementKey: `announcement_${string}`
 }
 
 const Announcement = ({
@@ -29,6 +27,7 @@ const Announcement = ({
   dismissable = true,
   className,
   children,
+  announcementKey,
 }: PropsWithChildren<AnnouncementComponentProps>) => {
   const [hidden, setHidden] = useState(true)
 
@@ -36,19 +35,19 @@ const Announcement = ({
   const isLaunchWeekSection = pathname?.includes('launch-week') ?? false
 
   // override to hide announcement
-  if (!show || !announcement.show) return null
+  if (!show) return null
 
   // construct the key for the announcement, based on the title text
-  const announcementKey = 'announcement_' + announcement.text.replace(/ /g, '')
+  const announcementKeyNoSpaces = announcementKey.replace(/ /g, '')
 
   // window.localStorage is kept inside useEffect
   // to prevent error
   useEffect(function () {
-    if (window.localStorage.getItem(announcementKey) === 'hidden') {
+    if (window.localStorage.getItem(announcementKeyNoSpaces) === 'hidden') {
       setHidden(true)
     }
 
-    if (!window.localStorage.getItem(announcementKey)) {
+    if (!window.localStorage.getItem(announcementKeyNoSpaces)) {
       setHidden(false)
     }
   }, [])
@@ -56,7 +55,7 @@ const Announcement = ({
   function handleClose(event: any) {
     event.stopPropagation()
 
-    window.localStorage.setItem(announcementKey, 'hidden')
+    window.localStorage.setItem(announcementKeyNoSpaces, 'hidden')
     return setHidden(true)
   }
 
@@ -67,7 +66,7 @@ const Announcement = ({
       <div className={cn('relative z-40 w-full', className)}>
         {dismissable && !isLaunchWeekSection && (
           <div
-            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-foreground transition-opacity hover:opacity-100"
+            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-foreground-contrast dark:text-foreground transition-opacity hover:opacity-80 hover:cursor-pointer"
             onClick={handleClose}
           >
             <X size={16} />

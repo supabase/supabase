@@ -1,21 +1,21 @@
 ---
 title: 'Set Up SSO with Google Workspace'
-description: 'Configure single sign-on with Google Workspace (GSuite).'
+description: 'Configure single sign-on with Google Workspace (G Suite).'
 ---
 
-<Admonition>
+<Admonition type="note">
 
-This feature is only available on the Team and Enterprise Plans. Please contact [Sales](https://forms.supabase.com/enterprise) before doing these steps.
+This feature is only available on the [Team and Enterprise Plans](/pricing). If you are an existing Team or Enterprise Plan customer, continue with the setup below.
 
 </Admonition>
 
-<Admonition>
+<Admonition type="tip">
 
 Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/enterprise-sso/auth-sso-saml).
 
 </Admonition>
 
-Supabase supports single sign-on (SSO) using Google Workspace (formerly known as GSuite).
+Supabase supports single sign-on (SSO) using Google Workspace (formerly known as G Suite).
 
 ## Step 1: Open the Google Workspace web and mobile apps console [#google-workspace-console]
 
@@ -35,11 +35,9 @@ The information you enter here is for visibility into your Google Workspace. You
 
 ## Step 4: Download IdP metadata [#download-idp-metadata]
 
-This is a very important step. Click on _DOWNLOAD METADATA_ and save the file that was downloaded.
+This is a very important step. Click on _DOWNLOAD METADATA_ and save the file that was downloaded. You will need to upload this file later in [Step 10](#dashboard-configure-metadata).
 
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML, Google Identity Provider details screen](/docs/img/sso-gsuite-step-04.png)
-
-It's very important to send this file to your support contact at Supabase to complete the SSO setup process. If you're not sure where to send this file, you can always reach out to [Supabase Support](https://supabase.help).
 
 **Important: Make sure the certificate as shown on screen has at least 1 year before it expires. Mark down this date in your calendar so you will be reminded that you need to update the certificate without any downtime for your users.**
 
@@ -63,34 +61,91 @@ Attribute mappings allow Supabase to get information about your Google Workspace
 
 **A _Primary email_ to `email` mapping is required.** Other mappings shown below are optional and configurable depending on your Google Workspace setup. If in doubt, replicate the same config as shown.
 
-Please share any changes, if any, from this screen with your Supabase support contact.
+Any changes you make from this screen will be used later in [Step 10: Configure Attribute Mapping](#dashboard-configure-attributes).
 
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML, Attribute mapping](/docs/img/sso-gsuite-step-06.png)
 
-## Step 7: Wait for confirmation [#confirmation]
-
-Once you’ve configured the Google Workspace app as shown above, make sure you send the [metadata file you downloaded](#download-idp-metadata) and information regarding the [attribute mapping](#configure-attribute-mappings) (if any changes are applicable) to your support contact at Supabase.
-
-This information needs to be entered into Supabase before SSO is activated end-to-end.
-
-Wait for confirmation that this information has successfully been added to Supabase. It usually takes us 1 business day to configure this information for you.
-
-## Step 8: Configure user access [#configure-user-access]
+## Step 7: Configure user access [#configure-user-access]
 
 You can configure which Google Workspace user accounts will get access to Supabase. This is important if you wish to limit access to your software engineering teams.
 
 You can configure this access by clicking on the _User access_ card (or down-arrow). Follow the instructions on screen.
 
-Changes from this step sometimes take a while to propagate across Google’s systems. Wait at least 15 minutes before proceeding to the next step.
-
 ![Google Workspace: Web and mobile apps admin console, Supabase app screen](/docs/img/sso-gsuite-step-08.png)
 
-## Step 9: Test single sign-on [#testing]
+<Admonition type="note">
 
-Once you’ve turned on access to Supabase for users in your organization, ask one of those users to help you out in testing the setup.
+Changes from this step sometimes take a while to propagate across Google's systems. Wait at least 15 minutes before testing your changes.
 
-It often helps to ask them to log out of their Google account and log back in.
+</Admonition>
 
-Ask them to enter their email address in the [Sign in with SSO](https://supabase.com/dashboard/sign-in-sso) page.
+## Step 8: Enable SSO in the Dashboard [#dashboard-enable-sso]
 
-If sign in is not working correctly, reach out to your support contact at Supabase.
+1. Visit the [SSO tab](/dashboard/org/_/sso) under the Organization Settings page. ![SSO disabled](/docs/img/sso-dashboard-disabled.png)
+
+2. Toggle **Enable Single Sign-On** to begin configuration. Once enabled, the configuration form appears. ![SSO enabled](/docs/img/sso-dashboard-enabled.png)
+
+## Step 9: Configure domains [#dashboard-configure-domain]
+
+Enter one or more domains associated with your users email addresses (e.g., `supabase.com`).
+These domains determine which users are eligible to sign in via SSO.
+
+![Domain configuration](/docs/img/sso-dashboard-configure-domain.png)
+
+If your organization uses more than one email domain - for example, `supabase.com` for staff and `supabase.io` for contractors - you can add multiple domains here. All listed domains will be authorized for SSO sign-in.
+
+![Domain configuration with multiple domains](/docs/img/sso-dashboard-configure-domain-multi.png)
+
+<Admonition type="note">
+
+We do not permit use of public domains like `gmail.com`, `yahoo.com`.
+
+</Admonition>
+
+## Step 10: Configure metadata [#dashboard-configure-metadata]
+
+Upload the metadata file you downloaded in [Step 6](#download-idp-metadata) into the Metadata Upload File field.
+
+![Metadata configuration with Google Workspace](/docs/img/sso-dashboard-configure-metadata-gsuite.png)
+
+## Step 11: Configure attribute mapping [#dashboard-configure-attributes]
+
+Enter the SAML attributes you filled out in [Step 6](#configure-attribute-mapping) into the Attribute Mapping section.
+
+![Attribute mapping configuration](/docs/img/sso-dashboard-configure-attributes-generic.png)
+
+<Admonition type="note">
+
+If you did not customize your settings you may save some time by clicking the **G Suite** preset.
+
+</Admonition>
+
+## Step 12: Join organization on signup (optional) [#dashboard-configure-autojoin]
+
+By default this setting is disabled, users logging in via SSO will not be added to your organization automatically.
+
+![Auto-join disabled](/docs/img/sso-dashboard-configure-autojoin-disabled.png)
+
+Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they log in via SSO.
+
+![Auto-join enable](/docs/img/sso-dashboard-configure-autojoin-enabled.png)
+
+When auto-join is enabled, you can choose the **default role** for new users:
+
+![Auto-join role selection](/docs/img/sso-dashboard-configure-autojoin-enabled-role.png)
+
+Choose a role that fits the level of access you want to grant to new members.
+
+<Admonition type="note">
+
+Visit [access-control](/docs/guides/platform/access-control) documentation for details about each role.
+
+</Admonition>
+
+## Step 13: Save changes and test single sign-on [#dashboard-configure-save]
+
+When you click **Save changes**, your new SSO configuration is applied immediately. From that moment, any user with an email address matching one of your configured domains who visits your organization's sign-in URL will be routed through the SSO flow.
+
+We recommend asking a few users to test signing in via their Google Workspace account. They can do this by entering their email address on the [Sign in with SSO](/dashboard/sign-in-sso) page.
+
+If SSO sign-in doesn't work as expected, contact your Supabase support representative for assistance.

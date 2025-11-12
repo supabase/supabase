@@ -3,13 +3,13 @@ title: 'Set Up SSO with Okta'
 description: 'Configure single sign-on with Okta.'
 ---
 
-<Admonition>
+<Admonition type="note">
 
-This feature is only available on the Team and Enterprise Plans. Please contact [Sales](https://forms.supabase.com/enterprise) before doing these steps.
+This feature is only available on the [Team and Enterprise Plans](/pricing). If you are an existing Team or Enterprise Plan customer, continue with the setup below.
 
 </Admonition>
 
-<Admonition>
+<Admonition type="tip">
 
 Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/enterprise-sso/auth-sso-saml).
 
@@ -37,15 +37,15 @@ The information you enter here is for visibility into your Okta applications men
 
 ## Step 4: Fill out SAML settings [#add-saml-settings]
 
-These settings let Supabase use SAML 2.0 properly with your Okta application. Make sure you enter this information exactly as shown on in this table and screenshot.
+These settings let Supabase use SAML 2.0 properly with your Okta application. Make sure you enter this information exactly as shown on in this table.
 
 | Setting                                        | Value                                               |
 | ---------------------------------------------- | --------------------------------------------------- |
 | Single sign-on URL                             | `https://alt.supabase.io/auth/v1/sso/saml/acs`      |
 | Use this for Recipient URL and Destination URL | ✔️                                                  |
 | Audience URI (SP Entity ID)                    | `https://alt.supabase.io/auth/v1/sso/saml/metadata` |
-| Default RelayState                             | `https://supabase.com/dashboard`                    |
-| Name ID format                                 | EmailAddress                                        |
+| Default `RelayState`                           | `https://supabase.com/dashboard`                    |
+| Name ID format                                 | `EmailAddress`                                      |
 | Application username                           | Email                                               |
 | Update application username on                 | Create and update                                   |
 
@@ -55,9 +55,7 @@ These settings let Supabase use SAML 2.0 properly with your Okta application. Ma
 
 Attribute Statements allow Supabase to get information about your Okta users on each login.
 
-**A `email` to `user.email` statement is required.** Other mappings shown below are optional and configurable depending on your Okta setup. If in doubt, replicate the same config as shown.
-
-Please share any changes, if any, from this screen with your Supabase support contact.
+**A `email` to `user.email` statement is required.** Other mappings shown below are optional and configurable depending on your Okta setup. If in doubt, replicate the same config as shown. You will use this mapping later in [Step 10](#dashboard-configure-attributes).
 
 ![Okta dashboard: Attribute Statements configuration screen](/docs/img/sso-okta-step-05.png)
 
@@ -67,22 +65,79 @@ Supabase needs to finalize enabling single sign-on with your Okta application.
 
 To do this scroll down to the _SAML Signing Certificates_ section on the _Sign On_ tab of the _Supabase_ application. Pick the the _SHA-2_ row with an _Active_ status. Click on the _Actions_ dropdown button and then on the _View IdP Metadata_.
 
-This will open up the SAML 2.0 Metadata XML file in a new tab in your browser. Copy this URL and send it to your support contact and await further instructions. If you're not clear who to send this link to or need further assistance, contact [Supabase Support](https://supabase.help).
+This will open up the SAML 2.0 Metadata XML file in a new tab in your browser. You will need to enter this URL later in [Step 9](#dashboard-configure-metadata).
 
 The link usually has this structure: `https://<okta-org>.okta.com/apps/<app-id>/sso/saml/metadata`
 
 ![Okta dashboard: SAML Signing Certificates, Actions button highlighted](/docs/img/sso-okta-step-06.png)
 
-## Step 7: Wait for confirmation [#confirmation]
+## Step 7: Enable SSO in the Dashboard [#dashboard-enable-sso]
 
-Once you’ve configured the Okta app as shown above, make sure you send the [metadata URL](#idp-metadata-url) and information regarding the [attribute statements](#add-attribute-statements) (if any changes are applicable) to your support contact at Supabase.
+1. Visit the [SSO tab](/dashboard/org/_/sso) under the Organization Settings page. ![SSO disabled](/docs/img/sso-dashboard-disabled.png)
 
-Wait for confirmation that this information has successfully been added to Supabase. It usually takes us 1 business day to configure this information for you.
+2. Toggle **Enable Single Sign-On** to begin configuration. Once enabled, the configuration form appears. ![SSO enabled](/docs/img/sso-dashboard-enabled.png)
 
-## Step 8: Test single sign-on [#testing]
+## Step 8: Configure domains [#dashboard-configure-domain]
 
-Once you’ve received confirmation from your support contact at Supabase that SSO setup has been completed for your enterprise, you can ask some of your users to sign in via their Okta account.
+Enter one or more domains associated with your users email addresses (e.g., `supabase.com`).
+These domains determine which users are eligible to sign in via SSO.
 
-You ask them to enter their email address on the [Sign in with SSO](https://supabase.com/dashboard/sign-in-sso) page.
+![Domain configuration](/docs/img/sso-dashboard-configure-domain.png)
 
-If sign in is not working correctly, please reach out to your support contact at Supabase for further guidance.
+If your organization uses more than one email domain - for example, `supabase.com` for staff and `supabase.io` for contractors - you can add multiple domains here. All listed domains will be authorized for SSO sign-in.
+
+![Domain configuration with multiple domains](/docs/img/sso-dashboard-configure-domain-multi.png)
+
+<Admonition type="note">
+
+We do not permit use of public domains like `gmail.com`, `yahoo.com`.
+
+</Admonition>
+
+## Step 9: Configure metadata [#dashboard-configure-metadata]
+
+Enter the metadata URL you obtained from [Step 6](#idp-metadata-url) into the Metadata URL field:
+
+![Metadata configuration with Okta](/docs/img/sso-dashboard-configure-metadata-okta.png)
+
+## Step 10: Configure attribute mapping [#dashboard-configure-attributes]
+
+Enter the SAML attributes you filled out in [Step 5](#add-attribute-statements) into the Attribute Mapping section.
+
+![Attribute mapping configuration](/docs/img/sso-dashboard-configure-attributes.png)
+
+<Admonition type="note">
+
+If you did not customize your settings you may save some time by clicking the **Okta** preset.
+
+</Admonition>
+
+## Step 11: Join organization on signup (optional) [#dashboard-configure-autojoin]
+
+By default this setting is disabled, users logging in via SSO will not be added to your organization automatically.
+
+![Auto-join disabled](/docs/img/sso-dashboard-configure-autojoin-disabled.png)
+
+Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they log in via SSO.
+
+![Auto-join enable](/docs/img/sso-dashboard-configure-autojoin-enabled.png)
+
+When auto-join is enabled, you can choose the **default role** for new users:
+
+![Auto-join role selection](/docs/img/sso-dashboard-configure-autojoin-enabled-role.png)
+
+Choose a role that fits the level of access you want to grant to new members.
+
+<Admonition type="note">
+
+Visit [access-control](/docs/guides/platform/access-control) documentation for details about each role.
+
+</Admonition>
+
+## Step 12: Save changes and test single sign-on [#dashboard-configure-save]
+
+When you click **Save changes**, your new SSO configuration is applied immediately. From that moment, any user with an email address matching one of your configured domains who visits your organization's sign-in URL will be routed through the SSO flow.
+
+We recommend asking a few users to test signing in via their Okta account. They can do this by entering their email address on the [Sign in with SSO](/dashboard/sign-in-sso) page.
+
+If SSO sign-in doesn't work as expected, contact your Supabase support representative for assistance.

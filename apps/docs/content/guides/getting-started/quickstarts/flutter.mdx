@@ -8,8 +8,8 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
-    <QuickstartDbSetup />
+
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -23,7 +23,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       flutter create my_app
       ```
 
@@ -43,7 +43,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```yaml pubspec.yaml
+      ```yaml name=pubspec.yaml
       supabase_flutter: ^2.0.0
       ```
 
@@ -58,13 +58,14 @@ hideToc: true
       Open `lib/main.dart` and edit the main function to initialize Supabase using your project URL and public API (anon) key:
 
       <ProjectConfigVariables variable="url" />
-      <ProjectConfigVariables variable="anonKey" />
+      <ProjectConfigVariables variable="publishable" />
+      <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```dart lib/main.dart
+      ```dart name=lib/main.dart
       import 'package:supabase_flutter/supabase_flutter.dart';
 
       Future<void> main() async {
@@ -72,7 +73,7 @@ hideToc: true
 
         await Supabase.initialize(
           url: 'YOUR_SUPABASE_URL',
-          anonKey: 'YOUR_SUPABASE_ANON_KEY',
+          anonKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
         );
         runApp(MyApp());
       }
@@ -94,14 +95,14 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```dart lib/main.dart
+      ```dart name=lib/main.dart
       class MyApp extends StatelessWidget {
         const MyApp({super.key});
 
         @override
         Widget build(BuildContext context) {
           return const MaterialApp(
-            title: 'Countries',
+            title: 'Instruments',
             home: HomePage(),
           );
         }
@@ -116,7 +117,7 @@ hideToc: true
 
       class _HomePageState extends State<HomePage> {
         final _future = Supabase.instance.client
-            .from('countries')
+            .from('instruments')
             .select();
 
         @override
@@ -128,13 +129,13 @@ hideToc: true
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                final countries = snapshot.data!;
+                final instruments = snapshot.data!;
                 return ListView.builder(
-                  itemCount: countries.length,
+                  itemCount: instruments.length,
                   itemBuilder: ((context, index) {
-                    final country = countries[index];
+                    final instrument = instruments[index];
                     return ListTile(
-                      title: Text(country['name']),
+                      title: Text(instrument['name']),
                     );
                   }),
                 );
@@ -155,13 +156,13 @@ hideToc: true
     Run your app on a platform of your choosing! By default an app should launch in your web browser.
 
     Note that `supabase_flutter` is compatible with web, iOS, Android, macOS, and Windows apps.
-    Running the app on MacOS requires additional configuration to [set the entitlements](https://docs.flutter.dev/development/platform-integration/macos/building#setting-up-entitlements).
+    Running the app on macOS requires additional configuration to [set the entitlements](https://docs.flutter.dev/development/platform-integration/macos/building#setting-up-entitlements).
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       flutter run
       ```
 
@@ -170,6 +171,10 @@ hideToc: true
   </StepHikeCompact.Step>
 
 </StepHikeCompact>
+
+## Setup deep links
+
+Many sign in methods require deep links to redirect the user back to your app after authentication. Read more about setting deep links up for all platforms (including web) in the [Flutter Mobile Guide](/docs/guides/getting-started/tutorials/with-flutter#setup-deep-links).
 
 ## Going to production
 

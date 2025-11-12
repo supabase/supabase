@@ -1,23 +1,81 @@
-import { useParams } from 'common'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronRight, ExternalLink, X } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { FEATURE_PREVIEWS } from 'components/interfaces/App/FeaturePreview/FeaturePreview.constants'
+import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { DOCS_URL } from 'lib/constants'
 import {
-  ScrollArea,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Switch,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
-import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
-import TemplateEditor from './TemplateEditor'
+import { EmailRateLimitsAlert } from '../EmailRateLimitsAlert'
+import { slugifyTitle } from './EmailTemplates.utils'
+import { TemplateEditor } from './TemplateEditor'
 
-const EmailTemplates = () => {
+const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
+  (t) => t.misc?.emailTemplateType === 'security'
+).map((template) => {
+  return `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED`
+})
+
+const NotificationsFormSchema = z.object({
+  ...notificationEnabledKeys.reduce(
+    (acc, key) => {
+      acc[key] = z.boolean()
+      return acc
+    },
+    {} as Record<string, z.ZodBoolean>
+  ),
+})
+
+const SECURITY_NOTIFICATIONS_DISCUSSIONS_URL = FEATURE_PREVIEWS.find(
+  (f) => f.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS
+)?.discussionsUrl
+
+export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
+  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
+
+  const [acknowledged, setAcknowledged] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SECURITY_NOTIFICATIONS_ACKNOWLEDGED(projectRef ?? ''),
+    false
+  )
+
   const {
     data: authConfig,
     error: authConfigError,
@@ -26,58 +84,261 @@ const EmailTemplates = () => {
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
 
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to update settings: ${error?.message}`)
+    },
+    onSuccess: () => {
+      toast.success('Successfully updated settings')
+    },
+  })
+
   const builtInSMTP =
     isSuccess &&
     authConfig &&
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
 
+  const defaultValues = notificationEnabledKeys.reduce(
+    (acc, key) => {
+      acc[key] = authConfig ? Boolean(authConfig[key as keyof typeof authConfig]) : false
+      return acc
+    },
+    {} as Record<string, boolean>
+  )
+
+  const notificationsForm = useForm<z.infer<typeof NotificationsFormSchema>>({
+    resolver: zodResolver(NotificationsFormSchema),
+    defaultValues,
+  })
+
+  const onSubmit = (values: any) => {
+    if (!projectRef) return console.error('Project ref is required')
+    updateAuthConfig({ projectRef: projectRef, config: { ...values } })
+  }
+
+  useEffect(() => {
+    if (authConfig) {
+      notificationsForm.reset(defaultValues)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authConfig])
+
   return (
-    <div className="w-full">
-      <div className="w-full flex justify-between items-center">
-        <FormHeader
-          title="Email Templates"
-          description="Customize the emails that will be sent out to your users."
-          docsUrl="https://supabase.com/docs/guides/auth/auth-email-templates"
-        />
-      </div>
+    <ScaffoldSection isFullWidth className="!pt-0">
       {isError && (
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        <AlertError
+          className="mt-12"
+          error={authConfigError}
+          subject="Failed to retrieve auth configuration"
+        />
       )}
       {isLoading && (
-        <div className="w-[854px]">
+        <div className="w-[854px] mt-12">
           <GenericSkeletonLoader />
         </div>
       )}
       {isSuccess && (
-        <FormPanel>
-          <Tabs_Shadcn_ defaultValue={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}>
-            <TabsList_Shadcn_ className="px-4 md:px-8 pt-2 gap-5 overflow-x-scroll no-scrollbar">
-              {TEMPLATES_SCHEMAS.map((template) => {
-                return (
-                  <TabsTrigger_Shadcn_ value={template.title.trim().replace(/\s+/g, '-')}>
-                    {template.title}
-                  </TabsTrigger_Shadcn_>
-                )
-              })}
-            </TabsList_Shadcn_>
-            {TEMPLATES_SCHEMAS.map((template) => {
-              const panelId = template.title.trim().replace(/\s+/g, '-')
-              return (
-                <TabsContent_Shadcn_ value={panelId} key={panelId}>
-                  {builtInSMTP ? (
-                    <div className="px-4 md:px-8">
-                      <EmailRateLimitsAlert />
+        <>
+          {builtInSMTP ? (
+            <div className="mt-12">
+              <EmailRateLimitsAlert />
+            </div>
+          ) : null}
+          {isSecurityNotificationsEnabled ? (
+            <div className="mt-12 space-y-12">
+              <div>
+                <ScaffoldSectionTitle className="mb-4">Authentication</ScaffoldSectionTitle>
+                <Card>
+                  {TEMPLATES_SCHEMAS.filter(
+                    (t) => t.misc?.emailTemplateType === 'authentication'
+                  ).map((template) => {
+                    const templateSlug = slugifyTitle(template.title)
+
+                    return (
+                      <CardContent key={`${template.id}`} className="p-0">
+                        <Link
+                          href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                          className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
+                        >
+                          <div className="flex flex-col">
+                            <h3 className="text-sm text-foreground">{template.title}</h3>
+                            {template.purpose && (
+                              <p className="text-sm text-foreground-lighter">{template.purpose}</p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-4">
+                            <ChevronRight size={16} className="text-foreground-muted" />
+                          </div>
+                        </Link>
+                      </CardContent>
+                    )
+                  })}
+                </Card>
+              </div>
+
+              <div>
+                <ScaffoldSectionTitle className="mb-4">Security</ScaffoldSectionTitle>
+                {!acknowledged && (
+                  <Admonition showIcon={false} type="tip" className="relative mb-6">
+                    <Tooltip>
+                      <TooltipTrigger
+                        onClick={() => setAcknowledged(true)}
+                        className="absolute top-3 right-3 opacity-30 hover:opacity-100 transition-opacity"
+                      >
+                        <X size={14} className="text-foreground-light" />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Dismiss</TooltipContent>
+                    </Tooltip>
+                    <div className="flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
+                      <div className="flex flex-col gap-y-0.5">
+                        <div className="flex flex-col gap-y-2 items-start">
+                          <Badge variant="success" className="-ml-0.5">
+                            NEW
+                          </Badge>
+                          <p className="text-sm">
+                            Notify users about security-sensitive actions on their accounts
+                          </p>
+                        </div>
+                        <p className="text-sm text-foreground-lighter text-balance">
+                          We’ve expanded our email templates to handle security-sensitive actions.
+                          The list of templates will continue to grow as our feature-set changes
+                          {SECURITY_NOTIFICATIONS_DISCUSSIONS_URL && (
+                            <>
+                              {' '}
+                              and as we{' '}
+                              <InlineLink
+                                href={SECURITY_NOTIFICATIONS_DISCUSSIONS_URL}
+                                target="_blank"
+                              >
+                                gather feedback
+                              </InlineLink>{' '}
+                              from our community
+                            </>
+                          )}
+                          .
+                        </p>
+                      </div>
+                      <Button
+                        asChild
+                        type="default"
+                        icon={<ExternalLink strokeWidth={1.5} />}
+                        className="mt-2"
+                      >
+                        <Link href={`${DOCS_URL}/guides/auth/auth-email-templates`} target="_blank">
+                          Docs
+                        </Link>
+                      </Button>
                     </div>
-                  ) : null}
-                  <TemplateEditor key={template.title} template={template} />
-                </TabsContent_Shadcn_>
-              )
-            })}
-          </Tabs_Shadcn_>
-        </FormPanel>
+                  </Admonition>
+                )}
+
+                <Form_Shadcn_ {...notificationsForm}>
+                  <form onSubmit={notificationsForm.handleSubmit(onSubmit)} className="space-y-4">
+                    <Card>
+                      {TEMPLATES_SCHEMAS.filter(
+                        (t) => t.misc?.emailTemplateType === 'security'
+                      ).map((template) => {
+                        const templateSlug = slugifyTitle(template.title)
+                        const templateEnabledKey =
+                          `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as keyof typeof authConfig
+
+                        return (
+                          <CardContent
+                            key={`${template.id}`}
+                            className="p-0 flex items-center justify-between hover:bg-surface-200 transition-colors w-full h-full"
+                          >
+                            <Link
+                              href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                              className="flex flex-col flex-1 py-4 px-6"
+                            >
+                              <h3 className="text-sm text-foreground">{template.title}</h3>
+                              {template.purpose && (
+                                <p className="text-sm text-foreground-lighter">
+                                  {template.purpose}
+                                </p>
+                              )}
+                            </Link>
+
+                            <div className="flex items-center gap-4 h-full pl-2 relative">
+                              <FormField_Shadcn_
+                                control={notificationsForm.control}
+                                name={templateEnabledKey}
+                                render={({ field }) => (
+                                  <FormControl_Shadcn_>
+                                    <Switch
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                      disabled={!canUpdateConfig}
+                                    />
+                                  </FormControl_Shadcn_>
+                                )}
+                              />
+
+                              <Link
+                                href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                                className="py-6 pr-6"
+                              >
+                                <ChevronRight size={16} className="text-foreground-muted" />
+                              </Link>
+                            </div>
+                          </CardContent>
+                        )
+                      })}
+                      <CardFooter className="justify-end space-x-2">
+                        {notificationsForm.formState.isDirty && (
+                          <Button type="default" onClick={() => notificationsForm.reset()}>
+                            Cancel
+                          </Button>
+                        )}
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          disabled={
+                            !canUpdateConfig ||
+                            isUpdatingConfig ||
+                            !notificationsForm.formState.isDirty
+                          }
+                          loading={isUpdatingConfig}
+                        >
+                          Save changes
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </form>
+                </Form_Shadcn_>
+              </div>
+            </div>
+          ) : (
+            <Card className="mt-12">
+              <Tabs_Shadcn_ defaultValue={slugifyTitle(TEMPLATES_SCHEMAS[0].title)}>
+                <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
+                  {TEMPLATES_SCHEMAS.filter(
+                    (t) => t.misc?.emailTemplateType === 'authentication'
+                  ).map((template) => (
+                    <TabsTrigger_Shadcn_
+                      key={`${template.id}`}
+                      value={slugifyTitle(template.title)}
+                    >
+                      {template.title}
+                    </TabsTrigger_Shadcn_>
+                  ))}
+                </TabsList_Shadcn_>
+                {TEMPLATES_SCHEMAS.filter(
+                  (t) => t.misc?.emailTemplateType === 'authentication'
+                ).map((template) => {
+                  const panelId = slugifyTitle(template.title)
+                  return (
+                    <TabsContent_Shadcn_ key={panelId} value={panelId} className="mt-0">
+                      <TemplateEditor key={template.title} template={template} />
+                    </TabsContent_Shadcn_>
+                  )
+                })}
+              </Tabs_Shadcn_>
+            </Card>
+          )}
+        </>
       )}
-    </div>
+    </ScaffoldSection>
   )
 }
-
-export default EmailTemplates

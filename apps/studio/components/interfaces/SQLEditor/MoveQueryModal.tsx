@@ -164,7 +164,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       snippets.forEach((snippet) => {
         snapV2.updateSnippet({
           id: snippet.id,
-          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : selectedId },
+          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
           skipSave: true,
         })
       })
@@ -262,7 +262,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                             {folders?.map((folder) => (
                               <CommandItem_Shadcn_
                                 key={folder.id}
-                                value={folder.id}
+                                value={folder.name}
                                 className="cursor-pointer w-full justify-between"
                                 onSelect={() => {
                                   setOpen(false)

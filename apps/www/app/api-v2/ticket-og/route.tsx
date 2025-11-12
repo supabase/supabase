@@ -1,7 +1,7 @@
-import React from 'react'
-import { ImageResponse } from '@vercel/og'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@supabase/supabase-js'
-import { themes } from '~/components/LaunchWeek/13/Ticket/ticketThemes'
+import { ImageResponse } from '@vercel/og'
+import useTicketBg from 'components/LaunchWeek/15/hooks/use-ticket-bg'
 
 export const runtime = 'edge' // 'nodejs' is the default
 export const dynamic = 'force-dynamic' // defaults to auto
@@ -15,21 +15,21 @@ const corsHeaders = {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
-const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw13`
-
-// Load custom font
-const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
-const MONO_FONT_URL = `${STORAGE_URL}/assets/font/SourceCodePro-Regular.ttf`
-const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
-const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
+const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw15`
+// Load custom fonts
+const FONT_URLS = {
+  SANS: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/fonts/CircularStd-Book.otf',
+}
 
 const LW_TABLE = 'tickets'
 const LW_MATERIALIZED_VIEW = 'tickets_view'
 
-export async function GET(req: Request, res: Response) {
+export async function GET(req: Request) {
   const url = new URL(req.url)
+
+  // Just here to silence snyk false positives
+  // Verify that req.url is from an allowed domain
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
-  const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
   const userAgent = req.headers.get('user-agent')
 
   try {
@@ -45,14 +45,14 @@ export async function GET(req: Request, res: Response) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_twitter: 'now' })
-        .eq('launch_week', 'lw13')
+        .eq('launch_week', 'lw15')
         .eq('username', username)
         .is('shared_on_twitter', null)
     } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_linkedin: 'now' })
-        .eq('launch_week', 'lw13')
+        .eq('launch_week', 'lw15')
         .eq('username', username)
         .is('shared_on_linkedin', null)
     }
@@ -61,60 +61,52 @@ export async function GET(req: Request, res: Response) {
     const { data: user, error } = await supabaseAdminClient
       .from(LW_MATERIALIZED_VIEW)
       .select(
-        'id, name, metadata, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location'
+        'id, name, metadata, shared_on_twitter, shared_on_linkedin, role, company, location, ticket_number'
       )
-      .eq('launch_week', 'lw13')
+      .eq('launch_week', 'lw15')
       .eq('username', username)
       .maybeSingle()
 
-    if (error) console.log('fetch error', error.message)
+    if (error) console.log('Failed to fetch user. Inner error:', error.message)
     if (!user) throw new Error(error?.message ?? 'user not found')
 
-    const {
-      name,
-      secret,
-      platinum: isPlatinum,
-      metadata,
-      shared_on_twitter: sharedOnTwitter,
-      shared_on_linkedin: sharedOnLinkedIn,
-    } = user
+    const FONT_SANS = fetch(new URL(FONT_URLS['SANS'], import.meta.url)).then((res) =>
+      res.arrayBuffer()
+    )
+    const FONT_DATA = await FONT_SANS
 
-    const isDark = metadata.theme !== 'light'
+    const { metadata, ticket_number } = user
 
-    const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
-    if (assumePlatinum && !platinum)
-      return await fetch(`${STORAGE_URL}/assets/platinum_no_meme.jpg`)
+    const ticketBg = useTicketBg(ticket_number)
 
     // Generate image and upload to storage.
-    const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
+    const ticketType = 'regular'
 
-    const STYLING_CONFIG = (isDark?: boolean) => ({
-      TICKET_FOREGROUND: themes(isDark)[ticketType].TICKET_FOREGROUND,
-    })
+    const STYLING_CONFIG = {
+      TICKET_FOREGROUND: metadata.colors?.foreground ?? '#ffffff',
+      TICKET_BACKGROUND: metadata.colors?.background ?? '#000000',
+      IMG: ticketBg,
+    }
 
-    const fontData = await font
-    const monoFontData = await mono_font
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
-    const USERNAME_LEFT = 400
-    const USERNAME_BOTTOM = 100
-    const USERNAME_WIDTH = 400
-    const DISPLAY_NAME = name || username
-
-    const BACKGROUND = (isDark?: boolean) => ({
-      regular: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-regular-${isDark ? 'dark' : 'light'}.png?v4`,
-      },
-      platinum: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-platinum.png?v4`,
-      },
-      secret: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-secret.png?v4`,
-      },
-    })
+    const OG_PADDING_Y = 100
+    const OG_PADDING_X = 60
+    const TICKET_RATIO = 940 / 1500
+    const TICKET_WIDTH = 480
+    const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
+    const SUPABASE_LOGO_IMG = `${STORAGE_URL}/assets/supabase-white.png`
+    const SUPABASE_LOGO_RATIO = 541 / 103
+    const SUPABASE_LOGO_HEIGHT = 24
+    const DATE_FONT_SIZE = 75
+    const LW15_LOGO_HEIGHT = 70
+    const LW15_LEFT = `${STORAGE_URL}/assets/LW15_LEFT.png`
+    const LW15_LEFT_RATIO = 215 / 116
+    const LW15_RIGHT = `${STORAGE_URL}/assets/LW15_RIGHT.png`
+    const LW15_RIGHT_RATIO = 145 / 116
+    const LW15_TEXT_LOGO_FONT_SIZE = 90
+    const USERNAME_FONT_SIZE = 40
+    const TICKET_BOTTOM_TEXT_FONT_SIZE = 20
 
     const generatedTicketImage = new ImageResponse(
       (
@@ -124,62 +116,349 @@ export async function GET(req: Request, res: Response) {
               width: '1200px',
               height: '628px',
               position: 'relative',
-              fontFamily: '"Circular"',
+              fontFamily: 'Circular',
               overflow: 'hidden',
-              color: STYLING_CONFIG(isDark).TICKET_FOREGROUND,
+              color: STYLING_CONFIG.TICKET_BACKGROUND,
+              backgroundColor: '#000',
               display: 'flex',
               flexDirection: 'column',
-              padding: '60px',
               justifyContent: 'space-between',
             }}
           >
-            {/* Background  */}
+            {/* Background */}
             <img
               width="1204"
               height="634"
               style={{
-                position: 'absolute',
+                position: 'relative',
+                width: '1204px',
+                height: '634px',
                 top: '-2px',
                 left: '-2px',
                 bottom: '-2px',
                 right: '-2px',
-                zIndex: '0',
                 backgroundSize: 'cover',
+                opacity: 0.25,
               }}
-              src={BACKGROUND(isDark)[ticketType].BACKGROUND_IMG}
+              src={STYLING_CONFIG.IMG}
             />
 
-            {/* Name & username */}
+            {/* LINEAR GRADIENT */}
             <div
               style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                flexDirection: 'column',
                 position: 'absolute',
-                bottom: USERNAME_BOTTOM,
-                left: USERNAME_LEFT,
-                width: USERNAME_WIDTH,
-                height: 'auto',
-                overflow: 'hidden',
-                textOverflow: 'clip',
-                textAlign: 'left',
-                letterSpacing: '-0.5px',
-                marginBottom: '10px',
+                width: '100%',
+                height: '100%',
+                left: '0px',
+                top: '0px',
+                bottom: '0px',
+                right: '0px',
+                background: 'linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))',
+                zIndex: 1,
+              }}
+            />
+
+            {/* LEFT */}
+            <div
+              style={{
+                position: 'absolute',
+                width: `${OG_WIDTH - OG_PADDING_X * 2 - TICKET_WIDTH}px`,
+                height: '100%',
+                top: '0px',
+                left: '0px',
+                padding: `${OG_PADDING_Y}px 0 ${OG_PADDING_Y}px ${OG_PADDING_X}px`,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                color: '#fff',
               }}
             >
-              <p
+              <div
                 style={{
-                  margin: '0',
-                  padding: '0',
-                  fontSize: '54',
-                  lineHeight: '105%',
+                  position: 'relative',
+                  width: '100%',
+                  height: '40px',
+                  top: '0px',
+                  left: '0px',
                   display: 'flex',
-                  marginBottom: '10px',
+                  justifyContent: 'space-between',
                 }}
               >
-                {DISPLAY_NAME}
-              </p>
+                <p
+                  style={{
+                    fontSize: `28px`,
+                    lineHeight: '110%',
+                    margin: '0',
+                  }}
+                >
+                  Launch Week 15
+                </p>
+                {/* <img
+                  src={LW15_LEFT}
+                  width="100%"
+                  height="100%"
+                  style={{
+                    position: 'relative',
+                    width: `${LW15_LOGO_HEIGHT * LW15_LEFT_RATIO}px`,
+                    height: `${LW15_LOGO_HEIGHT}`,
+                    backgroundSize: 'contain',
+                  }}
+                />
+                <img
+                  src={LW15_RIGHT}
+                  width="100%"
+                  height="100%"
+                  style={{
+                    position: 'relative',
+                    width: `${LW15_LOGO_HEIGHT * LW15_RIGHT_RATIO}px`,
+                    height: `${LW15_LOGO_HEIGHT}`,
+                    backgroundSize: 'contain',
+                  }}
+                /> */}
+              </div>
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '30px',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: `${DATE_FONT_SIZE}px`,
+                    lineHeight: '110%',
+                    margin: '0',
+                  }}
+                >
+                  July 14—18
+                </p>
+                <img
+                  src={SUPABASE_LOGO_IMG}
+                  width="100%"
+                  height="40px"
+                  style={{
+                    position: 'relative',
+                    backgroundSize: 'contain',
+                    height: `${SUPABASE_LOGO_HEIGHT}px`,
+                    width: `${SUPABASE_LOGO_RATIO * SUPABASE_LOGO_HEIGHT}px`,
+                    marginBottom: '20px',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* TICKET */}
+            <div
+              style={{
+                position: 'absolute',
+                width: `${TICKET_WIDTH}px`,
+                height: `${TICKET_HEIGHT}px`,
+                top: `${OG_PADDING_Y - 40}px`,
+                right: `${OG_PADDING_X}px`,
+                backgroundColor: STYLING_CONFIG.TICKET_BACKGROUND,
+                color: STYLING_CONFIG.TICKET_FOREGROUND,
+                borderRadius: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                border: '1px solid #ffffff40',
+                overflow: 'hidden',
+                boxShadow: '0 0 60px 0 rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '50%',
+                  display: 'flex',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    backgroundSize: 'cover',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                  }}
+                >
+                  <img
+                    width="600"
+                    height="600"
+                    src={STYLING_CONFIG.IMG}
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      backgroundSize: 'cover',
+                      left: 0,
+                      mixBlendMode: 'screen',
+                      opacity: 0.7,
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: 'flex',
+                      position: 'absolute',
+                      background: STYLING_CONFIG.TICKET_BACKGROUND,
+                      width: '100%',
+                      height: '100%',
+                      right: 0,
+                      bottom: 0,
+                      top: 0,
+                      left: 0,
+                      mixBlendMode: 'color',
+                      opacity: 0.2,
+                    }}
+                  />
+                  <span
+                    className="absolute top-5 mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg shadow-inner"
+                    style={{
+                      position: 'absolute',
+                      top: '30px',
+                      margin: '0 auto',
+                      width: '70px',
+                      height: '20px',
+                      backgroundColor: '#000',
+                      border: '1px solid #ffffff40',
+                      borderRadius: '10px',
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'relative',
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      zIndex: 2,
+                      padding: '0px 18px',
+                      gap: '10px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'relative',
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        margin: '0',
+                        padding: '0',
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: `${LW15_TEXT_LOGO_FONT_SIZE}px`,
+                          padding: '0',
+                          margin: '0',
+                        }}
+                      >
+                        LW
+                      </p>
+                      <p
+                        style={{
+                          fontSize: `${LW15_TEXT_LOGO_FONT_SIZE}px`,
+                          padding: '0',
+                          margin: '0',
+                        }}
+                      >
+                        15
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '50%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  padding: '10px 20px',
+                  gap: '0px',
+                }}
+              >
+                <p
+                  style={{
+                    display: 'flex',
+                    position: 'relative',
+                    width: '100%',
+                    backgroundSize: 'cover',
+                    fontSize: `${USERNAME_FONT_SIZE}px`,
+                    lineHeight: '110%',
+                  }}
+                >
+                  @{username}
+                </p>
+                <div
+                  style={{
+                    display: 'flex',
+                    position: 'relative',
+                    width: '100%',
+                    marginTop: '10px',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
+                      lineHeight: '110%',
+                      width: '35%',
+                      padding: '0',
+                      margin: '0',
+                    }}
+                  >
+                    Company
+                  </p>
+                  <p
+                    style={{
+                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
+                      lineHeight: '110%',
+                      padding: '0',
+                      margin: '0',
+                    }}
+                  >
+                    {metadata.company ?? '—'}
+                  </p>
+                </div>
+                {/* <div
+                  style={{
+                    display: 'flex',
+                    position: 'relative',
+                    width: '100%',
+                    marginTop: '8px',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
+                      lineHeight: '110%',
+                      width: '35%',
+                      padding: '0',
+                      margin: '0',
+                    }}
+                  >
+                    Location
+                  </p>
+                  <p
+                    style={{
+                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
+                      lineHeight: '110%',
+                      padding: '0',
+                      margin: '0',
+                    }}
+                  >
+                    {metadata.location ?? '—'}
+                  </p>
+                </div> */}
+              </div>
             </div>
           </div>
         </>
@@ -189,13 +468,8 @@ export async function GET(req: Request, res: Response) {
         height: OG_HEIGHT,
         fonts: [
           {
-            name: 'Circular',
-            data: fontData,
-            style: 'normal',
-          },
-          {
-            name: 'SourceCodePro',
-            data: monoFontData,
+            name: 'CircularStd-Book',
+            data: FONT_DATA,
             style: 'normal',
           },
         ],
@@ -208,12 +482,12 @@ export async function GET(req: Request, res: Response) {
     )
 
     // [Note] Uncomment only for local testing to return the image directly and skip storage upload.
-    // return await generatedTicketImage
+    // return generatedTicketImage
 
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(`launch-week/lw13/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
+      .upload(`launch-week/lw15/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
         contentType: 'image/png',
         // cacheControl: `${60 * 60 * 24 * 7}`,
         cacheControl: `0`,
@@ -227,6 +501,9 @@ export async function GET(req: Request, res: Response) {
 
     return await fetch(`${STORAGE_URL}/og/${ticketType}/${username}.png?t=${NEW_TIMESTAMP}`)
   } catch (error: any) {
+    Sentry.captureException(error)
+    await Sentry.flush(2000)
+
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,

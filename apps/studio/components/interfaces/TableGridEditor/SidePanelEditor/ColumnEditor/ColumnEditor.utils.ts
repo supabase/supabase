@@ -1,10 +1,12 @@
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn } from '@supabase/postgres-meta'
 import { isEqual, isNull } from 'lodash'
 import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { uuidv4 } from 'lib/helpers'
+import { toast } from 'sonner'
 import {
   ColumnField,
   CreateColumnPayload,
@@ -54,7 +56,7 @@ export const generateColumnField = (field: any = {}): ColumnField => {
 
 export const generateColumnFieldFromPostgresColumn = (
   column: PostgresColumn,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ): ColumnField => {
   const { primary_keys } = table
@@ -68,7 +70,7 @@ export const generateColumnFieldFromPostgresColumn = (
     table: column.table,
     schema: column.schema,
     name: column.name,
-    comment: column?.comment ?? '',
+    comment: column?.comment,
     format: isArray ? column.format.slice(1) : column.format,
     defaultValue: column?.default_value as string | null,
     check: column.check,
@@ -84,13 +86,14 @@ export const generateColumnFieldFromPostgresColumn = (
 }
 
 export const generateCreateColumnPayload = (
-  tableId: number,
+  table: RetrieveTableResult,
   field: ColumnField
 ): CreateColumnPayload => {
   const isIdentity = field.format.includes('int') ? field.isIdentity : false
-  const defaultValue = field.defaultValue as any
+  const defaultValue = field.defaultValue
   const payload: CreateColumnPayload = {
-    tableId,
+    schema: table.schema,
+    table: table.name,
     isIdentity,
     name: field.name.trim(),
     comment: field.comment?.trim(),
@@ -106,17 +109,15 @@ export const generateCreateColumnPayload = (
     ...(!isIdentity &&
       defaultValue && {
         defaultValueFormat:
-          isNull(defaultValue) || isSQLExpression(defaultValue)
-            ? 'expression'
-            : ('literal' as 'expression' | 'literal'),
+          isNull(defaultValue) || isSQLExpression(defaultValue) ? 'expression' : 'literal',
       }),
   }
   return payload
 }
 
 export const generateUpdateColumnPayload = (
-  originalColumn: PostgresColumn,
-  table: PostgresTable,
+  originalColumn: RetrievedTableColumn,
+  table: RetrieveTableResult,
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
   const primaryKeyColumns = table.primary_keys.map((key) => key.name)
@@ -125,7 +126,7 @@ export const generateUpdateColumnPayload = (
   // Only append the properties which are getting updated
   const name = field.name.trim()
   const type = field.isArray ? `${field.format}[]` : field.format
-  const comment = ((field.comment?.length ?? '') === 0 ? null : field.comment)?.trim()
+  const comment = field.comment?.trim()
   const check = field.check?.trim()
 
   const payload: Partial<UpdateColumnPayload> = {}
@@ -135,7 +136,7 @@ export const generateUpdateColumnPayload = (
     payload.name = name
   }
   if (!isEqual(originalColumn.comment?.trim(), comment)) {
-    payload.comment = comment as string | undefined
+    payload.comment = comment
   }
   if (!isEqual(originalColumn.check?.trim(), check)) {
     payload.check = check
@@ -148,9 +149,7 @@ export const generateUpdateColumnPayload = (
     const defaultValue = field.defaultValue
     payload.defaultValue = defaultValue as unknown as Record<string, never> | undefined
     payload.defaultValueFormat =
-      isNull(defaultValue) || isSQLExpression(defaultValue)
-        ? 'expression'
-        : ('literal' as 'expression' | 'literal')
+      isNull(defaultValue) || isSQLExpression(defaultValue) ? 'expression' : 'literal'
   }
   if (!isEqual(originalColumn.is_identity, field.isIdentity)) {
     payload.isIdentity = field.isIdentity
@@ -172,9 +171,11 @@ export const validateFields = (field: ColumnField) => {
   const errors = {} as Dictionary<any>
   if (field.name.length === 0) {
     errors['name'] = `Please assign a name for your column`
+    toast.error(errors['name'])
   }
   if (field.format.length === 0) {
     errors['format'] = `Please select a type for your column`
+    toast.error(errors['format'])
   }
   return errors
 }
@@ -206,7 +207,7 @@ export const getForeignKeyUIState = (
 
 export const getColumnForeignKey = (
   column: PostgresColumn,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ) => {
   const { relationships } = table

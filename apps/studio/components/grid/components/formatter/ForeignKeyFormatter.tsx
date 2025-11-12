@@ -1,34 +1,34 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { ArrowRight } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { useTablesQuery as useTableRetrieveQuery } from 'data/tables/table-retrieve-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
+import { ReferenceRecordPeek } from './ReferenceRecordPeek'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
-  projectRef?: string
-  tableId?: string
+  tableId?: number
 }
 
 export const ForeignKeyFormatter = (props: Props) => {
-  const { project } = useProjectContext()
-  const { selectedSchema } = useQuerySchemaState()
+  const { tableId, row, column } = props
+  const { data: project } = useSelectedProjectQuery()
 
-  const { projectRef, tableId, row, column } = props
-  const id = tableId ? Number(tableId) : undefined
-
-  const { data } = useTableEditorQuery({
+  const { data, isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    id,
+    id: tableId,
   })
+  const foreignKeyColumn = data?.columns.find((x) => x.name === column.key)
   const selectedTable = isTableLike(data) ? data : undefined
 
   const relationship = (selectedTable?.relationships ?? []).find(
@@ -37,52 +37,65 @@ export const ForeignKeyFormatter = (props: Props) => {
       r.source_table_name === selectedTable?.name &&
       r.source_column_name === column.name
   )
-  const { data: tables } = useTablesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: relationship?.target_table_schema,
-  })
-  const targetTable = tables?.find(
-    (table) =>
-      table.schema === relationship?.target_table_schema &&
-      table.name === relationship.target_table_name
-  )
+
+  const { data: targetTable, isLoading: isLoadingTargetTable } =
+    useTableRetrieveQuery<PostgresTable>(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: relationship?.target_table_schema ?? '',
+        name: relationship?.target_table_name ?? '',
+      },
+      {
+        enabled:
+          !!project?.ref &&
+          !!relationship?.target_table_schema &&
+          !!relationship?.target_table_name,
+      }
+    )
 
   const value = row[column.key]
+  const formattedValue =
+    foreignKeyColumn?.format === 'bytea' && !!value ? convertByteaToHex(value) : value
 
   return (
     <div className="sb-grid-foreign-key-formatter flex justify-between">
       <span className="sb-grid-foreign-key-formatter__text">
-        {value === null ? <NullValue /> : value}
+        {formattedValue === null ? <NullValue /> : formattedValue}
       </span>
-      {relationship !== undefined && targetTable !== undefined && value !== null && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              asChild
-              type="default"
-              size="tiny"
-              className="translate-y-[2px]"
-              style={{ padding: '3px' }}
-            >
-              <EditorTablePageLink
-                href={`/project/${projectRef}/editor/${targetTable?.id}?schema=${selectedSchema}&filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
-                projectRef={projectRef}
-                id={targetTable && String(targetTable?.id)}
-                filters={[
-                  {
-                    column: relationship.target_column_name,
-                    operator: '=',
-                    value: String(value),
-                  },
-                ]}
-              >
-                <ArrowRight size={14} />
-              </EditorTablePageLink>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">View referencing record</TooltipContent>
-        </Tooltip>
+      {isLoading && formattedValue !== null && (
+        <div className="w-6 h-6 flex items-center justify-center">
+          <ShimmeringLoader className="w-4 h-4" />
+        </div>
+      )}
+      {!isLoading && relationship !== undefined && formattedValue !== null && (
+        <>
+          {isLoadingTargetTable && (
+            <div className="w-6 h-6 flex items-center justify-center">
+              <ShimmeringLoader className="w-4 h-4" />
+            </div>
+          )}
+          {!isLoadingTargetTable && targetTable !== undefined && (
+            <Popover_Shadcn_>
+              <PopoverTrigger_Shadcn_ asChild>
+                <ButtonTooltip
+                  type="default"
+                  className="w-6 h-6"
+                  icon={<ArrowRight />}
+                  onClick={(e) => e.stopPropagation()}
+                  tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
+                />
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ portal align="end" className="p-0 w-96">
+                <ReferenceRecordPeek
+                  table={targetTable}
+                  column={relationship.target_column_name}
+                  value={formattedValue}
+                />
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          )}
+        </>
       )}
     </div>
   )

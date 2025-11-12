@@ -1,32 +1,37 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import Table from 'components/to-be-cleaned/Table'
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Badge } from 'ui'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import AddNewSecretModal from './AddNewSecretModal'
+import AddNewSecretForm from './AddNewSecretForm'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
+import { EditSecretSheet } from './EditSecretSheet'
+
+type SelectedProjectSecret = {
+  secret: ProjectSecret
+  op: 'delete' | 'edit'
+}
 
 const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
   const [searchString, setSearchString] = useState('')
-  const [showCreateSecret, setShowCreateSecret] = useState(false)
-  const [selectedSecret, setSelectedSecret] = useState<ProjectSecret>()
+  const [selectedSecret, setSelectedSecret] = useState<SelectedProjectSecret>()
 
-  const canReadSecrets = useCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const canUpdateSecrets = useCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
+  const { can: canReadSecrets, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
+  const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
 
   const { data, error, isLoading, isSuccess, isError } = useSecretsQuery({
     projectRef: projectRef,
@@ -34,7 +39,7 @@ const EdgeFunctionSecrets = () => {
 
   const { mutate: deleteSecret, isLoading: isDeleting } = useSecretsDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully deleted ${selectedSecret?.name}`)
+      toast.success(`Successfully deleted ${selectedSecret?.secret.name}`)
       setSelectedSecret(undefined)
     },
   })
@@ -45,110 +50,117 @@ const EdgeFunctionSecrets = () => {
         []
       : data ?? []
 
+  const headers = [
+    <TableHead key="secret-name">Name</TableHead>,
+    <TableHead key="secret-value" className="flex items-center gap-x-2">
+      Digest{' '}
+      <Badge color="scale" className="font-mono">
+        SHA256
+      </Badge>
+    </TableHead>,
+    <TableHead key="secret-updated-at">Updated at</TableHead>,
+    <TableHead key="actions" />,
+  ]
+
   return (
     <>
-      {isLoading && <GenericSkeletonLoader />}
+      {isLoading || isLoadingPermissions ? (
+        <GenericSkeletonLoader />
+      ) : (
+        <>
+          {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
 
-      {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
-
-      {isSuccess && (
-        <div className="space-y-4">
-          {!canReadSecrets ? (
-            <NoPermission resourceText="view this project's edge function secrets" />
-          ) : (
+          {isSuccess && (
             <>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-                <Input
-                  size="small"
-                  className="w-full md:w-80"
-                  placeholder="Search for a secret"
-                  value={searchString}
-                  onChange={(e: any) => setSearchString(e.target.value)}
-                  icon={<Search size={14} />}
-                />
-                <div className="flex items-center space-x-2">
-                  <DocsButton href="https://supabase.com/docs/guides/functions/secrets" />
-                  <ButtonTooltip
-                    disabled={!canUpdateSecrets}
-                    onClick={() => setShowCreateSecret(true)}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canUpdateSecrets
-                          ? 'You need additional permissions to update edge function secrets'
-                          : undefined,
-                      },
-                    }}
-                  >
-                    Add new secret
-                  </ButtonTooltip>
-                </div>
+              <div className="mb-6">
+                {!canUpdateSecrets ? (
+                  <NoPermission resourceText="manage this project's edge function secrets" />
+                ) : (
+                  <AddNewSecretForm />
+                )}
               </div>
-              <Table
-                head={[
-                  <Table.th key="secret-name">Name</Table.th>,
-                  <Table.th key="secret-value" className="flex items-center gap-x-2">
-                    Digest{' '}
-                    <Badge color="scale" className="font-mono">
-                      SHA256
-                    </Badge>
-                  </Table.th>,
-                  <Table.th key="actions" />,
-                ]}
-                body={
-                  secrets.length > 0 ? (
-                    secrets.map((secret) => (
-                      <EdgeFunctionSecret
-                        key={secret.name}
-                        secret={secret}
-                        onSelectDelete={() => setSelectedSecret(secret)}
-                      />
-                    ))
-                  ) : secrets.length === 0 && searchString.length > 0 ? (
-                    <Table.tr>
-                      <Table.td colSpan={3}>
-                        <p className="text-sm text-foreground">No results found</p>
-                        <p className="text-sm text-foreground-light">
-                          Your search for "{searchString}" did not return any results
-                        </p>
-                      </Table.td>
-                    </Table.tr>
-                  ) : (
-                    <Table.tr>
-                      <Table.td colSpan={3}>
-                        <p className="text-sm text-foreground">No secrets created</p>
-                        <p className="text-sm text-foreground-light">
-                          There are no secrets associated with your project yet
-                        </p>
-                      </Table.td>
-                    </Table.tr>
-                  )
-                }
-              />
+              {canUpdateSecrets && !canReadSecrets ? (
+                <NoPermission resourceText="view this project's edge function secrets" />
+              ) : canReadSecrets ? (
+                <div className="space-y-4 mt-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <Input
+                      size="small"
+                      className="w-full md:w-80"
+                      placeholder="Search for a secret"
+                      value={searchString}
+                      onChange={(e: any) => setSearchString(e.target.value)}
+                      icon={<Search size={14} />}
+                    />
+                  </div>
+
+                  <Card>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>{headers}</TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {secrets.length > 0 ? (
+                          secrets.map((secret) => (
+                            <EdgeFunctionSecret
+                              key={secret.name}
+                              secret={secret}
+                              onSelectEdit={() => setSelectedSecret({ secret, op: 'edit' })}
+                              onSelectDelete={() => setSelectedSecret({ secret, op: 'delete' })}
+                            />
+                          ))
+                        ) : secrets.length === 0 && searchString.length > 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={headers.length}>
+                              <p className="text-sm text-foreground">No results found</p>
+                              <p className="text-sm text-foreground-light">
+                                Your search for "{searchString}" did not return any results
+                              </p>
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={headers.length}>
+                              <p className="text-sm text-foreground">No secrets created</p>
+                              <p className="text-sm text-foreground-light">
+                                There are no secrets associated with your project yet
+                              </p>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </div>
+              ) : null}
             </>
           )}
-        </div>
+        </>
       )}
 
-      <AddNewSecretModal visible={showCreateSecret} onClose={() => setShowCreateSecret(false)} />
+      <EditSecretSheet
+        secret={selectedSecret?.secret}
+        visible={selectedSecret?.op === 'edit'}
+        onClose={() => setSelectedSecret(undefined)}
+      />
 
       <ConfirmationModal
-        variant="warning"
+        variant="destructive"
         loading={isDeleting}
-        visible={selectedSecret !== undefined}
+        visible={selectedSecret?.op === 'delete'}
         confirmLabel="Delete secret"
         confirmLabelLoading="Deleting secret"
-        title={`Confirm to delete secret "${selectedSecret?.name}"`}
+        title={`Confirm to delete secret "${selectedSecret?.secret.name}"`}
         onCancel={() => setSelectedSecret(undefined)}
         onConfirm={() => {
           if (selectedSecret !== undefined) {
-            deleteSecret({ projectRef, secrets: [selectedSecret.name] })
+            deleteSecret({ projectRef, secrets: [selectedSecret.secret.name] })
           }
         }}
       >
         <p className="text-sm">
-          Before removing this secret, do ensure that none of your edge functions are currently
-          actively using this secret. This action cannot be undone.
+          Before removing this secret, ensure none of your Edge Functions are actively using it.
+          This action cannot be undone.
         </p>
       </ConfirmationModal>
     </>

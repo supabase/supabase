@@ -10,7 +10,8 @@ import { useTheme } from 'next-themes'
 import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { copyToClipboard } from '../../lib/utils'
-import { Button } from '../Button'
+import { cn } from './../../lib/utils/cn'
+import { Button } from './../Button'
 import { dart } from './prism'
 
 dart(Prism)
@@ -24,13 +25,18 @@ interface SimpleCodeBlockProps {
   parentClassName?: string
   className?: string
   showCopy?: boolean
+  onCopy?: () => void
+  handleCopy?: (value: string) => void
 }
 
+// [Joshen] Refactor: De-dupe with CodeBlock.tsx
 export const SimpleCodeBlock = ({
   children,
   parentClassName,
   className: languageClassName,
   showCopy = true,
+  onCopy,
+  handleCopy,
 }: PropsWithChildren<SimpleCodeBlockProps>) => {
   const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
@@ -50,7 +56,13 @@ export const SimpleCodeBlock = ({
   }
 
   const handleCopyCode = (code: any) => {
-    copyToClipboard(code, () => setShowCopied(true))
+    if (!!handleCopy) {
+      handleCopy(code)
+    } else {
+      copyToClipboard(code)
+    }
+    setShowCopied(true)
+    onCopy?.()
   }
 
   return (
@@ -62,9 +74,9 @@ export const SimpleCodeBlock = ({
       {({ className, tokens, getLineProps, getTokenProps }) => {
         return (
           <div className="Code codeBlockWrapper group">
-            <pre ref={target} className={`codeBlock ${className} ${parentClassName}`}>
+            <pre ref={target} className={cn('codeBlock', className, parentClassName)}>
               {tokens.map((line, i) => {
-                const lineProps = getLineProps({ line, key: i })
+                const { key: _key, ...lineProps } = getLineProps({ line, key: i })
 
                 if (highlightLines.includes(i + 1)) {
                   lineProps.className = `${lineProps.className} docusaurus-highlight-code-line`
@@ -72,9 +84,10 @@ export const SimpleCodeBlock = ({
 
                 return (
                   <div key={i} {...lineProps}>
-                    {line.map((token, key) => (
-                      <span key={key} {...getTokenProps({ token, key })} />
-                    ))}
+                    {line.map((token, key) => {
+                      const { key: _key, ...tokenProps } = getTokenProps({ token, key })
+                      return <span key={key} {...tokenProps} />
+                    })}
                   </div>
                 )
               })}

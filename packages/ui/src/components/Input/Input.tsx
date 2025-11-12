@@ -2,15 +2,16 @@
 
 import React, { useEffect, useState } from 'react'
 
+import { Copy } from 'lucide-react'
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import { HIDDEN_PLACEHOLDER } from '../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
+import { copyToClipboard } from '../../lib/utils'
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button'
 import { useFormContext } from '../Form/FormContext'
-import { Copy } from 'lucide-react'
 
 export interface Props
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
@@ -37,7 +38,7 @@ export interface Props
 }
 
 /**
- * @deprecated Use ./Input_shadcn_ instead or ./ui-patterns/data-inputs/input
+ * @deprecated Use `import { Input_Shadcn_ } from 'ui'` instead or `import { Input } from 'ui-patterns/DataInputs/Input'`
  */
 function Input({
   autoComplete,
@@ -115,20 +116,13 @@ function Input({
   // }, [errors, touched])
 
   function _onCopy(value: any) {
-    navigator.clipboard.writeText(value)?.then(
-      function () {
-        /* clipboard successfully set */
-        setCopyLabel('Copied')
-        setTimeout(function () {
-          setCopyLabel('Copy')
-        }, 3000)
-        onCopy?.()
-      },
-      function () {
-        /* clipboard write failed */
-        setCopyLabel('Failed to copy')
-      }
-    )
+    copyToClipboard(value, () => {
+      setCopyLabel('Copied')
+      setTimeout(() => {
+        setCopyLabel('Copy')
+      }, 3000)
+      onCopy?.()
+    })
   }
 
   function onReveal() {
@@ -174,7 +168,7 @@ function Input({
           ref={inputRef}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
-          className={cn(inputClasses, size === 'tiny' && 'pl-8')}
+          className={cn(inputClasses)}
           {...props}
         />
         {icon && <InputIconContainer size={size} icon={icon} className={iconContainerClassName} />}
@@ -256,20 +250,14 @@ function TextArea({
   const [copyLabel, setCopyLabel] = useState('Copy')
 
   function _onCopy(value: any) {
-    navigator.clipboard.writeText(value).then(
-      function () {
-        /* clipboard successfully set */
-        setCopyLabel('Copied')
-        setTimeout(function () {
-          setCopyLabel('Copy')
-        }, 3000)
-        onCopy?.()
-      },
-      function () {
-        /* clipboard write failed */
-        setCopyLabel('Failed to copy')
-      }
-    )
+    copyToClipboard(value, () => {
+      /* clipboard successfully set */
+      setCopyLabel('Copied')
+      setTimeout(() => {
+        setCopyLabel('Copy')
+      }, 3000)
+      onCopy?.()
+    })
   }
 
   const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =

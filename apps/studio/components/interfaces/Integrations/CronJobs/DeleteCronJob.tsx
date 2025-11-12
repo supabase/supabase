@@ -1,10 +1,13 @@
+import { parseAsString, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { cleanPointerEventsNoneOnBody } from 'lib/helpers'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteCronJobProps {
@@ -14,12 +17,17 @@ interface DeleteCronJobProps {
 }
 
 export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+  const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: deleteDatabaseCronJob, isLoading } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
-      sendEvent({ action: TelemetryActions.CRON_JOB_DELETED })
+      sendEvent({
+        action: 'cron_job_deleted',
+        groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
       toast.success(`Successfully removed cron job ${cronJob.jobname}`)
       onClose()
     },
@@ -32,6 +40,7 @@ export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps)
       jobId: cronJob.jobid,
       projectRef: project.ref,
       connectionString: project.connectionString,
+      searchTerm: searchQuery,
     })
   }
 
@@ -39,12 +48,34 @@ export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps)
     return null
   }
 
+  // Cron job name is optional. If the cron job has no name, show a simplified modal which doesn't require the user to input the name.
+  if (!cronJob.jobname) {
+    return (
+      <ConfirmationModal
+        variant="destructive"
+        visible={visible}
+        onCancel={() => {
+          onClose()
+          cleanPointerEventsNoneOnBody()
+        }}
+        onConfirm={handleDelete}
+        title={`Delete the cron job`}
+        loading={isLoading}
+        confirmLabel={`Delete`}
+        alert={{ title: 'You cannot recover this cron job once deleted.' }}
+      />
+    )
+  }
+
   return (
     <TextConfirmModal
       variant="destructive"
       visible={visible}
-      onCancel={() => onClose()}
       onConfirm={handleDelete}
+      onCancel={() => {
+        onClose()
+        cleanPointerEventsNoneOnBody()
+      }}
       title="Delete this cron job"
       loading={isLoading}
       confirmLabel={`Delete cron job ${cronJob.jobname}`}

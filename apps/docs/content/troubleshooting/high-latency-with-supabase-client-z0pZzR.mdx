@@ -48,7 +48,7 @@ INSERT INTO your_table_name (id, column1, column2, column3) VALUES
     (uuid_generate_v4(), 'value20', 21, FALSE);
 ```
 
-2. Run the following script (you may need to `pip install psycopg[binary]` in addition to supabase client.
+2. Run the following script (you may need to `pip install psycopg[binary]` in addition to Supabase client.
 
 ```
 import time
@@ -96,4 +96,4 @@ if __name__ == "__main__":
 
 ## Expected behavior
 
-The overhead from PostgREST shouldn't be higher than a few milliseconds at max. 60-70 ms is way too high. This is particular deceiving because one can run the query on the SQL Editor page and it reports the same time as the direct postgres query, which is not what actually happens.
+The overhead from PostgREST shouldn't be higher than a few milliseconds at max. 60-70 ms is way too high. This is particular deceiving because one can run the query on the SQL Editor page and it reports the same time as the direct Postgres query, which is not what actually happens.

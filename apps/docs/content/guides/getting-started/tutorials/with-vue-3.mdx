@@ -3,7 +3,7 @@ title: 'Build a User Management App with Vue 3'
 description: 'Learn how to use Supabase in your Vue 3 App.'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
@@ -13,7 +13,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -41,24 +41,32 @@ npm install @supabase/supabase-js
 ```
 
 And finally we want to save the environment variables in a `.env`.
-All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+All we need are the API URL and the key that you copied [earlier](#get-api-details).
 
-```bash .env
+<$CodeTabs>
+
+```bash name=.env
 VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
+
+</$CodeTabs>
 
 With the API credentials in place, create an `src/supabase.js` helper file to initialize the Supabase client. These variables are exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js src/supabase.js
+<$CodeTabs>
+
+```js name=src/supabase.js
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabasePublishableKey)
 ```
+
+</$CodeTabs>
 
 Optionally, update [src/style.css](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/vue3-user-management/src/style.css) to style the app.
 
@@ -66,7 +74,9 @@ Optionally, update [src/style.css](https://raw.githubusercontent.com/supabase/su
 
 Set up an `src/components/Auth.vue` component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```vue /src/components/Auth.vue
+<$CodeTabs>
+
+```vue name=/src/components/Auth.vue
 <script setup>
 import { ref } from 'vue'
 import { supabase } from '../supabase'
@@ -113,12 +123,16 @@ const handleLogin = async () => {
 </template>
 ```
 
+</$CodeTabs>
+
 ### Account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Create a new `src/components/Account.vue` component to handle this.
 
-```vue src/components/Account.vue
+<$CodeTabs>
+
+```vue name=src/components/Account.vue
 <script setup>
 import { supabase } from '../supabase'
 import { onMounted, ref, toRefs } from 'vue'
@@ -227,11 +241,15 @@ async function signOut() {
 </template>
 ```
 
+</$CodeTabs>
+
 ### Launch!
 
 Now that we have all the components in place, let's update `App.vue`:
 
-```vue src/App.vue
+<$CodeTabs>
+
+```vue name=src/App.vue
 <script setup>
 import { onMounted, ref } from 'vue'
 import Account from './components/Account.vue'
@@ -259,6 +277,8 @@ onMounted(() => {
 </template>
 ```
 
+</$CodeTabs>
+
 Once that's done, run this in a terminal window:
 
 ```bash
@@ -277,9 +297,11 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 Create a new `src/components/Avatar.vue` component that allows users to upload profile photos:
 
-```vue src/components/Avatar.vue
+<$CodeTabs>
+
+```vue name=src/components/Avatar.vue
 <script setup>
-import { ref, toRefs, watch } from 'vue'
+import { ref, toRefs, watchEffect } from 'vue'
 import { supabase } from '../supabase'
 
 const prop = defineProps(['path', 'size'])
@@ -357,11 +379,15 @@ watchEffect(() => {
 </template>
 ```
 
+</$CodeTabs>
+
 ### Add the new widget
 
 And then we can add the widget to the Account page in `src/components/Account.vue`:
 
-```vue src/components/Account.vue
+<$CodeTabs>
+
+```vue name=src/components/Account.vue
 <script>
 // Import the new component
 import Avatar from './Avatar.vue'
@@ -379,5 +405,7 @@ const avatar_url = ref('')
   </form>
 </template>
 ```
+
+</$CodeTabs>
 
 At this stage you have a fully functional application!

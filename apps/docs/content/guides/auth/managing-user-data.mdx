@@ -26,7 +26,7 @@ alter table public.profiles enable row level security;
 
 <Admonition type="caution">
 
-Only use primary keys as [foreign key references](https://www.postgresql.org/docs/current/tutorial-fk.html) for schemas and tables like `auth.users` which are managed by Supabase. PostgreSQL lets you specify a foreign key reference for columns backed by a unique index (not necessarily primary keys).
+Only use primary keys as [foreign key references](https://www.postgresql.org/docs/current/tutorial-fk.html) for schemas and tables like `auth.users` which are managed by Supabase. Postgres lets you specify a foreign key reference for columns backed by a unique index (not necessarily primary keys).
 
 Primary keys are **guaranteed not to change**. Columns, indices, constraints or other database objects managed by Supabase **may change at any time** and you should be careful when referencing them directly.
 
@@ -68,6 +68,10 @@ You can assign metadata to users on sign up:
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!)
+
+// ---cut---
 const { data, error } = await supabase.auth.signUp({
   email: 'valid.email@supabase.io',
   password: 'example-password',
@@ -81,6 +85,7 @@ const { data, error } = await supabase.auth.signUp({
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -95,6 +100,8 @@ final res = await supabase.auth.signUp(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -109,6 +116,8 @@ try await supabase.auth.signUp(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -123,6 +132,7 @@ val data = supabase.auth.signUpWith(Email) {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
@@ -137,13 +147,18 @@ User metadata is stored on the `raw_user_meta_data` column of the `auth.users` t
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!)
+
+// ---cut---
 const {
   data: { user },
 } = await supabase.auth.getUser()
-let metadata = user.user_metadata
+let metadata = user?.user_metadata
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -152,6 +167,8 @@ final Map<String, dynamic>? metadata = user?.userMetadata;
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -160,6 +177,8 @@ let metadata = user.userMetadata
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -170,11 +189,12 @@ val metadata = user?.userMetadata
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Deleting users
 
-You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As Supabase makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired. Should you wish to immediately revoke access for a user, do consider making use of a Row Level Security policy as described below.
+You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As Supabase makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired.
 
 <Admonition type="caution">
 

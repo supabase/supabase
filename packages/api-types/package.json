@@ -7,12 +7,13 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules",
-    "codegen": "openapi-typescript http://localhost:8080/api-json -o types/api.d.ts --alphabetize --default-non-nullable=false && prettier --write types/api.d.ts"
+    "codegen": "openapi-typescript --redocly ./redocly.yaml --alphabetize --default-non-nullable=false && prettier --cache --write types/*.d.ts"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "openapi-typescript": "^7.4.3",
-    "prettier": "3.2.4"
+    "prettier": "3.2.4",
+    "typescript": "catalog:"
   }
 }

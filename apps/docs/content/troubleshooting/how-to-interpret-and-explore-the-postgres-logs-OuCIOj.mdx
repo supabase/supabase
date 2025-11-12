@@ -35,9 +35,9 @@ Logs provide insights into Postgres operations. They help meet compliance requir
 
 ## Querying logs
 
-The most practical way to explore and filter logs is through the [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer).
+The most practical way to explore and filter logs is through the [Logs Explorer](/dashboard/project/_/logs/explorer).
 
-It uses a subset of Bigquery SQL syntax and preparses queries for optimization. This imposes three primary limitations:
+It uses a subset of BigQuery SQL syntax and pre-parses queries for optimization. This imposes three primary limitations:
 
 - No subqueries or `WITH` statements
 - No `*` wildcards for column names
@@ -100,7 +100,7 @@ cross join unnest(parsed) AS parsed;
 
 **Suggested use cases:**
 
-- Filter by error severity or sql code
+- Filter by error severity or SQL code
 - Get hints, details, and context about error events
 
 #### Connection/Identification information
@@ -110,9 +110,9 @@ cross join unnest(parsed) AS parsed;
 | parsed.session_id         | The session ID                                                                                                                                                 | 12345                |
 | parsed.session_start_time | The start time of the session                                                                                                                                  | 2024-05-08 15:30:00  |
 | parsed.connection_from    | The connection IP                                                                                                                                              | 192.165.1.100        |
-| parsed.user_name          | The name of the connecting database user                                                                                                                       | postgres             |
-| parsed.application_name   | The name of the application                                                                                                                                    | Supavisor, postgREST |
-| parsed.database_name      | The name of the database                                                                                                                                       | postgres             |
+| parsed.user_name          | The name of the connecting database user                                                                                                                       | `postgres`           |
+| parsed.application_name   | The name of the application                                                                                                                                    | Supavisor, PostgREST |
+| parsed.database_name      | The name of the database                                                                                                                                       | `postgres`           |
 | parsed.process_id         | The process ID, often used to identify extension workers                                                                                                       | 1234                 |
 | parsed.backend_type       | Determine if the event originated internally (e.g., from background workers like pg_net, timescale, or pg_cron) or externally from a client (`client backend`) | `client backend`     |
 
@@ -182,7 +182,7 @@ where
 
 Queries can use complex syntax, so it is often helpful to isolate by referenced database objects, such as `functions`, `tables`, and `columns`. Because query structures can be complex, it is advised to use [regex](https://github.com/orgs/supabase/discussions/22640) to find matches. Some common regex patterns are:
 
-- `(?i)`: ignore case sensitivty
+- `(?i)`: ignore case sensitivity
 - `.`: wildcard
 - `^`: look for values at start of string
 - `|`: or operator
@@ -195,16 +195,16 @@ All failed queries, including those from PostgREST, Auth, and external libraries
 
 API servers have assigned database roles for connecting to the database:
 
-| Role                       | API/Tool                                                                  |
-| -------------------------- | ------------------------------------------------------------------------- |
-| supabase_admin             | Used by Supabase to configure projects and for monitoring                 |
-| authenticator              | PostgREST                                                                 |
-| supabase_auth_admin        | Auth                                                                      |
-| supabase_storage_admin     | Storage                                                                   |
-| supabase_realtime_admin    | Realtime                                                                  |
-| supabase_replication_admin | Synchronizes Read Replicas                                                |
-| postgres                   | Supabase Dashboard and External Tools (e.g., Prisma, SQLAlchemy, PSQL...) |
-| Custom roles               | External Tools (e.g., Prisma, SQLAlchemy, PSQL...)                        |
+| Role                         | API/Tool                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `supabase_admin`             | Used by Supabase to configure projects and for monitoring                 |
+| `authenticator`              | PostgREST                                                                 |
+| `supabase_auth_admin`        | Auth                                                                      |
+| `supabase_storage_admin`     | Storage                                                                   |
+| `supabase_realtime_admin`    | Realtime                                                                  |
+| `supabase_replication_admin` | Synchronizes Read Replicas                                                |
+| `postgres`                   | Supabase Dashboard and External Tools (e.g., Prisma, SQLAlchemy, PSQL...) |
+| Custom roles                 | External Tools (e.g., Prisma, SQLAlchemy, PSQL...)                        |
 
 Filter by the `parsed.user_name` role to only retrieve logs made by specific roles:
 
@@ -219,7 +219,7 @@ where
 
 ## By Dashboard queries
 
-Queries from the Supabase Dashboard are executed under the postgres role and include the comment `-- source: dashboard`. To isolate or exclude Dashboard requests during debugging, you can filter by this comment.
+Queries from the Supabase Dashboard are executed under the `postgres` role and include the comment `-- source: dashboard`. To isolate or exclude Dashboard requests during debugging, you can filter by this comment.
 
 ```sql
 -- find queries executed by the Dashboard
@@ -259,13 +259,13 @@ limit 100;
 
 ### Customized object and role activity logging
 
-> ⚠️ NOTE: This is specifically designated for those using the `postgres` role or [custom roles](https://supabase.com/docs/guides/database/postgres/roles) to interact with their database. Those utilizing the Database REST API should reference the [Database API Logging Guide](https://github.com/orgs/supabase/discussions/22849) instead.
+> ⚠️ NOTE: This is specifically designated for those using the `postgres` role or [custom roles](/docs/guides/database/postgres/roles) to interact with their database. Those utilizing the Database REST API should reference the [Database API Logging Guide](https://github.com/orgs/supabase/discussions/22849) instead.
 
 When recording what is accessed and by whom, logging based on database roles and objects is the most reliable way to ensure a proper trail of activity.
 
-You can use the [pg_audit](https://supabase.com/docs/guides/database/extensions/pgaudit) extension to selectively log relevant queries (not just errors) by certain roles, against specific database objects.
+You can use the [pg_audit](/docs/guides/database/extensions/pgaudit) extension to selectively log relevant queries (not just errors) by certain roles, against specific database objects.
 
-You should take care when using the extension to not log all database events, but only what is absolutely necessary. Overlogging can strain the database and create log noise that makes it difficult to filter for relevant events.
+You should take care when using the extension to not log all database events, but only what is absolutely necessary. Over-logging can strain the database and create log noise that makes it difficult to filter for relevant events.
 
 **Filtering by pg_audit**:
 
@@ -281,7 +281,7 @@ where
 
 ### Filtering by IP
 
-> If you are connecting from a known, limited range of IP addresses, you should enable [network restrictions](https://supabase.com/docs/guides/platform/network-restrictions).
+> If you are connecting from a known, limited range of IP addresses, you should enable [network restrictions](/docs/guides/platform/network-restrictions).
 
 Monitoring IPs becomes tricky when dealing with dynamic addressing, such as those from serverless or edge environments. This challenge amplifies when relying on certain poolers, such as Prisma Accelerate, Supavisor, or Cloudflare's Hyperdrive, as they record the pooler's IP, not the true origin.
 
@@ -339,7 +339,7 @@ where
 
 ## Changing log settings
 
-> WARNING: lenient settings can lead to overlogging, impacting database performance while creating noise in the logs.
+> WARNING: lenient settings can lead to over-logging, impacting database performance while creating noise in the logs.
 
 #### Severity levels
 
@@ -367,7 +367,7 @@ show log_min_messages; -- default WARNING
 
 #### Configuring queries logged
 
-By default, only failed queries are logged. The [PGAudit extension](https://supabase.com/docs/guides/database/extensions/pgaudit) extends Postgres's built-in logging abilities. It can be used to selectively track all queries in your database by:
+By default, only failed queries are logged. The [PGAudit extension](/docs/guides/database/extensions/pgaudit) extends Postgres's built-in logging abilities. It can be used to selectively track all queries in your database by:
 
 - role
 - session
@@ -376,15 +376,15 @@ By default, only failed queries are logged. The [PGAudit extension](https://supa
 
 #### Logging within database functions
 
-To track or debug functions, logging can be configured by followin the [function debugging guide](https://supabase.com/docs/guides/database/functions#general-logging)
+To track or debug functions, logging can be configured by following the [function debugging guide](/docs/guides/database/functions#general-logging)
 
 # Frequently Asked Questions
 
-#### Can I join together different log tables, such as `edge_logs` and `postgres_logs`?
+#### How to join different log tables
 
 No, log tables are independent from each other and do not share any primary/foreign key relations for joining.
 
-#### Can I download the logs?
+#### How to download logs
 
 At the moment, the way to download logs is through the Log Dashboard as a CSV
 
@@ -396,7 +396,7 @@ To see the default types of events that are logged, you can check this [guide](h
 
 - [Regex for filtering logs](https://github.com/orgs/supabase/discussions/22640)
 - [Debugging with the DB API logs](https://github.com/orgs/supabase/discussions/22849)
-- [Debugging Database Functions](https://supabase.com/docs/guides/database/functions#debugging-functions)
-- [pg_audit](https://supabase.com/docs/guides/database/extensions/pgaudit)
-- [Supabase Logging](https://supabase.com/docs/guides/platform/logs)
-- [Self-Hosting Logs](https://supabase.com/docs/reference/self-hosting-analytics/introduction)
+- [Debugging Database Functions](/docs/guides/database/functions#debugging-functions)
+- [pg_audit](/docs/guides/database/extensions/pgaudit)
+- [Supabase Logging](/docs/guides/platform/logs)
+- [Self-Hosting Logs](/docs/reference/self-hosting-analytics/introduction)

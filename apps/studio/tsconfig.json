@@ -24,7 +24,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "noErrorTruncation": true
   },
   "include": [
     "next-env.d.ts",
@@ -35,5 +36,5 @@
     ".next/types/**/*.ts",
     "./../../packages/ui/src/**/*.d.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "public/deno/*.ts"]
 }

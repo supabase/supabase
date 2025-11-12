@@ -4,6 +4,12 @@ title: 'plv8: JavaScript Language'
 description: 'JavaScript language for PostgreSQL.'
 ---
 
+<Admonition type="deprecation">
+
+The `plv8` extension is deprecated in projects using Postgres 17. It continues to be supported in projects using Postgres 15, but will need to dropped before those projects are upgraded to Postgres 17. See the [Upgrading to Postgres 17 notes](/docs/guides/platform/upgrading#upgrading-to-postgres-17) for more information.
+
+</Admonition>
+
 The `plv8` extension allows you use JavaScript within Postgres.
 
 ## Overview
@@ -24,7 +30,7 @@ It can be used for database functions, triggers, queries and more.
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "plv8" and enable the extension.
 
@@ -49,7 +55,7 @@ Procedural languages are automatically installed within `pg_catalog`, so you don
 
 ## Create `plv8` functions
 
-Functions written in `plv8` are written just like any other PostgreSQL functions, only
+Functions written in `plv8` are written just like any other Postgres functions, only
 with the `language` identifier set to `plv8`.
 
 ```sql
@@ -84,6 +90,7 @@ const { data, error } = supabase.rpc('function_name')
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -91,6 +98,7 @@ val data = supabase.postgrest.rpc("function_name")
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Examples

@@ -18,7 +18,11 @@ export const generateTriggerCreateSQL = (trigger: PostgresTrigger) => {
   const events = trigger.events.join(' OR ')
   const args = trigger.function_args.length > 0 ? `(${trigger.function_args.join(', ')})` : '()'
 
+  // Note: CREATE OR REPLACE is not supported for triggers
+  // We need to drop the existing trigger first if we want to replace it
   let sql = `
+DROP TRIGGER IF EXISTS "${trigger.name}" ON "${trigger.schema}"."${trigger.table}";
+
 CREATE TRIGGER "${trigger.name}"
 ${trigger.activation} ${events}
 ON "${trigger.schema}"."${trigger.table}"

@@ -11,13 +11,13 @@ hideToc: true
 
     <StepHikeCompact.Details title="Create a Hono app">
 
-    Boostrap the Hono example app from the Supabase Samples using the CLI.
+    Bootstrap the Hono example app from the Supabase Samples using the CLI.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npx supabase@latest bootstrap hono
       ```
 
@@ -34,7 +34,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm install
       ```
 
@@ -47,16 +47,17 @@ hideToc: true
 
     Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and anon key.
 
-    Lastly, [enable anonymous sign-ins](https://supabase.com/dashboard/project/_/settings/auth) in the Auth settings.
+    Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
 
     <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="anonKey" />
+    <ProjectConfigVariables variable="publishable" />
+    <ProjectConfigVariables variable="anon" />
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
 
-      ```bash Terminal
+      ```bash name=Terminal
       cp .env.example .env
       ```
 
@@ -75,7 +76,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 

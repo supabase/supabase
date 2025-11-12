@@ -5,6 +5,17 @@ subtitle: Learn how to develop locally and use the Supabase CLI
 
 Develop locally while running the Supabase stack on your machine.
 
+<Admonition type="note">
+
+As a prerequisite, you must install a container runtime compatible with Docker APIs.
+
+- [Docker Desktop](https://docs.docker.com/desktop/) (macOS, Windows, Linux)
+- [Rancher Desktop](https://rancherdesktop.io/) (macOS, Windows, Linux)
+- [Podman](https://podman.io/) (macOS, Windows, Linux)
+- [OrbStack](https://orbstack.dev/) (macOS)
+
+</Admonition>
+
 ## Quickstart
 
 1.  Install the Supabase CLI:
@@ -18,14 +29,20 @@ Develop locally while running the Supabase stack on your machine.
     </TabPanel><TabPanel id="yarn" label="yarn">
 
     ```sh
-    yarn add supabase --dev
+    NODE_OPTIONS=--no-experimental-fetch yarn add supabase --dev
     ```
 
     </TabPanel><TabPanel id="pnpm" label="pnpm">
 
     ```sh
-    pnpm add supabase --save-dev
+    pnpm add supabase --save-dev --allow-build=supabase
     ```
+
+    <Admonition type="note">
+
+    The `--allow-build=supabase` flag is required on pnpm version 10 or higher. If you're using an older version of pnpm, omit this flag.
+
+    </Admonition>
 
     </TabPanel><TabPanel id="brew" label="brew">
 
@@ -52,7 +69,7 @@ Develop locally while running the Supabase stack on your machine.
     </TabPanel><TabPanel id="pnpm" label="pnpm">
 
     ```sh
-    pnpm supabase init
+    pnpx supabase init
     ```
 
     </TabPanel><TabPanel id="brew" label="brew">
@@ -82,7 +99,7 @@ Develop locally while running the Supabase stack on your machine.
     </TabPanel><TabPanel id="pnpm" label="pnpm">
 
     ```sh
-    pnpm supabase start
+    pnpx supabase start
     ```
 
     </TabPanel><TabPanel id="brew" label="brew">
@@ -109,7 +126,7 @@ Local development with Supabase allows you to work on your projects in a self-co
 
 To get started with local development, you'll need to install the [Supabase CLI](#cli) and Docker. The Supabase CLI allows you to start and manage your local Supabase stack, while Docker is used to run the necessary services.
 
-Once set up, you can initialize a new Supabase project, start the local stack, and begin developing your application using local Supabase services. This includes access to a local PostgreSQL database, Auth, Storage, and other Supabase features.
+Once set up, you can initialize a new Supabase project, start the local stack, and begin developing your application using local Supabase services. This includes access to a local Postgres database, Auth, Storage, and other Supabase features.
 
 ## CLI
 

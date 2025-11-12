@@ -1,18 +1,24 @@
-import type { ContentType } from './content-query'
-import type { SqlSnippet } from './sql-snippets-query'
-
 export const contentKeys = {
   allContentLists: (projectRef: string | undefined) => ['projects', projectRef, 'content'] as const,
+  infiniteList: (
+    projectRef: string | undefined,
+    options?: {
+      type: string
+      name: string | undefined
+      limit?: number
+      sort?: string
+    }
+  ) => ['projects', projectRef, 'content-infinite', options].filter(Boolean),
   list: (
     projectRef: string | undefined,
-    options: { type: ContentType | undefined; name: string | undefined }
+    options: { type?: string; name?: string; limit?: number }
   ) => ['projects', projectRef, 'content', options] as const,
   sqlSnippets: (
     projectRef: string | undefined,
     options?: {
       sort?: 'inserted_at' | 'name'
       name?: string
-      visibility?: SqlSnippet['visibility']
+      visibility?: string
       favorite?: boolean
     }
   ) => ['projects', projectRef, 'content', 'sql', options].filter(Boolean),
@@ -26,10 +32,14 @@ export const contentKeys = {
     options?: { sort?: 'inserted_at' | 'name'; name?: string }
   ) => ['projects', projectRef, 'content', 'folders', id, options].filter(Boolean),
   resource: (projectRef: string | undefined, id?: string) =>
-    ['projects', projectRef, 'content', id] as const,
+    ['projects', projectRef, 'content-id', id] as const,
   count: (
     projectRef: string | undefined,
     type?: string,
-    options?: { visibility?: SqlSnippet['visibility']; favorite?: boolean; name?: string }
+    options?: {
+      visibility?: string
+      favorite?: boolean
+      name?: string
+    }
   ) => ['projects', projectRef, 'content', 'count', type, options].filter(Boolean),
 }

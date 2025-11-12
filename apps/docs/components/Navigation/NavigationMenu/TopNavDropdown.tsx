@@ -19,20 +19,26 @@ import {
   cn,
   themes,
 } from 'ui'
-
 import MenuIconPicker from './MenuIconPicker'
+import { isFeatureEnabled } from 'common'
 
 const menu = [
   [
-    {
-      label: 'Supabase.com',
-      icon: 'home',
-      href: 'https://supabase.com',
-      otherProps: {
-        target: '_blank',
-        rel: 'noreferrer noopener',
-      },
-    },
+    isFeatureEnabled('docs:navigation_dropdown_links_home')
+      ? {
+          label: 'Supabase.com',
+          icon: 'home',
+          href: 'https://supabase.com',
+          otherProps: {
+            target: '_blank',
+            rel: 'noreferrer noopener',
+          },
+        }
+      : {
+          label: 'Dashboard',
+          icon: 'home',
+          href: '../dashboard',
+        },
     {
       label: 'GitHub',
       icon: 'github',
@@ -70,7 +76,7 @@ const TopNavDropdown = () => {
           <Menu size={18} strokeWidth={1} />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-64">
+      <DropdownMenuContent side="bottom" align="end" className="w-52">
         {menu.map((menuSection, sectionIdx) => (
           <Fragment key={`topnav--${sectionIdx}`}>
             {sectionIdx !== 0 && <DropdownMenuSeparator key={`topnav--${sectionIdx}`} />}
