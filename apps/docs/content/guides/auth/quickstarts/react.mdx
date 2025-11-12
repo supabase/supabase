@@ -45,7 +45,7 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
 
-    The fastest way to get started is to use Supabase's `auth-ui-react` library which provides a convenient interface for working with Supabase Auth from a React app.
+    The fastest way to get started is to use Supabase's `password-based-auth-react-router` library which provides a convenient interface for working with Supabase Auth from a React app.
 
     Navigate to the React app and install the Supabase libraries.
 
@@ -54,8 +54,9 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash name=Terminal
-      cd my-app && npm install @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shared
-      ```
+       cd my-app npm install @supabase/supabase-js @supabase/password-based-auth-react-router
+
+````
 
     </StepHikeCompact.Code>
 
@@ -77,8 +78,8 @@ hideToc: true
         import './index.css'
         import { useState, useEffect } from 'react'
         import { createClient } from '@supabase/supabase-js'
-        import { Auth } from '@supabase/auth-ui-react'
-        import { ThemeSupa } from '@supabase/auth-ui-shared'
+        import { Auth } from ' @supabase/password-based-auth-react-router'
+        import { ThemeSupa } from ' @supabase/password-based-auth-react-router'
 
         const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
 
@@ -129,3 +130,4 @@ hideToc: true
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
+````
