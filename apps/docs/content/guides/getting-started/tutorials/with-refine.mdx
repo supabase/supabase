@@ -110,13 +110,12 @@ The `App.tsx` file initially looks like this:
 ```tsx name=src/App.tsx
 import { Refine, WelcomePage } from '@refinedev/core'
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
-import routerBindings, {
+import routerProvider, {
   DocumentTitleHandler,
   UnsavedChangesNotifier,
-} from '@refinedev/react-router-v6'
+} from '@refinedev/react-router'
 import { dataProvider, liveProvider } from '@refinedev/supabase'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-
+import { BrowserRouter, Route, Routes } from 'react-router'
 import './App.css'
 import authProvider from './authProvider'
 import { supabaseClient } from './utility'
@@ -129,7 +128,7 @@ function App() {
           dataProvider={dataProvider(supabaseClient)}
           liveProvider={liveProvider(supabaseClient)}
           authProvider={authProvider}
-          routerProvider={routerBindings}
+          routerProvider={routerProvider}
           options={{
             syncWithLocation: true,
             warnWhenUnsavedChanges: true,
@@ -188,11 +187,11 @@ We also want to remove `register`, `updatePassword`, `forgotPassword` and `getPe
 <$CodeTabs>
 
 ```ts name=src/authProvider.ts
-import { AuthBindings } from '@refinedev/core'
+import { AuthProvider } from '@refinedev/core'
 
 import { supabaseClient } from './utility'
 
-const authProvider: AuthBindings = {
+const authProvider: AuthProvider = {
   login: async ({ email }) => {
     try {
       const { error } = await supabaseClient.auth.signInWithOtp({ email })
@@ -297,7 +296,7 @@ import { useLogin } from '@refinedev/core'
 
 export default function Auth() {
   const [email, setEmail] = useState('')
-  const { isLoading, mutate: login } = useLogin()
+  const { isPending, mutate: login } = useLogin()
 
   const handleLogin = async (event: { preventDefault: () => void }) => {
     event.preventDefault()
@@ -321,8 +320,8 @@ export default function Auth() {
             />
           </div>
           <div>
-            <button className={'button block'} disabled={isLoading}>
-              {isLoading ? <span>Loading</span> : <span>Send magic link</span>}
+            <button className={'button block'} disabled={isPending}>
+              {isPending ? <span>Loading</span> : <span>Send magic link</span>}
             </button>
           </div>
         </form>
@@ -367,7 +366,7 @@ export default function Account() {
   const { mutate: logOut } = useLogout()
 
   const {
-    refineCore: { formLoading, queryResult, onFinish },
+    refineCore: { formLoading, query, onFinish },
     register,
     control,
     handleSubmit,
@@ -437,13 +436,13 @@ Add the routes for `/login` with the `<Auth />` component and the routes for `in
 ```tsx name=src/App.tsx
 import { Authenticated, Refine } from '@refinedev/core'
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
-import routerBindings, {
+import routerProvider, {
   CatchAllNavigate,
   DocumentTitleHandler,
   UnsavedChangesNotifier,
-} from '@refinedev/react-router-v6'
+} from '@refinedev/react-router'
 import { dataProvider, liveProvider } from '@refinedev/supabase'
-import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router'
 
 import './App.css'
 import authProvider from './authProvider'
@@ -455,34 +454,34 @@ function App() {
   return (
     <BrowserRouter>
       <RefineKbarProvider>
-        <Refine
-          dataProvider={dataProvider(supabaseClient)}
-          liveProvider={liveProvider(supabaseClient)}
-          authProvider={authProvider}
-          routerProvider={routerBindings}
-          options={{
-            syncWithLocation: true,
-            warnWhenUnsavedChanges: true,
-          }}
-        >
-          <Routes>
-            <Route
-              element={
-                <Authenticated fallback={<CatchAllNavigate to="/login" />}>
-                  <Outlet />
-                </Authenticated>
-              }
-            >
-              <Route index element={<Account />} />
-            </Route>
-            <Route element={<Authenticated fallback={<Outlet />} />}>
-              <Route path="/login" element={<Auth />} />
-            </Route>
-          </Routes>
-          <RefineKbar />
-          <UnsavedChangesNotifier />
-          <DocumentTitleHandler />
-        </Refine>
+      <Refine
+        dataProvider={dataProvider(supabaseClient)}
+        liveProvider={liveProvider(supabaseClient)}
+        authProvider={authProvider}
+        routerProvider={routerProvider}
+        options={{
+          syncWithLocation: true,
+          warnWhenUnsavedChanges: true,
+        }}
+      >
+        <Routes>
+          <Route
+            element={
+                <Authenticated key="authenticated-routes" fallback={<CatchAllNavigate to="/login" />}>
+                <Outlet />
+              </Authenticated>
+            }
+          >
+            <Route index element={<Account />} />
+          </Route>
+            <Route element={<Authenticated key="auth-pages" fallback={<Outlet />} />}>
+            <Route path="/login" element={<Auth />} />
+          </Route>
+        </Routes>
+        <RefineKbar />
+        <UnsavedChangesNotifier />
+        <DocumentTitleHandler />
+      </Refine>
       </RefineKbarProvider>
     </BrowserRouter>
   )
@@ -623,36 +622,36 @@ import Avatar from './avatar'
 
 // ...
 
-return (
+  return (
   <div className="container" style={{ padding: '50px 0 100px 0' }}>
     <form onSubmit={handleSubmit} className="form-widget">
-      <Controller
-        control={control}
-        name="avatar_url"
-        render={({ field }) => {
-          return (
-            <Avatar
-              url={field.value}
-              size={150}
-              onUpload={(filePath) => {
-                onFinish({
-                  ...queryResult?.data?.data,
-                  avatar_url: filePath,
+        <Controller
+          control={control}
+          name="avatar_url"
+          render={({ field }) => {
+            return (
+              <Avatar
+                url={field.value}
+                size={150}
+                onUpload={(filePath) => {
+                  onFinish({
+                  ...query?.data?.data,
+                    avatar_url: filePath,
                   onMutationError: (data: { message: string }) => alert(data?.message),
                 })
-                field.onChange({
-                  target: {
-                    value: filePath,
-                  },
+                  field.onChange({
+                    target: {
+                      value: filePath,
+                    },
                 })
-              }}
-            />
+                }}
+              />
           )
-        }}
-      />
+          }}
+        />
       {/* ... */}
-    </form>
-  </div>
+      </form>
+    </div>
 )
 ```
 
