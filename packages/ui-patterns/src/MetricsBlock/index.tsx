@@ -141,16 +141,27 @@ const MetricsBlockValue = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
 )
 MetricsBlockValue.displayName = 'MetricsBlockValue'
 
-const MetricsBlockDifferential = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <span
-    ref={ref}
-    className={cn('text-foreground-light tabular-nums text-sm', className)}
-    {...props}
-  />
-))
+interface MetricsBlockDifferentialProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'positive' | 'negative' | 'default'
+}
+
+const MetricsBlockDifferential = React.forwardRef<HTMLDivElement, MetricsBlockDifferentialProps>(
+  ({ className, variant = 'default', ...props }, ref) => (
+    <span
+      ref={ref}
+      className={cn(
+        variant === 'positive'
+          ? 'text-brand'
+          : variant === 'negative'
+            ? 'text-destructive'
+            : 'text-foreground-light',
+        'tabular-nums text-sm',
+        className
+      )}
+      {...props}
+    />
+  )
+)
 MetricsBlockDifferential.displayName = 'MetricsBlockDifferential'
 
 const MetricsBlockSparkline = React.forwardRef<
