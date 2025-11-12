@@ -37,8 +37,7 @@ export const SecurityNotificationsPreview = () => {
         <p>
           These changes are necessary to support incoming security-related notification templates.
           Given that the list of our email templates is doubling in size, this change requires some
-          wider interface changes. Ones that we think make for a clearer experience overall. Win
-          win!
+          wider interface changes. Ones that we think make for a clearer experience overall.
         </p>
       </div>
     </div>
