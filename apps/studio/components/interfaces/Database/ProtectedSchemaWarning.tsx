@@ -65,7 +65,7 @@ export const ProtectedSchemaWarning = ({
   entity: string
 }) => {
   const [showModal, setShowModal] = useState(false)
-  const { isSchemaLocked, reason } = useIsProtectedSchema({ schema })
+  const { isSchemaLocked, reason, fdwType } = useIsProtectedSchema({ schema })
 
   if (!isSchemaLocked) return null
 
@@ -81,10 +81,15 @@ export const ProtectedSchemaWarning = ({
         size === 'sm' ? '[&>div>p]:text-xs' : '[&>div>p]:text-sm'
       )}
     >
-      {reason === 'fdw' ? (
+      {reason === 'fdw' && fdwType === 'iceberg' ? (
         <p>
           The <code className="text-xs">{schema}</code> schema is used by Supabase to connect to
           analytics buckets and is read-only through the dashboard.
+        </p>
+      ) : reason === 'fdw' && fdwType === 's3_vectors' ? (
+        <p>
+          The <code className="text-xs">{schema}</code> schema is used by Supabase to connect to
+          vector buckets and is read-only through the dashboard.
         </p>
       ) : (
         <>

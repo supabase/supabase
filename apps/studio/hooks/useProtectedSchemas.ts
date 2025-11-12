@@ -1,4 +1,4 @@
-import { uniq } from 'lodash'
+import { uniq, uniqBy } from 'lodash'
 import { useMemo } from 'react'
 
 import {
@@ -61,16 +61,30 @@ const useFdwSchemasQuery = () => {
         FDWsWithSchemas.some((w) => wrapperMetaComparator(w, wrapper))
       ) ?? []
 
-    const fdwSchemas = icebergFDWs
-      .map((fdw) => convertKVStringArrayToJson(fdw.server_options))
-      .map((options) => options['supabase_target_schema'])
-      .flatMap((s) => s?.split(','))
-      .filter(Boolean)
+    const fdwSchemas = icebergFDWs.map((fdw) => {
+      const schemaOption =
+        convertKVStringArrayToJson(fdw.server_options)['supabase_target_schema'] ?? ''
 
-    return uniq(fdwSchemas)
+      const schemas = uniq(schemaOption.split(',').filter(Boolean))
+
+      return {
+        serverName: fdw.server_name,
+        type: fdw.handler.replace('_fdw_handler', ''),
+        schemas,
+      }
+    })
+
+    return fdwSchemas
   }, [result.data, FDWsWithSchemas])
 
   return { ...result, data: schemas }
+}
+
+type ProtectedSchema = {
+  name: string
+  type: 'fdw' | 'internal'
+  fdwType?: string
+  serverName?: string
 }
 
 /**
@@ -85,11 +99,18 @@ export const useProtectedSchemas = ({
 
   const result = useFdwSchemasQuery()
 
-  const schemas = useMemo<{ name: string; type: 'fdw' | 'internal' }[]>(() => {
+  const schemas = useMemo<ProtectedSchema[]>(() => {
     const internalSchemas = INTERNAL_SCHEMAS.map((s) => ({ name: s, type: 'internal' as const }))
-    const icebergFdwSchemas = result.data?.map((s) => ({ name: s, type: 'fdw' as const }))
+    const fdwSchemas = result.data?.flatMap((s) =>
+      s.schemas.map((schema) => ({
+        name: schema,
+        type: 'fdw' as const,
+        fdwType: s.type,
+        serverName: s.serverName,
+      }))
+    )
 
-    const schemas = uniq([...internalSchemas, ...icebergFdwSchemas])
+    const schemas = uniqBy([...internalSchemas, ...fdwSchemas], (s) => s.name)
     return schemas.filter((schema) => !stableExcludeSchemas.includes(schema.name))
   }, [result.data, stableExcludeSchemas])
 
@@ -106,8 +127,8 @@ export const useIsProtectedSchema = ({
   schema: string
   excludedSchemas?: string[]
 }):
-  | { isSchemaLocked: false; reason: undefined }
-  | { isSchemaLocked: true; reason: 'fdw' | 'internal' } => {
+  | { isSchemaLocked: false; reason: undefined; fdwType: undefined }
+  | { isSchemaLocked: true; reason: 'internal' | 'fdw'; fdwType: string | undefined } => {
   const { data: schemas } = useProtectedSchemas({ excludeSchemas: excludedSchemas })
 
   const foundSchema = schemas.find((s) => s.name === schema)
@@ -116,7 +137,8 @@ export const useIsProtectedSchema = ({
     return {
       isSchemaLocked: true,
       reason: foundSchema.type,
+      fdwType: foundSchema.fdwType,
     }
   }
-  return { isSchemaLocked: false, reason: undefined }
+  return { isSchemaLocked: false, reason: undefined, fdwType: undefined }
 }
