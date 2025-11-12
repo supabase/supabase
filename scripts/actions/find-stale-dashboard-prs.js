@@ -203,7 +203,7 @@ module.exports = async ({ github, context, core }) => {
 
   console.log(`Found ${stalePRs.length} stale Dashboard PRs`)
 
-  // Sort by age (oldest first)
+  // Sort by age (newest first)
   stalePRs.sort((a, b) => a.hoursOld - b.hoursOld)
 
   // Store results for next step
