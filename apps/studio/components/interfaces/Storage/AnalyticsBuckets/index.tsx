@@ -7,6 +7,7 @@ import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'component
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { Bucket as BucketIcon } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import { Button, Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -33,7 +34,7 @@ export const AnalyticsBuckets = () => {
   ) => {
     const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucketId)}`
     if (event.metaKey || event.ctrlKey) {
-      window.open(url, '_blank')
+      window.open(`${BASE_PATH}${url}`, '_blank')
     } else {
       router.push(url)
     }
