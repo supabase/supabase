@@ -3,6 +3,7 @@ import utc from 'dayjs/plugin/utc'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { usePHFlag } from 'hooks/ui/useFlag'
+import { IS_PLATFORM } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 
 dayjs.extend(utc)
@@ -74,6 +75,7 @@ export function useRealtimeExperiment({
   }, [projectInsertedAt])
 
   const activeVariant = useMemo(() => {
+    if (!IS_PLATFORM) return null
     if (!isTable || !isNewProject) return null
     if (!realtimeButtonVariant || realtimeButtonVariant === RealtimeButtonVariant.CONTROL) {
       return null
@@ -82,6 +84,7 @@ export function useRealtimeExperiment({
   }, [isTable, isNewProject, realtimeButtonVariant])
 
   useEffect(() => {
+    if (!IS_PLATFORM) return
     if (hasTrackedExposure.current) return
     if (!isTable || !isNewProject || !projectInsertedAt) return
     if (!realtimeButtonVariant) return
