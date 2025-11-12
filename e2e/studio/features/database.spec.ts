@@ -1,12 +1,12 @@
 import { expect, Page } from '@playwright/test'
-import { env } from '../env.config'
-import { test } from '../utils/test'
-import { toUrl } from '../utils/to-url'
+import { env } from '../env.config.js'
+import { test } from '../utils/test.js'
+import { toUrl } from '../utils/to-url.js'
 import {
+  createApiResponseWaiter,
   waitForApiResponse,
   waitForDatabaseToLoad,
-  createApiResponseWaiter,
-} from '../utils/wait-for-response'
+} from '../utils/wait-for-response.js'
 
 const databaseTableName = 'pw_database_table'
 const databaseTableNameNew = 'pw_database_table_new'
@@ -265,23 +265,24 @@ test.describe.serial('Database', () => {
 
       // validate navigating to table editor from database table page
       await page.getByRole('row', { name: databaseTableName }).getByRole('button').click()
+      const navigationPromise = page.waitForURL(/\/editor\//)
       await page.getByRole('menuitem', { name: 'View in Table Editor' }).click()
-      await page.waitForTimeout(1000) // wait for the table editor to be loaded
+      await navigationPromise
       expect(page.url().includes('editor')).toBe(true)
     })
   })
 
   test.describe('Tables columns', () => {
     test('can view, create, update, delete, and filter table columns', async ({ page, ref }) => {
+      const tableLoadPromise = waitForDatabaseToLoad(page, ref)
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
-
-      // Wait for database tables to be populated
-      await waitForDatabaseToLoad(page, ref)
+      await tableLoadPromise
 
       // navigate to table columns
       const databaseRow = page.getByRole('row', { name: databaseTableName })
+      const navigationPromise = page.waitForURL(/.*\/database\/tables\/\d+/)
       await databaseRow.getByRole('link', { name: '3 columns' }).click()
-      await page.waitForURL(/.*\/database\/tables\/\d+/)
+      await navigationPromise
 
       // validate and display everything correctly
       const columnDatabaseRow = page.getByRole('row', { name: databaseColumnName })
@@ -338,10 +339,9 @@ test.describe.serial('Database', () => {
 
   test.describe.serial('Triggers', () => {
     test('actions works as expected', async ({ page, ref }) => {
+      const databaseTriggersPromise = waitForApiResponse(page, 'pg-meta', ref, 'triggers')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
-
-      // Wait for database triggers to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'triggers')
+      await databaseTriggersPromise
 
       // create new trigger button to exist in public schema
       await expect(page.getByRole('button', { name: 'New trigger' })).toBeVisible()
@@ -368,7 +368,7 @@ test.describe.serial('Database', () => {
 
       // delete trigger if exists
       if ((await page.getByRole('button', { name: databaseTriggerName }).count()) > 0) {
-        const triggerRow = await page.getByRole('row', { name: databaseTriggerName })
+        const triggerRow = page.getByRole('row', { name: databaseTriggerName })
         await triggerRow.getByRole('button', { name: 'More options' }).click()
         await page.getByRole('menuitem', { name: 'Delete trigger' }).click()
         await page
@@ -443,10 +443,9 @@ test.describe.serial('Database', () => {
 
   test.describe('Database Indexes', () => {
     test('actions works as expected', async ({ page, ref }) => {
+      const indexPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/indexes?schema=public`))
-
-      // Wait for database indexes to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
+      await indexPromise
 
       // create new index button exists in public schema
       await expect(page.getByRole('button', { name: 'Create index' })).toBeVisible()
@@ -454,9 +453,10 @@ test.describe.serial('Database', () => {
       // change schema -> auth
       await page.getByTestId('schema-selector').click()
       await page.getByPlaceholder('Find schema...').fill('auth')
+      const navigationPromise = page.waitForURL(/schema=auth/)
       await page.getByRole('option', { name: 'auth' }).click()
-      await page.waitForTimeout(500)
-      expect(page.getByText('sso_providers_pkey')).toBeVisible()
+      await navigationPromise
+      await expect(page.getByText('sso_providers_pkey')).toBeVisible()
       expect(page.getByText('confirmation_token_idx')).toBeVisible()
       // create new index button does not exist in other schemas
       expect(page.getByRole('button', { name: 'Create index' })).not.toBeVisible()
@@ -469,7 +469,7 @@ test.describe.serial('Database', () => {
 
       // check index definition
       await page.getByRole('row', { name: 'confirmation_token_idx' }).getByRole('button').click()
-      await page.getByText('Index:confirmation_token_idx')
+      expect(page.getByText('Index:confirmation_token_idx')).toBeVisible()
       await page.waitForTimeout(500) // wait for text content to be visible
       expect(await page.getByRole('presentation').textContent()).toBe(
         `CREATE UNIQUE INDEX confirmation_token_idx ON auth.users USING btree (confirmation_token) WHERE ((confirmation_token)::text !~ '^[0-9 ]*$'::text)`
@@ -749,7 +749,7 @@ END;`)
     ).toBeVisible({
       timeout: 50000,
     })
-    const functionRow = await page.getByRole('row', { name: databaseFunctionName })
+    const functionRow = page.getByRole('row', { name: databaseFunctionName })
     expect(functionRow).toContainText(databaseFunctionName)
 
     // update function
