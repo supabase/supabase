@@ -1,7 +1,10 @@
 import { uniq } from 'lodash'
 import { useMemo } from 'react'
 
-import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import {
+  SUPABASE_TARGET_SCHEMA_OPTION,
+  WRAPPERS,
+} from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
   convertKVStringArrayToJson,
   wrapperMetaComparator,
@@ -34,31 +37,38 @@ export const INTERNAL_SCHEMAS = [
 ]
 
 /**
- * Get the list of schemas used by IcebergFDWs
+ * Get the list of schemas used by FDWs like Iceberg, S3 Vectors, etc.
  */
-const useIcebergFdwSchemasQuery = () => {
+const useFdwSchemasQuery = () => {
   const { data: project } = useSelectedProjectQuery()
   const result = useFDWsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
+  // Find all wrappers that create a schema for their data.
+  const FDWsWithSchemas = useMemo(
+    () =>
+      WRAPPERS.filter((wrapper) =>
+        wrapper.server.options.some((option) => option.name === SUPABASE_TARGET_SCHEMA_OPTION.name)
+      ),
+    []
+  )
+
   const schemas = useMemo(() => {
-    const icebergFDWs = result.data?.filter((wrapper) =>
-      wrapperMetaComparator(
-        { handlerName: WRAPPER_HANDLERS.ICEBERG, server: { options: [] } },
-        wrapper
-      )
-    )
+    const icebergFDWs =
+      result.data?.filter((wrapper) =>
+        FDWsWithSchemas.some((w) => wrapperMetaComparator(w, wrapper))
+      ) ?? []
 
     const fdwSchemas = icebergFDWs
-      ?.map((fdw) => convertKVStringArrayToJson(fdw.server_options))
+      .map((fdw) => convertKVStringArrayToJson(fdw.server_options))
       .map((options) => options['supabase_target_schema'])
       .flatMap((s) => s?.split(','))
       .filter(Boolean)
 
     return uniq(fdwSchemas)
-  }, [result.data])
+  }, [result.data, FDWsWithSchemas])
 
   return { ...result, data: schemas }
 }
@@ -73,7 +83,7 @@ export const useProtectedSchemas = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const stableExcludeSchemas = useMemo(() => excludeSchemas, [JSON.stringify(excludeSchemas)])
 
-  const result = useIcebergFdwSchemasQuery()
+  const result = useFdwSchemasQuery()
 
   const schemas = useMemo<{ name: string; type: 'fdw' | 'internal' }[]>(() => {
     const internalSchemas = INTERNAL_SCHEMAS.map((s) => ({ name: s, type: 'internal' as const }))
