@@ -108,13 +108,13 @@ export const AnalyticsBuckets = () => {
             {analyticsBuckets.length > 0 && (
               <Tooltip>
                 <TooltipTrigger>
-                  <span className="bg-surface-200 rounded-full px-1.5 py-1 leading-none text-xs text-foreground-lighter tracking-widest">
+                  <span className="bg-surface-200 rounded-full px-2 py-1 leading-none text-xs text-foreground-lighter tracking-widest">
                     {analyticsBuckets.length}
                     /2
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="w-64 text-center">
-                  Each project can only have up to 2 buckets while Analytics Buckets are in alpha{' '}
+                  Each project can only have up to 2 buckets while analytics buckets are in alpha{' '}
                 </TooltipContent>
               </Tooltip>
             )}
