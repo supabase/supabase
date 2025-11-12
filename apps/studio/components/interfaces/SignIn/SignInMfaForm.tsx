@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { Lock } from 'lucide-react'
+import { Lock, Fingerprint } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
@@ -13,15 +13,26 @@ import { useAuthError } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
+import { useMfaAuthenticateWebAuthnMutation } from 'data/profile/mfa-webauthn-authenticate-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import {
+  Button,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Alert, AlertDescription, AlertTitle } from 'ui/src/components/shadcn/ui/alert'
 import { SupportLink } from '../Support/SupportLink'
 
 const schema = z.object({
-  code: z.string().min(1, 'MFA Code is required'),
+  code: z.string().optional(),
+  selectedFactorType: z.enum(['totp', 'webauthn']).optional(),
 })
 
 const formId = 'sign-in-mfa-form'
@@ -37,8 +48,23 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: { code: '' },
+    defaultValues: { code: '', selectedFactorType: undefined },
   })
+
+  const handleSuccess = async () => {
+    if (context === 'forgot-password') {
+      router
+        .push({
+          pathname: '/reset-password',
+          query: router.query,
+        })
+        .then(async () => {
+          await queryClient.resetQueries()
+        })
+    } else {
+      router.push(getReturnToPath())
+    }
+  }
 
   const {
     data: factors,
@@ -49,30 +75,36 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,
-    isLoading: isVerifying,
-    isSuccess,
+    isLoading: isTotpVerifying,
+    isSuccess: isTotpSuccess,
   } = useMfaChallengeAndVerifyMutation({
-    onSuccess: async () => {
-      await queryClient.resetQueries()
-
-      if (context === 'forgot-password') {
-        router.push({
-          pathname: '/reset-password',
-          query: router.query,
-        })
-      } else {
-        router.push(getReturnToPath())
-      }
-    },
+    onSuccess: handleSuccess,
   })
+  const {
+    mutate: mfaAuthenticateWebAuthn,
+    isLoading: isWebAuthnVerifying,
+    isSuccess: isWebAuthnSuccess,
+  } = useMfaAuthenticateWebAuthnMutation({
+    onSuccess: handleSuccess,
+  })
+
+  const isFormDisabled =
+    isTotpVerifying || isWebAuthnVerifying || isTotpSuccess || isWebAuthnSuccess
 
   const onClickLogout = async () => {
     await signOut()
     await router.replace('/sign-in')
   }
 
-  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ code }) => {
-    if (selectedFactor) {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ code, selectedFactorType }) => {
+    if (!selectedFactor) return
+
+    if (selectedFactorType === 'webauthn') {
+      mfaAuthenticateWebAuthn({
+        factorId: selectedFactor.id,
+        webauthn: { rpId: window.location.hostname, rpOrigins: [window.location.origin] },
+      })
+    } else if (code && selectedFactorType === 'totp') {
       mfaChallengeAndVerify({ factorId: selectedFactor.id, code, refreshFactors: false })
     }
   }
@@ -80,14 +112,21 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   useEffect(() => {
     if (isSuccessFactors) {
       // if the user wanders into this page and he has no MFA setup, send the user to the next screen
-      if (factors.totp.length === 0) {
+      if (factors.totp.length === 0 && factors.webauthn.length === 0) {
         queryClient.resetQueries().then(() => router.push(getReturnToPath()))
+        return
       }
+
+      // Auto-select the first available factor and set the form type
       if (factors.totp.length > 0) {
         setSelectedFactor(factors.totp[0])
+        form.setValue('selectedFactorType', 'totp')
+      } else if (factors.webauthn.length > 0) {
+        setSelectedFactor(factors.webauthn[0])
+        form.setValue('selectedFactorType', 'webauthn')
       }
     }
-  }, [factors?.totp, isSuccessFactors, router, queryClient])
+  }, [factors?.totp, factors?.webauthn, isSuccessFactors, router, queryClient, form])
 
   const error = useAuthError()
 
@@ -114,48 +153,105 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       {isSuccessFactors && (
         <Form_Shadcn_ {...form}>
           <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
-              key="code"
-              name="code"
-              control={form.control}
-              render={({ field }) => (
-                <FormItemLayout
-                  name="code"
-                  label={
-                    selectedFactor && factors?.totp.length === 2
-                      ? `Code generated by ${selectedFactor.friendly_name}`
-                      : null
-                  }
-                >
-                  <FormControl_Shadcn_>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground-light [&_svg]:stroke-[1.5] [&_svg]:h-[20px] [&_svg]:w-[20px]">
-                        <Lock />
+            {/* Factor Type Selection - only show if both types are available */}
+            {factors.totp.length > 0 && factors.webauthn.length > 0 && (
+              <FormField_Shadcn_
+                name="selectedFactorType"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout name="selectedFactorType" label="Choose authentication method">
+                    <FormControl_Shadcn_>
+                      <RadioGroupStacked
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          // Update selected factor when type changes
+                          if (value === 'totp' && factors.totp.length > 0) {
+                            setSelectedFactor(factors.totp[0])
+                          } else if (value === 'webauthn' && factors.webauthn.length > 0) {
+                            setSelectedFactor(factors.webauthn[0])
+                          }
+                        }}
+                        className="flex flex-col"
+                      >
+                        {factors.totp.length > 0 && (
+                          <RadioGroupStackedItem
+                            value="totp"
+                            id="totp"
+                            label="Authenticator app (TOTP)"
+                          />
+                        )}
+                        {factors.webauthn.length > 0 && (
+                          <RadioGroupStackedItem
+                            value="webauthn"
+                            id="webauthn"
+                            label="WebAuthn (YubiKey)"
+                          />
+                        )}
+                      </RadioGroupStacked>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            )}
+
+            {/* TOTP Code Input - only show for TOTP factors */}
+            {form.watch('selectedFactorType') === 'totp' && (
+              <FormField_Shadcn_
+                key="code"
+                name="code"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    name="code"
+                    label={
+                      selectedFactor && factors?.totp.length === 2
+                        ? `Code generated by ${selectedFactor.friendly_name}`
+                        : 'Enter verification code'
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground-light [&_svg]:stroke-[1.5] [&_svg]:h-[20px] [&_svg]:w-[20px]">
+                          <Lock />
+                        </div>
+                        <Input_Shadcn_
+                          id="code"
+                          className="pl-10"
+                          {...field}
+                          autoFocus
+                          autoComplete="off"
+                          autoCorrect="off"
+                          autoCapitalize="none"
+                          spellCheck="false"
+                          placeholder="XXXXXX"
+                          disabled={isTotpVerifying}
+                        />
                       </div>
-                      <Input_Shadcn_
-                        id="code"
-                        className="pl-10"
-                        {...field}
-                        autoFocus
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="none"
-                        spellCheck="false"
-                        placeholder="XXXXXX"
-                        disabled={isVerifying}
-                      />
-                    </div>
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            )}
+
+            {/* WebAuthn Info - only show for WebAuthn factors */}
+            {form.watch('selectedFactorType') === 'webauthn' && (
+              <Alert>
+                <Fingerprint />
+                <AlertTitle>Security Key Authentication</AlertTitle>
+                <AlertDescription>
+                  Click "Verify" to use your security key:
+                  <div className="block italic">{selectedFactor?.friendly_name}</div>
+                </AlertDescription>
+              </Alert>
+            )}
 
             <div className="flex items-center justify-between space-x-2">
               <Button
                 block
                 type="outline"
                 size="large"
-                disabled={isVerifying || isSuccess}
+                disabled={isFormDisabled}
                 onClick={onClickLogout}
                 className="opacity-80 hover:opacity-100 transition"
               >
@@ -166,10 +262,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                 form={formId}
                 htmlType="submit"
                 size="large"
-                disabled={isVerifying || isSuccess}
-                loading={isVerifying || isSuccess}
+                disabled={isFormDisabled}
+                loading={isFormDisabled}
               >
-                {isVerifying ? 'Verifying' : isSuccess ? 'Signing in' : 'Verify'}
+                {isWebAuthnVerifying ? 'Verifying' : isWebAuthnSuccess ? 'Signing in' : 'Verify'}
               </Button>
             </div>
           </form>
@@ -181,16 +277,38 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
           <span className="text-foreground-light">Unable to sign in?</span>{' '}
         </div>
         <ul className="list-disc pl-6">
-          {factors?.totp.length === 2 && (
+          {/* TOTP factor switching - only show if multiple TOTP factors */}
+          {factors?.totp.length === 2 && form.watch('selectedFactorType') === 'totp' && (
             <li>
-              <a
+              <button
+                type="button"
                 className="text-sm text-foreground-light hover:text-foreground cursor-pointer"
-                onClick={() =>
-                  setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
-                }
+                onClick={() => {
+                  const otherFactor = factors.totp.find((f) => f.id !== selectedFactor?.id)
+                  if (otherFactor) {
+                    setSelectedFactor(otherFactor)
+                  }
+                }}
               >{`Authenticate using ${
                 factors.totp.find((f) => f.id !== selectedFactor?.id)?.friendly_name
-              }?`}</a>
+              }?`}</button>
+            </li>
+          )}
+          {/* WebAuthn factor switching - only show if multiple WebAuthn factors */}
+          {factors?.webauthn.length === 2 && form.watch('selectedFactorType') === 'webauthn' && (
+            <li>
+              <button
+                type="button"
+                className="text-sm text-foreground-light hover:text-foreground cursor-pointer"
+                onClick={() => {
+                  const otherFactor = factors.webauthn.find((f) => f.id !== selectedFactor?.id)
+                  if (otherFactor) {
+                    setSelectedFactor(otherFactor)
+                  }
+                }}
+              >{`Authenticate using ${
+                factors.webauthn.find((f) => f.id !== selectedFactor?.id)?.friendly_name
+              }?`}</button>
             </li>
           )}
           <li>

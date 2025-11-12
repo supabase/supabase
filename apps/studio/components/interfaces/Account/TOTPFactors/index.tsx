@@ -1,24 +1,36 @@
 import dayjs from 'dayjs'
-import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { DATETIME_FORMAT } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Button, CardContent, CardFooter } from 'ui'
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
+import type { AuthMFAListFactorsResponse } from '@supabase/auth-js'
 
-export const TOTPFactors = () => {
+export const TOTPFactors = ({
+  data,
+  isLoading,
+  isError,
+  isSuccess,
+  error,
+}: {
+  data?: AuthMFAListFactorsResponse['data']
+  isLoading: boolean
+  isError: boolean
+  isSuccess: boolean
+  error: AuthMFAListFactorsResponse['error']
+}) => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
-  const { data, isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
+
+  const totpFactors = data?.totp ?? []
 
   return (
     <>
-      <section className="space-y-3">
-        <p className="text-sm text-foreground-light">
+      <CardContent>
+        <p className="text-sm text-foreground-lighter">
           Generate one-time passwords via authenticator apps like 1Password, Authy, etc. as a second
           factor to verify your identity during sign-in.
         </p>
@@ -28,53 +40,41 @@ export const TOTPFactors = () => {
             <AlertError error={error} subject="Failed to retrieve account security information" />
           )}
           {isSuccess && (
-            <>
-              {data.totp.length === 1 && (
-                <Alert_Shadcn_ variant="default" className="mb-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>
-                    We recommend configuring two authenticator apps across different devices
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                    The two authenticator apps will serve as a backup for each other.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-              )}
-              <div>
-                {data.totp.map((factor) => {
-                  return (
-                    <div key={factor.id} className="flex flex-row justify-between py-2">
-                      <p className="text-sm text-foreground flex items-center space-x-2">
-                        <span className="text-foreground-light">Name:</span>{' '}
-                        <span>{factor.friendly_name ?? 'No name provided'}</span>
+            <div className="w-full">
+              {totpFactors.map((factor) => {
+                return (
+                  <div
+                    key={factor.id}
+                    className="first:mt-4 flex flex-row justify-between py-3 border-t"
+                  >
+                    <p className="text-sm text-foreground flex items-center space-x-2">
+                      <span className="text-foreground-light">Name:</span>{' '}
+                      <span>{factor.friendly_name ?? 'No name provided'}</span>
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <p className="text-sm text-foreground-light">
+                        Added on {dayjs(factor.updated_at).format(DATETIME_FORMAT)}
                       </p>
-                      <div className="flex items-center gap-4">
-                        <p className="text-sm text-foreground-light">
-                          Added on {dayjs(factor.updated_at).format(DATETIME_FORMAT)}
-                        </p>
-                        <Button
-                          size="tiny"
-                          type="default"
-                          onClick={() => setFactorToBeDeleted(factor.id)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
+                      <Button
+                        size="tiny"
+                        type="default"
+                        onClick={() => setFactorToBeDeleted(factor.id)}
+                      >
+                        Remove
+                      </Button>
                     </div>
-                  )
-                })}
-              </div>
-              {data.totp.length < 2 ? (
-                <>
-                  <div className="pt-2">
-                    <Button onClick={() => setIsAddNewFactorOpen(true)}>Add new app</Button>
                   </div>
-                </>
-              ) : null}
-            </>
+                )
+              })}
+            </div>
           )}
         </div>
-      </section>
+      </CardContent>
+      {totpFactors.length < 2 ? (
+        <CardFooter className="justify-end w-full space-x-2">
+          <Button onClick={() => setIsAddNewFactorOpen(true)}>Add new app</Button>
+        </CardFooter>
+      ) : null}
       <AddNewFactorModal
         visible={isAddNewFactorOpen}
         onClose={() => setIsAddNewFactorOpen(false)}
@@ -82,7 +82,7 @@ export const TOTPFactors = () => {
       <DeleteFactorModal
         visible={factorToBeDeleted !== null}
         factorId={factorToBeDeleted}
-        lastFactorToBeDeleted={data?.totp.length === 1}
+        lastFactorToBeDeleted={data?.all.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
       />
     </>

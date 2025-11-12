@@ -3,7 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
 import { toast } from 'sonner'
 import { profileKeys } from './keys'
-import { UseCustomMutationOptions } from 'types'
+import type { UseCustomMutationOptions } from 'types'
+
+interface MFAWebAuthnChallengeAndVerifyVariables extends MFAUnenrollParams {
+  refreshFactors?: boolean
+}
 
 const mfaUnenroll = async (params: MFAUnenrollParams) => {
   const { error, data } = await auth.mfa.unenroll(params)
@@ -20,7 +24,11 @@ export const useMfaUnenrollMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CustomMFAUnenrollResponse, CustomMFAUnenrollError, MFAUnenrollParams>,
+  UseCustomMutationOptions<
+    CustomMFAUnenrollResponse,
+    CustomMFAUnenrollError,
+    MFAWebAuthnChallengeAndVerifyVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -29,9 +37,16 @@ export const useMfaUnenrollMutation = ({
     mutationFn: (vars) => mfaUnenroll(vars),
     async onSuccess(data, variables, context) {
       // when a factor is unenrolled, the aaLevel is bumped down if it's the last factor
+      const refreshFactors = variables.refreshFactors ?? true
+
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors() }),
         queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() }),
+      ])
+
+      await Promise.all([
+        ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.mfaFactors())] : []),
+        ...(refreshFactors ? [queryClient.invalidateQueries(profileKeys.aaLevel())] : []),
       ])
 
       await onSuccess?.(data, variables, context)
