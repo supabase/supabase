@@ -30,3 +30,5 @@ public/sitemap.xml
 
 # contentlayer
 .contentlayer
+.vercel
+.env*.local
