@@ -1,14 +1,14 @@
+import { ChevronRight, ExternalLink, Search } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState, type KeyboardEvent, type MouseEvent } from 'react'
+
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 import { Bucket as BucketIcon } from 'icons'
 import { BASE_PATH } from 'lib/constants'
-import { ChevronRight, ExternalLink, Search } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import type React from 'react'
-import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -48,10 +48,7 @@ export const VectorsBuckets = () => {
           bucket.vectorBucketName.toLowerCase().includes(filterString.toLowerCase())
         )
 
-  const handleBucketNavigation = (
-    bucketName: string,
-    event: React.MouseEvent | React.KeyboardEvent
-  ) => {
+  const handleBucketNavigation = (bucketName: string, event: MouseEvent | KeyboardEvent) => {
     const url = `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(bucketName)}`
     if (event.metaKey || event.ctrlKey) {
       window.open(url, '_blank')
@@ -94,7 +91,6 @@ export const VectorsBuckets = () => {
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
             <Link
               // [Joshen] To update with Vector specific GH discussion
-
               href="https://github.com/orgs/supabase/discussions/40116"
               target="_blank"
               rel="noopener noreferrer"

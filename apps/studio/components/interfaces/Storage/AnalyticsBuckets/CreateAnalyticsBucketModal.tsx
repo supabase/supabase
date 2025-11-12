@@ -105,7 +105,7 @@ export const CreateAnalyticsBucketModal = ({
 
   const [visible, setVisible] = useState(false)
 
-  const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
+  const { data: buckets = [], isLoading } = useAnalyticsBucketsQuery({ projectRef: ref })
   const icebergCatalogEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
   const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
@@ -192,7 +192,13 @@ export const CreateAnalyticsBucketModal = ({
           type={buttonType}
           className={buttonClassName}
           icon={<Plus size={14} />}
-          disabled={!canCreateBuckets || !icebergCatalogEnabled || buckets.length >= 2 || disabled}
+          disabled={
+            !canCreateBuckets ||
+            !icebergCatalogEnabled ||
+            isLoading ||
+            buckets.length >= 2 ||
+            disabled
+          }
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
           tooltip={{
