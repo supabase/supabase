@@ -7,9 +7,14 @@ import {
   MetricsBlockContent,
   MetricsBlockValue,
   MetricsBlockDifferential,
+  MetricsBlockSparkline,
 } from 'ui-patterns/MetricsBlock'
 
 export default function MetricsBlockDemo() {
+  const data = Array.from({ length: 12 }, (_, i) => ({
+    value: Math.floor(4000 + i * 100 + (Math.random() * 2000 - 800)),
+  }))
+
   return (
     <div className="px-24 w-full">
       <MetricsBlock>
@@ -22,6 +27,7 @@ export default function MetricsBlockDemo() {
           <MetricsBlockValue>5,201</MetricsBlockValue>
           <MetricsBlockDifferential variant="positive">+0.7%</MetricsBlockDifferential>
         </MetricsBlockContent>
+        <MetricsBlockSparkline data={data} dataKey="value" />
       </MetricsBlock>
     </div>
   )

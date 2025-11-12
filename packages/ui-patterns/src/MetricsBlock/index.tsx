@@ -10,11 +10,12 @@ import {
   Card,
   CardTitle,
   cn,
-  InfoIcon,
+  // InfoIcon,
   CardContent,
 } from 'ui'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
+import { AreaChart, Area, ResponsiveContainer } from 'recharts'
 
 interface MetricsBlockContextValue {
   isLoading?: boolean
@@ -88,7 +89,7 @@ const MetricsBlockContent = React.forwardRef<HTMLDivElement, MetricsBlockContent
     <CardContent
       ref={ref}
       className={cn(
-        'pb-4 px-6 pt-0 flex-1 flex h-full items-start gap-1 overflow-hidden',
+        'pb-4 px-6 pt-0 flex-1 flex h-full items-start gap-1 overflow-hidden border-b-0',
         orientation === 'horizontal' ? 'flex-row' : 'flex-col ',
         className
       )}
@@ -164,12 +165,36 @@ const MetricsBlockDifferential = React.forwardRef<HTMLDivElement, MetricsBlockDi
 )
 MetricsBlockDifferential.displayName = 'MetricsBlockDifferential'
 
-const MetricsBlockSparkline = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn('text-foreground-light', className)} {...props} />
-))
+interface MetricsBlockSparklineProps extends React.HTMLAttributes<HTMLDivElement> {
+  data?: Array<{ value: number; [key: string]: any }>
+  dataKey?: string
+  className?: string
+}
+
+const MetricsBlockSparkline = React.forwardRef<HTMLDivElement, MetricsBlockSparklineProps>(
+  ({ className, data, dataKey, ...props }, ref) => {
+    if (!data || data.length === 0) {
+      return null
+    }
+
+    return (
+      <div ref={ref} className={cn('w-full h-24', className)} {...props}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data}>
+            <Area
+              type="natural"
+              dataKey={dataKey || 'value'}
+              fill="hsl(var(--brand-default))"
+              fillOpacity={0.2}
+              stroke="hsl(var(--brand-default))"
+              strokeWidth={1.5}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    )
+  }
+)
 MetricsBlockSparkline.displayName = 'MetricsBlockSparkline'
 
 export {
