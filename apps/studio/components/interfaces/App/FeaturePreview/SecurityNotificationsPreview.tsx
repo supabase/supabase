@@ -3,11 +3,9 @@ import Image from 'next/image'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { BASE_PATH } from 'lib/constants'
-import { useIsSecurityNotificationsEnabled } from './FeaturePreviewContext'
 
 export const SecurityNotificationsPreview = () => {
   const { ref } = useParams()
-  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
 
   return (
     <div className="text-sm text-foreground-light">
@@ -21,11 +19,7 @@ export const SecurityNotificationsPreview = () => {
       <div className="space-y-2 !mt-4">
         <p className=" mb-4">
           Try out our expanded set of{' '}
-          <InlineLink
-            href={`/project/${ref ?? '_'}/auth/${isSecurityNotificationsEnabled ? 'email' : 'templates'}`}
-          >
-            email templates
-          </InlineLink>{' '}
+          <InlineLink href={`/project/${ref ?? '_'}/auth/templates`}>email templates</InlineLink>{' '}
           with support for security-related notifications.
         </p>
         <p className="text-foreground">Enabling this preview will:</p>

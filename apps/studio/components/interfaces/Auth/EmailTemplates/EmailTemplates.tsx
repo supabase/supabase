@@ -1,21 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronRight, ExternalLink, X } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { FEATURE_PREVIEWS } from 'components/interfaces/App/FeaturePreview/FeaturePreview.constants'
 import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { ChevronRight, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { DOCS_URL } from 'lib/constants'
 import {
+  Badge,
   Button,
   Card,
   CardContent,
@@ -28,18 +33,15 @@ import {
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { z } from 'zod'
+import { Admonition } from 'ui-patterns'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
-import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
+import { EmailRateLimitsAlert } from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
 import { TemplateEditor } from './TemplateEditor'
-
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
-import { X } from 'lucide-react'
-import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
   (t) => t.misc?.emailTemplateType === 'security'
@@ -62,7 +64,7 @@ const SECURITY_NOTIFICATIONS_DISCUSSIONS_URL = FEATURE_PREVIEWS.find(
 )?.discussionsUrl
 
 export const EmailTemplates = () => {
-  const { ref: projectRef = '' } = useParams()
+  const { ref: projectRef } = useParams()
   const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -70,7 +72,7 @@ export const EmailTemplates = () => {
   )
 
   const [acknowledged, setAcknowledged] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SECURITY_NOTIFICATIONS_ACKNOWLEDGED(projectRef as string),
+    LOCAL_STORAGE_KEYS.SECURITY_NOTIFICATIONS_ACKNOWLEDGED(projectRef ?? ''),
     false
   )
 
