@@ -14,8 +14,7 @@ import {
 } from 'ui'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { AreaChart, Area, ResponsiveContainer, XAxis } from 'recharts'
-import dayjs from 'dayjs'
+import { AreaChart, Area, ResponsiveContainer } from 'recharts'
 
 interface MetricsBlockContextValue {
   isLoading?: boolean
@@ -181,29 +180,23 @@ const MetricsBlockSparkline = React.forwardRef<HTMLDivElement, MetricsBlockSpark
     return (
       <div ref={ref} className={cn('w-full h-20', className)} {...props}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 5, left: 24, right: 24, bottom: 2 }}>
+          <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--brand-default))" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="hsl(var(--brand-default))" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <Area
               type="step"
               dataKey={dataKey || 'value'}
-              fill="hsl(var(--brand-default))"
+              fill="url(#colorUv)"
               fillOpacity={0.1}
               stroke="hsl(var(--brand-default))"
               strokeWidth={1.5}
             />
-            <XAxis
-              dataKey="timestamp"
-              tick={false}
-              axisLine={{ stroke: 'hsl(var(--border-stronger))' }}
-              tickLine={false}
-            />
           </AreaChart>
         </ResponsiveContainer>
-        {data && (
-          <div className="text-foreground-lighter -mt-8 flex items-center justify-between text-[10px] font-mono px-6 pb-4">
-            <span>{dayjs(data[0]['timestamp']).format(customDateFormat)}</span>
-            <span>{dayjs(data[data?.length - 1]?.['timestamp']).format(customDateFormat)}</span>
-          </div>
-        )}
       </div>
     )
   }
