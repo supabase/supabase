@@ -51,13 +51,13 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
       <ConnectTabContent value="src/App.tsx">
         <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
-import { Refine, WelcomePage } from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import routerBindings, {
+import routerProvider, {
   DocumentTitleHandler,
   NavigateToResource,
   UnsavedChangesNotifier,
-} from "@refinedev/react-router-v6";
+} from "@refinedev/react-router";
 import { dataProvider, liveProvider } from "@refinedev/supabase";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -74,7 +74,7 @@ function App() {
           dataProvider={dataProvider(supabaseClient)}
           liveProvider={liveProvider(supabaseClient)}
           authProvider={authProvider}
-          routerProvider={routerBindings}
+          routerProvider={routerProvider}
           options={{
             syncWithLocation: true,
             warnWhenUnsavedChanges: true,
