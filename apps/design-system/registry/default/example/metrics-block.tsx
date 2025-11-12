@@ -13,6 +13,7 @@ import {
 export default function MetricsBlockDemo() {
   const data = Array.from({ length: 12 }, (_, i) => ({
     value: Math.floor(4000 + i * 100 + (Math.random() * 2000 - 800)),
+    timestamp: new Date().toISOString(),
   }))
 
   return (

@@ -10,12 +10,12 @@ import {
   Card,
   CardTitle,
   cn,
-  // InfoIcon,
   CardContent,
 } from 'ui'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { AreaChart, Area, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, ResponsiveContainer, XAxis } from 'recharts'
+import dayjs from 'dayjs'
 
 interface MetricsBlockContextValue {
   isLoading?: boolean
@@ -173,14 +173,15 @@ interface MetricsBlockSparklineProps extends React.HTMLAttributes<HTMLDivElement
 
 const MetricsBlockSparkline = React.forwardRef<HTMLDivElement, MetricsBlockSparklineProps>(
   ({ className, data, dataKey, ...props }, ref) => {
+    const customDateFormat = 'MMM D, YYYY'
     if (!data || data.length === 0) {
       return null
     }
 
     return (
-      <div ref={ref} className={cn('w-full h-16', className)} {...props}>
+      <div ref={ref} className={cn('w-full h-20', className)} {...props}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
+          <AreaChart data={data} margin={{ top: 5, left: 24, right: 24, bottom: 2 }}>
             <Area
               type="step"
               dataKey={dataKey || 'value'}
@@ -189,8 +190,20 @@ const MetricsBlockSparkline = React.forwardRef<HTMLDivElement, MetricsBlockSpark
               stroke="hsl(var(--brand-default))"
               strokeWidth={1.5}
             />
+            <XAxis
+              dataKey="timestamp"
+              tick={false}
+              axisLine={{ stroke: 'hsl(var(--border-stronger))' }}
+              tickLine={false}
+            />
           </AreaChart>
         </ResponsiveContainer>
+        {data && (
+          <div className="text-foreground-lighter -mt-8 flex items-center justify-between text-[10px] font-mono px-6 pb-4">
+            <span>{dayjs(data[0]['timestamp']).format(customDateFormat)}</span>
+            <span>{dayjs(data[data?.length - 1]?.['timestamp']).format(customDateFormat)}</span>
+          </div>
+        )}
       </div>
     )
   }
