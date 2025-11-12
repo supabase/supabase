@@ -17,7 +17,7 @@ export function EventBanner() {
   if (!featuredEvent) return null
 
   return (
-    <section className={cn('grid grid-cols-[minmax(320px,35%),1fr] gap-12')}>
+    <section className={cn('grid md:grid-cols-[minmax(320px,35%),1fr] gap-12')}>
       <CoverImage url={featuredEvent.cover_url} />
 
       <article className="flex flex-col gap-6 py-2">
@@ -33,7 +33,7 @@ export function EventBanner() {
           </div>
 
           {featuredEvent.link && (
-            <Button className="hidden lg:block mt-1" size="medium" asChild>
+            <Button className="hidden md:block mt-1" size="medium" asChild>
               <Link
                 href={featuredEvent.link.href}
                 target={featuredEvent.link.target}
@@ -45,7 +45,7 @@ export function EventBanner() {
           )}
         </div>
 
-        <div className="flex gap-x-12 items-center">
+        <div className="flex flex-wrap gap-y-4 gap-x-12 items-center">
           <DateWidget date={featuredEvent.date} endDate={featuredEvent.end_date} />
           <LocationWidget location={featuredEvent.location} />
         </div>
@@ -53,6 +53,18 @@ export function EventBanner() {
         <p className="whitespace-pre-line text-foreground-light mt-4">
           {featuredEvent.description}
         </p>
+
+        {featuredEvent.link && (
+          <Button className="block md:hidden mt-1" size="medium" asChild>
+            <Link
+              href={featuredEvent.link.href}
+              target={featuredEvent.link.target}
+              rel="noopener noreferrer"
+            >
+              Register
+            </Link>
+          </Button>
+        )}
       </article>
     </section>
   )
