@@ -12,7 +12,6 @@ for complete image version history and rollback information.
 
 ### Auth
 - Updated to `v2.182.1` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md#21821-2025-11-05) | [Release](https://github.com/supabase/auth/releases/tag/v2.182.1)
-- Note: Introduces OAuth 2.1 server capabilities (authorization list/revoke endpoints) and v2 refresh token algorithm
 
 ### Realtime
 - Updated to `v2.63.0` - [Release](https://github.com/supabase/realtime/releases/tag/v2.63.0)
