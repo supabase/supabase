@@ -178,14 +178,14 @@ const MetricsBlockSparkline = React.forwardRef<HTMLDivElement, MetricsBlockSpark
     }
 
     return (
-      <div ref={ref} className={cn('w-full h-24', className)} {...props}>
+      <div ref={ref} className={cn('w-full h-16', className)} {...props}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
+          <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <Area
-              type="natural"
+              type="step"
               dataKey={dataKey || 'value'}
               fill="hsl(var(--brand-default))"
-              fillOpacity={0.2}
+              fillOpacity={0.1}
               stroke="hsl(var(--brand-default))"
               strokeWidth={1.5}
             />
