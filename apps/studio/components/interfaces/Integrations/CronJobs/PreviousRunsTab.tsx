@@ -167,7 +167,7 @@ export const PreviousRunsTab = () => {
       connectionString: project?.connectionString,
       jobId: jobId,
     },
-    { enabled: !!jobId, staleTime: 30000 }
+    { enabled: !!jobId, staleTime: 30_000 }
   )
 
   const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])

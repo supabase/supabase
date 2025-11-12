@@ -31,16 +31,17 @@ export async function getDatabaseCronJobRuns({
   projectRef,
   connectionString,
   jobId,
-  afterTimestamp,
-}: DatabaseCronJobRunsVariables & { afterTimestamp: string }) {
+  beforeId,
+}: DatabaseCronJobRunsVariables & { beforeId?: string }) {
   if (!projectRef) throw new Error('Project ref is required')
+  const beforeIdProvided = beforeId !== undefined
 
   let query = `
     SELECT * FROM cron.job_run_details
     WHERE
       jobid = '${jobId}'
-      ${afterTimestamp ? `AND start_time < '${afterTimestamp}'` : ''}
-    ORDER BY start_time DESC
+      ${beforeIdProvided ? `AND runid < ${beforeId}` : ''}
+    ORDER BY runid DESC
     LIMIT ${CRON_JOB_RUNS_PAGE_SIZE}`
 
   const { result } = await executeSql({
@@ -68,16 +69,16 @@ export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
         projectRef,
         connectionString,
         jobId,
-        afterTimestamp: pageParam,
+        beforeId: pageParam,
       })
     },
     staleTime: 0,
     enabled: enabled && typeof projectRef !== 'undefined',
 
     getNextPageParam(lastPage) {
-      const hasNextPage = lastPage.length <= CRON_JOB_RUNS_PAGE_SIZE
+      const hasNextPage = lastPage.length === CRON_JOB_RUNS_PAGE_SIZE
       if (!hasNextPage) return undefined
-      return last(lastPage)?.start_time
+      return last(lastPage)?.runid
     },
     ...options,
   })
