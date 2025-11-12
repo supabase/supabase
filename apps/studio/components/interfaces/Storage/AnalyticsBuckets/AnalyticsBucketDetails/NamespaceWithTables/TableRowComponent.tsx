@@ -124,9 +124,9 @@ export const TableRowComponent = ({
       })
       await startPipeline({ projectRef, pipelineId: pipeline.id })
       setShowStopReplicationModal(false)
-      toast.success('Successfully stopped replication for table! Pipeline is being restarted.')
+      toast.success('Successfully disabled replication for table! Pipeline is being restarted.')
     } catch (error: any) {
-      toast.error(`Failed to stop replication for table: ${error.message}`)
+      toast.error(`Failed to disable replication for table: ${error.message}`)
     } finally {
       setIsUpdatingReplication(false)
     }
@@ -156,9 +156,9 @@ export const TableRowComponent = ({
       })
       await startPipeline({ projectRef, pipelineId: pipeline.id })
       setShowStartReplicationModal(false)
-      toast.success('Successfully stopped replication for table! Pipeline is being restarted.')
+      toast.success('Successfully enabled replication for table! Pipeline is being restarted.')
     } catch (error: any) {
-      toast.error(`Failed to stop replication for table: ${error.message}`)
+      toast.error(`Failed to enable replication for table: ${error.message}`)
     } finally {
       setIsUpdatingReplication(false)
     }
