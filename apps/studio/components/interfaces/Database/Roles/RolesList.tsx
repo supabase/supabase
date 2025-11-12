@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -28,6 +28,7 @@ export const RolesList = () => {
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
+  const deletingRoleIdRef = useRef<string | null>(null)
 
   const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -54,7 +55,13 @@ export const RolesList = () => {
     urlKey: 'delete',
     select: (id: string) => (id ? data?.find((role) => role.id.toString() === id) : undefined),
     enabled: !!data,
-    onError: () => toast.error(`Database Role not found`),
+    onError: (_error, selectedId) => {
+      if (selectedId !== deletingRoleIdRef.current) {
+        toast.error(`Database Role not found`)
+      } else {
+        deletingRoleIdRef.current = null
+      }
+    },
   })
 
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
@@ -230,6 +237,11 @@ export const RolesList = () => {
         role={roleToDelete as unknown as PostgresRole}
         visible={!!roleToDelete}
         onClose={() => setSelectedRoleIdToDelete(null)}
+        onDelete={() => {
+          if (roleToDelete) {
+            deletingRoleIdRef.current = roleToDelete.id.toString()
+          }
+        }}
       />
     </>
   )

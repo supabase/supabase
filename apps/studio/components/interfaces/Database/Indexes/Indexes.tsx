@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -38,6 +38,7 @@ const Indexes = () => {
 
   const [search, setSearch] = useState('')
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const deletingIndexNameRef = useRef<string | null>(null)
 
   const {
     data: allIndexes,
@@ -68,7 +69,13 @@ const Indexes = () => {
       urlKey: 'delete',
       select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
       enabled: !!allIndexes,
-      onError: () => toast.error(`Index not found`),
+      onError: (_error, selectedId) => {
+        if (selectedId !== deletingIndexNameRef.current) {
+          toast.error(`Index not found`)
+        } else {
+          deletingIndexNameRef.current = null
+        }
+      },
     })
 
   const {
@@ -99,6 +106,7 @@ const Indexes = () => {
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
     if (!project) return console.error('Project is required')
 
+    deletingIndexNameRef.current = index.name
     deleteIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,

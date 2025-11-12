@@ -22,7 +22,7 @@ export function useQueryStateWithSelect<T>({
   enabled: boolean
   urlKey: string
   select: (id: string) => T | undefined
-  onError: (error: Error) => void
+  onError: (error: Error, selectedId: string) => void
 }) {
   const [selectedId, setSelectedId] = useQueryState(
     urlKey,
@@ -33,7 +33,7 @@ export function useQueryStateWithSelect<T>({
 
   useEffect(() => {
     if (enabled && selectedId && !value) {
-      onError(new Error(`not found`))
+      onError(new Error(`not found`), selectedId)
       setSelectedId(null)
     }
   }, [enabled, onError, selectedId, setSelectedId, value])

@@ -1,6 +1,6 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
@@ -36,6 +36,7 @@ export const EnumeratedTypes = () => {
   const { data: project } = useSelectedProjectQuery()
   const [search, setSearch] = useState('')
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const deletingTypeIdRef = useRef<string | null>(null)
 
   const { data, error, isLoading, isError, isSuccess } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -51,14 +52,20 @@ export const EnumeratedTypes = () => {
     urlKey: 'edit',
     select: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
     enabled: !!data,
-    onError: () => toast.error(`Enumerated Tybe not found`),
+    onError: () => toast.error(`Enumerated Type not found`),
   })
 
   const { value: typeToDelete, setValue: setSelectedTypeIdToDelete } = useQueryStateWithSelect({
     urlKey: 'delete',
     select: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
     enabled: !!data,
-    onError: () => toast.error(`Enumerated Tybe not found`),
+    onError: (_error, selectedId) => {
+      if (selectedId !== deletingTypeIdRef.current) {
+        toast.error(`Enumerated Type not found`)
+      } else {
+        deletingTypeIdRef.current = null
+      }
+    },
   })
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
@@ -208,6 +215,11 @@ export const EnumeratedTypes = () => {
         visible={!!typeToDelete}
         selectedEnumeratedType={typeToDelete}
         onClose={() => setSelectedTypeIdToDelete(null)}
+        onDelete={() => {
+          if (typeToDelete) {
+            deletingTypeIdRef.current = typeToDelete.id.toString()
+          }
+        }}
       />
     </div>
   )

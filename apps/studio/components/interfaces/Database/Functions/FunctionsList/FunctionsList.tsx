@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsJson, useQueryState } from 'nuqs'
+import { useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -12,6 +13,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
+import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
@@ -66,6 +68,9 @@ const FunctionsList = () => {
     setInitialPrompt: setEditorPanelInitialPrompt,
   } = useEditorPanelStateSnapshot()
 
+  // Track the ID being deleted to exclude it from error checking
+  const deletingFunctionIdRef = useRef<string | null>(null)
+
   const createFunction = () => {
     setSelectedFunctionIdToDuplicate(null)
     if (isInlineEditorEnabled) {
@@ -104,7 +109,7 @@ const FunctionsList = () => {
     }
   }
 
-  const deleteFunction = (fn: any) => {
+  const deleteFunction = (fn: DatabaseFunction) => {
     setSelectedFunctionToDelete(fn.id.toString())
   }
 
@@ -194,7 +199,24 @@ const FunctionsList = () => {
       urlKey: 'delete',
       select: (id: string) => (id ? functions?.find((fn) => fn.id.toString() === id) : undefined),
       enabled: !!functions,
-      onError: () => toast.error(`Function not found`),
+      onError: (_error, selectedId) => {
+        if (selectedId !== deletingFunctionIdRef.current) {
+          toast.error(`Function not found`)
+        } else {
+          deletingFunctionIdRef.current = null
+        }
+      },
+    })
+
+  const { mutate: deleteDatabaseFunction, isLoading: isDeletingFunction } =
+    useDatabaseFunctionDeleteMutation({
+      onSuccess: (_, variables) => {
+        toast.success(`Successfully removed function ${variables.func.name}`)
+        setSelectedFunctionToDelete(null)
+      },
+      onError: () => {
+        deletingFunctionIdRef.current = null
+      },
     })
 
   if (isLoading) return <GenericSkeletonLoader />
@@ -366,6 +388,11 @@ const FunctionsList = () => {
         func={functionToDelete}
         visible={!!functionToDelete}
         setVisible={setSelectedFunctionToDelete}
+        onDelete={(params: Parameters<typeof deleteDatabaseFunction>[0]) => {
+          deletingFunctionIdRef.current = params.func.id.toString()
+          deleteDatabaseFunction(params)
+        }}
+        isLoading={isDeletingFunction}
       />
     </>
   )
