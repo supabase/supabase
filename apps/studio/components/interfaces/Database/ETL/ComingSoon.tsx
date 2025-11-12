@@ -89,7 +89,7 @@ const ReplicationStaticMockup = ({ projectRef }: { projectRef: string }) => {
   )
 
   return (
-    <div className="relative border-t h-full w-full relative">
+    <div className="relative border-t h-full w-full">
       <ReactFlow
         fitView
         fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
