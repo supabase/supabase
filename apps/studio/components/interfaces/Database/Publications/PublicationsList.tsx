@@ -147,25 +147,27 @@ export const PublicationsList = () => {
               {isSuccess &&
                 publications.map((x) => (
                   <TableRow key={x.name}>
-                    <TableCell className="flex items-center gap-x-2 items-center">
-                      {x.name}
-                      {/* [Joshen] Making this tooltip very specific for these 2 publications */}
-                      {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
-                        x.name
-                      ) && (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info size={14} className="text-foreground-light" />
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            {x.name === 'supabase_realtime'
-                              ? 'This publication is managed by Supabase and handles Postgres changes'
-                              : x.name === 'supabase_realtime_messages_publication'
-                                ? 'This publication is managed by Supabase and handles broadcasts from the database'
-                                : undefined}
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
+                    <TableCell>
+                      <div className="flex items-center gap-x-2">
+                        {x.name}
+                        {/* [Joshen] Making this tooltip very specific for these 2 publications */}
+                        {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
+                          x.name
+                        ) && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info size={14} className="text-foreground-light" />
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              {x.name === 'supabase_realtime'
+                                ? 'Managed by Supabase and handles Postgres changes'
+                                : x.name === 'supabase_realtime_messages_publication'
+                                  ? 'Managed by Supabase and handles broadcasts from the database'
+                                  : undefined}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>{x.id}</TableCell>
                     {publicationEvents.map((event) => (

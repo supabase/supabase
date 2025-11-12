@@ -34,7 +34,11 @@ export const StorageMenuV2 = () => {
                 <Menu.Item rounded active={isSelected}>
                   <div className="flex items-center justify-between">
                     <p className="truncate">{config.displayName}</p>
-                    {isAlphaEnabled && <Badge variant="warning">ALPHA</Badge>}
+                    {isAlphaEnabled && (
+                      <Badge variant="default" size="small">
+                        New
+                      </Badge>
+                    )}
                   </div>
                 </Menu.Item>
               </Link>

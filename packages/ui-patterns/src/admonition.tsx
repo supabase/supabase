@@ -103,6 +103,7 @@ export const Admonition = forwardRef<
       children,
       layout = 'vertical',
       actions,
+      childProps = {},
       ...props
     },
     ref
@@ -135,28 +136,25 @@ export const Admonition = forwardRef<
           {label || title ? (
             <div>
               <AlertTitle_Shadcn_
-                {...props.childProps?.title}
+                {...childProps.title}
                 className={cn(
                   'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
                   !label && 'flex-col',
-                  props.childProps?.title?.className
+                  childProps.title?.className
                 )}
               >
                 {label || title}
               </AlertTitle_Shadcn_>
               {description && (
-                <AlertDescription_Shadcn_ className={props.childProps?.description?.className}>
+                <AlertDescription_Shadcn_ className={childProps.description?.className}>
                   {description}
                 </AlertDescription_Shadcn_>
               )}
               {/* // children is to handle Docs and MDX issues with children and <p> elements */}
               {children && (
                 <AlertDescription_Shadcn_
-                  {...props.childProps?.description}
-                  className={cn(
-                    '[&_p]:mb-1.5 [&_p]:mt-0',
-                    props.childProps?.description?.className
-                  )}
+                  {...childProps.description}
+                  className={cn('[&_p]:mb-1.5 [&_p]:mt-0', childProps?.description?.className)}
                 >
                   {children}
                 </AlertDescription_Shadcn_>

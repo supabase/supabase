@@ -109,8 +109,6 @@ export const FilesBuckets = () => {
                 projectRef={ref ?? '_'}
                 filterString={filterString}
                 formattedGlobalUploadLimit={formattedGlobalUploadLimit}
-                setSelectedBucket={setSelectedBucket}
-                setModal={setModal}
                 getPolicyCount={getPolicyCount}
               />
             </Card>

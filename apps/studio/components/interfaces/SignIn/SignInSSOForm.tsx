@@ -1,6 +1,5 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
@@ -9,11 +8,10 @@ import z from 'zod'
 
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { BASE_PATH } from 'lib/constants'
+import { captureCriticalError } from 'lib/error-reporting'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -69,10 +67,7 @@ export const SignInSSOForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign in: ${error.message}`, { id: toastId })
-
-      if (!WHITELIST_ERRORS.includes(error.message)) {
-        Sentry.captureMessage('[CRITICAL] Failed to sign in via SSO: ' + error.message)
-      }
+      captureCriticalError(error, 'sign in via SSO')
     }
   }
 

@@ -27,6 +27,7 @@ import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { LogDrainsCard } from './LogDrainsCard'
 import { VoteLink } from './VoteLink'
+import { useTrack } from 'lib/telemetry/track'
 
 export function LogDrains({
   onNewDrainClick,
@@ -37,7 +38,7 @@ export function LogDrains({
 }) {
   const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
   const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
-
+  const track = useTrack()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
   const { ref } = useParams()
@@ -192,6 +193,12 @@ export function LogDrains({
             onConfirm={() => {
               if (selectedLogDrain && ref) {
                 deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
+                track('log_drain_confirm_button_submitted', {
+                  destination: selectedLogDrain.type as Exclude<
+                    LogDrainType,
+                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3'
+                  >,
+                })
               }
             }}
             onCancel={() => setIsDeleteModalOpen(false)}

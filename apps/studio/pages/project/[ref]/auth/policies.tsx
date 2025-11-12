@@ -1,9 +1,10 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
@@ -26,10 +27,10 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 /**
@@ -209,7 +210,18 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer size="large">
       <ScaffoldSection isFullWidth>
-        <div className="mb-4 flex flex-row gap-2 justify-between">
+        <div className="mb-4 flex flex-row gap-x-2">
+          <SchemaSelector
+            className="w-full lg:w-[180px]"
+            size="tiny"
+            align="end"
+            showError={false}
+            selectedSchemaName={schema}
+            onSelectSchema={(schemaName) => {
+              setSchema(schemaName)
+              setSearchString('')
+            }}
+          />
           <Input
             size="tiny"
             placeholder="Filter tables and policies"
@@ -221,17 +233,17 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               setSearchString(str)
             }}
             icon={<Search size={14} />}
-          />
-          <SchemaSelector
-            className="w-full lg:w-[180px]"
-            size="tiny"
-            align="end"
-            showError={false}
-            selectedSchemaName={schema}
-            onSelectSchema={(schemaName) => {
-              setSchema(schemaName)
-              setSearchString('')
-            }}
+            actions={
+              searchString ? (
+                <Button
+                  size="tiny"
+                  type="text"
+                  className="p-0 h-5 w-5"
+                  icon={<X />}
+                  onClick={() => setSearchString('')}
+                />
+              ) : null
+            }
           />
         </div>
 

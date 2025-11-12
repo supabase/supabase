@@ -68,8 +68,7 @@ export const ReportChartV2 = ({
   const { plan: orgPlan } = useCurrentOrgPlan()
   const orgPlanId = orgPlan?.id
 
-  const isAvailable =
-    report.availableIn === undefined || (orgPlanId && report.availableIn.includes(orgPlanId))
+  const isAvailable = !report?.availableIn || (orgPlanId && report.availableIn?.includes(orgPlanId))
 
   const canFetch = orgPlanId !== undefined && isAvailable
 
