@@ -6,9 +6,9 @@ import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
+import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useVectorBucketIndexCreateMutation } from 'data/storage/vector-bucket-index-create-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -34,6 +34,8 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
+import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
+import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 
 const isStagingLocal = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
@@ -75,7 +77,7 @@ const FormSchema = z.object({
         })
       }
     }),
-  targetSchema: z.string().default(''),
+  bucketName: z.string().default(''),
   dimension: z
     .number()
     .int('Dimension must be an integer')
@@ -102,18 +104,19 @@ interface CreateVectorTableSheetProps {
 }
 
 export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
-  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const [visible, setVisible] = useState(false)
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
+  const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId: bucketName })
 
   // [Joshen] Can remove this once this restriction is removed
   const showIndexCreationNotice = isStagingLocal && !!project && project?.region !== 'us-east-1'
 
   const defaultValues = {
     name: '',
-    targetSchema: bucketName,
+    bucketName,
     dimension: undefined,
     distanceMetric: 'cosine' as 'cosine' | 'euclidean',
     metadataKeys: [],
@@ -129,32 +132,52 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     name: 'metadataKeys',
   })
 
-  const { mutate: createVectorBucketTable, isLoading: isCreating } =
-    useVectorBucketIndexCreateMutation({
-      onSuccess: (values) => {
-        toast.success(`Successfully created vector table ${values.name}`)
-        form.reset()
+  const { mutateAsync: createVectorBucketTable, isLoading: isCreatingVectorBucketTable } =
+    useVectorBucketIndexCreateMutation()
 
-        setVisible(false)
-      },
-      onError: (error) => {
-        // For other errors, show a toast as fallback
-        toast.error(`Failed to create vector table: ${error.message}`)
-      },
+  const { mutateAsync: importForeignSchema, isLoading: isImportingForeignSchema } =
+    useFDWImportForeignSchemaMutation({
+      onError: () => {},
     })
+  const isCreating = isCreatingVectorBucketTable || isImportingForeignSchema
 
   const onSubmit: SubmitHandler<CreateVectorTableForm> = async (values) => {
-    if (!ref) return console.error('Project ref is required')
+    if (!project?.ref) return console.error('Project ref is required')
 
-    createVectorBucketTable({
-      projectRef: ref,
-      bucketName: values.targetSchema,
-      indexName: values.name,
-      dataType: 'float32',
-      dimension: values.dimension!,
-      distanceMetric: values.distanceMetric,
-      metadataKeys: values.metadataKeys.map((key) => key.value),
-    })
+    try {
+      await createVectorBucketTable({
+        projectRef: project.ref,
+        bucketName: values.bucketName,
+        indexName: values.name,
+        dataType: 'float32',
+        dimension: values.dimension!,
+        distanceMetric: values.distanceMetric,
+        metadataKeys: values.metadataKeys.map((key) => key.value),
+      })
+    } catch (error: any) {
+      toast.error(`Failed to create vector table: ${error.message}`)
+      return
+    }
+
+    try {
+      if (wrapperInstance) {
+        await importForeignSchema({
+          projectRef: project.ref,
+          connectionString: project?.connectionString,
+          serverName: wrapperInstance.server_name,
+          sourceSchema: getVectorBucketFDWSchemaName(values.bucketName),
+          targetSchema: getVectorBucketFDWSchemaName(values.bucketName),
+          schemaOptions: [`bucket_name '${values.bucketName}'`],
+        })
+      }
+    } catch (error: any) {
+      toast.warning(`Failed to connect vector table to the database: ${error.message}`)
+    }
+
+    toast.success(`Successfully created vector table ${values.name}`)
+    form.reset()
+
+    setVisible(false)
   }
 
   useEffect(() => {
@@ -235,25 +258,14 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
               />
 
               <FormField_Shadcn_
-                key="targetSchema"
-                name="targetSchema"
+                key="bucketName"
+                name="bucketName"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout
-                    name="targetSchema"
-                    label="Target schema"
-                    description="The bucket name will be used as the target schema."
-                    layout="horizontal"
-                  >
+                  <FormItemLayout name="bucketName" label="Bucket name" layout="horizontal">
                     <FormControl_Shadcn_>
                       <div className="relative">
-                        <Input_Shadcn_
-                          id="targetSchema"
-                          {...field}
-                          value={field.value}
-                          disabled
-                          className="pr-10"
-                        />
+                        <Input_Shadcn_ {...field} value={field.value} disabled className="pr-10" />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <Lock size={14} className="text-foreground-muted" />
                         </div>
