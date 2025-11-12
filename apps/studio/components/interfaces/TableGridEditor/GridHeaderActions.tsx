@@ -297,7 +297,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   >
                     <Link
                       passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
+                      href={`/project/${projectRef}/auth/policies?search=${table.name}&schema=${table.schema}`}
                     >
                       RLS {policies.length > 1 ? 'policies' : 'policy'}
                     </Link>
