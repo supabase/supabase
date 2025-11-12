@@ -3,6 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
@@ -26,6 +27,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { DOCS_URL } from 'lib/constants'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -102,10 +104,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [selectedPolicyIdToEdit, setSelectedPolicyIdToEdit] = useQueryState(
-    'edit',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
 
@@ -119,9 +117,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
   })
 
-  const policyToEdit: PostgresPolicy | undefined = useMemo(() => {
-    return policies?.find((policy) => policy.id.toString() === selectedPolicyIdToEdit)
-  }, [policies, selectedPolicyIdToEdit])
+  const { setValue: setSelectedPolicyIdToEdit, value: selectedPolicyIdToEdit } =
+    useQueryStateWithSelect({
+      urlKey: 'edit',
+      select: (id: string) =>
+        id ? policies?.find((policy) => policy.id.toString() === id) : undefined,
+      enabled: !!policies,
+      onError: () => toast.error(`Policy not found`),
+    })
 
   const {
     data: tables,
@@ -154,7 +157,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const handleSelectCreatePolicy = useCallback(
     (table: string) => {
       setSelectedTable(table)
-      setSelectedPolicyIdToEdit('')
+      setSelectedPolicyIdToEdit(null)
       setShowCreatePolicy(true)
 
       if (isInlineEditorEnabled) {
@@ -288,13 +291,13 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
         {/* Edit Policy */}
         <PolicyEditorPanel
-          visible={selectedPolicyIdToEdit !== '' && policyToEdit !== undefined}
+          visible={!!selectedPolicyIdToEdit}
           schema={schema}
           searchString={searchString}
-          selectedPolicy={policyToEdit}
+          selectedPolicy={selectedPolicyIdToEdit}
           onSelectCancel={() => {
             setSelectedTable(undefined)
-            setSelectedPolicyIdToEdit('')
+            setSelectedPolicyIdToEdit(null)
           }}
           authContext="database"
         />

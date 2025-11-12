@@ -1,7 +1,6 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
-import { memo, useCallback, useEffect, useMemo } from 'react'
-import { useQueryState, parseAsString } from 'nuqs'
+import { memo, useCallback, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -9,6 +8,7 @@ import AlertError from 'components/ui/AlertError'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { useQueryStateWithSelect, handleErrorOnDelete } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Alert_Shadcn_,
@@ -56,14 +56,16 @@ const PolicyTableRowComponent = ({
     [getPoliciesForTable, table.schema, table.name]
   )
 
-  const [selectedPolicyIdToDelete, setSelectedPolicyIdToDelete] = useQueryState(
-    'delete',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const deletingPolicyIdRef = useRef<string | null>(null)
 
-  const policyToDelete: PostgresPolicy | undefined = useMemo(() => {
-    return policies?.find((policy) => policy.id.toString() === selectedPolicyIdToDelete)
-  }, [policies, selectedPolicyIdToDelete])
+  const { setValue: setPolicyToDelete, value: policyToDelete } = useQueryStateWithSelect({
+    urlKey: 'delete',
+    select: (id: string) =>
+      id ? policies?.find((policy) => policy.id.toString() === id) : undefined,
+    enabled: !!policies,
+    onError: (_error, selectedId) =>
+      handleErrorOnDelete(deletingPolicyIdRef, selectedId, `Policy not found`),
+  })
 
   // [Joshen] Changes here are so that warnings are more accurate and granular instead of purely relying if RLS is disabled or enabled
   // The following scenarios are technically okay if the table has RLS disabled, in which it won't be publicly readable / writable
@@ -102,31 +104,30 @@ const PolicyTableRowComponent = ({
     onSettled: () => {
       closeConfirmModal()
     },
+    onError: () => {
+      deletingPolicyIdRef.current = null
+    },
   })
 
   const closeConfirmModal = useCallback(() => {
-    setSelectedPolicyIdToDelete('')
+    setPolicyToDelete(null)
   }, [])
 
   const onSelectDeletePolicy = useCallback((policy: PostgresPolicy) => {
-    setSelectedPolicyIdToDelete(policy.id.toString())
+    setPolicyToDelete(policy.id.toString())
   }, [])
 
   const onDeletePolicy = async () => {
     if (!project) return console.error('Project is required')
+    if (!policyToDelete) return console.error('Policy is required')
+
+    deletingPolicyIdRef.current = policyToDelete.id.toString()
     deleteDatabasePolicy({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      originalPolicy: policyToDelete!,
+      originalPolicy: policyToDelete,
     })
   }
-
-  useEffect(() => {
-    if (selectedPolicyIdToDelete !== '' && !policyToDelete) {
-      toast.error('Policy not found')
-      setSelectedPolicyIdToDelete('')
-    }
-  }, [selectedPolicyIdToDelete, policyToDelete])
 
   return (
     <>
@@ -222,7 +223,7 @@ const PolicyTableRowComponent = ({
 
       <ConfirmModal
         danger
-        visible={selectedPolicyIdToDelete !== '' && policyToDelete !== undefined}
+        visible={!!policyToDelete}
         title="Confirm to delete policy"
         description={`This is permanent! Are you sure you want to delete the policy "${policyToDelete?.name}"`}
         buttonLabel="Delete"
