@@ -171,9 +171,11 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
 function CommandMenuTriggerInput({
   className,
   placeholder = 'Search...',
+  showShortcut = true,
 }: {
   className?: string
   placeholder?: string | React.ReactNode
+  showShortcut?: boolean
 }) {
   return (
     <CommandMenuTrigger>
@@ -199,15 +201,17 @@ function CommandMenuTriggerInput({
           />
           <p className="flex text-sm pr-2 text-foreground-muted">{placeholder}</p>
         </div>
-        <div className="command-shortcut hidden md:flex items-center space-x-1">
-          <div
-            aria-hidden="true"
-            className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
-          >
-            <Command size={12} strokeWidth={1.5} />
-            <span className="text-[12px]">K</span>
+        {showShortcut && (
+          <div className="command-shortcut hidden md:flex items-center space-x-1">
+            <div
+              aria-hidden="true"
+              className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
+            >
+              <Command size={12} strokeWidth={1.5} />
+              <span className="text-[12px]">K</span>
+            </div>
           </div>
-        </div>
+        )}
       </button>
     </CommandMenuTrigger>
   )

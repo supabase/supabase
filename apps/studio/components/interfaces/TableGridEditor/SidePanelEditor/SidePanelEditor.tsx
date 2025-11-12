@@ -23,6 +23,7 @@ import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { getTables } from 'data/tables/tables-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -133,7 +134,14 @@ export const SidePanelEditor = ({
   const { data: org } = useSelectedOrganizationQuery()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
-  const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
+
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: () => isEdited,
+    onClose: () => {
+      setIsEdited(false)
+      snap.closeSidePanel()
+    },
+  })
 
   const enumArrayColumns = (selectedTable?.columns ?? [])
     .filter((column) => {
@@ -632,13 +640,7 @@ export const SidePanelEditor = ({
     snap.closeSidePanel()
   }
 
-  const onClosePanel = () => {
-    if (isEdited) {
-      setIsClosingPanel(true)
-    } else {
-      snap.closeSidePanel()
-    }
-  }
+  const onClosePanel = confirmOnClose
 
   return (
     <>
@@ -730,22 +732,22 @@ export const SidePanelEditor = ({
         closePanel={onClosePanel}
         updateEditorDirty={setIsEdited}
       />
-      <ConfirmationModal
-        visible={isClosingPanel}
-        title="Discard changes"
-        confirmLabel="Discard"
-        onCancel={() => setIsClosingPanel(false)}
-        onConfirm={() => {
-          setIsClosingPanel(false)
-          setIsEdited(false)
-          snap.closeSidePanel()
-        }}
-      >
-        <p className="text-sm text-foreground-light">
-          There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-          lost.
-        </p>
-      </ConfirmationModal>
+      <CloseConfirmationModal {...closeConfirmationModalProps} />
     </>
   )
 }
+
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
+      lost.
+    </p>
+  </ConfirmationModal>
+)
