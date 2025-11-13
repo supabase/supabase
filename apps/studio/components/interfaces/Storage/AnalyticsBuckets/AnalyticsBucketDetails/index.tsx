@@ -231,7 +231,7 @@ export const AnalyticBucketDetails = () => {
                         <div className="flex flex-col items-center text-center">
                           <h3>Connect database tables</h3>
                           <p className="text-foreground-light text-sm">
-                            Stream data from tables for archival, backups, or analytical queries.
+                            Stream table data for continuous backups and analysis
                           </p>
                         </div>
                         <ConnectTablesDialog

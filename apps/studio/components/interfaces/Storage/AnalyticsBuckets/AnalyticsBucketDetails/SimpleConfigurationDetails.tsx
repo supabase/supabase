@@ -37,7 +37,6 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
             >
               Learn more
             </InlineLink>
-            .
           </ScaffoldSectionDescription>
         </div>
         <CopyEnvButton
