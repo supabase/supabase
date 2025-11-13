@@ -7961,7 +7961,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/supabase-js.GoTrueAdminApi.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create an Auth Admin API instance
   - id: createuser
     title: createUser
     $ref: '@supabase/supabase-js.GoTrueAdminApi.createUser'
@@ -8002,7 +8002,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/supabase-js.RealtimeChannel.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a Realtime channel instance
   - id: httpsend
     title: httpSend
     $ref: '@supabase/supabase-js.RealtimeChannel.httpSend'
@@ -8018,7 +8018,7 @@ functions:
   - id: presencestate
     title: presenceState
     $ref: '@supabase/supabase-js.RealtimeChannel.presenceState'
-    description: 'TODO: Add description for presenceState'
+    description: Access current presence state
     examples:
       - id: example-1
         name: Get current presence state
@@ -8058,7 +8058,7 @@ functions:
   - id: track
     title: track
     $ref: '@supabase/supabase-js.RealtimeChannel.track'
-    description: 'TODO: Add description for track'
+    description: Track user presence in channel
     examples:
       - id: example-1
         name: Track user presence
@@ -8081,7 +8081,7 @@ functions:
   - id: untrack
     title: untrack
     $ref: '@supabase/supabase-js.RealtimeChannel.untrack'
-    description: 'TODO: Add description for untrack'
+    description: Stop tracking user presence
     examples:
       - id: example-1
         name: Stop tracking presence
@@ -8093,7 +8093,7 @@ functions:
   - id: updatejoinpayload
     title: updateJoinPayload
     $ref: '@supabase/supabase-js.RealtimeChannel.updateJoinPayload'
-    description: 'TODO: Add description for updateJoinPayload'
+    description: Update channel join payload
     examples:
       - id: example-1
         name: Update channel join configuration
@@ -8109,7 +8109,7 @@ functions:
   - id: channel
     title: channel
     $ref: '@supabase/supabase-js.RealtimeClient.channel'
-    description: 'TODO: Add description for channel'
+    description: Create or retrieve a channel
     examples:
       - id: example-1
         name: Create a realtime channel
@@ -8164,7 +8164,7 @@ functions:
   - id: onheartbeat
     title: onHeartbeat
     $ref: '@supabase/supabase-js.RealtimeClient.onHeartbeat'
-    description: 'TODO: Add description for onHeartbeat'
+    description: Handle heartbeat events
     examples:
       - id: example-1
         name: Handle heartbeat events
@@ -8225,7 +8225,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/auth-js.GoTrueAdminApi.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create an Auth Admin API instance
   - id: signout
     title: signOut
     $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
@@ -8233,7 +8233,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/realtime-js.RealtimeChannel.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a Realtime channel instance
   - id: httpsend
     title: httpSend
     $ref: '@supabase/realtime-js.RealtimeChannel.httpSend'
@@ -8245,7 +8245,7 @@ functions:
   - id: presencestate
     title: presenceState
     $ref: '@supabase/realtime-js.RealtimeChannel.presenceState'
-    description: 'TODO: Add description for presenceState'
+    description: Access current presence state
   - id: subscribe
     title: subscribe
     $ref: '@supabase/realtime-js.RealtimeChannel.subscribe'
@@ -8260,7 +8260,7 @@ functions:
   - id: track
     title: track
     $ref: '@supabase/realtime-js.RealtimeChannel.track'
-    description: 'TODO: Add description for track'
+    description: Track user presence in channel
   - id: unsubscribe
     title: unsubscribe
     $ref: '@supabase/realtime-js.RealtimeChannel.unsubscribe'
@@ -8275,11 +8275,11 @@ functions:
   - id: untrack
     title: untrack
     $ref: '@supabase/realtime-js.RealtimeChannel.untrack'
-    description: 'TODO: Add description for untrack'
+    description: Stop tracking user presence
   - id: updatejoinpayload
     title: updateJoinPayload
     $ref: '@supabase/realtime-js.RealtimeChannel.updateJoinPayload'
-    description: 'TODO: Add description for updateJoinPayload'
+    description: Update channel join payload
   - id: constructor
     title: constructor
     $ref: '@supabase/realtime-js.RealtimeClient.constructor'
@@ -8287,7 +8287,7 @@ functions:
   - id: channel
     title: channel
     $ref: '@supabase/realtime-js.RealtimeClient.channel'
-    description: 'TODO: Add description for channel'
+    description: Create or retrieve a channel
   - id: connect
     title: connect
     $ref: '@supabase/realtime-js.RealtimeClient.connect'
@@ -8334,7 +8334,7 @@ functions:
   - id: onheartbeat
     title: onHeartbeat
     $ref: '@supabase/realtime-js.RealtimeClient.onHeartbeat'
-    description: 'TODO: Add description for onHeartbeat'
+    description: Handle heartbeat events
   - id: push
     title: push
     $ref: '@supabase/realtime-js.RealtimeClient.push'
@@ -8366,7 +8366,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/storage-js.index.StorageVectorsClient.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a Storage client instance
   - id: from
     title: from
     $ref: '@supabase/storage-js.index.StorageVectorsClient.from'
@@ -8483,7 +8483,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/storage-js.index.VectorBucketScope.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a VectorBucketScope instance
   - id: createindex
     title: createIndex
     $ref: '@supabase/storage-js.index.VectorBucketScope.createIndex'
@@ -8578,7 +8578,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/storage-js.index.VectorDataApi.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a VectorDataApi instance
   - id: deletevectors
     title: deleteVectors
     $ref: '@supabase/storage-js.index.VectorDataApi.deleteVectors'
@@ -8740,7 +8740,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/storage-js.index.VectorIndexApi.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a VectorIndexApi instance
   - id: createindex
     title: createIndex
     $ref: '@supabase/storage-js.index.VectorIndexApi.createIndex'
@@ -8842,7 +8842,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/storage-js.index.VectorIndexScope.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a VectorIndexScope instance
   - id: deletevectors
     title: deleteVectors
     $ref: '@supabase/storage-js.index.VectorIndexScope.deleteVectors'
@@ -8938,7 +8938,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/functions-js.FunctionsClient.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a Functions client instance
   - id: setauth
     title: setAuth
     $ref: '@supabase/functions-js.FunctionsClient.setAuth'
@@ -9048,7 +9048,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a query builder instance
   - id: returns
     title: returns
     $ref: '@supabase/postgrest-js.PostgrestBuilder.returns'
@@ -9097,7 +9097,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a query builder instance
   - id: ilikeallof
     title: ilikeAllOf
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAllOf'
@@ -9157,11 +9157,11 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a query builder instance
   - id: constructor
     title: constructor
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a query builder instance
   - id: geojson
     title: geojson
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
@@ -9218,43 +9218,43 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/realtime-js.WebSocketFactory.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a WebSocketFactory instance
   - id: createwebsocket
     title: createWebSocket
     $ref: '@supabase/realtime-js.WebSocketFactory.createWebSocket'
-    description: 'TODO: Add description for createWebSocket'
+    description: Create WebSocket connection
   - id: getwebsocketconstructor
     title: getWebSocketConstructor
     $ref: '@supabase/realtime-js.WebSocketFactory.getWebSocketConstructor'
-    description: 'TODO: Add description for getWebSocketConstructor'
+    description: Get WebSocket constructor function
   - id: iswebsocketsupported
     title: isWebSocketSupported
     $ref: '@supabase/realtime-js.WebSocketFactory.isWebSocketSupported'
-    description: 'TODO: Add description for isWebSocketSupported'
+    description: Check if WebSocket is supported
   - id: addeventlistener
     title: addEventListener
     $ref: '@supabase/realtime-js.WebSocketLike.addEventListener'
-    description: 'TODO: Add description for addEventListener'
+    description: Add WebSocket event listener
   - id: close
     title: close
     $ref: '@supabase/realtime-js.WebSocketLike.close'
-    description: 'TODO: Add description for close'
+    description: Close WebSocket connection
   - id: removeeventlistener
     title: removeEventListener
     $ref: '@supabase/realtime-js.WebSocketLike.removeEventListener'
-    description: 'TODO: Add description for removeEventListener'
+    description: Remove WebSocket event listener
   - id: send
     title: send
     $ref: '@supabase/realtime-js.WebSocketLike.send'
-    description: 'TODO: Add description for send'
+    description: Send message through WebSocket
   - id: constructor
     title: constructor
     $ref: '@supabase/realtime-js.WebSocketLikeConstructor.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a WebSocketLikeConstructor instance
   - id: constructor
     title: constructor
     $ref: '@supabase/storage-js.index.StorageClient.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a Storage client instance
   - id: from
     title: from
     $ref: '@supabase/storage-js.index.StorageClient.from'
@@ -9262,7 +9262,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a StorageBucketApi instance
   - id: throwonerror
     title: throwOnError
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.throwOnError'
@@ -9270,7 +9270,7 @@ functions:
   - id: constructor
     title: constructor
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.constructor'
-    description: 'TODO: Add description for constructor'
+    description: Create a StorageFileApi instance
   - id: exists
     title: exists
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.exists'
