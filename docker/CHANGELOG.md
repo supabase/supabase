@@ -36,11 +36,9 @@ Check updates, changelogs, and release notes for each service to learn more.
 ## [2025-11-05]
 
 ### Studio
-- Added additional configuration in `docker-compose.yml`
 - Fixed issue with Studio failing to connect to Postgres with non-default settings - [PR #40169](https://github.com/supabase/supabase/pull/40169)
 
 ### Realtime
-- Changed Vector configuration in `volumes/logs/vector.yml`
 - Fixed issue with realtime logs not showing in Studio - [PR #39963](https://github.com/supabase/supabase/pull/39963)
 
 ---
