@@ -1549,13 +1549,6 @@
         "type": "function"
       },
       {
-        "id": "constructor",
-        "title": "Create a Storage client instance",
-        "slug": "storage-constructor",
-        "product": "storage",
-        "type": "function"
-      },
-      {
         "id": "createindex",
         "title": "Creates a new vector index in this bucket",
         "slug": "storage-createindex",
@@ -1591,23 +1584,9 @@
         "type": "function"
       },
       {
-        "id": "constructor",
-        "title": "Create a Storage client instance",
-        "slug": "storage-constructor",
-        "product": "storage",
-        "type": "function"
-      },
-      {
         "id": "throwonerror",
         "title": "Enable throwing errors instead of returning them in the response",
         "slug": "storage-throwonerror",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Create a Storage client instance",
-        "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
       },
@@ -1647,20 +1626,6 @@
         "type": "function"
       },
       {
-        "id": "constructor",
-        "title": "Create a Storage client instance",
-        "slug": "storage-constructor",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Create a Storage client instance",
-        "slug": "storage-constructor",
-        "product": "storage",
-        "type": "function"
-      },
-      {
         "id": "from",
         "title": "Perform file operation in a bucket",
         "slug": "storage-from",
@@ -1668,23 +1633,9 @@
         "type": "function"
       },
       {
-        "id": "constructor",
-        "title": "Create a Storage client instance",
-        "slug": "storage-constructor",
-        "product": "storage",
-        "type": "function"
-      },
-      {
         "id": "throwonerror",
         "title": "Enable throwing errors instead of returning them",
         "slug": "storage-throwonerror",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Create a Storage client instance",
-        "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
       },
