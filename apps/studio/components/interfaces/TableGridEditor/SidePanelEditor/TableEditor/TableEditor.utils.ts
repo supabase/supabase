@@ -10,8 +10,13 @@ import type { ColumnField } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 
-export const validateFields = (field: TableField) => {
-  const errors = {} as any
+type ValidateFieldsReturn = {
+  name?: string
+  columns?: string
+}
+
+export const validateFields = (field: TableField): ValidateFieldsReturn => {
+  const errors: ValidateFieldsReturn = {}
   if (field.name.length === 0) {
     errors['name'] = 'Please assign a name for your table'
   }
@@ -44,7 +49,7 @@ export const generateTableFieldFromPostgresTable = (
   return {
     id: table.id,
     name: isDuplicating ? `${table.name}_duplicate` : table.name,
-    comment: isDuplicating ? `This is a duplicate of ${table.name}` : table?.comment ?? '',
+    comment: isDuplicating ? `This is a duplicate of ${table.name}` : table?.comment,
     columns: (table.columns ?? []).map((column) => {
       return generateColumnFieldFromPostgresColumn(column, table, foreignKeys)
     }),

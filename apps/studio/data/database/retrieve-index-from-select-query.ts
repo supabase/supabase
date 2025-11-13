@@ -1,7 +1,7 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
 
 export type GetInvolvedIndexesFromSelectQueryVariables = {
@@ -132,7 +132,7 @@ export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelec
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     GetInvolvedIndexesFromSelectQueryData,
     GetInvolvedIndexesFromSelectQueryError,
     TData

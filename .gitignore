@@ -116,6 +116,10 @@ next-env.d.ts
 .idea
 .vercel
 
+# AI assistant local files
+.serena/
+CLAUDE.md
+
 #include template .env file for docker-compose
 !docker/.env
 !docker/supabase/.env

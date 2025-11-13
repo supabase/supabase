@@ -19,7 +19,6 @@ import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import { LayoutSidebar } from './LayoutSidebar'
 import { LoadingState } from './LoadingState'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import { PauseFailedState } from './PauseFailedState'
@@ -64,7 +63,6 @@ export interface ProjectLayoutProps {
   productMenu?: ReactNode
   selectedTable?: string
   resizableSidebar?: boolean
-  stickySidebarBottom?: boolean
   productMenuClassName?: string
 }
 
@@ -79,7 +77,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       children,
       selectedTable,
       resizableSidebar = false,
-      stickySidebarBottom = false,
+
       productMenuClassName,
     },
     ref
@@ -183,49 +181,32 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
             <ResizablePanel
               defaultSize={1}
               order={2}
-              id="panel-right"
-              className="h-full flex flex-col w-full"
+              id="panel-project-content"
+              className={cn('h-full flex flex-col w-full xl:min-w-[600px] bg-dash-sidebar')}
             >
-              <ResizablePanelGroup
-                direction="horizontal"
-                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
-                autoSaveId="project-layout-content"
+              <main
+                className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
+                ref={ref}
               >
-                <ResizablePanel
-                  id="panel-content"
-                  defaultSize={1}
-                  className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
-                >
-                  <main
-                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
-                    ref={ref}
-                  >
-                    {showPausedState ? (
-                      <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                        <div className="w-full">
-                          <ProjectPausedState product={product} />
-                        </div>
-                      </div>
-                    ) : (
-                      <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                        <ResourceExhaustionWarningBanner />
-                        {children}
-                      </ContentWrapper>
-                    )}
-                  </main>
-                </ResizablePanel>
-                <LayoutSidebar />
-              </ResizablePanelGroup>
+                {showPausedState ? (
+                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                    <div className="w-full">
+                      <ProjectPausedState product={product} />
+                    </div>
+                  </div>
+                ) : (
+                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                    <ResourceExhaustionWarningBanner />
+                    {children}
+                  </ContentWrapper>
+                )}
+              </main>
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
         <CreateBranchModal />
         <ProjectAPIDocs />
-        <MobileSheetNav
-          open={mobileMenuOpen}
-          onOpenChange={setMobileMenuOpen}
-          stickyBottom={stickySidebarBottom}
-        >
+        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
         </MobileSheetNav>
       </>

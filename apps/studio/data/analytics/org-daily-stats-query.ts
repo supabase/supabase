@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import type { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { analyticsKeys } from './keys'
 
 export enum EgressType {
@@ -149,7 +149,10 @@ export type OrgDailyStatsError = ResponseError
 
 export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
   { orgSlug, startDate, endDate, projectRef }: OrgDailyStatsVariables,
-  { enabled = true, ...options }: UseQueryOptions<OrgDailyStatsData, OrgDailyStatsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<OrgDailyStatsData, OrgDailyStatsError, TData> = {}
 ) =>
   useQuery<OrgDailyStatsData, OrgDailyStatsError, TData>({
     queryKey: analyticsKeys.orgDailyStats(orgSlug, { startDate, endDate, projectRef }),

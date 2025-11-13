@@ -31,7 +31,7 @@ In paid organizations, Nano Compute are billed at the same price as Micro Comput
 | 16XL         | <Price price="5.12" />    | ~<Price price="3" />,730                                                                                | 64-core ARM (dedicated) | 256 GB       | 10 TB                         |
 | >16XL        | -                         | [Contact Us](/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes) | Custom                  | Custom       | Custom                        |
 
-[^1]: Database max connections are recommended values and can be customized depending on your use case.
+[^1]: Database max connections are recommended values and can be [customized via `max_connections`](/docs/guides/database/custom-postgres-config) depending on your use case. Be aware of [these considerations](/docs/guides/troubleshooting/how-to-change-max-database-connections-_BQ8P5) before modifying.
 [^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/platform/shared-responsibility-model) for more information.
 [^3]: Compute resources on the Free plan are subject to change.
 

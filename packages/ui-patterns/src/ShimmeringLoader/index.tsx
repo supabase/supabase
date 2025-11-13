@@ -1,4 +1,4 @@
-import { cn } from 'ui'
+import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 export interface ShimmeringLoader {
   className?: string
@@ -6,7 +6,7 @@ export interface ShimmeringLoader {
   animationDelay?: number
 }
 
-const ShimmeringLoader = ({
+export const ShimmeringLoader = ({
   className,
   delayIndex = 0,
   animationDelay = 150,
@@ -26,7 +26,7 @@ interface GenericSkeletonLoaderProps {
   className?: string
 }
 
-const GenericSkeletonLoader = ({ className }: GenericSkeletonLoaderProps) => (
+export const GenericSkeletonLoader = ({ className }: GenericSkeletonLoaderProps) => (
   <div className={cn(className, 'space-y-2')}>
     <ShimmeringLoader />
     <ShimmeringLoader className="w-3/4" />
@@ -34,5 +34,35 @@ const GenericSkeletonLoader = ({ className }: GenericSkeletonLoaderProps) => (
   </div>
 )
 
-export { GenericSkeletonLoader }
+export const GenericTableLoader = ({
+  headers,
+  numRows = 3,
+}: {
+  headers: (string | null)[]
+  numRows?: number
+}) => {
+  return (
+    <Card>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {headers.map((h, i) => (
+              <TableHead key={`${h}_${i}`}>{h}</TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {new Array(numRows).fill(0).map((_, i) => (
+            <TableRow key={`row_${i}`}>
+              <TableCell colSpan={headers.length}>
+                <ShimmeringLoader />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Card>
+  )
+}
+
 export default ShimmeringLoader

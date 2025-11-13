@@ -1,26 +1,22 @@
 import { Query } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
-import {
-  useQuery,
-  useQueryClient,
-  type QueryClient,
-  type UseQueryOptions,
-} from '@tanstack/react-query'
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
+import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   RoleImpersonationState,
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
-import { ResponseError } from 'types'
 
 export interface GetTableRowsArgs {
   table?: SupaTable
@@ -253,8 +249,27 @@ export async function getTableRows(
 
   const table = parseSupaTable(entity)
 
+  const equalityFilterColumns = filters
+    ?.filter((filter) => filter.operator === '=' || filter.operator === 'is')
+    .flatMap((filter) => filter.column)
+
+  // There is an edge case for MS SQL foreign tables, where the Postgres query
+  // planner may drop sorts that are redundant with filters, resulting in
+  // invalid MS SQL syntax. To prevent this, we exclude potentially conflicting
+  // columns from potential default sort columns.
+  const excludedColumns = isMsSqlForeignTable(entity)
+    ? Array.from(new Set(equalityFilterColumns))
+    : undefined
+
   const sql = wrapWithRoleImpersonation(
-    getTableRowsSql({ table: entity, filters, sorts, limit, page }),
+    getTableRowsSql({
+      table: entity,
+      filters,
+      sorts,
+      limit,
+      page,
+      sortExcludedColumns: excludedColumns,
+    }),
     roleImpersonationState
   )
 
@@ -282,7 +297,7 @@ export async function getTableRows(
 
 export const useTableRowsQuery = <TData = TableRowsData>(
   { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>,
-  { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
   return useQuery<TableRowsData, TableRowsError, TData>({

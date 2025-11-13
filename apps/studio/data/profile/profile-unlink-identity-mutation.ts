@@ -1,8 +1,9 @@
 import type { UserIdentity } from '@supabase/supabase-js'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { auth } from 'lib/gotrue'
+import { UseCustomMutationOptions } from 'types'
 import { profileKeys } from './keys'
 
 const unlinkIdentity = async (identity: UserIdentity) => {
@@ -20,7 +21,7 @@ export const useUnlinkIdentityMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UnlinkIdentityResponse, UnlinkIdentityError, UserIdentity>,
+  UseCustomMutationOptions<UnlinkIdentityResponse, UnlinkIdentityError, UserIdentity>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

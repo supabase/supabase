@@ -86,7 +86,6 @@ export const generateSettingsMenu = (
           key: 'api-keys',
           url: `/project/${ref}/settings/api-keys`,
           items: [],
-          label: 'NEW',
         },
         {
           name: 'JWT Keys',
@@ -95,7 +94,6 @@ export const generateSettingsMenu = (
             ? `/project/${ref}/settings/jwt`
             : `/project/${ref}/settings/jwt/signing-keys`,
           items: [],
-          label: 'NEW',
         },
 
         {
@@ -116,7 +114,7 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'ALPHA',
+          label: 'BETA',
         },
       ],
     },

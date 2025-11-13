@@ -1,8 +1,10 @@
 import { isEmpty, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import useLatest from 'hooks/misc/useLatest'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import { Modal } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
@@ -71,28 +73,45 @@ const PolicyEditorModal = ({
   )
   const [policyStatementForReview, setPolicyStatementForReview] = useState<any>('')
   const [isDirty, setIsDirty] = useState(false)
-  const [isClosingPolicyEditorModal, setIsClosingPolicyEditorModal] = useState(false)
-  useEffect(() => {
-    if (visible) {
-      if (isNewPolicy) {
-        onViewIntro()
-      } else {
-        onViewEditor()
-      }
-      setPolicyFormFields(initializedPolicyFormFields)
-    }
-  }, [visible])
 
-  /* Methods that are for the UI */
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => {
+      onSelectCancel()
+      setIsDirty(false)
+    },
+  })
 
-  const onViewIntro = () => setView(POLICY_MODAL_VIEWS.SELECTION)
-  const onViewEditor = () => setView(POLICY_MODAL_VIEWS.EDITOR)
+  const onViewIntro = useCallback(() => setView(POLICY_MODAL_VIEWS.SELECTION), [])
+  const onViewEditor = useCallback(() => setView(POLICY_MODAL_VIEWS.EDITOR), [])
   const onViewTemplates = () => {
     setPreviousView(view)
     setView(POLICY_MODAL_VIEWS.TEMPLATES)
   }
   const onReviewPolicy = () => setView(POLICY_MODAL_VIEWS.REVIEW)
   const onSelectBackFromTemplates = () => setView(previousView)
+
+  const isNewPolicyRef = useLatest(isNewPolicy)
+  const initializedPolicyFormFieldsRef = useLatest(initializedPolicyFormFields)
+  useEffect(() => {
+    if (visible) {
+      if (isNewPolicyRef.current) {
+        onViewIntro()
+      } else {
+        onViewEditor()
+      }
+      setPolicyFormFields(initializedPolicyFormFieldsRef.current)
+    }
+  }, [
+    onViewIntro,
+    onViewEditor,
+    isNewPolicyRef,
+    initializedPolicyFormFieldsRef,
+    // end of stable references
+    visible,
+  ])
+
+  /* Methods that are for the UI */
 
   const onToggleFeaturePreviewModal = () => {
     toggleFeaturePreviewModal()
@@ -158,10 +177,6 @@ const PolicyEditorModal = ({
     hasError ? onViewEditor() : onSaveSuccess()
   }
 
-  const isClosingPolicyEditor = () => {
-    isDirty ? setIsClosingPolicyEditorModal(true) : onSelectCancel()
-  }
-
   return (
     <Modal
       hideFooter
@@ -180,25 +195,10 @@ const PolicyEditorModal = ({
           onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
         />,
       ]}
-      onCancel={isClosingPolicyEditor}
+      onCancel={confirmOnClose}
     >
       <div>
-        <ConfirmationModal
-          visible={isClosingPolicyEditorModal}
-          title="Discard changes"
-          confirmLabel="Discard"
-          onCancel={() => setIsClosingPolicyEditorModal(false)}
-          onConfirm={() => {
-            onSelectCancel()
-            setIsClosingPolicyEditorModal(false)
-            setIsDirty(false)
-          }}
-        >
-          <p className="text-sm text-foreground-light">
-            There are unsaved changes. Are you sure you want to close the editor? Your changes will
-            be lost.
-          </p>
-        </ConfirmationModal>
+        <CloseConfirmationModal {...closeConfirmationModalProps} />
         {view === POLICY_MODAL_VIEWS.SELECTION ? (
           <PolicySelection
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
@@ -232,5 +232,20 @@ const PolicyEditorModal = ({
     </Modal>
   )
 }
+
+const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
+  <ConfirmationModal
+    visible={visible}
+    title="Discard changes"
+    confirmLabel="Discard"
+    onCancel={onCancel}
+    onConfirm={onClose}
+  >
+    <p className="text-sm text-foreground-light">
+      There are unsaved changes. Are you sure you want to close the editor? Your changes will be
+      lost.
+    </p>
+  </ConfirmationModal>
+)
 
 export default PolicyEditorModal

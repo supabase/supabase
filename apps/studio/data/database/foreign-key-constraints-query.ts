@@ -1,7 +1,8 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
 
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { UseCustomQueryOptions } from 'types'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string
@@ -132,7 +133,7 @@ export const useForeignKeyConstraintsQuery = <TData = ForeignKeyConstraintsData>
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData> = {}
+  }: UseCustomQueryOptions<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData> = {}
 ) =>
   useQuery<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData>({
     queryKey: databaseKeys.foreignKeyConstraints(projectRef, schema),

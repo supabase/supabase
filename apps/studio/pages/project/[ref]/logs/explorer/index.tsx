@@ -18,7 +18,7 @@ import {
   LogsWarning,
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
-  maybeShowUpgradePrompt,
+  maybeShowUpgradePromptIfNotEntitled,
   useEditorHints,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
@@ -52,6 +52,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from 'ui'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
@@ -66,7 +67,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const { profile } = useProfile()
   const { ref, q, queryId } = useParams()
   const projectRef = ref as string
-  const { data: organization } = useSelectedOrganizationQuery()
   const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
 
   const allTemplates = useMemo(() => {
@@ -92,6 +92,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     `project-content-${projectRef}-recent-log-sql`,
     []
   )
+
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const { data: content } = useContentQuery({
     projectRef: ref,
@@ -253,7 +256,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
+    const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+      from,
+      entitledToAuditLogDays
+    )
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)
@@ -288,12 +294,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [timestampStart, organization])
+  }, [timestampStart, entitledToAuditLogDays])
 
   return (
     <div className="w-full h-full mx-auto">

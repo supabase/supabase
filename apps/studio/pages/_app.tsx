@@ -1,8 +1,8 @@
 import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
-import 'styles/date-picker.scss'
 import 'styles/editor.scss'
+import 'styles/focus.scss'
 import 'styles/graphiql-base.scss'
 import 'styles/grid.scss'
 import 'styles/main.scss'
@@ -141,7 +141,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       }}
                     />
                   </Head>
-                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
                   <TooltipProvider delayDuration={0}>
                     <RouteValidationWrapper>
                       <ThemeProvider

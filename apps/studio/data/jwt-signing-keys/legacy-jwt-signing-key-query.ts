@@ -1,6 +1,6 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { jwtSigningKeysKeys } from './keys'
 
@@ -30,7 +30,7 @@ export type LegacyJWTSigningKeyData = Awaited<ReturnType<typeof getLegacyJWTSign
 
 export const useLegacyJWTSigningKeyQuery = <TData = LegacyJWTSigningKeyData>(
   { projectRef }: LegacyJWTSigningKeyVariables,
-  { enabled, ...options }: UseQueryOptions<LegacyJWTSigningKeyData, ResponseError, TData> = {}
+  { enabled, ...options }: UseCustomQueryOptions<LegacyJWTSigningKeyData, ResponseError, TData> = {}
 ) =>
   useQuery<LegacyJWTSigningKeyData, ResponseError, TData>({
     queryKey: jwtSigningKeysKeys.legacy(projectRef),

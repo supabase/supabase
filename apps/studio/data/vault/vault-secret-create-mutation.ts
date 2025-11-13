@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import { quoteLiteral } from 'lib/pg-format'
-import type { ResponseError, VaultSecret } from 'types'
+import type { ResponseError, UseCustomMutationOptions, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretCreateVariables = {
@@ -36,7 +36,7 @@ export const useVaultSecretCreateMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<VaultSecretCreateData, ResponseError, VaultSecretCreateVariables>,
+  UseCustomMutationOptions<VaultSecretCreateData, ResponseError, VaultSecretCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
