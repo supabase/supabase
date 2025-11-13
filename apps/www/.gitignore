@@ -28,8 +28,5 @@ yarn-error.log*
 # Sitemap
 public/sitemap.xml
 
-# RSS feed
-public/rss.xml
-
 # contentlayer
 .contentlayer
