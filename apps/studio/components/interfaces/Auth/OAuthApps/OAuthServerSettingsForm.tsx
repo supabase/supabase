@@ -16,7 +16,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
+import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-get-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSupabaseClientQuery } from 'hooks/use-supabase-client-query'
 import {
