@@ -3,11 +3,12 @@ import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
+import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
 import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
 import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
@@ -15,20 +16,20 @@ import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationD
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
+import { CommandMenuTriggerInput } from 'ui-patterns'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import MergeRequestButton from './MergeRequestButton'
-import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
-import { CommandMenuTriggerInput } from 'ui-patterns'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -69,6 +70,8 @@ export const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setMobileMenuOpen } = useAppStateSnapshot()
   const gitlessBranching = useIsBranching2Enabled()
+
+  const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
   const isAccountPage = router.pathname.startsWith('/account')
 
@@ -211,13 +214,15 @@ export const LayoutHeader = ({
 
                 <div className="flex items-center gap-2">
                   <CommandMenuTriggerInput
+                    showShortcut={commandMenuEnabled}
                     placeholder="Search..."
-                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
-                    [&_.command-shortcut>div]:border-none
-                    [&_.command-shortcut>div]:pr-2
-                    [&_.command-shortcut>div]:bg-transparent
-                    [&_.command-shortcut>div]:text-foreground-lighter
-                  "
+                    className={cn(
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent',
+                      '[&_.command-shortcut>div]:border-none',
+                      '[&_.command-shortcut>div]:pr-2',
+                      '[&_.command-shortcut>div]:bg-transparent',
+                      '[&_.command-shortcut>div]:text-foreground-lighter'
+                    )}
                   />
                   <HelpPopover />
                   <AdvisorButton projectRef={projectRef} />
