@@ -101,14 +101,7 @@ export const SQLEditorTreeViewItem = ({
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: element.id,
     data: {
       type: isBranch ? 'folder' : 'snippet',

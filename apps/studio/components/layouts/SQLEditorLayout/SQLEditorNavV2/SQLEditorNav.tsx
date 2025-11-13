@@ -73,7 +73,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     favorite: showFavoriteSnippets,
     private: showPrivateSnippets,
   } = sectionVisibility
- 
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
