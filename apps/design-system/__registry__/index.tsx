@@ -2491,6 +2491,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "metrics-card-minimal": {
+      name: "metrics-card-minimal",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/metrics-card-minimal")),
+      source: "",
+      files: ["registry/default/example/metrics-card-minimal.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "metrics-card-minimal-horizontal": {
+      name: "metrics-card-minimal-horizontal",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/metrics-card-minimal-horizontal")),
+      source: "",
+      files: ["registry/default/example/metrics-card-minimal-horizontal.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "metrics-card-with-icon-link-tooltip": {
+      name: "metrics-card-with-icon-link-tooltip",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/metrics-card-with-icon-link-tooltip")),
+      source: "",
+      files: ["registry/default/example/metrics-card-with-icon-link-tooltip.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "chart-area-axes": {
       name: "chart-area-axes",
       type: "components:block",

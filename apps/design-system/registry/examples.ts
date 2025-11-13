@@ -1338,4 +1338,19 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/metrics-card.tsx'],
   },
+  {
+    name: 'metrics-card-minimal',
+    type: 'components:example',
+    files: ['example/metrics-card-minimal.tsx'],
+  },
+  {
+    name: 'metrics-card-minimal-horizontal',
+    type: 'components:example',
+    files: ['example/metrics-card-minimal-horizontal.tsx'],
+  },
+  {
+    name: 'metrics-card-with-icon-link-tooltip',
+    type: 'components:example',
+    files: ['example/metrics-card-with-icon-link-tooltip.tsx'],
+  },
 ]

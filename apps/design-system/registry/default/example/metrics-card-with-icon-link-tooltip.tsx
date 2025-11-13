@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 import {
   MetricsCard,
   MetricsCardHeader,
+  MetricsCardIcon,
   MetricsCardLabel,
   MetricsCardContent,
   MetricsCardValue,
   MetricsCardDifferential,
   MetricsCardSparkline,
 } from 'ui-patterns/MetricsCard'
+import { User2 } from 'lucide-react'
 
 export default function MetricsCardDemo() {
   const [data, setData] = useState<Array<{ value: number; timestamp: string }>>([])
@@ -33,6 +35,9 @@ export default function MetricsCardDemo() {
     <div className="w-1/2">
       <MetricsCard isLoading={!data.length}>
         <MetricsCardHeader hasLink href="https://www.supabase.io">
+          <MetricsCardIcon>
+            <User2 size={16} strokeWidth={1.5} />
+          </MetricsCardIcon>
           <MetricsCardLabel hasTooltip tooltip="The number of Active Users over the last 24 hours">
             Active Users
           </MetricsCardLabel>

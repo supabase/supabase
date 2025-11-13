@@ -8,7 +8,6 @@ import {
   MetricsCardContent,
   MetricsCardValue,
   MetricsCardDifferential,
-  MetricsCardSparkline,
 } from 'ui-patterns/MetricsCard'
 
 export default function MetricsCardDemo() {
@@ -32,10 +31,8 @@ export default function MetricsCardDemo() {
   return (
     <div className="w-1/2">
       <MetricsCard isLoading={!data.length}>
-        <MetricsCardHeader hasLink href="https://www.supabase.io">
-          <MetricsCardLabel hasTooltip tooltip="The number of Active Users over the last 24 hours">
-            Active Users
-          </MetricsCardLabel>
+        <MetricsCardHeader>
+          <MetricsCardLabel>Active Users</MetricsCardLabel>
         </MetricsCardHeader>
         <MetricsCardContent>
           <MetricsCardValue>
@@ -46,7 +43,6 @@ export default function MetricsCardDemo() {
             {Math.abs(diffPercentage).toFixed(1)}%
           </MetricsCardDifferential>
         </MetricsCardContent>
-        <MetricsCardSparkline data={data} dataKey="value" />
       </MetricsCard>
     </div>
   )
