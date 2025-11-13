@@ -10,11 +10,7 @@
     "id": "installing",
     "slug": "installing",
     "type": "markdown",
-    "excludes": [
-      "reference_javascript_v1",
-      "reference_kotlin_v1",
-      "reference_swift_v1"
-    ]
+    "excludes": ["reference_javascript_v1", "reference_kotlin_v1", "reference_swift_v1"]
   },
   {
     "title": "Initializing",
@@ -339,7 +335,7 @@
           },
           {
             "id": "constructor",
-            "title": "TODO: Add description for constructor",
+            "title": "Create a query builder instance",
             "slug": "constructor",
             "product": "database",
             "type": "function",
@@ -446,7 +442,7 @@
           },
           {
             "id": "constructor",
-            "title": "TODO: Add description for constructor",
+            "title": "Create a query builder instance",
             "slug": "constructor",
             "product": "database",
             "type": "function",
@@ -472,7 +468,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a query builder instance",
         "slug": "constructor",
         "product": "database",
         "type": "function"
@@ -521,7 +517,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a query builder instance",
         "slug": "constructor",
         "product": "database",
         "type": "function"
@@ -848,7 +844,7 @@
           },
           {
             "id": "constructor",
-            "title": "TODO: Add description for constructor",
+            "title": "Create an Auth Admin API instance",
             "slug": "auth-constructor",
             "product": "auth-admin",
             "type": "function"
@@ -911,7 +907,7 @@
           },
           {
             "id": "constructor",
-            "title": "TODO: Add description for constructor",
+            "title": "Create an Auth Admin API instance",
             "slug": "auth-constructor",
             "product": "auth-admin",
             "type": "function"
@@ -1024,7 +1020,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Functions client instance",
         "slug": "functions-constructor",
         "product": "functions",
         "type": "function"
@@ -1079,7 +1075,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Realtime client instance",
         "slug": "constructor",
         "product": "realtime",
         "type": "function"
@@ -1093,7 +1089,7 @@
       },
       {
         "id": "presencestate",
-        "title": "TODO: Add description for presenceState",
+        "title": "Access current presence state",
         "slug": "presencestate",
         "product": "realtime",
         "type": "function"
@@ -1107,7 +1103,7 @@
       },
       {
         "id": "track",
-        "title": "TODO: Add description for track",
+        "title": "Track user presence in channel",
         "slug": "track",
         "product": "realtime",
         "type": "function"
@@ -1121,14 +1117,14 @@
       },
       {
         "id": "untrack",
-        "title": "TODO: Add description for untrack",
+        "title": "Stop tracking user presence",
         "slug": "untrack",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "updatejoinpayload",
-        "title": "TODO: Add description for updateJoinPayload",
+        "title": "Update channel join payload",
         "slug": "updatejoinpayload",
         "product": "realtime",
         "type": "function"
@@ -1142,7 +1138,7 @@
       },
       {
         "id": "channel",
-        "title": "TODO: Add description for channel",
+        "title": "Create or retrieve a channel",
         "slug": "channel",
         "product": "realtime",
         "type": "function"
@@ -1219,7 +1215,7 @@
       },
       {
         "id": "onheartbeat",
-        "title": "TODO: Add description for onHeartbeat",
+        "title": "Handle heartbeat events",
         "slug": "onheartbeat",
         "product": "realtime",
         "type": "function"
@@ -1268,63 +1264,63 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Realtime client instance",
         "slug": "constructor",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "createwebsocket",
-        "title": "TODO: Add description for createWebSocket",
+        "title": "Create WebSocket connection",
         "slug": "createwebsocket",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "getwebsocketconstructor",
-        "title": "TODO: Add description for getWebSocketConstructor",
+        "title": "Get WebSocket constructor function",
         "slug": "getwebsocketconstructor",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "iswebsocketsupported",
-        "title": "TODO: Add description for isWebSocketSupported",
+        "title": "Check if WebSocket is supported",
         "slug": "iswebsocketsupported",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "addeventlistener",
-        "title": "TODO: Add description for addEventListener",
+        "title": "Add WebSocket event listener",
         "slug": "addeventlistener",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "close",
-        "title": "TODO: Add description for close",
+        "title": "Close WebSocket connection",
         "slug": "close",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "removeeventlistener",
-        "title": "TODO: Add description for removeEventListener",
+        "title": "Remove WebSocket event listener",
         "slug": "removeeventlistener",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "send",
-        "title": "TODO: Add description for send",
+        "title": "Send message through WebSocket",
         "slug": "send",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Realtime client instance",
         "slug": "constructor",
         "product": "realtime",
         "type": "function"
@@ -1498,7 +1494,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Storage client instance",
         "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
@@ -1554,7 +1550,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Storage client instance",
         "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
@@ -1596,7 +1592,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Storage client instance",
         "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
@@ -1610,7 +1606,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Storage client instance",
         "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
@@ -1652,14 +1648,14 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Storage client instance",
         "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Storage client instance",
         "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
@@ -1673,7 +1669,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Storage client instance",
         "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
@@ -1687,7 +1683,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a Storage client instance",
         "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
@@ -1722,7 +1718,7 @@
       },
       {
         "id": "tobase64",
-        "title": "TODO: Add description for toBase64",
+        "title": "Convert downloaded file to Base64",
         "slug": "storage-tobase64",
         "product": "storage",
         "type": "function"
@@ -1754,7 +1750,7 @@
       },
       {
         "id": "constructor",
-        "title": "TODO: Add description for constructor",
+        "title": "Create a client instance",
         "slug": "constructor",
         "product": "misc",
         "type": "function"
@@ -1775,7 +1771,7 @@
       },
       {
         "id": "presencestate",
-        "title": "TODO: Add description for presenceState",
+        "title": "Access current presence state",
         "slug": "presencestate",
         "product": "misc",
         "type": "function"
@@ -1796,7 +1792,7 @@
       },
       {
         "id": "track",
-        "title": "TODO: Add description for track",
+        "title": "Track user presence in channel",
         "slug": "track",
         "product": "misc",
         "type": "function"
@@ -1810,14 +1806,14 @@
       },
       {
         "id": "untrack",
-        "title": "TODO: Add description for untrack",
+        "title": "Stop tracking user presence",
         "slug": "untrack",
         "product": "misc",
         "type": "function"
       },
       {
         "id": "updatejoinpayload",
-        "title": "TODO: Add description for updateJoinPayload",
+        "title": "Update channel join payload",
         "slug": "updatejoinpayload",
         "product": "misc",
         "type": "function"
@@ -1831,7 +1827,7 @@
       },
       {
         "id": "channel",
-        "title": "TODO: Add description for channel",
+        "title": "Create or retrieve a channel",
         "slug": "channel",
         "product": "misc",
         "type": "function"
@@ -1908,7 +1904,7 @@
       },
       {
         "id": "onheartbeat",
-        "title": "TODO: Add description for onHeartbeat",
+        "title": "Handle heartbeat events",
         "slug": "onheartbeat",
         "product": "misc",
         "type": "function"
