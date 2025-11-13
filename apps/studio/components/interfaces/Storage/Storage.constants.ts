@@ -62,6 +62,7 @@ export const CONTEXT_MENU_KEYS = {
 
 export const BUCKET_TYPES = {
   files: {
+    platformOnly: false,
     displayName: 'Files',
     singularName: 'file',
     article: 'a',
@@ -70,6 +71,7 @@ export const BUCKET_TYPES = {
     docsUrl: `${DOCS_URL}/guides/storage/buckets/fundamentals`,
   },
   analytics: {
+    platformOnly: true,
     displayName: 'Analytics',
     singularName: 'analytics',
     article: 'an',
@@ -78,6 +80,7 @@ export const BUCKET_TYPES = {
     docsUrl: `${DOCS_URL}/guides/storage/analytics/introduction`,
   },
   vectors: {
+    platformOnly: true,
     displayName: 'Vectors',
     singularName: 'vector',
     article: 'a',
@@ -86,5 +89,5 @@ export const BUCKET_TYPES = {
     docsUrl: `${DOCS_URL}/guides/storage/vectors`,
   },
 }
-export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
+
 export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'files'
