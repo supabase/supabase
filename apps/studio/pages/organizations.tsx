@@ -14,6 +14,7 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
@@ -24,7 +25,6 @@ import {
   Skeleton,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { useProfile } from 'lib/profile'
 
 const OrganizationsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -50,7 +50,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
           (x) => x.name.toLowerCase().includes(search) || x.slug.toLowerCase().includes(search)
         )
 
-  const isLoading = isOrganizationsLoading && isProfileLoading
+  const isLoading = isOrganizationsLoading || isProfileLoading
   const hasProfileCreatedOrLoaded = !isProfileLoading && profile !== undefined
   const hasOrganizations = isSuccess && organizations.length > 0
 
