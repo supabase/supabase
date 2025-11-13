@@ -234,7 +234,7 @@ export const NamespaceWithTables = ({
               </TableCell>
             </TableRow>
           ) : (
-            allTables.map((table, index) => (
+            allTables.map((table) => (
               <TableRowComponent
                 key={table.name}
                 table={table}
@@ -242,7 +242,6 @@ export const NamespaceWithTables = ({
                 token={token}
                 schema={displaySchema}
                 isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
-                index={index}
               />
             ))
           )}
