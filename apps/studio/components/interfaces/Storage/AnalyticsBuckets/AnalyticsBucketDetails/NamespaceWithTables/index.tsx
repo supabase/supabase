@@ -35,7 +35,6 @@ type NamespaceWithTablesProps = {
   sourceType: 'replication' | 'direct'
   schema: string
   tables: (FormattedWrapperTable & { id: number })[]
-  token: string
   wrapperInstance: FDW
   wrapperValues: Record<string, string>
   wrapperMeta: WrapperMeta
@@ -49,7 +48,6 @@ export const NamespaceWithTables = ({
   sourceType = 'direct',
   schema,
   tables,
-  token,
   wrapperInstance,
   wrapperValues,
   wrapperMeta,
@@ -70,11 +68,10 @@ export const NamespaceWithTables = ({
     {
       catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
-      token: token,
       namespace: namespace,
+      projectRef,
     },
     {
-      enabled: !!token,
       refetchInterval: (data = []) => {
         if (pollIntervalNamespaceTables === 0) return false
 
@@ -265,15 +262,13 @@ export const NamespaceWithTables = ({
               </TableCell>
             </TableRow>
           ) : (
-            allTables.map((table, index) => (
+            allTables.map((table) => (
               <TableRowComponent
                 key={table.name}
                 table={table}
                 namespace={namespace}
-                token={token}
                 schema={displaySchema}
                 isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
-                index={index}
               />
             ))
           )}

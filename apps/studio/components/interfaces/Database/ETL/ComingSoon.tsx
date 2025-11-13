@@ -1,23 +1,12 @@
-import { motion } from 'framer-motion'
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Circle,
-  Database,
-  MoreVertical,
-  Plus,
-  Search,
-} from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Circle, Database, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import ReactFlow, { Background, Handle, Position, ReactFlowProvider } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, Card, CardContent, Input_Shadcn_ } from 'ui'
+import { Badge, Button, Card, CardContent } from 'ui'
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const STATIC_NODES = [
@@ -100,28 +89,25 @@ const ReplicationStaticMockup = ({ projectRef }: { projectRef: string }) => {
   )
 
   return (
-    <div className="relative border-t">
-      <div className="h-[500px] w-full relative">
-        <ReactFlow
-          fitView
-          fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
-          className="instance-configuration"
-          zoomOnPinch={false}
-          zoomOnScroll={false}
-          nodesDraggable={true}
-          nodesConnectable={false}
-          zoomOnDoubleClick={false}
-          edgesFocusable={false}
-          edgesUpdatable={false}
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          proOptions={{ hideAttribution: true }}
-        >
-          <Background color={backgroundPatternColor} />
-        </ReactFlow>
-      </div>
-      <StaticDestinations />
+    <div className="relative border-t h-full w-full">
+      <ReactFlow
+        fitView
+        fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
+        className="instance-configuration"
+        zoomOnPinch={false}
+        zoomOnScroll={false}
+        nodesDraggable={true}
+        nodesConnectable={false}
+        zoomOnDoubleClick={false}
+        edgesFocusable={false}
+        edgesUpdatable={false}
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        proOptions={{ hideAttribution: true }}
+      >
+        <Background color={backgroundPatternColor} />
+      </ReactFlow>
     </div>
   )
 }
@@ -234,81 +220,5 @@ const CTANode = ({ projectRef }: { projectRef: string }) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
-
-const StaticDestinations = () => {
-  const mockRows = [
-    { name: 'BigQuery', tables: 4, lag: '55ms', status: 'Enabled' },
-    { name: 'Iceberg', tables: 4, lag: '85ms', status: 'Enabled' },
-    { name: 'US East', tables: 4, lag: '125ms', status: 'Enabled' },
-  ]
-
-  return (
-    <>
-      <div className="flex flex-col bg-surface-100 px-6 py-6 border-t relative ">
-        <div className="z-10 bg-surface-300 w-full h-full absolute top-0 left-0 opacity-30" />
-
-        <ScaffoldContainer>
-          <ScaffoldSection className="!py-0">
-            <div className="col-span-12">
-              <div className="flex items-center justify-between">
-                <div className="relative w-52">
-                  <Search
-                    size={14}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-                  />
-                  <Input_Shadcn_
-                    className="pl-9 bg-transparent h-8 pointer-events-none"
-                    placeholder="Search..."
-                  />
-                </div>
-                <Button
-                  disabled
-                  type="primary"
-                  icon={<Plus size={16} />}
-                  className="flex items-center pointer-events-none"
-                >
-                  New destination
-                </Button>
-              </div>
-              <Table
-                head={[
-                  <Table.th key="name">Name</Table.th>,
-                  <Table.th key="publication">Publication</Table.th>,
-                  <Table.th key="lag">Lag</Table.th>,
-                  <Table.th key="status">Status</Table.th>,
-                  <Table.th key="actions"></Table.th>,
-                ]}
-                className="mt-4"
-                body={mockRows.map((row, i) => (
-                  <Table.tr key={i}>
-                    <Table.td>{row.name}</Table.td>
-                    <Table.td>
-                      <span className="flex items-center gap-2">
-                        <span className="font-bold">All</span>
-                        <span className="text-sm text-foreground-lighter">{row.tables} tables</span>
-                      </span>
-                    </Table.td>
-                    <Table.td>{row.lag}</Table.td>
-                    <Table.td>
-                      <span className="flex items-center gap-3">
-                        <Circle size={10} className="bg-brand-500 stroke-none rounded-full" />
-                        {row.status}
-                      </span>
-                    </Table.td>
-                    <Table.td className="text-right">
-                      <button className="p-1">
-                        <MoreVertical size={18} />
-                      </button>
-                    </Table.td>
-                  </Table.tr>
-                ))}
-              />
-            </div>
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      </div>
-    </>
   )
 }

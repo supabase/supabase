@@ -225,7 +225,6 @@ export const DestinationPanel = ({
       await createNamespace({
         catalogUri,
         warehouse: data.warehouseName!,
-        token: catalogToken,
         namespace: data.newNamespaceName,
       })
 
