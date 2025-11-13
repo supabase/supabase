@@ -50,7 +50,7 @@ download.analytics.v0:
 ###############################################################################
 # Transform docs into working files
 ###############################################################################
-transform: dereference.api.v1  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v2
+transform: dereference.api.v1  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v2 combine-raw.tsdoc.v2
 
 dereference.api.v1:
 	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/api_v1_openapi_deparsed.json $(REPO_DIR)/api_v1_openapi.json
