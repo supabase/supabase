@@ -52,15 +52,15 @@ const OrganizationsPage: NextPageWithLayout = () => {
 
   const isLoading = isOrganizationsLoading && isProfileLoading
   const hasProfileCreatedOrLoaded = !isProfileLoading && profile !== undefined
-  const hasOrganizations = organizations.length > 0
+  const hasOrganizations = isSuccess && organizations.length > 0
 
   useEffect(() => {
     // If there are no organizations and the user has a profile, force the user to create one
     // unless the user is on the not found page
-    if (isSuccess && !hasOrganizations && !orgNotFound && hasProfileCreatedOrLoaded) {
+    if (!hasOrganizations && !orgNotFound && hasProfileCreatedOrLoaded) {
       router.push('/new')
     }
-  }, [isSuccess, hasOrganizations, hasProfileCreatedOrLoaded, orgNotFound])
+  }, [hasOrganizations, hasProfileCreatedOrLoaded, orgNotFound])
 
   return (
     <ScaffoldContainer>
