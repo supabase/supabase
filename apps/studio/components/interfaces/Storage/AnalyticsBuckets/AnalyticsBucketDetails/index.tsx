@@ -30,7 +30,6 @@ import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
@@ -111,23 +110,13 @@ export const AnalyticBucketDetails = () => {
   })
   const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
 
-  const { data: token, isSuccess: isSuccessToken } = useVaultSecretDecryptedValueQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: wrapperValues.vault_token,
-    },
-    { enabled: wrapperValues.vault_token !== undefined }
-  )
-
   const { data: namespacesData, isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
     {
+      projectRef,
       catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
-      token: token!,
     },
     {
-      enabled: isSuccessToken,
       refetchInterval: (data) => {
         if (pollIntervalNamespaces === 0) return false
         if (tablesToPoll.length > 0) {
@@ -328,7 +317,6 @@ export const AnalyticBucketDetails = () => {
                           sourceType="direct"
                           schema={schema}
                           tables={tables as any}
-                          token={token!}
                           wrapperInstance={wrapperInstance}
                           wrapperValues={wrapperValues}
                           wrapperMeta={wrapperMeta}
