@@ -80,7 +80,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     async onError(err) {
       // if the user does not yet exist, create a profile for them
       if (err.message === "User's profile not found") {
-        await createProfile()
+        createProfile()
       }
 
       // [Alaister] If the user has a bad auth token, auth-js won't know about it
