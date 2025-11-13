@@ -313,6 +313,7 @@ allow_list = [
     "Uppy",
     "Upstash",
     "[Uu]pvote(s|d)?",
+    "userinfo",
     "VSCode",
     "Vecs",
     "Vercel",
