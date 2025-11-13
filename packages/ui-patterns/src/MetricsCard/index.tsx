@@ -15,7 +15,14 @@ import {
 } from 'ui'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { AreaChart, Area, ResponsiveContainer } from 'recharts'
+import {
+  AreaChart,
+  Area,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  TooltipProps as RechartsTooltipProps,
+} from 'recharts'
+import dayjs from 'dayjs'
 
 interface MetricsCardContextValue {
   isLoading?: boolean
@@ -183,6 +190,27 @@ const MetricsCardDifferential = React.forwardRef<HTMLDivElement, MetricsCardDiff
 
 MetricsCardDifferential.displayName = 'MetricsCardDifferential'
 
+const SparklineTooltip = ({ active, payload, label }: RechartsTooltipProps<any, any>) => {
+  if (!active || !payload || !payload.length) return null
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = dayjs(timestamp)
+    const hour = date.hour()
+    const period = hour >= 12 ? 'pm' : 'am'
+    const displayHour = hour % 12 || 12
+
+    return `${date.format('MMM D')}, ${displayHour}${period}`
+  }
+
+  return (
+    <div className="bg-black/90 text-white p-2 rounded text-xs">
+      {label && (
+        <div className="text-foreground-light">{formatTimestamp(payload[0].payload.timestamp)}</div>
+      )}
+      <div>{payload[0].value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+    </div>
+  )
+}
 interface MetricsCardSparklineProps extends React.HTMLAttributes<HTMLDivElement> {
   data?: Array<{ value: number; [key: string]: any }>
   dataKey?: string
@@ -210,6 +238,7 @@ const MetricsCardSparkline = React.forwardRef<HTMLDivElement, MetricsCardSparkli
                 <stop offset="95%" stopColor="hsl(var(--brand-default))" stopOpacity={0} />
               </linearGradient>
             </defs>
+            <RechartsTooltip content={<SparklineTooltip />} />
             <Area
               type="step"
               dataKey={dataKey || 'value'}
