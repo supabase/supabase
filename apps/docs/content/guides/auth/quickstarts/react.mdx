@@ -43,17 +43,14 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
 
-    The previous `auth-ui-react` library is no longer maintained.  
-    Now, install the Supabase client and the new Auth UI package:
-
-    Navigate to the React app and install the Supabase libraries.
+    Install the Supabase client and the new UI package that includes password-based authentication components.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash name=Terminal
-      cd my-app && npm install @supabase/supabase-js @supabase/auth-js-react
+      cd my-app && npm install @supabase/supabase-js @supabase/ui
       ```
     </StepHikeCompact.Code>
 
@@ -66,7 +63,7 @@ hideToc: true
 
     <$Partial path="api_settings_steps.mdx" />
 
-    You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
+    Use the `<PasswordAuth />` component from the UI library whenever there is no active session.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
@@ -75,7 +72,7 @@ hideToc: true
         import './index.css'
         import { useState, useEffect } from 'react'
         import { createClient } from '@supabase/supabase-js'
-        import { Auth, ThemeSupa } from '@supabase/auth-js-react'
+        import { PasswordAuth } from '@supabase/ui'
 
         const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
 
@@ -97,7 +94,11 @@ hideToc: true
           }, [])
 
           if (!session) {
-            return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />)
+            return (
+              <div className="auth-container">
+                <PasswordAuth supabaseClient={supabase} />
+              </div>
+            )
           }
           else {
             return (<div>Logged in!</div>)
@@ -111,7 +112,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app, go to http://localhost:3000 in a browser, and open the browser console and you should be able to log in.
+    Start the app, go to http://localhost:3000 in a browser, and you should be able to log in.
 
     </StepHikeCompact.Details>
 
