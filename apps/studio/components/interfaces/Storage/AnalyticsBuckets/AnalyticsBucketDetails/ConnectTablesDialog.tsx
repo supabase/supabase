@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useFlag, useParams } from 'common'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
@@ -156,7 +157,11 @@ export const ConnectTablesDialogContent = ({
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { data: apiKeys } = useAPIKeysQuery(
+    { projectRef, reveal: true },
+    { enabled: canReadAPIKeys }
+  )
   const { serviceKey } = getKeys(apiKeys)
 
   const { sourceId, pipeline, publication } = useAnalyticsBucketAssociatedEntities({
