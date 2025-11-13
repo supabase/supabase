@@ -191,7 +191,7 @@ describe('isTemporaryUploadKeyValid', () => {
     expect(isTemporaryUploadKeyValid(key)).toBe(false)
   })
 
-  it('should return false for a key missing apiKey property', () => {
+  it('should return true for a key missing apiKey property', () => {
     const now = Date.now()
     vi.setSystemTime(now)
 
