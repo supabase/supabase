@@ -1470,13 +1470,6 @@
         "type": "function"
       },
       {
-        "id": "throwonerror",
-        "title": "Enable throwing errors instead of returning them in the response",
-        "slug": "storage-throwonerror",
-        "product": "storage",
-        "type": "function"
-      },
-      {
         "id": "createindex",
         "title": "Creates a new vector index within a bucket",
         "slug": "storage-createindex",
@@ -1505,23 +1498,9 @@
         "type": "function"
       },
       {
-        "id": "throwonerror",
-        "title": "Enable throwing errors instead of returning them in the response",
-        "slug": "storage-throwonerror",
-        "product": "storage",
-        "type": "function"
-      },
-      {
         "id": "from",
         "title": "Perform file operation in a bucket",
         "slug": "storage-from",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "throwonerror",
-        "title": "Enable throwing errors instead of returning them",
-        "slug": "storage-throwonerror",
         "product": "storage",
         "type": "function"
       },
@@ -1543,13 +1522,6 @@
         "id": "listv2",
         "title": "this method signature might change in the future",
         "slug": "storage-listv2",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "throwonerror",
-        "title": "Enable throwing errors instead of returning them",
-        "slug": "storage-throwonerror",
         "product": "storage",
         "type": "function"
       }
