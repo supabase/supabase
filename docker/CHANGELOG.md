@@ -14,7 +14,7 @@ Check updates, changelogs, and release notes for each service to learn more.
 ### Studio
 - Updated to `2025.11.10-sha-5291fe3` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
 - Added log drains - [PR #28297](https://github.com/supabase/supabase/pull/28297)
-- Fixed issue with Studio trying to use `postgres` role instead of `supabase_admin` - [PR #39946](https://github.com/supabase/supabase/pull/39946)
+- Fixed issue with Studio using `postgres` role instead of `supabase_admin` - [PR #39946](https://github.com/supabase/supabase/pull/39946)
 
 ### Auth
 - Updated to `v2.182.1` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md#21821-2025-11-05) | [Release](https://github.com/supabase/auth/releases/tag/v2.182.1)
@@ -67,6 +67,6 @@ Check updates, changelogs, and release notes for each service to learn more.
 
 ### Studio
 - Added additional Kong configuration for MCP server routes - [PR #39849](https://github.com/supabase/supabase/pull/39849)
-- Added documentation page describing MCP server configuration - [PR #39952](https://github.com/supabase/supabase/pull/39952)
+- Added [documentation page](https://supabase.com/docs/guides/self-hosting/enable-mcp) describing MCP server configuration - [PR #39952](https://github.com/supabase/supabase/pull/39952)
 
 ---
