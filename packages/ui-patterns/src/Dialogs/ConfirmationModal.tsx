@@ -34,7 +34,7 @@ export interface ConfirmationModalProps {
   }
 }
 
-const ConfirmationModal = forwardRef<
+export const ConfirmationModal = forwardRef<
   React.ElementRef<typeof DialogContent>,
   React.ComponentPropsWithoutRef<typeof Dialog> & ConfirmationModalProps
 >(
