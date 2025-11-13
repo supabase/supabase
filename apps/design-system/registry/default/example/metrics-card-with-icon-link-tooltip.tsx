@@ -34,11 +34,11 @@ export default function MetricsCardDemo() {
   return (
     <div className="w-1/2">
       <MetricsCard isLoading={!data.length}>
-        <MetricsCardHeader hasLink href="https://www.supabase.io">
+        <MetricsCardHeader href="https://www.supabase.io">
           <MetricsCardIcon>
             <User2 size={16} strokeWidth={1.5} />
           </MetricsCardIcon>
-          <MetricsCardLabel hasTooltip tooltip="The number of Active Users over the last 24 hours">
+          <MetricsCardLabel tooltip="The number of Active Users over the last 24 hours">
             Active Users
           </MetricsCardLabel>
         </MetricsCardHeader>

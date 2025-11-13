@@ -57,13 +57,12 @@ const MetricsCard = React.forwardRef<HTMLDivElement, MetricsCardProps>(
 MetricsCard.displayName = 'MetricsCard'
 
 interface MetricsCardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  hasLink?: boolean
   href?: string
   children: React.ReactNode
 }
 
 const MetricsCardHeader = React.forwardRef<HTMLDivElement, MetricsCardHeaderProps>(
-  ({ className, hasLink = false, href, children, ...props }, ref) => {
+  ({ className, href, children, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -74,9 +73,9 @@ const MetricsCardHeader = React.forwardRef<HTMLDivElement, MetricsCardHeaderProp
         {...props}
       >
         <div className="flex flex-row items-center gap-2">{children}</div>
-        {hasLink && (
+        {href && (
           <Button type="text" size="tiny" className="px-1 text-foreground-lighter" asChild>
-            <Link href={href || ''}>
+            <Link href={href}>
               <ExternalLink size={14} strokeWidth={1.5} />
             </Link>
           </Button>
@@ -114,13 +113,12 @@ const MetricsCardIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
 MetricsCardIcon.displayName = 'MetricsCardIcon'
 
 interface MetricsCardLabelProps extends React.HTMLAttributes<HTMLDivElement> {
-  hasTooltip?: boolean
   tooltip?: string
   children: React.ReactNode
 }
 
 const MetricsCardLabel = React.forwardRef<HTMLDivElement, MetricsCardLabelProps>(
-  ({ className, hasTooltip = false, tooltip, children, ...props }, ref) => {
+  ({ className, tooltip, children, ...props }, ref) => {
     return (
       <CardTitle
         ref={ref}
@@ -128,7 +126,7 @@ const MetricsCardLabel = React.forwardRef<HTMLDivElement, MetricsCardLabelProps>
         {...props}
       >
         <span>{children}</span>
-        {hasTooltip && (
+        {tooltip && (
           <Tooltip>
             <TooltipTrigger asChild>
               <HelpCircle size={14} strokeWidth={1.5} />
