@@ -2234,6 +2234,355 @@ functions:
       Having a 2nd factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup factor.
 
       Learn more about implementing MFA in your application [in the MFA guide](https://supabase.com/docs/guides/auth/auth-mfa#overview).
+  - id: mfa-enroll
+    title: 'mfa.enroll()'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
+    notes: |
+      - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
+      - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
+      - To create and verify a TOTP challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/javascript/auth-mfa-challengeandverify).
+      - To generate a QR code for the `totp` secret in Next.js, you can do the following:
+      ```html
+      <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
+      ```
+      - The `challenge` and `verify` steps are separated when using Phone factors as the user will need time to receive and input the code obtained from the SMS in challenge.
+    examples:
+      - id: enroll-totp-factor
+        name: Enroll a time-based, one-time password (TOTP) factor
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.enroll({
+            factorType: 'totp',
+            friendlyName: 'your_friendly_name'
+          })
+
+          // Use the id to create a challenge.
+          // The challenge can be verified by entering the code generated from the authenticator app.
+          // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
+          const { id, type, totp: { qr_code, secret, uri }, friendly_name } = data
+          const challenge = await supabase.auth.mfa.challenge({ factorId: id });
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'totp'
+              totp: {
+                qr_code: '<QR_CODE_AS_SVG_DATA>',
+                secret: '<SECRET>',
+                uri: '<URI>',
+              }
+              friendly_name?: 'Important app'
+            },
+            error: null
+          }
+          ```
+      - id: enroll-phone-factor
+        name: Enroll a Phone Factor
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.enroll({
+            factorType: 'phone',
+            friendlyName: 'your_friendly_name',
+            phone: '+12345678',
+          })
+
+          // Use the id to create a challenge and send an SMS with a code to the user.
+          const { id, type, friendly_name, phone } = data
+
+          const challenge = await supabase.auth.mfa.challenge({ factorId: id });
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'phone',
+              friendly_name?: 'Important app',
+              phone: '+5787123456'
+            },
+            error: null
+          }
+          ```
+  - id: mfa-challenge
+    title: 'mfa.challenge()'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
+    notes: |
+      - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
+      - A phone factor sends a code to the user upon challenge. The channel defaults to `sms` unless otherwise specified.
+    examples:
+      - id: create-mfa-challenge
+        name: Create a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225'
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'totp',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-phone-challenge
+        name: Create a challenge for a phone factor
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              type: 'phone',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+      - id: create-mfa-phone-challenge-whatsapp
+        name: Create a challenge for a phone factor (WhatsApp)
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challenge({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            channel: 'whatsapp',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<ID>',
+              expires_at: 1700000000
+            },
+            error: null
+          }
+          ```
+  - id: mfa-verify
+    title: 'mfa.verify()'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.verify'
+    notes: |
+      - To verify a challenge, please [create a challenge](/docs/reference/javascript/auth-mfa-challenge) first.
+    examples:
+      - id: verify-challenge
+        name: Verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.verify({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
+            code: '123456'
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              access_token: '<ACCESS_TOKEN>',
+              token_type: 'Bearer',
+              expires_in: 3600,
+              refresh_token: '<REFRESH_TOKEN>',
+              user: {
+                id: '11111111-1111-1111-1111-111111111111',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {
+                  provider: 'email',
+                  providers: [
+                    "email",
+                  ]
+                },
+                user_metadata: {},
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false,
+                factors: [
+                  "id": '<ID>',
+                  "friendly_name": 'Important Auth App',
+                  "factor_type": 'totp',
+                  "status": 'verified',
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z"
+                ]
+              }
+            }
+            error: null
+          }
+          ```
+  - id: mfa-challenge-and-verify
+    title: 'mfa.challengeAndVerify()'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
+    notes: |
+      - Intended for use with only TOTP factors.
+      - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
+      - Executes [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify) in a single step.
+    examples:
+      - id: challenge-and-verify
+        name: Create and verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            code: '123456'
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              access_token: '<ACCESS_TOKEN>',
+              token_type: 'Bearer',
+              expires_in: 3600,
+              refresh_token: '<REFRESH_TOKEN>',
+              user: {
+                id: '11111111-1111-1111-1111-111111111111',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                email_confirmed_at: '2024-01-01T00:00:00Z',
+                phone: '',
+                confirmation_sent_at: '2024-01-01T00:00:00Z',
+                confirmed_at: '2024-01-01T00:00:00Z',
+                last_sign_in_at: '2024-01-01T00:00:00Z',
+                app_metadata: {
+                  provider: 'email',
+                  providers: [
+                    "email",
+                  ]
+                },
+                user_metadata: {},
+                identities: [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                ],
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                is_anonymous: false,
+                factors: [
+                  "id": '<ID>',
+                  "friendly_name": 'Important Auth App',
+                  "factor_type": 'totp',
+                  "status": 'verified',
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z"
+                ]
+              }
+            }
+            error: null
+          }
+          ```
+  - id: mfa-unenroll
+    title: 'mfa.unenroll()'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
+    examples:
+      - id: unenroll-a-factor
+        name: Unenroll a factor
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.unenroll({
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          })
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              id: '<FACTOR_ID>'
+            },
+            error: null
+          }
+          ```
+  - id: mfa-get-authenticator-assurance-level
+    title: 'mfa.getAuthenticatorAssuranceLevel()'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
+    notes: |
+      - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP) or Phone factor.
+      - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
+    examples:
+      - id: get-aal
+        name: Get the AAL details of a session
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+          const { currentLevel, nextLevel, currentAuthenticationMethods } = data
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              currentLevel: 'aal1',
+              nextLevel: 'aal2',
+              currentAuthenticationMethods: [
+                {
+                  method: 'password',
+                  timestamp: 1700000000
+                }
+              ]
+            }
+            error: null
+          }
+          ```
   - id: admin-api
     title: Overview
     notes: |

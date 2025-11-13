@@ -273,8 +273,8 @@ function findDocumentableClasses(
   function traverse(node: TypeDocNode, path: string[] = []) {
     const currentPath = [...path, node.name].join('.')
 
-    // Check if this is a class with public methods
-    if (node.kind === TypeDocKind.Class && isPublicApi(node)) {
+    // Check if this is a class or interface with public methods
+    if ((node.kind === TypeDocKind.Class || node.kind === TypeDocKind.Interface) && isPublicApi(node)) {
       // Skip Error classes - we don't document them
       if (node.name.endsWith('Error')) {
         return
