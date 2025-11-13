@@ -19,15 +19,15 @@ const AnalyticsBucketPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: bucket, isSuccess: isSuccessBucket } = useSelectedAnalyticsBucket()
+  const { data: bucket, isSuccess } = useSelectedAnalyticsBucket()
 
   useEffect(() => {
-    if (isSuccessBucket && !bucket) {
+    if (isSuccess && !bucket) {
       toast.info(`Bucket "${bucketId}" does not exist in your project`)
       router.push(`/project/${ref}/storage/analytics`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessBucket])
+  }, [isSuccess])
 
   return (
     <PageLayout

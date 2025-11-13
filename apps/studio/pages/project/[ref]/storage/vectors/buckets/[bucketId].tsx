@@ -20,15 +20,15 @@ const VectorsBucketPage: NextPageWithLayout = () => {
   const { ref, bucketId } = useParams()
   const { projectRef } = useStorageExplorerStateSnapshot()
 
-  const { data: bucket, isSuccess: isSuccessBucket } = useSelectedVectorBucket()
+  const { data: bucket, isSuccess } = useSelectedVectorBucket()
 
   useEffect(() => {
-    if (isSuccessBucket && !bucket) {
+    if (isSuccess && !bucket) {
       toast.info(`Bucket "${bucketId}" does not exist in your project`)
       router.push(`/project/${ref}/storage/vectors`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessBucket])
+  }, [isSuccess])
 
   return (
     <PageLayout
