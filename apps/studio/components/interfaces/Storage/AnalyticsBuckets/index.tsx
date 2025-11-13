@@ -1,3 +1,7 @@
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -5,9 +9,6 @@ import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { Bucket as BucketIcon } from 'icons'
 import { BASE_PATH } from 'lib/constants'
 import { ChevronRight, ExternalLink, Search } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -48,7 +49,7 @@ export const AnalyticsBuckets = () => {
   ) => {
     const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucketId)}`
     if (event.metaKey || event.ctrlKey) {
-      window.open(url, '_blank')
+      window.open(`${BASE_PATH}${url}`, '_blank')
     } else {
       router.push(url)
     }
