@@ -245,7 +245,7 @@ export const AnalyticBucketDetails = () => {
                   </>
                 ) : (
                   <>
-                    {!!pipeline && !!pipelineStatus && !isPipelineRunning && (
+                    {!!pipeline && !!isSuccessPipelineStatus && !isPipelineRunning && (
                       <Admonition
                         type="note"
                         layout="horizontal"
