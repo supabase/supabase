@@ -125,8 +125,7 @@ const RealtimeUsage = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 200)
     }
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [])
+  }, [state, db, chart])
 
   const handleDatePickerChange = (values: DatePickerValue) => {
     const promptShown = handleDatePickerChangeFromHook(values)
