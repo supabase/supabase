@@ -1524,13 +1524,13 @@ const PROVIDER_WEB3 = {
     EXTERNAL_WEB3_ETHEREUM_ENABLED: {
       title: 'Enable Sign in with Ethereum',
       description:
-        'Allow Ethereum wallets to sign in to your project via the Sign in with Ethereum (EIP-4361). Set up [attack protection](/project/${projectRef}/auth/protection) and adjust [rate limits](/project/${projectRef}/auth/rate-limits) to counter abuse.',
+        'Allow Ethereum wallets to sign in to your project via the Sign in with Ethereum (EIP-4361). Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
       type: 'boolean',
     },
     EXTERNAL_WEB3_SOLANA_ENABLED: {
       title: 'Enable Sign in with Solana',
       description:
-        'Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard. Set up [attack protection](/project/${projectRef}/auth/protection) and adjust [rate limits](/project/${projectRef}/auth/rate-limits) to counter abuse.',
+        'Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard. Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
       type: 'boolean',
     },
   },
