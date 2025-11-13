@@ -11,36 +11,32 @@ type GetNamespacesVariables = {
   projectRef?: string
 }
 
-// [Joshen] Investigate if we can use the temp API keys here
+const errorPrefix = 'Failed to delete Iceberg namespaces'
+
 async function getNamespaces({
   catalogUri,
   warehouse,
   tempApiKey,
 }: GetNamespacesVariables & { tempApiKey?: string }) {
-  console.log('getNamespaces', { catalogUri, warehouse, tempApiKey })
-
-  let headers = new Headers()
-  headers = await constructHeaders({
-    'Content-Type': 'application/json',
-    apikey: tempApiKey ?? '',
-  })
-  headers.delete('Authorization')
-
-  const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
-
   try {
-    const response = await fetchHandler(url, {
-      headers,
-      method: 'GET',
-    })
+    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
 
+    let headers = new Headers()
+    headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      apikey: tempApiKey,
+    })
+    headers.delete('Authorization')
+
+    const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
+
+    const response = await fetchHandler(url, { headers, method: 'GET' })
     const result = await response.json()
     if (result.error) {
-      if (result.error.message) {
-        throw new Error(result.error.message)
-      }
-      throw new Error('Failed to get iceberg namespaces')
+      if (result.error.message) throw new Error(`${errorPrefix}: ${result.error.message}`)
+      else throw new Error(errorPrefix)
     }
+
     const r = result as { namespaces: string[][] }
     return r.namespaces.flat()
   } catch (error) {
@@ -68,7 +64,6 @@ export const useIcebergNamespacesQuery = <TData = IcebergNamespacesData>(
       projectRef,
       warehouse,
       catalog: catalogUri,
-      apikey: tempApiKey,
     }),
     queryFn: () => getNamespaces({ ...params, tempApiKey }),
     enabled:

@@ -12,37 +12,37 @@ type CreateIcebergNamespaceVariables = {
   namespace: string
 }
 
+const errorPrefix = 'Failed to create Iceberg namespace'
+
 async function createIcebergNamespace({
   catalogUri,
   warehouse,
   namespace,
   tempApiKey,
 }: CreateIcebergNamespaceVariables & { tempApiKey?: string }) {
-  let headers = new Headers()
-  headers = await constructHeaders({
-    'Content-Type': 'application/json',
-    apikey: `${tempApiKey}`,
-  })
-  headers.delete('Authorization')
-
-  const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
-
   try {
+    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
+
+    let headers = new Headers()
+    headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      apikey: tempApiKey,
+    })
+    headers.delete('Authorization')
+
+    const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
+
     const response = await fetchHandler(url, {
       headers,
       method: 'POST',
-      body: JSON.stringify({
-        namespace: namespace,
-      }),
+      body: JSON.stringify({ namespace: namespace }),
     })
-
     const result = await response.json()
     if (result.error) {
-      if (result.error.message) {
-        throw new Error(result.error.message)
-      }
-      throw new Error('Failed to create Iceberg namespace')
+      if (result.error.message) throw new Error(`${errorPrefix}: ${result.error.message}`)
+      else throw new Error(errorPrefix)
     }
+
     return result
   } catch (error) {
     handleError(error)

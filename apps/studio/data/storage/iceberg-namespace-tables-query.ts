@@ -12,37 +12,36 @@ type GetNamespaceTablesVariables = {
   projectRef?: string
 }
 
+const errorPrefix = 'Failed to retrieve Iceberg namespace tables'
+
 async function getNamespaceTables({
   catalogUri,
   warehouse,
   namespace,
   tempApiKey,
 }: GetNamespaceTablesVariables & { tempApiKey?: string }) {
-  let headers = new Headers()
-  headers = await constructHeaders({
-    'Content-Type': 'application/json',
-    apikey: tempApiKey ?? '',
-  })
-  headers.delete('Authorization')
-
-  const url = `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables`.replaceAll(
-    /(?<!:)\/\//g,
-    '/'
-  )
-
   try {
-    const response = await fetchHandler(url, {
-      headers,
-      method: 'GET',
-    })
+    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
 
+    let headers = new Headers()
+    headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      apikey: tempApiKey,
+    })
+    headers.delete('Authorization')
+
+    const url = `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables`.replaceAll(
+      /(?<!:)\/\//g,
+      '/'
+    )
+
+    const response = await fetchHandler(url, { headers, method: 'GET' })
     const result = await response.json()
     if (result.error) {
-      if (result.error.message) {
-        throw new Error(result.error.message)
-      }
-      throw new Error('Failed to get iceberg namespace')
+      if (result.error.message) throw new Error(`${errorPrefix}: ${result.error.message}`)
+      else throw new Error(errorPrefix)
     }
+
     const r = result as { identifiers: { name: string; namespace: string[] }[] }
     return r.identifiers.map((i) => i.name)
   } catch (error) {
@@ -71,7 +70,6 @@ export const useIcebergNamespaceTablesQuery = <TData = IcebergNamespaceTablesDat
       warehouse,
       namespace,
       catalog: catalogUri,
-      apikey: tempApiKey,
     }),
     queryFn: () => getNamespaceTables({ ...params, tempApiKey }),
     enabled:

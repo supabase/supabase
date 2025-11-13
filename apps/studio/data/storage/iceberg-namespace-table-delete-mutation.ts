@@ -14,6 +14,8 @@ type DeleteIcebergNamespaceTableVariables = {
   projectRef?: string
 }
 
+const errorPrefix = 'Failed to delete Iceberg namespace table'
+
 async function deleteIcebergNamespaceTable({
   catalogUri,
   warehouse,
@@ -21,27 +23,29 @@ async function deleteIcebergNamespaceTable({
   table,
   tempApiKey,
 }: DeleteIcebergNamespaceTableVariables & { tempApiKey?: string }) {
-  let headers = new Headers()
-  headers = await constructHeaders({
-    'Content-Type': 'application/json',
-    apikey: `${tempApiKey}`,
-  })
-  headers.delete('Authorization')
-
-  const url =
-    `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables/${table}?purgeRequested=true`.replaceAll(
-      /(?<!:)\/\//g,
-      '/'
-    )
-
   try {
-    if (!tempApiKey) {
-      throw new Error('')
-    }
-    const response = await fetchHandler(url, {
-      headers,
-      method: 'DELETE',
+    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
+
+    let headers = new Headers()
+    headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      apikey: tempApiKey,
     })
+    headers.delete('Authorization')
+
+    const url =
+      `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables/${table}?purgeRequested=true`.replaceAll(
+        /(?<!:)\/\//g,
+        '/'
+      )
+
+    const response = await fetchHandler(url, { headers, method: 'DELETE' })
+    const result = await response.json()
+    if (result.error) {
+      if (result.error.message) throw new Error(`${errorPrefix}: ${result.error.message}`)
+      else throw new Error(errorPrefix)
+    }
+
     return response.status === 204
   } catch (error) {
     handleError(error)
