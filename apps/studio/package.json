@@ -73,7 +73,7 @@
     "@vercel/functions": "^2.1.0",
     "@vitejs/plugin-react": "^4.3.4",
     "@zip.js/zip.js": "^2.7.29",
-    "ai": "5.0.45",
+    "ai": "5.0.52",
     "ai-commands": "workspace:*",
     "awesome-debounce-promise": "^2.1.0",
     "common": "workspace:*",
