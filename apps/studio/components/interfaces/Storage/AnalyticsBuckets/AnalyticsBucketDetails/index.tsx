@@ -76,7 +76,7 @@ export const AnalyticBucketDetails = () => {
     { projectRef, pipelineId: pipeline?.id },
     {
       refetchInterval: (data) => {
-        if (data?.status.name !== 'started') return 2000
+        if (data?.status.name !== 'started') return 4000
         else return false
       },
     }
