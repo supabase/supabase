@@ -39,7 +39,9 @@
     "test:local:unwatch": "vitest --exclude \"**/*.smoke.test.ts\" --run",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
     "troubleshooting:sync": "node features/docs/Troubleshooting.script.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "validate:references": "tsx scripts/validate-reference-sync.ts",
+    "validate:references:fix": "tsx scripts/validate-reference-sync.ts --fix"
   },
   "dependencies": {
     "@har-sdk/openapi-sampler": "^2.2.0",
