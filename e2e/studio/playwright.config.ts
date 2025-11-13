@@ -9,13 +9,11 @@ dotenv.config({
 
 const IS_CI = !!process.env.CI
 
-const webServerConfig = IS_CI
-  ? undefined
-  : {
-      command: 'pnpm -w run e2e:setup',
-      port: 8082,
-      timeout: 5 * 60 * 1000,
-    }
+const webServerConfig = {
+  command: 'pnpm -w run e2e:setup',
+  port: 8082,
+  timeout: 5 * 60 * 1000,
+}
 
 export default defineConfig({
   timeout: 90 * 1000,
