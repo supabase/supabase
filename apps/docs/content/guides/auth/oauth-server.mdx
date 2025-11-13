@@ -44,7 +44,7 @@ Access tokens are standard Supabase JWTs that include `user_id`, `role`, and `cl
 OAuth 2.1 Server works seamlessly with your existing Supabase Auth configuration:
 
 - Users can authenticate using any enabled method (password, magic link, social providers, MFA, phone)
-- [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/access-token-hook) apply to OAuth tokens, allowing you to customize claims like `audience` or add client-specific permissions
+- [Custom Access Token Hooks](/guides/auth/auth-hooks/access-token-hook) apply to OAuth tokens, allowing you to customize claims like `audience` or add client-specific permissions
 - Row Level Security policies control data access using the `client_id` claim in tokens
 - All standard Supabase features (email templates, hooks, rate limiting) continue to work
 
@@ -52,44 +52,36 @@ OAuth 2.1 Server works seamlessly with your existing Supabase Auth configuration
 
 To enable OAuth 2.1 Server in your project, follow these guides:
 
-<div className="grid md:grid-cols-2 gap-6 not-prose py-8">
-  <div className="border rounded-lg p-6">
-    <h3 className="text-lg font-medium mb-2">Getting Started</h3>
-    <p className="text-sm text-foreground-light mb-4">Enable OAuth 2.1, configure your authorization endpoint, and register your first client.</p>
-    <a href="/docs/guides/auth/oauth-server/getting-started" className="text-brand">
-      View guide →
-    </a>
-  </div>
-
-{' '}
-<div className="border rounded-lg p-6">
-  <h3 className="text-lg font-medium mb-2">OAuth Flows</h3>
-  <p className="text-sm text-foreground-light mb-4">
-    Detailed walkthrough of authorization code and refresh token flows.
-  </p>
-  <a href="/docs/guides/auth/oauth-server/oauth-flows" className="text-brand">
-    View guide →
-  </a>
-</div>
-
-{' '}
-<div className="border rounded-lg p-6">
-  <h3 className="text-lg font-medium mb-2">MCP Authentication</h3>
-  <p className="text-sm text-foreground-light mb-4">
-    Authenticate AI agents and LLM tools using Model Context Protocol.
-  </p>
-  <a href="/docs/guides/auth/oauth-server/mcp-authentication" className="text-brand">
-    View guide →
-  </a>
-</div>
-
-  <div className="border rounded-lg p-6">
-    <h3 className="text-lg font-medium mb-2">Token Security & RLS</h3>
-    <p className="text-sm text-foreground-light mb-4">Control data access with Row Level Security policies for OAuth clients.</p>
-    <a href="/docs/guides/auth/oauth-server/token-security" className="text-brand">
-      View guide →
-    </a>
-  </div>
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {[
+    {
+      name: 'Getting Started',
+      description:
+        'Enable OAuth 2.1, configure your authorization endpoint, and register your first client.',
+      href: '/guides/auth/oauth-server/getting-started',
+    },
+    {
+      name: 'OAuth Flows',
+      description: 'Detailed walkthrough of authorization code and refresh token flows.',
+      href: '/guides/auth/oauth-server/oauth-flows',
+    },
+    {
+      name: 'MCP Authentication',
+      description: 'Authenticate AI agents and LLM tools using Model Context Protocol.',
+      href: '/guides/auth/oauth-server/mcp-authentication',
+    },
+    {
+      name: 'Token Security & RLS',
+      description: 'Control data access with Row Level Security policies for OAuth clients.',
+      href: '/guides/auth/oauth-server/token-security',
+    },
+  ].map((x) => (
+    <div className="col-span-6" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+      </Link>
+    </div>
+  ))}
 </div>
 
 ## Resources
