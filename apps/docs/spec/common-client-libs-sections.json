@@ -1715,13 +1715,6 @@
         "slug": "storage-throwonerror",
         "product": "storage",
         "type": "function"
-      },
-      {
-        "id": "tobase64",
-        "title": "Convert downloaded file to Base64",
-        "slug": "storage-tobase64",
-        "product": "storage",
-        "type": "function"
       }
     ]
   },

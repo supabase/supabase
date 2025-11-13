@@ -9316,22 +9316,3 @@ functions:
     title: throwOnError
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.throwOnError'
     description: Enable throwing errors instead of returning them.
-  - id: tobase64
-    title: toBase64
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.toBase64'
-    description: Convert downloaded file to Base64 string.
-    examples:
-      - id: example-1
-        name: Download and convert to Base64
-        code: |-
-          ```typescript
-          const { data, error } = await supabase
-            .storage
-            .from('avatars')
-            .download('public/avatar1.png')
-
-          if (data) {
-            const base64 = await data.text()
-            console.log('Base64:', base64)
-          }
-          ```
