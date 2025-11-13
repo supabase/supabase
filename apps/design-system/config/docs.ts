@@ -141,8 +141,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Metrics Block',
-          href: '/docs/fragments/metrics-block',
+          title: 'Metrics Card',
+          href: '/docs/fragments/metrics-card',
           items: [],
         },
         {

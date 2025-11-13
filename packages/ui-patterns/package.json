@@ -602,9 +602,9 @@
       "import": "./src/types/assets.d.ts",
       "types": "./src/types/assets.d.ts"
     },
-    "./MetricsBlock": {
-      "import": "./src/MetricsBlock/index.tsx",
-      "types": "./src/MetricsBlock/index.tsx"
+    "./MetricsCard": {
+      "import": "./src/MetricsCard/index.tsx",
+      "types": "./src/MetricsCard/index.tsx"
     }
   },
   "dependencies": {

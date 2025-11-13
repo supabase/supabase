@@ -1,0 +1,86 @@
+'use client'
+
+import {
+  MetricsCard,
+  MetricsCardHeader,
+  MetricsCardLabel,
+  MetricsCardContent,
+  MetricsCardValue,
+  MetricsCardDifferential,
+  MetricsCardSparkline,
+} from 'ui-patterns/MetricsCard'
+
+export default function MetricsCardDemo() {
+  const data = Array.from({ length: 12 }, (_, i) => ({
+    value: Math.floor(4000 + i * 100 + (Math.random() * 2000 - 800)),
+    timestamp: new Date().toISOString(),
+  }))
+
+  const averageValue = data.reduce((acc, curr) => acc + curr.value, 0) / data.length
+
+  const diff = data[data.length - 1].value - data[0].value
+  const diffPercentage = (diff / averageValue) * 100
+
+  return (
+    <div className="w-full grid grid-cols-2 gap-5">
+      <div className="w-full">
+        <MetricsCard>
+          <MetricsCardHeader hasLink href="https://www.supabase.io">
+            <MetricsCardLabel hasTooltip tooltip="This is a tooltip">
+              Metrics Card
+            </MetricsCardLabel>
+          </MetricsCardHeader>
+          <MetricsCardContent>
+            <MetricsCardValue>{averageValue.toFixed(2).toLocaleString()}</MetricsCardValue>
+            <MetricsCardDifferential variant="positive">
+              {diffPercentage.toFixed(1)}%
+            </MetricsCardDifferential>
+          </MetricsCardContent>
+          <MetricsCardSparkline data={data} dataKey="value" />
+        </MetricsCard>
+      </div>
+      <div className="w-full">
+        <MetricsCard>
+          <MetricsCardHeader hasLink={false}>
+            <MetricsCardLabel hasTooltip={false}>Metrics Card</MetricsCardLabel>
+          </MetricsCardHeader>
+          <MetricsCardContent orientation="horizontal">
+            <MetricsCardValue>{averageValue.toFixed(2).toLocaleString()}</MetricsCardValue>
+            <MetricsCardDifferential variant="positive">
+              {diffPercentage.toFixed(1)}%
+            </MetricsCardDifferential>
+          </MetricsCardContent>
+          <MetricsCardSparkline data={data} dataKey="value" />
+        </MetricsCard>
+      </div>
+      <div className="w-full">
+        <MetricsCard>
+          <MetricsCardHeader hasLink href="https://www.supabase.io">
+            <MetricsCardLabel hasTooltip tooltip="Something here">
+              Metrics Card
+            </MetricsCardLabel>
+          </MetricsCardHeader>
+          <MetricsCardContent>
+            <MetricsCardValue>{averageValue.toFixed(2).toLocaleString()}</MetricsCardValue>
+            <MetricsCardDifferential variant="positive">
+              {diffPercentage.toFixed(1)}%
+            </MetricsCardDifferential>
+          </MetricsCardContent>
+        </MetricsCard>
+      </div>
+      <div className="w-full">
+        <MetricsCard>
+          <MetricsCardHeader hasLink={false}>
+            <MetricsCardLabel hasTooltip={false}>Metrics Card</MetricsCardLabel>
+          </MetricsCardHeader>
+          <MetricsCardContent orientation="horizontal">
+            <MetricsCardValue>{averageValue.toFixed(2).toLocaleString()}</MetricsCardValue>
+            <MetricsCardDifferential variant="positive">
+              {diffPercentage.toFixed(1)}%
+            </MetricsCardDifferential>
+          </MetricsCardContent>
+        </MetricsCard>
+      </div>
+    </div>
+  )
+}

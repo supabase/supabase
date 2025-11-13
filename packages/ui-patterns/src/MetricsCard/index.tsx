@@ -17,45 +17,45 @@ import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { AreaChart, Area, ResponsiveContainer } from 'recharts'
 
-interface MetricsBlockContextValue {
+interface MetricsCardContextValue {
   isLoading?: boolean
   isDisabled?: boolean
 }
 
-const MetricsBlockContext = React.createContext<MetricsBlockContextValue>({
+const MetricsCardContext = React.createContext<MetricsCardContextValue>({
   isLoading: false,
   isDisabled: false,
 })
 
-const useMetricsBlock = () => {
-  return useContext(MetricsBlockContext)
+const useMetricsCard = () => {
+  return useContext(MetricsCardContext)
 }
 
-interface MetricsBlockProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MetricsCardProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean
   isDisabled?: boolean
 }
 
-const MetricsBlock = React.forwardRef<HTMLDivElement, MetricsBlockProps>(
+const MetricsCard = React.forwardRef<HTMLDivElement, MetricsCardProps>(
   ({ isLoading = false, isDisabled = false, className, children, ...props }, ref) => {
     return (
       <Card ref={ref} className={cn(className)} {...props}>
-        <MetricsBlockContext.Provider value={{ isLoading, isDisabled }}>
+        <MetricsCardContext.Provider value={{ isLoading, isDisabled }}>
           {children}
-        </MetricsBlockContext.Provider>
+        </MetricsCardContext.Provider>
       </Card>
     )
   }
 )
-MetricsBlock.displayName = 'MetricsBlock'
+MetricsCard.displayName = 'MetricsCard'
 
-interface MetricsBlockHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MetricsCardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   hasLink?: boolean
   href?: string
   children: React.ReactNode
 }
 
-const MetricsBlockHeader = React.forwardRef<HTMLDivElement, MetricsBlockHeaderProps>(
+const MetricsCardHeader = React.forwardRef<HTMLDivElement, MetricsCardHeaderProps>(
   ({ className, hasLink = false, href, children, ...props }, ref) => {
     return (
       <div
@@ -78,13 +78,13 @@ const MetricsBlockHeader = React.forwardRef<HTMLDivElement, MetricsBlockHeaderPr
     )
   }
 )
-MetricsBlockHeader.displayName = 'MetricsBlockHeader'
+MetricsCardHeader.displayName = 'MetricsCardHeader'
 
-interface MetricsBlockContentProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MetricsCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: 'horizontal' | 'vertical'
 }
 
-const MetricsBlockContent = React.forwardRef<HTMLDivElement, MetricsBlockContentProps>(
+const MetricsCardContent = React.forwardRef<HTMLDivElement, MetricsCardContentProps>(
   ({ className, orientation = 'vertical', ...props }, ref) => (
     <CardContent
       ref={ref}
@@ -97,22 +97,22 @@ const MetricsBlockContent = React.forwardRef<HTMLDivElement, MetricsBlockContent
     />
   )
 )
-MetricsBlockContent.displayName = 'MetricsBlockContent'
+MetricsCardContent.displayName = 'MetricsCardContent'
 
-const MetricsBlockIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const MetricsCardIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('text-foreground-light', className)} {...props} />
   )
 )
-MetricsBlockIcon.displayName = 'MetricsBlockIcon'
+MetricsCardIcon.displayName = 'MetricsCardIcon'
 
-interface MetricsBlockLabelProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MetricsCardLabelProps extends React.HTMLAttributes<HTMLDivElement> {
   hasTooltip?: boolean
   tooltip?: string
   children: React.ReactNode
 }
 
-const MetricsBlockLabel = React.forwardRef<HTMLDivElement, MetricsBlockLabelProps>(
+const MetricsCardLabel = React.forwardRef<HTMLDivElement, MetricsCardLabelProps>(
   ({ className, hasTooltip = false, tooltip, children, ...props }, ref) => {
     return (
       <CardTitle
@@ -133,11 +133,11 @@ const MetricsBlockLabel = React.forwardRef<HTMLDivElement, MetricsBlockLabelProp
     )
   }
 )
-MetricsBlockLabel.displayName = 'MetricsBlockLabel'
+MetricsCardLabel.displayName = 'MetricsCardLabel'
 
-const MetricsBlockValue = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const MetricsCardValue = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
-    const { isLoading } = useMetricsBlock()
+    const { isLoading } = useMetricsCard()
 
     if (isLoading) {
       return <Skeleton className="w-32 h-7" />
@@ -149,15 +149,15 @@ const MetricsBlockValue = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
   }
 )
 
-MetricsBlockValue.displayName = 'MetricsBlockValue'
+MetricsCardValue.displayName = 'MetricsCardValue'
 
-interface MetricsBlockDifferentialProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MetricsCardDifferentialProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'positive' | 'negative' | 'default'
 }
 
-const MetricsBlockDifferential = React.forwardRef<HTMLDivElement, MetricsBlockDifferentialProps>(
+const MetricsCardDifferential = React.forwardRef<HTMLDivElement, MetricsCardDifferentialProps>(
   ({ className, variant = 'default', ...props }, ref) => {
-    const { isLoading } = useMetricsBlock()
+    const { isLoading } = useMetricsCard()
 
     if (isLoading) {
       return <Skeleton className="w-16 h-5" />
@@ -181,17 +181,17 @@ const MetricsBlockDifferential = React.forwardRef<HTMLDivElement, MetricsBlockDi
   }
 )
 
-MetricsBlockDifferential.displayName = 'MetricsBlockDifferential'
+MetricsCardDifferential.displayName = 'MetricsCardDifferential'
 
-interface MetricsBlockSparklineProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MetricsCardSparklineProps extends React.HTMLAttributes<HTMLDivElement> {
   data?: Array<{ value: number; [key: string]: any }>
   dataKey?: string
   className?: string
 }
 
-const MetricsBlockSparkline = React.forwardRef<HTMLDivElement, MetricsBlockSparklineProps>(
+const MetricsCardSparkline = React.forwardRef<HTMLDivElement, MetricsCardSparklineProps>(
   ({ className, data, dataKey, ...props }, ref) => {
-    const { isLoading } = useMetricsBlock()
+    const { isLoading } = useMetricsCard()
     if (isLoading) {
       return <Skeleton className="w-full h-[56px] rounded-none" />
     }
@@ -224,16 +224,16 @@ const MetricsBlockSparkline = React.forwardRef<HTMLDivElement, MetricsBlockSpark
     )
   }
 )
-MetricsBlockSparkline.displayName = 'MetricsBlockSparkline'
+MetricsCardSparkline.displayName = 'MetricsCardSparkline'
 
 export {
-  MetricsBlock,
-  MetricsBlockHeader,
-  MetricsBlockIcon,
-  MetricsBlockLabel,
-  MetricsBlockContent,
-  MetricsBlockValue,
-  MetricsBlockDifferential,
-  MetricsBlockSparkline,
-  useMetricsBlock,
+  MetricsCard,
+  MetricsCardHeader,
+  MetricsCardIcon,
+  MetricsCardLabel,
+  MetricsCardContent,
+  MetricsCardValue,
+  MetricsCardDifferential,
+  MetricsCardSparkline,
+  useMetricsCard,
 }

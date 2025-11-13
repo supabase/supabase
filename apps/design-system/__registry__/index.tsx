@@ -2480,13 +2480,13 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "metrics-block": {
-      name: "metrics-block",
+    "metrics-card": {
+      name: "metrics-card",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/metrics-block")),
+      component: React.lazy(() => import("@/registry/default/example/metrics-card")),
       source: "",
-      files: ["registry/default/example/metrics-block.tsx"],
+      files: ["registry/default/example/metrics-card.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
