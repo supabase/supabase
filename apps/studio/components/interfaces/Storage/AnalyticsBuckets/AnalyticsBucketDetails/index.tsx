@@ -72,7 +72,7 @@ export const AnalyticBucketDetails = () => {
     projectRef,
     bucketId: bucket?.id,
   })
-  const { data } = useReplicationPipelineStatusQuery(
+  const { data, isSuccess: isSuccessPipelineStatus } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
     {
       refetchInterval: (data) => {
@@ -245,7 +245,7 @@ export const AnalyticBucketDetails = () => {
                   </>
                 ) : (
                   <>
-                    {!!pipeline && !isPipelineRunning && (
+                    {!!pipeline && !!isSuccessPipelineStatus && !isPipelineRunning && (
                       <Admonition
                         type="note"
                         layout="horizontal"
