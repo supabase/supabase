@@ -8970,6 +8970,18 @@ functions:
     title: listFactors
     $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
     description: Returns the list of MFA factors enabled for this user.
+    examples:
+      - id: example-1
+        name: List all MFA factors
+        code: |-
+          ```typescript
+          const { data, error } = await supabase.auth.mfa.listFactors()
+          if (data) {
+            data.all.forEach(factor => {
+              console.log(`${factor.factor_type}: ${factor.friendly_name}`)
+            })
+          }
+          ```
   - id: constructor
     title: constructor
     $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
@@ -8978,6 +8990,18 @@ functions:
     title: returns
     $ref: '@supabase/postgrest-js.PostgrestBuilder.returns'
     description: Override the type of the returned .
+    notes: |
+      - Deprecated: use overrideTypes method instead
+    examples:
+      - id: example-1
+        name: Override return type (deprecated)
+        code: |-
+          ```typescript
+          const { data } = await supabase
+            .from('users')
+            .select()
+            .returns<MyCustomType[]>()
+          ```
   - id: setheader
     title: setHeader
     $ref: '@supabase/postgrest-js.PostgrestBuilder.setHeader'
@@ -9015,18 +9039,58 @@ functions:
     title: ilikeAllOf
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAllOf'
     description: Match only rows where  matches all of  case-insensitively.
+    examples:
+      - id: example-1
+        name: Filter users matching all patterns
+        code: |-
+          ```typescript
+          const { data, error } = await supabase
+            .from('users')
+            .select('username')
+            .ilikeAllOf('username', ['%SUPA%', '%bot%'])
+          ```
   - id: ilikeanyof
     title: ilikeAnyOf
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAnyOf'
     description: Match only rows where  matches any of  case-insensitively.
+    examples:
+      - id: example-1
+        name: Filter users matching any pattern
+        code: |-
+          ```typescript
+          const { data, error } = await supabase
+            .from('users')
+            .select('username')
+            .ilikeAnyOf('username', ['%SUPA%', '%kiwi%'])
+          ```
   - id: likeallof
     title: likeAllOf
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAllOf'
     description: Match only rows where  matches all of  case-sensitively.
+    examples:
+      - id: example-1
+        name: Filter users matching all patterns
+        code: |-
+          ```typescript
+          const { data, error } = await supabase
+            .from('users')
+            .select('username')
+            .likeAllOf('username', ['%supa%', '%bot%'])
+          ```
   - id: likeanyof
     title: likeAnyOf
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAnyOf'
     description: Match only rows where  matches any of  case-sensitively.
+    examples:
+      - id: example-1
+        name: Filter users matching any pattern
+        code: |-
+          ```typescript
+          const { data, error} = await supabase
+            .from('users')
+            .select('username')
+            .likeAnyOf('username', ['%supa%', '%kiwi%'])
+          ```
   - id: constructor
     title: constructor
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.constructor'
@@ -9039,12 +9103,33 @@ functions:
     title: geojson
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
     description: Return  as an object in [GeoJSON](https://geojson.org) format.
+    examples:
+      - id: example-1
+        name: Get locations as GeoJSON
+        code: |-
+          ```typescript
+          const { data, error } = await supabase
+            .from('locations')
+            .select('*')
+            .geojson()
+          ```
   - id: maxaffected
     title: maxAffected
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maxAffected'
     description: |-
       Set the maximum number of rows that can be affected by the query.
       Only available in PostgREST v13+ and only works with PATCH and DELETE methods.
+    examples:
+      - id: example-1
+        name: Limit affected rows in update
+        code: |-
+          ```typescript
+          const { data, error } = await supabase
+            .from('users')
+            .update({ status: 'inactive' })
+            .eq('last_login', '2023-01-01')
+            .maxAffected(10)
+          ```
   - id: rollback
     title: rollback
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
@@ -9052,6 +9137,17 @@ functions:
       Rollback the query.
 
        will still be returned, but the query is not committed.
+    examples:
+      - id: example-1
+        name: Test insert without committing
+        code: |-
+          ```typescript
+          const { data, error } = await supabase
+            .from('users')
+            .insert({ username: 'test', status: 'ONLINE' })
+            .select()
+            .rollback()
+          ```
   - id: constructor
     title: constructor
     $ref: '@supabase/realtime-js.RealtimePresence.constructor'
@@ -9116,10 +9212,39 @@ functions:
     title: exists
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.exists'
     description: Checks the existence of a file.
+    examples:
+      - id: example-1
+        name: Check if file exists
+        code: |-
+          ```typescript
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .exists('public/avatar1.png')
+
+          if (data) {
+            console.log('File exists:', data)
+          }
+          ```
   - id: info
     title: info
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.info'
     description: Retrieves the details of an existing file.
+    examples:
+      - id: example-1
+        name: Get file metadata
+        code: |-
+          ```typescript
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .info('public/avatar1.png')
+
+          if (data) {
+            console.log('File size:', data.metadata.size)
+            console.log('Content type:', data.metadata.mimetype)
+          }
+          ```
   - id: listv2
     title: listV2
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.listV2'
@@ -9131,4 +9256,19 @@ functions:
   - id: tobase64
     title: toBase64
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.toBase64'
-    description: 'TODO: Add description for toBase64'
+    description: Convert downloaded file to Base64 string.
+    examples:
+      - id: example-1
+        name: Download and convert to Base64
+        code: |-
+          ```typescript
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .download('public/avatar1.png')
+
+          if (data) {
+            const base64 = await data.text()
+            console.log('Base64:', base64)
+          }
+          ```
