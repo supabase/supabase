@@ -6,7 +6,7 @@ import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-export function EmailRateLimitsAlert() {
+export const EmailRateLimitsAlert = () => {
   const { ref } = useParams()
 
   return (

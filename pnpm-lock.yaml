@@ -36,6 +36,9 @@ catalogs:
     react-dom:
       specifier: ^18.3.0
       version: 18.3.1
+    recharts:
+      specifier: ^2.15.4
+      version: 2.15.4
     tailwindcss:
       specifier: 3.4.1
       version: 3.4.1
@@ -232,6 +235,9 @@ importers:
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
+      dayjs:
+        specifier: 1.11.13
+        version: 1.11.13
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
@@ -281,8 +287,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0(react@18.3.1)
       recharts:
-        specifier: ^2.12.7
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rehype-autolink-headings:
         specifier: ^7.1.0
         version: 7.1.0
@@ -1045,8 +1051,8 @@ importers:
         specifier: ^11.10.1
         version: 11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts:
-        specifier: ^2.8.0
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       remark-gfm:
         specifier: ^3.0.1
         version: 3.0.1(supports-color@8.1.1)
@@ -1427,8 +1433,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0(react@18.3.1)
       recharts:
-        specifier: ^2.8.0
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rehype-autolink-headings:
         specifier: ^7.1.0
         version: 7.1.0
@@ -1707,8 +1713,8 @@ importers:
         specifier: ^17.4.0
         version: 17.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts:
-        specifier: ^2.8.0
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rehype-slug:
         specifier: ^5.1.0
         version: 5.1.0
@@ -2345,8 +2351,8 @@ importers:
         specifier: ^15.6.6
         version: 15.6.6(react@18.3.1)
       recharts:
-        specifier: ^2.12.7
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       sonner:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2514,8 +2520,8 @@ importers:
         specifier: ^17.5.0
         version: 17.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts:
-        specifier: ^2.8.0
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       remark:
         specifier: ^15.0.1
         version: 15.0.1(supports-color@8.1.1)
@@ -17054,11 +17060,11 @@ packages:
       react: ^16.8.0 || 17.x || 18.x
       react-dom: ^16.8.0 || 17.x || 18.x
 
-  react-smooth@4.0.1:
-    resolution: {integrity: sha512-OE4hm7XqR0jNOq3Qmk9mFLyd6p2+j6bvbPJ7qlB7+oo0eNcL2l7WQzG6MBnT3EXY6xzkLMUBec3AfewJdA0J8w==}
+  react-smooth@4.0.4:
+    resolution: {integrity: sha512-gnGKTpYwqL0Iii09gHobNolvX4Kiq4PKx6eWBCYYix+8cdw+cGo3do906l1NBPKkSWx1DghC1dlWG9L2uGd61Q==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-style-singleton@2.2.3:
     resolution: {integrity: sha512-b6jSvxvVnyptAiLjbkWLE/lOnR4lfTtDAl+eUC7RZy+QQWc6wRzIV2CE6xBuMmDxc2qIihtDCZD5NPOFl7fRBQ==}
@@ -17164,12 +17170,12 @@ packages:
   recharts-scale@0.4.5:
     resolution: {integrity: sha512-kivNFO+0OcUNu7jQquLXAxz1FIwZj8nrj+YkOKc5694NbjCvcT6aSZiIzNzd2Kul4o4rTto8QVR9lMNtxD4G1w==}
 
-  recharts@2.12.7:
-    resolution: {integrity: sha512-hlLJMhPQfv4/3NBSAyq3gzGg4h2v69RJh6KU7b3pXYNNAELs9kEoXOjbkxdXpALqKBoVmVptGfLpxdaVYqjmXQ==}
+  recharts@2.15.4:
+    resolution: {integrity: sha512-UT/q6fwS3c1dHbXv2uFgYJ9BMFHu3fwnd7AYZaEQhXuYQ4hgsxLvsUXzGdKeZrW5xopzDCvuA2N41WJ88I7zIw==}
     engines: {node: '>=14'}
     peerDependencies:
-      react: ^16.0.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0
+      react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   rechoir@0.6.2:
     resolution: {integrity: sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==}
@@ -38893,7 +38899,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       topojson-client: 3.1.0
 
-  react-smooth@4.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-smooth@4.0.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       fast-equals: 5.0.1
       prop-types: 15.8.1
@@ -39047,15 +39053,15 @@ snapshots:
     dependencies:
       decimal.js-light: 2.5.1
 
-  recharts@2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  recharts@2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       clsx: 2.1.1
       eventemitter3: 4.0.7
       lodash: 4.17.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-is: 16.13.1
-      react-smooth: 4.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-is: 18.3.1
+      react-smooth: 4.0.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts-scale: 0.4.5
       tiny-invariant: 1.3.3
       victory-vendor: 36.6.11
