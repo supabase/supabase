@@ -15,6 +15,7 @@ import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { Bucket } from 'data/storage/buckets-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useStoragePolicyCounts } from 'hooks/storage/useStoragePolicyCounts'
+import { Bucket as BucketIcon } from 'icons'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -58,6 +59,11 @@ const BucketPage: NextPageWithLayout = () => {
       <PageLayout
         size="full"
         isCompact
+        icon={
+          <div className="shrink-0 w-10 h-10 relative bg-surface-100 border rounded-md flex items-center justify-center">
+            <BucketIcon size={20} className="text-foreground-light" />
+          </div>
+        }
         className="[&>div:first-child]:!border-b-0" // Override the border-b from ScaffoldContainer
         title={
           <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -73,6 +79,9 @@ const BucketPage: NextPageWithLayout = () => {
           {
             label: 'Files',
             href: `/project/${ref}/storage/files`,
+          },
+          {
+            label: 'Buckets',
           },
         ]}
         primaryActions={

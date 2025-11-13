@@ -1,5 +1,5 @@
 import { ChevronRight, Info, Loader2, Plus, RefreshCw } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
@@ -25,6 +25,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
 import { TableRowComponent } from './TableRowComponent'
 
@@ -34,11 +35,9 @@ type NamespaceWithTablesProps = {
   sourceType: 'replication' | 'direct'
   schema: string
   tables: (FormattedWrapperTable & { id: number })[]
-  token: string
   wrapperInstance: FDW
   wrapperValues: Record<string, string>
   wrapperMeta: WrapperMeta
-  tablesToPoll: { schema: string; name: string }[]
   pollIntervalNamespaceTables: number
   setPollIntervalNamespaceTables: (value: number) => void
 }
@@ -49,11 +48,9 @@ export const NamespaceWithTables = ({
   sourceType = 'direct',
   schema,
   tables,
-  token,
   wrapperInstance,
   wrapperValues,
   wrapperMeta,
-  tablesToPoll,
   pollIntervalNamespaceTables,
   setPollIntervalNamespaceTables,
 }: NamespaceWithTablesProps) => {
@@ -63,31 +60,41 @@ export const NamespaceWithTables = ({
 
   const { publication } = useAnalyticsBucketAssociatedEntities({ projectRef, bucketId })
 
-  const { data: tablesData, isLoading: isLoadingNamespaceTables } = useIcebergNamespaceTablesQuery(
+  const {
+    data: tablesData = [],
+    isLoading: isLoadingNamespaceTables,
+    isSuccess: isSuccessNamespaceTables,
+  } = useIcebergNamespaceTablesQuery(
     {
       catalogUri: wrapperValues.catalog_uri,
       warehouse: wrapperValues.warehouse,
-      token: token,
       namespace: namespace,
+      projectRef,
     },
     {
-      enabled: !!token,
-      refetchInterval: (data) => {
+      refetchInterval: (data = []) => {
         if (pollIntervalNamespaceTables === 0) return false
-        if (tablesToPoll.length > 0) {
-          const hasMissingTables =
-            (data ?? []).filter((t) => !tables.find((table) => table.table.split('.')[1] === t))
-              .length > 0
 
-          if (hasMissingTables) {
-            setPollIntervalNamespaceTables(0)
-            return false
-          }
+        const publicationTables = publication?.tables ?? []
+        const isSynced = !publicationTables.some(
+          (x) => !data.includes(getNamespaceTableNameFromPostgresTableName(x))
+        )
+        if (isSynced) {
+          setPollIntervalNamespaceTables(0)
+          return false
         }
+
         return pollIntervalNamespaceTables
       },
     }
   )
+
+  const publicationTables = publication?.tables ?? []
+  const publicationTablesNotSyncedToNamespaceTables = publicationTables.filter(
+    (x) => !tablesData.includes(getNamespaceTableNameFromPostgresTableName(x))
+  )
+  const isSyncedPublicationTablesAndNamespaceTables =
+    publicationTablesNotSyncedToNamespaceTables.length === 0
 
   const { mutateAsync: importForeignSchema, isLoading: isImportingForeignSchema } =
     useFDWImportForeignSchemaMutation()
@@ -143,6 +150,13 @@ export const NamespaceWithTables = ({
     return `fdw_analytics_${namespace.replaceAll('-', '_')}`
   }, [schema, namespace])
 
+  useEffect(() => {
+    if (isSuccessNamespaceTables && !isSyncedPublicationTablesAndNamespaceTables) {
+      setPollIntervalNamespaceTables(4000)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessNamespaceTables, isSyncedPublicationTablesAndNamespaceTables])
+
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between items-center px-4 py-5 space-y-0">
@@ -182,14 +196,28 @@ export const NamespaceWithTables = ({
           )}
         </CardTitle>
 
-        <div className="flex flex-row gap-x-2">
-          {tablesToPoll.length > 0 && (
-            <div className="flex items-center gap-x-2 ml-6 text-foreground-lighter">
-              <Loader2 size={14} className="animate-spin" />
-              <p className="text-sm">
-                Connecting {tablesToPoll.length} table{tablesToPoll.length > 1 ? 's' : ''}
-              </p>
-            </div>
+        <div className="flex flex-row gap-x-6">
+          {pollIntervalNamespaceTables > 0 && (
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="flex items-center gap-x-2 text-foreground-lighter">
+                  <Loader2 size={14} className="animate-spin" />
+                  <p className="text-sm">
+                    Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
+                    {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
+                  </p>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="end">
+                <p className="mb-1">Waiting for namespace table to be created for:</p>
+                <ul className="list-disc pl-6">
+                  {publicationTablesNotSyncedToNamespaceTables.map((x) => {
+                    const value = `${x.schema}.${x.name}`
+                    return <li key={value}>{value}</li>
+                  })}
+                </ul>
+              </TooltipContent>
+            </Tooltip>
           )}
           {missingTables.length > 0 && (
             <Button
@@ -205,7 +233,7 @@ export const NamespaceWithTables = ({
         </div>
       </CardHeader>
 
-      {tablesToPoll.length > 0 && <LoadingLine loading />}
+      {pollIntervalNamespaceTables > 0 && <LoadingLine loading />}
 
       <Table>
         <TableHeader>
@@ -234,15 +262,13 @@ export const NamespaceWithTables = ({
               </TableCell>
             </TableRow>
           ) : (
-            allTables.map((table, index) => (
+            allTables.map((table) => (
               <TableRowComponent
                 key={table.name}
                 table={table}
                 namespace={namespace}
-                token={token}
                 schema={displaySchema}
                 isLoading={isImportingForeignSchema || isLoadingNamespaceTables}
-                index={index}
               />
             ))
           )}

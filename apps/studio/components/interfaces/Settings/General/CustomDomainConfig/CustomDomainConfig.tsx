@@ -42,7 +42,7 @@ export const CustomDomainConfig = () => {
       refetchInterval(data) {
         // while setting up the ssl certificate, we want to poll every 5 seconds
         if (data?.customDomain?.ssl.status) {
-          return 5000
+          return 10000 // 10 seconds
         }
 
         return false

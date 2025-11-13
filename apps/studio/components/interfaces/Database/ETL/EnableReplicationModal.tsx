@@ -20,7 +20,7 @@ export const EnableReplicationModal = () => {
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
 
-  const { mutateAsync: createTenantSource, isLoading: creatingTenantSource } =
+  const { mutate: createTenantSource, isLoading: creatingTenantSource } =
     useCreateTenantSourceMutation({
       onSuccess: () => {
         toast.success('Replication has been successfully enabled!')
@@ -33,7 +33,7 @@ export const EnableReplicationModal = () => {
 
   const onEnableReplication = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    await createTenantSource({ projectRef })
+    createTenantSource({ projectRef })
   }
 
   return (
