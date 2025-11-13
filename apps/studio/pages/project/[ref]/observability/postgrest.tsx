@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -70,8 +70,11 @@ const PostgrestReport = () => {
 
   const state = useDatabaseSelectorStateSnapshot()
 
-  // [Joshen] Empty dependency array as we only want this running once
+  const hasStateSyncedFromUrlRef = useRef(false)
   useEffect(() => {
+    if (hasStateSyncedFromUrlRef.current) return
+    hasStateSyncedFromUrlRef.current = true
+
     if (db !== undefined) {
       setTimeout(() => {
         // [Joshen] Adding a timeout here to support navigation from settings to reports
