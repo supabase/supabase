@@ -37,7 +37,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
   const {
     data: organizations = [],
     error,
-    isLoading: isOrgsLoading,
+    isLoading: isOrganizationsLoading,
     isError,
     isSuccess,
   } = useOrganizationsQuery()
@@ -50,15 +50,17 @@ const OrganizationsPage: NextPageWithLayout = () => {
           (x) => x.name.toLowerCase().includes(search) || x.slug.toLowerCase().includes(search)
         )
 
-  const isPageLoading = isOrgsLoading && isProfileLoading
+  const isLoading = isOrganizationsLoading && isProfileLoading
+  const hasProfileCreatedOrLoaded = !isProfileLoading && profile !== undefined
+  const hasOrganizations = organizations.length > 0
 
   useEffect(() => {
     // If there are no organizations and the user has a profile, force the user to create one
     // unless the user is on the not found page
-    if (isSuccess && organizations.length <= 0 && !orgNotFound && !!profile) {
+    if (isSuccess && !hasOrganizations && !orgNotFound && hasProfileCreatedOrLoaded) {
       router.push('/new')
     }
-  }, [isSuccess, organizations, profile])
+  }, [isSuccess, hasOrganizations, hasProfileCreatedOrLoaded, orgNotFound])
 
   return (
     <ScaffoldContainer>
@@ -105,7 +107,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
         )}
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {isPageLoading && (
+          {isLoading && (
             <>
               <Skeleton className="h-[70px] rounded-md" />
               <Skeleton className="h-[70px] rounded-md" />

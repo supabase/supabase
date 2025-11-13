@@ -77,7 +77,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     isSuccess,
   } = useProfileQuery({
     enabled: isLoggedIn,
-    async onError(err) {
+    onError(err) {
       // if the user does not yet exist, create a profile for them
       if (err.message === "User's profile not found") {
         createProfile()
@@ -88,8 +88,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
       // on every page load, we can check for a 401 here and sign the user out if
       // they have a bad token.
       if (err.code === 401) {
-        await signOut()
-        router.push('/sign-in')
+        signOut().then(() => router.push('/sign-in'))
       }
     },
   })
