@@ -76,7 +76,8 @@ const MetricsCardHeader = React.forwardRef<HTMLDivElement, MetricsCardHeaderProp
         {href && (
           <Button type="text" size="tiny" className="px-1 text-foreground-lighter" asChild>
             <Link href={href}>
-              <ExternalLink size={14} strokeWidth={1.5} />
+              <ExternalLink aria-disabled={true} size={14} strokeWidth={1.5} />
+              <span className="sr-only">More information</span>
             </Link>
           </Button>
         )}
