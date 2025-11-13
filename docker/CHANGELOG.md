@@ -5,10 +5,15 @@ All notable changes to the Supabase self-hosted Docker configuration.
 Changes are grouped by service rather than by change type. See [versions.md](./versions.md) 
 for complete image version history and rollback information.
 
+Check updates, changelogs, and release notes for each service to learn more.
+
+## Unreleased
+
 ## [2025-11-12]
 
 ### Studio
 - Updated to `2025.11.10-sha-5291fe3` - [Dashboard updates](https://github.com/orgs/supabase/discussions/40083)
+- Added log drains - [PR #28297](https://github.com/supabase/supabase/pull/28297)
 - Fixed issue with Studio trying to use `postgres` role instead of `supabase_admin` - [PR #39946](https://github.com/supabase/supabase/pull/39946)
 
 ### Auth
@@ -31,11 +36,11 @@ for complete image version history and rollback information.
 ## [2025-11-05]
 
 ### Studio
-- Updated configuration in `docker-compose.yml`
+- Added additional configuration in `docker-compose.yml`
 - Fixed issue with Studio failing to connect to Postgres with non-default settings - [PR #40169](https://github.com/supabase/supabase/pull/40169)
 
 ### Realtime
-- Updated Vector configuration in `volumes/logs/vector.yml`
+- Changed Vector configuration in `volumes/logs/vector.yml`
 - Fixed issue with realtime logs not showing in Studio - [PR #39963](https://github.com/supabase/supabase/pull/39963)
 
 ---
@@ -57,5 +62,13 @@ for complete image version history and rollback information.
 
 ### Edge Runtime
 - Updated to `v1.69.15` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.69.15)
+
+---
+
+## [2025-10-27]
+
+### Studio
+- Added additional Kong configuration for MCP server routes - [PR #39849](https://github.com/supabase/supabase/pull/39849)
+- Added documentation page describing MCP server configuration - [PR #39952](https://github.com/supabase/supabase/pull/39952)
 
 ---
