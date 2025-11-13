@@ -6,9 +6,9 @@ import { useParams } from 'common'
 import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
 import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
 import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
+import { useSelectedBucket } from 'components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
-import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
@@ -32,7 +32,7 @@ const BucketPage: NextPageWithLayout = () => {
   const { bucketId, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { projectRef } = useStorageExplorerStateSnapshot()
-  const { bucket, error, isSuccess, isError } = useSelectedBucket()
+  const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
   const [modal, setModal] = useState<'edit' | 'empty' | 'delete' | null>(null)
 
   const { getPolicyCount } = useStoragePolicyCounts(bucket ? [bucket as Bucket] : [])
