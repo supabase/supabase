@@ -162,7 +162,9 @@ async function generatePRComment(
     sections.push(`- ❌ **${report.summary.broken_references} broken references** (APIs removed)`)
   }
   if (report.summary.missing_documentation > 0) {
-    const errors = report.issues.filter((i) => i.type === 'missing-documentation' && i.severity === 'error').length
+    const errors = report.issues.filter(
+      (i) => i.type === 'missing-documentation' && i.severity === 'error'
+    ).length
     sections.push(`- 📝 **${errors} new undocumented APIs** (auto-detected)`)
   }
 

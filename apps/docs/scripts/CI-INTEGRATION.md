@@ -7,6 +7,7 @@ The reference sync validation is integrated into the `docs-js-libs-update.yml` w
 ## Workflow
 
 ### 1. Trigger (from supabase-js repo)
+
 ```
 supabase-js stable release → triggers docs-js-libs-update.yml
 ```
@@ -14,29 +15,35 @@ supabase-js stable release → triggers docs-js-libs-update.yml
 ### 2. Steps in CI
 
 1. **Regenerate TypeDoc files**
+
    ```bash
    cd apps/docs/spec
    make  # Downloads & transforms latest specs
    ```
 
 2. **Run validation**
+
    ```bash
    cd apps/docs
    pnpm run validate:references:fix
    ```
+
    - Generates `sync-report.json` with all issues
    - Generates `sync-report-stubs.yaml` with documentation stubs
    - Exits with error if validation fails (non-blocking)
 
 3. **Generate PR comment**
+
    ```bash
    pnpm run validate:references:comment
    ```
+
    - Reads `sync-report.json` and `sync-report-stubs.yaml`
    - Formats as markdown with GitHub suggestions
    - Outputs to temp file for PR comment
 
 4. **Create PR**
+
    - PR is created with regenerated TypeDoc files
    - Validation comment is posted automatically
 
@@ -49,7 +56,7 @@ supabase-js stable release → triggers docs-js-libs-update.yml
 
 ### 3. Example PR Comment
 
-```markdown
+````markdown
 ## 📊 Reference Documentation Sync Report
 
 ### Summary
@@ -67,9 +74,10 @@ supabase-js stable release → triggers docs-js-libs-update.yml
 <summary>View broken references (6)</summary>
 
 - `@supabase/auth-js.GoTrueClient.mfa.enroll`
-...
+  ...
 
 **Action:** Remove these entries from `spec/supabase_js_v2.yml`
+
 </details>
 
 ---
@@ -80,7 +88,7 @@ Click **"Commit suggestion"** on each block below.
 
 #### VectorBucketApi
 
-```suggestion
+````suggestion
   - id: createbucket
     title: createBucket
     $ref: '@supabase/storage-js.index.VectorBucketApi.createBucket'
@@ -94,10 +102,12 @@ Click **"Commit suggestion"** on each block below.
           ```typescript
           const { data, error } = await client.createBucket('embeddings')
           ```
-```
+````
+````
 
 🤖 Auto-generated via `validate-reference-sync.ts`
-```
+
+````
 
 ## Developer Workflow
 
@@ -150,9 +160,10 @@ Basic validation without stub generation.
 
 ```bash
 pnpm run validate:references
-```
+````
 
 ### `validate:references:fix`
+
 Validation + generate documentation stubs.
 
 ```bash
@@ -160,6 +171,7 @@ pnpm run validate:references:fix
 ```
 
 ### `validate:references:comment`
+
 Generate GitHub PR comment from validation results.
 
 ```bash
@@ -176,21 +188,25 @@ pnpm run validate:references:comment
 ## Troubleshooting
 
 **PR comment not appearing?**
+
 - Check workflow logs for "Generate PR comment" step
 - Ensure `sync-report.json` exists after validation
 - Verify PR was created successfully
 
 **Suggestions not formatting correctly?**
+
 - GitHub requires exact YAML indentation (2 spaces)
 - Check suggestion blocks start with proper indent
 - Verify no trailing whitespace
 
 **Too many suggestions overwhelming?**
+
 - Suggestions are grouped by class
 - You can apply them selectively
 - Or use the stub file directly and copy what you need
 
 **Validation failing incorrectly?**
+
 - Check if new API matches naming patterns (`*Client`, `*Api`, etc.)
 - Warnings won't block CI, only errors
 - Review classification logic in validation script
@@ -198,6 +214,7 @@ pnpm run validate:references:comment
 ## Future Enhancements
 
 Potential improvements:
+
 - Auto-remove broken references (optional flag)
 - Interactive mode for reviewing suggestions
 - Batch apply all suggestions at once

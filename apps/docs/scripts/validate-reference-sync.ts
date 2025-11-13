@@ -168,14 +168,7 @@ function isUserFacingClass(className: string): boolean {
   }
 
   // Check for user-facing patterns
-  const userFacingPatterns = [
-    /Client$/,
-    /Api$/,
-    /Builder$/,
-    /Channel$/,
-    /Scope$/,
-    /Manager$/,
-  ]
+  const userFacingPatterns = [/Client$/, /Api$/, /Builder$/, /Channel$/, /Scope$/, /Manager$/]
 
   return userFacingPatterns.some((pattern) => pattern.test(className))
 }
@@ -296,15 +289,14 @@ function findDocumentableClasses(
 
       if (hasPublicMethods) {
         // Check if this class has any documented methods
-        const hasDocumentation = node.children?.some((child) => {
-          const methodPath = [...path, node.name, child.name].join('.')
-          return yamlRefs.has(methodPath)
-        }) || false
+        const hasDocumentation =
+          node.children?.some((child) => {
+            const methodPath = [...path, node.name, child.name].join('.')
+            return yamlRefs.has(methodPath)
+          }) || false
 
         const isUserFacing =
-          isUserFacingClass(node.name) ||
-          isTopLevelExport(currentPath) ||
-          hasDocumentation
+          isUserFacingClass(node.name) || isTopLevelExport(currentPath) || hasDocumentation
 
         classes.set(currentPath, {
           className: node.name,
@@ -362,7 +354,9 @@ function validateMissingDocumentation(
     // Find the parent class for this method
     const parts = path.split('.')
     let parentClassPath: string | null = null
-    let parentClassInfo: { className: string; hasDocumentation: boolean; isUserFacing: boolean } | undefined
+    let parentClassInfo:
+      | { className: string; hasDocumentation: boolean; isUserFacing: boolean }
+      | undefined
 
     // Try to find parent class by removing last segment (the method name)
     for (let i = parts.length - 1; i >= 2; i--) {

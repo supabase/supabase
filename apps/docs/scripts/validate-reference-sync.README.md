@@ -5,6 +5,7 @@ This script validates that the documentation YAML files (e.g., `supabase_js_v2.y
 ## Purpose
 
 The documentation system combines two sources:
+
 - **Auto-generated API docs** from TypeDoc (`spec/enrichments/tsdoc_v2/combined.json`)
 - **Human-written enrichments** in YAML files (`spec/supabase_js_v2.yml`)
 
@@ -30,6 +31,7 @@ pnpm run validate:references
 ```
 
 This will:
+
 - Validate the sync between `combined.json` and `supabase_js_v2.yml`
 - Generate a report at `sync-report.json`
 - Exit with code 1 if issues are found (useful for CI)
@@ -41,6 +43,7 @@ pnpm run validate:references:fix
 ```
 
 This will:
+
 - Run the validation
 - Generate stub YAML entries for missing documentation at `sync-report-stubs.yaml`
 - You can then manually add these stubs to your YAML file and fill in descriptions
@@ -65,6 +68,7 @@ tsx scripts/validate-reference-sync.ts --fix --strict --report-path output/repor
 The script **automatically discovers** all classes with public methods. No hardcoded lists to maintain!
 
 **How it works:**
+
 1. Scans `combined.json` for all classes (kind: 128)
 2. Checks each class for public methods or constructors
 3. Classifies based on patterns and context
@@ -72,15 +76,18 @@ The script **automatically discovers** all classes with public methods. No hardc
 **Classification:**
 
 **ERROR severity** (must be documented):
+
 - Classes ending in: `Client`, `Api`, `Builder`, `Channel`, `Scope`, `Manager`
 - Classes exported from top-level or `index` module
 - Classes with any existing documentation (proves they're user-facing)
 
 **WARNING severity** (review needed):
+
 - Other classes with public methods
 - Allows manual decision on whether to document
 
 **EXCLUDED** (skipped entirely):
+
 - Error classes (name ends with `Error`)
 - Private/internal methods (starting with `_`)
 - Protected methods (`isProtected: true`)
@@ -88,6 +95,7 @@ The script **automatically discovers** all classes with public methods. No hardc
 - Classes with `@internal` JSDoc tag
 
 **Examples of auto-detected classes:**
+
 - `VectorBucketApi` ✅ (ends with `Api`)
 - `PostgrestFilterBuilder` ✅ (ends with `Builder`)
 - `RealtimeChannel` ✅ (ends with `Channel`)
@@ -97,12 +105,14 @@ The script **automatically discovers** all classes with public methods. No hardc
 ### Example issues
 
 **Broken reference:**
+
 ```
 Reference '@supabase/auth-js.GoTrueClient.mfa.enroll' in YAML
 does not exist in combined.json. This API may have been removed.
 ```
 
 **Missing documentation:**
+
 ```
 Public API '@supabase/supabase-js.GoTrueClient.getUser' exists
 in combined.json but is not documented in YAML.
@@ -115,6 +125,7 @@ in combined.json but is not documented in YAML.
 The script extracts descriptions from TypeDoc comments in `combined.json`:
 
 **Source (in your code):**
+
 ```typescript
 /**
  * Creates a new vector bucket
@@ -125,6 +136,7 @@ async createBucket(name: string): Promise<VectorBucketResponse>
 ```
 
 **Generated stub:**
+
 ```yaml
 - id: createbucket
   title: createBucket
@@ -139,7 +151,8 @@ async createBucket(name: string): Promise<VectorBucketResponse>
 Examples from `@example` JSDoc tags are also extracted:
 
 **Source (in your code):**
-```typescript
+
+````typescript
 /**
  * Creates a new vector bucket
  * @example
@@ -150,10 +163,11 @@ Examples from `@example` JSDoc tags are also extracted:
  * }
  * ```
  */
-```
+````
 
 **Generated stub:**
-```yaml
+
+````yaml
 - id: createbucket
   title: createBucket
   $ref: '@supabase/storage-js.index.VectorBucketApi.createBucket'
@@ -168,9 +182,10 @@ Examples from `@example` JSDoc tags are also extracted:
           console.error('Failed:', error.message)
         }
         ```
-```
+````
 
 **Benefits:**
+
 - 🎯 Less manual work - descriptions pulled from source
 - 📝 Single source of truth - update code comments, stubs auto-update
 - ✅ Consistency - same descriptions in code and docs
@@ -207,6 +222,7 @@ The report is a JSON file with:
 ```
 
 **Console output** shows statistics:
+
 ```
 ✅ Generated 176 stub entries at sync-report-stubs.yaml
    📝 150/176 have TypeDoc descriptions
@@ -272,6 +288,7 @@ The script parses `combined.json` as a tree and builds a lookup map for these re
 ### TypeDoc kinds
 
 The script checks these TypeDoc node kinds:
+
 - `512`: Constructor
 - `2048`: Method
 - `128`: Class (for context)
@@ -279,6 +296,7 @@ The script checks these TypeDoc node kinds:
 ### Public API detection
 
 APIs are considered public if they:
+
 - Don't start with `_`
 - Don't have `isProtected` or `isPrivate` flags
 - Aren't marked with `@internal` in JSDoc
@@ -287,25 +305,30 @@ APIs are considered public if they:
 ## Troubleshooting
 
 **New API not being detected?**
+
 - Check if the class name matches a pattern (`Client`, `Api`, `Builder`, etc.)
 - If not, it will show as a WARNING - you can still document it
 - To make it an ERROR, ensure it's exported from top-level or add partial docs
 
 **Too many warnings?**
+
 - Warnings are for review - you can ignore non-user-facing classes
 - Use `--strict` mode in CI only if you want warnings to fail builds
 - Consider if the warned class should have a documented method (which promotes it to ERROR)
 
 **Broken reference for valid API?**
+
 - Check the exact casing and path in `combined.json`
 - The structure might have changed (e.g., from method to property)
 - Verify the API still exists in the source code
 
 **TypeDoc descriptions not extracted?**
+
 - Check that JSDoc comments are on the method/constructor signature
 - Ensure comments use `/** */` format (not `//`)
 - Verify `combined.json` was regenerated after adding comments
 
 **Missing legitimate documentation?**
+
 - Add it to the YAML file manually
 - Or use `--fix` to generate a stub (with TypeDoc content) and fill in the rest
