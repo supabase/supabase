@@ -3,7 +3,7 @@ info:
   id: reference/supabase-js
   title: Supabase Javascript Client
   description: |
-    
+
     Supabase JavaScript.
   definition: spec/enrichments/tsdoc_v2/combined.json
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_js_v2.yml
@@ -14,7 +14,7 @@ info:
 functions:
   - id: initializing
     title: Initializing
-    $ref: "@supabase/supabase-js.SupabaseClient.constructor"
+    $ref: '@supabase/supabase-js.SupabaseClient.constructor'
     description: |
       You can initialize a new Supabase client using the `createClient()` method.
 
@@ -220,7 +220,7 @@ functions:
           ```
   - id: sign-up
     title: signUp()
-    $ref: "@supabase/auth-js.GoTrueClient.signUp"
+    $ref: '@supabase/auth-js.GoTrueClient.signUp'
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
@@ -394,7 +394,7 @@ functions:
           ```
   - id: on-auth-state-change
     title: onAuthStateChange()
-    $ref: "@supabase/auth-js.GoTrueClient.onAuthStateChange"
+    $ref: '@supabase/auth-js.GoTrueClient.onAuthStateChange'
     notes: |
       - Subscribes to important events occurring on the user's session.
       - Use on the frontend/client. It is less useful on the server.
@@ -587,7 +587,7 @@ functions:
           ```
   - id: sign-in-anonymously
     title: signInAnonymously()
-    $ref: "@supabase/auth-js.GoTrueClient.signInAnonymously"
+    $ref: '@supabase/auth-js.GoTrueClient.signInAnonymously'
     notes: |
       - Returns an anonymous user
       - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
@@ -659,7 +659,7 @@ functions:
           ```
   - id: sign-in-with-password
     title: signInWithPassword()
-    $ref: "@supabase/auth-js.GoTrueClient.signInWithPassword"
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithPassword'
     notes: |
       - Requires either an email and password or a phone number and password.
     examples:
@@ -772,7 +772,7 @@ functions:
           ```
   - id: sign-in-with-otp
     title: signInWithOtp()
-    $ref: "@supabase/auth-js.GoTrueClient.signInWithOtp"
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithOtp'
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
@@ -832,7 +832,7 @@ functions:
           ```
   - id: sign-in-with-oauth
     title: signInWithOAuth()
-    $ref: "@supabase/auth-js.GoTrueClient.signInWithOAuth"
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithOAuth'
     notes: |
       - This method is used for signing in using [Social Login (OAuth) providers](/docs/guides/auth#configure-third-party-providers).
       - It works by redirecting your application to the provider's authorization screen, before bringing back the user to your app.
@@ -911,7 +911,7 @@ functions:
           ```
   - id: sign-in-with-id-token
     title: signInWithIdToken
-    $ref: "@supabase/auth-js.GoTrueClient.signInWithIdToken"
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithIdToken'
     notes: |
       - Use an ID token to sign in.
       - Especially useful when implementing sign in using native platform dialogs in mobile or desktop apps using Sign in with Apple or Sign in with Google on iOS and Android.
@@ -983,7 +983,7 @@ functions:
           ```
   - id: sign-in-with-sso
     title: signInWithSSO()
-    $ref: "@supabase/auth-js.GoTrueClient.signInWithSSO"
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithSSO'
     notes: |
       - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
@@ -1027,7 +1027,7 @@ functions:
           ```
   - id: sign-in-with-web3
     title: signInWithWeb3()
-    $ref: "@supabase/auth-js.GoTrueClient.signInWithWeb3"
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithWeb3'
     notes: |
       - Uses a Web3 (Ethereum, Solana) wallet to sign a user in.
       - Read up on the [potential for abuse](/docs/guides/auth/auth-web3#potential-for-abuse) before using it.
@@ -1117,7 +1117,7 @@ functions:
           ```
   - id: get-claims
     title: getClaims()
-    $ref: "@supabase/auth-js.GoTrueClient.getClaims"
+    $ref: '@supabase/auth-js.GoTrueClient.getClaims'
     notes: |
       - Parses the user's [access token](/docs/guides/auth/sessions#access-token-jwt-claims) as a [JSON Web Token (JWT)](/docs/guides/auth/jwts) and returns its components if valid and not expired.
       - If your project is using asymmetric JWT signing keys, then the verification is done locally usually without a network request using the [WebCrypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API).
@@ -1167,7 +1167,7 @@ functions:
           ```
   - id: sign-out
     title: signOut()
-    $ref: "@supabase/auth-js.GoTrueClient.signOut"
+    $ref: '@supabase/auth-js.GoTrueClient.signOut'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
       - By default, `signOut()` uses the global scope, which signs out all other sessions that the user is logged into as well. Customize this behavior by passing a scope parameter.
@@ -1196,7 +1196,7 @@ functions:
           ```
   - id: verify-otp
     title: verifyOtp()
-    $ref: "@supabase/auth-js.GoTrueClient.verifyOtp"
+    $ref: '@supabase/auth-js.GoTrueClient.verifyOtp'
     notes: |
       - The `verifyOtp` method takes in different verification types.
       - If a phone number is used, the type can either be:
@@ -1336,7 +1336,7 @@ functions:
           ```
   - id: get-session
     title: getSession()
-    $ref: "@supabase/auth-js.GoTrueClient.getSession"
+    $ref: '@supabase/auth-js.GoTrueClient.getSession'
     notes: |
       - Since the introduction of [asymmetric JWT signing keys](/docs/guides/auth/signing-keys), this method is considered low-level and we encourage you to use `getClaims()` or `getUser()` instead.
       - Retrieves the current [user session](/docs/guides/auth/sessions) from the storage medium (local storage, cookies).
@@ -1412,7 +1412,7 @@ functions:
           ```
   - id: start-auto-refresh
     title: startAutoRefresh()
-    $ref: "@supabase/auth-js.GoTrueClient.startAutoRefresh"
+    $ref: '@supabase/auth-js.GoTrueClient.startAutoRefresh'
     notes: |
       - Only useful in non-browser environments such as React Native or Electron.
       - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
@@ -1437,7 +1437,7 @@ functions:
           ```
   - id: stop-auto-refresh
     title: stopAutoRefresh()
-    $ref: "@supabase/auth-js.GoTrueClient.stopAutoRefresh"
+    $ref: '@supabase/auth-js.GoTrueClient.stopAutoRefresh'
     notes: |
       - Only useful in non-browser environments such as React Native or Electron.
       - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
@@ -1462,7 +1462,7 @@ functions:
           ```
   - id: get-user
     title: getUser()
-    $ref: "@supabase/auth-js.GoTrueClient.getUser"
+    $ref: '@supabase/auth-js.GoTrueClient.getUser'
     notes: |
       - This method fetches the user object from the database instead of local session.
       - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
@@ -1535,7 +1535,7 @@ functions:
           ```
   - id: update-user
     title: updateUser()
-    $ref: "@supabase/auth-js.GoTrueClient.updateUser"
+    $ref: '@supabase/auth-js.GoTrueClient.updateUser'
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
@@ -1651,7 +1651,7 @@ functions:
           ```
   - id: get-user-identities
     title: getUserIdentities()
-    $ref: "@supabase/auth-js.GoTrueClient.getUserIdentities"
+    $ref: '@supabase/auth-js.GoTrueClient.getUserIdentities'
     notes: |
       - The user needs to be signed in to call `getUserIdentities()`.
     examples:
@@ -1690,7 +1690,7 @@ functions:
           ```
   - id: link-identity
     title: linkIdentity()
-    $ref: "@supabase/auth-js.GoTrueClient.linkIdentity"
+    $ref: '@supabase/auth-js.GoTrueClient.linkIdentity'
     notes: |
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `linkIdentity()`.
@@ -1718,7 +1718,7 @@ functions:
           ```
   - id: unlink-identity
     title: unlinkIdentity()
-    $ref: "@supabase/auth-js.GoTrueClient.unlinkIdentity"
+    $ref: '@supabase/auth-js.GoTrueClient.unlinkIdentity'
     notes: |
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `unlinkIdentity()`.
@@ -1743,7 +1743,7 @@ functions:
           ```
   - id: send-password-reauthentication
     title: reauthenticate()
-    $ref: "@supabase/auth-js.GoTrueClient.reauthenticate"
+    $ref: '@supabase/auth-js.GoTrueClient.reauthenticate'
     notes: |
       - This method is used together with `updateUser()` when a user's password needs to be updated.
       - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
@@ -1761,7 +1761,7 @@ functions:
           ```
   - id: resend-email-or-phone-otps
     title: resend()
-    $ref: "@supabase/auth-js.GoTrueClient.resend"
+    $ref: '@supabase/auth-js.GoTrueClient.resend'
     notes: |
       - Resends a signup confirmation, email change or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
@@ -1815,7 +1815,7 @@ functions:
           ```
   - id: set-session
     title: setSession()
-    $ref: "@supabase/auth-js.GoTrueClient.setSession"
+    $ref: '@supabase/auth-js.GoTrueClient.setSession'
     notes: |
       - This method sets the session using an `access_token` and `refresh_token`.
       - If successful, a `SIGNED_IN` event is emitted.
@@ -1934,7 +1934,7 @@ functions:
           ```
   - id: refresh-session
     title: refreshSession()
-    $ref: "@supabase/auth-js.GoTrueClient.refreshSession"
+    $ref: '@supabase/auth-js.GoTrueClient.refreshSession'
     notes: |
       - This method will refresh and return a new session whether the current one is expired or not.
     examples:
@@ -2057,7 +2057,7 @@ functions:
           ```
   - id: exchange-code-for-session
     title: exchangeCodeForSession()
-    $ref: "@supabase/auth-js.GoTrueClient.exchangeCodeForSession"
+    $ref: '@supabase/auth-js.GoTrueClient.exchangeCodeForSession'
     notes: |
       - Used when `flowType` is set to `pkce` in client options.
     examples:
@@ -2259,7 +2259,7 @@ functions:
           ```
   - id: get-user-by-id
     title: getUserById()
-    $ref: "@supabase/auth-js.GoTrueAdminApi.getUserById"
+    $ref: '@supabase/auth-js.GoTrueAdminApi.getUserById'
     notes: |
       - Fetches the user object from the database based on the user's id.
       - The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
@@ -2315,7 +2315,7 @@ functions:
           ```
   - id: list-users
     title: listUsers()
-    $ref: "@supabase/auth-js.GoTrueAdminApi.listUsers"
+    $ref: '@supabase/auth-js.GoTrueAdminApi.listUsers'
     notes: |
       - Defaults to return 50 users per page.
     examples:
@@ -2338,7 +2338,7 @@ functions:
           ```
   - id: create-user
     title: createUser()
-    $ref: "@supabase/auth-js.GoTrueAdminApi.createUser"
+    $ref: '@supabase/auth-js.GoTrueAdminApi.createUser'
     notes: |
       - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
       - `createUser()` will not send a confirmation email to the user. You can use [`inviteUserByEmail()`](/docs/reference/javascript/auth-admin-inviteuserbyemail) if you want to send them an email invite instead.
@@ -2417,7 +2417,7 @@ functions:
           ```
   - id: delete-user
     title: deleteUser()
-    $ref: "@supabase/auth-js.GoTrueAdminApi.deleteUser"
+    $ref: '@supabase/auth-js.GoTrueAdminApi.deleteUser'
     notes: |
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
     examples:
@@ -2441,7 +2441,7 @@ functions:
           ```
   - id: invite-user-by-email
     title: inviteUserByEmail()
-    $ref: "@supabase/auth-js.GoTrueAdminApi.inviteUserByEmail"
+    $ref: '@supabase/auth-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       - Sends an invite link to the user's email address.
       - The `inviteUserByEmail()` method is typically used by administrators to invite users to join the application.
@@ -2501,7 +2501,7 @@ functions:
           ```
   - id: reset-password-for-email
     title: resetPasswordForEmail()
-    $ref: "@supabase/auth-js.GoTrueClient.resetPasswordForEmail"
+    $ref: '@supabase/auth-js.GoTrueClient.resetPasswordForEmail'
     notes: |
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
@@ -2565,7 +2565,7 @@ functions:
           ```
   - id: generate-link
     title: generateLink()
-    $ref: "@supabase/auth-js.GoTrueAdminApi.generateLink"
+    $ref: '@supabase/auth-js.GoTrueAdminApi.generateLink'
     notes: |
       - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `email_change_current`, `email_change_new`, `phone_change`.
       - `generateLink()` only generates the email link for `email_change_email` if the **Secure email change** is enabled in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
@@ -2712,7 +2712,7 @@ functions:
           ```
   - id: update-user-by-id
     title: updateUserById()
-    $ref: "@supabase/auth-js.GoTrueAdminApi.updateUserById"
+    $ref: '@supabase/auth-js.GoTrueAdminApi.updateUserById'
     examples:
       - id: updates-a-users-email
         name: Updates a user's email
@@ -2838,7 +2838,7 @@ functions:
           ```
   - id: mfa-list-factors-admin
     title: mfa.listFactors()
-    $ref: "@supabase/auth-js.GoTrueAdminMFAApi.listFactors"
+    $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
     examples:
       - id: list-factors
         name: List all factors for a user
@@ -2867,7 +2867,7 @@ functions:
           ```
   - id: mfa-delete-factor
     title: mfa.deleteFactor()
-    $ref: "@supabase/auth-js.GoTrueAdminMFAApi.deleteFactor"
+    $ref: '@supabase/auth-js.GoTrueAdminMFAApi.deleteFactor'
     examples:
       - id: delete-factor
         name: Delete a factor for a user
@@ -2889,8 +2889,8 @@ functions:
           }
           ```
   - id: select
-    title: "Fetch data: select()"
-    $ref: "@supabase/postgrest-js.PostgrestQueryBuilder.select"
+    title: 'Fetch data: select()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
       - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
@@ -3638,8 +3638,8 @@ functions:
           Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
         hideCodeBlock: true
   - id: insert
-    title: "Create data: insert()"
-    $ref: "@supabase/postgrest-js.PostgrestQueryBuilder.insert"
+    title: 'Create data: insert()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
     examples:
       - id: create-a-record
         name: Create a record
@@ -3728,8 +3728,8 @@ functions:
           If any of the inserts fail, none of the rows are inserted.
         hideCodeBlock: true
   - id: update
-    title: "Modify data: update()"
-    $ref: "@supabase/postgrest-js.PostgrestQueryBuilder.update"
+    title: 'Modify data: update()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.update'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
     examples:
@@ -3850,8 +3850,8 @@ functions:
           working with JSON data. Currently, it is only possible to update the entire JSON document.
         hideCodeBlock: true
   - id: upsert
-    title: "Upsert data: upsert()"
-    $ref: "@supabase/postgrest-js.PostgrestQueryBuilder.upsert"
+    title: 'Upsert data: upsert()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
     notes: |
       - Primary keys must be included in `values` to use upsert.
     examples:
@@ -3977,8 +3977,8 @@ functions:
           another column with a unique constraint to determine conflicts.
         hideCodeBlock: true
   - id: delete
-    title: "Delete data: delete()"
-    $ref: "@supabase/postgrest-js.PostgrestQueryBuilder.delete"
+    title: 'Delete data: delete()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.delete'
     notes: |
       - `delete()` should always be combined with [filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
       - If you use `delete()` with filters and you have
@@ -4081,7 +4081,7 @@ functions:
           ```
         hideCodeBlock: true
   - id: rpc
-    title: "Postgres functions: rpc()"
+    title: 'Postgres functions: rpc()'
     description: |
       You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
       Functions are useful when the logic rarely changes—like for password resets and updates.
@@ -4093,7 +4093,7 @@ functions:
       ```
 
       To call Postgres functions on [Read Replicas](/docs/guides/platform/read-replicas), use the `get: true` option.
-    $ref: "@supabase/postgrest-js.PostgrestClient.rpc"
+    $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
       - id: call-a-postgres-function-without-arguments
         name: Call a Postgres function without arguments
@@ -4413,7 +4413,7 @@ functions:
           notation.
   - id: eq
     title: eq()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.eq"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
     examples:
       - id: with-select
         name: With `select()`
@@ -4454,7 +4454,7 @@ functions:
         isSpotlight: true
   - id: neq
     title: neq()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.neq"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
     examples:
       - id: with-select
         name: With `select()`
@@ -4499,7 +4499,7 @@ functions:
         isSpotlight: true
   - id: gt
     title: gt()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.gt"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
     examples:
       - id: with-select
         name: With `select()`
@@ -4543,7 +4543,7 @@ functions:
           to add double quotes e.g. `.gt('"order"', 2)`
   - id: gte
     title: gte()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.gte"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
     examples:
       - id: with-select
         name: With `select()`
@@ -4588,7 +4588,7 @@ functions:
         isSpotlight: true
   - id: lt
     title: lt()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.lt"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
     examples:
       - id: with-select
         name: With `select()`
@@ -4629,7 +4629,7 @@ functions:
         isSpotlight: true
   - id: lte
     title: lte()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.lte"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - id: with-select
         name: With `select()`
@@ -4674,7 +4674,7 @@ functions:
         isSpotlight: true
   - id: like
     title: like()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.like"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
     examples:
       - id: with-select
         name: With `select()`
@@ -4715,7 +4715,7 @@ functions:
         isSpotlight: true
   - id: ilike
     title: ilike()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.ilike"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
     examples:
       - id: with-select
         name: With `select()`
@@ -4756,7 +4756,7 @@ functions:
         isSpotlight: true
   - id: is
     title: is()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.is"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
     examples:
       - id: checking-nullness
         name: Checking for nullness, true or false
@@ -4800,7 +4800,7 @@ functions:
         isSpotlight: true
   - id: in
     title: in()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.in"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
     examples:
       - id: with-select
         name: With `select()`
@@ -4845,7 +4845,7 @@ functions:
         isSpotlight: true
   - id: contains
     title: contains()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.contains"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
     examples:
       - id: on-array-columns
         name: On array columns
@@ -4971,7 +4971,7 @@ functions:
         hideCodeBlock: true
   - id: contained-by
     title: containedBy()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.containedBy"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
     examples:
       - id: on-array-columns
         name: On array columns
@@ -5097,7 +5097,7 @@ functions:
         hideCodeBlock: true
   - id: range-gt
     title: rangeGt()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
     examples:
       - id: with-select
         name: With `select()`
@@ -5147,7 +5147,7 @@ functions:
         isSpotlight: true
   - id: range-gte
     title: rangeGte()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
     examples:
       - id: with-select
         name: With `select()`
@@ -5197,7 +5197,7 @@ functions:
         isSpotlight: true
   - id: range-lt
     title: rangeLt()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
     examples:
       - id: with-select
         name: With `select()`
@@ -5247,7 +5247,7 @@ functions:
         isSpotlight: true
   - id: range-lte
     title: rangeLte()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - id: with-select
         name: With `select()`
@@ -5297,7 +5297,7 @@ functions:
         isSpotlight: true
   - id: range-adjacent
     title: rangeAdjacent()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
     examples:
       - id: with-select
         name: With `select()`
@@ -5347,7 +5347,7 @@ functions:
         isSpotlight: true
   - id: overlaps
     title: overlaps()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.overlaps"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
     examples:
       - id: on-array-columns
         name: On array columns
@@ -5435,7 +5435,7 @@ functions:
         hideCodeBlock: true
   - id: text-search
     title: textSearch()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.textSearch"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
     notes: |
       - For more information, see [Postgres full text search](/docs/guides/database/full-text-search).
     examples:
@@ -5527,7 +5527,7 @@ functions:
           ```
   - id: match
     title: match()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.match"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.match'
     examples:
       - id: with-select
         name: With `select()`
@@ -5567,7 +5567,7 @@ functions:
         isSpotlight: true
   - id: not
     title: not()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.not"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
     notes: |
       not() expects you to use the raw PostgREST syntax for the filter values.
 
@@ -5614,7 +5614,7 @@ functions:
         isSpotlight: true
   - id: or
     title: or()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.or"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
     notes: |
       or() expects you to use the raw PostgREST syntax for the filter names and values.
 
@@ -5754,7 +5754,7 @@ functions:
         hideCodeBlock: true
   - id: filter
     title: filter()
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.filter"
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
     notes: |
       filter() expects you to use the raw PostgREST syntax for the filter values.
 
@@ -5868,7 +5868,7 @@ functions:
       returns a table response).
   - id: db-modifiers-select
     title: select()
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.select"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
     examples:
       - id: with-upsert
         name: With `upsert()`
@@ -5907,7 +5907,7 @@ functions:
         isSpotlight: true
   - id: order
     title: order()
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.order"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
     examples:
       - id: with-select
         name: With `select()`
@@ -6079,7 +6079,7 @@ functions:
         hideCodeBlock: true
   - id: limit
     title: limit()
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.limit"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
     examples:
       - id: with-select
         name: With `select()`
@@ -6173,7 +6173,7 @@ functions:
         hideCodeBlock: true
   - id: range
     title: range()
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.range"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.range'
     examples:
       - id: with-select
         name: With `select()`
@@ -6215,7 +6215,7 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
   - id: abort-signal
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.abortSignal'
     title: abortSignal()
     notes: |
       You can use this to set a timeout for the request.
@@ -6274,7 +6274,7 @@ functions:
         hideCodeBlock: true
   - id: single
     title: single()
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.single"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
     examples:
       - id: with-select
         name: With `select()`
@@ -6313,7 +6313,7 @@ functions:
         isSpotlight: true
   - id: maybe-single
     title: maybeSingle()
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
     examples:
       - id: with-select
         name: With `select()`
@@ -6348,7 +6348,7 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
   - id: csv
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.csv"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
     title: csv()
     examples:
       - id: return-data-as-csv
@@ -6386,7 +6386,7 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
   - id: returns
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.returns"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
     notes: |
       - Deprecated: use overrideTypes method instead
     title: returns()
@@ -6423,7 +6423,7 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
   - id: overrideTypes
-    $ref: "@supabase/postgrest-js.PostgrestBuilder.overrideTypes"
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.overrideTypes'
     title: overrideTypes()
     examples:
       - id: complete-override-type-of-successful-response
@@ -6489,7 +6489,7 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
   - id: explain
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.explain"
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
     title: Using Explain
     description: |
       For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
@@ -6574,7 +6574,7 @@ functions:
     title: invoke()
     description: |
       Invoke a Supabase Edge Function.
-    $ref: "@supabase/functions-js.FunctionsClient.invoke"
+    $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
@@ -6689,7 +6689,7 @@ functions:
           ```
   - id: subscribe
     title: on().subscribe()
-    $ref: "@supabase/realtime-js.RealtimeChannel.on"
+    $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
       - By default, Broadcast and Presence are enabled for all projects.
       - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
@@ -6864,7 +6864,7 @@ functions:
     notes: |
       - When using REST you don't need to subscribe to the channel
       - REST calls are only available from 2.37.0 onwards
-    $ref: "@supabase/realtime-js.RealtimeChannel.send"
+    $ref: '@supabase/realtime-js.RealtimeChannel.send'
     examples:
       - id: send-a-message
         name: Send a message via websocket
@@ -6898,7 +6898,7 @@ functions:
           ```
   - id: get-channels
     title: getChannels()
-    $ref: "@supabase/supabase-js.SupabaseClient.getChannels"
+    $ref: '@supabase/supabase-js.SupabaseClient.getChannels'
     examples:
       - id: get-all-channels
         name: Get all channels
@@ -6909,7 +6909,7 @@ functions:
           ```
   - id: remove-channel
     title: removeChannel()
-    $ref: "@supabase/supabase-js.SupabaseClient.removeChannel"
+    $ref: '@supabase/supabase-js.SupabaseClient.removeChannel'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
@@ -6922,7 +6922,7 @@ functions:
           ```
   - id: remove-all-channels
     title: removeAllChannels()
-    $ref: "@supabase/supabase-js.SupabaseClient.removeAllChannels"
+    $ref: '@supabase/supabase-js.SupabaseClient.removeAllChannels'
     notes: |
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
@@ -6935,7 +6935,7 @@ functions:
           ```
   - id: list-buckets
     title: listBuckets()
-    $ref: "@supabase/storage-js.packages/StorageBucketApi.default.listBuckets"
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -6973,7 +6973,7 @@ functions:
           ```
   - id: get-bucket
     title: getBucket()
-    $ref: "@supabase/storage-js.packages/StorageBucketApi.default.getBucket"
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -7009,7 +7009,7 @@ functions:
           ```
   - id: create-bucket
     title: createBucket()
-    $ref: "@supabase/storage-js.packages/StorageBucketApi.default.createBucket"
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
@@ -7040,7 +7040,7 @@ functions:
           ```
   - id: empty-bucket
     title: emptyBucket()
-    $ref: "@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket"
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -7067,7 +7067,7 @@ functions:
           ```
   - id: update-bucket
     title: updateBucket()
-    $ref: "@supabase/storage-js.packages/StorageBucketApi.default.updateBucket"
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `update`
@@ -7098,7 +7098,7 @@ functions:
           ```
   - id: delete-bucket
     title: deleteBucket()
-    $ref: "@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket"
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
@@ -7125,7 +7125,7 @@ functions:
           ```
   - id: from-upload
     title: from.upload()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.upload"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7171,7 +7171,7 @@ functions:
           ```
   - id: from-update
     title: from.update()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.update"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7218,7 +7218,7 @@ functions:
           ```
   - id: from-move
     title: from.move()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.move"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7246,7 +7246,7 @@ functions:
           ```
   - id: from-copy
     title: from.copy()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.copy"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7274,7 +7274,7 @@ functions:
           ```
   - id: from-create-signed-url
     title: from.createSignedUrl()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7329,7 +7329,7 @@ functions:
           ```
   - id: from-create-signed-urls
     title: from.createSignedUrls()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7368,7 +7368,7 @@ functions:
           ```
   - id: from-create-signed-upload-url
     title: from.createSignedUploadUrl()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.createSignedUploadUrl"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUploadUrl'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7398,7 +7398,7 @@ functions:
           ```
   - id: from-upload-to-signed-url
     title: from.uploadToSignedUrl()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.uploadToSignedUrl"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.uploadToSignedUrl'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7427,7 +7427,7 @@ functions:
           ```
   - id: from-get-public-url
     title: from.getPublicUrl()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
       - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
@@ -7482,7 +7482,7 @@ functions:
           ```
   - id: from-download
     title: from.download()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.download"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7524,7 +7524,7 @@ functions:
           ```
   - id: from-remove
     title: from.remove()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.remove"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7550,7 +7550,7 @@ functions:
           ```
   - id: from-list
     title: from.list()
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.list"
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7611,52 +7611,52 @@ functions:
           ```
   - id: constructor
     title: constructor
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/supabase-js.GoTrueAdminApi.constructor'
+    description: 'TODO: Add description for constructor'
   - id: createuser
     title: createUser
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.createUser"
+    $ref: '@supabase/supabase-js.GoTrueAdminApi.createUser'
     description: |-
       Creates a new user.
       This function should only be called on a server. Never expose your  key in the browser.
   - id: deleteuser
     title: deleteUser
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.deleteUser"
+    $ref: '@supabase/supabase-js.GoTrueAdminApi.deleteUser'
     description: Delete a user. Requires a  key.
   - id: generatelink
     title: generateLink
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.generateLink"
+    $ref: '@supabase/supabase-js.GoTrueAdminApi.generateLink'
     description: Generates email links and OTPs to be sent via a custom email provider.
   - id: getuserbyid
     title: getUserById
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.getUserById"
+    $ref: '@supabase/supabase-js.GoTrueAdminApi.getUserById'
     description: Get user by id.
   - id: inviteuserbyemail
     title: inviteUserByEmail
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.inviteUserByEmail"
+    $ref: '@supabase/supabase-js.GoTrueAdminApi.inviteUserByEmail'
     description: Sends an invite link to an email address.
   - id: listusers
     title: listUsers
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.listUsers"
+    $ref: '@supabase/supabase-js.GoTrueAdminApi.listUsers'
     description: |-
       Get a list of users.
 
       This function should only be called on a server. Never expose your  key in the browser.
   - id: signout
     title: signOut
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.signOut"
+    $ref: '@supabase/supabase-js.GoTrueAdminApi.signOut'
     description: Removes a logged-in session.
   - id: updateuserbyid
     title: updateUserById
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.updateUserById"
+    $ref: '@supabase/supabase-js.GoTrueAdminApi.updateUserById'
     description: Updates the user data.
   - id: constructor
     title: constructor
-    $ref: "@supabase/supabase-js.RealtimeChannel.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/supabase-js.RealtimeChannel.constructor'
+    description: 'TODO: Add description for constructor'
   - id: httpsend
     title: httpSend
-    $ref: "@supabase/supabase-js.RealtimeChannel.httpSend"
+    $ref: '@supabase/supabase-js.RealtimeChannel.httpSend'
     description: |-
       Sends a broadcast message explicitly via REST API.
 
@@ -7664,34 +7664,34 @@ functions:
       Useful when you want to guarantee REST delivery or when gradually migrating from implicit REST fallback.
   - id: on
     title: on
-    $ref: "@supabase/supabase-js.RealtimeChannel.on"
+    $ref: '@supabase/supabase-js.RealtimeChannel.on'
     description: Creates an event handler that listens to changes.
   - id: presencestate
     title: presenceState
-    $ref: "@supabase/supabase-js.RealtimeChannel.presenceState"
-    description: "TODO: Add description for presenceState"
+    $ref: '@supabase/supabase-js.RealtimeChannel.presenceState'
+    description: 'TODO: Add description for presenceState'
   - id: send
     title: send
-    $ref: "@supabase/supabase-js.RealtimeChannel.send"
+    $ref: '@supabase/supabase-js.RealtimeChannel.send'
     description: Sends a message into the channel.
   - id: subscribe
     title: subscribe
-    $ref: "@supabase/supabase-js.RealtimeChannel.subscribe"
+    $ref: '@supabase/supabase-js.RealtimeChannel.subscribe'
     description: Subscribe registers your client with the server
   - id: teardown
     title: teardown
-    $ref: "@supabase/supabase-js.RealtimeChannel.teardown"
+    $ref: '@supabase/supabase-js.RealtimeChannel.teardown'
     description: |-
       Teardown the channel.
 
       Destroys and stops related timers.
   - id: track
     title: track
-    $ref: "@supabase/supabase-js.RealtimeChannel.track"
-    description: "TODO: Add description for track"
+    $ref: '@supabase/supabase-js.RealtimeChannel.track'
+    description: 'TODO: Add description for track'
   - id: unsubscribe
     title: unsubscribe
-    $ref: "@supabase/supabase-js.RealtimeChannel.unsubscribe"
+    $ref: '@supabase/supabase-js.RealtimeChannel.unsubscribe'
     description: |-
       Leaves the channel.
 
@@ -7702,89 +7702,89 @@ functions:
       channel.unsubscribe().receive("ok", () => alert("left!") )
   - id: untrack
     title: untrack
-    $ref: "@supabase/supabase-js.RealtimeChannel.untrack"
-    description: "TODO: Add description for untrack"
+    $ref: '@supabase/supabase-js.RealtimeChannel.untrack'
+    description: 'TODO: Add description for untrack'
   - id: updatejoinpayload
     title: updateJoinPayload
-    $ref: "@supabase/supabase-js.RealtimeChannel.updateJoinPayload"
-    description: "TODO: Add description for updateJoinPayload"
+    $ref: '@supabase/supabase-js.RealtimeChannel.updateJoinPayload'
+    description: 'TODO: Add description for updateJoinPayload'
   - id: constructor
     title: constructor
-    $ref: "@supabase/supabase-js.RealtimeClient.constructor"
+    $ref: '@supabase/supabase-js.RealtimeClient.constructor'
     description: Initializes the Socket.
   - id: channel
     title: channel
-    $ref: "@supabase/supabase-js.RealtimeClient.channel"
-    description: "TODO: Add description for channel"
+    $ref: '@supabase/supabase-js.RealtimeClient.channel'
+    description: 'TODO: Add description for channel'
   - id: connect
     title: connect
-    $ref: "@supabase/supabase-js.RealtimeClient.connect"
+    $ref: '@supabase/supabase-js.RealtimeClient.connect'
     description: Connects the socket, unless already connected.
   - id: connectionstate
     title: connectionState
-    $ref: "@supabase/supabase-js.RealtimeClient.connectionState"
+    $ref: '@supabase/supabase-js.RealtimeClient.connectionState'
     description: Returns the current state of the socket.
   - id: disconnect
     title: disconnect
-    $ref: "@supabase/supabase-js.RealtimeClient.disconnect"
+    $ref: '@supabase/supabase-js.RealtimeClient.disconnect'
     description: Disconnects the socket.
   - id: endpointurl
     title: endpointURL
-    $ref: "@supabase/supabase-js.RealtimeClient.endpointURL"
+    $ref: '@supabase/supabase-js.RealtimeClient.endpointURL'
     description: Returns the URL of the websocket.
   - id: flushsendbuffer
     title: flushSendBuffer
-    $ref: "@supabase/supabase-js.RealtimeClient.flushSendBuffer"
+    $ref: '@supabase/supabase-js.RealtimeClient.flushSendBuffer'
     description: Flushes send buffer
   - id: getchannels
     title: getChannels
-    $ref: "@supabase/supabase-js.RealtimeClient.getChannels"
+    $ref: '@supabase/supabase-js.RealtimeClient.getChannels'
     description: Returns all created channels
   - id: isconnected
     title: isConnected
-    $ref: "@supabase/supabase-js.RealtimeClient.isConnected"
+    $ref: '@supabase/supabase-js.RealtimeClient.isConnected'
     description: Returns  is the connection is open.
   - id: isconnecting
     title: isConnecting
-    $ref: "@supabase/supabase-js.RealtimeClient.isConnecting"
+    $ref: '@supabase/supabase-js.RealtimeClient.isConnecting'
     description: Returns  if the connection is currently connecting.
   - id: isdisconnecting
     title: isDisconnecting
-    $ref: "@supabase/supabase-js.RealtimeClient.isDisconnecting"
+    $ref: '@supabase/supabase-js.RealtimeClient.isDisconnecting'
     description: Returns  if the connection is currently disconnecting.
   - id: log
     title: log
-    $ref: "@supabase/supabase-js.RealtimeClient.log"
+    $ref: '@supabase/supabase-js.RealtimeClient.log'
     description: |-
       Logs the message.
 
       For customized logging,  can be overridden.
   - id: onheartbeat
     title: onHeartbeat
-    $ref: "@supabase/supabase-js.RealtimeClient.onHeartbeat"
-    description: "TODO: Add description for onHeartbeat"
+    $ref: '@supabase/supabase-js.RealtimeClient.onHeartbeat'
+    description: 'TODO: Add description for onHeartbeat'
   - id: push
     title: push
-    $ref: "@supabase/supabase-js.RealtimeClient.push"
+    $ref: '@supabase/supabase-js.RealtimeClient.push'
     description: |-
       Push out a message if the socket is connected.
 
       If the socket is not connected, the message gets enqueued within a local buffer, and sent out when a connection is next established.
   - id: removeallchannels
     title: removeAllChannels
-    $ref: "@supabase/supabase-js.RealtimeClient.removeAllChannels"
+    $ref: '@supabase/supabase-js.RealtimeClient.removeAllChannels'
     description: Unsubscribes and removes all channels
   - id: removechannel
     title: removeChannel
-    $ref: "@supabase/supabase-js.RealtimeClient.removeChannel"
+    $ref: '@supabase/supabase-js.RealtimeClient.removeChannel'
     description: Unsubscribes and removes a single channel
   - id: sendheartbeat
     title: sendHeartbeat
-    $ref: "@supabase/supabase-js.RealtimeClient.sendHeartbeat"
+    $ref: '@supabase/supabase-js.RealtimeClient.sendHeartbeat'
     description: Sends a heartbeat message if the socket is connected.
   - id: setauth
     title: setAuth
-    $ref: "@supabase/supabase-js.RealtimeClient.setAuth"
+    $ref: '@supabase/supabase-js.RealtimeClient.setAuth'
     description: |-
       Sets the JWT access token used for channel subscription authorization and Realtime RLS.
 
@@ -7793,38 +7793,38 @@ functions:
       On callback used, it will set the value of the token internal to the client.
   - id: channel
     title: channel
-    $ref: "@supabase/supabase-js.SupabaseClient.channel"
+    $ref: '@supabase/supabase-js.SupabaseClient.channel'
     description: Creates a Realtime channel with Broadcast, Presence, and Postgres Changes.
   - id: from
     title: from
-    $ref: "@supabase/supabase-js.SupabaseClient.from"
+    $ref: '@supabase/supabase-js.SupabaseClient.from'
     description: Perform a query on a table or a view.
   - id: rpc
     title: rpc
-    $ref: "@supabase/supabase-js.SupabaseClient.rpc"
+    $ref: '@supabase/supabase-js.SupabaseClient.rpc'
     description: Perform a function call.
   - id: schema
     title: schema
-    $ref: "@supabase/supabase-js.SupabaseClient.schema"
+    $ref: '@supabase/supabase-js.SupabaseClient.schema'
     description: |-
       Select a schema to query or perform an function (rpc) call.
 
       The schema needs to be on the list of exposed schemas inside Supabase.
   - id: constructor
     title: constructor
-    $ref: "@supabase/auth-js.GoTrueAdminApi.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/auth-js.GoTrueAdminApi.constructor'
+    description: 'TODO: Add description for constructor'
   - id: signout
     title: signOut
-    $ref: "@supabase/auth-js.GoTrueAdminApi.signOut"
+    $ref: '@supabase/auth-js.GoTrueAdminApi.signOut'
     description: Removes a logged-in session.
   - id: constructor
     title: constructor
-    $ref: "@supabase/realtime-js.RealtimeChannel.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/realtime-js.RealtimeChannel.constructor'
+    description: 'TODO: Add description for constructor'
   - id: httpsend
     title: httpSend
-    $ref: "@supabase/realtime-js.RealtimeChannel.httpSend"
+    $ref: '@supabase/realtime-js.RealtimeChannel.httpSend'
     description: |-
       Sends a broadcast message explicitly via REST API.
 
@@ -7832,26 +7832,26 @@ functions:
       Useful when you want to guarantee REST delivery or when gradually migrating from implicit REST fallback.
   - id: presencestate
     title: presenceState
-    $ref: "@supabase/realtime-js.RealtimeChannel.presenceState"
-    description: "TODO: Add description for presenceState"
+    $ref: '@supabase/realtime-js.RealtimeChannel.presenceState'
+    description: 'TODO: Add description for presenceState'
   - id: subscribe
     title: subscribe
-    $ref: "@supabase/realtime-js.RealtimeChannel.subscribe"
+    $ref: '@supabase/realtime-js.RealtimeChannel.subscribe'
     description: Subscribe registers your client with the server
   - id: teardown
     title: teardown
-    $ref: "@supabase/realtime-js.RealtimeChannel.teardown"
+    $ref: '@supabase/realtime-js.RealtimeChannel.teardown'
     description: |-
       Teardown the channel.
 
       Destroys and stops related timers.
   - id: track
     title: track
-    $ref: "@supabase/realtime-js.RealtimeChannel.track"
-    description: "TODO: Add description for track"
+    $ref: '@supabase/realtime-js.RealtimeChannel.track'
+    description: 'TODO: Add description for track'
   - id: unsubscribe
     title: unsubscribe
-    $ref: "@supabase/realtime-js.RealtimeChannel.unsubscribe"
+    $ref: '@supabase/realtime-js.RealtimeChannel.unsubscribe'
     description: |-
       Leaves the channel.
 
@@ -7862,89 +7862,89 @@ functions:
       channel.unsubscribe().receive("ok", () => alert("left!") )
   - id: untrack
     title: untrack
-    $ref: "@supabase/realtime-js.RealtimeChannel.untrack"
-    description: "TODO: Add description for untrack"
+    $ref: '@supabase/realtime-js.RealtimeChannel.untrack'
+    description: 'TODO: Add description for untrack'
   - id: updatejoinpayload
     title: updateJoinPayload
-    $ref: "@supabase/realtime-js.RealtimeChannel.updateJoinPayload"
-    description: "TODO: Add description for updateJoinPayload"
+    $ref: '@supabase/realtime-js.RealtimeChannel.updateJoinPayload'
+    description: 'TODO: Add description for updateJoinPayload'
   - id: constructor
     title: constructor
-    $ref: "@supabase/realtime-js.RealtimeClient.constructor"
+    $ref: '@supabase/realtime-js.RealtimeClient.constructor'
     description: Initializes the Socket.
   - id: channel
     title: channel
-    $ref: "@supabase/realtime-js.RealtimeClient.channel"
-    description: "TODO: Add description for channel"
+    $ref: '@supabase/realtime-js.RealtimeClient.channel'
+    description: 'TODO: Add description for channel'
   - id: connect
     title: connect
-    $ref: "@supabase/realtime-js.RealtimeClient.connect"
+    $ref: '@supabase/realtime-js.RealtimeClient.connect'
     description: Connects the socket, unless already connected.
   - id: connectionstate
     title: connectionState
-    $ref: "@supabase/realtime-js.RealtimeClient.connectionState"
+    $ref: '@supabase/realtime-js.RealtimeClient.connectionState'
     description: Returns the current state of the socket.
   - id: disconnect
     title: disconnect
-    $ref: "@supabase/realtime-js.RealtimeClient.disconnect"
+    $ref: '@supabase/realtime-js.RealtimeClient.disconnect'
     description: Disconnects the socket.
   - id: endpointurl
     title: endpointURL
-    $ref: "@supabase/realtime-js.RealtimeClient.endpointURL"
+    $ref: '@supabase/realtime-js.RealtimeClient.endpointURL'
     description: Returns the URL of the websocket.
   - id: flushsendbuffer
     title: flushSendBuffer
-    $ref: "@supabase/realtime-js.RealtimeClient.flushSendBuffer"
+    $ref: '@supabase/realtime-js.RealtimeClient.flushSendBuffer'
     description: Flushes send buffer
   - id: getchannels
     title: getChannels
-    $ref: "@supabase/realtime-js.RealtimeClient.getChannels"
+    $ref: '@supabase/realtime-js.RealtimeClient.getChannels'
     description: Returns all created channels
   - id: isconnected
     title: isConnected
-    $ref: "@supabase/realtime-js.RealtimeClient.isConnected"
+    $ref: '@supabase/realtime-js.RealtimeClient.isConnected'
     description: Returns  is the connection is open.
   - id: isconnecting
     title: isConnecting
-    $ref: "@supabase/realtime-js.RealtimeClient.isConnecting"
+    $ref: '@supabase/realtime-js.RealtimeClient.isConnecting'
     description: Returns  if the connection is currently connecting.
   - id: isdisconnecting
     title: isDisconnecting
-    $ref: "@supabase/realtime-js.RealtimeClient.isDisconnecting"
+    $ref: '@supabase/realtime-js.RealtimeClient.isDisconnecting'
     description: Returns  if the connection is currently disconnecting.
   - id: log
     title: log
-    $ref: "@supabase/realtime-js.RealtimeClient.log"
+    $ref: '@supabase/realtime-js.RealtimeClient.log'
     description: |-
       Logs the message.
 
       For customized logging,  can be overridden.
   - id: onheartbeat
     title: onHeartbeat
-    $ref: "@supabase/realtime-js.RealtimeClient.onHeartbeat"
-    description: "TODO: Add description for onHeartbeat"
+    $ref: '@supabase/realtime-js.RealtimeClient.onHeartbeat'
+    description: 'TODO: Add description for onHeartbeat'
   - id: push
     title: push
-    $ref: "@supabase/realtime-js.RealtimeClient.push"
+    $ref: '@supabase/realtime-js.RealtimeClient.push'
     description: |-
       Push out a message if the socket is connected.
 
       If the socket is not connected, the message gets enqueued within a local buffer, and sent out when a connection is next established.
   - id: removeallchannels
     title: removeAllChannels
-    $ref: "@supabase/realtime-js.RealtimeClient.removeAllChannels"
+    $ref: '@supabase/realtime-js.RealtimeClient.removeAllChannels'
     description: Unsubscribes and removes all channels
   - id: removechannel
     title: removeChannel
-    $ref: "@supabase/realtime-js.RealtimeClient.removeChannel"
+    $ref: '@supabase/realtime-js.RealtimeClient.removeChannel'
     description: Unsubscribes and removes a single channel
   - id: sendheartbeat
     title: sendHeartbeat
-    $ref: "@supabase/realtime-js.RealtimeClient.sendHeartbeat"
+    $ref: '@supabase/realtime-js.RealtimeClient.sendHeartbeat'
     description: Sends a heartbeat message if the socket is connected.
   - id: setauth
     title: setAuth
-    $ref: "@supabase/realtime-js.RealtimeClient.setAuth"
+    $ref: '@supabase/realtime-js.RealtimeClient.setAuth'
     description: |-
       Sets the JWT access token used for channel subscription authorization and Realtime RLS.
 
@@ -7953,11 +7953,11 @@ functions:
       On callback used, it will set the value of the token internal to the client.
   - id: constructor
     title: constructor
-    $ref: "@supabase/storage-js.index.StorageVectorsClient.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/storage-js.index.StorageVectorsClient.constructor'
+    description: 'TODO: Add description for constructor'
   - id: from
     title: from
-    $ref: "@supabase/storage-js.index.StorageVectorsClient.from"
+    $ref: '@supabase/storage-js.index.StorageVectorsClient.from'
     description: |-
       Access operations for a specific vector bucket
       Returns a scoped client for index and vector operations within the bucket
@@ -7981,11 +7981,11 @@ functions:
           ```
   - id: constructor
     title: constructor
-    $ref: "@supabase/storage-js.index.VectorBucketApi.constructor"
+    $ref: '@supabase/storage-js.index.VectorBucketApi.constructor'
     description: Creates a new VectorBucketApi instance
   - id: createbucket
     title: createBucket
-    $ref: "@supabase/storage-js.index.VectorBucketApi.createBucket"
+    $ref: '@supabase/storage-js.index.VectorBucketApi.createBucket'
     description: |-
       Creates a new vector bucket
       Vector buckets are containers for vector indexes and their data
@@ -8001,7 +8001,7 @@ functions:
           ```
   - id: deletebucket
     title: deleteBucket
-    $ref: "@supabase/storage-js.index.VectorBucketApi.deleteBucket"
+    $ref: '@supabase/storage-js.index.VectorBucketApi.deleteBucket'
     description: |-
       Deletes a vector bucket
       Bucket must be empty before deletion (all indexes must be removed first)
@@ -8018,7 +8018,7 @@ functions:
           ```
   - id: getbucket
     title: getBucket
-    $ref: "@supabase/storage-js.index.VectorBucketApi.getBucket"
+    $ref: '@supabase/storage-js.index.VectorBucketApi.getBucket'
     description: |-
       Retrieves metadata for a specific vector bucket
       Returns bucket configuration including encryption settings and creation time
@@ -8034,7 +8034,7 @@ functions:
           ```
   - id: listbuckets
     title: listBuckets
-    $ref: "@supabase/storage-js.index.VectorBucketApi.listBuckets"
+    $ref: '@supabase/storage-js.index.VectorBucketApi.listBuckets'
     description: |-
       Lists vector buckets with optional filtering and pagination
       Supports prefix-based filtering and paginated results
@@ -8055,7 +8055,7 @@ functions:
           ```
   - id: throwonerror
     title: throwOnError
-    $ref: "@supabase/storage-js.index.VectorBucketApi.throwOnError"
+    $ref: '@supabase/storage-js.index.VectorBucketApi.throwOnError'
     description: |-
       Enable throwing errors instead of returning them in the response
       When enabled, failed operations will throw instead of returning { data: null, error }
@@ -8070,11 +8070,11 @@ functions:
           ```
   - id: constructor
     title: constructor
-    $ref: "@supabase/storage-js.index.VectorBucketScope.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/storage-js.index.VectorBucketScope.constructor'
+    description: 'TODO: Add description for constructor'
   - id: createindex
     title: createIndex
-    $ref: "@supabase/storage-js.index.VectorBucketScope.createIndex"
+    $ref: '@supabase/storage-js.index.VectorBucketScope.createIndex'
     description: |-
       Creates a new vector index in this bucket
       Convenience method that automatically includes the bucket name
@@ -8096,7 +8096,7 @@ functions:
           ```
   - id: deleteindex
     title: deleteIndex
-    $ref: "@supabase/storage-js.index.VectorBucketScope.deleteIndex"
+    $ref: '@supabase/storage-js.index.VectorBucketScope.deleteIndex'
     description: |-
       Deletes an index from this bucket
       Convenience method that automatically includes the bucket name
@@ -8110,7 +8110,7 @@ functions:
           ```
   - id: getindex
     title: getIndex
-    $ref: "@supabase/storage-js.index.VectorBucketScope.getIndex"
+    $ref: '@supabase/storage-js.index.VectorBucketScope.getIndex'
     description: |-
       Retrieves metadata for a specific index in this bucket
       Convenience method that automatically includes the bucket name
@@ -8125,7 +8125,7 @@ functions:
           ```
   - id: index
     title: index
-    $ref: "@supabase/storage-js.index.VectorBucketScope.index"
+    $ref: '@supabase/storage-js.index.VectorBucketScope.index'
     description: |-
       Access operations for a specific index within this bucket
       Returns a scoped client for vector data operations
@@ -8151,7 +8151,7 @@ functions:
           ```
   - id: listindexes
     title: listIndexes
-    $ref: "@supabase/storage-js.index.VectorBucketScope.listIndexes"
+    $ref: '@supabase/storage-js.index.VectorBucketScope.listIndexes'
     description: |-
       Lists indexes in this bucket
       Convenience method that automatically includes the bucket name
@@ -8165,11 +8165,11 @@ functions:
           ```
   - id: constructor
     title: constructor
-    $ref: "@supabase/storage-js.index.VectorDataApi.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/storage-js.index.VectorDataApi.constructor'
+    description: 'TODO: Add description for constructor'
   - id: deletevectors
     title: deleteVectors
-    $ref: "@supabase/storage-js.index.VectorDataApi.deleteVectors"
+    $ref: '@supabase/storage-js.index.VectorDataApi.deleteVectors'
     description: |-
       Deletes vectors by their keys in batch
       Accepts 1-500 keys per request
@@ -8189,7 +8189,7 @@ functions:
           ```
   - id: getvectors
     title: getVectors
-    $ref: "@supabase/storage-js.index.VectorDataApi.getVectors"
+    $ref: '@supabase/storage-js.index.VectorDataApi.getVectors'
     description: |-
       Retrieves vectors by their keys in batch
       Optionally includes vector data and/or metadata in response
@@ -8212,7 +8212,7 @@ functions:
           ```
   - id: listvectors
     title: listVectors
-    $ref: "@supabase/storage-js.index.VectorDataApi.listVectors"
+    $ref: '@supabase/storage-js.index.VectorDataApi.listVectors'
     description: |-
       Lists/scans vectors in an index with pagination
       Supports parallel scanning via segment configuration for high-throughput scenarios
@@ -8252,7 +8252,7 @@ functions:
           ```
   - id: putvectors
     title: putVectors
-    $ref: "@supabase/storage-js.index.VectorDataApi.putVectors"
+    $ref: '@supabase/storage-js.index.VectorDataApi.putVectors'
     description: |-
       Inserts or updates vectors in batch (upsert operation)
       Accepts 1-500 vectors per request. Larger batches should be split
@@ -8280,7 +8280,7 @@ functions:
           ```
   - id: queryvectors
     title: queryVectors
-    $ref: "@supabase/storage-js.index.VectorDataApi.queryVectors"
+    $ref: '@supabase/storage-js.index.VectorDataApi.queryVectors'
     description: |-
       Queries for similar vectors using approximate nearest neighbor (ANN) search
       Returns top-K most similar vectors based on the configured distance metric
@@ -8312,7 +8312,7 @@ functions:
           ```
   - id: throwonerror
     title: throwOnError
-    $ref: "@supabase/storage-js.index.VectorDataApi.throwOnError"
+    $ref: '@supabase/storage-js.index.VectorDataApi.throwOnError'
     description: |-
       Enable throwing errors instead of returning them in the response
       When enabled, failed operations will throw instead of returning { data: null, error }
@@ -8327,11 +8327,11 @@ functions:
           ```
   - id: constructor
     title: constructor
-    $ref: "@supabase/storage-js.index.VectorIndexApi.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/storage-js.index.VectorIndexApi.constructor'
+    description: 'TODO: Add description for constructor'
   - id: createindex
     title: createIndex
-    $ref: "@supabase/storage-js.index.VectorIndexApi.createIndex"
+    $ref: '@supabase/storage-js.index.VectorIndexApi.createIndex'
     description: |-
       Creates a new vector index within a bucket
       Defines the schema for vectors including dimensionality, distance metric, and metadata config
@@ -8353,7 +8353,7 @@ functions:
           ```
   - id: deleteindex
     title: deleteIndex
-    $ref: "@supabase/storage-js.index.VectorIndexApi.deleteIndex"
+    $ref: '@supabase/storage-js.index.VectorIndexApi.deleteIndex'
     description: |-
       Deletes a vector index and all its data
       This operation removes the index schema and all vectors stored in the index
@@ -8370,7 +8370,7 @@ functions:
           ```
   - id: getindex
     title: getIndex
-    $ref: "@supabase/storage-js.index.VectorIndexApi.getIndex"
+    $ref: '@supabase/storage-js.index.VectorIndexApi.getIndex'
     description: |-
       Retrieves metadata for a specific vector index
       Returns index configuration including dimension, distance metric, and metadata settings
@@ -8387,7 +8387,7 @@ functions:
           ```
   - id: listindexes
     title: listIndexes
-    $ref: "@supabase/storage-js.index.VectorIndexApi.listIndexes"
+    $ref: '@supabase/storage-js.index.VectorIndexApi.listIndexes'
     description: |-
       Lists vector indexes within a bucket with optional filtering and pagination
       Supports prefix-based filtering and paginated results
@@ -8414,7 +8414,7 @@ functions:
           ```
   - id: throwonerror
     title: throwOnError
-    $ref: "@supabase/storage-js.index.VectorIndexApi.throwOnError"
+    $ref: '@supabase/storage-js.index.VectorIndexApi.throwOnError'
     description: |-
       Enable throwing errors instead of returning them in the response
       When enabled, failed operations will throw instead of returning { data: null, error }
@@ -8429,11 +8429,11 @@ functions:
           ```
   - id: constructor
     title: constructor
-    $ref: "@supabase/storage-js.index.VectorIndexScope.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/storage-js.index.VectorIndexScope.constructor'
+    description: 'TODO: Add description for constructor'
   - id: deletevectors
     title: deleteVectors
-    $ref: "@supabase/storage-js.index.VectorIndexScope.deleteVectors"
+    $ref: '@supabase/storage-js.index.VectorIndexScope.deleteVectors'
     description: |-
       Deletes vectors by keys from this index
       Convenience method that automatically includes bucket and index names
@@ -8449,7 +8449,7 @@ functions:
           ```
   - id: getvectors
     title: getVectors
-    $ref: "@supabase/storage-js.index.VectorIndexScope.getVectors"
+    $ref: '@supabase/storage-js.index.VectorIndexScope.getVectors'
     description: |-
       Retrieves vectors by keys from this index
       Convenience method that automatically includes bucket and index names
@@ -8466,7 +8466,7 @@ functions:
           ```
   - id: listvectors
     title: listVectors
-    $ref: "@supabase/storage-js.index.VectorIndexScope.listVectors"
+    $ref: '@supabase/storage-js.index.VectorIndexScope.listVectors'
     description: |-
       Lists vectors in this index with pagination
       Convenience method that automatically includes bucket and index names
@@ -8483,7 +8483,7 @@ functions:
           ```
   - id: putvectors
     title: putVectors
-    $ref: "@supabase/storage-js.index.VectorIndexScope.putVectors"
+    $ref: '@supabase/storage-js.index.VectorIndexScope.putVectors'
     description: |-
       Inserts or updates vectors in this index
       Convenience method that automatically includes bucket and index names
@@ -8505,7 +8505,7 @@ functions:
           ```
   - id: queryvectors
     title: queryVectors
-    $ref: "@supabase/storage-js.index.VectorIndexScope.queryVectors"
+    $ref: '@supabase/storage-js.index.VectorIndexScope.queryVectors'
     description: |-
       Queries for similar vectors in this index
       Convenience method that automatically includes bucket and index names
@@ -8525,9 +8525,9 @@ functions:
           ```
   - id: constructor
     title: constructor
-    $ref: "@supabase/functions-js.FunctionsClient.constructor"
-    description: "TODO: Add description for constructor"
+    $ref: '@supabase/functions-js.FunctionsClient.constructor'
+    description: 'TODO: Add description for constructor'
   - id: setauth
     title: setAuth
-    $ref: "@supabase/functions-js.FunctionsClient.setAuth"
+    $ref: '@supabase/functions-js.FunctionsClient.setAuth'
     description: Updates the authorization header
