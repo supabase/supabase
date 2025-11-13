@@ -369,6 +369,32 @@ function isDocumentedReexport(path: string, yamlRefs: Map<string, YamlFunction>)
 }
 
 /**
+ * Check if a path is an internal implementation class
+ *
+ * Internal classes have patterns like:
+ * - @supabase/storage-js.packages/BlobDownloadBuilder.default.constructor
+ * - Classes accessed via .default export
+ * - Classes with / in their module path
+ */
+function isInternalImplementationClass(path: string): boolean {
+  // Check for .default. pattern (module default exports)
+  if (path.includes('.default.')) {
+    return true
+  }
+
+  // Check for / in class name (internal module structure)
+  // Example: packages/BlobDownloadBuilder
+  const parts = path.split('.')
+  for (const part of parts) {
+    if (part.includes('/')) {
+      return true
+    }
+  }
+
+  return false
+}
+
+/**
  * Validate JSON → YML (check for missing documentation)
  */
 function validateMissingDocumentation(
@@ -389,6 +415,11 @@ function validateMissingDocumentation(
 
     // Skip re-exports that are already documented in source packages
     if (isDocumentedReexport(path, yamlRefs)) {
+      continue
+    }
+
+    // Skip internal implementation classes
+    if (isInternalImplementationClass(path)) {
       continue
     }
 
