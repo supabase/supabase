@@ -6,7 +6,6 @@ import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
-import type { SpecificFilterColumn } from './Users.constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from 'components/ui/AlertError'
@@ -44,6 +43,7 @@ import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { SortDropdown } from './SortDropdown'
 import { UserPanel } from './UserPanel'
+import type { SpecificFilterColumn } from './Users.constants'
 import {
   ColumnConfiguration,
   Filter,
@@ -95,7 +95,9 @@ export const UsersV2 = () => {
 
   const [specificFilterColumn, setSpecificFilterColumn] = useQueryState<SpecificFilterColumn>(
     'filter',
-    parseAsStringEnum<SpecificFilterColumn>(['id', 'email', 'phone', 'freeform']).withDefault('id')
+    parseAsStringEnum<SpecificFilterColumn>(['id', 'email', 'phone', 'freeform']).withDefault(
+      'email'
+    )
   )
   const [filterUserType, setFilterUserType] = useQueryState(
     'userType',
@@ -118,7 +120,7 @@ export const UsersV2 = () => {
   const [localStorageFilter, setLocalStorageFilter, { isSuccess: isLocalStorageFilterLoaded }] =
     useLocalStorageQuery<'id' | 'email' | 'phone' | 'freeform'>(
       LOCAL_STORAGE_KEYS.AUTH_USERS_FILTER(projectRef ?? ''),
-      'id'
+      'email'
     )
 
   const [
