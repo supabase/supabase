@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { useTemporaryAPIKeyQuery } from 'data/api-keys/temp-api-keys-query'
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
@@ -8,45 +9,43 @@ import { storageKeys } from './keys'
 type DeleteIcebergNamespaceTableVariables = {
   catalogUri: string
   warehouse: string
-  token: string
   namespace: string
   table: string
+  projectRef?: string
 }
 
-// [Joshen] Investigate if we can use the temp API keys here
+const errorPrefix = 'Failed to delete Iceberg namespace table'
+
 async function deleteIcebergNamespaceTable({
   catalogUri,
   warehouse,
-  token,
   namespace,
   table,
-}: DeleteIcebergNamespaceTableVariables) {
-  let headers = new Headers()
-  // handle both secret key and service role key
-  if (token.startsWith('sb_secret_')) {
+  tempApiKey,
+}: DeleteIcebergNamespaceTableVariables & { tempApiKey?: string }) {
+  try {
+    if (!tempApiKey) throw new Error(`${errorPrefix}: API Key missing`)
+
+    let headers = new Headers()
     headers = await constructHeaders({
       'Content-Type': 'application/json',
-      apikey: `${token}`,
+      apikey: tempApiKey,
     })
     headers.delete('Authorization')
-  } else {
-    headers = await constructHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    })
-  }
 
-  const url =
-    `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables/${table}?purgeRequested=true`.replaceAll(
-      /(?<!:)\/\//g,
-      '/'
-    )
+    const url =
+      `${catalogUri}/v1/${warehouse}/namespaces/${namespace}/tables/${table}?purgeRequested=true`.replaceAll(
+        /(?<!:)\/\//g,
+        '/'
+      )
 
-  try {
-    const response = await fetchHandler(url, {
-      headers,
-      method: 'DELETE',
-    })
+    const response = await fetchHandler(url, { headers, method: 'DELETE' })
+    const result = await response.json()
+    if (result.error) {
+      if (result.error.message) throw new Error(`${errorPrefix}: ${result.error.message}`)
+      else throw new Error(errorPrefix)
+    }
+
     return response.status === 204
   } catch (error) {
     handleError(error)
@@ -56,10 +55,11 @@ async function deleteIcebergNamespaceTable({
 type IcebergNamespaceTableDeleteData = Awaited<ReturnType<typeof deleteIcebergNamespaceTable>>
 
 export const useIcebergNamespaceTableDeleteMutation = ({
+  projectRef,
   onSuccess,
   onError,
   ...options
-}: Omit<
+}: { projectRef?: string } & Omit<
   UseCustomMutationOptions<
     IcebergNamespaceTableDeleteData,
     ResponseError,
@@ -68,13 +68,15 @@ export const useIcebergNamespaceTableDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { data } = useTemporaryAPIKeyQuery({ projectRef })
+  const tempApiKey = data?.api_key
 
   return useMutation<
     IcebergNamespaceTableDeleteData,
     ResponseError,
     DeleteIcebergNamespaceTableVariables
   >({
-    mutationFn: (vars) => deleteIcebergNamespaceTable(vars),
+    mutationFn: (vars) => deleteIcebergNamespaceTable({ ...vars, tempApiKey }),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.icebergNamespace(

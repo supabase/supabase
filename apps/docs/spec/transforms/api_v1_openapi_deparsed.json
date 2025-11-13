@@ -324,6 +324,30 @@
                     "notify_url": {
                       "type": "string",
                       "format": "uri"
+                    },
+                    "deletion_scheduled_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "preview_project_status": {
+                      "type": "string",
+                      "enum": [
+                        "INACTIVE",
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "UNKNOWN",
+                        "GOING_DOWN",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UPGRADING",
+                        "PAUSING",
+                        "RESTORE_FAILED",
+                        "RESTARTING",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ]
                     }
                   },
                   "required": [
@@ -362,7 +386,7 @@
         "x-oauth-scope": "environment:write"
       },
       "delete": {
-        "description": "Deletes the specified database branch",
+        "description": "Deletes the specified database branch. By default, deletes immediately. Use force=false to schedule deletion with 1-hour grace period (only when soft deletion is enabled).",
         "operationId": "v1-delete-a-branch",
         "parameters": [
           {
@@ -385,6 +409,16 @@
                   "deprecated": true
                 }
               ]
+            }
+          },
+          {
+            "name": "force",
+            "required": false,
+            "in": "query",
+            "description": "If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled).",
+            "schema": {
+              "default": "true",
+              "type": "boolean"
             }
           }
         ],
@@ -668,6 +702,72 @@
           }
         ],
         "summary": "Resets a database branch",
+        "tags": ["Environments"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: environment:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "environment:write"
+      }
+    },
+    "/v1/branches/{branch_id_or_ref}/restore": {
+      "post": {
+        "description": "Cancels scheduled deletion and restores the branch to active state",
+        "operationId": "v1-restore-a-branch",
+        "parameters": [
+          {
+            "name": "branch_id_or_ref",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 20,
+                  "maxLength": 20,
+                  "pattern": "^[a-z]+$",
+                  "description": "Project ref"
+                },
+                {
+                  "type": "string",
+                  "format": "uuid",
+                  "deprecated": true
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "enum": ["Branch restoration initiated"]
+                    }
+                  },
+                  "required": ["message"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to restore database branch"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restore a scheduled branch deletion",
         "tags": ["Environments"],
         "x-badges": [
           {
@@ -3470,6 +3570,30 @@
                       "notify_url": {
                         "type": "string",
                         "format": "uri"
+                      },
+                      "deletion_scheduled_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "preview_project_status": {
+                        "type": "string",
+                        "enum": [
+                          "INACTIVE",
+                          "ACTIVE_HEALTHY",
+                          "ACTIVE_UNHEALTHY",
+                          "COMING_UP",
+                          "UNKNOWN",
+                          "GOING_DOWN",
+                          "INIT_FAILED",
+                          "REMOVED",
+                          "RESTORING",
+                          "UPGRADING",
+                          "PAUSING",
+                          "RESTORE_FAILED",
+                          "RESTARTING",
+                          "PAUSE_FAILED",
+                          "RESIZING"
+                        ]
                       }
                     },
                     "required": [
@@ -3680,6 +3804,30 @@
                     "notify_url": {
                       "type": "string",
                       "format": "uri"
+                    },
+                    "deletion_scheduled_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "preview_project_status": {
+                      "type": "string",
+                      "enum": [
+                        "INACTIVE",
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "UNKNOWN",
+                        "GOING_DOWN",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UPGRADING",
+                        "PAUSING",
+                        "RESTORE_FAILED",
+                        "RESTARTING",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ]
                     }
                   },
                   "required": [
@@ -3870,6 +4018,30 @@
                     "notify_url": {
                       "type": "string",
                       "format": "uri"
+                    },
+                    "deletion_scheduled_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "preview_project_status": {
+                      "type": "string",
+                      "enum": [
+                        "INACTIVE",
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "UNKNOWN",
+                        "GOING_DOWN",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UPGRADING",
+                        "PAUSING",
+                        "RESTORE_FAILED",
+                        "RESTARTING",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ]
                     }
                   },
                   "required": [
@@ -8221,9 +8393,22 @@
                         }
                       },
                       "required": ["upstreamTarget"]
+                    },
+                    "migrationVersion": {
+                      "type": "string"
+                    },
+                    "databasePoolMode": {
+                      "type": "string"
                     }
                   },
-                  "required": ["fileSizeLimit", "features", "capabilities", "external"]
+                  "required": [
+                    "fileSizeLimit",
+                    "features",
+                    "capabilities",
+                    "external",
+                    "migrationVersion",
+                    "databasePoolMode"
+                  ]
                 }
               }
             }
@@ -13937,7 +14122,7 @@
     },
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
-        "description": "Executes a SQL query on the project's logs.\n\nEither the 'iso_timestamp_start' and 'iso_timestamp_end' parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n",
+        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources. \n",
         "operationId": "v1-get-project-logs",
         "parameters": [
           {
@@ -13956,6 +14141,7 @@
             "name": "sql",
             "required": false,
             "in": "query",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
             "schema": {
               "type": "string"
             }
@@ -14719,6 +14905,9 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "rollback": {
+                    "type": "string"
                   }
                 },
                 "required": ["query"]
@@ -14797,6 +14986,9 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "rollback": {
+                    "type": "string"
                   }
                 },
                 "required": ["query"]
@@ -14827,6 +15019,236 @@
           }
         ],
         "summary": "[Beta] Upsert a database migration without applying",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
+      },
+      "delete": {
+        "description": "Only available to selected partner OAuth apps",
+        "operationId": "v1-rollback-migrations",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "gte",
+            "required": true,
+            "in": "query",
+            "description": "Rollback migrations greater or equal to this version",
+            "schema": {
+              "pattern": "^\\d+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to rollback database migration"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Rollback database migrations and remove them from history table",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/database/migrations/{version}": {
+      "get": {
+        "description": "Only available to selected partner OAuth apps",
+        "operationId": "v1-get-a-migration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^\\d+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "statements": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "rollback": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "created_by": {
+                      "type": "string"
+                    },
+                    "idempotency_key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["version"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to get database migration"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Fetch an existing entry from migration history",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-oauth-scope": "database:read"
+      },
+      "patch": {
+        "description": "Only available to selected partner OAuth apps",
+        "operationId": "v1-patch-a-migration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^\\d+$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "rollback": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to patch database migration"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "[Beta] Patch an existing entry in migration history",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -18967,6 +19389,30 @@
           "notify_url": {
             "type": "string",
             "format": "uri"
+          },
+          "deletion_scheduled_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "preview_project_status": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "UNKNOWN",
+              "GOING_DOWN",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORE_FAILED",
+              "RESTARTING",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ]
           }
         },
         "required": [
@@ -19012,6 +19458,16 @@
           }
         },
         "required": ["workflow_run_id", "message"]
+      },
+      "BranchRestoreResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": ["Branch restoration initiated"]
+          }
+        },
+        "required": ["message"]
       },
       "V1ListProjectsPaginatedResponse": {
         "type": "object",
@@ -20665,6 +21121,12 @@
           "required": ["name", "value"]
         }
       },
+      "DeleteSecretsBody": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
       "SslEnforcementResponse": {
         "type": "object",
         "properties": {
@@ -21390,9 +21852,22 @@
               }
             },
             "required": ["upstreamTarget"]
+          },
+          "migrationVersion": {
+            "type": "string"
+          },
+          "databasePoolMode": {
+            "type": "string"
           }
         },
-        "required": ["fileSizeLimit", "features", "capabilities", "external"]
+        "required": [
+          "fileSizeLimit",
+          "features",
+          "capabilities",
+          "external",
+          "migrationVersion",
+          "databasePoolMode"
+        ]
       },
       "UpdateStorageConfigBody": {
         "type": "object",
@@ -24598,6 +25073,9 @@
           },
           "name": {
             "type": "string"
+          },
+          "rollback": {
+            "type": "string"
           }
         },
         "required": ["query"]
@@ -24611,9 +25089,54 @@
           },
           "name": {
             "type": "string"
+          },
+          "rollback": {
+            "type": "string"
           }
         },
         "required": ["query"]
+      },
+      "V1GetMigrationResponse": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "statements": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rollback": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": ["version"]
+      },
+      "V1PatchMigrationBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "rollback": {
+            "type": "string"
+          }
+        }
       },
       "V1RunQueryBody": {
         "type": "object",

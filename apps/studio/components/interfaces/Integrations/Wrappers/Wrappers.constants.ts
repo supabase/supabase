@@ -27,7 +27,7 @@ export const WRAPPER_HANDLERS = {
   ORB: 'wasm_fdw_handler',
 }
 
-const SUPABASE_TARGET_SCHEMA_OPTION: ServerOption = {
+export const SUPABASE_TARGET_SCHEMA_OPTION: ServerOption = {
   name: 'supabase_target_schema',
   label: 'Target Schema',
   required: false,
@@ -1458,6 +1458,7 @@ export const WRAPPERS: WrapperMeta[] = [
           secureEntry: false,
           defaultValue: '',
         },
+        SUPABASE_TARGET_SCHEMA_OPTION,
       ],
     },
     canTargetSchema: true,

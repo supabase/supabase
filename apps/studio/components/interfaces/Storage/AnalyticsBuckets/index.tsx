@@ -1,4 +1,4 @@
-import { ChevronRight, ExternalLink, Search } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -7,7 +7,23 @@ import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'component
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
 import { Bucket as BucketIcon } from 'icons'
-import { Button, Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { BASE_PATH } from 'lib/constants'
+import { ChevronRight, ExternalLink, Search } from 'lucide-react'
+import {
+  Badge,
+  Button,
+  Card,
+  cn,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyBucketState } from '../EmptyBucketState'
@@ -33,7 +49,7 @@ export const AnalyticsBuckets = () => {
   ) => {
     const url = `/project/${ref}/storage/analytics/buckets/${encodeURIComponent(bucketId)}`
     if (event.metaKey || event.ctrlKey) {
-      window.open(url, '_blank')
+      window.open(`${BASE_PATH}${url}`, '_blank')
     } else {
       router.push(url)
     }
@@ -41,28 +57,45 @@ export const AnalyticsBuckets = () => {
 
   return (
     <ScaffoldSection isFullWidth>
-      <Admonition
-        type="note"
-        layout="horizontal"
-        className="-mt-4 mb-8 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
-        title="Private alpha"
-        actions={
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <a
+      <Admonition showIcon={false} type="tip" className="relative mb-6 overflow-hidden">
+        <div className="absolute -inset-16 z-0 opacity-50">
+          <img
+            src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
+            alt="Supabase Grafana"
+            className="w-full h-full object-cover object-right hidden dark:block"
+          />
+          <img
+            src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
+            alt="Supabase Grafana"
+            className="w-full h-full object-cover object-right dark:hidden"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
+        </div>
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
+          <div className="flex flex-col gap-y-0.5">
+            <div className="flex flex-col gap-y-2 items-start">
+              <Badge variant="success" className="-ml-0.5 uppercase">
+                New
+              </Badge>
+              <p className="text-sm font-medium">Introducing analytics buckets</p>
+            </div>
+            <p className="text-sm text-foreground-lighter text-balance">
+              Analytics buckets are now in private alpha. Expect rapid changes, limited features,
+              and possible breaking updates. Please share feedback as we refine the experience and
+              expand access.
+            </p>
+          </div>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
+            <Link
+              href="https://github.com/orgs/supabase/discussions/40116"
               target="_blank"
               rel="noopener noreferrer"
-              href="https://github.com/orgs/supabase/discussions/40116"
             >
               Share feedback
-            </a>
+            </Link>
           </Button>
-        }
-      >
-        <p className="!leading-normal !mb-0 text-balance">
-          Analytics buckets are now in private alpha. Expect rapid changes, limited features, and
-          possible breaking updates. Please share feedback as we refine the experience and expand
-          access.
-        </p>
+        </div>
       </Admonition>
 
       {!isLoadingBuckets &&
@@ -71,8 +104,21 @@ export const AnalyticsBuckets = () => {
         <EmptyBucketState bucketType="analytics" />
       ) : (
         <div className="flex flex-col gap-y-4">
-          <ScaffoldHeader className="py-0">
+          <ScaffoldHeader className="py-0 flex flex-row items-center gap-x-2">
             <ScaffoldSectionTitle>Buckets</ScaffoldSectionTitle>
+            {analyticsBuckets.length > 0 && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="bg-surface-200 rounded-full px-2 py-1 leading-none text-xs text-foreground-lighter tracking-widest">
+                    {analyticsBuckets.length}
+                    /2
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-64 text-center">
+                  Each project can only have up to 2 buckets while analytics buckets are in alpha{' '}
+                </TooltipContent>
+              </Tooltip>
+            )}
           </ScaffoldHeader>
           <div className="flex flex-grow justify-between gap-x-2 items-center">
             <Input
