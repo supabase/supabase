@@ -1,9 +1,9 @@
-import { Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { ChevronUp, Eye, MoreVertical, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
@@ -24,13 +24,17 @@ import {
   useVectorBucketsIndexesQuery,
   VectorBucketIndex,
 } from 'data/storage/vector-buckets-indexes-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import ReactMarkdown from 'react-markdown'
 import {
+  Badge,
   Button,
   Card,
   CardContent,
+  cn,
+  Collapsible,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -41,6 +45,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -168,6 +176,26 @@ export const VectorBucketDetails = () => {
             {state === 'missing' && <WrapperMissing bucketName={bucket?.vectorBucketName} />}
             {isLoadingIndexes ? (
               <GenericSkeletonLoader />
+            ) : filteredList.length === 0 ? (
+              <Card>
+                <CardContent className="py-10 text-center space-y-1">
+                  {filterString.length > 0 ? (
+                    <>
+                      <p className="text-sm text-foreground">No results found</p>
+                      <p className="text-sm text-foreground-lighter">
+                        Your search for "{filterString}" did not return any results
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-foreground">No tables yet</p>
+                      <p className="text-sm text-foreground-lighter">
+                        Create your first table to get started
+                      </p>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
             ) : (
               <Card>
                 <Table>
@@ -318,6 +346,191 @@ export const VectorBucketDetails = () => {
         }}
       />
     </>
+  )
+}
+
+interface VectorBucketIndexRowProps {
+  index: VectorBucketIndex
+  projectRef?: string
+  wrapperAvailable: boolean
+  onSelectDelete: (table: VectorBucketIndex) => void
+}
+
+const VectorBucketIndexRow = ({
+  index,
+  projectRef,
+  wrapperAvailable,
+  onSelectDelete,
+}: VectorBucketIndexRowProps) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const metadataKeys = index.metadataConfiguration?.nonFilterableMetadataKeys ?? []
+  const creationTime = index.creationTime ? index.creationTime * 1000 : undefined
+  const encodedIndexName = encodeURIComponent(index.indexName)
+  const editorHref =
+    wrapperAvailable && projectRef
+      ? `/project/${projectRef}/editor/${encodedIndexName}?schema=${getVectorBucketFDWSchemaName(index.vectorBucketName)}`
+      : undefined
+
+  return (
+    <li>
+      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+        <div
+          className={cn(
+            'transition-colors',
+            isExpanded ? 'bg-selection' : 'hover:bg-overlay-hover'
+          )}
+        >
+          <div className="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
+            <Collapsible.Trigger asChild>
+              <button
+                type="button"
+                className="flex w-full items-start gap-3 text-left md:flex-1 md:items-center"
+              >
+                <ChevronUp
+                  className={cn(
+                    'mt-1 h-4 w-4 text-foreground-light transition-transform md:mt-0',
+                    isExpanded ? 'rotate-0' : 'rotate-180'
+                  )}
+                />
+                <div className="flex flex-1 flex-col gap-2 md:flex-row md:items-center md:gap-6">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm text-foreground">{index.indexName}</span>
+                    <span className="text-xs uppercase text-foreground-light">
+                      {index.dataType}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline">{index.distanceMetric}</Badge>
+                    <span className="text-xs text-foreground-light">
+                      {index.dimension} {index.dimension === 1 ? 'dimension' : 'dimensions'}
+                    </span>
+                    {metadataKeys.length > 0 && (
+                      <span className="text-xs text-foreground-light">
+                        {metadataKeys.length} metadata {metadataKeys.length === 1 ? 'key' : 'keys'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </button>
+            </Collapsible.Trigger>
+            <div className="flex items-center gap-2 md:ml-auto">
+              {editorHref ? (
+                <Button
+                  asChild
+                  icon={<Eye size={14} className="text-foreground-lighter" />}
+                  type="default"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <Link href={editorHref}>Table Editor</Link>
+                </Button>
+              ) : null}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="default"
+                    className="px-1"
+                    icon={<MoreVertical />}
+                    onClick={(event) => event.stopPropagation()}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom" align="end" className="w-40">
+                  <DropdownMenuItem
+                    className="flex items-center gap-2"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onSelectDelete(index)
+                    }}
+                  >
+                    <Trash2 size={12} />
+                    <p>Delete table</p>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          <Collapsible.Content>
+            <div className="border-t border-default px-4 py-4 md:px-6">
+              <VectorBucketIndexExamples
+                bucketName={index.vectorBucketName}
+                indexName={index.indexName}
+                dimension={index.dimension}
+                metadataKeys={metadataKeys}
+              />
+            </div>
+          </Collapsible.Content>
+        </div>
+      </Collapsible>
+    </li>
+  )
+}
+
+interface VectorBucketIndexExamplesProps {
+  bucketName: string
+  indexName: string
+  dimension: number
+  metadataKeys: string[]
+}
+
+function VectorBucketIndexExamples({
+  bucketName,
+  indexName,
+  dimension,
+  metadataKeys,
+}: VectorBucketIndexExamplesProps) {
+  return (
+    <div className="flex flex-col gap-1">
+      <Tabs_Shadcn_ defaultValue="account" className="">
+        <TabsList_Shadcn_ className="grid w-full grid-cols-2">
+          <TabsTrigger_Shadcn_ value="js">Javascript</TabsTrigger_Shadcn_>
+          <TabsTrigger_Shadcn_ value="sql">SQL</TabsTrigger_Shadcn_>
+        </TabsList_Shadcn_>
+        <TabsContent_Shadcn_ value="js">
+          <Card>
+            <ReactMarkdown>
+              {`
+\`\`\`js
+import { createClient } from '@supabase/supabase-js'
+
+const client = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+)
+
+const index = client.storage.vectors.from(${bucketName}).index('${indexName}')
+const result = await index.putVectors({
+  vectors: [
+    {
+      key: 'product_001',
+      data: { float32: [${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}] },
+      metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
+    },
+    {
+      key: 'product_002',
+      data: { float32: [${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}] },
+      metadata: { ${metadataKeys.map((key) => `${key}: "${key} value"`).join(', ')} },
+    },
+  ],
+})
+\`\`\``}
+            </ReactMarkdown>
+          </Card>
+        </TabsContent_Shadcn_>
+        <TabsContent_Shadcn_ value="sql">
+          <Card>
+            <ReactMarkdown>
+              {`
+\`\`\`sql
+-- Insert multiple vectors
+insert into ${bucketName}.${indexName} (key, data, metadata)
+values
+  ('product_001', '[${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb),
+  ('product_002', '[${dimension === 1 ? '0.2' : `0.2, ...${dimension - 1} more floats`}]'::embd, '{${metadataKeys.map((key) => `"${key}": "${key} value"`).join(', ')}}'::jsonb);
+\`\`\``}
+            </ReactMarkdown>
+          </Card>
+        </TabsContent_Shadcn_>
+      </Tabs_Shadcn_>
+    </div>
   )
 }
 
