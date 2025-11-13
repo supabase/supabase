@@ -28,10 +28,13 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
+  const securityNotificationsFlag = useFlag('securityNotifications')
 
   // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
   const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
     switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_PREVIEW_SECURITY_NOTIFICATIONS:
+        return securityNotificationsFlag === true
       default:
         return false
     }
@@ -121,7 +124,7 @@ export const useFeaturePreviewModal = () => {
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
 
-  // [Joshen] Use this if we want to feature flag previews
+  // [Joshen] Use this if we want to make publicly available feature flag previews
   const isFeaturePreviewReleasedToPublic = useCallback(
     (feature: (typeof FEATURE_PREVIEWS)[number]) => {
       switch (feature.key) {
@@ -131,18 +134,12 @@ export const useFeaturePreviewModal = () => {
           return advisorRulesEnabled
         case 'supabase-ui-preview-unified-logs':
           return isUnifiedLogsPreviewAvailable
-        case 'security-notifications':
-          return isSecurityNotificationsAvailable
+
         default:
           return true
       }
     },
-    [
-      gitlessBranchingEnabled,
-      advisorRulesEnabled,
-      isUnifiedLogsPreviewAvailable,
-      isSecurityNotificationsAvailable,
-    ]
+    [gitlessBranchingEnabled, advisorRulesEnabled, isUnifiedLogsPreviewAvailable]
   )
 
   const selectedFeatureKey = (
