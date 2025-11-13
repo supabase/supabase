@@ -850,7 +850,7 @@
           {
             "id": "signout",
             "title": "Removes a logged-in session",
-            "slug": "auth-signout",
+            "slug": "auth-admin-signout",
             "product": "auth-admin",
             "type": "function"
           },
@@ -858,13 +858,6 @@
             "id": "updateuserbyid",
             "title": "Updates the user data",
             "slug": "auth-updateuserbyid",
-            "product": "auth-admin",
-            "type": "function"
-          },
-          {
-            "id": "signout",
-            "title": "Removes a logged-in session",
-            "slug": "auth-signout",
             "product": "auth-admin",
             "type": "function"
           },
@@ -1102,7 +1095,7 @@
       {
         "id": "getchannels",
         "title": "Returns all created channels",
-        "slug": "getchannels",
+        "slug": "getchannels-returns",
         "product": "realtime",
         "type": "function"
       },
@@ -1151,14 +1144,14 @@
       {
         "id": "removeallchannels",
         "title": "Unsubscribes and removes all channels",
-        "slug": "removeallchannels",
+        "slug": "removeallchannels-removes",
         "product": "realtime",
         "type": "function"
       },
       {
         "id": "removechannel",
         "title": "Unsubscribes and removes a single channel",
-        "slug": "removechannel",
+        "slug": "removechannel-removes",
         "product": "realtime",
         "type": "function"
       },
@@ -1395,35 +1388,35 @@
       {
         "id": "from",
         "title": "Access operations for a specific vector bucket",
-        "slug": "storage-from",
+        "slug": "storage-from-vector-bucket",
         "product": "storage",
         "type": "function"
       },
       {
         "id": "createbucket",
         "title": "Creates a new vector bucket",
-        "slug": "storage-createbucket",
+        "slug": "storage-create-vector-bucket",
         "product": "storage",
         "type": "function"
       },
       {
         "id": "deletebucket",
         "title": "Deletes a vector bucket",
-        "slug": "storage-deletebucket",
+        "slug": "storage-delete-vector-bucket",
         "product": "storage",
         "type": "function"
       },
       {
         "id": "getbucket",
         "title": "Retrieves metadata for a specific vector bucket",
-        "slug": "storage-getbucket",
+        "slug": "storage-get-vector-bucket",
         "product": "storage",
         "type": "function"
       },
       {
         "id": "listbuckets",
         "title": "Lists vector buckets with optional filtering and pagination",
-        "slug": "storage-listbuckets",
+        "slug": "storage-list-vector-buckets",
         "product": "storage",
         "type": "function"
       },
@@ -1465,34 +1458,6 @@
       {
         "id": "listindexes",
         "title": "Lists indexes in this bucket",
-        "slug": "storage-listindexes",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "createindex",
-        "title": "Creates a new vector index within a bucket",
-        "slug": "storage-createindex",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "deleteindex",
-        "title": "Deletes a vector index and all its data",
-        "slug": "storage-deleteindex",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "getindex",
-        "title": "Retrieves metadata for a specific vector index",
-        "slug": "storage-getindex",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "listindexes",
-        "title": "Lists vector indexes within a bucket with optional filtering and pagination",
         "slug": "storage-listindexes",
         "product": "storage",
         "type": "function"
@@ -1551,13 +1516,6 @@
         "type": "markdown"
       },
       {
-        "id": "httpsend",
-        "title": "Sends a broadcast message explicitly via REST API",
-        "slug": "httpsend",
-        "product": "misc",
-        "type": "function"
-      },
-      {
         "id": "on",
         "title": "Creates an event handler that listens to changes",
         "slug": "on",
@@ -1565,191 +1523,16 @@
         "type": "function"
       },
       {
-        "id": "presencestate",
-        "title": "Access current presence state",
-        "slug": "presencestate",
-        "product": "misc",
-        "type": "function"
-      },
-      {
         "id": "send",
         "title": "Sends a message into the channel",
-        "slug": "send",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "teardown",
-        "title": "Teardown the channel",
-        "slug": "teardown",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "track",
-        "title": "Track user presence in channel",
-        "slug": "track",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "unsubscribe",
-        "title": "Leaves the channel",
-        "slug": "unsubscribe",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "untrack",
-        "title": "Stop tracking user presence",
-        "slug": "untrack",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "updatejoinpayload",
-        "title": "Update channel join payload",
-        "slug": "updatejoinpayload",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "channel",
-        "title": "Create or retrieve a channel",
-        "slug": "channel",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "connect",
-        "title": "Connects the socket, unless already connected",
-        "slug": "connect",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "connectionstate",
-        "title": "Returns the current state of the socket",
-        "slug": "connectionstate",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "disconnect",
-        "title": "Disconnects the socket",
-        "slug": "disconnect",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "endpointurl",
-        "title": "Returns the URL of the websocket",
-        "slug": "endpointurl",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "flushsendbuffer",
-        "title": "Flushes send buffer",
-        "slug": "flushsendbuffer",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "getchannels",
-        "title": "Returns all created channels",
-        "slug": "getchannels",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "isconnected",
-        "title": "Returns  is the connection is open",
-        "slug": "isconnected",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "isconnecting",
-        "title": "Returns  if the connection is currently connecting",
-        "slug": "isconnecting",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "isdisconnecting",
-        "title": "Returns  if the connection is currently disconnecting",
-        "slug": "isdisconnecting",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "log",
-        "title": "Logs the message",
-        "slug": "log",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "onheartbeat",
-        "title": "Handle heartbeat events",
-        "slug": "onheartbeat",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "push",
-        "title": "Push out a message if the socket is connected",
-        "slug": "push",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "removeallchannels",
-        "title": "Unsubscribes and removes all channels",
-        "slug": "removeallchannels",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "removechannel",
-        "title": "Unsubscribes and removes a single channel",
-        "slug": "removechannel",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "sendheartbeat",
-        "title": "Sends a heartbeat message if the socket is connected",
-        "slug": "sendheartbeat",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "setauth",
-        "title": "Sets the JWT access token used for channel subscription authorization and Realtime RLS",
-        "slug": "setauth",
+        "slug": "send-channel",
         "product": "misc",
         "type": "function"
       },
       {
         "id": "channel",
         "title": "Creates a Realtime channel with Broadcast, Presence, and Postgres Changes",
-        "slug": "channel",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "from",
-        "title": "Perform a query on a table or a view",
-        "slug": "from",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "schema",
-        "title": "Select a schema to query or perform an function (rpc) call",
-        "slug": "schema",
+        "slug": "channel-realtime",
         "product": "misc",
         "type": "function"
       }
