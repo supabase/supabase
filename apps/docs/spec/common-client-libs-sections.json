@@ -332,14 +332,6 @@
             "product": "database",
             "parent": "filters",
             "type": "function"
-          },
-          {
-            "id": "constructor",
-            "title": "Create a query builder instance",
-            "slug": "constructor",
-            "product": "database",
-            "type": "function",
-            "parent": "filters"
           }
         ]
       },
@@ -441,14 +433,6 @@
             "type": "function"
           },
           {
-            "id": "constructor",
-            "title": "Create a query builder instance",
-            "slug": "constructor",
-            "product": "database",
-            "type": "function",
-            "parent": "modifiers"
-          },
-          {
             "id": "maxaffected",
             "title": "Set the maximum number of rows that can be affected by the query",
             "slug": "maxaffected",
@@ -465,13 +449,6 @@
             "parent": "modifiers"
           }
         ]
-      },
-      {
-        "id": "constructor",
-        "title": "Create a query builder instance",
-        "slug": "constructor",
-        "product": "database",
-        "type": "function"
       },
       {
         "id": "setheader",
@@ -495,13 +472,6 @@
         "type": "function"
       },
       {
-        "id": "constructor",
-        "title": "Creates a PostgREST client",
-        "slug": "constructor",
-        "product": "database",
-        "type": "function"
-      },
-      {
         "id": "from",
         "title": "Perform a query on a table or a view",
         "slug": "from",
@@ -512,13 +482,6 @@
         "id": "schema",
         "title": "Select a schema to query or perform an function (rpc) call",
         "slug": "schema",
-        "product": "database",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Create a query builder instance",
-        "slug": "constructor",
         "product": "database",
         "type": "function"
       }
@@ -843,13 +806,6 @@
             "type": "function"
           },
           {
-            "id": "constructor",
-            "title": "Create an Auth Admin API instance",
-            "slug": "auth-constructor",
-            "product": "auth-admin",
-            "type": "function"
-          },
-          {
             "id": "createuser",
             "title": "Creates a new user",
             "slug": "auth-createuser",
@@ -906,13 +862,6 @@
             "type": "function"
           },
           {
-            "id": "constructor",
-            "title": "Create an Auth Admin API instance",
-            "slug": "auth-constructor",
-            "product": "auth-admin",
-            "type": "function"
-          },
-          {
             "id": "signout",
             "title": "Removes a logged-in session",
             "slug": "auth-signout",
@@ -964,13 +913,6 @@
         ]
       },
       {
-        "id": "constructor",
-        "title": "Create a new client for use in the browser",
-        "slug": "auth-constructor",
-        "product": "auth",
-        "type": "function"
-      },
-      {
         "id": "initialize",
         "title": "Initializes the client session either from the url or from storage",
         "slug": "auth-initialize",
@@ -1015,13 +957,6 @@
         "id": "invoke",
         "title": "Invokes a Supabase Edge Function.",
         "slug": "functions-invoke",
-        "product": "functions",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Create a Functions client instance",
-        "slug": "functions-constructor",
         "product": "functions",
         "type": "function"
       },
@@ -1074,13 +1009,6 @@
         "type": "function"
       },
       {
-        "id": "constructor",
-        "title": "Create a Realtime client instance",
-        "slug": "constructor",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
         "id": "httpsend",
         "title": "Sends a broadcast message explicitly via REST API",
         "slug": "httpsend",
@@ -1126,13 +1054,6 @@
         "id": "updatejoinpayload",
         "title": "Update channel join payload",
         "slug": "updatejoinpayload",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Initializes the Socket",
-        "slug": "constructor",
         "product": "realtime",
         "type": "function"
       },
@@ -1256,20 +1177,6 @@
         "type": "function"
       },
       {
-        "id": "constructor",
-        "title": "Initializes the Presence",
-        "slug": "constructor",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Create a Realtime client instance",
-        "slug": "constructor",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
         "id": "createwebsocket",
         "title": "Create WebSocket connection",
         "slug": "createwebsocket",
@@ -1315,13 +1222,6 @@
         "id": "send",
         "title": "Send message through WebSocket",
         "slug": "send",
-        "product": "realtime",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Create a Realtime client instance",
-        "slug": "constructor",
         "product": "realtime",
         "type": "function"
       }
@@ -1493,23 +1393,9 @@
         "type": "function"
       },
       {
-        "id": "constructor",
-        "title": "Create a Storage client instance",
-        "slug": "storage-constructor",
-        "product": "storage",
-        "type": "function"
-      },
-      {
         "id": "from",
         "title": "Access operations for a specific vector bucket",
         "slug": "storage-from",
-        "product": "storage",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Creates a new VectorBucketApi instance",
-        "slug": "storage-constructor",
         "product": "storage",
         "type": "function"
       },
@@ -1693,13 +1579,6 @@
         "type": "markdown"
       },
       {
-        "id": "constructor",
-        "title": "Create a client instance",
-        "slug": "constructor",
-        "product": "misc",
-        "type": "function"
-      },
-      {
         "id": "httpsend",
         "title": "Sends a broadcast message explicitly via REST API",
         "slug": "httpsend",
@@ -1759,13 +1638,6 @@
         "id": "updatejoinpayload",
         "title": "Update channel join payload",
         "slug": "updatejoinpayload",
-        "product": "misc",
-        "type": "function"
-      },
-      {
-        "id": "constructor",
-        "title": "Initializes the Socket",
-        "slug": "constructor",
         "product": "misc",
         "type": "function"
       },

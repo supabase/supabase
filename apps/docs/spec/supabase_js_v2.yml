@@ -8655,10 +8655,6 @@ functions:
               search: 'jon'
             })
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/supabase-js.GoTrueAdminApi.constructor"
-    description: Create an Auth Admin API instance
   - id: createuser
     title: createUser
     $ref: "@supabase/supabase-js.GoTrueAdminApi.createUser"
@@ -8695,10 +8691,6 @@ functions:
   - id: updateuserbyid
     title: updateUserById
     $ref: "@supabase/supabase-js.GoTrueAdminApi.updateUserById"
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/supabase-js.RealtimeChannel.constructor"
-    description: Create a Realtime channel instance
   - id: httpsend
     title: httpSend
     $ref: "@supabase/supabase-js.RealtimeChannel.httpSend"
@@ -8796,9 +8788,6 @@ functions:
           const channel = supabase.channel('room1')
           channel.updateJoinPayload({ user_token: 'new-token' })
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/supabase-js.RealtimeClient.constructor"
   - id: channel
     title: channel
     $ref: "@supabase/supabase-js.RealtimeClient.channel"
@@ -8900,17 +8889,9 @@ functions:
   - id: schema
     title: schema
     $ref: "@supabase/supabase-js.SupabaseClient.schema"
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/auth-js.GoTrueAdminApi.constructor"
-    description: Create an Auth Admin API instance
   - id: signout
     title: signOut
     $ref: "@supabase/auth-js.GoTrueAdminApi.signOut"
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/realtime-js.RealtimeChannel.constructor"
-    description: Create a Realtime channel instance
   - id: httpsend
     title: httpSend
     $ref: "@supabase/realtime-js.RealtimeChannel.httpSend"
@@ -8953,9 +8934,6 @@ functions:
     title: updateJoinPayload
     $ref: "@supabase/realtime-js.RealtimeChannel.updateJoinPayload"
     description: Update channel join payload
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/realtime-js.RealtimeClient.constructor"
   - id: channel
     title: channel
     $ref: "@supabase/realtime-js.RealtimeClient.channel"
@@ -9027,10 +9005,6 @@ functions:
 
       On callback used, it will set the value of the token internal to the
       client.
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/storage-js.index.StorageVectorsClient.constructor"
-    description: Create a Storage Vector client instance
   - id: from
     title: from
     $ref: "@supabase/storage-js.index.StorageVectorsClient.from"
@@ -9052,9 +9026,6 @@ functions:
           // List indexes in this bucket
           const { data } = await bucket.listIndexes()
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/storage-js.index.VectorBucketApi.constructor"
   - id: createbucket
     title: createBucket
     $ref: "@supabase/storage-js.index.VectorBucketApi.createBucket"
@@ -9137,10 +9108,6 @@ functions:
           error
 
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/storage-js.index.VectorBucketScope.constructor"
-    description: Create a VectorBucketScope instance
   - id: createindex
     title: createIndex
     $ref: "@supabase/storage-js.index.VectorBucketScope.createIndex"
@@ -9224,10 +9191,6 @@ functions:
           const bucket = client.bucket('embeddings-prod')
           const { data } = await bucket.listIndexes({ prefix: 'documents-' })
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/storage-js.index.VectorDataApi.constructor"
-    description: Create a VectorDataApi instance
   - id: deletevectors
     title: deleteVectors
     $ref: "@supabase/storage-js.index.VectorDataApi.deleteVectors"
@@ -9365,10 +9328,6 @@ functions:
           client.throwOnError()
           const { data } = await client.putVectors(options) // throws on error
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/storage-js.index.VectorIndexApi.constructor"
-    description: Create a VectorIndexApi instance
   - id: createindex
     title: createIndex
     $ref: "@supabase/storage-js.index.VectorIndexApi.createIndex"
@@ -9461,10 +9420,6 @@ functions:
           client.throwOnError()
           const { data } = await client.createIndex(options) // throws on error
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/storage-js.index.VectorIndexScope.constructor"
-    description: Create a VectorIndexScope instance
   - id: deletevectors
     title: deleteVectors
     $ref: "@supabase/storage-js.index.VectorIndexScope.deleteVectors"
@@ -9562,16 +9517,9 @@ functions:
           })
 
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/functions-js.FunctionsClient.constructor"
-    description: Create a Functions client instance
   - id: setauth
     title: setAuth
     $ref: "@supabase/functions-js.FunctionsClient.setAuth"
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/auth-js.GoTrueClient.constructor"
   - id: initialize
     title: initialize
     $ref: "@supabase/auth-js.GoTrueClient.initialize"
@@ -9668,10 +9616,6 @@ functions:
             })
           }
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/postgrest-js.PostgrestBuilder.constructor"
-    description: Create a query builder instance
   - id: returns
     title: returns
     $ref: "@supabase/postgrest-js.PostgrestBuilder.returns"
@@ -9696,19 +9640,12 @@ functions:
   - id: throwonerror
     title: throwOnError
     $ref: "@supabase/postgrest-js.PostgrestBuilder.throwOnError"
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/postgrest-js.PostgrestClient.constructor"
   - id: from
     title: from
     $ref: "@supabase/postgrest-js.PostgrestClient.from"
   - id: schema
     title: schema
     $ref: "@supabase/postgrest-js.PostgrestClient.schema"
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.constructor"
-    description: Create a query builder instance
   - id: ilikeallof
     title: ilikeAllOf
     $ref: "@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAllOf"
@@ -9765,14 +9702,6 @@ functions:
             .select('username')
             .likeAnyOf('username', ['%supa%', '%kiwi%'])
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/postgrest-js.PostgrestQueryBuilder.constructor"
-    description: Create a query builder instance
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.constructor"
-    description: Create a query builder instance
   - id: geojson
     title: geojson
     $ref: "@supabase/postgrest-js.PostgrestTransformBuilder.geojson"
@@ -9819,13 +9748,6 @@ functions:
             .select()
             .rollback()
           ```
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/realtime-js.RealtimePresence.constructor"
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/realtime-js.WebSocketFactory.constructor"
-    description: Create a WebSocketFactory instance
   - id: createwebsocket
     title: createWebSocket
     $ref: "@supabase/realtime-js.WebSocketFactory.createWebSocket"
@@ -9854,28 +9776,12 @@ functions:
     title: send
     $ref: "@supabase/realtime-js.WebSocketLike.send"
     description: Send message through WebSocket
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/realtime-js.WebSocketLikeConstructor.constructor"
-    description: Create a WebSocketLikeConstructor instance
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/storage-js.index.StorageClient.constructor"
-    description: Create a Storage client instance
   - id: from
     title: from
     $ref: "@supabase/storage-js.index.StorageClient.from"
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/storage-js.packages/StorageBucketApi.default.constructor"
-    description: Create a StorageBucketApi instance
   - id: throwonerror
     title: throwOnError
     $ref: "@supabase/storage-js.packages/StorageBucketApi.default.throwOnError"
-  - id: constructor
-    title: constructor
-    $ref: "@supabase/storage-js.packages/StorageFileApi.default.constructor"
-    description: Create a StorageFileApi instance
   - id: exists
     title: exists
     $ref: "@supabase/storage-js.packages/StorageFileApi.default.exists"
