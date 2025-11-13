@@ -301,7 +301,7 @@ try {
   const rss = `
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-      <title>Blog - Supabase</title>
+      <title>Supabase Blog</title>
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
