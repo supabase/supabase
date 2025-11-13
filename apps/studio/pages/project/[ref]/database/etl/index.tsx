@@ -3,8 +3,8 @@ import { ReplicationComingSoon } from 'components/interfaces/Database/ETL/Coming
 import { Destinations } from 'components/interfaces/Database/ETL/Destinations'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
@@ -20,35 +20,27 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   }
 
   return (
-    <>
+    <PageLayout
+      size="large"
+      title="ETL Replication"
+      subtitle={
+        enablePgReplicate
+          ? 'Replicate your database to any analytics destination'
+          : 'Send data to other destinations'
+      }
+    >
       {enablePgReplicate ? (
         <PipelineRequestStatusProvider>
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <div className="col-span-12">
-                <FormHeader
-                  className="[&>div>p]:max-w-full"
-                  title="ETL Replication"
-                  description="Automatically replicate your database changes to external data warehouses and analytics platforms in real-time"
-                />
-                <Destinations />
-              </div>
+          <ScaffoldContainer size="large">
+            <ScaffoldSection isFullWidth>
+              <Destinations />
             </ScaffoldSection>
           </ScaffoldContainer>
         </PipelineRequestStatusProvider>
       ) : (
-        <>
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <div className="col-span-12">
-                <FormHeader title="ETL Replication" description="Send data to other destinations" />
-              </div>
-            </ScaffoldSection>
-          </ScaffoldContainer>
-          <ReplicationComingSoon projectRef={ref || '_'} />
-        </>
+        <ReplicationComingSoon projectRef={ref || '_'} />
       )}
-    </>
+    </PageLayout>
   )
 }
 
