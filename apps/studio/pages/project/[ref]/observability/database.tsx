@@ -173,8 +173,11 @@ const DatabaseUsage = () => {
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
-  // [Joshen] Empty dependency array as we only want this running once
+  const stateSyncedFromUrlRef = useRef(false)
   useEffect(() => {
+    if (stateSyncedFromUrlRef.current) return
+    stateSyncedFromUrlRef.current = true
+
     if (db !== undefined) {
       setTimeout(() => {
         // [Joshen] Adding a timeout here to support navigation from settings to reports
