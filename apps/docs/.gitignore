@@ -36,3 +36,6 @@ public/llms/
 
 # Sentry Config File
 .env.sentry-build-plugin
+# Validation reports (ephemeral)
+sync-report.json
+sync-report-stubs.yaml

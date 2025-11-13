@@ -2235,7 +2235,7 @@ functions:
 
       Learn more about implementing MFA in your application [in the MFA guide](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
-    title: 'mfa.enroll()'
+    title: mfa.enroll()
     $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
     notes: |
       - Use `totp` or `phone` as the `factorType` and use the returned `id` to create a challenge.
@@ -2309,7 +2309,7 @@ functions:
           }
           ```
   - id: mfa-challenge
-    title: 'mfa.challenge()'
+    title: mfa.challenge()
     $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
@@ -2377,7 +2377,7 @@ functions:
           }
           ```
   - id: mfa-verify
-    title: 'mfa.verify()'
+    title: mfa.verify()
     $ref: '@supabase/auth-js.GoTrueMFAApi.verify'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/javascript/auth-mfa-challenge) first.
@@ -2453,7 +2453,7 @@ functions:
           }
           ```
   - id: mfa-challenge-and-verify
-    title: 'mfa.challengeAndVerify()'
+    title: mfa.challengeAndVerify()
     $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
       - Intended for use with only TOTP factors.
@@ -2530,7 +2530,7 @@ functions:
           }
           ```
   - id: mfa-unenroll
-    title: 'mfa.unenroll()'
+    title: mfa.unenroll()
     $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
     examples:
       - id: unenroll-a-factor
@@ -2552,7 +2552,7 @@ functions:
           }
           ```
   - id: mfa-get-authenticator-assurance-level
-    title: 'mfa.getAuthenticatorAssuranceLevel()'
+    title: mfa.getAuthenticatorAssuranceLevel()
     $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
@@ -8880,3 +8880,255 @@ functions:
     title: setAuth
     $ref: '@supabase/functions-js.FunctionsClient.setAuth'
     description: Updates the authorization header
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/auth-js.GoTrueClient.constructor'
+    description: Create a new client for use in the browser.
+  - id: initialize
+    title: initialize
+    $ref: '@supabase/auth-js.GoTrueClient.initialize'
+    description: |-
+      Initializes the client session either from the url or from storage.
+      This method is automatically called when instantiating the client, but should also be called
+      manually when checking for an error from an auth redirect (oauth, magiclink, password recovery, etc).
+  - id: isthrowonerrorenabled
+    title: isThrowOnErrorEnabled
+    $ref: '@supabase/auth-js.GoTrueClient.isThrowOnErrorEnabled'
+    description: Returns whether error throwing mode is enabled for this client.
+  - id: approveauthorization
+    title: approveAuthorization
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.approveAuthorization'
+    description: |-
+      Approves an OAuth authorization request.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+  - id: denyauthorization
+    title: denyAuthorization
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.denyAuthorization'
+    description: |-
+      Denies an OAuth authorization request.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+  - id: getauthorizationdetails
+    title: getAuthorizationDetails
+    $ref: '@supabase/auth-js.AuthOAuthServerApi.getAuthorizationDetails'
+    description: |-
+      Retrieves details about an OAuth authorization request.
+      Used to display consent information to the user.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This method returns authorization details including client info, scopes, and user information.
+      If the response includes a redirect_uri, it means consent was already given - the caller
+      should handle the redirect manually if needed.
+  - id: createclient
+    title: createClient
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
+    description: |-
+      Creates a new OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: deleteclient
+    title: deleteClient
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.deleteClient'
+    description: |-
+      Deletes an OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: getclient
+    title: getClient
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.getClient'
+    description: |-
+      Gets details of a specific OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: listclients
+    title: listClients
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.listClients'
+    description: |-
+      Lists all OAuth clients with optional pagination.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: regenerateclientsecret
+    title: regenerateClientSecret
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.regenerateClientSecret'
+    description: |-
+      Regenerates the secret for an OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: updateclient
+    title: updateClient
+    $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.updateClient'
+    description: |-
+      Updates an existing OAuth client.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+
+      This function should only be called on a server. Never expose your  key in the browser.
+  - id: listfactors
+    title: listFactors
+    $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
+    description: Returns the list of MFA factors enabled for this user.
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: returns
+    title: returns
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.returns'
+    description: Override the type of the returned .
+  - id: setheader
+    title: setHeader
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.setHeader'
+    description: Set an HTTP header for the request.
+  - id: then
+    title: then
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.then'
+    description: Attaches callbacks for the resolution and/or rejection of the Promise.
+  - id: throwonerror
+    title: throwOnError
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.throwOnError'
+    description: |-
+      If there's an error with the query, throwOnError will reject the promise by
+      throwing the error instead of returning it as part of a successful response.
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/postgrest-js.PostgrestClient.constructor'
+    description: Creates a PostgREST client.
+  - id: from
+    title: from
+    $ref: '@supabase/postgrest-js.PostgrestClient.from'
+    description: Perform a query on a table or a view.
+  - id: schema
+    title: schema
+    $ref: '@supabase/postgrest-js.PostgrestClient.schema'
+    description: |-
+      Select a schema to query or perform an function (rpc) call.
+
+      The schema needs to be on the list of exposed schemas inside Supabase.
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: ilikeallof
+    title: ilikeAllOf
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAllOf'
+    description: Match only rows where  matches all of  case-insensitively.
+  - id: ilikeanyof
+    title: ilikeAnyOf
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilikeAnyOf'
+    description: Match only rows where  matches any of  case-insensitively.
+  - id: likeallof
+    title: likeAllOf
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAllOf'
+    description: Match only rows where  matches all of  case-sensitively.
+  - id: likeanyof
+    title: likeAnyOf
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.likeAnyOf'
+    description: Match only rows where  matches any of  case-sensitively.
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: geojson
+    title: geojson
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
+    description: Return  as an object in [GeoJSON](https://geojson.org) format.
+  - id: maxaffected
+    title: maxAffected
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maxAffected'
+    description: |-
+      Set the maximum number of rows that can be affected by the query.
+      Only available in PostgREST v13+ and only works with PATCH and DELETE methods.
+  - id: rollback
+    title: rollback
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
+    description: |-
+      Rollback the query.
+
+       will still be returned, but the query is not committed.
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/realtime-js.RealtimePresence.constructor'
+    description: Initializes the Presence.
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/realtime-js.WebSocketFactory.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: createwebsocket
+    title: createWebSocket
+    $ref: '@supabase/realtime-js.WebSocketFactory.createWebSocket'
+    description: 'TODO: Add description for createWebSocket'
+  - id: getwebsocketconstructor
+    title: getWebSocketConstructor
+    $ref: '@supabase/realtime-js.WebSocketFactory.getWebSocketConstructor'
+    description: 'TODO: Add description for getWebSocketConstructor'
+  - id: iswebsocketsupported
+    title: isWebSocketSupported
+    $ref: '@supabase/realtime-js.WebSocketFactory.isWebSocketSupported'
+    description: 'TODO: Add description for isWebSocketSupported'
+  - id: addeventlistener
+    title: addEventListener
+    $ref: '@supabase/realtime-js.WebSocketLike.addEventListener'
+    description: 'TODO: Add description for addEventListener'
+  - id: close
+    title: close
+    $ref: '@supabase/realtime-js.WebSocketLike.close'
+    description: 'TODO: Add description for close'
+  - id: removeeventlistener
+    title: removeEventListener
+    $ref: '@supabase/realtime-js.WebSocketLike.removeEventListener'
+    description: 'TODO: Add description for removeEventListener'
+  - id: send
+    title: send
+    $ref: '@supabase/realtime-js.WebSocketLike.send'
+    description: 'TODO: Add description for send'
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/realtime-js.WebSocketLikeConstructor.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/storage-js.index.StorageClient.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: from
+    title: from
+    $ref: '@supabase/storage-js.index.StorageClient.from'
+    description: Perform file operation in a bucket.
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: throwonerror
+    title: throwOnError
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.throwOnError'
+    description: Enable throwing errors instead of returning them.
+  - id: constructor
+    title: constructor
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.constructor'
+    description: 'TODO: Add description for constructor'
+  - id: exists
+    title: exists
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.exists'
+    description: Checks the existence of a file.
+  - id: info
+    title: info
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.info'
+    description: Retrieves the details of an existing file.
+  - id: listv2
+    title: listV2
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.listV2'
+    description: this method signature might change in the future
+  - id: throwonerror
+    title: throwOnError
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.throwOnError'
+    description: Enable throwing errors instead of returning them.
+  - id: tobase64
+    title: toBase64
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.toBase64'
+    description: 'TODO: Add description for toBase64'

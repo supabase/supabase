@@ -84,6 +84,17 @@ const TypeDocKind = {
   TypeAlias: 4194304,
 } as const
 
+// Source packages (vs re-export package)
+const SOURCE_PACKAGES = [
+  '@supabase/auth-js',
+  '@supabase/storage-js',
+  '@supabase/postgrest-js',
+  '@supabase/realtime-js',
+  '@supabase/functions-js',
+]
+
+const REEXPORT_PACKAGE = '@supabase/supabase-js'
+
 /**
  * Extract description from TypeDoc comment (checks signatures too)
  */
@@ -323,6 +334,41 @@ function findDocumentableClasses(
 }
 
 /**
+ * Check if a path is a re-export that's already documented in a source package
+ *
+ * Example:
+ * - @supabase/supabase-js.GoTrueClient.signUp is a re-export
+ * - @supabase/auth-js.GoTrueClient.signUp is documented → skip supabase-js version
+ */
+function isDocumentedReexport(path: string, yamlRefs: Map<string, YamlFunction>): boolean {
+  // Only check re-export package
+  if (!path.startsWith(REEXPORT_PACKAGE + '.')) {
+    return false
+  }
+
+  // Extract the class.method part (everything after @supabase/supabase-js.)
+  const pathSuffix = path.substring(REEXPORT_PACKAGE.length + 1)
+
+  // Check if this same path exists in any source package AND is documented
+  for (const sourcePackage of SOURCE_PACKAGES) {
+    const sourceEquivalent = `${sourcePackage}.${pathSuffix}`
+    if (yamlRefs.has(sourceEquivalent)) {
+      // Found documented version in source package - this is a re-export
+      return true
+    }
+  }
+
+  // Exception: SupabaseClient methods are NOT re-exports (they only exist in supabase-js)
+  if (pathSuffix.startsWith('SupabaseClient.')) {
+    return false
+  }
+
+  // Default: assume it's a re-export if it's in supabase-js but not documented
+  // This handles cases where source package doc is missing but we don't want double errors
+  return true
+}
+
+/**
  * Validate JSON → YML (check for missing documentation)
  */
 function validateMissingDocumentation(
@@ -338,6 +384,11 @@ function validateMissingDocumentation(
   for (const [path, node] of jsonMap.entries()) {
     // Skip if already documented
     if (yamlRefs.has(path)) {
+      continue
+    }
+
+    // Skip re-exports that are already documented in source packages
+    if (isDocumentedReexport(path, yamlRefs)) {
       continue
     }
 
