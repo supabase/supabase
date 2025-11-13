@@ -39,7 +39,6 @@ type NamespaceWithTablesProps = {
   wrapperInstance: FDW
   wrapperValues: Record<string, string>
   wrapperMeta: WrapperMeta
-  // tablesToPoll: { schema: string; name: string }[]
   pollIntervalNamespaceTables: number
   setPollIntervalNamespaceTables: (value: number) => void
 }
