@@ -193,10 +193,10 @@ export const EmailTemplates = () => {
                     <div className="flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
                       <div className="flex flex-col gap-y-0.5">
                         <div className="flex flex-col gap-y-2 items-start">
-                          <Badge variant="success" className="-ml-0.5">
-                            NEW
+                          <Badge variant="success" className="-ml-0.5 uppercase">
+                            New
                           </Badge>
-                          <p className="text-sm">
+                          <p className="text-sm font-medium">
                             Notify users about security-sensitive actions on their accounts
                           </p>
                         </div>
