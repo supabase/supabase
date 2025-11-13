@@ -18,27 +18,10 @@ export function isTemporaryUploadKeyValid(
   key: TemporaryUploadKey | null | undefined
 ): key is TemporaryUploadKey {
   if (!key) return false
-  if (!key.apiKey || typeof key.expiryTime !== 'number') {
-    return false
-  }
 
   const now = Date.now()
   const timeRemaining = key.expiryTime - now
   return timeRemaining > 60000 // More than 60 seconds remaining
-}
-
-/**
- * Get the time remaining in milliseconds for a temporary upload key
- *
- * @param key - The temporary upload key
- * @returns The time remaining in milliseconds, or 0 if invalid
- */
-export function getKeyTimeRemaining(key: TemporaryUploadKey | null | undefined): number {
-  if (!key || typeof key.expiryTime !== 'number') return 0
-
-  const now = Date.now()
-  const timeRemaining = key.expiryTime - now
-  return Math.max(0, timeRemaining)
 }
 
 /**
@@ -50,11 +33,10 @@ export function getKeyTimeRemaining(key: TemporaryUploadKey | null | undefined):
  */
 export function createTemporaryUploadKey(
   apiKey: string,
-  expiryInSeconds: number = 3600
+  expiryInSeconds: number
 ): TemporaryUploadKey {
   return {
     apiKey,
     expiryTime: Date.now() + expiryInSeconds * 1000,
   }
 }
-

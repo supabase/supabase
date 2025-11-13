@@ -107,7 +107,7 @@ function createStorageExplorerState({
     uploadProgresses: [] as UploadProgress[],
 
     // Temporary API key management for batch uploads
-    temporaryUploadKey: null as TemporaryUploadKey | null,
+    temporaryUploadKey: undefined as TemporaryUploadKey | undefined,
 
     // abortController,
     abortApiCalls: () => {
@@ -123,20 +123,14 @@ function createStorageExplorerState({
       state.abortUploadCallbacks[toastId] = []
     },
 
-    // Check if the temporary upload key is still valid
-    // Returns true if key exists and has more than 60 seconds remaining
-    isTemporaryUploadKeyValid: () => {
-      return isTemporaryUploadKeyValid(state.temporaryUploadKey)
-    },
-
     // Get or refresh the temporary upload key
     getOrRefreshTemporaryUploadKey: async () => {
-      if (state.isTemporaryUploadKeyValid()) {
-        return state.temporaryUploadKey!.apiKey
+      if (isTemporaryUploadKeyValid(state.temporaryUploadKey)) {
+        return state.temporaryUploadKey.apiKey
       }
 
-      // Generate new key with 1 hour expiry
-      const expiryInSeconds = 3600
+      // Generate new key with 10 minutes expiry
+      const expiryInSeconds = 600
       const data = await getTemporaryAPIKey({
         projectRef: state.projectRef,
         expiry: expiryInSeconds,
@@ -149,7 +143,7 @@ function createStorageExplorerState({
 
     // Clear the temporary upload key
     clearTemporaryUploadKey: () => {
-      state.temporaryUploadKey = null
+      state.temporaryUploadKey = undefined
     },
 
     columns: [] as StorageColumn[],
