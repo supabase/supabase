@@ -92,7 +92,7 @@ const PROGRESS_INDICATORS = {
 }
 
 interface ConnectTablesDialogProps {
-  onSuccessConnectTables: (tables: { schema: string; name: string }[]) => void
+  onSuccessConnectTables: () => void
 }
 
 export const ConnectTablesDialog = ({ onSuccessConnectTables }: ConnectTablesDialogProps) => {
@@ -245,7 +245,7 @@ export const ConnectTablesDialogContent = ({
       setConnectingStep(PROGRESS_STAGE.START_PIPELINE)
       await startPipeline({ projectRef, pipelineId })
 
-      onSuccessConnectTables?.(publicationTables)
+      onSuccessConnectTables?.()
       toast.success(`Connected ${values.tables.length} tables to Analytics bucket!`)
       form.reset()
       onClose()
@@ -287,7 +287,7 @@ export const ConnectTablesDialogContent = ({
       setConnectingStep(PROGRESS_STAGE.START_PIPELINE)
       await startPipeline({ projectRef, pipelineId: pipeline.id })
 
-      onSuccessConnectTables?.(tablesToBeAdded)
+      onSuccessConnectTables?.()
       toast.success('Successfully updated connected tables! Pipeline is being restarted')
       onClose()
     } catch (error: any) {

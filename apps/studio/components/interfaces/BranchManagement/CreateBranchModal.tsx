@@ -398,9 +398,11 @@ export const CreateBranchModal = () => {
                       description="Clone production data into this branch"
                     >
                       <FormControl_Shadcn_>
-                        {hasPitrEnabled && (
-                          <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        )}
+                        <Switch
+                          disabled={!hasPitrEnabled}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

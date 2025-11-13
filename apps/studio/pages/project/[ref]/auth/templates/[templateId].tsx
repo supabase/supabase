@@ -234,7 +234,7 @@ const RedirectToTemplates = () => {
             <ScaffoldSection isFullWidth>
               {/* Only show title if there is an another section above */}
               {showConfigurationSection && (
-                <ScaffoldSectionTitle className="mb-4">Contents</ScaffoldSectionTitle>
+                <ScaffoldSectionTitle className="mb-4">Content</ScaffoldSectionTitle>
               )}
               <Card>
                 <TemplateEditor template={template} />
