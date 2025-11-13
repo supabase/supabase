@@ -142,7 +142,11 @@ export const generateUpdateColumnPayload = (
     payload.check = check
   }
 
-  if (!isEqual(originalColumn.format, type)) {
+  const originalFormat =
+    originalColumn.data_type === 'ARRAY'
+      ? `${originalColumn.format.replace(/^_/, '')}[]`
+      : originalColumn.format
+  if (!isEqual(originalFormat, type)) {
     payload.type = type
   }
   if (!isEqual(originalColumn.default_value, field.defaultValue)) {
