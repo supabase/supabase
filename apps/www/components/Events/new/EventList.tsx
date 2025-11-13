@@ -1,12 +1,27 @@
 'use client'
 
+import { Rows3Icon } from 'lucide-react'
 import Link from 'next/link'
-import { Badge } from 'ui'
+import { Badge, cn } from 'ui'
 import { useEvents } from '~/app/events/context'
 import { formatHosts } from '~/lib/eventsUtils'
 
+const CATEGORIES_FILTERS = [
+  { name: 'All', value: 'all' },
+  { name: 'Meetup', value: 'meetup' },
+  { name: 'Workshop', value: 'workshop' },
+  { name: 'Hackathon', value: 'hackathon' },
+  { name: 'Webinar', value: 'webinar' },
+  { name: 'On demand', value: 'on-demand' },
+]
+
 export function EventList() {
   const { isLoading, filteredEvents } = useEvents()
+
+  const getCategoryLabel = (value: string) => {
+    const category = CATEGORIES_FILTERS.find((cat) => cat.value === value)
+    return category?.name || value
+  }
 
   if (isLoading) {
     return <EventListSkeleton />
@@ -32,10 +47,15 @@ export function EventList() {
   )
 
   return (
-    <div className="flex flex-col gap-y-8">
-      {Object.entries(eventsByDate).map(([date, events]) => (
+    <div className="flex flex-col gap-y-8 min-h-72">
+      {Object.entries(eventsByDate).map(([date, events], index) => (
         <div key={`group-${date}`} className="flex flex-col gap-y-2 relative">
-          <div className="absolute top-2 -left-[calc(48px+11px)] rounded-full size-1.5 bg-foreground-muted" />
+          <div
+            className={cn(
+              'absolute top-2 -left-[calc(48px+11px)] rounded-full size-1.5',
+              index === 0 ? 'bg-brand size-2 -left-[calc(48px+12px)]' : 'bg-foreground-muted'
+            )}
+          />
 
           <h3 className="text-foreground-light font-normal">{date}</h3>
 
@@ -71,13 +91,21 @@ export function EventList() {
                 </div>
 
                 {event.categories.map((tag, idx) => (
-                  <Badge key={`tag-${idx}`}>{tag}</Badge>
+                  <Badge key={`tag-${idx}`}>{getCategoryLabel(tag)}</Badge>
                 ))}
               </div>
             ))}
           </div>
         </div>
       ))}
+
+      {/* emtpy state */}
+      {Object.keys(eventsByDate).length === 0 && (
+        <div className="self-center text-muted my-auto flex flex-col items-center gap-y-4">
+          <Rows3Icon className="size-8" />
+          <p className="">Oops! No events found.</p>
+        </div>
+      )}
     </div>
   )
 }

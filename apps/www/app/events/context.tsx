@@ -69,7 +69,9 @@ export function EventsProvider({ children, staticEvents }: EventsProviderProps) 
               tags: categories,
               categories,
               timezone: event?.timezone || 'America/Los_Angeles',
-              location: `${event?.city}, ${event?.country}`,
+              location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
+                [event?.city, event?.country].filter(Boolean)
+              ),
               hosts: isMeetup || event?.hosts?.length === 0 ? [SUPABASE_HOST] : event?.hosts || [],
               source: 'luma',
               disable_page_build: true,

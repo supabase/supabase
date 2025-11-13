@@ -10,14 +10,14 @@ export function EventClientRenderer({ staticEvents }: { staticEvents: SupabaseEv
   return (
     <EventsProvider staticEvents={staticEvents}>
       <DefaultLayout className="flex flex-col">
-        <SectionContainer className="border-x border-b lg:!py-16">
+        <SectionContainer className="border-x border-b lg:!py-12">
           <h1 className="h1">
             <span className="sr-only">Supabase</span> Events
           </h1>
           <p className="text-foreground-light">Join us at the following upcoming events</p>
         </SectionContainer>
 
-        <SectionContainer className="border-x flex-1">
+        <SectionContainer className="border-x flex-1 lg:!pt-12">
           <EventBanner />
         </SectionContainer>
 
