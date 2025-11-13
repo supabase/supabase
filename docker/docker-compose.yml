@@ -431,9 +431,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    depends_on:
-      vector:
-        condition: service_healthy
+    # Removed vector dependency to fix circular dependency issue
+    # Vector service should start independently for log collection
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
