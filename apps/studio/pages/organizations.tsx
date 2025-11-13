@@ -24,6 +24,7 @@ import {
   Skeleton,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { useProfile } from 'lib/profile'
 
 const OrganizationsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -32,6 +33,8 @@ const OrganizationsPage: NextPageWithLayout = () => {
   const orgNotFound = orgNotFoundError === 'org_not_found'
 
   const { data: organizations = [], error, isLoading, isError, isSuccess } = useOrganizationsQuery()
+
+  const { profile } = useProfile()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
   const filteredOrganizations =
@@ -42,12 +45,12 @@ const OrganizationsPage: NextPageWithLayout = () => {
         )
 
   useEffect(() => {
-    // If there are no organizations, force the user to create one
+    // If there are no organizations and the user has a profile, force the user to create one
     // unless the user is on the not found page
-    if (isSuccess && organizations.length <= 0 && !orgNotFound) {
+    if (isSuccess && organizations.length <= 0 && !orgNotFound && !!profile) {
       router.push('/new')
     }
-  }, [isSuccess, organizations])
+  }, [isSuccess, organizations, profile])
 
   return (
     <ScaffoldContainer>
