@@ -38,6 +38,8 @@ export interface LogsQueryPanelProps {
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: string) => void
   onDateChange: (value: DatePickerValue) => void
+  activeTab?: 'builder' | 'editor'
+  onTabChange?: (tab: 'builder' | 'editor') => void
 }
 
 function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: string }) {
@@ -57,6 +59,8 @@ const LogsQueryPanel = ({
   onSelectTemplate,
   onSelectSource,
   onDateChange,
+  activeTab = 'builder',
+  onTabChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
@@ -100,34 +104,49 @@ const LogsQueryPanel = ({
 
   return (
     <div className="border-b bg-surface-100">
-      <div className="flex w-full items-center justify-between px-4 md:px-5 py-2 overflow-x-scroll no-scrollbar">
+      <div className="flex w-full items-center justify-between px-4 md:px-5 h-10 overflow-x-scroll no-scrollbar">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<ChevronDown />}>
-                  Insert source
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="bottom"
-                align="start"
-                className="max-h-[390px] overflow-auto"
-              >
-                {logsTableNames
-                  .sort((a, b) => a.localeCompare(b))
-                  .map((source) => (
-                    <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
-                      <DropdownMenuItemContent
-                        name={source}
-                        desc={LOGS_SOURCE_DESCRIPTION[source]}
-                      />
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Tabs
+              size="small"
+              type="underlined"
+              activeId={activeTab}
+              onChange={(id: string) =>
+                onTabChange?.((id === 'editor' ? 'editor' : 'builder') as any)
+              }
+              listClassNames="mr-2"
+            >
+              <Tabs.Panel id="builder" label="Query Builder" className="hidden" />
+              <Tabs.Panel id="editor" label="Code Editor" className="hidden" />
+            </Tabs>
 
-            {IS_PLATFORM && logsTemplates && (
+            {activeTab === 'editor' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" iconRight={<ChevronDown />}>
+                    Insert source
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="bottom"
+                  align="start"
+                  className="max-h-[390px] overflow-auto"
+                >
+                  {logsTableNames
+                    .sort((a, b) => a.localeCompare(b))
+                    .map((source) => (
+                      <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
+                        <DropdownMenuItemContent
+                          name={source}
+                          desc={LOGS_SOURCE_DESCRIPTION[source]}
+                        />
+                      </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {activeTab === 'editor' && IS_PLATFORM && logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>
@@ -149,14 +168,16 @@ const LogsQueryPanel = ({
               </DropdownMenu>
             )}
 
-            <LogsDatePicker
-              value={selectedDatePickerValue}
-              onSubmit={(value) => {
-                setSelectedDatePickerValue(value)
-                onDateChange(value)
-              }}
-              helpers={EXPLORER_DATEPICKER_HELPERS}
-            />
+            {activeTab === 'editor' && (
+              <LogsDatePicker
+                value={selectedDatePickerValue}
+                onSubmit={(value) => {
+                  setSelectedDatePickerValue(value)
+                  onDateChange(value)
+                }}
+                helpers={EXPLORER_DATEPICKER_HELPERS}
+              />
+            )}
 
             <div
               data-testid="log-explorer-warnings"

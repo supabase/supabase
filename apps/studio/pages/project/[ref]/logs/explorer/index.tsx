@@ -47,12 +47,14 @@ import {
   Button,
   Form,
   Input,
+  Tabs,
   Modal,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from 'ui'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { LogsQueryBuilder } from 'components/interfaces/Settings/Logs/LogsQueryBuilder'
 
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
@@ -87,6 +89,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const [selectedLog, setSelectedLog] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState<'builder' | 'editor'>('builder')
+  const [builderSql, setBuilderSql] = useState<string>('')
 
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
@@ -320,16 +324,32 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
+            activeTab={activeTab}
+            onTabChange={(tab) => {
+              setActiveTab(tab)
+              if (tab === 'editor') setEditorValue(builderSql || editorValue)
+            }}
           />
           <ShimmerLine active={isLoading} />
-          <CodeEditor
-            id={editorId}
-            editorRef={editorRef}
-            language="pgsql"
-            defaultValue={editorValue}
-            onInputChange={(v) => setEditorValue(v || '')}
-            actions={{ runQuery: { enabled: true, callback: handleRun } }}
-          />
+          {activeTab === 'builder' ? (
+            <LogsQueryBuilder
+              value={builderSql}
+              onChange={(sql) => setBuilderSql(sql)}
+              onRun={(sql) => handleRun(sql)}
+              defaultFrom={timestampStart || ''}
+              defaultTo={timestampEnd || ''}
+              onDateChange={handleDateChange}
+            />
+          ) : (
+            <CodeEditor
+              id={editorId}
+              editorRef={editorRef}
+              language="pgsql"
+              value={editorValue}
+              onInputChange={(v) => setEditorValue(v || '')}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
+            />
+          )}
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel collapsible minSize={5} className="overflow-auto">
