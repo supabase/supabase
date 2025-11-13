@@ -6,9 +6,12 @@ description: 'Encode and decode JWTs in PostgreSQL'
 
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
+Note, Supabase creates and handles JWT for you. It is built into the platform so the pgjwt extension is not needed and is safe to disable. For more information on how Supabase handles JWT see our documentation here: [Supabase and JWTs](https://supabase.com/docs/guides/auth/jwts#supabase-and-jwts)
+
 <Admonition type="deprecation">
 
 The `pgjwt` extension is deprecated in projects using Postgres 17. It continues to be supported in projects using Postgres 15, but will need to dropped before those projects are upgraded to Postgres 17. See the [Upgrading to Postgres 17 notes](/docs/guides/platform/upgrading#upgrading-to-postgres-17) for more information.
+
 
 </Admonition>
 
