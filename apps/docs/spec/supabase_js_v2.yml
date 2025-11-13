@@ -8019,6 +8019,15 @@ functions:
     title: presenceState
     $ref: '@supabase/supabase-js.RealtimeChannel.presenceState'
     description: 'TODO: Add description for presenceState'
+    examples:
+      - id: example-1
+        name: Get current presence state
+        code: |-
+          ```typescript
+          const channel = supabase.channel('room1')
+          const presences = channel.presenceState()
+          console.log('Current users:', presences)
+          ```
   - id: send
     title: send
     $ref: '@supabase/supabase-js.RealtimeChannel.send'
@@ -8027,6 +8036,18 @@ functions:
     title: subscribe
     $ref: '@supabase/supabase-js.RealtimeChannel.subscribe'
     description: Subscribe registers your client with the server
+    examples:
+      - id: example-1
+        name: Subscribe to channel
+        code: |-
+          ```typescript
+          const channel = supabase.channel('room1')
+          channel.subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              console.log('Connected!')
+            }
+          })
+          ```
   - id: teardown
     title: teardown
     $ref: '@supabase/supabase-js.RealtimeChannel.teardown'
@@ -8038,6 +8059,14 @@ functions:
     title: track
     $ref: '@supabase/supabase-js.RealtimeChannel.track'
     description: 'TODO: Add description for track'
+    examples:
+      - id: example-1
+        name: Track user presence
+        code: |-
+          ```typescript
+          const channel = supabase.channel('room1')
+          await channel.track({ user_id: 'user-123', online_at: new Date().toISOString() })
+          ```
   - id: unsubscribe
     title: unsubscribe
     $ref: '@supabase/supabase-js.RealtimeChannel.unsubscribe'
@@ -8053,10 +8082,26 @@ functions:
     title: untrack
     $ref: '@supabase/supabase-js.RealtimeChannel.untrack'
     description: 'TODO: Add description for untrack'
+    examples:
+      - id: example-1
+        name: Stop tracking presence
+        code: |-
+          ```typescript
+          const channel = supabase.channel('room1')
+          await channel.untrack()
+          ```
   - id: updatejoinpayload
     title: updateJoinPayload
     $ref: '@supabase/supabase-js.RealtimeChannel.updateJoinPayload'
     description: 'TODO: Add description for updateJoinPayload'
+    examples:
+      - id: example-1
+        name: Update channel join configuration
+        code: |-
+          ```typescript
+          const channel = supabase.channel('room1')
+          channel.updateJoinPayload({ user_token: 'new-token' })
+          ```
   - id: constructor
     title: constructor
     $ref: '@supabase/supabase-js.RealtimeClient.constructor'
@@ -8065,6 +8110,14 @@ functions:
     title: channel
     $ref: '@supabase/supabase-js.RealtimeClient.channel'
     description: 'TODO: Add description for channel'
+    examples:
+      - id: example-1
+        name: Create a realtime channel
+        code: |-
+          ```typescript
+          const channel = supabase.channel('room1')
+          channel.subscribe()
+          ```
   - id: connect
     title: connect
     $ref: '@supabase/supabase-js.RealtimeClient.connect'
@@ -8112,6 +8165,16 @@ functions:
     title: onHeartbeat
     $ref: '@supabase/supabase-js.RealtimeClient.onHeartbeat'
     description: 'TODO: Add description for onHeartbeat'
+    examples:
+      - id: example-1
+        name: Handle heartbeat events
+        code: |-
+          ```typescript
+          const client = supabase.realtime
+          client.onHeartbeat(() => {
+            console.log('Heartbeat received')
+          })
+          ```
   - id: push
     title: push
     $ref: '@supabase/supabase-js.RealtimeClient.push'
