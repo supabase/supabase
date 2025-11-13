@@ -12,7 +12,7 @@ const IS_CI = !!process.env.CI
 const webServerConfig = {
   command: 'pnpm -w run e2e:setup',
   port: 8082,
-  timeout: 5 * 60 * 1000,
+  timeout: 10 * 60 * 1000,
 }
 
 export default defineConfig({
