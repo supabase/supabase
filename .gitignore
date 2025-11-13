@@ -150,3 +150,10 @@ gcloud.json
 **/.sentryclirc
 
 keys.json
+
+# Sitemap
+public/sitemap.xml
+
+# RSS Feed
+public/rss.xml
+
