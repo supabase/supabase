@@ -1294,6 +1294,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/s3' as `/${string}`,
         },
         {
+          name: 'Connecting to AWS S3 Vectors',
+          url: '/guides/database/extensions/wrappers/s3_vectors' as `/${string}`,
+        },
+        {
           name: 'Connecting to BigQuery',
           url: '/guides/database/extensions/wrappers/bigquery' as `/${string}`,
         },

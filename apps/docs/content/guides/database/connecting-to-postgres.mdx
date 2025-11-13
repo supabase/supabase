@@ -196,7 +196,7 @@ You can technically use both, but it’s not recommended unless you’re specifi
 
 ### How does the default pool size work?
 
-Supavisor and PgBouncer work independently, but both reference the same pool size setting. For example, if you set the pool size to 30, Supavisor can open up to 30 server-side connections to Postgres each for its session mode port (5432) and transaction mode port (6543), and PgBouncer can also open up to 30. If both poolers are active and reach their roles/modes limits at the same time, you could have as many as 60 backend connections hitting your database, in addition to any direct connections. You can adjust the pool size in [Database settings](/dashboard/project/_/database/settings) in the dashboard.
+Supavisor and PgBouncer work independently, but both reference the same pool size setting. For example, If you set the pool size to 30, Supavisor can open up to 30 server side connections to Postgres. These connections are shared between the session mode port (5432) and the transaction mode port (6543). Each mode can use up to 30 connections independently, or split them between both, but the total combined connections across both modes cannot exceed 30. PgBouncer can also open up to 30 connections under the same limit. If both poolers are active and reach their roles/modes limits at the same time, you could have as many as 60 backend connections hitting your database, in addition to any direct connections. You can adjust the pool size in [Database settings](/dashboard/project/_/database/settings) in the dashboard.
 
 ### What is the difference between client connections and backend connections?
 

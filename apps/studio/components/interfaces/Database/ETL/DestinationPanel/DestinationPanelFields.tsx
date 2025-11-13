@@ -168,9 +168,9 @@ export const AnalyticsBucketFields = ({
     refetch: refetchNamespaces,
   } = useIcebergNamespacesQuery(
     {
+      projectRef,
       catalogUri,
       warehouse: warehouseName || '',
-      token: serviceApiKey || '',
     },
     {
       enabled: type === 'Analytics Bucket' && !!catalogUri && !!warehouseName && !!serviceApiKey,
