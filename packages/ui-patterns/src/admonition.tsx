@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import { forwardRef, ReactNode } from 'react'
+import { ComponentProps, forwardRef, ReactNode } from 'react'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 
 export interface AdmonitionProps {
@@ -14,11 +14,11 @@ export interface AdmonitionProps {
     | 'warning'
   label?: string
   title?: string
-  description?: string | React.ReactNode
+  description?: string | ReactNode
   showIcon?: boolean
   childProps?: {
-    title?: React.ComponentProps<typeof AlertTitle_Shadcn_>
-    description?: React.ComponentProps<typeof AlertDescription_Shadcn_>
+    title?: ComponentProps<typeof AlertTitle_Shadcn_>
+    description?: ComponentProps<typeof AlertDescription_Shadcn_>
   }
   layout?: 'horizontal' | 'vertical'
   actions?: ReactNode

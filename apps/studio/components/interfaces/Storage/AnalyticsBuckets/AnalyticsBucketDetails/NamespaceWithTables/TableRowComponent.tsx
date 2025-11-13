@@ -1,7 +1,7 @@
 import { snakeCase, uniq } from 'lodash'
 import { Loader2, MoreVertical, Pause, Play, Trash } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -89,18 +89,20 @@ export const TableRowComponent = ({
   const isPipelineRunning = pipelineStatus === 'started'
   const isReplicating = isTableUnderReplicationPublication && isPipelineRunning
 
-  const getStatusLabel = () => {
+  // [Joshen] Considers both the replication pipeline status + if the table is in the replication publication
+  const replicationStatusLabel = useMemo(() => {
     if (isLoading) return 'Checking'
-    if (hasReplication && isTableUnderReplicationPublication) {
-      if (isPipelineRunning) {
+
+    if (hasReplication) {
+      if (!isPipelineRunning) {
+        return '-'
+      } else if (isTableUnderReplicationPublication) {
         return 'Running'
       } else {
-        return pipelineStatus ?? 'unknown'
+        return 'Disabled'
       }
-    } else {
-      return 'Stopped'
     }
-  }
+  }, [hasReplication, isLoading, isPipelineRunning, isTableUnderReplicationPublication])
 
   const onConfirmStopReplication = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -236,22 +238,26 @@ export const TableRowComponent = ({
                   <div className="flex items-center gap-x-2">
                     {isLoading ? (
                       <Loader2 size={12} className="animate-spin text-foreground-lighter" />
-                    ) : (
+                    ) : isPipelineRunning ? (
                       <DotPing
                         animate={isReplicating}
                         variant={isReplicating ? 'primary' : 'default'}
                       />
-                    )}
-                    <span className="text-foreground-lighter capitalize">{getStatusLabel()}</span>
+                    ) : null}
+                    <span className="text-foreground-lighter capitalize">
+                      {replicationStatusLabel}
+                    </span>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  {isReplicating
-                    ? `Table data is currently replicating${!!inferredPostgresTable ? ` from ${inferredPostgresTable.schema}.${inferredPostgresTable.name}` : ''}`
-                    : !isTableUnderReplicationPublication
-                      ? 'Replication is disabled for this table'
-                      : `Replication on the bucket is ${pipelineStatus}`}
-                </TooltipContent>
+                {isPipelineRunning && (
+                  <TooltipContent side="bottom">
+                    {isReplicating
+                      ? `Table data is currently replicating${!!inferredPostgresTable ? ` from ${inferredPostgresTable.schema}.${inferredPostgresTable.name}` : ''}`
+                      : !isTableUnderReplicationPublication
+                        ? 'Replication is disabled for this table'
+                        : undefined}
+                  </TooltipContent>
+                )}
               </Tooltip>
             </div>
           </TableCell>

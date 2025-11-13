@@ -26,13 +26,14 @@ import {
   useDatabaseExtensionsQuery,
 } from 'data/database-extensions/database-extensions-query'
 import { useReplicationPipelineStatusQuery } from 'data/etl/pipeline-status-query'
+import { useStartPipelineMutation } from 'data/etl/start-pipeline-mutation'
 import { AnalyticsBucket } from 'data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
-import { Button, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
@@ -65,6 +66,8 @@ export const AnalyticBucketDetails = () => {
   const [pollIntervalNamespaces, setPollIntervalNamespaces] = useState(0)
   const [pollIntervalNamespaceTables, setPollIntervalNamespaceTables] = useState(0)
 
+  const { mutateAsync: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation()
+
   /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
   const { data: wrapperInstance, isLoading } = useAnalyticsBucketWrapperInstance({
     bucketId: bucket?.id,
@@ -73,9 +76,18 @@ export const AnalyticBucketDetails = () => {
     projectRef,
     bucketId: bucket?.id,
   })
-  const { data } = useReplicationPipelineStatusQuery({ projectRef, pipelineId: pipeline?.id })
+  const { data } = useReplicationPipelineStatusQuery(
+    { projectRef, pipelineId: pipeline?.id },
+    {
+      refetchInterval: (data) => {
+        if (data?.status.name !== 'started') return 2000
+        else return false
+      },
+    }
+  )
   const pipelineStatus = data?.status.name
-  const isPipelineRunning = ['starting', 'started'].includes(pipelineStatus ?? '')
+  const isPipelineRunning = pipelineStatus === 'started'
+  const isPipelineStopped = ['failed', 'stopped'].includes(pipelineStatus ?? '')
 
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
@@ -197,17 +209,7 @@ export const AnalyticBucketDetails = () => {
                     </ScaffoldSectionDescription>
                   </div>
                   <div className="flex items-center gap-x-2">
-                    {!isPipelineRunning && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <WarningIcon />
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">
-                          Replication on the bucket is {pipelineStatus}
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                    {!!pipeline && (
+                    {!!pipeline && isPipelineRunning && (
                       <Button asChild type="default">
                         <Link
                           href={`/project/${projectRef}/database/etl/${pipeline.replicator_id}`}
@@ -269,25 +271,74 @@ export const AnalyticBucketDetails = () => {
                     )}
                   </>
                 ) : (
-                  <div className="flex flex-col gap-y-10">
-                    {namespaces.map(({ namespace, schema, tables }) => (
-                      <NamespaceWithTables
-                        key={namespace}
-                        bucketName={bucket?.id}
-                        namespace={namespace}
-                        sourceType="direct"
-                        schema={schema}
-                        tables={tables as any}
-                        token={token!}
-                        wrapperInstance={wrapperInstance}
-                        wrapperValues={wrapperValues}
-                        wrapperMeta={wrapperMeta}
-                        tablesToPoll={tablesToPoll}
-                        pollIntervalNamespaceTables={pollIntervalNamespaceTables}
-                        setPollIntervalNamespaceTables={setPollIntervalNamespaceTables}
-                      />
-                    ))}
-                  </div>
+                  <>
+                    {!!pipeline && !isPipelineRunning && (
+                      <Admonition
+                        type="note"
+                        layout="horizontal"
+                        className="[&>div]:pl-[2.5rem] [&>div]:-translate-y-[3px]"
+                        childProps={{ title: { className: 'block capitalize-sentence' } }}
+                        showIcon={isPipelineStopped}
+                        title={
+                          isPipelineStopped
+                            ? `Replication on the bucket has ${pipelineStatus}`
+                            : `${pipelineStatus} replication on the bucket...`
+                        }
+                        description={
+                          isPipelineStopped
+                            ? 'Data changes from Postgres tables is currently not streaming to their corresponding analytics bucket table'
+                            : 'Data changes from Postgres tables will resume streaming once pipeline has started'
+                        }
+                        actions={
+                          <div className="flex items-center gap-x-2">
+                            <Button asChild type="default">
+                              <Link
+                                href={`/project/${projectRef}/database/etl/${pipeline.replicator_id}`}
+                              >
+                                View replication
+                              </Link>
+                            </Button>
+                            {isPipelineStopped && (
+                              <Button
+                                type="default"
+                                loading={isStartingPipeline}
+                                onClick={async () => {
+                                  if (projectRef) {
+                                    await startPipeline({ projectRef, pipelineId: pipeline.id })
+                                  }
+                                }}
+                              >
+                                Restart
+                              </Button>
+                            )}
+                          </div>
+                        }
+                      >
+                        {!isPipelineStopped && (
+                          <Loader2 size={18} className="absolute top-1.5 left-[3px] animate-spin" />
+                        )}
+                      </Admonition>
+                    )}
+                    <div className="flex flex-col gap-y-10">
+                      {namespaces.map(({ namespace, schema, tables }) => (
+                        <NamespaceWithTables
+                          key={namespace}
+                          bucketName={bucket?.id}
+                          namespace={namespace}
+                          sourceType="direct"
+                          schema={schema}
+                          tables={tables as any}
+                          token={token!}
+                          wrapperInstance={wrapperInstance}
+                          wrapperValues={wrapperValues}
+                          wrapperMeta={wrapperMeta}
+                          tablesToPoll={tablesToPoll}
+                          pollIntervalNamespaceTables={pollIntervalNamespaceTables}
+                          setPollIntervalNamespaceTables={setPollIntervalNamespaceTables}
+                        />
+                      ))}
+                    </div>
+                  </>
                 )}
               </ScaffoldSection>
 
