@@ -5,8 +5,7 @@ import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Badge, Separator } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, Badge, Separator } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
@@ -51,37 +50,35 @@ export const IntegrationOverviewTab = ({
       <BuiltBySection integration={integration} />
       {dependsOnExtension && (
         <div className="px-4 md:px-10 max-w-4xl">
-          <Admonition
-            showIcon={false}
-            type="default"
-            className="[&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
-          >
-            <Badge className="bg-surface-300 bg-opacity-100 flex items-center gap-x-2 w-max">
-              <img
-                alt="Supabase"
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                className=" h-2.5 cursor-pointer rounded"
-              />
-              <span>Postgres Module</span>
-            </Badge>
-            <Markdown
-              className="max-w-full"
-              content={`This integration uses the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')}
+          <Alert_Shadcn_ variant="default" className="bg-surface-200/25 border border-default">
+            <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+              <Badge className="bg-surface-300 bg-opacity-100 flex items-center gap-x-2 w-max">
+                <img
+                  alt="Supabase"
+                  src={`${router.basePath}/img/supabase-logo.svg`}
+                  className=" h-2.5 cursor-pointer rounded"
+                />
+                <span>Postgres Module</span>
+              </Badge>
+              <Markdown
+                className="max-w-full"
+                content={`This integration uses the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')}
               extension${integration.requiredExtensions.length > 1 ? 's' : ''} directly in your Postgres database.
               ${hasToInstallExtensions && !hasMissingExtensions ? `Install ${integration.requiredExtensions.length > 1 ? 'these' : 'this'} database extension${integration.requiredExtensions.length > 1 ? 's' : ''} to use ${integration.name} in your project.` : ''}
               `}
-            />
+              />
 
-            {hasMissingExtensions ? (
-              integration.missingExtensionsAlert
-            ) : (
-              <div className="flex flex-row gap-x-2">
-                {installableExtensions.map((extension) => (
-                  <MissingExtensionAlert key={extension.name} extension={extension} />
-                ))}
-              </div>
-            )}
-          </Admonition>
+              {hasMissingExtensions ? (
+                integration.missingExtensionsAlert
+              ) : (
+                <div className="flex flex-row gap-x-2">
+                  {installableExtensions.map((extension) => (
+                    <MissingExtensionAlert key={extension.name} extension={extension} />
+                  ))}
+                </div>
+              )}
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         </div>
       )}
       {!!actions && !hasToInstallExtensions && <div className="px-10 max-w-4xl">{actions}</div>}

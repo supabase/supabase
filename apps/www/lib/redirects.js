@@ -1299,6 +1299,18 @@ module.exports = [
     destination: '/docs/guides/auth/auth-helpers/auth-ui',
   },
   {
+    permanent: false,
+    source: '/docs/guides/auth/server-side/nextjs',
+    destination:
+      '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/auth/server-side/sveltekit',
+    destination:
+      '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=sveltekit',
+  },
+  {
     permanent: true,
     source: '/docs/guides/client-libraries',
     destination: '/docs#reference-documentation',

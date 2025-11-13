@@ -1,18 +1,19 @@
-import { ExternalLink, MoreVertical, Search, Trash2 } from 'lucide-react'
+import { ChevronRight, ExternalLink, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useState, type KeyboardEvent, type MouseEvent } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldHeader, ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
+import { Bucket as BucketIcon } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import {
+  Badge,
   Button,
   Card,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  cn,
   Table,
   TableBody,
   TableCell,
@@ -25,7 +26,6 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
-import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
 
 /**
  * [Joshen] Low-priority refactor: We should use a virtualized table here as per how we do it
@@ -34,12 +34,9 @@ import { DeleteVectorBucketModal } from './DeleteVectorBucketModal'
 
 export const VectorsBuckets = () => {
   const { ref: projectRef } = useParams()
+  const router = useRouter()
 
   const [filterString, setFilterString] = useState('')
-  const [bucketForDeletion, setBucketForDeletion] = useState<{
-    vectorBucketName: string
-    creationTime: string
-  } | null>(null)
 
   const { data, isLoading: isLoadingBuckets } = useVectorBucketsQuery({ projectRef })
   const bucketsList = data?.vectorBuckets ?? []
@@ -51,30 +48,57 @@ export const VectorsBuckets = () => {
           bucket.vectorBucketName.toLowerCase().includes(filterString.toLowerCase())
         )
 
+  const handleBucketNavigation = (bucketName: string, event: MouseEvent | KeyboardEvent) => {
+    const url = `/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(bucketName)}`
+    if (event.metaKey || event.ctrlKey) {
+      window.open(url, '_blank')
+    } else {
+      router.push(url)
+    }
+  }
+
   return (
     <ScaffoldSection isFullWidth>
-      <Admonition
-        type="warning"
-        layout="horizontal"
-        className="mb-12 [&>div]:!translate-y-0 [&>svg]:!translate-y-1"
-        title="Vector buckets are in alpha"
-        actions={
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
+      <Admonition showIcon={false} type="tip" className="relative mb-6 overflow-hidden">
+        <div className="absolute -inset-16 z-0 opacity-50">
+          <img
+            src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
+            alt="Supabase Grafana"
+            className="w-full h-full object-cover object-right hidden dark:block"
+          />
+          <img
+            src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
+            alt="Supabase Grafana"
+            className="w-full h-full object-cover object-right dark:hidden"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
+        </div>
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
+          <div className="flex flex-col gap-y-0.5">
+            <div className="flex flex-col gap-y-2 items-start">
+              <Badge variant="success" className="-ml-0.5 uppercase">
+                New
+              </Badge>
+              <p className="text-sm font-medium">Introducing vector buckets</p>
+            </div>
+            <p className="text-sm text-foreground-lighter text-balance">
+              Vector buckets are now in private alpha. Expect rapid changes, limited features, and
+              possible breaking updates. Please share feedback as we refine the experience and
+              expand access.
+            </p>
+          </div>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />} className="mt-2">
+            <Link
               // [Joshen] To update with Vector specific GH discussion
               href="https://github.com/orgs/supabase/discussions/40116"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Leave feedback
-            </a>
+              Share feedback
+            </Link>
           </Button>
-        }
-      >
-        <p className="!leading-normal !mb-0">
-          Expect rapid changes, limited features, and possible breaking updates as we expand access.
-        </p>
-        <p className="!leading-normal !mb-0">Please share feedback as we refine the experience!</p>
+        </div>
       </Admonition>
 
       {!isLoadingBuckets && bucketsList.length === 0 ? (
@@ -103,14 +127,21 @@ export const VectorsBuckets = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    {filteredBuckets.length > 0 && (
+                      <TableHead className="w-2 pr-1">
+                        <span className="sr-only">Icon</span>
+                      </TableHead>
+                    )}
                     <TableHead>Name</TableHead>
                     <TableHead>Created at</TableHead>
-                    <TableHead />
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredBuckets.length === 0 && filterString.length > 0 && (
-                    <TableRow>
+                    <TableRow className="[&>td]:hover:bg-inherit">
                       <TableCell colSpan={3}>
                         <p className="text-sm text-foreground">No results found</p>
                         <p className="text-sm text-foreground-lighter">
@@ -126,15 +157,18 @@ export const VectorsBuckets = () => {
                     const created = +bucket.creationTime * 1000
 
                     return (
-                      <TableRow key={id}>
+                      <TableRow key={id} className="relative cursor-pointer h-16">
+                        <TableCell className="w-2 pr-1">
+                          <BucketIcon size={16} className="text-foreground-muted" />
+                        </TableCell>
                         <TableCell>
-                          <Link
-                            href={`/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`}
-                            title={name}
-                            className="text-link-table-cell"
+                          <p className="whitespace-nowrap max-w-[512px] truncate">{name}</p>
+                          <button
+                            className={cn('absolute inset-0', 'inset-focus')}
+                            onClick={(event) => handleBucketNavigation(name, event)}
                           >
-                            {name}
-                          </Link>
+                            <span className="sr-only">Go to bucket details</span>
+                          </button>
                         </TableCell>
                         <TableCell>
                           <p className="text-foreground-light">
@@ -145,30 +179,8 @@ export const VectorsBuckets = () => {
                           </p>
                         </TableCell>
                         <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <Button asChild type="default">
-                              <Link
-                                href={`/project/${projectRef}/storage/vectors/buckets/${encodeURIComponent(name)}`}
-                              >
-                                View contents
-                              </Link>
-                            </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent side="bottom" align="end" className="w-40">
-                                <DropdownMenuItem
-                                  className="flex items-center space-x-2"
-                                  onClick={() => {
-                                    setBucketForDeletion(bucket)
-                                  }}
-                                >
-                                  <Trash2 size={12} />
-                                  <p>Delete bucket</p>
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                          <div className="flex justify-end items-center h-full">
+                            <ChevronRight size={14} className="text-foreground-muted/60" />
                           </div>
                         </TableCell>
                       </TableRow>
@@ -180,13 +192,6 @@ export const VectorsBuckets = () => {
           )}
         </div>
       )}
-
-      <DeleteVectorBucketModal
-        visible={!!bucketForDeletion}
-        bucketName={bucketForDeletion?.vectorBucketName!}
-        onCancel={() => setBucketForDeletion(null)}
-        onSuccess={() => setBucketForDeletion(null)}
-      />
     </ScaffoldSection>
   )
 }

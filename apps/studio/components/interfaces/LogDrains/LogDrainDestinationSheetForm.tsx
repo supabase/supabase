@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import { useTrack } from 'lib/telemetry/track'
 
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import Link from 'next/link'
@@ -182,11 +183,7 @@ export function LogDrainDestinationSheetForm({
 
   const defaultType = defaultValues?.type || 'webhook'
   const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
-
-  const baseValues = {
-    name: defaultValues?.name || '',
-    description: defaultValues?.description || '',
-  }
+  const track = useTrack()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -289,6 +286,12 @@ export function LogDrainDestinationSheetForm({
                 }
 
                 form.handleSubmit(onSubmit)(e)
+                track('log_drain_save_button_clicked', {
+                  destination: form.getValues('type') as Exclude<
+                    LogDrainType,
+                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3'
+                  >,
+                })
               }}
             >
               <div className="space-y-8 px-content">

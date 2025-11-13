@@ -1,42 +1,14 @@
 import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
 import { useQuery } from '@tanstack/react-query'
+import { EdgeFunctionFile } from 'components/interfaces/EdgeFunctions/EdgeFunction.types'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
-export type EdgeFunctionBodyVariables = {
+type EdgeFunctionBodyVariables = {
   projectRef?: string
   slug?: string
-}
-
-export type EdgeFunctionFile = {
-  name: string
-  content: string
-}
-
-export type EdgeFunctionBodyResponse = {
-  files: EdgeFunctionFile[]
-}
-
-async function streamToString(stream: ReadableStream<Uint8Array>) {
-  const reader = stream.getReader()
-  const decoder = new TextDecoder()
-  let result = ''
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      result += decoder.decode(value, { stream: true })
-    }
-    // Final decode to handle any remaining bytes
-    result += decoder.decode()
-    return result
-  } catch (error) {
-    console.error('Error reading stream:', error)
-    throw error
-  }
 }
 
 export async function getEdgeFunctionBody(
@@ -70,7 +42,7 @@ export async function getEdgeFunctionBody(
     }
   }
 
-  return { files: files as EdgeFunctionFile[] }
+  return { files: files as Omit<EdgeFunctionFile, 'id' | 'selected'>[] }
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>

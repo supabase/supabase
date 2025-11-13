@@ -105,7 +105,7 @@ export const CreateAnalyticsBucketModal = ({
 
   const [visible, setVisible] = useState(false)
 
-  const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
+  const { data: buckets = [], isLoading } = useAnalyticsBucketsQuery({ projectRef: ref })
   const icebergCatalogEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
   const wrappersExtenstionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
@@ -164,8 +164,8 @@ export const CreateAnalyticsBucketModal = ({
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
 
-      toast.success(`Created bucket “${values.name}”`)
       form.reset()
+      toast.success(`Created bucket “${values.name}”`)
       setVisible(false)
       router.push(`/project/${ref}/storage/analytics/buckets/${values.name}`)
     } catch (error: any) {
@@ -192,7 +192,13 @@ export const CreateAnalyticsBucketModal = ({
           type={buttonType}
           className={buttonClassName}
           icon={<Plus size={14} />}
-          disabled={!canCreateBuckets || !icebergCatalogEnabled || disabled}
+          disabled={
+            !canCreateBuckets ||
+            !icebergCatalogEnabled ||
+            isLoading ||
+            buckets.length >= 2 ||
+            disabled
+          }
           style={{ justifyContent: 'start' }}
           onClick={() => setVisible(true)}
           tooltip={{
@@ -203,7 +209,9 @@ export const CreateAnalyticsBucketModal = ({
                 ? 'Analytics buckets are not enabled for your project. Please contact support to enable it.'
                 : !canCreateBuckets
                   ? 'You need additional permissions to create buckets'
-                  : tooltip?.content?.text,
+                  : buckets.length >= 2
+                    ? 'Bucket limit reached'
+                    : tooltip?.content?.text,
             },
           }}
         >

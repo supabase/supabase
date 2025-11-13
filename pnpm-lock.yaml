@@ -36,6 +36,9 @@ catalogs:
     react-dom:
       specifier: ^18.3.0
       version: 18.3.1
+    recharts:
+      specifier: ^2.15.4
+      version: 2.15.4
     tailwindcss:
       specifier: 3.4.1
       version: 3.4.1
@@ -232,6 +235,9 @@ importers:
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
+      dayjs:
+        specifier: 1.11.13
+        version: 1.11.13
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
@@ -259,6 +265,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 18.3.1
+      react-data-grid:
+        specifier: 7.0.0-beta.41
+        version: 7.0.0-beta.41(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-day-picker:
         specifier: ^9.11.1
         version: 9.11.1(react@18.3.1)
@@ -278,8 +287,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0(react@18.3.1)
       recharts:
-        specifier: ^2.12.7
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rehype-autolink-headings:
         specifier: ^7.1.0
         version: 7.1.0
@@ -320,6 +329,9 @@ importers:
       '@shikijs/compat':
         specifier: ^1.1.7
         version: 1.6.0
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))
       '@types/lodash.template':
         specifier: 4.5.0
         version: 4.5.0
@@ -400,13 +412,13 @@ importers:
         version: 1.0.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^10.3.0
-        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.78.0
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
-        version: 0.1.1(tailwindcss@4.1.13)
+        version: 0.1.1(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))
       '@tanstack/react-query':
         specifier: ^5.13.4
         version: 5.13.4(react@18.3.1)
@@ -705,6 +717,9 @@ importers:
       smol-toml:
         specifier: ^1.3.1
         version: 1.3.1
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -815,7 +830,7 @@ importers:
         version: 1.1.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^10.3.0
-        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@std/path':
         specifier: npm:@jsr/std__path@^1.0.8
         version: '@jsr/std__path@1.0.8'
@@ -1036,8 +1051,8 @@ importers:
         specifier: ^11.10.1
         version: 11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts:
-        specifier: ^2.8.0
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       remark-gfm:
         specifier: ^3.0.1
         version: 3.0.1(supports-color@8.1.1)
@@ -1418,8 +1433,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0(react@18.3.1)
       recharts:
-        specifier: ^2.8.0
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rehype-autolink-headings:
         specifier: ^7.1.0
         version: 7.1.0
@@ -1576,7 +1591,7 @@ importers:
         version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^10
-        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
+        version: 10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.78.0
@@ -1698,8 +1713,8 @@ importers:
         specifier: ^17.4.0
         version: 17.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts:
-        specifier: ^2.8.0
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rehype-slug:
         specifier: ^5.1.0
         version: 5.1.0
@@ -1812,12 +1827,27 @@ importers:
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.78.0
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       h3:
         specifier: ^1.15.4
         version: 1.15.4
       nuxt:
         specifier: ^4.0.3
         version: 4.1.2(@electric-sql/pglite@0.2.15)(@parcel/watcher@2.5.1)(@types/node@22.13.14)(@vue/compiler-sfc@3.5.21)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.15)(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3)))(drizzle-orm@0.44.2(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(pg@8.16.3))(encoding@0.1.13)(eslint@9.37.0(jiti@2.5.1)(supports-color@8.1.1))(ioredis@5.7.0(supports-color@8.1.1))(magicast@0.3.5)(rollup@4.50.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(typescript@5.9.2)(vite@7.1.11(@types/node@22.13.14)(jiti@2.5.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1))(yaml@2.8.1)
+      tailwind-merge:
+        specifier: ^3.3.1
+        version: 3.3.1
+      vue:
+        specifier: ^3.5.21
+        version: 3.5.21(typescript@5.9.2)
+      vue-router:
+        specifier: ^4.5.1
+        version: 4.5.1(vue@3.5.21(typescript@5.9.2))
     devDependencies:
       shadcn:
         specifier: ^3.0.0
@@ -2321,8 +2351,8 @@ importers:
         specifier: ^15.6.6
         version: 15.6.6(react@18.3.1)
       recharts:
-        specifier: ^2.12.7
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       sonner:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2490,8 +2520,8 @@ importers:
         specifier: ^17.5.0
         version: 17.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts:
-        specifier: ^2.8.0
-        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 'catalog:'
+        version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       remark:
         specifier: ^15.0.1
         version: 15.0.1(supports-color@8.1.1)
@@ -17030,11 +17060,11 @@ packages:
       react: ^16.8.0 || 17.x || 18.x
       react-dom: ^16.8.0 || 17.x || 18.x
 
-  react-smooth@4.0.1:
-    resolution: {integrity: sha512-OE4hm7XqR0jNOq3Qmk9mFLyd6p2+j6bvbPJ7qlB7+oo0eNcL2l7WQzG6MBnT3EXY6xzkLMUBec3AfewJdA0J8w==}
+  react-smooth@4.0.4:
+    resolution: {integrity: sha512-gnGKTpYwqL0Iii09gHobNolvX4Kiq4PKx6eWBCYYix+8cdw+cGo3do906l1NBPKkSWx1DghC1dlWG9L2uGd61Q==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-style-singleton@2.2.3:
     resolution: {integrity: sha512-b6jSvxvVnyptAiLjbkWLE/lOnR4lfTtDAl+eUC7RZy+QQWc6wRzIV2CE6xBuMmDxc2qIihtDCZD5NPOFl7fRBQ==}
@@ -17140,12 +17170,12 @@ packages:
   recharts-scale@0.4.5:
     resolution: {integrity: sha512-kivNFO+0OcUNu7jQquLXAxz1FIwZj8nrj+YkOKc5694NbjCvcT6aSZiIzNzd2Kul4o4rTto8QVR9lMNtxD4G1w==}
 
-  recharts@2.12.7:
-    resolution: {integrity: sha512-hlLJMhPQfv4/3NBSAyq3gzGg4h2v69RJh6KU7b3pXYNNAELs9kEoXOjbkxdXpALqKBoVmVptGfLpxdaVYqjmXQ==}
+  recharts@2.15.4:
+    resolution: {integrity: sha512-UT/q6fwS3c1dHbXv2uFgYJ9BMFHu3fwnd7AYZaEQhXuYQ4hgsxLvsUXzGdKeZrW5xopzDCvuA2N41WJ88I7zIw==}
     engines: {node: '>=14'}
     peerDependencies:
-      react: ^16.0.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0
+      react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   rechoir@0.6.2:
     resolution: {integrity: sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==}
@@ -18318,9 +18348,6 @@ packages:
     resolution: {integrity: sha512-qAYmXRfk3ENzuPBakNK0SRrUDipP8NQnEY6772uDhflcQz5EhRdD7JNZxyrFHVQNCwULPBn6FNPp9brpO7ctcA==}
     engines: {node: '>=14.0.0'}
     hasBin: true
-
-  tailwindcss@4.1.13:
-    resolution: {integrity: sha512-i+zidfmTqtwquj4hMEwdjshYYgMbOrPzb9a0M3ZgNa0JMoZeFC6bxZvO8yr8ozS6ix2SDz0+mvryPeBs2TFE+w==}
 
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
@@ -27566,7 +27593,7 @@ snapshots:
 
   '@sentry/core@10.3.0': {}
 
-  '@sentry/nextjs@10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
+  '@sentry/nextjs@10.3.0(@opentelemetry/context-async-hooks@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.2(@babel/core@7.28.4(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.36.0
@@ -28534,10 +28561,6 @@ snapshots:
   '@tailwindcss/container-queries@0.1.1(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))':
     dependencies:
       tailwindcss: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
-
-  '@tailwindcss/container-queries@0.1.1(tailwindcss@4.1.13)':
-    dependencies:
-      tailwindcss: 4.1.13
 
   '@tailwindcss/forms@0.5.6(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))':
     dependencies:
@@ -38876,7 +38899,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       topojson-client: 3.1.0
 
-  react-smooth@4.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-smooth@4.0.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       fast-equals: 5.0.1
       prop-types: 15.8.1
@@ -39030,15 +39053,15 @@ snapshots:
     dependencies:
       decimal.js-light: 2.5.1
 
-  recharts@2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  recharts@2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       clsx: 2.1.1
       eventemitter3: 4.0.7
       lodash: 4.17.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-is: 16.13.1
-      react-smooth: 4.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-is: 18.3.1
+      react-smooth: 4.0.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts-scale: 0.4.5
       tiny-invariant: 1.3.3
       victory-vendor: 36.6.11
@@ -40641,8 +40664,6 @@ snapshots:
       sucrase: 3.34.0
     transitivePeerDependencies:
       - ts-node
-
-  tailwindcss@4.1.13: {}
 
   tapable@2.2.1: {}
 
