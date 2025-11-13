@@ -54,14 +54,38 @@ jobs:
           echo "Generating new typespec snapshot for review..."
           npx vitest run --update ./features/docs/Reference.typeSpec.test.ts
 
+      - name: Validate reference sync
+        id: validate
+        working-directory: apps/docs
+        run: |
+          echo "Running reference documentation validation..."
+          pnpm run validate:references:fix || echo "validation_failed=true" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Generate PR comment
+        id: comment
+        if: always()
+        working-directory: apps/docs
+        run: |
+          if [ -f sync-report.json ]; then
+            echo "Generating PR comment with validation results..."
+            COMMENT=$(tsx scripts/generate-yaml-suggestions.ts)
+            echo "$COMMENT" > /tmp/pr-comment.md
+            echo "comment_generated=true" >> $GITHUB_OUTPUT
+          else
+            echo "No validation report found, skipping comment generation"
+            echo "comment_generated=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create pull request
+        id: create-pr
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'docs: update js client libraries (${{ github.event.inputs.version }})'
           title: 'docs: update js client libraries (${{ github.event.inputs.version }})'
           body: |
-            Updates JS client libraries documentation following stable release. 
+            Updates JS client libraries documentation following stable release.
             Ran `make` in apps/docs/spec to regenerate tsdoc files.
 
             **Details:**
@@ -72,3 +96,23 @@ jobs:
             🤖 Auto-generated from supabase-js-libs stable release.
           branch: 'gha/update-js-libs-docs-${{ github.run_number }}'
           base: 'master'
+
+      - name: Add validation comment to PR
+        if: steps.comment.outputs.comment_generated == 'true' && steps.create-pr.outputs.pull-request-number != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const comment = fs.readFileSync('/tmp/pr-comment.md', 'utf8');
+
+            // Extract just the comment content
+            const match = comment.match(/<!-- validation-comment -->([\s\S]*?)<!-- \/validation-comment -->/);
+            const commentBody = match ? match[1].trim() : comment;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.create-pr.outputs.pull-request-number }},
+              body: commentBody
+            });
